@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Controller\UseControllerTraitController;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -43,26 +43,18 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 {
-    use ControllerTrait {
-        getSerializer as traitGetSerializer;
-    }
-
-    private $token;
-    private $serializer;
-    private $flashBag;
-    private $isGranted;
-    private $twig;
-    private $formFactory;
-
-    protected function getRouter()
+    public function testGenerateUrl()
     {
         $router = $this->getMockBuilder(RouterInterface::class)->getMock();
         $router->expects($this->once())->method('generate')->willReturn('/foo');
 
-        return $router;
+        $controller = new UseControllerTraitController();
+        $controller->setRouter($router);
+
+        $this->assertEquals('/foo', $controller->generateUrl('foo'));
     }
 
-    protected function getRequestStack()
+    public function testForward()
     {
         $request = Request::create('/');
         $request->setLocale('fr');
@@ -71,92 +63,24 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        return $requestStack;
-    }
-
-    protected function getHttpKernel()
-    {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+        $httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $httpKernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
         }));
 
-        return $kernel;
-    }
+        $controller = new UseControllerTraitController();
+        $controller->setRequestStack($requestStack);
+        $controller->setHttpKernel($httpKernel);
 
-    protected function getSerializer()
-    {
-        if ($this->serializer) {
-            return $this->serializer;
-        }
-
-        return $this->traitGetSerializer();
-    }
-
-    protected function getSession()
-    {
-        $session = $this->getMockBuilder(Session::class)->getMock();
-        $session->expects($this->once())->method('getFlashBag')->willReturn($this->flashBag);
-
-        return $session;
-    }
-
-    protected function getAuthorizationChecker()
-    {
-        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
-        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn($this->isGranted);
-
-        return $authorizationChecker;
-    }
-
-    protected function getTwig()
-    {
-        return $this->twig;
-    }
-
-    protected function getDoctrine()
-    {
-        return $this->getMockBuilder(ManagerRegistry::class)->getMock();
-    }
-
-    protected function getFormFactory()
-    {
-        return $this->formFactory;
-    }
-
-    protected function getTokenStorage()
-    {
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($this->token));
-
-        return $tokenStorage;
-    }
-
-    protected function getCsrfTokenManager()
-    {
-        $tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
-        $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
-
-        return $tokenManager;
-    }
-
-    public function testGenerateUrl()
-    {
-        $this->assertEquals('/foo', $this->generateUrl('foo'));
-    }
-
-    public function testForward()
-    {
-        $response = $this->forward('a_controller');
+        $response = $controller->forward('a_controller');
         $this->assertEquals('xml--fr', $response->getContent());
     }
 
     public function testRedirect()
     {
-        $response = $this->redirect('http://example.com', 301);
+        $controller = new UseControllerTraitController();
+
+        $response = $controller->redirect('http://example.com', 301);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame('http://example.com', $response->getTargetUrl());
@@ -165,7 +89,13 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testRedirectToRoute()
     {
-        $response = $this->redirectToRoute('foo');
+        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
+        $router->expects($this->once())->method('generate')->willReturn('/foo');
+
+        $controller = new UseControllerTraitController();
+        $controller->setRouter($router);
+
+        $response = $controller->redirectToRoute('foo');
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame('/foo', $response->getTargetUrl());
@@ -175,56 +105,86 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
     public function testGetUser()
     {
         $user = new User('user', 'pass');
-        $this->token = new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'));
 
-        $this->assertSame($this->getUser(), $user);
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'))));
+
+        $controller = new UseControllerTraitController();
+        $controller->setTokenStorage($tokenStorage);
+
+        $this->assertSame($controller->getUser(), $user);
     }
 
     public function testGetUserAnonymousUserConvertedToNull()
     {
-        $this->token = new AnonymousToken('default', 'anon.');
-        $this->assertNull($this->getUser());
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(new AnonymousToken('default', 'anon.')));
+
+        $controller = new UseControllerTraitController();
+        $controller->setTokenStorage($tokenStorage);
+
+        $this->assertNull($controller->getUser());
     }
 
     public function testGetUserWithEmptyTokenStorage()
     {
-        $this->token = null;
-        $this->assertNull($this->getUser());
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null));
+
+        $controller = new UseControllerTraitController();
+        $controller->setTokenStorage($tokenStorage);
+
+        $this->assertNull($controller->getUser());
     }
 
     public function testJson()
     {
-        $this->serializer = null;
+        $controller = new UseControllerTraitController();
 
-        $response = $this->json(array());
+        $response = $controller->json(array());
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
     }
 
     public function testJsonWithSerializer()
     {
-        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $this->serializer
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer
             ->expects($this->once())
             ->method('serialize')
             ->with(array(), 'json', array('json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS))
             ->will($this->returnValue('[]'));
 
-        $response = $this->json(array());
+        $controller = new UseControllerTraitController();
+        $controller->setSerializer($serializer);
+
+        $response = $controller->json(array());
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
     }
 
     public function testJsonWithSerializerContextOverride()
     {
-        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $this->serializer
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer
             ->expects($this->once())
             ->method('serialize')
             ->with(array(), 'json', array('json_encode_options' => 0, 'other' => 'context'))
             ->will($this->returnValue('[]'));
 
-        $response = $this->json(array(), 200, array(), array('json_encode_options' => 0, 'other' => 'context'));
+        $controller = new UseControllerTraitController();
+        $controller->setSerializer($serializer);
+
+        $response = $controller->json(array(), 200, array(), array('json_encode_options' => 0, 'other' => 'context'));
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
         $response->setEncodingOptions(JSON_FORCE_OBJECT);
@@ -233,17 +193,28 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testAddFlash()
     {
-        $this->flashBag = new FlashBag();
-        $this->addFlash('foo', 'bar');
+        $flashBag = new FlashBag();
 
-        $this->assertSame(array('bar'), $this->flashBag->get('foo'));
+        $session = $this->getMockBuilder(Session::class)->getMock();
+        $session->method('getFlashBag')->willReturn($flashBag);
+
+        $controller = new UseControllerTraitController();
+        $controller->setSession($session);
+
+        $controller->addFlash('foo', 'bar');
+
+        $this->assertSame(array('bar'), $flashBag->get('foo'));
     }
 
     public function testIsGranted()
     {
-        $this->isGranted = true;
+        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(true);
 
-        $this->assertTrue($this->isGranted('foo'));
+        $controller = new UseControllerTraitController();
+        $controller->setAuthorizationChecker($authorizationChecker);
+
+        $this->assertTrue($controller->isGranted('foo'));
     }
 
     /**
@@ -251,71 +222,105 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
      */
     public function testDenyAccessUnlessGranted()
     {
-        $this->isGranted = false;
+        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 
-        $this->denyAccessUnlessGranted('foo');
+        $controller = new UseControllerTraitController();
+        $controller->setAuthorizationChecker($authorizationChecker);
+
+        $controller->denyAccessUnlessGranted('foo');
     }
 
-    public function testRenderViewTwig()
+    public function testRenderView()
     {
-        $this->twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
-        $this->twig->expects($this->once())->method('render')->willReturn('bar');
+        $twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->willReturn('bar');
 
-        $this->assertEquals('bar', $this->renderView('foo'));
+        $controller = new UseControllerTraitController();
+        $controller->setTwig($twig);
+
+        $this->assertEquals('bar', $controller->renderView('foo'));
     }
 
     public function testRenderTwig()
     {
-        $this->twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
-        $this->twig->expects($this->once())->method('render')->willReturn('bar');
+        $twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->willReturn('bar');
 
-        $this->assertEquals('bar', $this->render('foo')->getContent());
+        $controller = new UseControllerTraitController();
+        $controller->setTwig($twig);
+
+        $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
     public function testStreamTwig()
     {
-        $this->twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
 
-        $this->assertInstanceOf(StreamedResponse::class, $this->stream('foo'));
+        $controller = new UseControllerTraitController();
+        $controller->setTwig($twig);
+
+        $this->assertInstanceOf(StreamedResponse::class, $controller->stream('foo'));
     }
 
     public function testCreateNotFoundException()
     {
-        $this->assertInstanceOf(NotFoundHttpException::class, $this->createNotFoundException());
+        $controller = new UseControllerTraitController();
+
+        $this->assertInstanceOf(NotFoundHttpException::class, $controller->createNotFoundException());
     }
 
     public function testCreateAccessDeniedException()
     {
-        $this->assertInstanceOf(AccessDeniedException::class, $this->createAccessDeniedException());
+        $controller = new UseControllerTraitController();
+
+        $this->assertInstanceOf(AccessDeniedException::class, $controller->createAccessDeniedException());
     }
 
     public function testCreateForm()
     {
         $form = $this->getMockBuilder(FormInterface::class)->getMock();
 
-        $this->formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
-        $this->formFactory->expects($this->once())->method('create')->willReturn($form);
+        $formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
+        $formFactory->expects($this->once())->method('create')->willReturn($form);
 
-        $this->assertEquals($form, $this->createForm('foo'));
+        $controller = new UseControllerTraitController();
+        $controller->setFormFactory($formFactory);
+
+        $this->assertEquals($form, $controller->createForm('foo'));
     }
 
     public function testCreateFormBuilder()
     {
         $formBuilder = $this->getMockBuilder(FormBuilderInterface::class)->getMock();
 
-        $this->formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
-        $this->formFactory->expects($this->once())->method('createBuilder')->willReturn($formBuilder);
+        $formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
+        $formFactory->expects($this->once())->method('createBuilder')->willReturn($formBuilder);
 
-        $this->assertEquals($formBuilder, $this->createFormBuilder('foo'));
+        $controller = new UseControllerTraitController();
+        $controller->setFormFactory($formFactory);
+
+        $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
     public function testGetDoctrine()
     {
-        $this->assertInstanceOf(ManagerRegistry::class, $this->getDoctrine());
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+
+        $controller = new UseControllerTraitController();
+        $controller->setDoctrine($doctrine);
+
+        $this->assertSame($doctrine, $controller->getDoctrine());
     }
 
     public function testIsCsrfTokenValid()
     {
-        $this->assertTrue($this->isCsrfTokenValid('foo', 'bar'));
+        $csrfTokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
+        $csrfTokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
+
+        $controller = new UseControllerTraitController();
+        $controller->setCsrfTokenManager($csrfTokenManager);
+
+        $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
     }
 }

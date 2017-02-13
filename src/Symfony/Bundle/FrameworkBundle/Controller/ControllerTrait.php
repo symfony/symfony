@@ -48,7 +48,7 @@ trait ControllerTrait
 {
     protected function getRouter(): RouterInterface
     {
-        throw new \LogicException(sprintf('An instance of "%" must be provided.', RouterInterface::class));
+        throw new \LogicException(sprintf('An instance of "%s" must be provided.', RouterInterface::class));
     }
 
     protected function getRequestStack(): RequestStack

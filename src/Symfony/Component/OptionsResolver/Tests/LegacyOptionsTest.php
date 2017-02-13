@@ -50,7 +50,7 @@ class LegacyOptionsTest extends TestCase
 
         // defined by subclass
         $this->options->overload('foo', function (Options $options, $previousValue) use ($test) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             $test->assertEquals('bar', $previousValue);
 
             return 'dynamic';
@@ -70,7 +70,7 @@ class LegacyOptionsTest extends TestCase
 
         // defined by subclass
         $this->options->overload('foo', function (Options $options, $previousValue) use ($test) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             $test->assertEquals('bar', $previousValue);
 
             return 'dynamic';
@@ -103,7 +103,7 @@ class LegacyOptionsTest extends TestCase
         $this->options->set('foo', 'bar');
 
         $this->options->set('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             $test->assertEquals('bar', $options->get('foo'));
 
             return 'dynamic';
@@ -121,7 +121,7 @@ class LegacyOptionsTest extends TestCase
         });
 
         $this->options->set('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             $test->assertEquals('bar', $options->get('foo'));
 
             return 'dynamic';
@@ -160,7 +160,7 @@ class LegacyOptionsTest extends TestCase
         $this->options->set('bam', 'baz');
 
         $this->options->setNormalizer('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             $test->assertEquals('bar', $options->get('foo'));
 
             return 'normalized';
@@ -179,7 +179,7 @@ class LegacyOptionsTest extends TestCase
         $this->options->set('bam', 'baz');
 
         $this->options->setNormalizer('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             $test->assertEquals('bar', $options->get('foo'));
 
             return 'normalized';

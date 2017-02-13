@@ -1026,7 +1026,7 @@ class OptionsResolver2Dot6Test extends TestCase
         $this->resolver->setDefault('norm', 'baz');
 
         $this->resolver->setNormalizer('norm', function (Options $options) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             Assert::assertSame('bar', $options['default']);
 
             return 'normalized';
@@ -1046,7 +1046,7 @@ class OptionsResolver2Dot6Test extends TestCase
         $this->resolver->setDefault('norm', 'baz');
 
         $this->resolver->setNormalizer('norm', function (Options $options) {
-            /* @var \PHPUnit\Framework\TestCase $test */
+            /* @var TestCase $test */
             Assert::assertEquals('bar', $options['lazy']);
 
             return 'normalized';

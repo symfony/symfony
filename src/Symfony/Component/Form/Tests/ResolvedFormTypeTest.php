@@ -62,7 +62,7 @@ class ResolvedFormTypeTest extends TestCase
 
         $assertIndexAndAddOption = function ($index, $option, $default) use (&$i, $test) {
             return function (OptionsResolver $resolver) use (&$i, $test, $index, $option, $default) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
@@ -161,7 +161,7 @@ class ResolvedFormTypeTest extends TestCase
 
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
@@ -229,7 +229,7 @@ class ResolvedFormTypeTest extends TestCase
 
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
@@ -273,7 +273,7 @@ class ResolvedFormTypeTest extends TestCase
 
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;

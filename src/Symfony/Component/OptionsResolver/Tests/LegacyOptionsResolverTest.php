@@ -123,7 +123,7 @@ class LegacyOptionsResolverTest extends TestCase
 
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->assertFalse(isset($options['one']));
 
                 return '2';
@@ -147,7 +147,7 @@ class LegacyOptionsResolverTest extends TestCase
 
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->assertTrue(isset($options['one']));
 
                 return $options['one'].'2';
@@ -191,7 +191,7 @@ class LegacyOptionsResolverTest extends TestCase
 
         $this->resolver->setDefaults(array(
             'one' => function (Options $options) use ($test) {
-                /* @var \PHPUnit\Framework\TestCase $test */
+                /* @var TestCase $test */
                 $test->fail('Previous closure should not be executed');
             },
         ));

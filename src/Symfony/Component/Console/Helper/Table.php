@@ -394,6 +394,9 @@ class Table
                 foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
                     $value = isset($lines[$unmergedRowKey - $line]) ? $lines[$unmergedRowKey - $line] : '';
                     $unmergedRows[$unmergedRowKey][$column] = new TableCell($value, array('colspan' => $cell->getColspan()));
+                    if ($nbLines === $unmergedRowKey - $line) {
+                        break;
+                    }
                 }
             }
         }

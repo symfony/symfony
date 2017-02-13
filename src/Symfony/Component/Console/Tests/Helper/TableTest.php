@@ -298,10 +298,10 @@ TABLE
                 array(
                     array(
                         new TableCell('9971-5-0210-0', array('rowspan' => 3)),
-                        'Divine Comedy',
+                        new TableCell('Divine Comedy', array('rowspan' => 2)),
                         'Dante Alighieri',
                     ),
-                    array('A Tale of Two Cities', 'Charles Dickens'),
+                    array(),
                     array("The Lord of \nthe Rings", "J. R. \nR. Tolkien"),
                     new TableSeparator(),
                     array('80-902734-1-6', new TableCell("And Then \nThere \nWere None", array('rowspan' => 3)), 'Agatha Christie'),
@@ -309,18 +309,18 @@ TABLE
                 ),
                 'default',
 <<<'TABLE'
-+---------------+----------------------+-----------------+
-| ISBN          | Title                | Author          |
-+---------------+----------------------+-----------------+
-| 9971-5-0210-0 | Divine Comedy        | Dante Alighieri |
-|               | A Tale of Two Cities | Charles Dickens |
-|               | The Lord of          | J. R.           |
-|               | the Rings            | R. Tolkien      |
-+---------------+----------------------+-----------------+
-| 80-902734-1-6 | And Then             | Agatha Christie |
-| 80-902734-1-7 | There                | Test            |
-|               | Were None            |                 |
-+---------------+----------------------+-----------------+
++---------------+---------------+-----------------+
+| ISBN          | Title         | Author          |
++---------------+---------------+-----------------+
+| 9971-5-0210-0 | Divine Comedy | Dante Alighieri |
+|               |               |                 |
+|               | The Lord of   | J. R.           |
+|               | the Rings     | R. Tolkien      |
++---------------+---------------+-----------------+
+| 80-902734-1-6 | And Then      | Agatha Christie |
+| 80-902734-1-7 | There         | Test            |
+|               | Were None     |                 |
++---------------+---------------+-----------------+
 
 TABLE
             ),

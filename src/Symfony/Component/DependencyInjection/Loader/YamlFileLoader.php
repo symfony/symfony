@@ -255,6 +255,22 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
+     * @param array $service
+     *
+     * @return bool
+     */
+    private function isUsingShortSyntax(array $service)
+    {
+        foreach ($service as $key => $value) {
+            if (is_string($key) && ('' === $key || '$' !== $key[0])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Parses a definition.
      *
      * @param string       $id
@@ -273,7 +289,7 @@ class YamlFileLoader extends FileLoader
             return;
         }
 
-        if (is_array($service) && array_values($service) === $service) {
+        if (is_array($service) && $this->isUsingShortSyntax($service)) {
             $service = array('arguments' => $service);
         }
 

@@ -26,6 +26,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -450,6 +451,22 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services31.yml');
 
         $this->assertEquals(array('getbar' => array('bar' => new Reference('bar'))), $container->getDefinition('foo')->getOverriddenGetters());
+    }
+
+    public function testNamedArguments()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_named_args.yml');
+
+        $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition('another_one')->getArguments());
+
+        $container->compile();
+
+        $this->assertEquals(array(null, 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        $this->assertEquals(array(null, 'ABCD'), $container->getDefinition('another_one')->getArguments());
+        $this->assertEquals(array(array('setApiKey', array('123'))), $container->getDefinition('another_one')->getMethodCalls());
     }
 
     /**

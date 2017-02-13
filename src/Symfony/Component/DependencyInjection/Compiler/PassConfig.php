@@ -53,12 +53,14 @@ class PassConfig
             new ResolveFactoryClassPass(),
             new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
+            new ResolveNamedArgumentsPass(),
             new AutowirePass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
+            new CheckArgumentsValidityPass(),
         ));
 
         $this->removingPasses = array(array(

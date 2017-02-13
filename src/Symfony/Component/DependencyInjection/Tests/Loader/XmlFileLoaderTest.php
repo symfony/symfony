@@ -25,6 +25,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -703,5 +704,19 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults')->getAutowiredCalls());
         $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults_child')->getAutowiredCalls());
         $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getAutowiredCalls());
+    }
+
+    public function testNamedArguments()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_named_args.xml');
+
+        $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+
+        $container->compile();
+
+        $this->assertEquals(array(null, 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        $this->assertEquals(array(array('setApiKey', array('123'))), $container->getDefinition(NamedArgumentsDummy::class)->getMethodCalls());
     }
 }

@@ -10,14 +10,14 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
+ * Symfony_DI_PhpDumper_Test_Locator_Argument_Provide_Service_Locator.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_Locator_Argument_Provide_Service_Locator extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -29,8 +29,8 @@ class ProjectServiceContainer extends Container
     {
         $this->services = array();
         $this->methodMap = array(
-            'service_from_anonymous_factory' => 'getServiceFromAnonymousFactoryService',
-            'service_with_method_call_and_factory' => 'getServiceWithMethodCallAndFactoryService',
+            'lazy_context' => 'getLazyContextService',
+            'lazy_referenced' => 'getLazyReferencedService',
         );
 
         $this->aliases = array();
@@ -53,32 +53,32 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'service_from_anonymous_factory' service.
+     * Gets the 'lazy_context' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \LazyContext A LazyContext instance
      */
-    protected function getServiceFromAnonymousFactoryService()
+    protected function getLazyContextService()
     {
-        return $this->services['service_from_anonymous_factory'] = (new \Bar\FooClass())->getInstance();
+        return $this->services['lazy_context'] = new \LazyContext(new ServiceLocator(array(
+            'lazy1' => function () { return ${($_ = isset($this->services['lazy_referenced']) ? $this->services['lazy_referenced'] : $this->get('lazy_referenced')) && false ?: '_'}; },
+            'lazy2' => function () { return ${($_ = isset($this->services['lazy_referenced']) ? $this->services['lazy_referenced'] : $this->get('lazy_referenced')) && false ?: '_'}; },
+            'container' => function () { return $this; },
+        )));
     }
 
     /**
-     * Gets the 'service_with_method_call_and_factory' service.
+     * Gets the 'lazy_referenced' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \stdClass A stdClass instance
      */
-    protected function getServiceWithMethodCallAndFactoryService()
+    protected function getLazyReferencedService()
     {
-        $this->services['service_with_method_call_and_factory'] = $instance = new \Bar\FooClass();
-
-        $instance->setBar(\Bar\FooClass::getInstance());
-
-        return $instance;
+        return $this->services['lazy_referenced'] = new \stdClass();
     }
 }

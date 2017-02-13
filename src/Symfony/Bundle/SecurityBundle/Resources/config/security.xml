@@ -105,8 +105,8 @@
         </service>
 
         <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
-            <argument type="service" id="service_container" />
-            <argument />
+            <argument /> <!-- Firewall context locator -->
+            <argument /> <!-- Request matchers -->
         </service>
 
         <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">

@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This is a lazy-loading firewall map implementation.
@@ -116,9 +116,6 @@ class _FirewallMap
         $this->contexts = new \SplObjectStorage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getListeners(Request $request)
     {
         $context = $this->getFirewallContext($request);

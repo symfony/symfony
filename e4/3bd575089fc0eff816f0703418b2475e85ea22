@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-05-22T08:31:27Z
+
+Your example in the description is wrong, the context should be a nested array `['attributes' => ['a', 'c']]`.
+Otherwise, this looks great!
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-05-22T08:31:57Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-22T09:21:51Z
+
+Good catch @Ener-Getick, thanks!
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-05-22T10:10:20Z
+
+Is there a support for nested attributes as well? Example:
+
+``` php
+class Foo {
+  public $bar;
+
+  public function __construct(Bar $bar) {
+    $this->bar = $bar;
+  }
+}
+
+class Bar {
+  public $a = 1;
+  public $b = 2;
+}
+
+$normalizer = new \Symfony\Component\Serializer\Normalizer\ObjectNormalizer();
+$normalizer->normalize(new Foo(new Bar()), null, ['attributes' => ['bar.a']]);
+// => ['bar.a' => 1]
+```
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-06-07T11:40:25Z
+
+@theofidry no this isn't possible.
+
+@dunglas maybe an associative array could be used to allow nested attributes safely ?
+
+``` php
+[
+    'attributes' => [
+        'a' => [
+            'b' => [], 'c' => [ 'd' ]
+        ],
+        'e' => []
+    ]
+]
+```
+
+BTW there are no bc breaks/deprecations in this PR, so this can be removed from the pr header.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T20:11:56Z
+
+Sounds like a good new feature. @dunglas Can you finish it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T22:25:18Z
+
+Any news?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-14T23:22:43Z
+
+Yes I've an idea of how to manage related entities. I'll finish this one ASAP.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-12-20T03:52:35Z
+
+I think it's crucial to have nested attributes support, and in a nice syntax. Perhaps using PropertyAccess path...
+
+The semantics could be something like this: If one attribute is specified for a certain object / item, then all attributes on the same object / item need to be specified (otherwise they will be omitted). Similar to how Prophecy mocks work.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T23:24:14Z
+
+Making use of the PropertyAccess component for this feature sounds like a good idea to me.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-03T19:38:46Z
+
+I eventually added support for nested attributes (it works for normalization and denormalization).
+
+Usage:
+
+```php
+class Foo
+{
+    public $a = '1';
+    public $b = '2';
+    public $c = '3';
+    public $bar = new Bar();
+}
+
+class Bar
+{
+    public $x = 'x';
+    public $y = 'y';
+    public $z = 'z';
+}
+
+$serializer = new \Symfony\Component\Serializer(
+    [new \Symfony\Component\Serializer\Normalizer\ObjectNormalizer()]
+);
+$serializer->normalize(new Foo(), null, ['attributes' => ['a', 'c', 'bar' => ['y']]]);
+// ['a' => '1', 'c' => '3', 'bar' => ['y' => 'y']
+```
+
+This PR is ready now. ping @symfony/deciders

@@ -2076,7 +2076,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             'trusted without via' => array('HTTP/2.0', true, '', 'HTTP/2.0'),
             'trusted with via' => array('HTTP/2.0', true, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'),
             'trusted with via and protocol name' => array('HTTP/2.0', true, 'HTTP/1.0 fred, HTTP/1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'),
-            'trusted with broken via' => array('HTTP/2.0', true, 'foo', 'HTTP/2.0'),
+            'trusted with broken via' => array('HTTP/2.0', true, 'HTTP/1^0 foo', 'HTTP/2.0'),
             'trusted with partially-broken via' => array('HTTP/2.0', true, '1.0 fred, foo', 'HTTP/1.0'),
         );
     }

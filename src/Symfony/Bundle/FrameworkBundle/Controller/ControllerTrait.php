@@ -34,14 +34,15 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 /**
  * Common features needed in controllers.
  *
- * Supports both autowiring trough setters and accessing services using a container.
+ * The recommended way of injecting dependencies is trough getter injection.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @experimental in version 3.3
  */
 trait ControllerTrait
 {
@@ -79,11 +80,6 @@ trait ControllerTrait
     protected function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', AuthorizationCheckerInterface::class));
-    }
-
-    protected function getTemplating(): EngineInterface
-    {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', EngineInterface::class));
     }
 
     protected function getTwig(): \Twig_Environment
@@ -271,11 +267,7 @@ trait ControllerTrait
      */
     protected function renderView(string $view, array $parameters = array()): string
     {
-        try {
-            return $this->getTemplating()->render($view, $parameters);
-        } catch (\LogicException $e) {
-            return $this->getTwig()->render($view, $parameters);
-        }
+        return $this->getTwig()->render($view, $parameters);
     }
 
     /**
@@ -289,15 +281,11 @@ trait ControllerTrait
      */
     protected function render(string $view, array $parameters = array(), Response $response = null): Response
     {
-        try {
-            return $this->getTemplating()->renderResponse($view, $parameters, $response);
-        } catch (\LogicException $e) {
-            if (null === $response) {
-                $response = new Response();
-            }
-
-            return $response->setContent($this->getTwig()->render($view, $parameters));
+        if (null === $response) {
+            $response = new Response();
         }
+
+        return $response->setContent($this->getTwig()->render($view, $parameters));
     }
 
     /**
@@ -311,19 +299,11 @@ trait ControllerTrait
      */
     protected function stream(string $view, array $parameters = array(), StreamedResponse $response = null): StreamedResponse
     {
-        try {
-            $templating = $this->getTemplating();
+        $twig = $this->getTwig();
 
-            $callback = function () use ($templating, $view, $parameters) {
-                $templating->stream($view, $parameters);
-            };
-        } catch (\LogicException $e) {
-            $twig = $this->getTwig();
-
-            $callback = function () use ($twig, $view, $parameters) {
-                $twig->display($view, $parameters);
-            };
-        }
+        $callback = function () use ($twig, $view, $parameters) {
+            $twig->display($view, $parameters);
+        };
 
         if (null === $response) {
             return new StreamedResponse($callback);

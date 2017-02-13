@@ -35,29 +35,28 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @requires PHP 7
  */
 class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 {
     use ControllerTrait {
         getSerializer as traitGetSerializer;
-        getTemplating as traitGetTemplating;
     }
 
     private $token;
     private $serializer;
     private $flashBag;
     private $isGranted;
-    private $templating;
     private $twig;
     private $formFactory;
 
     protected function getRouter()
     {
-        $router = $this->getMock(RouterInterface::class);
+        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
         $router->expects($this->once())->method('generate')->willReturn('/foo');
 
         return $router;
@@ -77,7 +76,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function getHttpKernel()
     {
-        $kernel = $this->getMock(HttpKernelInterface::class);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
         }));
@@ -96,7 +95,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function getSession()
     {
-        $session = $this->getMock(Session::class);
+        $session = $this->getMockBuilder(Session::class)->getMock();
         $session->expects($this->once())->method('getFlashBag')->willReturn($this->flashBag);
 
         return $session;
@@ -104,19 +103,10 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function getAuthorizationChecker()
     {
-        $authorizationChecker = $this->getMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn($this->isGranted);
 
         return $authorizationChecker;
-    }
-
-    protected function getTemplating()
-    {
-        if ($this->templating) {
-            return $this->templating;
-        }
-
-        return $this->traitGetTemplating();
     }
 
     protected function getTwig()
@@ -126,7 +116,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function getDoctrine()
     {
-        return $this->getMock(ManagerRegistry::class);
+        return $this->getMockBuilder(ManagerRegistry::class)->getMock();
     }
 
     protected function getFormFactory()
@@ -136,7 +126,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function getTokenStorage()
     {
-        $tokenStorage = $this->getMock(TokenStorageInterface::class);
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
@@ -147,7 +137,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     protected function getCsrfTokenManager()
     {
-        $tokenManager = $this->getMock(CsrfTokenManagerInterface::class);
+        $tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
         $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
 
         return $tokenManager;
@@ -213,7 +203,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testJsonWithSerializer()
     {
-        $this->serializer = $this->getMock(SerializerInterface::class);
+        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->serializer
             ->expects($this->once())
             ->method('serialize')
@@ -227,7 +217,7 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testJsonWithSerializerContextOverride()
     {
-        $this->serializer = $this->getMock(SerializerInterface::class);
+        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->serializer
             ->expects($this->once())
             ->method('serialize')
@@ -244,7 +234,6 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
     public function testAddFlash()
     {
         $this->flashBag = new FlashBag();
-
         $this->addFlash('foo', 'bar');
 
         $this->assertSame(array('bar'), $this->flashBag->get('foo'));
@@ -267,50 +256,24 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
         $this->denyAccessUnlessGranted('foo');
     }
 
-    public function testRenderViewTemplating()
-    {
-        $this->templating = $this->getMock(EngineInterface::class);
-        $this->templating->expects($this->once())->method('render')->willReturn('bar');
-
-        $this->assertEquals('bar', $this->renderView('foo'));
-    }
-
     public function testRenderViewTwig()
     {
-        $this->templating = false;
         $this->twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
         $this->twig->expects($this->once())->method('render')->willReturn('bar');
 
         $this->assertEquals('bar', $this->renderView('foo'));
-    }
-
-    public function testRenderTemplating()
-    {
-        $this->templating = $this->getMock(EngineInterface::class);
-        $this->templating->expects($this->once())->method('renderResponse')->willReturn(new Response('bar'));
-
-        $this->assertEquals('bar', $this->render('foo')->getContent());
     }
 
     public function testRenderTwig()
     {
-        $this->templating = false;
         $this->twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
         $this->twig->expects($this->once())->method('render')->willReturn('bar');
 
         $this->assertEquals('bar', $this->render('foo')->getContent());
     }
 
-    public function testStreamTemplating()
-    {
-        $this->templating = $this->getMock(EngineInterface::class);
-
-        $this->assertInstanceOf(StreamedResponse::class, $this->stream('foo'));
-    }
-
     public function testStreamTwig()
     {
-        $this->templating = false;
         $this->twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
 
         $this->assertInstanceOf(StreamedResponse::class, $this->stream('foo'));
@@ -328,9 +291,9 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateForm()
     {
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
 
-        $this->formFactory = $this->getMock(FormFactoryInterface::class);
+        $this->formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
         $this->formFactory->expects($this->once())->method('create')->willReturn($form);
 
         $this->assertEquals($form, $this->createForm('foo'));
@@ -338,9 +301,9 @@ class ControllerTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFormBuilder()
     {
-        $formBuilder = $this->getMock(FormBuilderInterface::class);
+        $formBuilder = $this->getMockBuilder(FormBuilderInterface::class)->getMock();
 
-        $this->formFactory = $this->getMock(FormFactoryInterface::class);
+        $this->formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
         $this->formFactory->expects($this->once())->method('createBuilder')->willReturn($formBuilder);
 
         $this->assertEquals($formBuilder, $this->createFormBuilder('foo'));

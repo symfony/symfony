@@ -1,0 +1,378 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-07-16T23:07:00Z
+
+I always wondered why it was not already the case and assumed it was by design.
+
+However, IIRC, the Serializer previously used — in older versions of the component — a hash of the `supports*` methods arguments, in order to cache the normalizer/denormalizer instance to use for those arguments.
+Now, should we consider the fact someone may have mimic this behavior in it's own serializer, and that the cache would be compromised by not taking care of the `context` (which can also create issue in order to be serialized, but that's another topic) ? It may also prevent this to be considered as a bug fix and backported as is in previous branches.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-17T09:50:54Z
+
+@ogizanagi It's not a problem because we don't use the context in `supports*` methods of built-in normalizers. It can be broken only if someone use the context and has its own cache mechanism... But it's his responsibility.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-17T13:41:58Z
+
+@dunglas I would be 👎 for this one. It is a limitation for sure, but having the context in the supports makes the lookup for the (de)normalizer much more dynamic, thus extremely hard to cache. Now let's say you have a set of data that you want to denormalize in a `UserInterface` object, and provide a different concrete class depending of the context, you can always have a `UserDenormalizer` supporting `UserInterface`, have a denormalizer for each case, and manually pick the right denormalizer in `UserDenormalizer`. If there's too many custom denormalizers, it might be worth to abstract it a bit to make it more easy, but IMO it's not a very common use case.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-07-17T15:00:13Z
+
+I agree with @dunglas this is not part of the symfony promises imo.
+
+@theofidry if you change the context the serializer output will very likely change too so i don't get what's the problem. Moreover the context shouldn't change that much.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-17T17:22:42Z
+
+> Moreover the context shouldn't change that much.
+
+The context is very likely to change a lot, it already changes natively to handle proxies or cache keys. In ApiPlatform for example, we also have a lot of keys passing through the context (`type`, `normalization_context`, `denormalization_context`, `resource_class` etc.)
+
+> If you change the context the serializer output will very likely change too so i don't get what's the problem.
+
+Yeah the output may change, but so does the context. It makes much harder to predict the result for a given context and now you have to handle the context, which is dynamic and accessible to all normalizers (hence very likely to change) for caching. The context was initially for giving additional info on _how_ to (de)normalize a set of data. Adding it to the `supports*` is making use of it for _which_ (de)normalizer can use handle it. It's not innocent, and IMO brings more trouble than it's worth.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-07-17T22:43:17Z
+
+@theofidry if i'm not wrong the things such as proxy classes, cache keys, etc. are generated only when the cache is cleared ? If this is true then the context should remain the same.
+I'll investigate more later thanks for your explanation ☺
+
+Anyway imo as the context describes how to (de)serialize an object it should be possible to not execute a normalizer in case it doesn't support some part of the context.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-07-18T12:51:18Z
+
+Maybe adding a new field `dynamic_fields` to the context would solve your issue @theofidry ?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-18T20:37:53Z
+
+@Ener-Getick could mitigate it, but looks horribly brittle to me. I just feel like this feature is about trying to extend the usage of context for something it is not meant. I'm not the one who gets to decide, but IMO it will only add complexity to something that is already very complex and make it messier.
+
+@dunglas is there any use case in which you want to use this feature?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-07-18T20:59:01Z
+
+@theofidry I just looked the code @ogizanagi mentioned and it is no longer in the code (the normalizer to use is always determined) so there are absolutely no problem.
+It's last occurrence is in `2.6` which is no longer maintained and is not compatible with symfony 3.
+
+So there won't ever be any issues about caching here (except if someone doesn't update to the latest patches but this is not our problem...).
+
+I'm in favor of merging that as a feature (as people were limited but didn't have a weird behaviour).
+
+And I see several use cases. One of them is if you use normalization groups with custom normalizers, you may want to have one normalizer per group.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-18T21:23:33Z
+
+@Ener-Getick I fail to see how have a dynamic array that can change from one call to another is not going to have an impact on caching. It may not have one in the Symfony code base right now but it will definitely have some in userland (I am not talking of BC, but of usability).
+
+> There are many use cases. For example if you use normalization groups with custom normalizers, you may want to have one normalizer per group.
+
+To that I would said my argument still stands:
+
+> Now let's say you have a set of data that you want to denormalize in a UserInterface object, and provide a different concrete class depending of the context, you can always have a UserDenormalizer supporting UserInterface, have a denormalizer for each case, and manually pick the right denormalizer in UserDenormalizer. If there's too many custom denormalizers, it might be worth to abstract it a bit to make it more easy, but IMO it's not a very common use case.
+
+So it's not that I don't see the use case (and believe me, I'm the first one _abusing_ of it), but I don't believe it belongs to the core.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-07-18T21:42:42Z
+
+@theofidry nothing is cached anymore about which normalizer to use so we can't have a problem about that ^^
+
+Your argument doesn't work in case you have to deal with third party normalizers.
+And IMO this change is also good for DX as it would make all signature consistent and should be merged at least for that.
+
+Anyway it would be easier to have other people reviews :)
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-18T22:18:54Z
+
+> nothing is cached anymore about which normalizer to use so we can't have a problem about that ^^
+
+Nevermind misread your comment. Indeed if there is no caching there anymore should be alright.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-07-27T11:07:25Z
+
+Maybe there _should_ be caching? For a system with many Normalizers there is likely to be some gain from do so - You can imagine a Serializer that uses code generation to make this really fast.
+
+Thinking if the use cases for this outweigh not being able (or so able) to create a cache in the future.
+
+It seems like if the action of a Normalizer needs to change based on the content, it could always delegate in the actual normalize/denormalize methods.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-27T11:25:55Z
+
+@mcfedr caching at this level has been removed because proved to be more likely to cause bugs than anything else. The Serializer lookup is usually quite fast unless you really do weird things in your `supports*()`, if you want something faster still, the best thing is to cache the whole result.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-16T09:30:04Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-21T13:46:02Z
+
+It would be great to have this feature for 3.2 :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T14:02:16Z
+
+Changing the interfaces needs a smooth upgrade path. In this case, we have no choice but create new interfaces that extend the current ones, while deprecating them.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-21T14:08:43Z
+
+@nicolas-grekas It will be very difficult to find a better name than the current one. Maybe can we let interfaces as-is in 4.0+ (with the comment)? Updating every single implementation of these interfaces to use the new ones will also be a very tedious work. But I agree, breaking existing code is a worse solution and we will not do it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T14:23:12Z
+
+`ContextAware*Interface`?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-21T14:58:53Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-09-21T15:21:39Z
+
+@nicolas-grekas can't we instead trigger a deprecation when the last argument is not implemented? I don't like having new interfaces.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T15:25:35Z
+
+How would you do that? An interface cannot trigger any deprecation. Who would trigger it?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-09-21T15:29:57Z
+
+In the serializer, it should cover most cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T15:39:55Z
+
+@Ener-Getick could be tried :)
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-09-21T17:23:51Z
+
+@dunglas do you see what i'd like to do or do you need help? :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-21T17:57:18Z
+
+@Ener-Getick : I fail to see how you expect to do it from the `Serializer`, considering the fact that, in the [old version of this PR](https://github.com/symfony/symfony/pull/19371/commits/8871fd7e94ab1cc167b55ca92f14a21e464fa38a), normalizers using it won't be able to have the `$context` argument in the signature, [but will still use something like `$context = 3 === func_num_args() ? func_get_arg(2) : [];` in order to acces it](https://github.com/symfony/symfony/pull/19371/commits/8871fd7e94ab1cc167b55ca92f14a21e464fa38a#diff-7a9e62dfccb4f89883ddfb1ad2dd8896R76). 😕
+
+Regarding new interfaces, when will the new `ContextAware*Interface` interfaces be deprecated and the support switch in order to make the original interfaces support the `$context` natively ?
+
+Can't we create the new interfaces at the root of the component (`Symfony/Serializer` namespace instead of `Symfony/Serializer/Normalizer` for instance) with the same name as before, and deprecate old ones instead ?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-09-21T19:05:22Z
+
+@ogizanagi i was thinking only triggering deprecations for third party libraries and updating the symfony's api in 4.0.
+And i don't like much having new interfaces as it forces people to upgrade to a new interface AND update their api instead of only updating their api.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-22T06:24:05Z
+
+> @nicolas-grekas can't we instead trigger a deprecation when the last argument is not implemented? I don't like having new interfaces.
+
+I doesn't feel confortable with this. From my experience, implementations of the `NormalizerInterface` are often used alone (without building an instance of the `Serializer` class). If we trigger a deprecation from the `Serializer` class, we will have no upgrade path for this case.
+
+On the other hand, @nicolas-grekas's proposal is nice because it doesn't imply do deprecate anything. The new `ContextAware*Interface` interfaces can be implemented only by normalizers and encoders needing to have the context in their support method. Existing normalizers/encoders can be left untouched.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-22T06:51:22Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-09-22T15:38:36Z
+
+@dunglas that sounds weird to me to have an interface only for a new argument.
+Maybe we could hook into the autoloading and detect classes that are not updated. That one looks a bit hacky but we could use it for many bc issues (and we could eventually find a solution to disable it in production to improve perf).
+
+But are this interfaces used that often without the sf serializer ?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-09-23T16:24:05Z
+
+We could create a new util class that would be very useful for many bc layers concerning interfaces:
+
+``` php
+final class DeprecationDetectorAutoloader
+{
+    private static $registered = false;
+    private static $enabled = true;
+    private static $deprecators = array();
+
+    /**
+     * Has to be used before any {@see self::addDeprecationDetector()} and {@see self::register()} call.
+     */
+    public static function disable()
+    {
+        self::$enabled = false;
+    }
+
+    public static function register()
+    {
+        if (!self::$enabled || self::$registered) {
+            return;
+        }
+
+        // Extend the autoloading functions
+        $autoloadFunctions = spl_autoload_functions();
+        if (false === $autoloadFunctions) {
+            return;
+        }
+
+        // Unregister existing autoloaders as we extend them
+        foreach ($autoloadFunctions as $function) {
+            spl_autoload_unregister($function);
+        }
+
+        spl_autoload_register(function ($class) use ($autoloadFunctions) {
+            // load the class
+            foreach ($autoloadFunctions as $function) {
+                $function($class);
+                if (class_exists($class)) {
+                    break;
+                }
+            }
+
+            self::triggerDeprecations($class);
+        });
+        self::$registered = true;
+    }
+
+    public static function triggerDeprecations($class)
+    {
+        foreach(self::$deprecators as $deprecator) {
+            $deprecator($class);
+        }
+    }
+
+    public static function addDeprecator(callable $deprecator)
+    {
+        if (!self::$enabled) {
+            return;
+        }
+
+        // trigger deprecations for classes already loaded
+        foreach (get_declared_classes() as $class) {
+            $deprecator($class);
+        }
+        self::$deprecators[] = $deprecators;
+    }
+}
+```
+
+It would be used like that:
+
+``` php
+// your interface file
+DeprecationDetectorAutoloader::register();
+DeprecationDetectorAutoloader::addDeprecator(function($class) {
+    if (is_a($class, 'MyInterface') {
+        @trigger_error('MyInterface is deprecated', E_USER_DEPRECATED);
+    }
+}
+```
+
+We should disable it when used in prod to have better perf but it won't be registered unless the concerned interfaces are loaded anyway.
+WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-24T17:54:48Z
+
+What is left to do with this one ? Is it still achievable for 3.2 and do you need any help to finish this PR @dunglas ?
+
+AFAIU, we need to:
+- make the `ChainDecoder` only implements `ContextAwareDecoderInterface`, uncomment the `/*, array $context = array()*/` argument and remove `func_num_args` hacks.
+- make the `ChainEncoder` only implements `ContextAwareEncoderInterface`, uncomment the `/*, array $context = array()*/` argument and remove `func_num_args` hacks.
+
+considering its quite uncommon to extend chain encoders/decoders.
+
+And we're good ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-25T10:49:24Z
+
+I've uncommented all the commented code. It should be ok now to merge this PR.
+
+However I'm unsure if it's ok or not to uncomment new arguments in the `Serializer` class. People may have extended its `supports*` methods. IMO it's not common but it can be considered as a (small) BC break.
+
+WDYT? /cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-25T18:21:20Z
+
+@dunglas That is indeed a BC break and our BC promise forbids such a change (see http://symfony.com/doc/current/contributing/code/bc.html#changing-classes):
+
+> | **Type of Change** | **Change Allowed** |
+> | --- | --- |
+> | **Public Methods** |  |
+> | Add argument with a default value | No |
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-26T05:43:49Z
+
+@xabbuh yes I know but see this thread for the why: https://github.com/symfony/symfony/pull/19371#discussion_r80930575
+
+We have 3 solutions if we want to merge give access to the context in `supports*` methods:
+- Merge this PR without the last commit: https://github.com/symfony/symfony/pull/19371/commits/1cceb990dedb780c0be544cbaae0a4706d3d75c9 it doesn't introduce a BC break but has a bad upgrade path
+- Merge this PR as is (including the last commit): it introduces a theoretical BC break but provide a smooth upgrade path (a line in the CHANGELOG should be enough for people having this BC to upgrade easily)
+- Keep the hack only for the `Serializer` class (and not for chain classes) to prevent the most likely BC but have a smooth upgrade path for other classes
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-28T19:18:07Z
+
+I've used the same strategy than in https://github.com/symfony/symfony/blob/5bd3a000d830e685791276f7f2975e8c649586b5/src/Symfony/Component/DependencyInjection/Compiler/Compiler.php#L75-L86
+
+It should be ready now.
+
+Status: Needs review

@@ -1,0 +1,295 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-14T13:52:07Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-01-14T15:03:46Z
+
+Does this also support Symfony specific conventions like parameters and the `@Bundle` notation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-14T16:46:45Z
+
+@sstok should be yes.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-01-14T17:22:29Z
+
+I voted 😕, so let's explain some of my thoughts about this feature:
+
+ * To start of: Symfony 3.3 is working at the very edge between the "magic convention-based Laravel" and "explicit and clear Symfony". All added features are both exciting and very scary because of their magic. Yet, I consider all currently merged features to still be explicit enough to overrule the "magic".
+ * This PR however is removing quite a lot of explicitness. Previously, whenever someone asks on IRC how to find out which services they can use or how servcies are defined, I suggest them to take a look at the `Resources/config` directory of a bundle. All service definitions could be found somewhere in there. Just a Ctrl + F for the service ID or classname would give you all information you need.
+   With this PR however, all this information will be removed from the service configuration. Symfony will derive this information itself based on some magic globs.
+ * From my experience, class discovery in projects is one of the most magic things in live. It's mostly based on conventions and often isn't easy to understand. Also, these conventions are prone to change, which can lead to problems with Symfony versions (see what happend with PHPspec when PSR-4 became a thing).
+ * I think the current configuration isn't clear. Defining the psr-4 glob as service ID confused me a lot when looking at this PR. I would rather expect the PSR-4 glob to be define by `psr4` and have a special `resource` or the like option to define the directory. Like:
+
+   ```yaml
+   services:
+       app.controllers:
+           psr4: AppBundle\Controller\
+           resource: '@AppBundle/Controller/`
+   ```
+
+   That said, I think it would make more sense to support this in a new loader:
+
+   ```yaml
+   imports:
+       - { resource: ../src/Controller, psr4_prefix: AppBundle\Controller\ }
+   ```
+
+   This seems more clear to me than including this in the service definition configuration.
+ * I don't see much use-cases for this kind of 'include every class as service' thing. Yet, it does make some sense for e.g. automatic twig extension registration.
+ * I'm worrying that this feature will lead to structuring your code based on container import conventions. For instance, I expect lots of people to start introducing `Service` namespaces in their bundles to register all classes in this namespace as services. That would be a very bad practice imo.
+ * I'm not sure about excluding `Test`, I don't know why we should introduce such convention. Nobody should ever define a complete bundle using this method and it makes sense to sometimes include some test helper classes (which are often found in the `Test` sub-namespace).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-14T17:48:31Z
+
+> Symfony 3.3 is working at the very edge between the "magic convention-based Laravel"
+
+and we have to account for the success of Laravel because of its DXness.
+But I don't agree with the word "magic".
+Magic means "I didn't ask for and it works".
+Black (bad) magic means "some global context leaks in to provide this thing".
+
+Here, it's plain explicit - and plain *local*.
+You *ask* for something by writting this snippet. You get it.
+
+> Symfony will derive this information itself based on some ~~magic~~ globs.
+
+*You* asked for it. No convention here.
+
+> services:
+>        app.controllers:
+>            psr4: AppBundle\Controller\
+>            resource: '@AppBundle/Controller/`
+
+that does not work, because what matters is to be able to express a pattern that can be expanded to generate **service ids**.
+
+> imports:
+>        - { resource: ../src/Controller, psr4_prefix: AppBundle\Controller\ }
+
+same here.
+
+> I don't see much use-cases for this kind
+
+Ask [DunglasActionBundle](https://github.com/dunglas/DunglasActionBundle/) supporters (221 stars, not bad).
+
+> I'm not sure about excluding Test, I don't know why we should introduce such convention. Nobody should ever define a complete bundle using this method
+
+I *think* it's a good **default** - but if I can't convince the majority, I'll remove it (but I still think that a good default and that *not* excluding it will prove soon to lead to more problems than WTFs :) )
+
+> and it makes sense to sometimes include some test helper classes (which are often found in the Test sub-namespace).
+
+Sure it does! It's really easy to opt-in "Test" classes.
+
+Last word on your other comments about your feelings:
+
+I do understand them.
+I felt the same when autowiring was introduced.
+Now?
+I love it.
+:)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-01-14T18:11:25Z
+
+@nicolas-grekas please note that I'm 😕 and not 👎. I'm just not sure whether I like this or not, but I just wanted to share my current thoughts.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-01-15T14:55:36Z
+
+@wouterj a few thoughts:
+
+> This PR however is removing quite a lot of explicitness. Previously, whenever someone asks on IRC how to find out which services they can use or how servcies are defined, I suggest them to take a look at the Resources/config directory of a bundle
+
+That's not true: a service can easily be added via a Compiler pass, and a few classes a service locators which are not declared as services, e.g. Controllers and (console) Commands.
+
+The reason why DunglasApiBundle is popular, is that it allows you to remove those service locators (Controllers & Commands) and make use of dependency injection, without introducing the pain of having to declare them as services (although you do add the necessity to ensure your autowiring bindings are correct).
+
+>That said, I think it would make more sense to support this in a new loader:
+
+```yaml
+imports:
+    - { resource: ../src/Controller, psr4_prefix: AppBundle\Controller\ }
+```
+
+I must say that it makes more sense to me as well, with `psr4_prefix` which is optional. If it's already declared in the `composer.json` I don't see why (from a user perspective) you would need to declare it here as well. It seems more confusing and error prone than anything to me.
+
+Maybe you would need to add a type:
+
+```yaml
+imports:
+    - { resource: ../src/Controller, type: autowired-services }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T19:23:15Z
+
+> If it's already declared in the composer.json I don't see why (from a user perspective) you would need to declare it
+
+that would be black magic as defined earlier: some global context leaks in!
+
+> type: autowired-services
+
+that is strong coupling with autowiring. This feature is orthogonal: autowiring is not required by this PR at all. The fact that it plays well with autowiring is not an unwanted side effect of course, but things are better decoupled+composed than strongly tightened together.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-01-15T19:33:40Z
+
+So the few points lost in the edit:
+
+- What happens when you come across a file which is not a class: a function, a trait, an abstract class, an interface...
+- The include works with globs is that right? Is it possible to have a kinda granular filtering/include? We had a discussion with @dunglas about it somewhere at some point. For example you may have a class in the directory which should not be declared as a service or something
+- What happens if a class found is already registered as a service? (I would expect the original definition not to be touched)
+- I fall in the case several times where I have to do slightly more than "just" registering the services found in a directory, adding a special tag which the name can be determined from the FQCN. Is there any way to re-use that [the one from your PR] logic to achieve that rather than rolling a kinda duplicate of DunglasApiBundle for this specific task?
+
+A few other things lost but can't remember them...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T20:14:30Z
+
+> What happens when you come across a file which is not a class: a function, a trait, an abstract class, an interface...
+
+the code uses `class_exists`, which is selective about classes, so interfaces and traits are excluded. For abstract classes, they would be registered, but of course you'll get an error if you use them. Still, this will prove usefull when getter injection will be merged (because it allows to make them usable when abstract is only about getters).
+
+> The include works with globs is that right?
+
+yes, and for consistency with #21270, I'm going to use a real `glob` call.
+but I don't think we should add some "exclude" mechanism: if you happen to register too many classes, that's not an issue. Just don't use them. Or don't use this mechanism. Or, last option, mark these as private and all the non used ones will be removed automatically.
+
+> What happens if a class found is already registered as a service?
+
+same logic as today: the last registered ones wins. Which means you should put these auto-registering declarations before the typical ones and you'll get the behavior you describe.
+
+> I fall in the case several times where I have to do slightly more than "just" registering the services found in a directory, adding a special tag which the name can be determined from the FQCN.
+
+That's the reason why this needs to be in the "services" section and not in "imports":
+the "psr4" attribute is just one amongst all the regular ones, and `_default` also applies.
+
+eg this works:
+```yaml
+services:
+    App\Command\:
+        psr4: ../src/Command
+        tags: [console.command]
+```
+this will tag all discovered classes with the console.command tag
+
+DunglasActionBundle provides one additional feature that this PR does not try to implement:
+conditional tagging (the bundle allows to declare: every instance of EventSubscriberInterface should have the kernel.event_subscriber tag).
+We've some ideas with @dunglas about this, but this is orthogonal to this PR, so may come in a later PR.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-01-15T21:05:38Z
+
+@nicolas-grekas thanks for the answers.
+
+Overall, I'm in favour of this mechanism: there is parts on my application where loosening the control whilst still using dependency injection over service locators which I prefer. There is however a big caveat which I'm not happy at all with: side effects.
+
+1. It may not be clear for the typical user what happens when service IDs collides, i.e. which trumps on the other. (I think for this one a mention in the doc is enough)
+2. You may have classes you don't expect to be registered which are. You're answer to this for now is "it's ok, if you don't use it they are going to be removed or it doesn't matter much". Whilst I perfectly understand the approach, IMO this is a big deal and this is by far the thing I hate the most in Laravel. (Further explanation in this below).
+
+To extend on the second point, in Laravel you can try to retrieve *any* class from the DIC. It may not succeed, but it will try at least, even if the class in question is not meant to be registered in the DIC. Now in Symfony we are adopting a similar thing with this mechanism, more scoped as we are specifying the folders we want to apply this mechanism to, but the problem remains the same: you are registering things that *should not* be registered.
+
+To this problem, I think we should, at least, proving the tooling necessary for the people how mind it like me to "uncover" this side-effect. For example a command listing the services registered in this way.
+
+In case this seems weird to you I'm giving you the use case I have in mind: I get my hand on a application I'm not familiar with, the glob is hard to understand or I suspect a class is registered when it should not or simply, I want to see if what I expect to be registered actually is, how can I see that easily?
+
+>That's the reason why this needs to be in the "services" section and not in "imports":
+the "psr4" attribute is just one amongst all the regular ones, and _default also applies.
+
+Fair enough in a very simple case, but say mind the tag name needs a bit of processing to be determined (and is currently done in a Compiler pass which does something a la DunglasApiBundle). To extend a bit on this use case: it seems much more interesting to me, more than this PR to be honest, interesting to provide a way to re-use that logic of "find recursively the classes here, return an array of FQC => serviceDefinition", to which you could hook something to do whatever kind of processing you would like to in a compiler pass. Granted this may not be the scope of this PR, but I think it affects the way this feature is implemented (if we want to provide this kind of hooks).
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-01-15T21:52:24Z
+
+@nicolas-grekas I'm asking those questions here as I'm missing a bit the technical insight to be able to judge if this requires to be done upfront or if this can be done gradually, in which case this PR is just a first step. If you think this can be done gradually, I'm in favour to open dedicated issue for this PR and just 👍 this one, your call.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T09:56:14Z
+
+> It may not be clear for the typical user what happens when service IDs collides
+
+That could also apply to "imports". That's why ordering is the only rule to me - for consistency.
+
+> in Laravel you can try to retrieve any class from the DIC
+
+that is #18268 - discuss that there - nothing to do with this PR :)
+
+> mind the tag name needs a bit of processing to be determined
+
+exactly the topic I mentionned before: DunglasActionBundle provides conditional tagging - and this PR does not try to do it, because that's something orthogonal - ie that must be done indenpendently, because it is not required for making this PR self consistent.
+
+> return an array of FQC => serviceDefinition
+
+same here, that's building on top of this PR, or reusing some of its logic to do something else. Not required to make this PR self consistent.
+
+All in all @theofidry, I'm really happy to see that this PR is raising many ideas in your mind.
+Just let's things be built one consistent step at a time. PR after PR, each one self-consistent and useful by itself.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T10:10:33Z
+
+PR updated, trying to listen to comments:
+
+- the glob pattern is moved from the "id" side to the "psr4" side, so that we can use the real `glob()` function
+- given that `glob()` is powerful enough to include/exclude dirs, I removed the `Test` special exclusion
+- the "id" side now *must* be a PSR4 namespace prefix, thus must end with a `\` (same convention as composer)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-30T20:32:16Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-02T19:48:24Z
+
+noted as experimental
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-03T14:49:43Z
+
+I am not sure if it is really helpful to have this feature ~~as it heavily depends on the environment/context~~, but since it is marked as experimental I am 👍 for merging it and see how it works out in practice.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-08T23:40:39Z
+
+PR will now handle double-star globs and GLOB_BRACE portability via to #21572.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-09T13:21:09Z
+
+@fabpot comments addressed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T15:54:34Z
+
+Tests are broken.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-12T22:14:55Z
+
+back to green

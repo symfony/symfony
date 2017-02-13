@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-06T17:25:49Z
+
+Hello @Padam87
+
+1/ there is already the `enter` event. What is the difference?
+2/ What is the use case for this new event?
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2016-12-06T17:37:25Z
+
+Hi, I have expained in the issue. The `enter` event is called before the new markings are set, so you can't flush an entity in a listener because of this :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T15:38:15Z
+
+Thanks @Padam87 for your time. But  sadly I'm still :-1: about this event.
+
+We already have many events. More over if you really want to to have your flush outside the controller, you can put it in the marking store. As well it makes more sense since the marking store, is all about the "store", and so the DB.
+
+I need to close this PR as "won't fix" because of the -1 votes from the Symfony Core Team members.
+
+The Workflow component is very recent, so we are very cautious about adding new features to it. In any case, if more users complain about this very same thing, we'll reconsider your proposal for Symfony 3.3. Thanks!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-09T19:00:40Z
+
+@Padam87 Could you rebase the PR? Thanks.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-09T21:16:52Z
+
+:+1:

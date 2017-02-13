@@ -12,7 +12,7 @@ class StateMachineGraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     private $dumper;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->dumper = new StateMachineGraphvizDumper();
     }

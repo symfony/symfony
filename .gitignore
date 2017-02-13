@@ -1,8 +1,5 @@
-vendor/
-composer.lock
-phpunit.xml
-.php_cs.cache
-composer.phar
-package.tar
-/packages.json
+/.php_cs.cache
 /.phpunit
+/composer.lock
+/phpunit.xml
+/vendor/

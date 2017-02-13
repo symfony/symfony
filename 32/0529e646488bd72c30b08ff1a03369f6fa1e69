@@ -1,0 +1,188 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-07T09:11:39Z
+
+WDYT about using tags on each service available through a locator instead of listing the services as the locator arguments?
+
+Something like:
+
+```xml
+<service id="MyServiceAvailableThroughALocator" class="...">
+    <!-- ... -->
+    <tag name="service.locator" locator="locator_name" alias="service_alias_within_the_locator" />
+</service>
+```
+
+Then any service can declare it is available through a named locator, and can provide an alias used to identify it within the locator itself.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-02-07T09:30:30Z
+
+Does it allow mapping keys to services like this ?
+```yaml
+App\FooBar:
+    arguments:
+        - =locator:
+            foo: '@service1'
+            bar: '@service2'
+```
+I think most of the time it's what is needed since you need to map the service id to some kind of alias used by the component receiving the locator.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-07T09:35:02Z
+
+@ogizanagi As discussed, I find more adapted to let the locator consumers defining explicitly which services they need rather than asking each service to define from which service locator(s) they can be accessed. The service being already in the container, to me it's fine to request it, as when using other lazy arguments. I don't see the need for extending the ServiceLocator itself in userland, nor restricting which services should be accessed by a locator elsewhere than the service using the locator itself, even if the idea is interesting.
+Discussion stays open if others think it's a good idea.
+
+@jvasseur Right now it doesn't, but it makes sense to me and adding it should not be hard.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T09:35:15Z
+
+@ogizanagi when a service needs a service locator, it has a single service locator, not multiple ones.
+Services needing a service locator will often fill it using a tag. But it is better to keep using separate tags for each use case instead of transforming them all into ``<tag name="service.locator" locator="..." />``
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-07T09:38:43Z
+
+@stof
+
+> when a service needs a service locator, it has a single service locator, not multiple ones.
+Services needing a service locator will often fill it using a tag. But it is better to keep using separate tags for each use case instead of transforming them all into <tag name="service.locator" locator="..." />
+
+I think you misunderstood me (or am I misunderstanding you?). I updated my comment since, though, in order to show a more complete sample.
+I don't want to tag a service needing a locator instance, but instead tag each service being available through a locator (maybe the `service.locator` tag name isn't right).
+This means being able to extend the list of available services of a well identified locator on userland or from third-party bundles.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T09:57:08Z
+
+@ogizanagi bundles wanting to make the list extendable should use their own tags, allowing to keep things more understandable, and more flexible (the bundle can do extra processing of the tagged services in the compiler pass, or expect additional attributes).
+Forcing to handle all collecting in a single compiler pass defined in Symfony itself is *less* powerful for bundles, and has a worse DX (and it leaks implementation details about the usage of the ServiceLocator feature in the bundle, while the bundle should be free to refactor the way it actually injects the services).
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T09:57:52Z
+
+thus, it would also force to add an identifier on locators (to reference them in your proposed tag), which goes against the architecture of arguments
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-07T09:58:01Z
+
+> This means being able to add services to a well identified locator on userland or from third-party bundles.
+
+I'm not sure about the usefulness of defining service locators as services, as use cases are quite specific (most of the times only one service needs a given range to be accessible f.i. CommandBus, FirewallMap).
+
+If one needs two services with the same locator, then the services should be quite related IMO, so it can be solved by defining a parent service defining the locator argument and children would inherit this argument (e.g. Console command needing access to console helpers).
+Right now I don't see a concrete need for having well identified locators nor creating custom ServiceLocator implementations in userland.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-07T10:11:45Z
+
+@stof : Understood. Finally, I agree. Thanks.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-07T10:54:19Z
+
+@jvasseur Updated to support mapping keys to services
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-07T21:15:37Z
+
+This should be marked as experimental also.
+And thanks for working on it :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-07T22:30:45Z
+
+Status: needs work
+
+😅
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-08T10:17:34Z
+
+I relax my statement about ContainerInterface: we only need PSR-11 here, Symfony's ContainerInterface doesn't fit well. Which means this PR should be rebased on top of #21265 before merging.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-08T13:45:33Z
+
+@nicolas-grekas updated following your suggestions (see last commit only).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-08T15:58:11Z
+
+IteratorAggregate implemented, review comments addressed (thanks btw, first time I touch PhpDumper).
+
+> the map must be explicitly keyed
+
+Since we allow numeric keys, should we (and is there a way to) enforce defining keys explicitly in xml/yaml file loaders?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-08T16:32:38Z
+
+Missing tests added.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T12:18:18Z
+
+What about using this new feature where it makes sense internally?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-12T12:39:03Z
+
+@fabpot This PR is already big and replacing container injections by this will require deprecations, I'd prefer to do it in separate PRs just after merging this. Ok for you?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T15:49:19Z
+
+@chalasr Ok. Can you create this PR including this one so that we can see how that works in practice before merging this PR?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-12T16:19:04Z
+
+Sure, will do in the next hour.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-12T18:57:13Z
+
+@fabpot Done on FirewallMap in this PR, see last commit (it doesn't require any deprec to me).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T18:58:38Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T19:09:28Z
+
+fabbot errors should be fixed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-12T19:12:47Z
+
+done, thanks

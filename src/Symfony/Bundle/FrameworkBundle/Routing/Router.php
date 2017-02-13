@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class Router extends BaseRouter implements WarmableInterface
 {
-    private $container;
+    protected $container;
 
     /**
      * Constructor.

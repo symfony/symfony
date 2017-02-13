@@ -32,7 +32,7 @@ abstract class FileLoader extends Loader
      */
     protected $locator;
 
-    private $currentDir;
+    protected $currentDir;
 
     /**
      * Constructor.

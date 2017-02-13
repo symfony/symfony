@@ -121,14 +121,19 @@ class XmlFileLoader extends FileLoader
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
 
-        if (false === $services = $xpath->query('//container:services/container:service')) {
+        if (false === $services = $xpath->query('//container:services/container:service|//container:services/container:prototype')) {
             return;
         }
+        $this->setCurrentDir(dirname($file));
 
         $defaults = $this->getServiceDefaults($xml, $file);
         foreach ($services as $service) {
             if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
-                $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
+                if ('prototype' === $service->tagName) {
+                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'));
+                } else {
+                    $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
+                }
             }
         }
     }

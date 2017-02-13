@@ -159,6 +159,10 @@ class AutowirePass extends AbstractRecursivePass
                     continue 2;
                 }
             }
+
+            if ($reflectionMethod->isAbstract() && !$reflectionMethod->getNumberOfParameters()) {
+                $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
+            }
         }
 
         if ($notFound = array_diff($autowiredMethods, $found)) {
@@ -478,7 +482,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->populateAvailableType($argumentId, $argumentDefinition);
 
         try {
-            $this->processValue($argumentDefinition, true);
+            $this->processValue($argumentDefinition);
             $this->currentId = $currentId;
         } catch (RuntimeException $e) {
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';

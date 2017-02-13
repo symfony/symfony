@@ -643,6 +643,70 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $normalizer->normalize($data, null, array('include_foo_and_bar' => true)));
     }
+
+    public function testAttributesContextNormalize()
+    {
+        $normalizer = new ObjectNormalizer();
+        $serializer = new Serializer(array($normalizer));
+
+        $objectInner = new ObjectInner();
+        $objectInner->foo = 'innerFoo';
+        $objectInner->bar = 'innerBar';
+
+        $objectDummy = new ObjectDummy();
+        $objectDummy->setFoo('foo');
+        $objectDummy->setBaz(true);
+        $objectDummy->setObject($objectInner);
+
+        $context = array('attributes' => array('foo', 'baz', 'object' => array('foo')));
+        $this->assertEquals(
+            array(
+                'foo' => 'foo',
+                'baz' => true,
+                'object' => array('foo' => 'innerFoo'),
+            ),
+            $serializer->normalize($objectDummy, null, $context)
+        );
+    }
+
+    public function testAttributesContextDenormalize()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer(array($normalizer));
+
+        $objectInner = new ObjectInner();
+        $objectInner->foo = 'innerFoo';
+
+        $objectOuter = new ObjectOuter();
+        $objectOuter->bar = 'bar';
+        $objectOuter->setInner($objectInner);
+
+        $context = array('attributes' => array('bar', 'inner' => array('foo')));
+        $this->assertEquals($objectOuter, $serializer->denormalize(
+            array(
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'date' => '2017-02-03',
+                'inner' => array('foo' => 'innerFoo', 'bar' => 'innerBar'),
+            ), ObjectOuter::class, null, $context));
+    }
+
+    public function testAttributesContextDenormalizeConstructor()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer(array($normalizer));
+
+        $objectInner = new ObjectInner();
+        $objectInner->bar = 'bar';
+
+        $obj = new DummyWithConstructorObjectAndDefaultValue('a', $objectInner);
+
+        $context = array('attributes' => array('inner' => array('bar')));
+        $this->assertEquals($obj, $serializer->denormalize(array(
+            'foo' => 'b',
+            'inner' => array('foo' => 'foo', 'bar' => 'bar'),
+        ), DummyWithConstructorObjectAndDefaultValue::class, null, $context));
+    }
 }
 
 class ObjectDummy
@@ -813,6 +877,8 @@ class ObjectTypeHinted
 
 class ObjectOuter
 {
+    public $foo;
+    public $bar;
     private $inner;
     private $date;
 
@@ -909,4 +975,26 @@ class JsonNumber
      * @var float
      */
     public $number;
+}
+
+class DummyWithConstructorObjectAndDefaultValue
+{
+    private $foo;
+    private $inner;
+
+    public function __construct($foo = 'a', ObjectInner $inner)
+    {
+        $this->foo = $foo;
+        $this->inner = $inner;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    public function getInner()
+    {
+        return $this->inner;
+    }
 }

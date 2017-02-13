@@ -136,6 +136,13 @@
     <service id="closure_proxy" class="BarClass">
       <argument type="closure-proxy" id="closure_proxy" method="getBaz"/>
     </service>
+    <service id="service_locator" class="Bar">
+      <argument type="service-locator">
+        <argument key="bar" type="service" id="bar"/>
+        <argument key="invalid" type="service" id="invalid" on-invalid="ignore"/>
+        <argument key="container" type="service" id="service_container"/>
+      </argument>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

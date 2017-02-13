@@ -16,6 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -328,12 +329,14 @@ class TextDescriptor extends Descriptor
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
                 } elseif ($argument instanceof IteratorArgument) {
-                    $argumentsInformation[] = 'Iterator';
+                    $argumentsInformation[] = sprintf('Iterator (%d element(s))', count($argument->getValues()));
+                } elseif ($argument instanceof ServiceLocatorArgument) {
+                    $argumentsInformation[] = sprintf('ServiceLocator (%d service(s))', count($argument->getValues()));
                 } elseif ($argument instanceof ClosureProxyArgument) {
                     list($reference, $method) = $argument->getValues();
                     $argumentsInformation[] = sprintf('ClosureProxy(Service(%s)::%s())', $reference, $method);
                 } else {
-                    $argumentsInformation[] = is_array($argument) ? 'Array' : $argument;
+                    $argumentsInformation[] = is_array($argument) ? sprintf('Array (%d element(s))', count($argument)) : $argument;
                 }
             }
 

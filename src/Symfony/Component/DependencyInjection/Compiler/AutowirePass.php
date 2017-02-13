@@ -226,7 +226,7 @@ class AutowirePass implements CompilerPassInterface
      */
     private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
-        if (isset($this->notGuessableTypes[$typeHint->name])) {
+        if (isset($this->notGuessableTypes[$typeHint->name]) && !isset($this->definedTypes[$typeHint->name])) {
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $matchingServices = implode(', ', $this->types[$typeHint->name]);
 

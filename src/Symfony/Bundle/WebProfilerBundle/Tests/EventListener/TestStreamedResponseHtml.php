@@ -35,7 +35,7 @@ class TestStreamedResponseHtml extends StreamedResponse implements HtmlResponseI
             $extraHtml = "\n".$this->extraHtml."\n";
             $content = substr($content, 0, $pos).$extraHtml.substr($content, $pos);
         }
-        
+
         echo $content;
     }
 }

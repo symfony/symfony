@@ -119,9 +119,10 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     {
         if ($response instanceof HtmlResponseInterface) {
             $response->appendToBody($this->getToolbarJs($response, $request, $nonces));
+
             return;
         }
-        
+
         $content = $response->getContent();
         $pos = strripos($content, '</body>');
 
@@ -138,7 +139,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             KernelEvents::RESPONSE => array('onKernelResponse', -128),
         );
     }
-    
+
     private function getToolbarJs(Response $response, Request $request, array $nonces)
     {
         return $this->twig->render(

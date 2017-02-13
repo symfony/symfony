@@ -29,7 +29,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $m = new \ReflectionMethod($listener, 'injectToolbar');
         $m->setAccessible(true);
-        
+
         $response = new TestStreamedResponseHtml(function () use ($content) {
             echo $content;
         });

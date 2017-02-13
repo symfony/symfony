@@ -21,6 +21,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  * Denormalizes arrays of objects.
  *
  * @author Alexander M. Turek <me@derrabus.de>
+ *
+ * @final since version 3.3.
  */
 class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterface
 {
@@ -66,18 +68,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
      */
     public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
     {
-        if (func_num_args() > 3) {
-            $context = func_get_arg(3);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a fourth `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
+        $context = func_num_args() > 3 ? func_get_arg(3) : array();
 
         return substr($type, -2) === '[]'
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);

@@ -45,18 +45,7 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      */
     public function supportsEncoding($format/*, array $context = array()*/)
     {
-        if (func_num_args() > 1) {
-            $context = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
+        $context = func_num_args() > 1 ? func_get_arg(1) : array();
 
         try {
             $this->getEncoder($format, $context);
@@ -77,19 +66,7 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      */
     public function needsNormalization($format/*, array $context = array()*/)
     {
-        if (func_num_args() > 1) {
-            $context = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a third `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
-
+        $context = func_num_args() > 1 ? func_get_arg(1) : array();
         $encoder = $this->getEncoder($format, $context);
 
         if (!$encoder instanceof NormalizationAwareInterface) {

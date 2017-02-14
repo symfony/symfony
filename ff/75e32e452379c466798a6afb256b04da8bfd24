@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T10:15:37Z
+
+Updated to 2.7, reverted base `Extension`.
+
+However, we could update built in bundles to bypass `Extension::getConfiguration` right? Initializing the configuration class explicitly per extension (like the framework bundle already does).
+
+That should improve something.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T11:49:56Z
+
+This should be considered as a bug, isn't it? What about adding a test case?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T09:43:23Z
+
+Test added.
+
+What about core bundles with different implementations regarding `getConfiguration`?
+
+Then again, maye this should work vice-versa, updating bundles to consistently track resources from `getConfiguration` vs. keeping it as is.
+
+I think moving the responsibility away from `getConfiguration` makes sense.
+
+Im not sure.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T10:08:48Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T10:15:14Z
+
+:+1: for keeping thing as is from here.

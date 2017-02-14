@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-06T23:17:21Z
+
+I know that we already had some discussion about this topic. ping @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-13T09:26:52Z
+
+What is the actual use case for this change?
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-10-13T16:18:36Z
+
+This is to make it easier to jump to results for the current IP, which brings it inline with the behaviour of clicking on the URL.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-13T20:02:33Z
+
+Let's answer two questions: How common is it that you have profiles with different IP addresses which would justify a need for this feature? And would it be confusing for all other users that the IP address is clickable?
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-10-13T20:04:46Z
+
+1. Quite, if you're viewing the debug profiler in a non-local environment which a lot of people seem to do
+2. I'm not sure it would be confusing given that it's styled exactly the same as the URL in the same part of the profiler.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T10:15:37Z
+
+👍 I like this proposal because it changes nothing for most users and it improves the productivity of those using this.
+
+@jameshalsall I'd like to have a minor change before merge: let's make the new link look like the previous text. In line 494 of profiler.css.twig, please update the selector to this:
+
+``` css
+#summary dl.metadata,
+#summary dl.metadata a {    /*  <-- add this line  */
+    margin: 5px 0 0;
+    color: rgba(255, 255, 255, 0.75);
+}
+```
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-11-09T21:52:30Z
+
+This has now been updated.

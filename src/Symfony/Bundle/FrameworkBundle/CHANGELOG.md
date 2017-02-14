@@ -15,6 +15,8 @@ CHANGELOG
  * Added configurable paths for validation files
  * Deprecated `SerializerPass`, use `Symfony\Component\Serializer\DependencyInjection\SerializerPass` instead
  * Deprecated `FormPass`, use `Symfony\Component\Form\DependencyInjection\FormPass` instead
+ * Deprecated `SessionListener`
+ * Deprecated `TestSessionListener`
 
 3.2.0
 -----

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
@@ -23,7 +23,11 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 class LazyLoadingFragmentHandler extends FragmentHandler
 {
     private $container;
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0
+     */
     private $rendererIds = array();
+    private $initialized = array();
 
     /**
      * Constructor.
@@ -44,9 +48,13 @@ class LazyLoadingFragmentHandler extends FragmentHandler
      *
      * @param string $name     The service name
      * @param string $renderer The render service id
+     *
+     * @deprecated since version 3.3, to be removed in 4.0
      */
     public function addRendererService($name, $renderer)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         $this->rendererIds[$name] = $renderer;
     }
 
@@ -55,10 +63,17 @@ class LazyLoadingFragmentHandler extends FragmentHandler
      */
     public function render($uri, $renderer = 'inline', array $options = array())
     {
+        // BC 3.x, to be removed in 4.0
         if (isset($this->rendererIds[$renderer])) {
             $this->addRenderer($this->container->get($this->rendererIds[$renderer]));
-
             unset($this->rendererIds[$renderer]);
+
+            return parent::render($uri, $renderer, $options);
+        }
+
+        if (!isset($this->initialized[$renderer]) && $this->container->has($renderer)) {
+            $this->addRenderer($this->container->get($renderer));
+            $this->initialized[$renderer] = true;
         }
 
         return parent::render($uri, $renderer, $options);

@@ -21,7 +21,7 @@
         "symfony/twig-bridge": "^3.2.1",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8.16|~3.1.9|^3.2.2",
-        "twig/twig": "~1.28|~2.0"
+        "twig/twig": "^1.32|^2.2"
     },
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",

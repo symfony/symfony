@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Deprecated `LazyLoadingFragmentHandler::addRendererService()`
+ * Added `SessionListener`
+ * Added `TestSessionListener`
+
 3.2.0
 -----
 

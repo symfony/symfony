@@ -171,6 +171,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $markingStoreRef = $serviceMarkingStoreWorkflowDefinition->getArgument(1);
         $this->assertInstanceOf(Reference::class, $markingStoreRef);
         $this->assertEquals('workflow_service', (string) $markingStoreRef);
+
+        $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
+        $registryDefinition = $container->getDefinition('workflow.registry');
+        $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
     }
 
     /**

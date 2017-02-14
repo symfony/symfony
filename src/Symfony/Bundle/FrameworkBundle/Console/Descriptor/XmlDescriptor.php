@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -431,6 +432,12 @@ class XmlDescriptor extends Descriptor
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
             } elseif ($argument instanceof IteratorArgument) {
                 $argumentXML->setAttribute('type', 'iterator');
+
+                foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
+                    $argumentXML->appendChild($childArgumentXML);
+                }
+            } elseif ($argument instanceof ServiceLocatorArgument) {
+                $argumentXML->setAttribute('type', 'service_locator');
 
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);

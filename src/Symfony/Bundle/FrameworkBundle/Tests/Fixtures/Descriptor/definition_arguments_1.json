@@ -62,7 +62,17 @@
                 "id": "definition1"
             },
             "get"
-        ]
+        ],
+        {
+            "def1": {
+                "type": "service",
+                "id": "definition_1"
+            },
+            "def2": {
+                "type": "service",
+                "id": "definition_2"
+            }
+        }
     ],
     "file": null,
     "factory_class": "Full\\Qualified\\FactoryClass",

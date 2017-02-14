@@ -80,12 +80,18 @@ class UniqueEntityValidator extends ConstraintValidator
         /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
 
         $criteria = array();
+        $hasNullValue = false;
+
         foreach ($fields as $fieldName) {
             if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
                 throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $fieldName));
             }
 
             $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
+
+            if (null === $fieldValue) {
+                $hasNullValue = true;
+            }
 
             if ($constraint->ignoreNull && null === $fieldValue) {
                 continue;
@@ -100,6 +106,11 @@ class UniqueEntityValidator extends ConstraintValidator
                  */
                 $em->initializeObject($criteria[$fieldName]);
             }
+        }
+
+        // validation doesn't fail if one of the fields is null and if null values should be ignored
+        if ($hasNullValue && $constraint->ignoreNull) {
+            return;
         }
 
         // skip validation if there are no criteria (this can happen when the

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -303,21 +302,6 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
-    }
-
-    public function testMergeDoesOverrideConstraintsFromParentClassIfPropertyIsOverriddenInChildClass()
-    {
-        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
-        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
-
-        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
-        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
-        $childMetadata->mergeConstraints($parentMetadata);
-
-        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
-        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
-
-        $this->assertEquals($expectedMetadata, $childMetadata);
     }
 }
 

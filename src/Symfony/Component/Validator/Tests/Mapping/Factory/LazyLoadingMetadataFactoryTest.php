@@ -168,6 +168,25 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
     }
+
+    public function testGroupsFromParent()
+    {
+        $reader = new \Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader();
+        $factory = new LazyLoadingMetadataFactory($reader);
+        $metadata = $factory->getMetadataFor('Symfony\Component\Validator\Tests\Fixtures\EntityStaticCarTurbo');
+        $groups = array();
+
+        foreach ($metadata->getPropertyMetadata('wheels') as $propertyMetadata) {
+            $constraints = $propertyMetadata->getConstraints();
+            $groups = array_replace($groups, $constraints[0]->groups);
+        }
+
+        $this->assertCount(4, $groups);
+        $this->assertContains('Default', $groups);
+        $this->assertContains('EntityStaticCarTurbo', $groups);
+        $this->assertContains('EntityStaticCar', $groups);
+        $this->assertContains('EntityStaticVehicle', $groups);
+    }
 }
 
 class TestLoader implements LoaderInterface

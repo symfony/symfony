@@ -96,8 +96,10 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     public function testIsFreshDeleteFile()
     {
         $resource = new DirectoryResource($this->directory);
+        $time = time();
+        sleep(1);
         unlink($this->directory.'/tmp.xml');
-        $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if an existing file is removed');
+        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if an existing file is removed');
     }
 
     public function testIsFreshDeleteDirectory()

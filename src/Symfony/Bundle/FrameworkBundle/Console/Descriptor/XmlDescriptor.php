@@ -437,7 +437,7 @@ class XmlDescriptor extends Descriptor
                     $argumentXML->appendChild($childArgumentXML);
                 }
             } elseif ($argument instanceof ServiceLocatorArgument) {
-                $argumentXML->setAttribute('type', 'service_locator');
+                $argumentXML->setAttribute('type', 'service-locator');
 
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);

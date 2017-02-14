@@ -168,6 +168,43 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
     }
+
+    public function testGroupsFromParent()
+    {
+        $reader = new \Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader();
+        $factory = new LazyLoadingMetadataFactory($reader);
+        $metadata = $factory->getMetadataFor('Symfony\Component\Validator\Tests\Fixtures\EntityStaticCarTurbo');
+        $classMetaDataCollection = $metadata->getPropertyMetadata('wheels');
+
+        /*
+         * Array element will be removed if it exists
+         * in any constraint group
+         */
+        $expectedConstraints = [
+            'Default' => 'Default',
+            'EntityStaticCarTurbo' => 'EntityStaticCarTurbo',
+            'EntityStaticCar' => 'EntityStaticCar',
+            'EntityStaticVehicle' => 'EntityStaticVehicle',
+        ];
+
+        foreach ($classMetaDataCollection as $classMetaData) {
+            $constraints = $classMetaData->getConstraints();
+            foreach ($constraints as $constraint) {
+                $groups = $constraint->groups;
+                foreach ($groups as $group) {
+                    if (array_key_exists($group, $expectedConstraints)) {
+                        unset($expectedConstraints[$group]);
+                    }
+                }
+            }
+        }
+
+        $this->assertEmpty(
+            $expectedConstraints,
+            "Following groups were not found " . implode(',', $expectedConstraints)
+        );
+    }
+
 }
 
 class TestLoader implements LoaderInterface

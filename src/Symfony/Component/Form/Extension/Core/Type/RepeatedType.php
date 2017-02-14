@@ -60,7 +60,7 @@ class RepeatedType extends AbstractType
         $resolver->setAllowedTypes('options', 'array');
         $resolver->setAllowedTypes('first_options', 'array');
         $resolver->setAllowedTypes('second_options', 'array');
-        $resolver->setAllowedTypes('compare', array('callable','null'));
+        $resolver->setAllowedTypes('compare', array('callable', 'null'));
     }
 
     /**

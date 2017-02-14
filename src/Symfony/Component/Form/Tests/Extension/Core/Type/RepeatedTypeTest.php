@@ -223,7 +223,8 @@ class RepeatedTypeTest extends BaseTypeTest
         }, $form->getConfig()->getOption('compare'));
     }
 
-    public function compare($value1, $value2) {
+    public function compare($value1, $value2)
+    {
         return 0 === strcmp($value1, $value2);
     }
 

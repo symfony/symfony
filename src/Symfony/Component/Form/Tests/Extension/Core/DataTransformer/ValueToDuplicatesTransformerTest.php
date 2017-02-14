@@ -109,6 +109,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
 
         $this->assertNull($this->transformer->reverseTransform($input));
     }
+    
     public function testReverseTransformCompletelyEmptyWithSimpleCallable()
     {
         $input = array(

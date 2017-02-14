@@ -151,11 +151,10 @@ EOTXT
             $this->markTestSkipped('xdebug is active');
         }
 
-        $g = new GeneratorDemo();
-        $g = $g->baz();
-        $r = new \ReflectionGenerator($g);
+        $generator = new GeneratorDemo();
+        $generator = $generator->baz();
 
-        $xDump = <<<'EODUMP'
+        $expectedDump = <<<'EODUMP'
 Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
@@ -167,16 +166,17 @@ Generator {
       }
     }
   }
+  closed: false
 }
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $g);
+        $this->assertDumpMatchesFormat($expectedDump, $generator);
 
-        foreach ($g as $v) {
+        foreach ($generator as $v) {
             break;
         }
 
-        $xDump = <<<'EODUMP'
+        $expectedDump = <<<'EODUMP'
 array:2 [
   0 => ReflectionGenerator {
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
@@ -197,6 +197,7 @@ array:2 [
         : }
       }
     }
+    closed: false
   }
   1 => Generator {
     executing: {
@@ -208,11 +209,23 @@ array:2 [
         }
       }
     }
+    closed: false
   }
 ]
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, array($r, $r->getExecutingGenerator()));
+        $r = new \ReflectionGenerator($generator);
+        $this->assertDumpMatchesFormat($expectedDump, array($r, $r->getExecutingGenerator()));
+
+        foreach ($generator as $v) {
+        }
+
+        $expectedDump = <<<'EODUMP'
+Generator {
+  closed: true
+}
+EODUMP;
+        $this->assertDumpMatchesFormat($expectedDump, $generator);
     }
 }
 

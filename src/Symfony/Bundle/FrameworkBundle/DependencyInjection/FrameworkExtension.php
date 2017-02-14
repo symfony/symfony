@@ -796,23 +796,14 @@ class FrameworkExtension extends Extension
             throw new \LogicException('An asset package cannot have base URLs and base paths.');
         }
 
-        if (!$baseUrls) {
-            $package = new ChildDefinition('assets.path_package');
-
-            return $package
-                ->setPublic(false)
-                ->replaceArgument(0, $basePath)
-                ->replaceArgument(1, $version)
-            ;
-        }
-
-        $package = new ChildDefinition('assets.url_package');
-
-        return $package
+        $package = new ChildDefinition($baseUrls ? 'assets.url_package' : 'assets.path_package');
+        $package
             ->setPublic(false)
-            ->replaceArgument(0, $baseUrls)
+            ->replaceArgument(0, $baseUrls ?: $basePath)
             ->replaceArgument(1, $version)
         ;
+
+        return $package;
     }
 
     private function createVersion(ContainerBuilder $container, $version, $format, $name)
@@ -1084,9 +1075,10 @@ class FrameworkExtension extends Extension
 
             $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference($cacheService))
                 ->replaceArgument(2, $config['debug'])
+                ->addTag('annotations.cached_reader', array('provider' => $cacheService))
             ;
+            $container->setAlias('annotation_reader', 'annotations.cached_reader');
             $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
         } else {
             $container->removeDefinition('annotations.cached_reader');
@@ -1276,7 +1268,6 @@ class FrameworkExtension extends Extension
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
     {
         $version = substr(str_replace('/', '-', base64_encode(hash('sha256', uniqid(mt_rand(), true), true))), 0, 22);
-        $container->getDefinition('cache.annotations')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);

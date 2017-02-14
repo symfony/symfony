@@ -212,15 +212,15 @@ class RepeatedTypeTest extends BaseTypeTest
 
     public function testSetOptionsForCompareCallableAsCallable()
     {
+        $callable = function ($value1, $value2) {
+            return $value1 === $value2;
+        };
+
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'compare' => function ($value1, $value2) {
-                return $value1 === $value2;
-            },
+            'compare' => $callable,
         ));
 
-        $this->assertEquals(function ($value1, $value2) {
-            return $value1 === $value2;
-        }, $form->getConfig()->getOption('compare'));
+        $this->assertEquals($callable, $form->getConfig()->getOption('compare'));
     }
 
     public function compare($value1, $value2)

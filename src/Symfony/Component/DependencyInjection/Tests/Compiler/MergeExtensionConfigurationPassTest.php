@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -47,5 +50,33 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $this->assertEquals(array($provider), $tmpProviders);
+    }
+
+    public function testExtensionConfigurationIsTrackedByDefault()
+    {
+        $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\Extension')->getMock();
+        $extension->expects($this->once())
+            ->method('getConfiguration')
+            ->will($this->returnValue(new FooConfiguration()));
+        $extension->expects($this->any())
+            ->method('getAlias')
+            ->will($this->returnValue('foo'));
+
+        $container = new ContainerBuilder(new ParameterBag());
+        $container->registerExtension($extension);
+        $container->prependExtensionConfig('foo', array('bar' => true));
+
+        $pass = new MergeExtensionConfigurationPass();
+        $pass->process($container);
+
+        $this->assertContains(new FileResource(__FILE__), $container->getResources(), '', false, false);
+    }
+}
+
+class FooConfiguration implements ConfigurationInterface
+{
+    public function getConfigTreeBuilder()
+    {
+        return new TreeBuilder();
     }
 }

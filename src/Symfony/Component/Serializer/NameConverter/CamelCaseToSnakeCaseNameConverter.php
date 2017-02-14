@@ -48,10 +48,11 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
 
             $len = strlen($propertyName);
             for ($i = 0; $i < $len; ++$i) {
-                if (ctype_upper($propertyName[$i])) {
-                    $snakeCasedName .= '_'.strtolower($propertyName[$i]);
+                $lcPropertyName = strtolower($propertyName[$i]);
+                if (0 !== $i && $lcPropertyName !== $propertyName[$i]) {
+                    $snakeCasedName .= '_'.$lcPropertyName;
                 } else {
-                    $snakeCasedName .= strtolower($propertyName[$i]);
+                    $snakeCasedName .= $lcPropertyName;
                 }
             }
 

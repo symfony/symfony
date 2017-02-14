@@ -20,10 +20,12 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class ValueToDuplicatesTransformer implements DataTransformerInterface
 {
     private $keys;
+    private $compare;
 
-    public function __construct(array $keys)
+    public function __construct(array $keys, callable $compare = null)
     {
         $this->keys = $keys;
+        $this->compare = $compare;
     }
 
     /**
@@ -62,10 +64,13 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
 
         $result = current($array);
         $emptyKeys = array();
+        $compare = is_callable($this->compare) ? $this->compare : function ($value1, $value2) {
+            return $value1 === $value2;
+        };
 
         foreach ($this->keys as $key) {
             if (isset($array[$key]) && '' !== $array[$key] && false !== $array[$key] && array() !== $array[$key]) {
-                if ($array[$key] !== $result) {
+                if (!$compare($array[$key], $result)) {
                     throw new TransformationFailedException(
                         'All values in the array should be the same'
                     );

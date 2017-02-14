@@ -190,4 +190,57 @@ class RepeatedTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, array('first' => null, 'second' => null));
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetOptionsForCompareNotCallableOrNull()
+    {
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'compare' => 'test',
+        ));
+    }
+
+    public function testSetOptionsForCompareCallableAsNull()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'compare' => null,
+        ));
+
+        $this->assertNull($form->getConfig()->getOption('compare'));
+    }
+
+    public function testSetOptionsForCompareCallableAsCallable()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'compare' => function ($value1, $value2) {
+                return $value1 === $value2;
+            },
+        ));
+
+        $this->assertEquals(function ($value1, $value2) {
+            return $value1 === $value2;
+        }, $form->getConfig()->getOption('compare'));
+    }
+
+    public function compare($value1, $value2) {
+        return 0 === strcmp($value1, $value2);
+    }
+
+    public function testSetOptionsForCompareNativeFunction()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'compare' => array($this, 'compare'),
+        ));
+
+        $input = array('first' => 'foo', 'second' => 'foo');
+
+        $form->submit($input);
+
+        $this->assertEquals('foo', $form['first']->getViewData());
+        $this->assertEquals('foo', $form['second']->getViewData());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertEquals($input, $form->getViewData());
+        $this->assertEquals('foo', $form->getData());
+    }
 }

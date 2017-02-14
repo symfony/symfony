@@ -46,5 +46,12 @@ class SerializerPass implements CompilerPassInterface
             throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the Serializer service');
         }
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
+
+        // Looks for all the services tagged "serializer.name-converter" and adds the highest priority one to the
+        // Object Normalizer
+        $nameConverters = $this->findAndSortTaggedServices('serializer.name-converter', $container);
+        if (!empty($nameConverters)) {
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, $nameConverters[0]);
+        }
     }
 }

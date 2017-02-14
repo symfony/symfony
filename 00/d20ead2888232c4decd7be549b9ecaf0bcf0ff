@@ -1,0 +1,259 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T10:44:20Z
+
+While working on using glob for another use case in #21289, I found some similarities with this PR.
+Here is what I did there. It looks like this PR could do almost exactly the same:
+
+- let the Config component untouched
+- move the glob call to FileLoader in the DI component
+
+Before calling glob, the "resource" should be parsed for glob-specific characters. The constant part of the "resource" should be the part that is given the locator. Then, FileLoader could use glob on the result, with the glob tail appended.
+
+In case this is not clear enough, this logic is implemented here:
+https://github.com/symfony/symfony/pull/21289/files#diff-ad1ed76aba6a80df5a48dfa4585adcf3R61
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-01-17T14:00:54Z
+
+@nicolas-grekas I have made the suggested changes, please have a look if that is what you had in mind.
+
+For me the downside of keeping this in the DI component and out of the Config component, is that you loose the ability to load multiple configs in a container extension, E.G
+
+```
+$loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+$loader->load('*.yml');
+```
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-01-17T14:57:48Z
+
+The other issue with not changing the `FileLocator::locate`method, is that you now always need to have a directory prefix. You can't just load, for example, something like `*.yml` or`dev_*.yml`, and use whatever the paths is set in the locator
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-01-17T15:16:16Z
+
+The following patch fixes the above mentioned issues, wdyt about applying this changes?
+
+```diff
+ src/Symfony/Component/Config/FileLocator.php                   | 10 ++++++----
+ .../Component/DependencyInjection/Loader/FileLoader.php        |  4 +++-
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/Symfony/Component/Config/FileLocator.php b/src/Symfony/Component/Config/FileLocator.php
+index 6b686390bc..09288b4bde 100644
+--- a/src/Symfony/Component/Config/FileLocator.php
++++ b/src/Symfony/Component/Config/FileLocator.php
+@@ -59,11 +59,13 @@ class FileLocator implements FileLocatorInterface
+         $filepaths = array();
+
+         foreach ($paths as $path) {
+-            if (@file_exists($file = $path.DIRECTORY_SEPARATOR.$name)) {
+-                if (true === $first) {
+-                    return $file;
++            foreach(glob($path.DIRECTORY_SEPARATOR.$name, defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $file) {
++                if (@file_exists($file)) {
++                    if (true === $first) {
++                        return $file;
++                    }
++                    $filepaths[] = $file;
+                 }
+-                $filepaths[] = $file;
+             }
+         }
+
+diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
+index 46e89ab1e9..983cfbc5db 100644
+--- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
++++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
+@@ -54,7 +54,9 @@ abstract class FileLoader extends BaseFileLoader
+      */
+     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+     {
+-        if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
++        $i = strcspn($resource, '*?{[');
++
++        if (strlen($resource) === $i || 0 === $i || false === strpos($resource, '/')) {
+             $directoryPrefix = $resource;
+             $directoryGlob = '';
+         } else {
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-03T13:13:24Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-02-08T19:10:39Z
+
+@nicolas-grekas Changes made. I still think it's important to load config without the need of a directory prefix, but I'll work separately on that. If I can get something to work, I'll open a new PR
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-02-08T19:10:46Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-08T19:18:40Z
+
+Sure, when there is no prefix, we should just use ./
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-02-08T19:40:09Z
+
+That might not be intuitive for users, so it should probably then just be documented
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-08T20:26:11Z
+
+here is a fix - a separate test case would be better indeed
+```diff
+diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
+index 555831b..0f642dc 100644
+--- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
++++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
+@@ -55,6 +55,9 @@ abstract class FileLoader extends BaseFileLoader
+         if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
+             $directoryPrefix = $resource;
+             $directoryGlob = '';
++        } elseif (0 === $i) {
++            $directoryPrefix = '.';
++            $directoryGlob = '/'.$resource;
+         } else {
+             $directoryPrefix = dirname(substr($resource, 0, 1 + $i));
+             $directoryGlob = substr($resource, strlen($directoryPrefix));
+diff --git a/src/Symfony/Component/DependencyInjection/Tests/Loader/FileLoaderTest.php b/src/Symfony/Component/DependencyInjection/Tests/Loader/FileLoaderTest.php
+index ad875ba..8853eb6 100644
+--- a/src/Symfony/Component/DependencyInjection/Tests/Loader/FileLoaderTest.php
++++ b/src/Symfony/Component/DependencyInjection/Tests/Loader/FileLoaderTest.php
+@@ -43,7 +43,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
+         ));
+
+         $loader->setResolver($resolver);
+-        $loader->import('Fixtures/{xml,yaml}/services2.{yml,xml}');
++        $loader->import('{F}ixtures/{xml,yaml}/services2.{yml,xml}');
+
+         $actual = $container->getParameterBag()->all();
+         $expected = array(
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T19:31:20Z
+
+Coding standard should be fixed (cf. fabbot)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-12T22:12:40Z
+
+I suggest waiting for #21289 before working on this PR - it will need a rebase and share code (new `glob` method)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T11:02:08Z
+
+rebase unlocked, you can now use the new "glob" function:
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php#L95
+
+If you happen to chosse to use "true" as second argument, then I invite you to remove this argument altogether because then it's the only value used in the code base (I tend to think we should do that.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T13:24:54Z
+
+Thinking again about this one, I'd now say it should not handle directories at all - only files (meaning $recursive is required :) )
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-02-13T19:35:05Z
+
+Rebased and updated to use the new glob method.
+
+> I'd now say it should not handle directories at all - only files
+
+Does that mean I also don't need to change the `$type` to `directory` when a path is a directory? Or is that part still fine?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T20:09:50Z
+
+I think that part should be removed yes: just skip directories.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-02-13T20:24:55Z
+
+It seems like directory loading can't be skipped, it makes the current tests fail. So I think either `$recursive` then needs to be `true`, or we need to pass `directory` as the type if the path is a directory
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T22:28:53Z
+
+This should do it, WDYT?
+```diff
+diff --git a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
+index 794e242..41c9da6 100644
+--- a/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
++++ b/src/Symfony/Component/DependencyInjection/Loader/FileLoader.php
+@@ -90,7 +90,7 @@ abstract class FileLoader extends BaseFileLoader
+         $extRegexp = defined('HHVM_VERSION') ? '/\\.(?:php|hh)$/' : '/\\.php$/';
+
+         foreach ($this->glob($resource, true, $prefixLen) as $path => $info) {
+-            if (!preg_match($extRegexp, $path, $m) || !$info->isFile() || !$info->isReadable()) {
++            if (!preg_match($extRegexp, $path, $m) || !$info->isReadable()) {
+                 continue;
+             }
+             $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, -strlen($m[0]))), '\\');
+@@ -112,6 +112,11 @@ abstract class FileLoader extends BaseFileLoader
+     private function glob($resource, $recursive, &$prefixLen = null)
+     {
+         if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
++            if (!$recursive) {
++                yield $resource => new \SplFileInfo($resource);
++
++                return;
++            }
+             $resourcePrefix = $resource;
+             $resource = '';
+         } elseif (0 === $i) {
+@@ -134,9 +139,11 @@ abstract class FileLoader extends BaseFileLoader
+                 if ($recursive && is_dir($path)) {
+                     $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS;
+                     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, $flags)) as $path => $info) {
+-                        yield $path => $info;
++                        if ($info->isFile()) {
++                            yield $path => $info;
++                        }
+                     }
+-                } else {
++                } elseif (is_file($path)) {
+                     yield $path => new \SplFileInfo($path);
+                 }
+             }
+@@ -155,7 +162,7 @@ abstract class FileLoader extends BaseFileLoader
+         }
+
+         foreach ($finder->followLinks()->in($resourcePrefix) as $path => $info) {
+-            if (preg_match($regex, substr($path, $prefixLen))) {
++            if (preg_match($regex, substr($path, $prefixLen)) && $info->isFile()) {
+                 yield $path => $info;
+             }
+         }
+```
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-02-14T06:08:04Z
+
+Changes made and tests passing again

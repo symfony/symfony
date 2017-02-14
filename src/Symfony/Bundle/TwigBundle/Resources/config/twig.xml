@@ -138,10 +138,8 @@
             <argument /> <!-- thousands separator, set in TwigExtension -->
         </service>
 
-        <service id="twig.runtime_loader" class="Symfony\Bundle\TwigBundle\ContainerAwareRuntimeLoader" public="false">
-            <argument type="service" id="service_container" />
-            <argument type="collection" /> <!-- the mapping between class names and service names -->
-            <argument type="service" id="logger" on-invalid="null" />
+        <service id="twig.runtime_loader" class="Twig_ContainerRuntimeLoader" public="false">
+            <argument /> <!-- runtime locator -->
         </service>
     </services>
 </container>

@@ -47,9 +47,9 @@
 
         <service id="session.handler.write_check" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler" public="false" />
 
-        <service id="session_listener" class="Symfony\Bundle\FrameworkBundle\EventListener\SessionListener">
+        <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\SessionListener">
             <tag name="kernel.event_subscriber" />
-            <argument type="service" id="service_container" />
+            <getter name="getSession" type="service" id="session" on-invalid="null" />
         </service>
 
         <service id="session.save_listener" class="Symfony\Component\HttpKernel\EventListener\SaveSessionListener">

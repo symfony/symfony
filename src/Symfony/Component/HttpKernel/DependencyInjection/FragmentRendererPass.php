@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 /**
@@ -43,11 +45,9 @@ class FragmentRendererPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition($this->handlerService);
+        $renderers = array();
         foreach ($container->findTaggedServiceIds($this->rendererTag) as $id => $tags) {
             $def = $container->getDefinition($id);
-            if (!$def->isPublic()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" must be public as fragment renderer are lazy-loaded.', $id));
-            }
 
             if ($def->isAbstract()) {
                 throw new InvalidArgumentException(sprintf('The service "%s" must not be abstract as fragment renderer are lazy-loaded.', $id));
@@ -63,8 +63,10 @@ class FragmentRendererPass implements CompilerPassInterface
             }
 
             foreach ($tags as $tag) {
-                $definition->addMethodCall('addRendererService', array($tag['alias'], $id));
+                $renderers[$tag['alias']] = new Reference($id);
             }
         }
+
+        $definition->replaceArgument(0, new ServiceLocatorArgument($renderers));
     }
 }

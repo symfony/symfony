@@ -20,9 +20,9 @@
 
         <service id="test.client.cookiejar" class="Symfony\Component\BrowserKit\CookieJar" shared="false" />
 
-        <service id="test.session.listener" class="Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener">
-            <argument type="service" id="service_container" />
+        <service id="test.session.listener" class="Symfony\Component\HttpKernel\EventListener\TestSessionListener">
             <tag name="kernel.event_subscriber" />
+            <getter name="getSession" type="service" id="session" on-invalid="null" />
         </service>
     </services>
 </container>

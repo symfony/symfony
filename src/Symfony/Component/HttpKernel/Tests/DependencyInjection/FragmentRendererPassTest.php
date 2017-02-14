@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
@@ -60,19 +62,13 @@ class FragmentRendererPassTest extends TestCase
         $renderer = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $renderer
             ->expects($this->once())
-            ->method('addMethodCall')
-            ->with('addRendererService', array('foo', 'my_content_renderer'))
-        ;
+            ->method('replaceArgument')
+            ->with(0, $this->equalTo(new ServiceLocatorArgument(array('foo' => new Reference('my_content_renderer')))));
 
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
             ->will($this->returnValue('Symfony\Component\HttpKernel\Tests\DependencyInjection\RendererService'));
-        $definition
-            ->expects($this->once())
-            ->method('isPublic')
-            ->will($this->returnValue(true))
-        ;
 
         $builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition', 'getReflectionClass'))->getMock();
         $builder->expects($this->any())

@@ -619,23 +619,14 @@ class FrameworkExtension extends Extension
             throw new \LogicException('An asset package cannot have base URLs and base paths.');
         }
 
-        if (!$baseUrls) {
-            $package = new DefinitionDecorator('assets.path_package');
-
-            return $package
-                ->setPublic(false)
-                ->replaceArgument(0, $basePath)
-                ->replaceArgument(1, $version)
-            ;
-        }
-
-        $package = new DefinitionDecorator('assets.url_package');
-
-        return $package
+        $package = new DefinitionDecorator($baseUrls ? 'assets.url_package' : 'assets.path_package');
+        $package
             ->setPublic(false)
-            ->replaceArgument(0, $baseUrls)
+            ->replaceArgument(0, $baseUrls ?: $basePath)
             ->replaceArgument(1, $version)
         ;
+
+        return $package;
     }
 
     private function createVersion(ContainerBuilder $container, $version, $format, $name)

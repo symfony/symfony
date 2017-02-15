@@ -36,6 +36,11 @@
             <argument type="service" id="file_locator" />
         </service>
 
+        <service id="routing.loader.glob" class="Symfony\Component\Config\Loader\GlobFileLoader" public="false">
+            <tag name="routing.loader" />
+            <argument type="service" id="file_locator" />
+        </service>
+
         <service id="routing.loader.directory" class="Symfony\Component\Routing\Loader\DirectoryLoader" public="false">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />

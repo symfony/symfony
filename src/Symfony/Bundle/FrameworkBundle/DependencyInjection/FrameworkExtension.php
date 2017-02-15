@@ -35,7 +35,6 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Workflow;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * FrameworkExtension.

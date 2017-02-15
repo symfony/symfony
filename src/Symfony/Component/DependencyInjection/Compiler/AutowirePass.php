@@ -455,6 +455,10 @@ class AutowirePass extends AbstractRecursivePass
     private function createAutowiredDefinition(\ReflectionClass $typeHint)
     {
         if (isset($this->ambiguousServiceTypes[$typeHint->name])) {
+            if ($this->container->has($typeHint->name)) {
+                return new Reference($typeHint->name);
+            }
+
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $matchingServices = implode(', ', $this->ambiguousServiceTypes[$typeHint->name]);
 

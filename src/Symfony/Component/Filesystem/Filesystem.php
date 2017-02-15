@@ -128,6 +128,26 @@ class Filesystem
     }
 
     /**
+     * Checks if files are real files.
+     *
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
+     *
+     * @return bool true if the file is a real file, false otherwise
+     */
+    public function isFile($files)
+    {
+        foreach ($this->toIterator($files) as $file) {
+            if ('\\' === DIRECTORY_SEPARATOR && strlen($file) > 258) {
+                throw new IOException('Could not check if file exist because path length exceeds 258 characters.', 0, null, $file);
+            }
+            if (!is_file($file)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create

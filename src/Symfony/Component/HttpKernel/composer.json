@@ -37,12 +37,13 @@
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/templating": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",
-        "symfony/var-dumper": "~3.2",
+        "symfony/var-dumper": "~3.3",
         "psr/cache": "~1.0"
     },
     "conflict": {
         "symfony/config": "<2.8",
-        "symfony/dependency-injection": "<3.3"
+        "symfony/dependency-injection": "<3.3",
+        "symfony/var-dumper": "<3.3"
     },
     "suggest": {
         "symfony/browser-kit": "",

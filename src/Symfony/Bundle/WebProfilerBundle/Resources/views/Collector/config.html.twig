@@ -267,7 +267,7 @@
                 {% for name in collector.bundles|keys|sort %}
                 <tr>
                     <th scope="row" class="font-normal">{{ name }}</th>
-                    <td class="font-normal">{{ collector.bundles[name] }}</td>
+                    <td class="font-normal">{{ profiler_dump(collector.bundles[name]) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

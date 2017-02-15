@@ -116,10 +116,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 continue;
             }
             if ('request_headers' === $key || 'response_headers' === $key) {
-                $value = array_map(function ($v) { return isset($v[0]) && !isset($v[1]) ? $v[0] : $v; }, $value);
-            }
-            if ('request_server' !== $key && 'request_cookies' !== $key) {
-                $this->data[$key] = array_map(array($this, 'cloneVar'), $value);
+                $this->data[$key] = array_map(function ($v) { return isset($v[0]) && !isset($v[1]) ? $v[0] : $v; }, $value);
             }
         }
 
@@ -144,6 +141,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 ));
             }
         }
+
+        $this->data = $this->cloneVar($this->data);
     }
 
     public function getMethod()
@@ -158,52 +157,52 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function getRequestRequest()
     {
-        return new ParameterBag($this->data['request_request']);
+        return new ParameterBag($this->data['request_request']->getValue());
     }
 
     public function getRequestQuery()
     {
-        return new ParameterBag($this->data['request_query']);
+        return new ParameterBag($this->data['request_query']->getValue());
     }
 
     public function getRequestHeaders()
     {
-        return new ParameterBag($this->data['request_headers']);
+        return new ParameterBag($this->data['request_headers']->getValue());
     }
 
     public function getRequestServer($raw = false)
     {
-        return new ParameterBag($raw ? $this->data['request_server'] : array_map(array($this, 'cloneVar'), $this->data['request_server']));
+        return new ParameterBag($this->data['request_server']->getValue($raw));
     }
 
     public function getRequestCookies($raw = false)
     {
-        return new ParameterBag($raw ? $this->data['request_cookies'] : array_map(array($this, 'cloneVar'), $this->data['request_cookies']));
+        return new ParameterBag($this->data['request_cookies']->getValue($raw));
     }
 
     public function getRequestAttributes()
     {
-        return new ParameterBag($this->data['request_attributes']);
+        return new ParameterBag($this->data['request_attributes']->getValue());
     }
 
     public function getResponseHeaders()
     {
-        return new ParameterBag($this->data['response_headers']);
+        return new ParameterBag($this->data['response_headers']->getValue());
     }
 
     public function getSessionMetadata()
     {
-        return $this->data['session_metadata'];
+        return $this->data['session_metadata']->getValue();
     }
 
     public function getSessionAttributes()
     {
-        return $this->data['session_attributes'];
+        return $this->data['session_attributes']->getValue();
     }
 
     public function getFlashes()
     {
-        return $this->data['flashes'];
+        return $this->data['flashes']->getValue();
     }
 
     public function getContent()
@@ -262,22 +261,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function getRouteParams()
     {
-        if (!isset($this->data['request_attributes']['_route_params'])) {
-            return array();
-        }
-
-        $data = $this->data['request_attributes']['_route_params'];
-        $rawData = $data->getRawData();
-        if (!isset($rawData[1])) {
-            return array();
-        }
-
-        $params = array();
-        foreach ($rawData[1] as $k => $v) {
-            $params[$k] = $data->seek($k);
-        }
-
-        return $params;
+        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params']->getValue() : array();
     }
 
     /**

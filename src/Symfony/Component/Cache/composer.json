@@ -31,6 +31,9 @@
         "doctrine/dbal": "~2.4",
         "predis/predis": "~1.0"
     },
+    "conflict": {
+        "symfony/var-dumper": "<3.3"
+    },
     "suggest": {
         "symfony/polyfill-apcu": "For using ApcuAdapter on HHVM"
     },

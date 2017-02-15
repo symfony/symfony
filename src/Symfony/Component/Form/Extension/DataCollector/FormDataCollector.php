@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -80,7 +81,8 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      * @var ClonerInterface
      */
     private $cloner;
-    private $clonerCache = array();
+
+    private $hasVarDumper;
 
     public function __construct(FormDataExtractorInterface $dataExtractor)
     {
@@ -90,6 +92,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             'forms_by_hash' => array(),
             'nb_errors' => 0,
         );
+        $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
     /**
@@ -238,38 +241,15 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function serialize()
     {
-        $cloneVar = array($this, 'cloneVar');
-
-        foreach ($this->data['forms_by_hash'] as &$form) {
-            foreach ($form as $k => $v) {
-                switch ($k) {
-                    case 'type_class':
-                        $form[$k] = $cloneVar($v, true);
-                        break;
-                    case 'synchronized':
-                        $form[$k] = $cloneVar($v);
-                        break;
-                    case 'view_vars':
-                    case 'passed_options':
-                    case 'resolved_options':
-                    case 'default_data':
-                    case 'submitted_data':
-                        if ($v && is_array($v)) {
-                            $form[$k] = array_map($cloneVar, $v);
-                        }
-                        break;
-                    case 'errors':
-                        foreach ($v as $i => $e) {
-                            if (!empty($e['trace'])) {
-                                $form['errors'][$i]['trace'] = array_map($cloneVar, $e['trace']);
-                            }
-                        }
-                        break;
+        if ($this->hasVarDumper) {
+            foreach ($this->data['forms_by_hash'] as &$form) {
+                if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
+                    $form['type_class'] = new ClassStub($form['type_class']);
                 }
             }
         }
 
-        return serialize($this->data);
+        return serialize($this->cloneVar($this->data));
     }
 
     /**
@@ -281,14 +261,15 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             return $var;
         }
         if (null === $this->cloner) {
-            if (class_exists(ClassStub::class)) {
+            if ($this->hasVarDumper) {
                 $this->cloner = new VarCloner();
-                $this->cloner->setMaxItems(25);
+                $this->cloner->setMaxItems(-1);
                 $this->cloner->addCasters(array(
                     '*' => function ($v, array $a, Stub $s, $isNested) {
-                        if ($isNested && !$v instanceof \DateTimeInterface) {
-                            $s->cut = -1;
-                            $a = array();
+                        foreach ($a as &$v) {
+                            if (is_object($v) && !$v instanceof \DateTimeInterface) {
+                                $v = new CutStub($v);
+                            }
                         }
 
                         return $a;
@@ -320,34 +301,15 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
                 $this->cloner = false;
             }
         }
-        if (false === $this->cloner) {
-            if (null === $this->valueExporter) {
-                $this->valueExporter = new ValueExporter();
-            }
-
-            return $this->valueExporter->exportValue($var);
-        }
-        if (null === $var) {
-            $type = $hash = 'null';
-        } elseif (array() === $var) {
-            $type = $hash = 'array';
-        } elseif ('object' === $type = gettype($var)) {
-            $hash = spl_object_hash($var);
-        } elseif ('double' === $type) {
-            $hash = (string) $var;
-        } elseif ('integer' === $type || 'string' === $type) {
-            $hash = $var;
-        } else {
-            $type = null;
-        }
-        if (null !== $type && null !== $cache = &$this->clonerCache[$type][$hash]) {
-            return $cache;
-        }
-        if ($isClass) {
-            return $cache = $this->cloner->cloneVar(array(new ClassStub($var)))->seek(0);
+        if (false !== $this->cloner) {
+            return $this->cloner->cloneVar($var, Caster::EXCLUDE_VERBOSE);
         }
 
-        return $cache = $this->cloner->cloneVar($var);
+        if (null === $this->valueExporter) {
+            $this->valueExporter = new ValueExporter();
+        }
+
+        return $this->valueExporter->exportValue($var);
     }
 
     private function &recursiveBuildPreliminaryFormTree(FormInterface $form, array &$outputByHash)

@@ -19,7 +19,7 @@
         "php": ">=5.5.9",
         "symfony/security": "~3.3",
         "symfony/dependency-injection": "~3.3",
-        "symfony/http-kernel": "~3.2",
+        "symfony/http-kernel": "~3.3",
         "symfony/polyfill-php70": "~1.0"
     },
     "require-dev": {
@@ -37,11 +37,14 @@
         "symfony/twig-bridge": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "symfony/validator": "^3.2.5",
-        "symfony/var-dumper": "~3.2",
+        "symfony/var-dumper": "~3.3",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "doctrine/doctrine-bundle": "~1.4",
         "twig/twig": "~1.28|~2.0"
+    },
+    "conflict": {
+        "symfony/var-dumper": "<3.3"
     },
     "suggest": {
         "symfony/security-acl": "For using the ACL functionality of this bundle"

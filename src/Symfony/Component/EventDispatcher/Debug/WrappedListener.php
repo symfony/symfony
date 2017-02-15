@@ -29,7 +29,7 @@ class WrappedListener
     private $stopwatch;
     private $dispatcher;
     private $pretty;
-    private $data;
+    private $stub;
 
     private static $cloner;
 
@@ -91,15 +91,15 @@ class WrappedListener
 
     public function getInfo($eventName)
     {
-        if (null === $this->data) {
-            $this->data = false !== self::$cloner ? self::$cloner->cloneVar(array(new ClassStub($this->pretty.'()', $this->listener)))->seek(0) : $this->pretty;
+        if (null === $this->stub) {
+            $this->stub = false === self::$cloner ? $this->pretty.'()' : new ClassStub($this->pretty.'()', $this->listener);
         }
 
         return array(
             'event' => $eventName,
             'priority' => null !== $this->dispatcher ? $this->dispatcher->getListenerPriority($eventName, $this->listener) : null,
             'pretty' => $this->pretty,
-            'data' => $this->data,
+            'stub' => $this->stub,
         );
     }
 

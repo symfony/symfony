@@ -182,7 +182,7 @@
              <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
 
             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                {{ profiler_dump(log.context.seek('exception').seek('\0Exception\0trace'), maxDepth=2) }}
+                {{ profiler_dump(log.context.exception['\0Exception\0trace'], maxDepth=2) }}
             </div>
         </span>
     {% elseif log.context is defined and log.context is not empty %}

@@ -14,7 +14,6 @@ namespace Symfony\Component\Translation\Tests\DataCollector;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class TranslationDataCollectorTest extends TestCase
 {
@@ -36,13 +35,11 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals(0, $dataCollector->getCountMissings());
         $this->assertEquals(0, $dataCollector->getCountFallbacks());
         $this->assertEquals(0, $dataCollector->getCountDefines());
-        $this->assertEquals(array(), $dataCollector->getMessages());
+        $this->assertEquals(array(), $dataCollector->getMessages()->getValue());
     }
 
     public function testCollect()
     {
-        $cloner = new VarCloner();
-
         $collectedMessages = array(
             array(
                   'id' => 'foo',
@@ -119,9 +116,9 @@ class TranslationDataCollectorTest extends TestCase
                   'state' => DataCollectorTranslator::MESSAGE_MISSING,
                   'count' => 3,
                   'parameters' => array(
-                      $cloner->cloneVar(array('%count%' => 3)),
-                      $cloner->cloneVar(array('%count%' => 3)),
-                      $cloner->cloneVar(array('%count%' => 4, '%foo%' => 'bar')),
+                      array('%count%' => 3),
+                      array('%count%' => 3),
+                      array('%count%' => 4, '%foo%' => 'bar'),
                   ),
                   'transChoiceNumber' => 3,
             ),
@@ -136,7 +133,8 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals(1, $dataCollector->getCountMissings());
         $this->assertEquals(1, $dataCollector->getCountFallbacks());
         $this->assertEquals(1, $dataCollector->getCountDefines());
-        $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()));
+
+        $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()->getValue(true)));
     }
 
     private function getTranslator()

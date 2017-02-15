@@ -45,7 +45,7 @@ class SplCaster
         } else {
             if (!($flags & \ArrayObject::STD_PROP_LIST)) {
                 $c->setFlags(\ArrayObject::STD_PROP_LIST);
-                $a = Caster::castObject($c, new \ReflectionClass($class));
+                $a = Caster::castObject($c, $class);
                 $c->setFlags($flags);
             }
 

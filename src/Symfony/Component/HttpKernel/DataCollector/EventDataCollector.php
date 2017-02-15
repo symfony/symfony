@@ -47,6 +47,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
             $this->setCalledListeners($this->dispatcher->getCalledListeners());
             $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners());
         }
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**

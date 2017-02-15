@@ -98,9 +98,9 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         }
 
         $replacements = array();
-        foreach ($context->getRawData()[1] as $k => $v) {
-            $v = '{'.twig_escape_filter($env, $k).'}';
-            $replacements['&quot;'.$v.'&quot;'] = $replacements[$v] = $this->dumpData($env, $context->seek($k));
+        foreach ($context as $k => $v) {
+            $k = '{'.twig_escape_filter($env, $k).'}';
+            $replacements['&quot;'.$k.'&quot;'] = $replacements[$k] = $this->dumpData($env, $v);
         }
 
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';

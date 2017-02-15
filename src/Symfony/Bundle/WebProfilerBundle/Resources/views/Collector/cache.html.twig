@@ -90,7 +90,7 @@
                 <div class="metric">
                     <span class="value">
                         {% if key == 'time' %}
-                            {{ '%0.2f'|format(1000*value) }} ms
+                            {{ '%0.2f'|format(1000*value.value) }} ms
                         {% else %}
                             {{ value }}
                         {% endif %}

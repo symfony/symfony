@@ -81,11 +81,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBazService()
     {
-        $this->services['baz'] = $instance = new \Baz();
-
-        $instance->setFoo($this->get('foo_with_inline'));
-
-        return $instance;
+        return $this->services['baz'] = new \Baz();
     }
 
     /**

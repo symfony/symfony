@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-16T15:26:48Z
+
+Just to confirm: the issue seems to come from the [`FirewallEntryPointExtension`](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/Tests/Functional/Bundle/FirewallEntryPointBundle/DependencyInjection/FirewallEntryPointExtension.php) from the registered bundles in the fixtures app, as this extension does not have any configuration.
+Thus, https://github.com/symfony/symfony/pull/21057/files#diff-40ba7de9e4147b219f8ed3a42dede24dR51 which is calling `getConfiguration()` causes the error.

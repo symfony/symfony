@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T15:34:58Z
+
+@ogizanagi That's too many PRs on the same subject. Too much overhead for everyone. I'm going to close the 2 other ones. Let's do everything here. Let's really think about this and let's say that this one is the last one on the topic.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T15:52:43Z
+
+No problem with that. I've cherry-picked 90dee8c so we can discuss about everything here.
+
+Last issue that should be tackled (IMHO in a dedicated PR unless you consider it a new feature rather than a bug fix for 3.2) is [your comment about json & xml descriptors](https://github.com/symfony/symfony/pull/20866#issuecomment-266678895) that should show hidden commands too.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-13T17:07:51Z
+
+Tags are already included in help texts as well. Hence i chose to use getLongVersion as well. Tags are not shown anyway..
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T18:15:11Z
+
+> Tags are not shown anyway
+
+@ro0NL: That's not true when using shortcuts (i.e `<info>3.0</>`) as `Symfony\Bundle\FrameworkBundle\Console\Application::getLongVersion()` does.
+
+We can't do much for help texts, but this is the markdown document title. It also displays information that should not been shown for the format purpose (kernel, env, debug).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-13T18:19:38Z
+
+I used github to preview, ie. the title in https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Tests/Fixtures/application_2.md looks right to me
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T18:26:02Z
+
+Here is what it looks like with tags shortcuts and the `Symfony\Bundle\FrameworkBundle\Console\Application::getLongVersion()`: https://github.com/ogizanagi/symfony/blob/8be2185a778c04dc87fb3f9e62d2e1ce31ed3066/application.md
+
+Anyone may have used short closing tags in their own application and `getLongVersion()` implementation.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-13T18:51:51Z
+
+Fair enough. Let's add a test for it then :)
+
+edit: what if we just filter text with tags using`strip_tags`.  Wouldnt that be much simpler?
+
+edit2: https://3v4l.org/3DFsX
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-26T15:24:39Z
+
+@ro0NL : Sorry, I've missed your comment.
+
+> Fair enough. Let's add a test for it then :)
+
+Which kind of test do you have in mind? IMHO it isn't worth adding a test related to this for the FrameworkBundle `Application` class. Anyway, we don't use `getLongVersion` anymore here, so there is nothing to test regarding the mentioned tags and extra info previously displayed.
+
+> what if we just filter text with tags usingstrip_tags. Wouldnt that be much simpler?
+
+If you mean just filtering the result of `getLongVersion` to keep using it, yes, but the fact is `getLongVersion` can still return anything not suitable for a document title. Pragmatically, we just need the application title. So there is no reason to use `getLongVersion` over directly using what we really need.
+
+If you mean stripping all tags in every texts, the issue is that striptags won't preserve tags that might be legit in a description, even when escaping it, on the contrary of calling `OutputFormatter::format` from a non decorated instance.
+I can update this PR to disable decoration for the markdown descriptor and calling `Descriptor::write()` with the `$decorated` argument ironically set to `true` 😅  in order to escape any text while preserving explicitly escaped tags.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T15:44:03Z
+
+Maybe use short notation in the component, ie here https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Application.php#L342
+
+That should cover.
+
+> but the fact is getLongVersion can still return anything not suitable for a document title
+
+Guess your right.. it looks bad if long version is something like
+
+```
+<name> <version>
+Some built date notice
+Some copyright notice
+```
+
+What about UX-wise, the following header;
+
+```
+<app> <version> # or Console Tool by default
+===============
+
+\```
+<long-version> # not shown if same as default?
+\```
+
+# etc.
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T15:48:35Z
+
+Or lets forget about `getLongVersion`.. not sure the info is worth it anyway?
+
+Lets do the XML/JSON approach :+1: and continue hardcoding `UNKNOWN` (sorry couldnt resist ;-))
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-26T17:28:51Z
+
+In 7687bf5cd2e0f1be5cbf335c7e6f0e96e2b58907, I've added what I mentioned in https://github.com/symfony/symfony/pull/20896#issuecomment-269220046
+
+> I can update this PR to disable decoration for the markdown descriptor and calling Descriptor::write() with the $decorated argument ironically set to true 😅 in order to escape any text while preserving explicitly escaped tags.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-29T18:39:11Z
+
+I don't have more changes to bring to the descriptor. IMHO this PR is ready for a decision.

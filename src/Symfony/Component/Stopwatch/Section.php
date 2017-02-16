@@ -70,6 +70,16 @@ class Section
     }
 
     /**
+     * Returns the children from this section.
+     *
+     * @return Section[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
      * Creates or re-opens a child section.
      *
      * @param string|null $id Null to create a new section, the identifier to re-open an existing one

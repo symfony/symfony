@@ -1,0 +1,7 @@
+- Class: `AutowiredService`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowire: `set*`, `addFoo`

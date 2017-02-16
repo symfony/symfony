@@ -11,7 +11,7 @@
 - Lazy: no
 - Shared: yes
 - Abstract: no
-- Autowired: no
+- Autowire: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`

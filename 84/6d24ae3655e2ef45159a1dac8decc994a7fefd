@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-24T14:36:56Z
+
+@nicolas-grekas Is there any reason for adding this to the 3.x milestone but https://github.com/symfony/symfony/pull/21375 to the 3.3 one? They are about fixing the same ticket so if there is something wrong to you here, please tell me :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-24T15:03:20Z
+
+Updated this to make the serializer id and encoder/normalizer tags configurable through the constructor, defaulting to the ones used in the framework.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-26T08:02:24Z
+
+But, isn't a BC break to add a parent class with a new constructor to the deprecated pass?
+Edit: according to the BC promise:
+
+> Add constructor without mandatory arguments: Yes [1]
+[1] Should be avoided. When done, this change must be documented in the UPGRADE file.
+
+I guess it's fine here.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-07T13:10:20Z
+
+Do we want to move forward on this for 3.3? It would be nice to have a thought, to know if it's worth working on other relevant passes listed in the ticket using the same approach.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-08T10:33:42Z
+
+IMO it makes sense to move them.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-08T10:52:54Z
+
+👍

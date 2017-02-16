@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
 /**
@@ -47,6 +48,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             $tmpContainer = new ContainerBuilder($container->getParameterBag());
             $tmpContainer->setResourceTracking($container->isTrackingResources());
             $tmpContainer->addObjectResource($extension);
+            if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
+                $tmpContainer->addObjectResource($configuration);
+            }
 
             foreach ($exprLangProviders as $provider) {
                 $tmpContainer->addExpressionLanguageProvider($provider);

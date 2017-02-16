@@ -41,6 +41,5 @@ digraph sc {
   node_method_call1 -> node_foobaz [label="setBar()" style="dashed"];
   node_foo_with_inline -> node_inlined [label="setBar()" style="dashed"];
   node_inlined -> node_baz [label="setBaz()" style="dashed"];
-  node_baz -> node_foo_with_inline [label="setFoo()" style="dashed"];
   node_configurator_service -> node_baz [label="setFoo()" style="dashed"];
 }

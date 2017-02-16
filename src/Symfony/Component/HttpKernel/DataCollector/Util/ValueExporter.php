@@ -37,7 +37,7 @@ class ValueExporter
 
         if (is_object($value)) {
             if ($value instanceof \DateTimeInterface) {
-                return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ISO8601));
+                return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ATOM));
             }
 
             return sprintf('Object(%s)', get_class($value));

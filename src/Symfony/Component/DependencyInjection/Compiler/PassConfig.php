@@ -74,7 +74,6 @@ class PassConfig
                 new RemoveUnusedDefinitionsPass(),
             )),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
-            new CheckCircularReferencesPass(),
         ));
     }
 

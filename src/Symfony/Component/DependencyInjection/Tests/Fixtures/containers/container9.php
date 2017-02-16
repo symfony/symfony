@@ -67,6 +67,7 @@ $container
 ;
 $container
     ->register('baz', 'Baz')
+    ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
 ;
 $container
     ->register('request', 'Request')

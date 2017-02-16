@@ -70,7 +70,11 @@
         <argument type="service" id="baz"/>
       </call>
     </service>
-    <service id="baz" class="Baz"/>
+    <service id="baz" class="Baz">
+      <call method="setFoo">
+        <argument type="service" id="foo_with_inline"/>
+      </call>
+    </service>
     <service id="request" class="Request" synthetic="true"/>
     <service id="configurator_service" class="ConfClass" public="false">
       <call method="setFoo">

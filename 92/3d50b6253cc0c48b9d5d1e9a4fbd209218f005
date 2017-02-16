@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-14T13:36:53Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-24T15:28:45Z
+
+Updated this to make the form extension service id and form type/type_extension/type_guesser tags configurable through the constructor, defaulting to the ones used in the framework.
+This needs a second review :)

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-27T17:18:26Z
+
+Clearly not acceptable without tests
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-27T17:20:53Z
+
+@stof Sure, I just wanted to make sure first that there is no reason I did not think of that this is a stupid solution.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-27T18:18:55Z
+
+Please add a test ensuring that circular references in method calls stay allowed when inlining the services (i.e. we can instantiate both objects and then make method calls on them before leaving the ``get*Service`` method)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-28T11:12:47Z
+
+@stof Not sure I understand what you mean. Do you have an example of what you have in mind?

@@ -104,11 +104,16 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         }
         $this->lazy = false;
 
-        if ($this->onlyConstructorArguments) {
-            $this->processValue($value->getFactory());
-            $this->processValue($value->getArguments());
-        } else {
-            parent::processValue($value, $isRoot);
+        $this->processValue($value->getFactory());
+        $this->processValue($value->getArguments());
+
+        if (!$this->onlyConstructorArguments) {
+            $this->processValue($value->getProperties());
+            $this->lazy = true;
+            $this->processValue($value->getOverriddenGetters());
+            $this->lazy = false;
+            $this->processValue($value->getMethodCalls());
+            $this->processValue($value->getConfigurator());
         }
         $this->lazy = $lazy;
 

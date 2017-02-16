@@ -363,6 +363,38 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('ParentClass', $def->getClass());
     }
 
+    public function testProcessInheritTags()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'ParentClass')->addTag('some.tag', array('foo' => 'bar'));
+
+        $definition = (new ChildDefinition('parent'))
+            ->setInheritTags(true)
+            ->addTag('other.tag')
+            ->addTag('some.tag', array('bar' => 'foo'));
+
+        $container->setDefinition('child', $definition);
+
+        $this->process($container);
+
+        $definition = $container->getDefinition('child');
+        $this->assertSame('ParentClass', $definition->getClass());
+        $this->assertCount(2, $definition->getTags());
+        $this->assertSame(
+            array(
+                'other.tag' => array(
+                    array(),
+                ),
+                'some.tag' => array(
+                    array('bar' => 'foo'),
+                    array('foo' => 'bar'),
+                ),
+            ),
+            $definition->getTags()
+        );
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

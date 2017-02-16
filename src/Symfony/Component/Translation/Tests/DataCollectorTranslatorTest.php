@@ -86,8 +86,6 @@ class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('bar' => 'bar (fr)'), 'fr');
         $translator->addResource('array', array('bar_ru' => 'bar (ru)'), 'ru');
 
-        $collector = new DataCollectorTranslator($translator);
-
-        return $collector;
+        return new DataCollectorTranslator($translator);
     }
 }

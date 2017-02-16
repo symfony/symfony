@@ -36,7 +36,7 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
         $tmp = tempnam(sys_get_temp_dir(), 'sf');
 
-        file_put_contents($tmp, file_get_contents(self::$fixturesPath.'/'.$type.'/'.$fixture));
+        copy(self::$fixturesPath.'/'.$type.'/'.$fixture, $tmp);
 
         $container1 = new ContainerBuilder();
         $loader1 = new $loaderClass($container1, new FileLocator());

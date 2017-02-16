@@ -1,15 +1,15 @@
-My Symfony application <info>v1.0</info>
-========================================
+My Symfony application v1.0
+===========================
 
-* `alias1`
-* `alias2`
-* `help`
-* `list`
+* [`alias1`](#descriptorcommand1)
+* [`alias2`](#descriptorcommand1)
+* [`help`](#help)
+* [`list`](#list)
 
 **descriptor:**
 
-* `descriptor:command1`
-* `descriptor:command2`
+* [`descriptor:command1`](#descriptorcommand1)
+* [`descriptor:command2`](#descriptorcommand2)
 
 `help`
 ------
@@ -20,15 +20,15 @@ Displays help for a command
 
 * `help [--format FORMAT] [--raw] [--] [<command_name>]`
 
-The <info>help</info> command displays help for a given command:
+The help command displays help for a given command:
 
-  <info>php app/console help list</info>
+  php app/console help list
 
-You can also output the help in other formats by using the <comment>--format</comment> option:
+You can also output the help in other formats by using the --format option:
 
-  <info>php app/console help --format=xml list</info>
+  php app/console help --format=xml list
 
-To display the list of available commands, please use the <info>list</info> command.
+To display the list of available commands, please use the list command.
 
 ### Arguments
 
@@ -132,21 +132,21 @@ Lists commands
 
 * `list [--raw] [--format FORMAT] [--] [<namespace>]`
 
-The <info>list</info> command lists all commands:
+The list command lists all commands:
 
-  <info>php app/console list</info>
+  php app/console list
 
 You can also display the commands for a specific namespace:
 
-  <info>php app/console list test</info>
+  php app/console list test
 
-You can also output the information in other formats by using the <comment>--format</comment> option:
+You can also output the information in other formats by using the --format option:
 
-  <info>php app/console list --format=xml</info>
+  php app/console list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  <info>php app/console list --raw</info>
+  php app/console list --raw
 
 ### Arguments
 

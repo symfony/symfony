@@ -610,8 +610,7 @@ class Parser
             $previousLineIndented = false;
             $previousLineBlank = false;
 
-            $blockLinesCount = count($blockLines);
-            for ($i = 0; $i < $blockLinesCount; ++$i) {
+            for ($i = 0, $blockLinesCount = count($blockLines); $i < $blockLinesCount; ++$i) {
                 if ('' === $blockLines[$i]) {
                     $text .= "\n";
                     $previousLineIndented = false;

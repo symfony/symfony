@@ -179,6 +179,9 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass` class has been removed. 
    Use the `Symfony\Component\Serializer\DependencyInjection\SerializerPass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
+   removed. Use the `Symfony\Component\Form\DependencyInjection\FormPass` class instead.
+
 SecurityBundle
 --------------
 

@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass`. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
  * Added configurable paths for validation files 
  * Deprecated `SerializerPass`, use `Symfony\Component\Serializer\DependencyInjection\SerializerPass` instead.
+ * Deprecated `FormPass`, use `Symfony\Component\Form\DependencyInjection\FormPass` instead.
 
 3.2.0
 -----

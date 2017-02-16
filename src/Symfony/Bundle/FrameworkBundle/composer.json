@@ -41,7 +41,7 @@
         "symfony/dom-crawler": "~2.8|~3.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/security": "~2.8|~3.0",
-        "symfony/form": "~2.8.16|~3.1.9|^3.2.2",
+        "symfony/form": "~3.3",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "symfony/security-core": "~3.2",
@@ -61,7 +61,8 @@
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0",
         "symfony/console": "<3.3",
-        "symfony/serializer": "<3.3"
+        "symfony/serializer": "<3.3",
+        "symfony/form": "<3.3"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

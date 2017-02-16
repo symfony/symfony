@@ -61,6 +61,10 @@ FrameworkBundle
    deprecated and will be removed in 4.0. 
    Use the `Symfony\Component\Serializer\DependencyInjection\SerializerPass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
+   deprecated and will be removed in 4.0. Use the `Symfony\Component\Form\DependencyInjection\FormPass`
+   class instead.
+
 HttpKernel
 -----------
 

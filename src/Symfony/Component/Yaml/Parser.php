@@ -609,8 +609,9 @@ class Parser
             $text = '';
             $previousLineIndented = false;
             $previousLineBlank = false;
+            $blockLinesCount = count($blockLines);
 
-            for ($i = 0; $i < count($blockLines); ++$i) {
+            for ($i = 0; $i < $blockLinesCount; ++$i) {
                 if ('' === $blockLines[$i]) {
                     $text .= "\n";
                     $previousLineIndented = false;
@@ -639,7 +640,7 @@ class Parser
 
         // deal with trailing newlines
         if ('' === $chomping) {
-            $text = preg_replace('/\n+$/', "\n", $text);
+            $text = preg_replace('/\n+$/', "\n", $text.('>' === $style ? "\n" : null));
         } elseif ('-' === $chomping) {
             $text = preg_replace('/\n+$/', '', $text);
         }

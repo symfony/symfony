@@ -13,8 +13,10 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
+use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 
 /**
@@ -24,6 +26,7 @@ use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
  */
 class UserPasswordEncoderCommandTest extends WebTestCase
 {
+    /** @var CommandTester */
     private $passwordEncoderCommandTester;
 
     public function testEncodePasswordEmptySalt()
@@ -105,6 +108,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             array(
                 'command' => 'security:encode-password',
                 'password' => 'p@ssw0rd',
+                'user-class' => 'Symfony\Component\Security\Core\User\User',
                 '--empty-salt' => true,
             )
         );
@@ -138,6 +142,74 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         ), array('interactive' => false));
     }
 
+    public function testEncodePasswordAsksNonProvidedUserClass()
+    {
+        $this->passwordEncoderCommandTester->setInputs(array('Custom\Class\Pbkdf2\User', "\n"));
+        $this->passwordEncoderCommandTester->execute(array(
+            'command' => 'security:encode-password',
+            'password' => 'password',
+        ), array('decorated' => false));
+
+        $this->assertContains(<<<EOTXT
+ For which user class would you like to encode a password? [Custom\Class\Bcrypt\User]:
+  [0] Custom\Class\Bcrypt\User
+  [1] Custom\Class\Pbkdf2\User
+  [2] Custom\Class\Test\User
+  [3] Symfony\Component\Security\Core\User\User
+EOTXT
+        , $this->passwordEncoderCommandTester->getDisplay(true));
+    }
+
+    public function testNonInteractiveEncodePasswordUsesFirstUserClass()
+    {
+        $this->passwordEncoderCommandTester->execute(array(
+            'command' => 'security:encode-password',
+            'password' => 'password',
+        ), array('interactive' => false));
+
+        $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $this->passwordEncoderCommandTester->getDisplay());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage There are no configured encoders for the "security" extension.
+     */
+    public function testThrowsExceptionOnNoConfiguredEncoders()
+    {
+        $application = new ConsoleApplication();
+        $application->add(new UserPasswordEncoderCommand($this->createMock(EncoderFactoryInterface::class), array()));
+
+        $passwordEncoderCommand = $application->find('security:encode-password');
+
+        $tester = new CommandTester($passwordEncoderCommand);
+        $tester->execute(array(
+            'command' => 'security:encode-password',
+            'password' => 'password',
+        ), array('interactive' => false));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing null as the first argument of "Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand::__construct" is deprecated since version 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     */
+    public function testLegacy()
+    {
+        $application = new ConsoleApplication();
+        $application->add(new UserPasswordEncoderCommand());
+
+        $passwordEncoderCommand = $application->find('security:encode-password');
+        self::bootKernel(array('test_case' => 'PasswordEncode'));
+        $passwordEncoderCommand->setContainer(self::$kernel->getContainer());
+
+        $tester = new CommandTester($passwordEncoderCommand);
+        $tester->execute(array(
+            'command' => 'security:encode-password',
+            'password' => 'password',
+        ), array('interactive' => false));
+
+        $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $tester->getDisplay());
+    }
+
     protected function setUp()
     {
         putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
@@ -146,8 +218,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
         $application = new Application($kernel);
 
-        $application->add(new UserPasswordEncoderCommand());
-        $passwordEncoderCommand = $application->find('security:encode-password');
+        $passwordEncoderCommand = $application->get('security:encode-password');
 
         $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
     }

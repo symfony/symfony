@@ -96,6 +96,14 @@ SecurityBundle
 
  * The `FirewallMap::$map` and `$container` properties have been deprecated and will be removed in 4.0.
 
+ * The `UserPasswordEncoderCommand` command expects to be registered as a service and its
+   constructor arguments fully provided.
+   Registering by convention the command or commands extending it is deprecated and will
+   not be allowed anymore in 4.0.
+ 
+ * `UserPasswordEncoderCommand::getContainer()` is deprecated, and this class won't 
+    extend `ContainerAwareCommand` nor implement `ContainerAwareInterface` anymore in 4.0.
+
 TwigBridge
 ----------
 

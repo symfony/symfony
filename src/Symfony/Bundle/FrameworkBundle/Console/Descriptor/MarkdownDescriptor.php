@@ -185,7 +185,7 @@ class MarkdownDescriptor extends Descriptor
         ;
 
         foreach ($definition->getAutowiringTypes() as $autowiringType) {
-            $output .= "\n" . '- Autowiring Type: `' . $autowiringType . '`';
+            $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
         }
 
         if ($definition->getFile()) {

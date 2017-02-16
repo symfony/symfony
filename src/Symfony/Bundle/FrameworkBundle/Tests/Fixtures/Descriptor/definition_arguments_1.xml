@@ -21,7 +21,7 @@
     <argument type="service" id="definition_2"/>
   </argument>
   <argument type="closure-proxy" id="definition1" method="get"/>
-  <argument type="service_locator">
+  <argument type="service-locator">
     <argument key="def1" type="service" id="definition_1"/>
     <argument key="def2" type="service" id="definition_2"/>
   </argument>

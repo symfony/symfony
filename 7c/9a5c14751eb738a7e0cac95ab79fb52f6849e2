@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-02-01T10:13:09Z
+
+Maybe we could use a yaml tag for default values (or other non-service keys) instead and keep allowing anything for service names.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T10:15:12Z
+
+We wondered about tags for eg `_defaults` in #21194, but that didn't look good. What would it look like to you?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-02-01T10:22:12Z
+
+Probably something like this
+```yaml
+services:
+  defaults: !default
+    public: false
+  Foo\Bar: [@foo]
+```
+Any service tagged with default would be used as default instead of a service. And the key would be ignored.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T10:30:21Z
+
+That's what I meant by:
+
+> that didn't look good
+
+I keep this opinion :)
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-02-01T10:37:58Z
+
+Yeah I don't like it that much, but using underscore-names to convey special meanings looks to much like a hack to me to like it.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-01T10:51:51Z
+
+Is it too late to create a new config option called `services_defaults` ? It could convey its meaning better and it'd remove the need for hacks and for the YAML/XML unparity:
+
+```yaml
+services_defaults:
+    public: false
+
+services:
+    Foo\Bar: [@foo]
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T10:54:52Z
+
+@javiereguiluz this discussion already happened, see #21071 :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-01T11:07:52Z
+
+@javiereguiluz this is *also* a BC break, as it makes this key forbidden for DI extensions (and it is much harder to write a BC layer, as we would be unable to detect this case as the DI extension could expose a config similar to our defaults)

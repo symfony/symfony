@@ -84,6 +84,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddConstraintValidatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AddValidatorInitializersPass());
+        $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class);
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new LoggingTranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
@@ -92,15 +93,12 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
-        if (class_exists(SerializerPass::class)) {
-            $container->addCompilerPass(new SerializerPass());
-        }
+        $this->addCompilerPassIfExists($container, SerializerPass::class);
         $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new ValidateWorkflowsPass());
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class);
         $this->addCompilerPassIfExists($container, FormPass::class);
 
         if ($container->getParameter('kernel.debug')) {

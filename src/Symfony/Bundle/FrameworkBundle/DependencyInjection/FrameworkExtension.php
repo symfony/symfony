@@ -35,7 +35,6 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Console\Application;
 
 /**

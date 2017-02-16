@@ -104,11 +104,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBazService()
     {
-        $this->services['baz'] = $instance = new \Baz();
-
-        $instance->setFoo(${($_ = isset($this->services['foo_with_inline']) ? $this->services['foo_with_inline'] : $this->get('foo_with_inline')) && false ?: '_'});
-
-        return $instance;
+        return $this->services['baz'] = new \Baz();
     }
 
     /**
@@ -294,11 +290,10 @@ class ProjectServiceContainer extends Container
     protected function getFooWithInlineService()
     {
         $a = new \Bar();
-
-        $this->services['foo_with_inline'] = $instance = new \Foo();
-
         $a->pub = 'pub';
         $a->setBaz(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
+
+        $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $instance->setBar($a);
 

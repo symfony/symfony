@@ -82,7 +82,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         $class = $container->getReflectionClass($class);
         $constructor = $class ? $class->getConstructor() : null;
 
-        if (!$constructor || !$constructor->getNumberOfRequiredParameters()) {
+        if ($class && (!$constructor || !$constructor->getNumberOfRequiredParameters())) {
             return $class->newInstance();
         }
     }

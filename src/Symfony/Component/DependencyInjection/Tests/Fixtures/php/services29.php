@@ -28,6 +28,11 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters extends Container
     public function __construct()
     {
         $this->services = array();
+        $this->normalizedIds = array(
+            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
+            'symfony\\component\\dependencyinjection\\container' => 'Symfony\\Component\\DependencyInjection\\Container',
+            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
+        );
         $this->methodMap = array(
             'baz' => 'getBazService',
             'foo' => 'getFooService',

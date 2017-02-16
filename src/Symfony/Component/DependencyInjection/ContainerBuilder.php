@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -38,6 +39,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
 use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -116,6 +118,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var string[] the list of vendor directories
      */
     private $vendors;
+
+    public function __construct(ParameterBagInterface $parameterBag = null)
+    {
+        parent::__construct($parameterBag);
+
+        $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true));
+        $this->setAlias(PsrContainerInterface::class, new Alias('service_container', false));
+        $this->setAlias(ContainerInterface::class, new Alias('service_container', false));
+        $this->setAlias(Container::class, new Alias('service_container', false));
+    }
 
     /**
      * Sets the track resources flag.

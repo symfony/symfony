@@ -7,6 +7,26 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.4 (2017-02-16)
+
+ * bug #21634 [VarDumper] Added missing persistent stream cast (lyrixx)
+ * bug #21436 [DependencyInjection] check for circular refs caused by method calls (xabbuh)
+ * bug #21400 [Serializer] fix upper camel case conversion (see #21399) (markusu49)
+ * bug #21599 [Console][Table] fixed render when using multiple rowspans. (aitboudad)
+ * bug #21613 [Process] Permit empty suffix on Windows (Bilge)
+ * bug #21057 [DI] Auto register extension configuration classes as a resource (ro0NL)
+ * bug #21607 Improve tracking of environment variables in the case of private services (tgalopin)
+ * bug #21592 [Validator] property constraints can be added in child classes (angelk, xabbuh)
+ * bug #21458 [Config] Early return for DirectoryResource (robfrawley)
+ * bug #21562 [DoctrineBridge] make sure that null can be the invalid value (xabbuh)
+ * bug #21556 [FrameworkBundle] Wire ArrayCache for annotation reader at bootstrap (nicolas-grekas)
+ * bug #21584 [WebProfilerBundle] Readd Symfony version status in the toolbar (wouterj)
+ * bug #21557 [VarDumper] Improve dump of AMQP* Object (lyrixx)
+ * bug #21579 [Security] LdapUserProvider should not throw an exception if the UID key does not exist in an LDAP entry (csarrazi)
+ * bug #21552 [FrameworkBundle] Fix annotations cache folder path (akeeman)
+ * bug #21542 [VarDumper] Fixed dumping of terminated generator (lyrixx)
+ * bug #21292 Ignore missing 'debug.file_link_formatter' service in Debug bundle (core23)
+
 * 3.2.3 (2017-02-06)
 
  * bug #21528 [Cache] Fix class exists checks in PhpArrayAdapter (nicolas-grekas)

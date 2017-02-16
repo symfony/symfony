@@ -158,7 +158,7 @@ EOF
             }
         }
 
-        if ($erroredFiles === 0) {
+        if (0 === $erroredFiles) {
             $io->success(sprintf('All %d XLIFF files contain valid syntax.', $countFiles));
         } else {
             $io->warning(sprintf('%d XLIFF files have valid syntax and %d contain errors.', $countFiles - $erroredFiles, $erroredFiles));

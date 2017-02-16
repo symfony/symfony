@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-30T17:00:31Z
+
+I'm sorry that the title of my e99cbe7 commit is so ugly. I just used GitHub interface to test the new feature to resolve conflicts.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-30T17:01:13Z
+
+👍
+
+Status: reviewed.
+
+@ogizanagi thanks for this DX improvement.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-31T08:17:04Z
+
+This PR should be rebased as we don't merge PR with merge commits.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-31T12:06:00Z
+
+Sorry @javiereguiluz , I don't know what I should have done eventually in order to keep authorship for the conflict resolution. But anyway, thank you for that.
+
+PR rebased on master.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T12:13:39Z
+
+The changelog file of the SecurityBundle must be updated too.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-31T12:23:54Z
+
+@xabbuh : Thanks. I've updated it. Let me know how it can possibly be enhanced. :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-15T20:27:28Z
+
+I think this one is ready :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-16T07:46:44Z
+
+@ogizanagi I've tested this and it works nice! Thanks.
+
+I'm not sure this idea belongs to this PR, but the list of user classes maybe could be sorted alphabetically to make it easier to find them. At the moment the are displayed in the same order as defined in the security file:
+
+![available-users](https://cloud.githubusercontent.com/assets/73419/21974646/3dcfba4c-dbc8-11e6-85df-d0c161c735dc.png)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-16T08:42:57Z
+
+@javiereguiluz : That's a nice suggestion indeed. I've updated the code to use `natcasesort`. :)

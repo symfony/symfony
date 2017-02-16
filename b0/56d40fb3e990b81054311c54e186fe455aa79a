@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-29T17:48:44Z
+
+In case a logger is provided, the number of authenticators is provided in the context array ([GuardAuthenticationListener.php#L69](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Guard/Firewall/GuardAuthenticationListener.php#L69)).
+Using `count` on the generator won't provide the right value. I don't think this information is really useful though...
+
+Do you think it'll be worth it to make `RewindableGenerator` implement `\Countable`? (It'll still require an extra check anyway for such cases).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T19:10:36Z
+
+I think it's a good idea to make `RewindableGenerator` implement Countable, since we always have the info, isn't it?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-29T19:28:49Z
+
+@chalasr , @nicolas-grekas : See #21455
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-31T09:02:42Z
+
+Uses order fixed (must be the last time, moved to a real IDE everywhere)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-31T22:47:05Z
+
+Same done for authentication providers in last commit https://github.com/symfony/symfony/pull/21450/commits/cd6422ae73848b457b5db31f3759da3c0803976d. This service is injected into all listeners. WDYT? I can do it in another PR if you prefer.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-14T21:48:01Z
+
+@nicolas-grekas still ok for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-14T21:48:53Z
+
+Still OK

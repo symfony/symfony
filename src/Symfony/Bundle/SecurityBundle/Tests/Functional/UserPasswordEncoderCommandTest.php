@@ -177,7 +177,7 @@ EOTXT
     public function testThrowsExceptionOnNoConfiguredEncoders()
     {
         $application = new ConsoleApplication();
-        $application->add(new UserPasswordEncoderCommand($this->createMock(EncoderFactoryInterface::class), array()));
+        $application->add(new UserPasswordEncoderCommand($this->getMockBuilder(EncoderFactoryInterface::class)->getMock(), array()));
 
         $passwordEncoderCommand = $application->find('security:encode-password');
 

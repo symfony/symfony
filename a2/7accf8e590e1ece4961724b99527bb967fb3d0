@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-04T10:06:57Z
+
+(rebased)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-14T14:31:44Z
+
+Rebased done. Everything seems to be green.
+As the `autowiredMethods` has changed for `autowiredCalls`, I did the same in the xml format (`autowire-call(s)` tags).

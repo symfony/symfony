@@ -33,11 +33,11 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilder
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -95,7 +95,9 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new SerializerPass());
+        if (class_exists(SerializerPass::class)) {
+            $container->addCompilerPass(new SerializerPass());
+        }
         $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);

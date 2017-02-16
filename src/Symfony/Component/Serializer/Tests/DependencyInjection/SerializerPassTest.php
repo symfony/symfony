@@ -9,15 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 
 /**
  * Tests for the SerializerPass class.
- *
- * @group legacy
  *
  * @author Javier Lopez <f12loalf@gmail.com>
  */
@@ -93,7 +91,7 @@ class SerializerPassTest extends \PHPUnit_Framework_TestCase
         $serializerPass = new SerializerPass();
 
         $method = new \ReflectionMethod(
-          'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass',
+          SerializerPass::class,
           'findAndSortTaggedServices'
         );
         $method->setAccessible(true);

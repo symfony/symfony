@@ -26,6 +26,7 @@
         "symfony/cache": "~3.1",
         "symfony/property-info": "~3.1",
         "doctrine/annotations": "~1.0",
+        "symfony/dependency-injection": "~3.2",
         "doctrine/cache": "~1.0",
         "phpdocumentor/reflection-docblock": "~3.0"
     },

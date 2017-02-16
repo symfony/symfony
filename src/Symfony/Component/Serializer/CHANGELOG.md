@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added `SerializerPass`
+
 3.1.0
 -----
 

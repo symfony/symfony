@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T09:00:59Z
+
+what happens when you use a parameter as class name for the service (which is still supported even though we discourage its usage in the doc) ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T09:04:24Z
+
+what happens when the service class matches multiple ``_instanceof`` ? and what happens for services defined using a factory ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-07T10:42:41Z
+
+> what happens when you use a parameter as class name for the service?
+
+the class is resolved using the parameterbag already.
+of course that can't account for params added later in compiler passes.
+in that case (ie when the class is missing really), nothing special happens (ie we continue as usual).
+See [ResolveDefinitionTemplatesPass.php](https://github.com/symfony/symfony/pull/21530/files#diff-d81a6a2f4968eb3c7d1511f42bdb8c79)
+
+> what happens when the service class matches multiple _instanceof ?
+
+they are applied on top of each others in declaration order
+
+> and what happens for services defined using a factory ?
+
+nothing special: we use the "class" attribute, which we deprecated not defining, so we can use "instanceof" even in the case of factories.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-17T16:01:34Z
+
+👍

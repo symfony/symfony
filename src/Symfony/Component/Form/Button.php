@@ -343,6 +343,13 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
+     */
+    public function getChildrenTransformationFailures()
+    {
+    }
+
+    /**
+     * Unsupported method.
      *
      * @throws BadMethodCallException
      */

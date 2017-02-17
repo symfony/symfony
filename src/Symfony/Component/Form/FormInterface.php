@@ -244,6 +244,13 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getTransformationFailure();
 
     /**
+     * Returns the data transformation failure of the children, if any.
+     *
+     * @return array
+     */
+    public function getChildrenTransformationFailures();
+
+    /**
      * Initializes the form tree.
      *
      * Should be called on the root form after constructing the tree.

@@ -21,6 +21,8 @@ use Symfony\Component\PropertyInfo\Type;
  * Extracts data using the reflection API.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since version 3.3
  */
 class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-02-17T09:04:17Z
+
+what is the existing behavior for a mapping without key ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-17T09:06:20Z
+
+if the parser is not broken currently for such case, and so accepts the input (even though it is not compliant), we should rather deprecate it instead, to be consistent with our previous changes where we give users time to update their YAML files
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-17T11:13:39Z
+
+The parser behaviour currently is inconsistent since some changes we made in 3.2. However, you are right that we should deprecate it first on `master` (#21647 will make sure that the wrong behaviour is restored in the `3.2` branch).
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-17T11:49:02Z
+
+I updated here to deprecate the possibility to omit mapping keys and changed the target branch to `master`. Please not that this contains the changes from #21647 and needs to be merged afterwards.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-17T11:57:15Z
+
+the other PR is now merged (including in master)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-17T13:11:35Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-17T13:29:23Z
+
+👍

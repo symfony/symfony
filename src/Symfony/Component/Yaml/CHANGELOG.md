@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-3.2.3
+3.2.5
 -----
 
  * Added support for dumping empty PHP arrays as YAML sequences:

@@ -26,13 +26,13 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
         if (!$value instanceof Definition) {
             return parent::processValue($value, $isRoot);
         }
-        if ($value instanceof ChildDefinition) {
-            $this->resolveDefinition($value);
-        }
-        $class = $value->getClass();
+
+        $class = $value instanceof ChildDefinition ? $this->resolveDefinition($value) : $value->getClass();
+
         if (!$class || false !== strpos($class, '%') || !$instanceof = $value->getInstanceofConditionals()) {
             return parent::processValue($value, $isRoot);
         }
+        $value->setInstanceofConditionals(array());
 
         foreach ($instanceof as $interface => $definition) {
             if ($interface !== $class && (!$this->container->getReflectionClass($interface) || !$this->container->getReflectionClass($class))) {
@@ -56,16 +56,13 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
         }
 
         $parentDef = $this->container->findDefinition($parent);
-        if ($parentDef instanceof ChildDefinition) {
-            $this->resolveDefinition($parentDef);
-        }
-
-        if (!isset($definition->getChanges()['class'])) {
-            $definition->setClass($parentDef->getClass());
-        }
+        $class = $parentDef instanceof ChildDefinition ? $this->resolveDefinition($parentDef) : $parentDef->getClass();
+        $class = $definition->getClass() ?: $class;
 
         // append parent tags when inheriting is enabled
         if ($definition->getInheritTags()) {
+            $definition->setInheritTags(false);
+
             foreach ($parentDef->getTags() as $k => $v) {
                 foreach ($v as $v) {
                     $definition->addTag($k, $v);
@@ -73,7 +70,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
             }
         }
 
-        $definition->setInheritTags(false);
+        return $class;
     }
 
     private function mergeDefinition(Definition $def, ChildDefinition $definition)

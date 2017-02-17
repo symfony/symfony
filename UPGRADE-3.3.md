@@ -119,6 +119,8 @@ Workflow
 Yaml
 ----
 
+ * Omitting the key of a mapping is deprecated and will throw a `ParseException` in Symfony 4.0.
+
  * The constructor arguments `$offset`, `$totalNumberOfLines` and
    `$skippedLineNumbers` of the `Parser` class are deprecated and will be
    removed in 4.0

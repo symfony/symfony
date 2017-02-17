@@ -340,6 +340,8 @@ Validator
 Yaml
 ----
 
+ * Omitting the key of a mapping is not supported anymore and throws a `ParseException`.
+
  * Mappings with a colon (`:`) that is not followed by a whitespace are not
    supported anymore and lead to a `ParseException`(e.g. `foo:bar` must be
    `foo: bar`).

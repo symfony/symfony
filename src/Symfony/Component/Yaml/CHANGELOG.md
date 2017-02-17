@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Omitting the key of a mapping is deprecated and will throw a `ParseException` in Symfony 4.0.
+
 3.2.0
 -----
 

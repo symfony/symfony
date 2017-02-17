@@ -122,6 +122,16 @@ class ChildDefinition extends Definition
     /**
      * {@inheritdoc}
      */
+    public function setShared($boolean)
+    {
+        $this->changes['shared'] = true;
+
+        return parent::setShared($boolean);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setPublic($boolean)
     {
         $this->changes['public'] = true;
@@ -137,6 +147,16 @@ class ChildDefinition extends Definition
         $this->changes['lazy'] = true;
 
         return parent::setLazy($boolean);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAbstract($boolean)
+    {
+        $this->changes['abstract'] = true;
+
+        return parent::setAbstract($boolean);
     }
 
     /**

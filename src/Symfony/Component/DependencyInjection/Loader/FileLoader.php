@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -29,6 +30,8 @@ use Symfony\Component\Finder\Glob;
 abstract class FileLoader extends BaseFileLoader
 {
     protected $container;
+    protected $isLoadingInstanceof = false;
+    protected $instanceof = array();
 
     /**
      * @param ContainerBuilder     $container A ContainerBuilder instance
@@ -80,7 +83,22 @@ abstract class FileLoader extends BaseFileLoader
         $prototype = serialize($prototype);
 
         foreach ($classes as $class) {
-            $this->container->setDefinition($class, unserialize($prototype));
+            $this->setDefinition($class, unserialize($prototype));
+        }
+    }
+
+    /**
+     * @experimental in version 3.3
+     */
+    protected function setDefinition($id, Definition $definition)
+    {
+        if ($this->isLoadingInstanceof) {
+            if (!$definition instanceof ChildDefinition) {
+                throw new InvalidArgumentException(sprintf('Invalid type definition "%s": ChildDefinition expected, "%s" given.', $id, get_class($definition)));
+            }
+            $this->instanceof[$id] = $definition;
+        } else {
+            $this->container->setDefinition($id, $definition->setInstanceofConditionals($this->instanceof));
         }
     }
 

@@ -469,6 +469,19 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array('setApiKey', array('123'))), $container->getDefinition('another_one')->getMethodCalls());
     }
 
+    public function testInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_instanceof.yml');
+        $container->compile();
+
+        $definition = $container->getDefinition(Foo::class);
+        $this->assertTrue($definition->isAutowired());
+        $this->assertTrue($definition->isLazy());
+        $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").
@@ -499,4 +512,12 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_underscore.yml');
     }
+}
+
+interface FooInterface
+{
+}
+
+class Foo implements FooInterface
+{
 }

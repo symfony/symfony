@@ -719,4 +719,25 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(null, 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
         $this->assertEquals(array(array('setApiKey', array('123'))), $container->getDefinition(NamedArgumentsDummy::class)->getMethodCalls());
     }
+
+    public function testInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_instanceof.xml');
+        $container->compile();
+
+        $definition = $container->getDefinition(Bar::class);
+        $this->assertSame(array('__construct', 'set*'), $definition->getAutowiredCalls());
+        $this->assertTrue($definition->isLazy());
+        $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
+    }
+}
+
+interface BarInterface
+{
+}
+
+class Bar implements BarInterface
+{
 }

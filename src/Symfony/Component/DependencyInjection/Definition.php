@@ -30,6 +30,7 @@ class Definition
     private $properties = array();
     private $calls = array();
     private $getters = array();
+    private $instanceof = array();
     private $configurator;
     private $tags = array();
     private $public = true;
@@ -361,6 +362,32 @@ class Definition
     public function getOverriddenGetters()
     {
         return $this->getters;
+    }
+
+    /**
+     * Sets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
+     *
+     * @param $instanceof ChildDefinition[]
+     *
+     * @experimental in version 3.3
+     */
+    public function setInstanceofConditionals(array $instanceof)
+    {
+        $this->instanceof = $instanceof;
+
+        return $this;
+    }
+
+    /**
+     * Gets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
+     *
+     * @return ChildDefinition[]
+     *
+     * @experimental in version 3.3
+     */
+    public function getInstanceofConditionals()
+    {
+        return $this->instanceof;
     }
 
     /**
@@ -736,9 +763,7 @@ class Definition
      */
     public function setAutowired($autowired)
     {
-        $this->autowiredCalls = $autowired ? array('__construct') : array();
-
-        return $this;
+        return $this->setAutowiredCalls($autowired ? array('__construct') : array());
     }
 
     /**

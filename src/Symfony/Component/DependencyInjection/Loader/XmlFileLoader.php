@@ -57,7 +57,11 @@ class XmlFileLoader extends FileLoader
         $this->loadFromExtensions($xml);
 
         // services
-        $this->parseDefinitions($xml, $path);
+        try {
+            $this->parseDefinitions($xml, $path);
+        } finally {
+            $this->instanceof = array();
+        }
     }
 
     /**
@@ -126,13 +130,21 @@ class XmlFileLoader extends FileLoader
         }
         $this->setCurrentDir(dirname($file));
 
+        $this->instanceof = array();
+        $this->isLoadingInstanceof = true;
+        $instanceof = $xpath->query('//container:services/container:instanceof');
+        foreach ($instanceof as $service) {
+            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, array()));
+        }
+
+        $this->isLoadingInstanceof = false;
         $defaults = $this->getServiceDefaults($xml, $file);
         foreach ($services as $service) {
             if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
                 if ('prototype' === $service->tagName) {
                     $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'));
                 } else {
-                    $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
+                    $this->setDefinition((string) $service->getAttribute('id'), $definition);
                 }
             }
         }
@@ -209,7 +221,9 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
-        if ($parent = $service->getAttribute('parent')) {
+        if ($this->isLoadingInstanceof) {
+            $definition = new ChildDefinition('');
+        } elseif ($parent = $service->getAttribute('parent')) {
             $definition = new ChildDefinition($parent);
 
             if ($value = $service->getAttribute('inherit-tags')) {
@@ -247,7 +261,7 @@ class XmlFileLoader extends FileLoader
             $definition->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
         }
 
-        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', false, (bool) $parent));
+        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', false, $definition instanceof ChildDefinition));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
         $definition->setOverriddenGetters($this->getArgumentsAsPhp($service, 'getter'));
 
@@ -422,7 +436,7 @@ class XmlFileLoader extends FileLoader
         uksort($definitions, 'strnatcmp');
         foreach (array_reverse($definitions) as $id => list($domElement, $file, $wild)) {
             if (null !== $definition = $this->parseDefinition($domElement, $file)) {
-                $this->container->setDefinition($id, $definition);
+                $this->setDefinition($id, $definition);
             }
 
             if (true === $wild) {

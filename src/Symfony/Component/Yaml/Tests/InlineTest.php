@@ -686,4 +686,9 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($longStringWithQuotes, $arrayFromYaml['longStringWithQuotes']);
     }
+
+    public function testOmittedMappingKeyIsParsedAsColon()
+    {
+        $this->assertSame(array(':' => 'foo'), Inline::parse('{: foo}'));
+    }
 }

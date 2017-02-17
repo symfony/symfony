@@ -705,7 +705,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getChildrenTransformationFailures()
     {
-        $failures = [];
+        $failures = array();
 
         foreach ($this->children as $childName => $child) {
             if ($failure = $child->getTransformationFailure()) {

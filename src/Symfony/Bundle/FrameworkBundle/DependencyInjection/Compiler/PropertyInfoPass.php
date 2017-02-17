@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,15 +37,15 @@ class PropertyInfoPass implements CompilerPassInterface
         $definition = $container->getDefinition('property_info');
 
         $listExtractors = $this->findAndSortTaggedServices('property_info.list_extractor', $container);
-        $definition->replaceArgument(0, $listExtractors);
+        $definition->replaceArgument(0, new IteratorArgument($listExtractors));
 
         $typeExtractors = $this->findAndSortTaggedServices('property_info.type_extractor', $container);
-        $definition->replaceArgument(1, $typeExtractors);
+        $definition->replaceArgument(1, new IteratorArgument($typeExtractors));
 
         $descriptionExtractors = $this->findAndSortTaggedServices('property_info.description_extractor', $container);
-        $definition->replaceArgument(2, $descriptionExtractors);
+        $definition->replaceArgument(2, new IteratorArgument($descriptionExtractors));
 
         $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
-        $definition->replaceArgument(3, $accessExtractors);
+        $definition->replaceArgument(3, new IteratorArgument($accessExtractors));
     }
 }

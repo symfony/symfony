@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 class InputOptionTest extends \PHPUnit_Framework_TestCase
@@ -177,6 +178,15 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     {
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
         $option->setDefault('default');
+    }
+
+    /**
+     * @expectedException        InvalidArgumentException
+     * @expectedExceptionMessage Impossible to have an option mode VALUE_IS_COMMA_SEPARATED without VALUE_IS_ARRAY.
+     */
+    public function testValueIsCommaSeparatedWithoutArrayMode()
+    {
+        new InputOption('name', null, InputOption::VALUE_IS_COMMA_SEPARATED);
     }
 
     public function testEquals()

@@ -25,6 +25,7 @@ class InputOption
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
+    const VALUE_IS_COMMA_SEPARATED = 16;
 
     private $name;
     private $shortcut;
@@ -72,7 +73,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif (!is_int($mode) || $mode > 15 || $mode < 1) {
+        } elseif (!is_int($mode) || $mode > 31 || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -83,6 +84,10 @@ class InputOption
 
         if ($this->isArray() && !$this->acceptValue()) {
             throw new InvalidArgumentException('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
+        }
+
+        if ($this->isValueCommaSeparated() && !$this->isArray()) {
+            throw new InvalidArgumentException('Impossible to have an option mode VALUE_IS_COMMA_SEPARATED without VALUE_IS_ARRAY.');
         }
 
         $this->setDefault($default);
@@ -146,6 +151,16 @@ class InputOption
     public function isArray()
     {
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
+    }
+
+    /**
+     * Returns true if the value is comma separated.
+     *
+     * @return bool true if mode is self::VALUE_IS_COMMA_SEPARATED, false otherwise
+     */
+    public function isValueCommaSeparated()
+    {
+        return self::VALUE_IS_COMMA_SEPARATED === (self::VALUE_IS_COMMA_SEPARATED & $this->mode);
     }
 
     /**

@@ -254,7 +254,16 @@ class ArgvInput extends Input
         }
 
         if ($option->isArray()) {
-            $this->options[$name][] = $value;
+            if ($option->isValueCommaSeparated()) {
+                if (!isset($this->options[$name])) {
+                    $this->options[$name] = array();
+                }
+
+                $values = explode(',', $value);
+                $this->options[$name] = array_merge($this->options[$name], $values);
+            } else {
+                $this->options[$name][] = $value;
+            }
         } else {
             $this->options[$name] = $value;
         }

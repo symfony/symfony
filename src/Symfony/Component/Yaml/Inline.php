@@ -174,7 +174,7 @@ class Inline
                 }
 
                 if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \stdClass || $value instanceof \ArrayObject)) {
-                    return self::dumpArray((array) $value, $flags);
+                    return self::dumpArray((array) $value, $flags & ~Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
                 }
 
                 if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
@@ -262,7 +262,7 @@ class Inline
     private static function dumpArray($value, $flags)
     {
         // array
-        if ($value && !self::isHash($value)) {
+        if (($value || Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE & $flags) && !self::isHash($value)) {
             $output = array();
             foreach ($value as $val) {
                 $output[] = self::dump($val, $flags);

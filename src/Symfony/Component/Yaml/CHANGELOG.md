@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.2.5
+-----
+
+ * Added support for dumping empty PHP arrays as YAML sequences:
+
+   ```php
+   Yaml::dump([], 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
+   ```
+
 3.2.0
 -----
 

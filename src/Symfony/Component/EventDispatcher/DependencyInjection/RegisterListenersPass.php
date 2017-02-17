@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
@@ -105,8 +106,8 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             $container->addObjectResource($class);
 
-            $r = new \ReflectionClass($class);
-            $extractingDispatcher->addSubscriber($r->newInstanceWithoutConstructor());
+            ExtractingEventDispatcher::$subscriber = $class;
+            $extractingDispatcher->addSubscriber($extractingDispatcher);
             foreach ($extractingDispatcher->listeners as $args) {
                 $args[1] = new ClosureProxyArgument($id, $args[1]);
                 $definition->addMethodCall('addListener', $args);
@@ -119,12 +120,21 @@ class RegisterListenersPass implements CompilerPassInterface
 /**
  * @internal
  */
-class ExtractingEventDispatcher extends EventDispatcher
+class ExtractingEventDispatcher extends EventDispatcher implements EventSubscriberInterface
 {
     public $listeners = array();
+
+    public static $subscriber;
 
     public function addListener($eventName, $listener, $priority = 0)
     {
         $this->listeners[] = array($eventName, $listener[1], $priority);
+    }
+
+    public static function getSubscribedEvents()
+    {
+        $callback = array(self::$subscriber, 'getSubscribedEvents');
+
+        return $callback();
     }
 }

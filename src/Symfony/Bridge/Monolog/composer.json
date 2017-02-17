@@ -22,7 +22,8 @@
     },
     "require-dev": {
         "symfony/console": "~2.8|~3.0",
-        "symfony/event-dispatcher": "~2.8|~3.0"
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/var-dumper": "~3.3"
     },
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",

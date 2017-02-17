@@ -31,7 +31,7 @@ class ExpressionFunctionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage An expression function name must be defined when PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is in namespace.
+     * @expectedExceptionMessage An expression function name must be defined when PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is namespaced.
      */
     public function testFunctionNamespaced()
     {

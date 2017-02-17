@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyInfo;
  * Type value object (immutable).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since version 3.3
  */
 class Type
 {

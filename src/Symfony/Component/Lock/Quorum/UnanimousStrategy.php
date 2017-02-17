@@ -14,11 +14,11 @@ namespace Symfony\Component\Lock\Quorum;
 use Symfony\Component\Lock\QuorumInterface;
 
 /**
- * UnanimousQuorum is a QuorumInterface implementation where 100% of elements should be successful.
+ * UnanimousStrategy is a QuorumInterface implementation where 100% of elements should be successful.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class UnanimousQuorum implements QuorumInterface
+class UnanimousStrategy implements QuorumInterface
 {
     /**
      * {@inheritdoc}

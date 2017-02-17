@@ -13,7 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Quorum\UnanimousQuorum;
+use Symfony\Component\Lock\Quorum\UnanimousStrategy;
 use Symfony\Component\Lock\QuorumInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -46,7 +46,7 @@ class CombinedStoreTest extends AbstractStoreTest
             self::markTestSkipped($e->getMessage());
         }
 
-        return new CombinedStore(array(new RedisStore($redis)), new UnanimousQuorum());
+        return new CombinedStore(array(new RedisStore($redis)), new UnanimousStrategy());
     }
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */

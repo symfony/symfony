@@ -14,11 +14,11 @@ namespace Symfony\Component\Lock\Quorum;
 use Symfony\Component\Lock\QuorumInterface;
 
 /**
- * MajorityQuorum is a QuorumInterface implementation where strictly more than 50% items should be successful.
+ * ConsensusStrategy is a QuorumInterface implementation where strictly more than 50% items should be successful.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class MajorityQuorum implements QuorumInterface
+class ConsensusStrategy implements QuorumInterface
 {
     /**
      * {@inheritdoc}

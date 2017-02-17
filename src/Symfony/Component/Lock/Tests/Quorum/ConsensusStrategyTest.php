@@ -11,27 +11,27 @@
 
 namespace Symfony\Component\Lock\Tests\Quorum;
 
-use Symfony\Component\Lock\Quorum\UnanimousQuorum;
+use Symfony\Component\Lock\Quorum\ConsensusStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class UnanimousQuorumTest extends \PHPUnit_Framework_TestCase
+class ConsensusStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var UnanimousQuorum */
+    /** @var ConsensusStrategy */
     private $quorum;
 
     public function setup()
     {
-        $this->quorum = new UnanimousQuorum();
+        $this->quorum = new ConsensusStrategy();
     }
 
     public function provideMetResults()
     {
         // success, failure, total, isMet
         yield array(3, 0, 3, true);
-        yield array(2, 1, 3, false);
-        yield array(2, 0, 3, false);
+        yield array(2, 1, 3, true);
+        yield array(2, 0, 3, true);
         yield array(1, 2, 3, false);
         yield array(1, 1, 3, false);
         yield array(1, 0, 3, false);
@@ -52,14 +52,14 @@ class UnanimousQuorumTest extends \PHPUnit_Framework_TestCase
     {
         // success, failure, total, canBeMet
         yield array(3, 0, 3, true);
-        yield array(2, 1, 3, false);
+        yield array(2, 1, 3, true);
         yield array(2, 0, 3, true);
         yield array(1, 2, 3, false);
-        yield array(1, 1, 3, false);
+        yield array(1, 1, 3, true);
         yield array(1, 0, 3, true);
         yield array(0, 3, 3, false);
         yield array(0, 2, 3, false);
-        yield array(0, 1, 3, false);
+        yield array(0, 1, 3, true);
         yield array(0, 0, 3, true);
 
         yield array(2, 0, 2, true);

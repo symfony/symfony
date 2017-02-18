@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHandler;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHan
  * @group time-sensitive
  * @requires extension pdo_sqlite
  */
-class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
+class LegacyPdoSessionHandlerTest extends TestCase
 {
     private $pdo;
 

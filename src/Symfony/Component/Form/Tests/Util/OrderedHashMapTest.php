@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Util\OrderedHashMap;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class OrderedHashMapTest extends \PHPUnit_Framework_TestCase
+class OrderedHashMapTest extends TestCase
 {
     public function testGet()
     {

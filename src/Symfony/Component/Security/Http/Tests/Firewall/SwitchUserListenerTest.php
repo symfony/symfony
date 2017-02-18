@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
+class SwitchUserListenerTest extends TestCase
 {
     private $tokenStorage;
 

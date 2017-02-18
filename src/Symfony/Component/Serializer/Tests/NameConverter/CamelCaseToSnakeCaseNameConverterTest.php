@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\NameConverter;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CamelCaseToSnakeCaseNameConverterTest extends \PHPUnit_Framework_TestCase
+class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 {
     public function testInterface()
     {

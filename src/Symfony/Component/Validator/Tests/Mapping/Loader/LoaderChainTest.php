@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 
-class LoaderChainTest extends \PHPUnit_Framework_TestCase
+class LoaderChainTest extends TestCase
 {
     public function testAllLoadersAreCalled()
     {

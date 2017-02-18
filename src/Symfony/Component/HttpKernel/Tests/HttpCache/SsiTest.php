@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
-class SsiTest extends \PHPUnit_Framework_TestCase
+class SsiTest extends TestCase
 {
     public function testHasSurrogateSsiCapability()
     {

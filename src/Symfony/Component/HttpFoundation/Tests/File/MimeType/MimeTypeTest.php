@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\File\MimeType;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\FileBinaryMimeTypeGuesser;
 
 /**
  * @requires extension fileinfo
  */
-class MimeTypeTest extends \PHPUnit_Framework_TestCase
+class MimeTypeTest extends TestCase
 {
     protected $path;
 

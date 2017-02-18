@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Exception;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
-class UsernameNotFoundExceptionTest extends \PHPUnit_Framework_TestCase
+class UsernameNotFoundExceptionTest extends TestCase
 {
     public function testGetMessageData()
     {

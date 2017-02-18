@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class PropertyPathTest extends \PHPUnit_Framework_TestCase
+class PropertyPathTest extends TestCase
 {
     public function testToString()
     {

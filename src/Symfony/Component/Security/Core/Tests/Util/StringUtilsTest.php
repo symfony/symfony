@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Core\Util\StringUtils;
  *
  * @group legacy
  */
-class StringUtilsTest extends \PHPUnit_Framework_TestCase
+class StringUtilsTest extends TestCase
 {
     public function dataProviderTrue()
     {

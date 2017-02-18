@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\AccessMap;
 
-class AccessMapTest extends \PHPUnit_Framework_TestCase
+class AccessMapTest extends TestCase
 {
     public function testReturnsFirstMatchedPattern()
     {

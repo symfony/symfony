@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Logger;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 
-class DbalLoggerTest extends \PHPUnit_Framework_TestCase
+class DbalLoggerTest extends TestCase
 {
     /**
      * @dataProvider getLogFixtures

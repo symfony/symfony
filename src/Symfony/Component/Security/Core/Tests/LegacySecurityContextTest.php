@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 /**
  * @group legacy
  */
-class LegacySecurityContextTest extends \PHPUnit_Framework_TestCase
+class LegacySecurityContextTest extends TestCase
 {
     private $tokenStorage;
     private $authorizationChecker;

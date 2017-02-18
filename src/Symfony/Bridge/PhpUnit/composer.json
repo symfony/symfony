@@ -23,6 +23,9 @@
     "suggest": {
         "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
+    "conflict": {
+        "phpunit/phpunit": ">=6.0"
+    },
     "autoload": {
         "files": [ "bootstrap.php" ],
         "psr-4": { "Symfony\\Bridge\\PhpUnit\\": "" },

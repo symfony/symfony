@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests\Generator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 
-class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
+class UrlGeneratorTest extends TestCase
 {
     public function testAbsoluteUrlWithPort80()
     {

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 
-class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
+class PhpFileLoaderTest extends TestCase
 {
     public function testSupports()
     {

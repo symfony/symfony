@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
-class UserPasswordEncoderTest extends \PHPUnit_Framework_TestCase
+class UserPasswordEncoderTest extends TestCase
 {
     public function testEncodePassword()
     {

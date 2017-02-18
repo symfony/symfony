@@ -11,10 +11,11 @@
 
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 
-class TranslationDefaultDomainNodeVisitorTest extends \PHPUnit_Framework_TestCase
+class TranslationDefaultDomainNodeVisitorTest extends TestCase
 {
     private static $message = 'message';
     private static $domain = 'domain';

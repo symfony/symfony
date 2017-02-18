@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Output;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class NullOutputTest extends \PHPUnit_Framework_TestCase
+class NullOutputTest extends TestCase
 {
     public function testConstructor()
     {

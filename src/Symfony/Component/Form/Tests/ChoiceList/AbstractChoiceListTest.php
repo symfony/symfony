@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractChoiceListTest extends TestCase
 {
     /**
      * @var \Symfony\Component\Form\ChoiceList\ChoiceListInterface

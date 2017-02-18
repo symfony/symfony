@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Translation\IdentityTranslator;
 
-class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
+class IdentityTranslatorTest extends TestCase
 {
     /**
      * @dataProvider getTransTests

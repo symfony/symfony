@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\PoFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
+class PoFileLoaderTest extends TestCase
 {
     public function testLoad()
     {

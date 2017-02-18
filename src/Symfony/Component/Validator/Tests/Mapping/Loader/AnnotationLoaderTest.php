@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -23,7 +24,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
-class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
+class AnnotationLoaderTest extends TestCase
 {
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {

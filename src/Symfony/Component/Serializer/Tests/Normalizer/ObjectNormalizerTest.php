@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -26,7 +27,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
+class ObjectNormalizerTest extends TestCase
 {
     /**
      * @var ObjectNormalizer

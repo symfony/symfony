@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Test;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
@@ -19,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * @deprecated since version 2.8, to be removed in 3.0. Use the VarDumperTestTrait instead.
  */
-abstract class VarDumperTestCase extends \PHPUnit_Framework_TestCase
+abstract class VarDumperTestCase extends TestCase
 {
     public function assertDumpEquals($dump, $data, $message = '')
     {

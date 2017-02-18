@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 
@@ -19,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
  *
  * @author Javier Lopez <f12loalf@gmail.com>
  */
-class SerializerPassTest extends \PHPUnit_Framework_TestCase
+class SerializerPassTest extends TestCase
 {
     public function testThrowExceptionWhenNoNormalizers()
     {

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy;
 
 require_once __DIR__.'/Fixtures/includes/foo.php';
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
-class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
+class ContainerBuilderTest extends TestCase
 {
     public function testCreateProxyServiceWithRuntimeInstantiator()
     {

@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
+class CachingFactoryDecoratorTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

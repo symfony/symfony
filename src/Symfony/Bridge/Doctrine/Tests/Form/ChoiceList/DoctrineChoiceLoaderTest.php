@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -23,7 +24,7 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class DoctrineChoiceLoaderTest extends \PHPUnit_Framework_TestCase
+class DoctrineChoiceLoaderTest extends TestCase
 {
     /**
      * @var ChoiceListFactoryInterface|\PHPUnit_Framework_MockObject_MockObject

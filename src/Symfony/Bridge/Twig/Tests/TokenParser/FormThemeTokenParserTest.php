@@ -11,10 +11,11 @@
 
 namespace Symfony\Bridge\Twig\Tests\TokenParser;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 
-class FormThemeTokenParserTest extends \PHPUnit_Framework_TestCase
+class FormThemeTokenParserTest extends TestCase
 {
     /**
      * @dataProvider getTestsForFormTheme

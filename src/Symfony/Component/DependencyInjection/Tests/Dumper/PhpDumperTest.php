@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use DummyProxyDumper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -22,7 +23,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 require_once __DIR__.'/../Fixtures/includes/classes.php';
 
-class PhpDumperTest extends \PHPUnit_Framework_TestCase
+class PhpDumperTest extends TestCase
 {
     protected static $fixturesPath;
 

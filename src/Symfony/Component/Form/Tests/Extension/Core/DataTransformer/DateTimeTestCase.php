@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-abstract class DateTimeTestCase extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+abstract class DateTimeTestCase extends TestCase
 {
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
     {

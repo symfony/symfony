@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\CodeExtension;
 
-class CodeExtensionTest extends \PHPUnit_Framework_TestCase
+class CodeExtensionTest extends TestCase
 {
     protected $helper;
 

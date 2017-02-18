@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Finder\Tests\Expression;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Expression\Expression;
 
 /**
  * @group legacy
  */
-class GlobTest extends \PHPUnit_Framework_TestCase
+class GlobTest extends TestCase
 {
     /**
      * @dataProvider getToRegexData

@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 /**
  * @group tty
  */
-class SymfonyQuestionHelperTest extends \PHPUnit_Framework_TestCase
+class SymfonyQuestionHelperTest extends TestCase
 {
     public function testAskChoice()
     {

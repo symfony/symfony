@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Locale\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -21,7 +22,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  *
  * @group legacy
  */
-class LocaleTest extends \PHPUnit_Framework_TestCase
+class LocaleTest extends TestCase
 {
     protected function setUp()
     {

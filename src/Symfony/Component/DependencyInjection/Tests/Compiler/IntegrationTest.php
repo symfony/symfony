@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * This class tests the integration of the different compiler passes.
  */
-class IntegrationTest extends \PHPUnit_Framework_TestCase
+class IntegrationTest extends TestCase
 {
     /**
      * This tests that dependencies are correctly processed.

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
@@ -34,7 +35,7 @@ class FormDataExtractorTest_SimpleValueExporter extends ValueExporter
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
+class FormDataExtractorTest extends TestCase
 {
     /**
      * @var FormDataExtractorTest_SimpleValueExporter

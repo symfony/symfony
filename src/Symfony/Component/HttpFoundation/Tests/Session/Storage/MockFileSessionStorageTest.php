@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  *
  * @author Drak <drak@zikula.org>
  */
-class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
+class MockFileSessionStorageTest extends TestCase
 {
     /**
      * @var string

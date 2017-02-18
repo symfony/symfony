@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Inline;
 
-class InlineTest extends \PHPUnit_Framework_TestCase
+class InlineTest extends TestCase
 {
     /**
      * @dataProvider getTestsForParse

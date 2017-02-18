@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Finder\Tests\Comparator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 
-class NumberComparatorTest extends \PHPUnit_Framework_TestCase
+class NumberComparatorTest extends TestCase
 {
     /**
      * @dataProvider getConstructorTestData

@@ -14,6 +14,8 @@ namespace Symfony\Bridge\PhpUnit;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\BaseTestListener;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\TextUI\TestSuite;
+use PHPUnit\Util\Test;
 
 /**
  * Collects and replays skipped tests.
@@ -66,7 +68,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestSuite $suite)
     {
         $suiteName = $suite->getName();
 
@@ -93,12 +95,12 @@ class SymfonyTestsListener extends BaseTestListener
             $testSuites = array($suite);
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($test instanceof \PHPUnit_Framework_TestSuite) {
+                    if ($test instanceof TestSuite) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;
                         }
-                        $groups = \PHPUnit_Util_Test::getGroups($test->getName());
+                        $groups = Test::getGroups($test->getName());
                         if (in_array('time-sensitive', $groups, true)) {
                             ClockMock::register($test->getName());
                         }
@@ -118,7 +120,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
+    public function addSkippedTest(Test $test, \Exception $e, $time)
     {
         if (0 < $this->state) {
             if ($test instanceof TestCase) {
@@ -133,10 +135,10 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function startTest(\PHPUnit_Framework_Test $test)
+    public function startTest(Test $test)
     {
         if (-2 < $this->state && $test instanceof TestCase) {
-            $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));
+            $groups = Test::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::register(get_class($test));
@@ -145,10 +147,10 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function endTest(\PHPUnit_Framework_Test $test, $time)
+    public function endTest(Test $test, $time)
     {
         if (-2 < $this->state && $test instanceof TestCase) {
-            $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));
+            $groups = Test::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::withClockMock(false);

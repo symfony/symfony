@@ -18,7 +18,9 @@ require_once __DIR__.'/../../bootstrap.php';
 
 @trigger_error('root deprecation', E_USER_DEPRECATED);
 
-class PHPUnit_Util_Test
+namespace PHPUnit\Util;
+
+class Test
 {
     public static function getGroups()
     {
@@ -26,20 +28,24 @@ class PHPUnit_Util_Test
     }
 }
 
-class FooTestCase
-{
-    public function testLegacyFoo()
+namespace {
+
+    class FooTestCase
     {
-        @trigger_error('silenced foo deprecation', E_USER_DEPRECATED);
-        trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
-        trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+        public function testLegacyFoo()
+        {
+            @trigger_error('silenced foo deprecation', E_USER_DEPRECATED);
+            trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+            trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+        }
+
+        public function testNonLegacyBar()
+        {
+            @trigger_error('silenced bar deprecation', E_USER_DEPRECATED);
+            trigger_error('unsilenced bar deprecation', E_USER_DEPRECATED);
+        }
     }
 
-    public function testNonLegacyBar()
-    {
-        @trigger_error('silenced bar deprecation', E_USER_DEPRECATED);
-        trigger_error('unsilenced bar deprecation', E_USER_DEPRECATED);
-    }
 }
 
 $foo = new FooTestCase();

@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\PhpUnit\TextUI;
 
+use PHPUnit\TextUI\TestRunner as BaseTestRunner;
 use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 
 /**
  * {@inheritdoc}
  */
-class TestRunner extends \PHPUnit_TextUI_TestRunner
+class TestRunner extends BaseTestRunner
 {
     /**
      * {@inheritdoc}

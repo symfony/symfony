@@ -30,10 +30,10 @@
         "files": [ "bootstrap.php" ],
         "psr-4": {
             "Symfony\\Bridge\\PhpUnit\\": "",
-            "PHPUnit\\Framework": "ForwardCompatibility/Framework/",
-            "PHPUnit\\Runner": "ForwardCompatibility/Runner/",
-            "PHPUnit\\TextUI": "ForwardCompatibility/TextUI/",
-            "PHPUnit\\Util": "ForwardCompatibility/Util/"
+            "PHPUnit\\Framework\\": "ForwardCompatibility/Framework/",
+            "PHPUnit\\Runner\\": "ForwardCompatibility/Runner/",
+            "PHPUnit\\TextUI\\": "ForwardCompatibility/TextUI/",
+            "PHPUnit\\Util\\": "ForwardCompatibility/Util/"
         },
         "exclude-from-classmap": [
             "/Tests/"

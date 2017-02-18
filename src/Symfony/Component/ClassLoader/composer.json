@@ -21,7 +21,7 @@
         "symfony/polyfill-apcu": "~1.1"
     },
     "require-dev": {
-        "symfony/finder": "~2.0,>=2.0.5"
+        "symfony/finder": "^2.0.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\ClassLoader\\": "" },

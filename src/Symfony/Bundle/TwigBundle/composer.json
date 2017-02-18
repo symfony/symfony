@@ -21,14 +21,14 @@
         "symfony/twig-bridge": "~2.7",
         "twig/twig": "~1.28|~2.0",
         "symfony/http-foundation": "~2.5",
-        "symfony/http-kernel": "~2.7.23|~2.8.16"
+        "symfony/http-kernel": "~2.7.23|^2.8.16"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.6,>=2.6.6",
+        "symfony/dependency-injection": "^2.6.6",
         "symfony/expression-language": "~2.4",
         "symfony/config": "~2.2",
-        "symfony/finder": "~2.0,>=2.0.5",
+        "symfony/finder": "^2.0.5",
         "symfony/routing": "~2.1",
         "symfony/templating": "~2.1",
         "symfony/yaml": "~2.3",

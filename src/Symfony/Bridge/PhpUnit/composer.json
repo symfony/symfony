@@ -31,6 +31,7 @@
         "psr-4": {
             "Symfony\\Bridge\\PhpUnit\\": "",
             "PHPUnit\\Framework": "ForwardCompatibility/Framework/",
+            "PHPUnit\\Runner": "ForwardCompatibility/Runner/",
             "PHPUnit\\TextUI": "ForwardCompatibility/TextUI/",
             "PHPUnit\\Util": "ForwardCompatibility/Util/"
         },

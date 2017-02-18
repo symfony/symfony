@@ -11,7 +11,9 @@
 
 namespace Symfony\Bridge\PhpUnit\TextUI;
 
+use PHPUnit\Runner\Version;
 use PHPUnit\TextUI\TestRunner as BaseTestRunner;
+use Symfony\Bridge\PhpUnit\SymfonyTestsListenerBC;
 use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 
 /**
@@ -25,7 +27,13 @@ class TestRunner extends BaseTestRunner
     protected function handleConfiguration(array &$arguments)
     {
         $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
-        $arguments['listeners'][] = new SymfonyTestsListener();
+
+        if (preg_match('/6\..*(', Version::id())) {
+            $arguments['listeners'][] = new SymfonyTestsListener();
+
+        } else {
+            $arguments['listeners'][] = new SymfonyTestsListenerBC();
+        }
 
         return parent::handleConfiguration($arguments);
     }

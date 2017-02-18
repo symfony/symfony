@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-02-17T19:04:26Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-17T19:05:21Z
+
+Actually, you need to add a conflict rule in FrameworkBundle, to forbid it to use an older property-info component (which would have an array typehint), if we don't have the conflict already
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-17T19:42:14Z
+
+Indeed, thanks!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-17T22:12:47Z
+
+👍

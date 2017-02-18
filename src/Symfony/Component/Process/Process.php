@@ -377,7 +377,7 @@ class Process implements \IteratorAggregate
         if (null !== $callback) {
             if (!$this->processPipes->haveReadSupport()) {
                 $this->stop(0);
-                throw new \LogicException('Pass the callback to the Process:start method or enableOutput to use a callback with Process::wait');
+                throw new \LogicException('Pass the callback to the Process::start method or enableOutput to use a callback with Process::wait');
             }
             $this->callback = $this->buildCallback($callback);
         }

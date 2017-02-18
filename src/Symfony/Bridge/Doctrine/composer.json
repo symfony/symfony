@@ -29,11 +29,11 @@
         "symfony/property-info": "~2.8|3.0",
         "symfony/security": "~2.2|~3.0.0",
         "symfony/expression-language": "~2.2|~3.0.0",
-        "symfony/validator": "~2.5,>=2.5.5|~3.0.0",
-        "symfony/translation": "~2.0,>=2.0.5|~3.0.0",
+        "symfony/validator": "^2.5.5|~3.0.0",
+        "symfony/translation": "^2.0.5|~3.0.0",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
-        "doctrine/orm": "~2.4,>=2.4.5"
+        "doctrine/orm": "^2.4.5"
     },
     "suggest": {
         "symfony/form": "",

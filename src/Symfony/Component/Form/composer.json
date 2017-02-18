@@ -30,7 +30,7 @@
         "symfony/http-foundation": "~2.2|~3.0.0",
         "symfony/http-kernel": "~2.4|~3.0.0",
         "symfony/security-csrf": "~2.4|~3.0.0",
-        "symfony/translation": "~2.0,>=2.0.5|~3.0.0"
+        "symfony/translation": "^2.0.5|~3.0.0"
     },
     "conflict": {
         "symfony/doctrine-bridge": "<2.7",

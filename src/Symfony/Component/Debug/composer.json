@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "symfony/class-loader": "~2.2|~3.0.0",
-        "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2|~3.0.0"
+        "symfony/http-kernel": "~2.3.24|~2.5.9|^2.6.2|~3.0.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Debug\\": "" },

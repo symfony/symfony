@@ -24,9 +24,6 @@
         "twig/twig": "~1.28|~2.0",
         "psr/log": "~1.0"
     },
-    "conflict": {
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
-    },
     "replace": {
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
@@ -84,6 +81,9 @@
         "symfony/phpunit-bridge": "~3.2",
         "egulias/email-validator": "~1.2,>=1.2.1",
         "sensio/framework-extra-bundle": "^3.0.2"
+    },
+    "conflict": {
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
     },
     "autoload": {
         "psr-4": {

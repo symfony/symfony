@@ -23,7 +23,7 @@
     "require-dev": {
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
-        "symfony/form": "~3.0,>=3.0.5",
+        "symfony/form": "^3.0.5",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/property-access": "~2.8|~3.0",
         "symfony/property-info": "~2.8|3.0",
@@ -34,7 +34,7 @@
         "symfony/translation": "~2.8|~3.0",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
-        "doctrine/orm": "~2.4,>=2.4.5"
+        "doctrine/orm": "^2.4.5"
     },
     "suggest": {
         "symfony/form": "",

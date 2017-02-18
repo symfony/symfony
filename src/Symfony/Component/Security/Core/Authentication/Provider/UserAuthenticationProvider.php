@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Token\AuthenticatedUserToken;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordRequestToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -66,8 +68,15 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $username = AuthenticationProviderInterface::USERNAME_NONE_PROVIDED;
         }
 
+        // For backwards compatibility with <3.1. Deprecation notice is already triggered in supports().
+        if (!$token instanceof UsernamePasswordRequestToken) {
+            $newToken = new UsernamePasswordRequestToken($token->getUsername(), $token->getCredentials(), $token->getProviderKey(), $token->getRoles());
+            $newToken->setAttributes($token->getAttributes());
+            $token = $newToken;
+        }
+
         try {
-            $user = $this->retrieveUser($username, $token);
+            $user = $this->getUserFromToken($username, $token);
         } catch (UsernameNotFoundException $e) {
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials.', 0, $e);
@@ -78,12 +87,12 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         }
 
         if (!$user instanceof UserInterface) {
-            throw new AuthenticationServiceException('retrieveUser() must return a UserInterface.');
+            throw new AuthenticationServiceException('getUserFromToken() must return a UserInterface.');
         }
 
         try {
             $this->userChecker->checkPreAuth($user);
-            $this->checkAuthentication($user, $token);
+            $this->authenticateUser($user, $token);
             $this->userChecker->checkPostAuth($user);
         } catch (BadCredentialsException $e) {
             if ($this->hideUserNotFoundExceptions) {
@@ -93,7 +102,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             throw $e;
         }
 
-        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token));
+        $authenticatedToken = new AuthenticatedUserToken($user, $user->getRoles(), $this->providerKey);
         $authenticatedToken->setAttributes($token->getAttributes());
 
         return $authenticatedToken;
@@ -104,7 +113,17 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey();
+        if ($token instanceof UsernamePasswordRequestToken) {
+            return $this->providerKey === $token->getProviderKey();
+        }
+
+        if ($token instanceof UsernamePasswordToken) {
+            @trigger_error('Support for UsernamePasswordToken in the '.__CLASS__.' class is deprecated in 3.1 and will be removed in 4.0. Pass a UsernamePasswordRequestToken object instead.', E_USER_DEPRECATED);
+
+            return $this->providerKey === $token->getProviderKey();
+        }
+
+        return false;
     }
 
     /**
@@ -131,25 +150,52 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     }
 
     /**
-     * Retrieves the user from an implementation-specific location.
-     *
-     * @param string                $username The username to retrieve
-     * @param UsernamePasswordToken $token    The Token
-     *
-     * @return UserInterface The user
-     *
-     * @throws AuthenticationException if the credentials could not be validated
+     * @deprecated Since Symfony 3.1, to be removed in 4.0. Implement getUserFromToken() instead.
      */
-    abstract protected function retrieveUser($username, UsernamePasswordToken $token);
+    protected function retrieveUser($username, UsernamePasswordToken $token)
+    {
+        throw new \LogicException('Method UserAuthenticationProvider::getUserFromToken() needs to be implemented.');
+    }
 
     /**
-     * Does additional checks on the user and token (like validating the
-     * credentials).
+     * Retrieves the user by the provided username and information from the token.
      *
-     * @param UserInterface         $user  The retrieved UserInterface instance
-     * @param UsernamePasswordToken $token The UsernamePasswordToken token to be authenticated
+     * @param string                       $username
+     * @param UsernamePasswordRequestToken $token
      *
-     * @throws AuthenticationException if the credentials could not be validated
+     * @return UserInterface
+     *
+     * @throws AuthenticationException If no user could be found for the provided information
      */
-    abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);
+    protected function getUserFromToken($username, UsernamePasswordRequestToken $token)
+    {
+        @trigger_error('Method '.__CLASS__.'::retrieveUser() is deprecated since version 3.1 and will be removed in 4.0. Override getUserFromToken() instead.', E_USER_DEPRECATED);
+
+        return $this->retrieveUser($username, $token);
+    }
+
+    /**
+     * Checks whether the user is correctly authenticated.
+     *
+     * This is done by e.g. comparing the user password to the provided credentials.
+     *
+     * @param UserInterface                $user  The user retrieved by the requested username
+     * @param UsernamePasswordRequestToken $token
+     *
+     * @throws AuthenticationException If the user is not correctly authenticated.
+     */
+    protected function authenticateUser(UserInterface $user, UsernamePasswordRequestToken $token)
+    {
+        @trigger_error('Method '.__CLASS__.'::checkAuthentication() is deprecated since version 3.1 and will be removed in 4.0. Override authenticateUser() instead.', E_USER_DEPRECATED);
+
+        return $this->checkAuthentication($user, $token);
+    }
+
+    /**
+     * @deprecated Since Symfony 3.1, to be removed in 4.0. Implement authenticateUser() instead.
+     */
+    protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
+    {
+        throw new \LogicException('Method UserAuthenticationProvider::authenticateUser() needs to be implemented.');
+    }
 }

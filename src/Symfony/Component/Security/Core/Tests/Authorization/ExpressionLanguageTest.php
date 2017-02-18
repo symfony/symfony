@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use Symfony\Component\Security\Core\Authentication\Token\AuthenticatedAnonymousToken;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -25,7 +26,7 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsAuthenticated($token, $expression, $result, array $roles = array())
     {
-        $anonymousTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken';
+        $anonymousTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AuthenticatedAnonymousToken';
         $rememberMeTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken';
         $expressionLanguage = new ExpressionLanguage();
         $trustResolver = new AuthenticationTrustResolver($anonymousTokenClass, $rememberMeTokenClass);
@@ -44,7 +45,7 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $user = new User('username', 'password', $roles);
 
         $noToken = null;
-        $anonymousToken = new AnonymousToken('firewall', 'anon.');
+        $anonymousToken = new AuthenticatedAnonymousToken('firewall', 'anon.');
         $rememberMeToken = new RememberMeToken($user, 'providerkey', 'firewall');
         $usernamePasswordToken = new UsernamePasswordToken('username', 'password', 'providerkey', $roles);
 

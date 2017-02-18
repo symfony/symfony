@@ -25,6 +25,13 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
     }
 
+    public function testLegacySupports()
+    {
+        $provider = $this->getProvider();
+
+        $this->assertTrue($provider->supports($this->getSupportedToken(null, 'secret', 'RememberMeToken')));
+    }
+
     public function testAuthenticateWhenTokenIsNotSupported()
     {
         $provider = $this->getProvider();
@@ -74,10 +81,9 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
         $this->assertEquals(array(new Role('ROLE_FOO')), $authToken->getRoles());
-        $this->assertEquals('', $authToken->getCredentials());
     }
 
-    protected function getSupportedToken($user = null, $secret = 'test')
+    protected function getSupportedToken($user = null, $secret = 'test', $class = 'RememberMeRequestToken')
     {
         if (null === $user) {
             $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
@@ -87,7 +93,7 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(array()));
         }
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(array('getProviderKey'))->setConstructorArgs(array($user, 'foo', $secret))->getMock();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\\'.$class)->setMethods(array('getProviderKey'))->setConstructorArgs(array($user, 'foo', $secret))->getMock();
         $token
             ->expects($this->once())
             ->method('getProviderKey')

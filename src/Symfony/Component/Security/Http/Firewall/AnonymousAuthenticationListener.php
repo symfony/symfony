@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousRequestToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Psr\Log\LoggerInterface;
@@ -51,7 +52,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = new AnonymousToken($this->secret, 'anon.', array());
+            $token = new AnonymousRequestToken($this->secret, 'anon.');
             if (null !== $this->authenticationManager) {
                 $token = $this->authenticationManager->authenticate($token);
             }

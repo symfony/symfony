@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousRequestToken;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
 
@@ -48,7 +49,7 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null))
         ;
 
-        $anonymousToken = new AnonymousToken('TheSecret', 'anon.', array());
+        $anonymousToken = new AnonymousRequestToken('TheSecret', 'anon.');
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
         $authenticationManager

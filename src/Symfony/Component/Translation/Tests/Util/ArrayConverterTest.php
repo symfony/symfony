@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Translation\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Util\ArrayConverter;
 
-class ArrayConverterTest extends \PHPUnit_Framework_TestCase
+class ArrayConverterTest extends TestCase
 {
     /**
      * @dataProvider messagesData

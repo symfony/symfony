@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 
-class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
+class DependencyInjectionExtensionTest extends TestCase
 {
     public function testGetTypeExtensions()
     {

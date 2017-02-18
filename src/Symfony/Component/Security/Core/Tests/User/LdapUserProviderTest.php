@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\LdapUserProvider;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * @requires extension ldap
  */
-class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
+class LdapUserProviderTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException

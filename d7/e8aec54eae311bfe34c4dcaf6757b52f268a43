@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-10T12:29:26Z
+
+Note: I've called this command `lint:translation` instead of `lint:xliff` or `lint:xlf` because, in the future, the idea would be to keep adding linting features related to translation ... and maybe not directly related to XLIFF.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-11T11:43:12Z
+
+do we have any plan for other formats? if not, I'm not sure about the name.
+"linting" is about some specific language - so having the name of the actual linted language in the command looks good to me.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-15T15:57:23Z
+
+Thanks for the reviews. About extracting the `validate()` method:
+
+* It's not the common practice in the other linters
+* For interoperability, the idea would be to execute `lint:xliff --format=json`
+* However, I'd love if linters would be easier to use (for example like this -> https://github.com/symfony/symfony/pull/19916  which sadly was refused)
+
+So ... I don't know what to do.

@@ -44,6 +44,9 @@ DependencyInjection
  * The `DefinitionDecorator` class is deprecated and will be removed in 4.0, use
    the `ChildDefinition` class instead.
 
+ * The ``strict`` attribute in service arguments has been deprecated and will be removed in 4.0.
+   The attribute is ignored since 3.0, so you can simply remove it.
+
 EventDispatcher
 ---------------
 

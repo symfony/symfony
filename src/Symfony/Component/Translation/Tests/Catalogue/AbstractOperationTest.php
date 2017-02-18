@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Translation\Tests\Catalogue;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
-abstract class AbstractOperationTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractOperationTest extends TestCase
 {
     public function testGetEmptyDomains()
     {

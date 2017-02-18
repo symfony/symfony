@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Role;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
-class SwitchUserRoleTest extends \PHPUnit_Framework_TestCase
+class SwitchUserRoleTest extends TestCase
 {
     public function testGetSource()
     {

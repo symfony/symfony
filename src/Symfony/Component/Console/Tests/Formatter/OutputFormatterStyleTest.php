@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Formatter;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
+class OutputFormatterStyleTest extends TestCase
 {
     public function testConstructor()
     {

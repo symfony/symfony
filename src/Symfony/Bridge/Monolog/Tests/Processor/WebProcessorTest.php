@@ -12,10 +12,11 @@
 namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\WebProcessor;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebProcessorTest extends \PHPUnit_Framework_TestCase
+class WebProcessorTest extends TestCase
 {
     public function testUsesRequestServerData()
     {

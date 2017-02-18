@@ -11,13 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
+class AddConsoleCommandPassTest extends TestCase
 {
     /**
      * @dataProvider visibilityProvider

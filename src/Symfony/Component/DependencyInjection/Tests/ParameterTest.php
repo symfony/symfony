@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Parameter;
 
-class ParameterTest extends \PHPUnit_Framework_TestCase
+class ParameterTest extends TestCase
 {
     public function testConstructor()
     {

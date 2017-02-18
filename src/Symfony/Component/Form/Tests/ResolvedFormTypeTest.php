@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormType;
@@ -20,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
+class ResolvedFormTypeTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

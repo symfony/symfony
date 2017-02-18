@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Tests\Logout;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Logout\SessionLogoutHandler;
 
-class SessionLogoutHandlerTest extends \PHPUnit_Framework_TestCase
+class SessionLogoutHandlerTest extends TestCase
 {
     public function testLogout()
     {

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
-class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
+class PropertyMetadataTest extends TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';

@@ -12,11 +12,12 @@
 namespace Symfony\Bridge\Doctrine\Tests\DataCollector;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
+class DoctrineDataCollectorTest extends TestCase
 {
     public function testCollectConnections()
     {

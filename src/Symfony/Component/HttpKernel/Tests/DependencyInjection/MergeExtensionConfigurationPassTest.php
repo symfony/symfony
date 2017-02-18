@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
-class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
+class MergeExtensionConfigurationPassTest extends TestCase
 {
     public function testAutoloadMainExtension()
     {

@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * @group time-sensitive
  */
-class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
+class ResponseHeaderBagTest extends TestCase
 {
     /**
      * @dataProvider provideAllPreserveCase

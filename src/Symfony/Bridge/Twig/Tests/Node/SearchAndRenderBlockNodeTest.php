@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Tests\Node;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
 
-class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
+class SearchAndRenderBlockNodeTest extends TestCase
 {
     public function testCompileWidget()
     {

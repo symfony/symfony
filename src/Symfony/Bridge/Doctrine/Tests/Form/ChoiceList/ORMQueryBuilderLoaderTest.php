@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Version;
 
-class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
+class ORMQueryBuilderLoaderTest extends TestCase
 {
     public function testIdentifierTypeIsStringArray()
     {

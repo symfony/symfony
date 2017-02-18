@@ -15,10 +15,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
 
-class ResponseCacheStrategyTest extends \PHPUnit_Framework_TestCase
+class ResponseCacheStrategyTest extends TestCase
 {
     public function testMinimumSharedMaxAgeWins()
     {

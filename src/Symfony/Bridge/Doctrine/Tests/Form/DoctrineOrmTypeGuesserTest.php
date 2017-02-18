@@ -12,11 +12,12 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
-class DoctrineOrmTypeGuesserTest extends \PHPUnit_Framework_TestCase
+class DoctrineOrmTypeGuesserTest extends TestCase
 {
     /**
      * @dataProvider requiredProvider

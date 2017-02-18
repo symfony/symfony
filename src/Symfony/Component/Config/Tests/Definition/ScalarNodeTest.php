@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ScalarNode;
 
-class ScalarNodeTest extends \PHPUnit_Framework_TestCase
+class ScalarNodeTest extends TestCase
 {
     /**
      * @dataProvider getValidValues

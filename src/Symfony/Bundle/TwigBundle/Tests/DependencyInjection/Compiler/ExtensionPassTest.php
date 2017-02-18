@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ExtensionPassTest extends \PHPUnit_Framework_TestCase
+class ExtensionPassTest extends TestCase
 {
     public function testProcessDoesNotDropExistingFileLoaderMethodCalls()
     {

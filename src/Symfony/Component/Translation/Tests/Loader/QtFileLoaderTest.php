@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\QtFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class QtFileLoaderTest extends \PHPUnit_Framework_TestCase
+class QtFileLoaderTest extends TestCase
 {
     public function testLoad()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Debug\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\Debug\ErrorHandler;
@@ -23,7 +24,7 @@ use Symfony\Component\Debug\Exception\SilencedErrorContext;
  * @author Robert Schönthal <seroscho@googlemail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
+class ErrorHandlerTest extends TestCase
 {
     public function testRegister()
     {

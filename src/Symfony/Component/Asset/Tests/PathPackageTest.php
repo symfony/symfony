@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
-class PathPackageTest extends \PHPUnit_Framework_TestCase
+class PathPackageTest extends TestCase
 {
     /**
      * @dataProvider getConfigs

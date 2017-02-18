@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputArgument;
 
-class InputArgumentTest extends \PHPUnit_Framework_TestCase
+class InputArgumentTest extends TestCase
 {
     public function testConstructor()
     {

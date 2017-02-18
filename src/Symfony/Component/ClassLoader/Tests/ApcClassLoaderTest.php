@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\ClassLoader\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\ClassLoader\ClassLoader;
 
-class ApcClassLoaderTest extends \PHPUnit_Framework_TestCase
+class ApcClassLoaderTest extends TestCase
 {
     protected function setUp()
     {

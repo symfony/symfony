@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Templating\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\StringStorage;
@@ -19,7 +20,7 @@ use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\TemplateReference;
 
-class PhpEngineTest extends \PHPUnit_Framework_TestCase
+class PhpEngineTest extends TestCase
 {
     protected $loader;
 

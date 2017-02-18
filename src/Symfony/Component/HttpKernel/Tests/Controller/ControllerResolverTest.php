@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpFoundation\Request;
 
-class ControllerResolverTest extends \PHPUnit_Framework_TestCase
+class ControllerResolverTest extends TestCase
 {
     public function testGetControllerWithoutControllerParameter()
     {

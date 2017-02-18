@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Cookie;
 
-class CookieTest extends \PHPUnit_Framework_TestCase
+class CookieTest extends TestCase
 {
     /**
      * @dataProvider getTestsForToFromString

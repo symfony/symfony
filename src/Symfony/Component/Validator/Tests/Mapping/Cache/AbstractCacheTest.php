@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCacheTest extends TestCase
 {
     /**
      * @var CacheInterface

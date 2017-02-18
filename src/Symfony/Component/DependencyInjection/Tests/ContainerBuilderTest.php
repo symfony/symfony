@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -31,7 +32,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\ExpressionLanguage\Expression;
 
-class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
+class ContainerBuilderTest extends TestCase
 {
     public function testDefinitions()
     {

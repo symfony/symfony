@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
@@ -57,7 +58,8 @@ class ConcreteToken extends AbstractToken
     }
 }
 
-class AbstractTokenTest extends \PHPUnit_Framework_TestCase
+/** @noinspection PhpUndefinedClassInspection */
+class AbstractTokenTest extends TestCase
 {
     public function testGetUsername()
     {

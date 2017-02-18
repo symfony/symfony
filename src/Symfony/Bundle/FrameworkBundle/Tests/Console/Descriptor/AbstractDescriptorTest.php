@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -22,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractDescriptorTest extends TestCase
 {
     /** @dataProvider getDescribeRouteCollectionTestData */
     public function testDescribeRouteCollection(RouteCollection $routes, $expectedDescription)

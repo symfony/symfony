@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -22,7 +23,7 @@ use Symfony\Component\Process\Process;
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */
-class ProcessTest extends \PHPUnit_Framework_TestCase
+class ProcessTest extends TestCase
 {
     private static $phpBin;
     private static $process;

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
@@ -19,7 +20,7 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
+class AnnotationLoaderTest extends TestCase
 {
     /**
      * @var AnnotationLoader

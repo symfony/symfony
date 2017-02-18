@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener;
 use Symfony\Component\Security\Core\Security;
 
-class UsernamePasswordFormAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
+class UsernamePasswordFormAuthenticationListenerTest extends TestCase
 {
     /**
      * @dataProvider getUsernameForLength

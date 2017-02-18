@@ -11,12 +11,13 @@
 
 namespace Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RegexTest extends \PHPUnit_Framework_TestCase
+class RegexTest extends TestCase
 {
     public function testConstraintGetDefaultOption()
     {

@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
-class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
+class ExpressionLanguageTest extends TestCase
 {
     public function testCachedParse()
     {

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ProcessBuilder;
 
-class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
+class ProcessBuilderTest extends TestCase
 {
     public function testInheritEnvironmentVars()
     {

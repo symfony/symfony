@@ -12,11 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 
-class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
+class ResizeFormListenerTest extends TestCase
 {
     private $dispatcher;
     private $factory;

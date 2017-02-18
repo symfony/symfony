@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class GroupSequenceTest extends \PHPUnit_Framework_TestCase
+class GroupSequenceTest extends TestCase
 {
     public function testCreate()
     {

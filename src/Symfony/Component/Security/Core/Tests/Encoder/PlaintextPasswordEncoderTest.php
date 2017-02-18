@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 
-class PlaintextPasswordEncoderTest extends \PHPUnit_Framework_TestCase
+class PlaintextPasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()
     {

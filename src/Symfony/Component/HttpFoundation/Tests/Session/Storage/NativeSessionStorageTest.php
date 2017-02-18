@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
@@ -28,7 +29,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NativeSessionStorageTest extends TestCase
 {
     private $savePath;
 

@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
 
-class RouteCollectionTest extends \PHPUnit_Framework_TestCase
+class RouteCollectionTest extends TestCase
 {
     public function testRoute()
     {

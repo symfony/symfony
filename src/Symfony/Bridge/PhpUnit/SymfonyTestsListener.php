@@ -68,7 +68,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function startTestSuite(TestSuite $suite)
+    public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
         $suiteName = $suite->getName();
 
@@ -120,7 +120,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function addSkippedTest(Test $test, \Exception $e, $time)
+    public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
         if (0 < $this->state) {
             if ($test instanceof TestCase) {
@@ -135,7 +135,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function startTest(Test $test)
+    public function startTest(\PHPUnit_Framework_Test $test)
     {
         if (-2 < $this->state && $test instanceof TestCase) {
             $groups = Test::getGroups(get_class($test), $test->getName(false));
@@ -147,7 +147,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function endTest(Test $test, $time)
+    public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
         if (-2 < $this->state && $test instanceof TestCase) {
             $groups = Test::getGroups(get_class($test), $test->getName(false));

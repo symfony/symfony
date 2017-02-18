@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Security\Guard\Tests\Provider;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
  */
-class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
+class GuardAuthenticationProviderTest extends TestCase
 {
     private $userProvider;
     private $userChecker;

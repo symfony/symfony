@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Loader\ObjectRouteLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class ObjectRouteLoaderTest extends \PHPUnit_Framework_TestCase
+class ObjectRouteLoaderTest extends TestCase
 {
     public function testLoadCallsServiceAndReturnsCollection()
     {

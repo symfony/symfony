@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\PhpDocExtractors;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PhpDocExtractorTest extends \PHPUnit_Framework_TestCase
+class PhpDocExtractorTest extends TestCase
 {
     /**
      * @var PhpDocExtractor

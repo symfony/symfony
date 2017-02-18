@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 
-class ChainDecoderTest extends \PHPUnit_Framework_TestCase
+class ChainDecoderTest extends TestCase
 {
     const FORMAT_1 = 'format1';
     const FORMAT_2 = 'format2';

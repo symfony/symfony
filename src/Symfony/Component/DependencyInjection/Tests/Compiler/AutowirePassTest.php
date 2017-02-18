@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -18,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AutowirePassTest extends \PHPUnit_Framework_TestCase
+class AutowirePassTest extends TestCase
 {
     public function testProcess()
     {

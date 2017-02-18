@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Helper;
 
+@trigger_error('The '.SlotsHelper::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * SlotsHelper manages template slots.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The SlotsHelper class will be removed in Symfony 4.0. You should use Twig instead.
  */
 class SlotsHelper extends Helper
 {

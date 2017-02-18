@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+@trigger_error('The '.EngineInterface::class.' interface is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * EngineInterface is the interface each engine must implement.
  *
@@ -27,6 +29,8 @@ namespace Symfony\Component\Templating;
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The EngineInterface interface will be removed in Symfony 4.0. You should use Twig instead.
  */
 interface EngineInterface
 {

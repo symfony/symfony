@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+@trigger_error('The '.CacheLoader::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
@@ -23,6 +25,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * All other mechanism would imply the use of `eval()`.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The CacheLoader class will be removed in Symfony 4.0. You should use Twig instead.
  */
 class CacheLoader extends Loader
 {

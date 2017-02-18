@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Storage;
 
+@trigger_error('The '.StringStorage::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * StringStorage represents a template stored in a string.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The StringStorage class will be removed in Symfony 4.0. You should use Twig instead.
  */
 class StringStorage extends Storage
 {

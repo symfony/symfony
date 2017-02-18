@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Storage;
 
+@trigger_error('The '.Storage::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * Storage is the base class for all storage classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The Storage class will be removed in Symfony 4.0. You should use Twig instead.
  */
 abstract class Storage
 {

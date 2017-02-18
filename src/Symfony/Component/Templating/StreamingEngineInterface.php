@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating;
 
+@trigger_error('The '.StreamingEngineInterface::class.' interface is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * StreamingEngineInterface provides a method that knows how to stream a template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The StreamingEngineInterface interface will be removed in Symfony 4.0. You should use Twig instead.
  */
 interface StreamingEngineInterface
 {

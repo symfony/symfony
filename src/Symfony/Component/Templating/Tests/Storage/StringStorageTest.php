@@ -13,6 +13,9 @@ namespace Symfony\Component\Templating\Tests\Storage;
 
 use Symfony\Component\Templating\Storage\StringStorage;
 
+/**
+ * @group legacy
+ */
 class StringStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetContent()

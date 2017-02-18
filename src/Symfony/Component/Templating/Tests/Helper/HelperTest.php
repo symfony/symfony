@@ -13,6 +13,9 @@ namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 
+/**
+ * @group legacy
+ */
 class HelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetCharset()

@@ -14,6 +14,9 @@ namespace Symfony\Component\Templating\Tests;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 
+/**
+ * @group legacy
+ */
 class TemplateNameParserTest extends \PHPUnit_Framework_TestCase
 {
     protected $parser;

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+@trigger_error('The '.PhpEngine::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\StringStorage;
@@ -21,6 +23,8 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
  * PhpEngine is an engine able to render PHP templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The PhpEngine class will be removed in Symfony 4.0. You should use Twig instead.
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {

@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating;
 
+@trigger_error('The '.TemplateReferenceInterface::class.' interface is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * Interface to be implemented by all templates.
  *
  * @author Victor Berchet <victor@suumit.com>
+ *
+ * @deprecated The TemplateReferenceInterface interface will be removed in Symfony 4.0. You should use Twig instead.
  */
 interface TemplateReferenceInterface
 {

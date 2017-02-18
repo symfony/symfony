@@ -13,6 +13,9 @@ namespace Symfony\Component\Templating\Tests\Storage;
 
 use Symfony\Component\Templating\Storage\FileStorage;
 
+/**
+ * @group legacy
+ */
 class FileStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetContent()

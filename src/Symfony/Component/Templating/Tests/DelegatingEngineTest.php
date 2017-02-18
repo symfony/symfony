@@ -15,6 +15,9 @@ use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\StreamingEngineInterface;
 use Symfony\Component\Templating\EngineInterface;
 
+/**
+ * @group legacy
+ */
 class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
 {
     public function testRenderDelegatesToSupportedEngine()

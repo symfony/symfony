@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\Formatter;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class OutputFormatterTest extends \PHPUnit_Framework_TestCase
+class OutputFormatterTest extends TestCase
 {
     public function testEmptyTag()
     {

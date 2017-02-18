@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
@@ -18,7 +19,7 @@ use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
-class AssetExtensionTest extends \PHPUnit_Framework_TestCase
+class AssetExtensionTest extends TestCase
 {
     /**
      * @group legacy

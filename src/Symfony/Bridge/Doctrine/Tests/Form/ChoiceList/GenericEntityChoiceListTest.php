@@ -16,13 +16,14 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * @group legacy
  */
-class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
+class GenericEntityChoiceListTest extends TestCase
 {
     const SINGLE_INT_ID_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
 

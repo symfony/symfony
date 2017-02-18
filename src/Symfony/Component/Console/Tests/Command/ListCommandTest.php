@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Application;
 
-class ListCommandTest extends \PHPUnit_Framework_TestCase
+class ListCommandTest extends TestCase
 {
     public function testExecuteListsCommands()
     {

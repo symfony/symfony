@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
-class FilesLoaderTest extends \PHPUnit_Framework_TestCase
+class FilesLoaderTest extends TestCase
 {
     public function testCallsGetFileLoaderInstanceForeachPath()
     {

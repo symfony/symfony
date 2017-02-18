@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class JsonBundleReaderTest extends \PHPUnit_Framework_TestCase
+class JsonBundleReaderTest extends TestCase
 {
     /**
      * @var JsonBundleReader

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\GetterMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
-class GetterMetadataTest extends \PHPUnit_Framework_TestCase
+class GetterMetadataTest extends TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
@@ -18,7 +19,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormConfigTest extends \PHPUnit_Framework_TestCase
+class FormConfigTest extends TestCase
 {
     public function getHtml4Ids()
     {

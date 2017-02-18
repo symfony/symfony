@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
@@ -945,7 +946,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $assertChildViewsEqual = function (array $childViews) use ($test) {
             return function (FormView $view) use ($test, $childViews) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var TestCase $test */
                 $test->assertSame($childViews, $view->children);
             };
         };

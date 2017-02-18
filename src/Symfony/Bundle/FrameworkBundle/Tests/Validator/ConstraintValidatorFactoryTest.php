@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Validator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
 
-class ConstraintValidatorFactoryTest extends \PHPUnit_Framework_TestCase
+class ConstraintValidatorFactoryTest extends TestCase
 {
     public function testGetInstanceCreatesValidator()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
+class RequestDataCollectorTest extends TestCase
 {
     public function testCollect()
     {

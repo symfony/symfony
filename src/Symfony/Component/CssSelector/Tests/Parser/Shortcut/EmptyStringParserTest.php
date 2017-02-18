@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\CssSelector\Tests\Parser\Shortcut;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\Shortcut\EmptyStringParser;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class EmptyStringParserTest extends \PHPUnit_Framework_TestCase
+class EmptyStringParserTest extends TestCase
 {
     public function testParse()
     {

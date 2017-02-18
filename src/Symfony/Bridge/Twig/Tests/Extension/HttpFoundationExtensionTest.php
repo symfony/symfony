@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 
-class HttpFoundationExtensionTest extends \PHPUnit_Framework_TestCase
+class HttpFoundationExtensionTest extends TestCase
 {
     /**
      * @dataProvider getGenerateAbsoluteUrlData()

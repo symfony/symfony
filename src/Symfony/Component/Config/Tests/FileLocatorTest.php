@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 
-class FileLocatorTest extends \PHPUnit_Framework_TestCase
+class FileLocatorTest extends TestCase
 {
     /**
      * @dataProvider getIsAbsolutePathTests

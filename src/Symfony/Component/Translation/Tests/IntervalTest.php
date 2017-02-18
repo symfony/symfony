@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Interval;
 
-class IntervalTest extends \PHPUnit_Framework_TestCase
+class IntervalTest extends TestCase
 {
     /**
      * @dataProvider getTests

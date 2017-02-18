@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
-class HttpKernelExtensionTest extends \PHPUnit_Framework_TestCase
+class HttpKernelExtensionTest extends TestCase
 {
     /**
      * @expectedException \Twig_Error_Runtime

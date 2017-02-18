@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\CssSelector\Tests\Parser;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
 
-class TokenStreamTest extends \PHPUnit_Framework_TestCase
+class TokenStreamTest extends TestCase
 {
     public function testGetNext()
     {

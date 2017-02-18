@@ -12,12 +12,13 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
+class CollectionToArrayTransformerTest extends TestCase
 {
     /**
      * @var CollectionToArrayTransformer

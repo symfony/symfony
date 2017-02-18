@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
  *
  * @group time-sensitive
  */
-class MetadataBagTest extends \PHPUnit_Framework_TestCase
+class MetadataBagTest extends TestCase
 {
     /**
      * @var MetadataBag

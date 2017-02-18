@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintC;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithValue;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithValueAsDefault;
 
-class ConstraintTest extends \PHPUnit_Framework_TestCase
+class ConstraintTest extends TestCase
 {
     public function testSetProperties()
     {

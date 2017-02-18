@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -18,7 +19,7 @@ use Symfony\Component\Console\Output\StreamOutput;
  * @group legacy
  * @group time-sensitive
  */
-class LegacyProgressHelperTest extends \PHPUnit_Framework_TestCase
+class LegacyProgressHelperTest extends TestCase
 {
     public function testAdvance()
     {

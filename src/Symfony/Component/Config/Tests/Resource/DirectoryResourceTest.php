@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
-class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
+class DirectoryResourceTest extends TestCase
 {
     protected $directory;
 

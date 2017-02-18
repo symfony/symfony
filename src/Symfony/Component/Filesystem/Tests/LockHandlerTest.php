@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\LockHandler;
 
-class LockHandlerTest extends \PHPUnit_Framework_TestCase
+class LockHandlerTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException

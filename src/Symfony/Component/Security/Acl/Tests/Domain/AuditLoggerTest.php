@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Domain;
 
-class AuditLoggerTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class AuditLoggerTest extends TestCase
 {
     /**
      * @dataProvider getTestLogData

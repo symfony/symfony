@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\LazyProxy\Instantiator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 
@@ -19,7 +20,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInst
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
-class RealServiceInstantiatorTest extends \PHPUnit_Framework_TestCase
+class RealServiceInstantiatorTest extends TestCase
 {
     public function testInstantiateProxy()
     {

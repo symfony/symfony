@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Domain;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
 
-class FieldEntryTest extends \PHPUnit_Framework_TestCase
+class FieldEntryTest extends TestCase
 {
     public function testConstructor()
     {

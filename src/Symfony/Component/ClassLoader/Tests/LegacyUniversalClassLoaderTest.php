@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\ClassLoader\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 /**
  * @group legacy
  */
-class LegacyUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
+class LegacyUniversalClassLoaderTest extends TestCase
 {
     /**
      * @dataProvider getLoadClassTests

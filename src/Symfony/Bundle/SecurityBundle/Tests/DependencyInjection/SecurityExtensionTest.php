@@ -11,12 +11,13 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
+class SecurityExtensionTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
@@ -18,7 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
+class MergeExtensionConfigurationPassTest extends TestCase
 {
     public function testExpressionLanguageProviderForwarding()
     {

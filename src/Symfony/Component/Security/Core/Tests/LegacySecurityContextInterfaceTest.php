@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
  * @group legacy
  */
-class LegacySecurityContextInterfaceTest extends \PHPUnit_Framework_TestCase
+class LegacySecurityContextInterfaceTest extends TestCase
 {
     /**
      * Test if the BC Layer is working as intended.

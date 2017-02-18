@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * @author Sebastian Marek <proofek@gmail.com>
  */
-class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
+class ProcessFailedExceptionTest extends TestCase
 {
     /**
      * tests ProcessFailedException throws exception if the process was successful.

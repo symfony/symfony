@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 
-class TranslatorPassTest extends \PHPUnit_Framework_TestCase
+class TranslatorPassTest extends TestCase
 {
     public function testValidCollector()
     {

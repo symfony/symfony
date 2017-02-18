@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 
-class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
+class FormDataCollectorTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

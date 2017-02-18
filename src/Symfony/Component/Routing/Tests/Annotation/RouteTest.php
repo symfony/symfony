@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Routing\Tests\Annotation;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Annotation\Route;
 
-class RouteTest extends \PHPUnit_Framework_TestCase
+class RouteTest extends TestCase
 {
     /**
      * @expectedException \BadMethodCallException

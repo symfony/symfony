@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Domain
 {
+
+    use PHPUnit\Framework\TestCase;
     use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
     use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
-    class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
+    class ObjectIdentityTest extends TestCase
     {
         public function testConstructor()
         {

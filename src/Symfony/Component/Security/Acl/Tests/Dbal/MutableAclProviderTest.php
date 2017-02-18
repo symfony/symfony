@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Dbal;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\FieldEntryInterface;
 use Symfony\Component\Security\Acl\Model\AuditableEntryInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 /**
  * @requires extension pdo_sqlite
  */
-class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
+class MutableAclProviderTest extends TestCase
 {
     protected $con;
 

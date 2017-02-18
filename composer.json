@@ -27,9 +27,6 @@
         "symfony/polyfill-php70": "~1.0",
         "symfony/polyfill-util": "~1.0"
     },
-    "conflict": {
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
-    },
     "replace": {
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
@@ -98,7 +95,8 @@
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
-        "phpdocumentor/type-resolver": "<0.2.0"
+        "phpdocumentor/type-resolver": "<0.2.0",
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
     },
     "provide": {
         "psr/cache-implementation": "1.0"

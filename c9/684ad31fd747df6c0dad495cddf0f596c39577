@@ -1,0 +1,327 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T07:34:32Z
+
+The FC layer is basically restricted to a few classes as you can see here: https://github.com/sebastianbergmann/phpunit/commit/a55235c033c2dc18db631cc6b804844f6d37615a
+
+- PHPUnit_Framework_Assert
+- PHPUnit_Framework_BaseTestListener
+- PHPUnit_Framework_TestCase
+- PHPUnit_Framework_TestListener
+
+In order to fully switch to namespaces we must upgrade to 6.0.
+
+Meanwhile to Bridge will not work with 6.0.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T08:23:04Z
+
+The PHP 5.3 test fails due to the wrong phpunit version.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-08T09:19:15Z
+
+Well, you say you are replacing #21540, but our remarks on it are still valid. We have more public base test cases (and we have some listeners in the PHPUnit bridge)
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T09:45:27Z
+
+@stof Yes. Sorry, it looks like I did not elaborate enough information about your Bridge remark.
+
+The issue is since only the above mentioned 4 classes are in the FC layer, the Bridge cannot be updated to 6.0 as it uses the following classes:
+
+````
+/symfony/src/Symfony/Bridge/PhpUnit$ pt PHPUnit_
+bootstrap.php
+16:if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Command', false)) {
+
+DeprecationErrorHandler.php
+54:                return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
+62:            while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_')))) {
+76:                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+99:            if (array('PHPUnit_Util_ErrorHandler', 'handleError') === $oldErrorHandler) {
+
+Tests/DeprecationErrorHandler/default.phpt
+21:class PHPUnit_Util_Test
+
+TextUI/Command.php
+17:class Command extends \PHPUnit_TextUI_Command
+````
+
+Are those the listeners/handlers you meant? I do not see a way other then adding classes to the bridge which should then work like the FC layer here https://github.com/sebastianbergmann/phpunit/commit/a55235c033c2dc18db631cc6b804844f6d37615a.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T09:47:47Z
+
+I would think all the other remarks are included in the PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-08T09:47:53Z
+
+@peterrehm it cannot be switched to namespaces entirely to add compat, I know. But several places can be changed.
+
+And we also have base test cases elsewhere than the KernelTestCase (I know that the Form and Validator components have some)
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T09:49:35Z
+
+How about migrating at least ALL those 4 classes to the namespaced version that the FC layer provides?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T11:23:12Z
+
+And `PHPUnit_Framework_Assert` is also migrated.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-08T14:19:20Z
+
+I dont get why the PHP 7 tests are failing, on my local machine I do not have any issues.
+Any other remarks?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-10T07:03:48Z
+
+/ping @symfony-deciders Any remarks? Can we get this merged?
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-02-10T10:04:23Z
+
+If this gets merged, due to the new conflicts with the older PHPUnit versions, I can completely rewrite my PR for the PHPUnit bridge too (#21221)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-02-10T10:07:20Z
+
+If this PR break unit tests for a supported version, you should find a way to fix it
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-10T10:10:09Z
+
+@jderusse As mentioned I do not get why they are failing, it might be related to the rebuild of the bridge, the subtree split, etc. Feel free to take over if you know better.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-11T11:30:00Z
+
+I cleared the phpunit cache and restarted tests. There are still a few failures to take care of.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-11T12:54:29Z
+
+Hm, when quickly scanning the logs I do not understand the reason for the failures. I see some missing autoloadphp's and some command failures.
+
+Do you have a clue what the reason might be?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-11T12:58:14Z
+
+Dunno yet about the autoload failure.
+You should be able to reproduce (then debug) this one easily locally, isn't it?
+https://travis-ci.org/symfony/symfony/jobs/199575966#L3178
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-12T08:33:56Z
+
+Actually not at all:
+
+````
+With PHPUnit 5.7.
+./phpunit src/Symfony/Bundle/TwigBundle/Tests/Functional/CacheWarmingTest.php
+#!/usr/bin/env php
+PHPUnit 5.7.12 by Sebastian Bergmann and contributors.
+
+Testing Symfony\Bundle\TwigBundle\Tests\CacheWarmingTest
+..                                                                  2 / 2 (100%)
+
+Time: 430 ms, Memory: 14.00MB
+
+With PHPUnit 4.8
+
+./phpunit src/Symfony/Bundle/TwigBundle/Tests/Functional/CacheWarmingTest.php
+#!/usr/bin/env php
+PHPUnit 4.8.35 by Sebastian Bergmann and contributors.
+
+Testing Symfony\Bundle\TwigBundle\Tests\CacheWarmingTest
+..
+
+Time: 456 ms, Memory: 14.00MB
+````
+
+I tried some adjustment, it just makes no sense. Localy the tests pass on PHP7 as well.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-12T11:29:08Z
+
+With the latest commits I fixed 5.3 which IMHO makes no sense but who cares.
+
+No there are the issues with 7.x ledt which seem more related with the test setup rather than the actual changes? Is this maybe due to the subtree split?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T09:37:40Z
+
+travis failures are unrelated (known composer bug when too many local packages are created)
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T10:27:19Z
+
+@nicolas-grekas Updated the constraint. For now some PHPUnit_ classes are still needed due to the limited scope of the FC layer.
+
+If we manage to provide a full FC layer we could enforce that. Next would be to update the bridge to full PHP6 compatibility.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T10:41:20Z
+
+Just did that: `grep PHPUnit_ * -r`, which leads to two things that remain:
+all doc block annotations should be updated to namespaces, even if the BC layer doesn't provide them.
+all instanceof/catch checks should be doubled with both namespaced and underscore versions.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-02-13T11:20:32Z
+
+@nicolas-grekas what about the usages of static methods in the bridge, like those?
+
+ * https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler.php#L73
+ * https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler.php#L94
+
+We don't have an FC layer for that..
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T11:23:00Z
+
+See my attempt here: https://github.com/sebastianbergmann/phpunit/issues/2502 Lets see how it goes.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-02-13T11:25:37Z
+
+@peterrehm already done that, was shut down: https://github.com/sebastianbergmann/phpunit/pull/2414
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T11:44:16Z
+
+Well, I wanna go the other round, extending the existing Forward Copatibility Layer by a few classes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T11:55:48Z
+
+For the bridge, we should add a conflict header for phpunit6 in its composer.json file. phpunit6 compat should be only for master.
+There are still many `@return \PHPUnit_Framework_MockObject_MockObject` or `@var \PHPUnit_Framework_MockObject_MockObject` and similar that should be replaced by namespaced alternatives.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T12:06:07Z
+
+Added the conflict header. If that is okay with you I would like to change all the other occurences only once we have an actual solution for them. I hope we get the FC layer of PHPUnit extended.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T12:07:06Z
+
+We already have one solution for the annotation: just use phpunit 4.8.35/6. There is no technical side effect to these annotations so we should change them right now - no need for any bc/fc layer for them.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T12:20:18Z
+
+If you want to, I will have a look at all the ones in comments. I just stumbled upon the MockObjects, looks like they are not yet namespaced:
+
+https://github.com/sebastianbergmann/phpunit-mock-objects/blob/master/src/MockObject.php
+
+The other dockblocks are updated.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T13:07:44Z
+
+@Jean85 Okay, got declined as well. That's a shame.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T13:11:07Z
+
+PR or at least issue on phpunit-mock-objects to move to namespaces?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-13T13:16:14Z
+
+I am sure Sebastian is fully aware of this and we can adopt once there are changes.
+
+However I opened up an issue: https://github.com/sebastianbergmann/phpunit-mock-objects/issues/353
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-17T07:14:32Z
+
+@nicolas-grekas Is there anything preventing this getting merged?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-17T07:24:00Z
+
+a rebase is needed - would you be able to try a PR on php-cs-fixer to add a rule so that we can detect and fix non namespaced uses in the future?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-17T08:31:04Z
+
+@nicolas-grekas Rebased. Once this is merged I would like to check first the 3.x branches then we should care about the bridge. Once we have this done we could look into how to prevent those issues. Does fabbot rely on php-cs-fixer?
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-02-17T08:42:33Z
+
+@peterrehm I this get merged, I would like to help with the bridhe.
+I'll close and attempt a rewrite to my prev PR (#21221) but I think it'll be a hard think to do... The main issue that I was unable to overcome was the usage of the TestCase in argument typehints, and the use of the FC layer should be helpful!
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-17T10:25:53Z
+
+@Jean85 Lets discuss once this is done. I think we have to look into providing a FC layer as PHPUnit does.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-18T08:35:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-18T08:53:00Z
+
+:+1: The changes look good. I just don't understand why the build is failing.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-18T09:59:36Z
+
+@xabbuh https://github.com/symfony/symfony/pull/21564#issuecomment-279336727
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-02-18T11:26:50Z
+
+👍

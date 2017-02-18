@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by dbu at 2017-02-12T12:51:19Z
+
+ups, yep url not uri. but i wait for feedback on the general idea before fixing any details here
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T19:23:07Z
+
+fabbot reports errors that should be fixed.
+
+---------------------------------------------------------------------------
+
+by dbu at 2017-02-13T08:49:23Z
+
+updated. should this go into master or is it a bugfix?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T12:37:20Z
+
+I think this is a bug fix.
+
+---------------------------------------------------------------------------
+
+by dbu at 2017-02-18T17:11:32Z
+
+fixed the spelling. should i close this and open a new pull request against the 2.7 branch? or can the mergers handle that?

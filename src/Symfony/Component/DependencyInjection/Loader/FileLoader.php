@@ -11,16 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\Glob;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -42,22 +38,6 @@ abstract class FileLoader extends BaseFileLoader
         $this->container = $container;
 
         parent::__construct($locator);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
-    {
-        try {
-            foreach ($this->glob($resource, false) as $path => $info) {
-                parent::import($path, $type, $ignoreErrors, $sourceResource);
-            }
-        } catch (FileLocatorFileNotFoundException $e) {
-            if (!$ignoreErrors) {
-                throw $e;
-            }
-        }
     }
 
     /**
@@ -106,8 +86,12 @@ abstract class FileLoader extends BaseFileLoader
     {
         $classes = array();
         $extRegexp = defined('HHVM_VERSION') ? '/\\.(?:php|hh)$/' : '/\\.php$/';
+        $prefixLen = null;
+        foreach ($this->glob($resource, true, $prefix) as $path => $info) {
+            if (null === $prefixLen) {
+                $prefixLen = strlen($prefix);
+            }
 
-        foreach ($this->glob($resource, true, $prefixLen) as $path => $info) {
             if (!preg_match($extRegexp, $path, $m) || !$info->isReadable()) {
                 continue;
             }
@@ -124,65 +108,11 @@ abstract class FileLoader extends BaseFileLoader
             }
         }
 
+        if (null !== $prefix) {
+            // track directories only for new & removed files
+            $this->container->fileExists($prefix, '/^$/');
+        }
+
         return $classes;
-    }
-
-    private function glob($resource, $recursive, &$prefixLen = null)
-    {
-        if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
-            if (!$recursive) {
-                yield $resource => new \SplFileInfo($resource);
-
-                return;
-            }
-            $resourcePrefix = $resource;
-            $resource = '';
-        } elseif (0 === $i) {
-            $resourcePrefix = '.';
-            $resource = '/'.$resource;
-        } else {
-            $resourcePrefix = dirname(substr($resource, 0, 1 + $i));
-            $resource = substr($resource, strlen($resourcePrefix));
-        }
-
-        $resourcePrefix = $this->locator->locate($resourcePrefix, $this->currentDir, true);
-        $resourcePrefix = realpath($resourcePrefix) ?: $resourcePrefix;
-        $prefixLen = strlen($resourcePrefix);
-
-        // track directories only for new & removed files
-        $this->container->fileExists($resourcePrefix, '/^$/');
-
-        if (false === strpos($resource, '/**/') && (defined('GLOB_BRACE') || false === strpos($resource, '{'))) {
-            foreach (glob($resourcePrefix.$resource, defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $path) {
-                if ($recursive && is_dir($path)) {
-                    $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS;
-                    foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, $flags)) as $path => $info) {
-                        if ($info->isFile()) {
-                            yield $path => $info;
-                        }
-                    }
-                } elseif (is_file($path)) {
-                    yield $path => new \SplFileInfo($path);
-                }
-            }
-
-            return;
-        }
-
-        if (!class_exists(Finder::class)) {
-            throw new LogicException(sprintf('Extended glob pattern "%s" cannot be used as the Finder component is not installed.', $resource));
-        }
-
-        $finder = new Finder();
-        $regex = Glob::toRegex($resource);
-        if ($recursive) {
-            $regex = substr_replace($regex, '(/|$)', -2, 1);
-        }
-
-        foreach ($finder->followLinks()->in($resourcePrefix) as $path => $info) {
-            if (preg_match($regex, substr($path, $prefixLen)) && $info->isFile()) {
-                yield $path => $info;
-            }
-        }
     }
 }

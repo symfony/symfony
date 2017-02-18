@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
-class StaticVersionStrategyTest extends \PHPUnit_Framework_TestCase
+class StaticVersionStrategyTest extends TestCase
 {
     public function testGetVersion()
     {

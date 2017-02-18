@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\TableStyle;
 
-class TableStyleTest extends \PHPUnit_Framework_TestCase
+class TableStyleTest extends TestCase
 {
     /**
      * @expectedException        \InvalidArgumentException

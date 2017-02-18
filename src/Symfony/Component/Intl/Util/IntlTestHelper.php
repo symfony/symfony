@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -29,7 +30,7 @@ class IntlTestHelper
     /**
      * Should be called before tests that work fine with the stub implementation.
      */
-    public static function requireIntl(\PHPUnit_Framework_TestCase $testCase, $minimumIcuVersion = null)
+    public static function requireIntl(TestCase $testCase, $minimumIcuVersion = null)
     {
         if (null === $minimumIcuVersion) {
             $minimumIcuVersion = Intl::getIcuStubVersion();
@@ -63,7 +64,7 @@ class IntlTestHelper
      * Should be called before tests that require a feature-complete intl
      * implementation.
      */
-    public static function requireFullIntl(\PHPUnit_Framework_TestCase $testCase, $minimumIcuVersion = null)
+    public static function requireFullIntl(TestCase $testCase, $minimumIcuVersion = null)
     {
         // We only run tests if the intl extension is loaded...
         if (!Intl::isExtensionLoaded()) {
@@ -83,7 +84,7 @@ class IntlTestHelper
     /**
      * Skips the test unless the current system has a 32bit architecture.
      */
-    public static function require32Bit(\PHPUnit_Framework_TestCase $testCase)
+    public static function require32Bit(TestCase $testCase)
     {
         if (4 !== PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 32 bit is required.');
@@ -93,7 +94,7 @@ class IntlTestHelper
     /**
      * Skips the test unless the current system has a 64bit architecture.
      */
-    public static function require64Bit(\PHPUnit_Framework_TestCase $testCase)
+    public static function require64Bit(TestCase $testCase)
     {
         if (8 !== PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 64 bit is required.');

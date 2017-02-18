@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
  */
-class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
+class BCryptPasswordEncoderTest extends TestCase
 {
     const PASSWORD = 'password';
     const BYTES = '0123456789abcdef';

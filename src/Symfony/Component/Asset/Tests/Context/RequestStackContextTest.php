@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Asset\Tests\Context;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\RequestStackContext;
 
-class RequestStackContextTest extends \PHPUnit_Framework_TestCase
+class RequestStackContextTest extends TestCase
 {
     public function testGetBasePathEmpty()
     {

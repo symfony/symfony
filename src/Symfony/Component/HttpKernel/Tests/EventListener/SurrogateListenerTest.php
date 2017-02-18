@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\EventListener\SurrogateListener;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SurrogateListenerTest extends \PHPUnit_Framework_TestCase
+class SurrogateListenerTest extends TestCase
 {
     public function testFilterDoesNothingForSubRequests()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
@@ -20,7 +21,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormFactoryTest extends \PHPUnit_Framework_TestCase
+class FormFactoryTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Tests\Node;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 
-class FormThemeTest extends \PHPUnit_Framework_TestCase
+class FormThemeTest extends TestCase
 {
     public function testConstructor()
     {

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
-class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
+class XmlReferenceDumperTest extends TestCase
 {
     public function testDumper()
     {

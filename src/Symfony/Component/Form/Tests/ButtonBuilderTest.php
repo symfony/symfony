@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ButtonBuilder;
 
 /**
  * @author Alexander Cheprasov <cheprasov.84@ya.ru>
  */
-class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
+class ButtonBuilderTest extends TestCase
 {
     public function getValidNames()
     {

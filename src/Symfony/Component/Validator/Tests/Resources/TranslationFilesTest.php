@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Resources;
 
-class TranslationFilesTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class TranslationFilesTest extends TestCase
 {
     /**
      * @dataProvider provideTranslationFiles

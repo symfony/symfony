@@ -24,6 +24,9 @@
         "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader",
         "ext-zip": "Zip support is required when using bin/simple-phpunit"
     },
+    "conflict": {
+        "phpunit/phpunit": ">=6.0"
+    },
     "autoload": {
         "files": [ "bootstrap.php" ],
         "psr-4": { "Symfony\\Bridge\\PhpUnit\\": "" },

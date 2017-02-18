@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Util\XmlUtils;
 
-class XmlUtilsTest extends \PHPUnit_Framework_TestCase
+class XmlUtilsTest extends TestCase
 {
     public function testLoadFile()
     {

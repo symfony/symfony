@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\EnumNodeDefinition;
 
-class EnumNodeDefinitionTest extends \PHPUnit_Framework_TestCase
+class EnumNodeDefinitionTest extends TestCase
 {
     public function testWithOneValue()
     {

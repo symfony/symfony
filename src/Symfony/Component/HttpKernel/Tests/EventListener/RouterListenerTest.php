@@ -9,6 +9,9 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\HttpKernel\Tests\EventListener;
+
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\RequestContext;
 
-class RouterListenerTest extends \PHPUnit_Framework_TestCase
+class RouterListenerTest extends TestCase
 {
     private $requestStack;
 

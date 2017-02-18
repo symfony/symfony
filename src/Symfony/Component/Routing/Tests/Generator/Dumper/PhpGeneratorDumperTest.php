@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\RequestContext;
 
-class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
+class PhpGeneratorDumperTest extends TestCase
 {
     /**
      * @var RouteCollection

@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
 
 /**
  * @author Wouter J <wouter@wouterj.nl>
  */
-class ExtensionCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ExtensionCompilerPassTest extends TestCase
 {
     private $container;
     private $pass;

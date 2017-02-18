@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
-class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
+class RegisterListenersPassTest extends TestCase
 {
     /**
      * Tests that event subscribers not implementing EventSubscriberInterface

@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 
-class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
+class AddCacheWarmerPassTest extends TestCase
 {
     public function testThatCacheWarmersAreProcessedInPriorityOrder()
     {

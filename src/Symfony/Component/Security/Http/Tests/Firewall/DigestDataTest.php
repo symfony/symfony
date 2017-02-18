@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Firewall\DigestData;
 
-class DigestDataTest extends \PHPUnit_Framework_TestCase
+class DigestDataTest extends TestCase
 {
     public function testGetResponse()
     {

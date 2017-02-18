@@ -574,6 +574,39 @@ EOF;
         }
     }
 
+    public function testLocateResourceOverrideBundleConfigFiles()
+    {
+        $bundle = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, 'BaseBundle', 'BaseBundle');
+
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideConfig')
+            ->setConstructorArgs(array('test', false))
+            ->setMethods(array('getBundle', 'getContainerClass'))
+            ->getMock();
+
+        $p = new \ReflectionProperty($kernel, 'rootDir');
+        $p->setAccessible(true);
+        $p->setValue($kernel, __DIR__.'/Fixtures');
+
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+            ->will($this->returnValue(array($bundle)))
+        ;
+
+        $kernel
+            ->expects($this->any())
+            ->method('getContainerClass')
+            ->will($this->returnValue('OverrideTestProjectContainer'))
+        ;
+
+        $kernel->boot();
+
+        $container = $kernel->getContainer();
+
+        $this->assertEquals('override-foo', $container->getParameter('foo'));
+        $this->assertEquals('override-bar', $container->getParameter('bar'));
+    }
+
     public function testLocateResourceOnDirectories()
     {
         $kernel = $this->getKernel(array('getBundle'));

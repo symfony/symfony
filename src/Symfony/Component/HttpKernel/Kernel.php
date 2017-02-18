@@ -684,7 +684,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
-        $locator = new FileLocator($this);
+        $locator = new FileLocator($this, $this->rootDir.'/Resources');
         $resolver = new LoaderResolver(array(
             new XmlFileLoader($container, $locator),
             new YamlFileLoader($container, $locator),

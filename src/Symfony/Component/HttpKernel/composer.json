@@ -37,7 +37,8 @@
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.2",
         "symfony/translation": "~2.0,>=2.0.5",
-        "symfony/var-dumper": "~2.6"
+        "symfony/var-dumper": "~2.6",
+        "symfony/yaml": "~2.2"
     },
     "conflict": {
         "symfony/config": "<2.7"

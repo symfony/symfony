@@ -22,16 +22,16 @@
     "require-dev": {
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.2",
-        "symfony/form": "~2.7.12|~2.8.5",
+        "symfony/form": "~2.7.12|^2.8.5",
         "symfony/http-kernel": "~2.2",
         "symfony/property-access": "~2.3",
         "symfony/security": "~2.2",
         "symfony/expression-language": "~2.2",
-        "symfony/validator": "~2.5,>=2.5.5",
-        "symfony/translation": "~2.0,>=2.0.5",
+        "symfony/validator": "^2.5.5",
+        "symfony/translation": "^2.0.5",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
-        "doctrine/orm": "~2.4,>=2.4.5"
+        "doctrine/orm": "^2.4.5"
     },
     "suggest": {
         "symfony/form": "",

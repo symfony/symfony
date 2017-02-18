@@ -19,7 +19,7 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/yaml": "^2.0.5",
         "symfony/config": "~2.2",
         "symfony/property-access": "~2.3",
         "doctrine/annotations": "~1.0",

@@ -22,18 +22,18 @@
     "require-dev": {
         "symfony/asset": "~2.7",
         "symfony/finder": "~2.3",
-        "symfony/form": "~2.7.23|~2.8.16",
+        "symfony/form": "~2.7.23|^2.8.16",
         "symfony/http-kernel": "~2.3",
         "symfony/intl": "~2.3",
         "symfony/routing": "~2.2",
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.7",
-        "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/yaml": "^2.0.5",
         "symfony/security": "~2.6",
         "symfony/security-acl": "~2.6",
         "symfony/stopwatch": "~2.2",
         "symfony/console": "~2.7",
-        "symfony/var-dumper": "~2.7.16|~2.8.9",
+        "symfony/var-dumper": "~2.7.16|^2.8.9",
         "symfony/expression-language": "~2.4"
     },
     "suggest": {

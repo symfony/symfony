@@ -32,7 +32,7 @@
         "symfony/finder": "~2.3",
         "symfony/intl": "~2.3",
         "symfony/routing": "~2.2",
-        "symfony/validator": "~2.5,>=2.5.9",
+        "symfony/validator": "^2.5.9",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",

@@ -30,7 +30,6 @@ class TestRunner extends BaseTestRunner
 
         if (preg_match('/6\..*(', Version::id())) {
             $arguments['listeners'][] = new SymfonyTestsListener();
-
         } else {
             $arguments['listeners'][] = new SymfonyTestsListenerBC();
         }

@@ -27,7 +27,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
-        "symfony/routing": "~3.1.10|~3.2.3",
+        "symfony/routing": "~3.1.10|^3.2.3",
         "symfony/security-core": "~2.8|~3.0",
         "symfony/security-csrf": "~2.8|~3.0",
         "symfony/stopwatch": "~2.8|~3.0",

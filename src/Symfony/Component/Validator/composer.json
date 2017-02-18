@@ -29,7 +29,7 @@
         "symfony/cache": "~3.1",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "~1.2,>=1.2.8|~2.0"
+        "egulias/email-validator": "^1.2.8|~2.0"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

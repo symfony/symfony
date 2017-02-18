@@ -28,6 +28,7 @@ class AutowirePass implements CompilerPassInterface
     private $definedTypes = array();
     private $types;
     private $notGuessableTypes = array();
+    private $usedTypes = array();
 
     /**
      * {@inheritdoc}
@@ -44,6 +45,15 @@ class AutowirePass implements CompilerPassInterface
                     $this->completeDefinition($id, $definition);
                 }
             }
+
+            foreach ($this->usedTypes as $type => $id) {
+                if (isset($this->usedTypes[$type]) && isset($this->notGuessableTypes[$type])) {
+                    $classOrInterface = class_exists($type) ? 'class' : 'interface';
+                    $matchingServices = implode(', ', $this->types[$type]);
+
+                    throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $type, $id, $classOrInterface, $matchingServices));
+                }
+            }
         } catch (\Exception $e) {
         } catch (\Throwable $e) {
         }
@@ -56,6 +66,7 @@ class AutowirePass implements CompilerPassInterface
         $this->definedTypes = array();
         $this->types = null;
         $this->notGuessableTypes = array();
+        $this->usedTypes = array();
 
         if (isset($e)) {
             throw $e;
@@ -109,9 +120,11 @@ class AutowirePass implements CompilerPassInterface
 
                 if (isset($this->types[$typeHint->name]) && !isset($this->notGuessableTypes[$typeHint->name])) {
                     $value = new Reference($this->types[$typeHint->name]);
+                    $this->usedTypes[$typeHint->name] = $id;
                 } else {
                     try {
                         $value = $this->createAutowiredDefinition($typeHint, $id);
+                        $this->usedTypes[$typeHint->name] = $id;
                     } catch (RuntimeException $e) {
                         if ($parameter->allowsNull()) {
                             $value = null;

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
+abstract class KernelTestCase extends \PHPUnit\Framework\TestCase
 {
     protected static $class;
 

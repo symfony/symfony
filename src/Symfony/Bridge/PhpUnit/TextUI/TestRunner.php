@@ -28,7 +28,7 @@ class TestRunner extends BaseTestRunner
     {
         $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
 
-        if (preg_match('/6\..*(', Version::id())) {
+        if (preg_match('/6\..*/', Version::id())) {
             $arguments['listeners'][] = new SymfonyTestsListener();
         } else {
             $arguments['listeners'][] = new SymfonyTestsListenerBC();

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-02T08:21:22Z
+
+Actually, I think that changes made to the `XMLFileLoader` and the `YamlFileLoader` should be moved into a different PR targeting `master` as a new feature.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-07T08:41:56Z
+
+I also reverted the changes to the `YamlFileLoader` and `XmlFileLoader` as they are not needed to fix the issue reported in #18700 and qualify as new features instead.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-27T14:29:00Z
+
+ping @symfony/deciders

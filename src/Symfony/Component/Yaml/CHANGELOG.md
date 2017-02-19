@@ -6,6 +6,12 @@ CHANGELOG
 
  * Omitting the key of a mapping is deprecated and will throw a `ParseException` in Symfony 4.0.
 
+ * Added support for dumping empty PHP arrays as YAML sequences:
+
+   ```php
+   Yaml::dump([], 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
+   ```
+
 3.2.0
 -----
 

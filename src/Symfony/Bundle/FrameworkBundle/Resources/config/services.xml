@@ -61,7 +61,7 @@
         </service>
 
         <service id="config_cache_factory" class="Symfony\Component\Config\ResourceCheckerConfigCacheFactory">
-            <argument type="collection"></argument>
+            <argument /> <!-- resource checkers -->
         </service>
 
         <service class="Symfony\Component\Config\Resource\SelfCheckingResourceChecker" public="false">

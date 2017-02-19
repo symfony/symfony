@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,6 +43,6 @@ class ConfigCachePass implements CompilerPassInterface
             return;
         }
 
-        $container->getDefinition($this->factoryServiceId)->replaceArgument(0, $resourceCheckers);
+        $container->getDefinition($this->factoryServiceId)->replaceArgument(0, new IteratorArgument($resourceCheckers));
     }
 }

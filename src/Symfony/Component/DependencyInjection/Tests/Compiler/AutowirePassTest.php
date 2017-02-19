@@ -544,6 +544,26 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @requires PHP 7.1
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "getter_overriding". Multiple services exist for this class (a1, a2).
+     */
+    public function testGetterOverridingWithAmbiguousServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a1', Foo::class);
+        $container->register('a2', Foo::class);
+
+        $container
+            ->register('getter_overriding', GetterOverriding::class)
+            ->setAutowiredCalls(array('getFoo'))
+        ;
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
      * @dataProvider getCreateResourceTests
      * @group legacy
      */

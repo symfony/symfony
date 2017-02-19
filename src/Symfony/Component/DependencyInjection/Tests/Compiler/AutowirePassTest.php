@@ -459,6 +459,31 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(new Reference('a'), '', new Reference('lille')), $container->getDefinition('foo')->getArguments());
     }
+
+    /**
+     * @dataProvider provideAutodiscoveredAutowiringOrder
+     *
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB).
+     */
+    public function testAutodiscoveredAutowiringOrder($class)
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\\'.$class)
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    public function provideAutodiscoveredAutowiringOrder()
+    {
+        return array(
+            array('CannotBeAutowiredForwardOrder'),
+            array('CannotBeAutowiredReverseOrder'),
+        );
+    }
 }
 
 class Foo
@@ -536,6 +561,20 @@ class CollisionB implements CollisionInterface
 class CannotBeAutowired
 {
     public function __construct(CollisionInterface $collision)
+    {
+    }
+}
+
+class CannotBeAutowiredForwardOrder
+{
+    public function __construct(CollisionA $a, CollisionInterface $b, CollisionB $c)
+    {
+    }
+}
+
+class CannotBeAutowiredReverseOrder
+{
+    public function __construct(CollisionA $a, CollisionB $c, CollisionInterface $b)
     {
     }
 }

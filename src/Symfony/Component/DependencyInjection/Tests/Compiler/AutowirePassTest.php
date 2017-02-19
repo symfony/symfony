@@ -173,7 +173,8 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('a1', __NAMESPACE__.'\Foo');
-        $container->register('a2', __NAMESPACE__.'\Foo')->addAutowiringType(__NAMESPACE__.'\Foo');
+        $container->register('a2', __NAMESPACE__.'\Foo');
+        $container->register('a3', __NAMESPACE__.'\Foo')->addAutowiringType(__NAMESPACE__.'\Foo');
         $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgument');
         $aDefinition->setAutowired(true);
 
@@ -181,7 +182,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $this->assertCount(1, $container->getDefinition('a')->getArguments());
-        $this->assertEquals('a2', (string) $container->getDefinition('a')->getArgument(0));
+        $this->assertEquals('a3', (string) $container->getDefinition('a')->getArgument(0));
     }
 
     public function testWithTypeSet()

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-18T18:34:26Z
+
+The benefit here is simplicity, the drawback is that this won't work with setter autowiring, where instead of throwing, we skip. Can you try something on master also see if you can make this approach fit there or if we need v1?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-18T19:13:59Z
+
+@nicolas-grekas you're talking about the fact that an exception could be throw when using a setter, right? Imo this is a very weird case and I don't think we should take position here, I think it's better to throw an exception and let the user manually fix the issue. For example, should a service created for a constructor win against a setter?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-18T19:21:15Z
+
+My bad: on conflicts, an exception is always thrown even for setters, so should be good.
+But the check should be done outside of the autowiring loop - any ambiguous type must throw - setter or not.

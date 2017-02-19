@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-25T18:17:42Z
+
+Isn't there a lot more than those 4 commands? What about `LintCommand` for instance? :)
+
+(I guess keeping this in #20586 would be less painful to update as you target master too for this bug fix 😅)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-25T18:39:20Z
+
+@ogizanagi I made the changes only where it makes sense in my opinion, which exclude commands where the output give no relevant information at all.
+
+I just applied it on the `TwigLintCommand` which makes use of `SymfonyStyle::error`, because the output is intended to be redirected, but at the moment I don't see more commands to update.
+
+> I guess keeping this in #20586 would be less painful to update
+
+Not that much, each one can be merged independently and, since the subject of #20586 was "Add getErrorIo AND use stderr in existing commands", I do think it should be done in two PRs :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-25T18:42:54Z
+
+Note that when exceptions are thrown (which is the case in lot of commands including lint ones), the output goes to stderr naturally.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-28T18:00:20Z
+
+@chalasr : I may have found some other places where it'll be relevant. See https://github.com/symfony/symfony/pull/20674
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-28T18:04:14Z
+
+Oh, I could have did it here if you just said me.. but ok then
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-28T18:05:57Z
+
+I had to check relevant places myself so it was simpler to submit it 😅
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-28T18:15:35Z
+
+Having two places to discuss/review/merge about the same thing looks not simpler to me, as you wish.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-28T18:17:00Z
+
+Apply the patch then and I'll close mine.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-28T18:28:02Z
+
+Done 2af000a2a813135970bc924b79ea06a2967245f2
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T13:54:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-06T22:09:44Z
+
+Updated for using `getErrorStyle()` in the FrameworkBundle (as it requires the console to be `~3.3`) and fixed the WebServerBundle commands.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-08T12:43:37Z
+
+Build failure unrelated (see #21198)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-10T17:42:15Z
+
+Rebased, tests are green. This is ready
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T15:42:34Z
+
+ping

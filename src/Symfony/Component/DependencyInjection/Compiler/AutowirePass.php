@@ -169,6 +169,7 @@ class AutowirePass implements CompilerPassInterface
         foreach ($definition->getAutowiringTypes() as $type) {
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
+            unset($this->notGuessableTypes[$type]);
         }
 
         if (!$reflectionClass = $this->getReflectionClass($id, $definition)) {

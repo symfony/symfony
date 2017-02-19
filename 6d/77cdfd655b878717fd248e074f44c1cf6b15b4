@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-31T21:01:15Z
+
+Test and [`nopush`](https://www.w3.org/TR/preload/#server-push-http-2) support added.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2017-02-01T06:27:03Z
+
+Very nice! We were about to implement this ourselves.
+
+Why use a different function for this? Would an attribute not be more logical?
+
+```
+{{ asset('/scripts/foo.js', 'script', {preload: true}) }}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-01T08:49:49Z
+
+I have the same question as @pkruithof: why adding a new `preloaded_asset()` function instead of adding config options (globally for asset package config and locally for the `asset()` function).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-01T13:04:52Z
+
+@pkruithof @javiereguiluz it was my 1st though, however the current signature is: `{ asset('/path', 'packageName') }`.
+Both `{ asset('/path', null, true, 'script', false) }` and `{ asset('/path', null, {'preload': true, 'nopush': true, 'as': 'script') }` look bad.
+Changing parameters order isn't possible for BC. It's why I've introduced this new tag.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-01T14:02:06Z
+
+@dunglas thanks for the explanation. Another question: should we name this function `asset_preload()` instead?
+
+First, it would match the naming followed by other functions, where the first word is "the common thing" (e.g. `render_*()`, `form_*()`, `asset_*()`, etc.)
+
+Second, it would look better when using composition:
+
+```twig
+{{ preloaded_asset(asset('/scripts/foo.js'), 'script') }}
+{{ asset_preload(asset('/scripts/foo.js'), 'script') }}
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-01T17:55:52Z
+
+@stof (thanks!!), @lyrixx and @javiereguiluz comments took into account:
+
+- The preload feature is now 100% independent of the packages and has a Twig function of its own.
+- Dealing with the HttpFoundation's Response is only done in the listener (the manager can now be reused with any HTTP message implementation)
+- Memory leak fixed
+
+The new syntax:
+
+```html
+<html>
+    <body>
+    Hello
+    <script src="{{ preload(asset('/scripts/foo.js'), 'script') }}"></script>
+    </body>
+</html>
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-01T19:19:21Z
+
+@stof done. I've also remove the `PreloadManager::getResources()` because it was leaking an internal state and was not used.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-01T19:21:27Z
+
+By the way, the preload system is now 100% decoupled of the rest of the `Asset` component. It may be moved to its own component and its own Twig extension but I'm not sure it's worth it (it's only a couple of files).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-03T08:01:32Z
+
+Should be all good now.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-06T13:44:21Z
+
+General question: Do we want to merge the PR as long as the spec document is in draft state?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-06T14:10:41Z
+
+@xabbuh it's already broadly used in the wild: Chrome and Opera support this feature, Firefox and Webkit are implementing it, Edge is considering implementing it (https://developer.microsoft.com/en-us/microsoft-edge/platform/status/preload/) and - more interestingly - CloudFlare already supports the transparent conversion of `preload` links to HTTP/2 pushes so there are immediate benefits for any client supporting HTTP/2 (80% of all modern browsers) if the website uses CloudFlare.
+
+Maybe can we mark it as `@experimental` in the (unlikely) eventuality that the spec change but I think we should merge it as soon as possible to allow our users to benefit of the already existing performance boost.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-07T07:43:58Z
+
+@xabbuh btw it's an hot topic, the @GoogleChrome team just released a Webpack plugin that looks very similar: https://github.com/googlechrome/preload-webpack-plugin (but our solution is better because CloudFlare supports only HTTP headers, not HTML links yet).
+
+They also support [`prefetch`](https://www.w3.org/TR/resource-hints/) while we just support `preload` for now. What do you think of adding a new `prefetch` Twig tag?

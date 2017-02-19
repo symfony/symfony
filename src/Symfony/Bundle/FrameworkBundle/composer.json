@@ -60,6 +60,7 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0",
+        "symfony/asset": "<3.3",
         "symfony/console": "<3.3",
         "symfony/serializer": "<3.3",
         "symfony/form": "<3.3",

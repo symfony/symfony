@@ -70,6 +70,7 @@
 
         <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
             <argument type="service" id="assets.packages" />
+            <argument type="service" id="assets.preload_manager" on-invalid="ignore" />
         </service>
 
         <service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">

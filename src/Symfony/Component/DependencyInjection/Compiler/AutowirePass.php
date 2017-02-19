@@ -37,6 +37,7 @@ class AutowirePass extends AbstractRecursivePass
     private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
+    private $usedTypes = array();
 
     /**
      * {@inheritdoc}
@@ -45,11 +46,27 @@ class AutowirePass extends AbstractRecursivePass
     {
         try {
             parent::process($container);
+
+            foreach ($this->usedTypes as $type => $id) {
+                if (!isset($this->usedTypes[$type]) || !isset($this->ambiguousServiceTypes[$type])) {
+                    continue;
+                }
+
+                if ($container->has($type) && !$container->findDefinition($type)->isAbstract()) {
+                    continue;
+                }
+
+                $classOrInterface = class_exists($type) ? 'class' : 'interface';
+                $matchingServices = implode(', ', $this->ambiguousServiceTypes[$type]);
+
+                throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $type, $id, $classOrInterface, $matchingServices));
+            }
         } finally {
             // Free memory
             $this->definedTypes = array();
             $this->types = null;
             $this->ambiguousServiceTypes = array();
+            $this->usedTypes = array();
         }
     }
 
@@ -271,10 +288,12 @@ class AutowirePass extends AbstractRecursivePass
             if (isset($this->types[$typeName])) {
                 $value = new Reference($this->types[$typeName]);
                 $didAutowire = true;
+                $this->usedTypes[$typeName] = $this->currentId;
             } elseif ($typeHint = $this->container->getReflectionClass($typeName, true)) {
                 try {
                     $value = $this->createAutowiredDefinition($typeHint);
                     $didAutowire = true;
+                    $this->usedTypes[$typeName] = $this->currentId;
                 } catch (RuntimeException $e) {
                     if ($parameter->allowsNull()) {
                         $value = null;
@@ -354,6 +373,10 @@ class AutowirePass extends AbstractRecursivePass
                 try {
                     $value = $this->createAutowiredDefinition($returnType);
                 } catch (RuntimeException $e) {
+                    if (1 === $e->getCode()) {
+                        throw $e;
+                    }
+
                     continue;
                 }
             } else {
@@ -361,6 +384,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $overridenGetters[$lcMethod] = $value;
+            $this->usedTypes[$typeName] = $this->currentId;
         }
 
         return $overridenGetters;
@@ -394,6 +418,7 @@ class AutowirePass extends AbstractRecursivePass
         foreach ($definition->getAutowiringTypes(false) as $type) {
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
+            unset($this->ambiguousServiceTypes[$type]);
         }
 
         if (!$reflectionClass = $this->container->getReflectionClass($definition->getClass(), true)) {

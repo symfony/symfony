@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -79,7 +80,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $cliOutput = $output);
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         if (!extension_loaded('pcntl')) {
             $io->error(array(
@@ -88,7 +89,7 @@ EOF
             ));
 
             if ($io->ask('Do you want to execute <info>server:run</info> immediately? [yN] ', false)) {
-                return $this->getApplication()->find('server:run')->run($input, $cliOutput);
+                return $this->getApplication()->find('server:run')->run($input, $output);
             }
 
             return 1;

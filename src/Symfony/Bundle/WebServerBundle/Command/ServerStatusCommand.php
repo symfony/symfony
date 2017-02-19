@@ -15,6 +15,7 @@ use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -44,7 +45,7 @@ class ServerStatusCommand extends ServerCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $server = new WebServer();
         if ($server->isRunning($input->getOption('pidfile'))) {
             $io->success(sprintf('Web server still listening on http://%s', $server->getAddress($input->getOption('pidfile'))));

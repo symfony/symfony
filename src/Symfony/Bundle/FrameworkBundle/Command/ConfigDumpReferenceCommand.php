@@ -55,7 +55,7 @@ this is either <comment>yaml</comment> or <comment>xml</comment>.
 When the option is not provided, <comment>yaml</comment> is used.
 
   <info>php %command.full_name% FrameworkBundle --format=xml</info>
-  
+
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
   <info>php %command.full_name% framework profiler.matcher</info>
@@ -73,10 +73,11 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $errorIo = $io->getErrorStyle();
 
         if (null === $name = $input->getArgument('name')) {
-            $this->listBundles($io);
-            $io->comment(array(
+            $this->listBundles($errorIo);
+            $errorIo->comment(array(
                 'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
                 'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle profiler.matcher</comment> to dump the <comment>framework.profiler.matcher</comment> configuration)',
             ));
@@ -94,7 +95,7 @@ EOF
         $path = $input->getArgument('path');
 
         if ($path !== null && 'yaml' !== $format) {
-            $io->error('The "path" option is only available for the "yaml" format.');
+            $errorIo->error('The "path" option is only available for the "yaml" format.');
 
             return 1;
         }

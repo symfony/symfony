@@ -77,17 +77,15 @@ class ExpressionFunction
      */
     public static function fromPhp($phpFunctionName, $expressionFunctionName = null)
     {
+        $phpFunctionName = ltrim($phpFunctionName, '\\');
         if (!function_exists($phpFunctionName)) {
             throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $phpFunctionName));
         }
 
-        $reflection = new \ReflectionFunction($phpFunctionName);
-        if (!$expressionFunctionName && $reflection->inNamespace()) {
+        $parts = explode('\\', $phpFunctionName);
+        if (!$expressionFunctionName && count($parts) > 1) {
             throw new \InvalidArgumentException(sprintf('An expression function name must be defined when PHP function "%s" is namespaced.', $phpFunctionName));
         }
-
-        $phpFunctionName = $reflection->getName();
-        $expressionFunctionName = $expressionFunctionName ?: $reflection->getShortName();
 
         $compiler = function () use ($phpFunctionName) {
             return sprintf('\%s(%s)', $phpFunctionName, implode(', ', func_get_args()));
@@ -99,6 +97,6 @@ class ExpressionFunction
             return call_user_func_array($phpFunctionName, array_splice($args, 1));
         };
 
-        return new self($expressionFunctionName, $compiler, $evaluator);
+        return new self($expressionFunctionName ?: end($parts), $compiler, $evaluator);
     }
 }

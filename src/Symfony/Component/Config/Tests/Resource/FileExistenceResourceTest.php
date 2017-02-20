@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 
-class FileExistenceResourceTest extends \PHPUnit_Framework_TestCase
+class FileExistenceResourceTest extends TestCase
 {
     protected $resource;
     protected $file;

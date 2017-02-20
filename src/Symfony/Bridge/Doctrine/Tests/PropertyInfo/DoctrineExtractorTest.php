@@ -14,13 +14,14 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo\Tests;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
+class DoctrineExtractorTest extends TestCase
 {
     /**
      * @var DoctrineExtractor

@@ -2,13 +2,14 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * @group time-sensitive
  */
-class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
+class ProgressIndicatorTest extends TestCase
 {
     public function testDefaultIndicator()
     {

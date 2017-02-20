@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class MicroKernelTraitTest extends \PHPUnit_Framework_TestCase
+class MicroKernelTraitTest extends TestCase
 {
     public function test()
     {

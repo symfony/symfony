@@ -109,7 +109,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
 
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+        $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
     }
 
     public function testProviders()
@@ -117,6 +117,12 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage = new ExpressionLanguage(null, array(new TestProvider()));
         $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
         $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
+        $this->assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
+        $this->assertEquals('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
+        $this->assertEquals('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
+        $this->assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
+        $this->assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
+        $this->assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
     }
 
     /**

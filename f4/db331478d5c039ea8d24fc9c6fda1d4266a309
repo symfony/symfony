@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-20T07:46:55Z
+
+Do you have before/after comparisons?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-02-20T08:07:45Z
+
+I'd be interested in before/after numbers as well.
+
+---------------------------------------------------------------------------
+
+by gadelat at 2017-02-20T10:17:57Z
+
+Testing command: `time php ./vendor/bin/phpunit Tests/NameConverter --filter testNormalize --repeat 5000`. Results are based on 10 sample average.
+
+Default testcase:
+<table>
+  <tr>
+    <th>Implementation:</th>
+    <td>loop</td>
+   <td>regex</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>12,646s</td>
+    <td>12,352s</td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center">2,3% improvement</td>
+  </tr>
+</table>
+
+However, when you change testcase like this:
+
+```diff
+--- Tests/NameConverter/CamelCaseToSnakeCaseNameConverterTest.php	(revision b14a5f3efa9b6f24b55d022216e8c2e93e861459)
++++ Tests/NameConverter/CamelCaseToSnakeCaseNameConverterTest.php	(revision )
+@@ -46,6 +46,7 @@
+     public function attributeProvider()
+     {
+         return array(
++            array(str_repeat('coop_tilleuls', 100), str_repeat('coopTilleuls', 100), true),
+             array('coop_tilleuls', 'coopTilleuls', true),
+             array('_kevin_dunglas', '_kevinDunglas', true),
+             array('this_is_a_test', 'thisIsATest', true),
+```
+<table>
+  <tr>
+    <th>Implementation:</th>
+    <td>loop</td>
+   <td>regex</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>19,955s</td>
+    <td>13,626s</td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center">46,5% improvement</td>
+  </tr>
+</table>
+
+Now, I'm not going to continue doing this with 10 samples and 5000 repeats, but if you change str_repeat argument from 100 to 10000, regex is **25x** faster
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-20T10:22:25Z
+
+So it's primarily a gain for bigger strings? Note that those are less common. However, it seems that even with the smallest strings it gains speed, so that's all good!
+
+---------------------------------------------------------------------------
+
+by gadelat at 2017-02-20T10:25:43Z
+
+Yep. What's most important is that this is more clean and doesn't have negative performance impact.

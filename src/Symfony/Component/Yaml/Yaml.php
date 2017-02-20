@@ -29,7 +29,7 @@ class Yaml
     const DUMP_OBJECT_AS_MAP = 64;
     const DUMP_MULTI_LINE_LITERAL_BLOCK = 128;
     const PARSE_CONSTANT = 256;
-    const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 512;
+    const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
 
     /**
      * @experimental in version 3.3

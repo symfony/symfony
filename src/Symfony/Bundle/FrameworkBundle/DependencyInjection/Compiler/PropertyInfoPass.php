@@ -11,41 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass instead.', PropertyInfoPass::class), E_USER_DEPRECATED);
+
+use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass as BasePropertyInfoPass;
 
 /**
  * Adds extractors to the property_info service.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BasePropertyInfoPass instead}.
  */
-class PropertyInfoPass implements CompilerPassInterface
+class PropertyInfoPass extends BasePropertyInfoPass
 {
-    use PriorityTaggedServiceTrait;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('property_info')) {
-            return;
-        }
-
-        $definition = $container->getDefinition('property_info');
-
-        $listExtractors = $this->findAndSortTaggedServices('property_info.list_extractor', $container);
-        $definition->replaceArgument(0, new IteratorArgument($listExtractors));
-
-        $typeExtractors = $this->findAndSortTaggedServices('property_info.type_extractor', $container);
-        $definition->replaceArgument(1, new IteratorArgument($typeExtractors));
-
-        $descriptionExtractors = $this->findAndSortTaggedServices('property_info.description_extractor', $container);
-        $definition->replaceArgument(2, new IteratorArgument($descriptionExtractors));
-
-        $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
-        $definition->replaceArgument(3, new IteratorArgument($accessExtractors));
-    }
 }

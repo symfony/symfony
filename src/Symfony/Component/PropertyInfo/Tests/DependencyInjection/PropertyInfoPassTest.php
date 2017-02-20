@@ -9,15 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\PropertyInfo\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 
-/**
- * @group legacy
- */
 class PropertyInfoPassTest extends TestCase
 {
     public function testServicesAreOrderedAccordingToPriority()
@@ -44,7 +41,7 @@ class PropertyInfoPassTest extends TestCase
         $propertyInfoPass = new PropertyInfoPass();
 
         $method = new \ReflectionMethod(
-            'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass',
+            'Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass',
             'findAndSortTaggedServices'
         );
         $method->setAccessible(true);
@@ -67,7 +64,7 @@ class PropertyInfoPassTest extends TestCase
         $propertyInfoPass = new PropertyInfoPass();
 
         $method = new \ReflectionMethod(
-            'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass',
+            'Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass',
             'findAndSortTaggedServices'
         );
         $method->setAccessible(true);

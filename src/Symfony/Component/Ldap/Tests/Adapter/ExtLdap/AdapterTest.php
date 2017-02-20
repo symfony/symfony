@@ -73,7 +73,7 @@ class AdapterTest extends LdapTestCase
     public function testLdapQueryWithoutBind()
     {
         $ldap = new Adapter($this->getLdapConfig());
-        $this->setExpectedException(NotBoundException::class);
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
         $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array());
         $query->execute();
     }

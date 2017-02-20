@@ -112,7 +112,12 @@ class FactoryReturnTypePassTest extends TestCase
         $factory->setFactory(array(FactoryDummy::class, 'createFactory'));
 
         if (!method_exists(\ReflectionMethod::class, 'getReturnType')) {
-            $this->setExpectedException(\RuntimeException::class, 'Please add the class to service "factory" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.');
+            if (method_exists($this, 'expectException')) {
+                $this->expectException(\RuntimeException::class);
+                $this->expectExceptionMessage('Please add the class to service "factory" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.');
+            } else {
+                $this->setExpectedException(\RuntimeException::class, 'Please add the class to service "factory" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.');
+            }
         }
 
         $container->compile();

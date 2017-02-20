@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -20,7 +21,7 @@ use Symfony\Component\Form\AbstractType;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormPassTest extends \PHPUnit_Framework_TestCase
+class FormPassTest extends TestCase
 {
     public function testDoNothingIfFormExtensionNotLoaded()
     {

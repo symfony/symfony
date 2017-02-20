@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ServiceLocatorTest extends \PHPUnit_Framework_TestCase
+class ServiceLocatorTest extends TestCase
 {
     public function testHas()
     {

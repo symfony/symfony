@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -19,7 +20,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResolveNamedArgumentsPassTest extends \PHPUnit_Framework_TestCase
+class ResolveNamedArgumentsPassTest extends TestCase
 {
     public function testProcess()
     {

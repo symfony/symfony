@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Marking;
@@ -19,7 +20,7 @@ use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
-class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
+class WorkflowExtensionTest extends TestCase
 {
     private $extension;
 

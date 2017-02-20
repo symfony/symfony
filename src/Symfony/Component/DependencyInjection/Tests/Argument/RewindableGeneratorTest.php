@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Argument;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 
-class RewindableGeneratorTest extends \PHPUnit_Framework_TestCase
+class RewindableGeneratorTest extends TestCase
 {
     public function testImplementsCountable()
     {

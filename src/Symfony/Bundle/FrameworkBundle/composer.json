@@ -53,6 +53,9 @@
         "twig/twig": "~1.23|~2.0",
         "sensio/framework-extra-bundle": "^3.0.2"
     },
+    "conflict": {
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+    },
     "suggest": {
         "symfony/console": "For using the console commands",
         "symfony/form": "For using forms",

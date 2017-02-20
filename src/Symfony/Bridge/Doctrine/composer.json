@@ -35,6 +35,9 @@
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "^2.4.5"
     },
+    "conflict": {
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+    },
     "suggest": {
         "symfony/form": "",
         "symfony/validator": "",

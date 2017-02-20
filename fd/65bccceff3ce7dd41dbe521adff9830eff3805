@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-18T17:44:31Z
+
+should we also enhance/instead the deprecation message in the code?
+
+---------------------------------------------------------------------------
+
+by dbu at 2017-02-18T17:48:08Z
+
+if the flag can actually just be removed, that would be developer friendly i think.
+
+however, i just tried to fix this and with the head branch of symfony/symfony 2.8 i still get the "Scope Widening Injection detected". i understood that the latest symfony 2.8 was fixed to allow removing the parameter?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-19T10:58:57Z
+
+only master has the deprecation about the strict attribute - not sure why you talk about 2.8 :)
+
+---------------------------------------------------------------------------
+
+by dbu at 2017-02-19T12:52:22Z
+
+i maintain bundles that support both 2.8 and 3. https://github.com/symfony/symfony/pull/21058#issuecomment-276083294 made me think we can just remove the attribute but that fails on 2.8 while working in 3: https://github.com/symfony-cmf/routing-bundle/pull/390

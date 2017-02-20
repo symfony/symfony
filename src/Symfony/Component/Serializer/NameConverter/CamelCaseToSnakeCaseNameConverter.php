@@ -76,7 +76,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         }
 
         if (null === $this->attributes || in_array($camelCasedName, $this->attributes)) {
-            return $this->lowerCamelCase ? lcfirst($camelCasedName) : $camelCasedName;
+            return $camelCasedName;
         }
 
         return $propertyName;

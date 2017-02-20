@@ -11,13 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CachePoolPassTest extends \PHPUnit_Framework_TestCase
+class CachePoolPassTest extends TestCase
 {
     private $cachePoolPass;
 

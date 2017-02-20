@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\FactoryReturnTypePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,7 +22,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryParent;
 /**
  * @author Guilhem N. <egetick@gmail.com>
  */
-class FactoryReturnTypePassTest extends \PHPUnit_Framework_TestCase
+class FactoryReturnTypePassTest extends TestCase
 {
     public function testProcess()
     {

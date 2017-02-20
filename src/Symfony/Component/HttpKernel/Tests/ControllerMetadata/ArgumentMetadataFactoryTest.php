@@ -12,13 +12,14 @@
 namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use Fake\ImportedAndFake;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
-class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ArgumentMetadataFactoryTest extends TestCase
 {
     /**
      * @var ArgumentMetadataFactory

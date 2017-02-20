@@ -2,12 +2,13 @@
 
 namespace Symfony\Component\Workflow\Tests\Validator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
-class WorkflowValidatorTest extends \PHPUnit_Framework_TestCase
+class WorkflowValidatorTest extends TestCase
 {
     use WorkflowBuilderTrait;
 

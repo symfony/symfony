@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
-class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
+class EnvPlaceholderParameterBagTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -18,7 +19,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CliDumperTest extends \PHPUnit_Framework_TestCase
+class CliDumperTest extends TestCase
 {
     use VarDumperTestTrait;
 

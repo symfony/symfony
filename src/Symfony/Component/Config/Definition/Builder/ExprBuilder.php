@@ -38,11 +38,11 @@ class ExprBuilder
     /**
      * Marks the expression as being always used.
      *
-     * @param \Closure $then
+     * @param callable $then
      *
      * @return $this
      */
-    public function always(\Closure $then = null)
+    public function always(callable $then = null)
     {
         $this->ifPart = function ($v) { return true; };
 
@@ -54,21 +54,21 @@ class ExprBuilder
     }
 
     /**
-     * Sets a closure to use as tests.
+     * Sets a callable to use as tests.
      *
      * The default one tests if the value is true.
      *
-     * @param \Closure $closure
+     * @param callable $callback
      *
      * @return $this
      */
-    public function ifTrue(\Closure $closure = null)
+    public function ifTrue(callable $callback = null)
     {
-        if (null === $closure) {
-            $closure = function ($v) { return true === $v; };
+        if (null === $callback) {
+            $callback = function ($v) { return true === $v; };
         }
 
-        $this->ifPart = $closure;
+        $this->ifPart = $callback;
 
         return $this;
     }
@@ -150,15 +150,15 @@ class ExprBuilder
     }
 
     /**
-     * Sets the closure to run if the test pass.
+     * Sets the callable to run if the test pass.
      *
-     * @param \Closure $closure
+     * @param callable $callback
      *
      * @return $this
      */
-    public function then(\Closure $closure)
+    public function then(callable $callback)
     {
-        $this->thenPart = $closure;
+        $this->thenPart = $callback;
 
         return $this;
     }
@@ -240,7 +240,7 @@ class ExprBuilder
                 $if = $expr->ifPart;
                 $then = $expr->thenPart;
                 $expressions[$k] = function ($v) use ($if, $then) {
-                    return $if($v) ? $then($v) : $v;
+                    return call_user_func($if, $v) ? call_user_func($then, $v) : $v;
                 };
             }
         }

@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Csp;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContentSecurityPolicyHandlerTest extends \PHPUnit_Framework_TestCase
+class ContentSecurityPolicyHandlerTest extends TestCase
 {
     /**
      * @dataProvider provideRequestAndResponses

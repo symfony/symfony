@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class DebugAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
+class DebugAccessDecisionManagerTest extends TestCase
 {
     /**
      * @dataProvider provideObjectsAndLogs

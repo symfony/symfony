@@ -2,7 +2,9 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
-class LdapTestCase extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class LdapTestCase extends TestCase
 {
     protected function getLdapConfig()
     {

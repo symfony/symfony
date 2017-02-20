@@ -12,13 +12,14 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class MergeDoctrineCollectionListenerTest extends \PHPUnit_Framework_TestCase
+class MergeDoctrineCollectionListenerTest extends TestCase
 {
     /** @var \Doctrine\Common\Collections\ArrayCollection */
     private $collection;

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
-class AbstractObjectNormalizerTest extends \PHPUnit_Framework_TestCase
+class AbstractObjectNormalizerTest extends TestCase
 {
     public function testDenormalize()
     {

@@ -11,10 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 
-class ManagerRegistryTest extends \PHPUnit_Framework_TestCase
+class ManagerRegistryTest extends TestCase
 {
     public static function setUpBeforeClass()
     {

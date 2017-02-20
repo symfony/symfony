@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
 
-class AddClassesToCachePassTest extends \PHPUnit_Framework_TestCase
+class AddClassesToCachePassTest extends TestCase
 {
     public function testExpandClasses()
     {

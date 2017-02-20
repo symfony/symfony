@@ -2,11 +2,12 @@
 
 namespace Symfony\Component\Workflow\Tests\Validator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
 
-class StateMachineValidatorTest extends \PHPUnit_Framework_TestCase
+class StateMachineValidatorTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException

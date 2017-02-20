@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * @requires extension ldap
  */
-class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
+class LdapBindAuthenticationProviderTest extends TestCase
 {
     /**
      * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException

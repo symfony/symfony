@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Type;
@@ -18,7 +19,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
+class ReflectionExtractorTest extends TestCase
 {
     /**
      * @var ReflectionExtractor

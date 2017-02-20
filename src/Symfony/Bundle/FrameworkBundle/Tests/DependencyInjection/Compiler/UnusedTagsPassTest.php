@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 
-class UnusedTagsPassTest extends \PHPUnit_Framework_TestCase
+class UnusedTagsPassTest extends TestCase
 {
     public function testProcess()
     {

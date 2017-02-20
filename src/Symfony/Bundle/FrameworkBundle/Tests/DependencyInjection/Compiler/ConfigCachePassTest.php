@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
 
-class ConfigCachePassTest extends \PHPUnit_Framework_TestCase
+class ConfigCachePassTest extends TestCase
 {
     public function testThatCheckersAreProcessedInPriorityOrder()
     {

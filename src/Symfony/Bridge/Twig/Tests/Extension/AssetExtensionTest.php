@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\Preload\PreloadManager;
@@ -18,7 +19,7 @@ use Symfony\Component\Asset\Preload\PreloadManager;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AssetExtensionTest extends \PHPUnit_Framework_TestCase
+class AssetExtensionTest extends TestCase
 {
     public function testGetAndPreloadAssetUrl()
     {

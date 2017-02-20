@@ -2,10 +2,11 @@
 
 namespace Symfony\Component\Workflow\Tests\SupportStrategy;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\Workflow;
 
-class ClassInstanceSupportStrategyTest extends \PHPUnit_Framework_TestCase
+class ClassInstanceSupportStrategyTest extends TestCase
 {
     public function testSupportsIfClassInstance()
     {

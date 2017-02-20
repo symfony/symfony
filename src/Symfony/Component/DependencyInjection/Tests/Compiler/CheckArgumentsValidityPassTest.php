@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckArgumentsValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CheckArgumentsValidityPassTest extends \PHPUnit_Framework_TestCase
+class CheckArgumentsValidityPassTest extends TestCase
 {
     public function testProcess()
     {

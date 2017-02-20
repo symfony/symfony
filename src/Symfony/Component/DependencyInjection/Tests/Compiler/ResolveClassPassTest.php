@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 
-class ResolveClassPassTest extends \PHPUnit_Framework_TestCase
+class ResolveClassPassTest extends TestCase
 {
     /**
      * @dataProvider provideValidClassId

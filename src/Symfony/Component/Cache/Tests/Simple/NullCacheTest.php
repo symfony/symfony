@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Simple\NullCache;
 
 /**
  * @group time-sensitive
  */
-class NullCacheTest extends \PHPUnit_Framework_TestCase
+class NullCacheTest extends TestCase
 {
     public function createCachePool()
     {

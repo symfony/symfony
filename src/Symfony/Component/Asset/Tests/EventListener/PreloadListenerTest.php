@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\EventListener\PreloadListener;
 use Symfony\Component\Asset\Preload\PreloadManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PreloadListenerTest extends \PHPUnit_Framework_TestCase
+class PreloadListenerTest extends TestCase
 {
     public function testOnKernelResponse()
     {

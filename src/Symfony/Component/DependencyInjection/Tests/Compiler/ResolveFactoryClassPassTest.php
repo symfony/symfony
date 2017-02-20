@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ResolveFactoryClassPassTest extends \PHPUnit_Framework_TestCase
+class ResolveFactoryClassPassTest extends TestCase
 {
     public function testProcess()
     {

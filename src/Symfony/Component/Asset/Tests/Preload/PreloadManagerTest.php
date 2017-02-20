@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Asset\Preload;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PreloadManagerTest extends \PHPUnit_Framework_TestCase
+class PreloadManagerTest extends TestCase
 {
     public function testManageResources()
     {

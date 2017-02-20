@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Psr\Cache\CacheItemPoolInterface;
 
-class Psr6CacheClearerTest extends \PHPUnit_Framework_TestCase
+class Psr6CacheClearerTest extends TestCase
 {
     public function testClearPoolsInjectedInConstructor()
     {

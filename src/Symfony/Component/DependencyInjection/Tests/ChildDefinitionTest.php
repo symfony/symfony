@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
-class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
+class ChildDefinitionTest extends TestCase
 {
     public function testConstructor()
     {

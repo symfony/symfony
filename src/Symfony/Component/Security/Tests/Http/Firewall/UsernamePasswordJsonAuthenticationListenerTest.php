@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -27,7 +28,7 @@ use Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationL
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
+class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 {
     /**
      * @var UsernamePasswordJsonAuthenticationListener

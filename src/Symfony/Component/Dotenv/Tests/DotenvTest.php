@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Dotenv\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
 
-class DotenvTest extends \PHPUnit_Framework_TestCase
+class DotenvTest extends TestCase
 {
     /**
      * @dataProvider getEnvDataWithFormatErrors

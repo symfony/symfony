@@ -12,9 +12,10 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use Composer\Autoload\ClassLoader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ComposerResource;
 
-class ComposerResourceTest extends \PHPUnit_Framework_TestCase
+class ComposerResourceTest extends TestCase
 {
     public function testGetVendor()
     {

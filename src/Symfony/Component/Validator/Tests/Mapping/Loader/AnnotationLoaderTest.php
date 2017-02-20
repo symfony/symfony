@@ -72,7 +72,7 @@ class AnnotationLoaderTest extends TestCase
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
         $expected->addGetterConstraint('lastName', new NotNull());
-        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterMethodConstraint('valid', 'isValid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
 
         // load reflection class so that the comparison passes
@@ -144,7 +144,7 @@ class AnnotationLoaderTest extends TestCase
         $expected->addPropertyConstraint('childA', new Valid());
         $expected->addPropertyConstraint('childB', new Valid());
         $expected->addGetterConstraint('lastName', new NotNull());
-        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterMethodConstraint('valid', 'isValid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
 
         // load reflection class so that the comparison passes

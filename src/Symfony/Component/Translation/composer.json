@@ -22,11 +22,12 @@
     "require-dev": {
         "symfony/config": "~2.8|~3.0",
         "symfony/intl": "^2.8.18|^3.2.5",
-        "symfony/yaml": "~2.8|~3.0",
+        "symfony/yaml": "~3.3",
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/config": "<2.8"
+        "symfony/config": "<2.8",
+        "symfony/yaml": "<3.3"
     },
     "suggest": {
         "symfony/config": "",

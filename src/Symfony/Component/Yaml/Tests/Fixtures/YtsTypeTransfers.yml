@@ -210,20 +210,6 @@ php: |
       'negative one-thousand' => -1000.0
     )
 ---
-test: Integers as Map Keys
-brief: >
-    An integer can be used a dictionary key.
-yaml: |
-    1: one
-    2: two
-    3: three
-php: |
-    array(
-        1 => 'one',
-        2 => 'two',
-        3 => 'three'
-    )
----
 test: Floats
 dump_skip: true
 brief: >

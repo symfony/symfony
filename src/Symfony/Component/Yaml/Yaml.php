@@ -30,6 +30,7 @@ class Yaml
     const DUMP_MULTI_LINE_LITERAL_BLOCK = 128;
     const PARSE_CONSTANT = 256;
     const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
+    const PARSE_KEYS_AS_STRINGS = 2048;
 
     /**
      * @experimental in version 3.3

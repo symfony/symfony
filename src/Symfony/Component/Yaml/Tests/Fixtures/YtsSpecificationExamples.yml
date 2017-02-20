@@ -556,21 +556,6 @@ php: |
     'fixed' => 1230.15,
   )
 ---
-test: Miscellaneous
-spec: 2.21
-yaml: |
-  null: ~
-  true: true
-  false: false
-  string: '12345'
-php: |
-  array(
-    '' => null,
-    1 => true,
-    0 => false,
-    'string' => '12345'
-  )
----
 test: Timestamps
 todo: true
 spec: 2.22
@@ -1532,18 +1517,6 @@ ruby: |
     ]
   }
 
----
-test: Boolean
-yaml: |
-   false: used as key
-   logical:  true
-   answer: false
-php: |
-   array(
-     false => 'used as key',
-     'logical' => true,
-     'answer' => false
-   )
 ---
 test: Integer
 yaml: |

@@ -26,6 +26,9 @@ class DataCollectorTranslatorPassTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder();
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();
 
+        $this->container->setParameter('translator_implementing_bag', 'Symfony\Component\Translation\Translator');
+        $this->container->setParameter('translator_not_implementing_bag', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag');
+
         $this->container->register('translator.data_collector', 'Symfony\Component\Translation\DataCollectorTranslator')
             ->setPublic(false)
             ->setDecoratedService('translator')
@@ -37,40 +40,68 @@ class DataCollectorTranslatorPassTest extends \PHPUnit_Framework_TestCase
         ;
     }
 
-    public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface()
+    /**
+     * @dataProvider getImplementingTranslatorBagInterfaceTranslatorClassNames
+     */
+    public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface($class)
     {
-        $this->container->register('translator', 'Symfony\Component\Translation\Translator');
+        $this->container->register('translator', $class);
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
         $this->assertTrue($this->container->hasDefinition('translator.data_collector'));
     }
 
-    public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface()
+    /**
+     * @dataProvider getImplementingTranslatorBagInterfaceTranslatorClassNames
+     */
+    public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface($class)
     {
-        $this->container->register('translator', 'Symfony\Component\Translation\Translator');
+        $this->container->register('translator', $class);
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
         $this->assertTrue($this->container->hasDefinition('data_collector.translation'));
     }
 
-    public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface()
+    public function getImplementingTranslatorBagInterfaceTranslatorClassNames()
     {
-        $this->container->register('translator', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag');
+        return array(
+            array('Symfony\Component\Translation\Translator'),
+            array('%translator_implementing_bag%'),
+        );
+    }
+
+    /**
+     * @dataProvider getNotImplementingTranslatorBagInterfaceTranslatorClassNames
+     */
+    public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface($class)
+    {
+        $this->container->register('translator', $class);
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
         $this->assertFalse($this->container->hasDefinition('translator.data_collector'));
     }
 
-    public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface()
+    /**
+     * @dataProvider getNotImplementingTranslatorBagInterfaceTranslatorClassNames
+     */
+    public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface($class)
     {
-        $this->container->register('translator', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag');
+        $this->container->register('translator', $class);
 
         $this->dataCollectorTranslatorPass->process($this->container);
 
         $this->assertFalse($this->container->hasDefinition('data_collector.translation'));
+    }
+
+    public function getNotImplementingTranslatorBagInterfaceTranslatorClassNames()
+    {
+        return array(
+            array('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag'),
+            array('%translator_not_implementing_bag%'),
+        );
     }
 }
 

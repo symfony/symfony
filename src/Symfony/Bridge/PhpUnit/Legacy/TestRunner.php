@@ -9,23 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\PhpUnit\TextUI;
-
-use PHPUnit\TextUI\TestRunner as BaseRunner;
-use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
-
-if (class_exists('PHPUnit_TextUI_Command')) {
-    class_alias('Symfony\Bridge\PhpUnit\Legacy\TestRunner', 'Symfony\Bridge\PhpUnit\TextUI\TestRunner');
-
-    return;
-}
+namespace Symfony\Bridge\PhpUnit\Legacy;
 
 /**
  * {@inheritdoc}
  *
  * @internal
  */
-class TestRunner extends BaseRunner
+class TestRunner extends \PHPUnit_TextUI_TestRunner
 {
     /**
      * {@inheritdoc}

@@ -9,22 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\PhpUnit\TextUI;
-
-use PHPUnit\TextUI\Command as BaseCommand;
-
-if (class_exists('PHPUnit_TextUI_Command')) {
-    class_alias('Symfony\Bridge\PhpUnit\Legacy\Command', 'Symfony\Bridge\PhpUnit\TextUI\Command');
-
-    return;
-}
+namespace Symfony\Bridge\PhpUnit\Legacy;
 
 /**
  * {@inheritdoc}
  *
  * @internal
  */
-class Command extends BaseCommand
+class Command extends \PHPUnit_TextUI_Command
 {
     /**
      * {@inheritdoc}

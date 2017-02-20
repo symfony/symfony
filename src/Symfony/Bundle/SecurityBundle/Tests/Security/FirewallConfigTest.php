@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 
-class FirewallConfigTest extends \PHPUnit_Framework_TestCase
+class FirewallConfigTest extends TestCase
 {
     public function testGetters()
     {

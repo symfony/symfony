@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class YamlLintCommandTest extends \PHPUnit_Framework_TestCase
+class YamlLintCommandTest extends TestCase
 {
     private $files;
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpFoundation\Request;
 
-class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
+class ArgumentResolverTest extends TestCase
 {
     /** @var ArgumentResolver */
     private static $resolver;

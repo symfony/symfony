@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
+class DateTimeNormalizerTest extends TestCase
 {
     /**
      * @var DateTimeNormalizer

@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -9,7 +10,7 @@ use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 
-class RegistryTest extends \PHPUnit_Framework_TestCase
+class RegistryTest extends TestCase
 {
     private $registry;
 

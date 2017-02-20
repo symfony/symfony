@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\GuardEvent;
@@ -11,7 +12,7 @@ use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
-class WorkflowTest extends \PHPUnit_Framework_TestCase
+class WorkflowTest extends TestCase
 {
     use WorkflowBuilderTrait;
 

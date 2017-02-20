@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Config;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 
 /**
  * @group legacy
  */
-class AutowireServiceResourceTest extends \PHPUnit_Framework_TestCase
+class AutowireServiceResourceTest extends TestCase
 {
     /**
      * @var AutowireServiceResource

@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Workflow\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\EventListener\AuditTrailListener;
@@ -11,7 +12,7 @@ use Symfony\Component\Workflow\Tests\createSimpleWorkflowDefinition;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
-class AuditTrailListenerTest extends \PHPUnit_Framework_TestCase
+class AuditTrailListenerTest extends TestCase
 {
     use WorkflowBuilderTrait;
 

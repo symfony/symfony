@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
+class DataUriNormalizerTest extends TestCase
 {
     const TEST_GIF_DATA = 'data:image/gif;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=';
     const TEST_TXT_DATA = 'data:text/plain,K%C3%A9vin%20Dunglas%0A';

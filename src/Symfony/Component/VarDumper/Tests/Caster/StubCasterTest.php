@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\LinkStub;
@@ -19,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\FooInterface;
 
-class StubCasterTest extends \PHPUnit_Framework_TestCase
+class StubCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 

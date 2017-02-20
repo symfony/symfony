@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-06T15:53:36Z
+
+Does it work for namespaced functions ? I think it does not in case they don't have the leading ``\`` in the name (well, it works only if the compiled code is placed in the global namespace)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-01-07T23:13:39Z
+
+@stof Indeed, for namespaced functions, it's doesn't work; a ``SyntaxError`` is thrown that said ``Unexpected character "\" around position 0.``. To solve this, I throw an exception if given function is not in global namespace. WDYT?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-01-07T23:27:10Z
+
+@stof An another solution would be don't throw exception, to evaluate with short name of namespaced function and to compile with full name of namespaced function.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-09T11:08:48Z
+
+A syntax error ? Which error are you talking about ? Are you trying to put the namespace in the ExpressionLanguage function name too ? This is not supported, as EL does not have namespaced functions.
+this tells me that the factory would need to allow 2 arguments: the PHP function name, and the EL function name used to expose it.
+The EL name could be optional in case the PHP function is not namespaced, reusing the PHP function name. And the factory would throw an exception if the PHP function is namespaced and the EL name is omitted.
+
+The alternative is to decide than namespaced PHP functions are unsupported, but I would throw an exception early in this case, saying that EL function names cannot use ``\`` in their name.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-09T14:04:24Z
+
+I think supporting namespaced functions is better and having a second argument to change the function name in EL sounds like a good idea anyway, even for regular functions.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-01-10T19:44:47Z
+
+I done the changes that you suggested @fabpot and @stof.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-22T02:10:06Z
+
+@maidmaid could you update the PR description to match the new API?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-01-24T21:00:18Z
+
+@lyrixx Yes, I updated the PR description now.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-02-16T10:02:31Z
+
+It's done @nicolas-grekas :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T11:32:49Z
+
+Apparently, tests are broken when applying these changes.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-02-19T12:53:32Z
+
+I fixed tests @fabpot.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-19T22:34:29Z
+
+@maidmaid I'm still not convinced that using reflection is needed. Here is my patch to get rid of it:
+
+```diff
+diff --git a/src/Symfony/Component/ExpressionLanguage/ExpressionFunction.php b/src/Symfony/Component/ExpressionLanguage/ExpressionFunction.php
+index d011854804..87a494f82d 100644
+--- a/src/Symfony/Component/ExpressionLanguage/ExpressionFunction.php
++++ b/src/Symfony/Component/ExpressionLanguage/ExpressionFunction.php
+@@ -77,18 +77,16 @@ class ExpressionFunction
+      */
+     public static function fromPhp($phpFunctionName, $expressionFunctionName = null)
+     {
++        $phpFunctionName = ltrim($phpFunctionName, '\\');
+         if (!function_exists($phpFunctionName)) {
+             throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $phpFunctionName));
+         }
+
+-        $reflection = new \ReflectionFunction($phpFunctionName);
+-        if (!$expressionFunctionName && $reflection->inNamespace()) {
++        $parts = explode('\\', $phpFunctionName);
++        if (!$expressionFunctionName && count($parts) > 1) {
+             throw new \InvalidArgumentException(sprintf('An expression function name must be defined when PHP function "%s" is namespaced.', $phpFunctionName));
+         }
+
+-        $phpFunctionName = $reflection->getName();
+-        $expressionFunctionName = $expressionFunctionName ?: $reflection->getShortName();
+-
+         $compiler = function () use ($phpFunctionName) {
+             return sprintf('\%s(%s)', $phpFunctionName, implode(', ', func_get_args()));
+         };
+@@ -99,6 +97,6 @@ class ExpressionFunction
+             return call_user_func_array($phpFunctionName, array_splice($args, 1));
+         };
+
+-        return new self($expressionFunctionName, $compiler, $evaluator);
++        return new self($expressionFunctionName ?: $parts[count($parts) - 1], $compiler, $evaluator);
+     }
+ }
+```
+
+Any downsides?

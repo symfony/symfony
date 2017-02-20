@@ -54,21 +54,21 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Rounds to the nearest number and halves to the next even number.
      *
-     * Rounds 2.5, 1.6 and 1.5 to 2 and 1.4 to 1.
+     * Rounds 2.5, 1.6 and 1.5 to 2 and -1.4 to 1.
      */
     const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
 
     /**
      * Rounds to the nearest number and halves away from zero.
      *
-     * Rounds 2.5 to 3, 1.6 and 1.5 to 2 and 1.4 to 1.
+     * Rounds 2.5 to 3, 1.6 and 1.5 to 2 and -1.4 to 1.
      */
     const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
 
     /**
      * Rounds to the nearest number and halves towards zero.
      *
-     * Rounds 2.5 and 1.6 to 2, 1.5 and 1.4 to 1.
+     * Rounds 2.5 and 1.6 to 2, 1.5 and -1.4 to 1.
      */
     const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
 

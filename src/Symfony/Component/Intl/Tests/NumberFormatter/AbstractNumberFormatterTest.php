@@ -309,7 +309,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
-        if (class_exists('\PHPUnit_Framework_Error_Warning')) {
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
             $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
         } else {
             $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
@@ -648,7 +648,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
-        if (class_exists('\PHPUnit_Framework_Error_Warning')) {
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
             $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
         } else {
             $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
@@ -791,7 +791,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeCurrency()
     {
-        if (class_exists('\PHPUnit_Framework_Error_Warning')) {
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
             $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
         } else {
             $this->setExpectedException('\PHPUnit\Framework\Error\Warning');

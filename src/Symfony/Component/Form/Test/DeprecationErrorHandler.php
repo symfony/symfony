@@ -24,7 +24,7 @@ class DeprecationErrorHandler
             return true;
         }
 
-        if (class_exists('\PHPUnit_Util_ErrorHandler')) {
+        if (class_exists('PHPUnit_Util_ErrorHandler')) {
             return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
         }
 

@@ -11,49 +11,80 @@
 
 namespace Symfony\Component\Form\Extension\DependencyInjection;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtension implements FormExtensionInterface
 {
-    private $container;
-    private $typeServiceIds;
-    private $typeExtensionServiceIds;
-    private $guesserServiceIds;
     private $guesser;
     private $guesserLoaded = false;
+    private $typeContainer;
+    private $typeExtensionServices;
+    private $guesserServices;
 
-    public function __construct(ContainerInterface $container, array $typeServiceIds, array $typeExtensionServiceIds, array $guesserServiceIds)
+    // @deprecated to be removed in Symfony 4.0
+    private $typeServiceIds;
+    private $guesserServiceIds;
+
+    /**
+     * Constructor.
+     *
+     * @param ContainerInterface $typeContainer
+     * @param iterable[]         $typeExtensionServices
+     * @param iterable           $guesserServices
+     */
+    public function __construct(ContainerInterface $typeContainer, array $typeExtensionServices, $guesserServices, array $guesserServiceIds = null)
     {
-        $this->container = $container;
-        $this->typeServiceIds = $typeServiceIds;
-        $this->typeExtensionServiceIds = $typeExtensionServiceIds;
-        $this->guesserServiceIds = $guesserServiceIds;
+        if (null !== $guesserServiceIds) {
+            @trigger_error(sprintf('Passing four arguments to the %s::__construct() method is deprecated since Symfony 3.3 and will be disallowed in Symfony 4.0. The new constructor only accepts three arguments.', __CLASS__), E_USER_DEPRECATED);
+            $this->guesserServiceIds = $guesserServiceIds;
+            $this->typeServiceIds = $typeExtensionServices;
+        }
+
+        $this->typeContainer = $typeContainer;
+        $this->typeExtensionServices = $typeExtensionServices;
+        $this->guesserServices = $guesserServices;
     }
 
     public function getType($name)
     {
-        if (!isset($this->typeServiceIds[$name])) {
-            throw new InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
+        if (null !== $this->guesserServiceIds) {
+            if (!isset($this->typeServiceIds[$name])) {
+                throw new InvalidArgumentException(sprintf('The field type "%s" is not registered in the service container.', $name));
+            }
+
+            return $this->typeContainer->get($this->typeServiceIds[$name]);
         }
 
-        return $this->container->get($this->typeServiceIds[$name]);
+        if (!$this->typeContainer->has($name)) {
+            throw new InvalidArgumentException(sprintf('The field type "%s" is not registered in the service container.', $name));
+        }
+
+        return $this->typeContainer->get($name);
     }
 
     public function hasType($name)
     {
-        return isset($this->typeServiceIds[$name]);
+        if (null !== $this->guesserServiceIds) {
+            return isset($this->typeServiceIds[$name]);
+        }
+
+        return $this->typeContainer->has($name);
     }
 
     public function getTypeExtensions($name)
     {
         $extensions = array();
 
-        if (isset($this->typeExtensionServiceIds[$name])) {
-            foreach ($this->typeExtensionServiceIds[$name] as $serviceId) {
-                $extensions[] = $extension = $this->container->get($serviceId);
+        if (isset($this->typeExtensionServices[$name])) {
+            foreach ($this->typeExtensionServices[$name] as $serviceId => $extension) {
+                if (null !== $this->guesserServiceIds) {
+                    $extension = $this->typeContainer->get($serviceId = $extension);
+                }
+
+                $extensions[] = $extension;
 
                 // validate result of getExtendedType() to ensure it is consistent with the service definition
                 if ($extension->getExtendedType() !== $name) {
@@ -73,7 +104,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
 
     public function hasTypeExtensions($name)
     {
-        return isset($this->typeExtensionServiceIds[$name]);
+        return isset($this->typeExtensionServices[$name]);
     }
 
     public function getTypeGuesser()
@@ -82,11 +113,15 @@ class DependencyInjectionExtension implements FormExtensionInterface
             $this->guesserLoaded = true;
             $guessers = array();
 
-            foreach ($this->guesserServiceIds as $serviceId) {
-                $guessers[] = $this->container->get($serviceId);
+            foreach ($this->guesserServices as $serviceId => $service) {
+                if (null !== $this->guesserServiceIds) {
+                    $service = $this->typeContainer->get($serviceId = $service);
+                }
+
+                $guessers[] = $service;
             }
 
-            if (count($guessers) > 0) {
+            if ($guessers) {
                 $this->guesser = new FormTypeGuesserChain($guessers);
             }
         }

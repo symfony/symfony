@@ -11,14 +11,18 @@
 
 namespace Symfony\Component\Form\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds all services with the tags "form.type" and "form.type_guesser" as
- * arguments of the "form.extension" service.
+ * Adds all services with the tags "form.type", "form.type_extension" and
+ * "form.type_guesser" as arguments of the "form.extension" service.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -46,29 +50,37 @@ class FormPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition($this->formExtensionService);
+        $definition->replaceArgument(0, $this->processFormTypes($container, $definition));
+        $definition->replaceArgument(1, $this->processFormTypeExtensions($container));
+        $definition->replaceArgument(2, $this->processFormTypeGuessers($container));
+    }
 
-        // Builds an array with fully-qualified type class names as keys and service IDs as values
-        $types = array();
-        foreach ($container->findTaggedServiceIds($this->formTypeTag) as $serviceId => $tag) {
-            $serviceDefinition = $container->getDefinition($serviceId);
-            if (!$serviceDefinition->isPublic()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" must be public as form types are lazy-loaded.', $serviceId));
-            }
-
-            // Support type access by FQCN
-            $types[$serviceDefinition->getClass()] = $serviceId;
+    private function processFormTypes(ContainerBuilder $container, Definition $definition)
+    {
+        // Get service locator argument
+        $servicesMap = array();
+        $locator = $definition->getArgument(0);
+        if ($locator instanceof ServiceLocatorArgument) {
+            $servicesMap = $locator->getValues();
         }
 
-        $definition->replaceArgument(1, $types);
+        // Builds an array with fully-qualified type class names as keys and service IDs as values
+        foreach ($container->findTaggedServiceIds($this->formTypeTag) as $serviceId => $tag) {
+            $serviceDefinition = $container->getDefinition($serviceId);
 
+            // Add form type service to the service locator
+            $servicesMap[$serviceDefinition->getClass()] = new Reference($serviceId);
+        }
+
+        return new ServiceLocatorArgument($servicesMap);
+    }
+
+    private function processFormTypeExtensions(ContainerBuilder $container)
+    {
         $typeExtensions = array();
-
         foreach ($this->findAndSortTaggedServices($this->formTypeExtensionTag, $container) as $reference) {
             $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
-            if (!$serviceDefinition->isPublic()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" must be public as form type extensions are lazy-loaded.', $serviceId));
-            }
 
             $tag = $serviceDefinition->getTag($this->formTypeExtensionTag);
             if (isset($tag[0]['extended_type'])) {
@@ -77,19 +89,23 @@ class FormPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('"%s" tagged services must have the extended type configured using the extended_type/extended-type attribute, none was configured for the "%s" service.', $this->formTypeExtensionTag, $serviceId));
             }
 
-            $typeExtensions[$extendedType][] = $serviceId;
+            $typeExtensions[$extendedType][] = new Reference($serviceId);
         }
 
-        $definition->replaceArgument(2, $typeExtensions);
-
-        $guessers = array_keys($container->findTaggedServiceIds($this->formTypeGuesserTag));
-        foreach ($guessers as $serviceId) {
-            $serviceDefinition = $container->getDefinition($serviceId);
-            if (!$serviceDefinition->isPublic()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" must be public as form type guessers are lazy-loaded.', $serviceId));
-            }
+        foreach ($typeExtensions as $extendedType => $extensions) {
+            $typeExtensions[$extendedType] = new IteratorArgument($extensions);
         }
 
-        $definition->replaceArgument(3, $guessers);
+        return $typeExtensions;
+    }
+
+    private function processFormTypeGuessers(ContainerBuilder $container)
+    {
+        $guessers = array();
+        foreach ($container->findTaggedServiceIds($this->formTypeGuesserTag) as $serviceId => $tags) {
+            $guessers[] = new Reference($serviceId);
+        }
+
+        return new IteratorArgument($guessers);
     }
 }

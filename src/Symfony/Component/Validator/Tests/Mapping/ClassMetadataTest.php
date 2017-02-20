@@ -39,14 +39,14 @@ class ClassMetadataTest extends TestCase
 
     public function testAddConstraintDoesNotAcceptValid()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new Valid());
     }
 
     public function testAddConstraintRequiresClassConstraints()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new PropertyConstraint());
     }
@@ -249,14 +249,14 @@ class ClassMetadataTest extends TestCase
 
     public function testGroupSequencesFailIfNotContainingDefaultGroup()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\GroupDefinitionException');
 
         $this->metadata->setGroupSequence(array('Foo', 'Bar'));
     }
 
     public function testGroupSequencesFailIfContainingDefault()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\GroupDefinitionException');
 
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }

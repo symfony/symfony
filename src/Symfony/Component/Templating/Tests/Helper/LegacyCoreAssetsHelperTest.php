@@ -44,7 +44,7 @@ class LegacyCoreAssetsHelperTest extends TestCase
     {
         $helper = new CoreAssetsHelper($this->package);
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('\InvalidArgumentException');
 
         $helper->getPackage('foo');
     }

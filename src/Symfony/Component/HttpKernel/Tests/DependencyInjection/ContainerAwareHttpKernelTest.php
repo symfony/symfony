@@ -104,6 +104,8 @@ class ContainerAwareHttpKernelTest extends TestCase
         try {
             $kernel->handle($request, $type);
             $this->fail('->handle() suppresses the controller exception');
+        } catch (\PHPUnit\Framework\Exception $e) {
+            throw $e;
         } catch (\PHPUnit_Framework_Exception $e) {
             throw $e;
         } catch (\Exception $e) {

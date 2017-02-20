@@ -86,7 +86,7 @@ class PhpEngineTest extends TestCase
         $foo = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('foo');
         $engine->set($foo);
 
-        $this->setExpectedException('\LogicException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('\LogicException');
 
         unset($engine['foo']);
     }

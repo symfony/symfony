@@ -101,7 +101,7 @@ class TranslatorTest extends TestCase
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
         $translator->setLocale('invalid locale');
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('\InvalidArgumentException');
         $translator->trans('foo');
     }
 

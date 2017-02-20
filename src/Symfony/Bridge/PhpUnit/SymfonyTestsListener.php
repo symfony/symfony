@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Collects and replays skipped tests.
@@ -107,7 +106,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         } elseif (2 === $this->state) {
             $skipped = array();
             foreach ($suite->tests() as $test) {
-                if (!$test instanceof TestCase
+                if (!$test instanceof \PHPUnit_Framework_TestCase
                     || isset($this->wasSkipped[$suiteName]['*'])
                     || isset($this->wasSkipped[$suiteName][$test->getName()])) {
                     $skipped[] = $test;
@@ -120,7 +119,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
         if (0 < $this->state) {
-            if ($test instanceof TestCase) {
+            if ($test instanceof \PHPUnit_Framework_TestCase) {
                 $class = get_class($test);
                 $method = $test->getName();
             } else {
@@ -134,7 +133,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
     public function startTest(\PHPUnit_Framework_Test $test)
     {
-        if (-2 < $this->state && $test instanceof TestCase) {
+        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
             $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {
@@ -146,7 +145,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        if (-2 < $this->state && $test instanceof TestCase) {
+        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
             $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {

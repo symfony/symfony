@@ -221,6 +221,10 @@ FrameworkBundle
    has been removed. Use the `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass`
    class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass`
+   class has been removed. Use the 
+   `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` class instead.
+
 HttpFoundation
 ---------------
 

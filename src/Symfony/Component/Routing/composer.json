@@ -23,6 +23,7 @@
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"

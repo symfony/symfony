@@ -309,12 +309,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
-        if (class_exists('PHPUnit_Framework_Error_Warning')) {
-            $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
-        } else {
-            $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
-        }
-
+        $this->handleExpectedWarningException();
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
 
@@ -648,11 +643,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     public function testParseTypeDefault()
     {
-        if (class_exists('PHPUnit_Framework_Error_Warning')) {
-            $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
-        } else {
-            $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
-        }
+        $this->handleExpectedWarningException();
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
     }
@@ -789,13 +780,24 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
+    private function handleExpectedWarningException()
+    {
+        $exceptionCode = 'PHPUnit\Framework\Error\Warning';
+
+        if (class_exists('PHPUnit_Framework_Error_Warning')) {
+            $exceptionCode = 'PHPUnit_Framework_Error_Warning';
+        }
+
+        if (method_exists($this, 'expectedException')) {
+            $this->expectException($exceptionCode);
+        } else {
+            $this->setExpectedException($exceptionCode);
+        }
+    }
+
     public function testParseTypeCurrency()
     {
-        if (class_exists('PHPUnit_Framework_Error_Warning')) {
-            $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
-        } else {
-            $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
-        }
+        $this->handleExpectedWarningException();
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
     }

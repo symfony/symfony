@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use PHPUnit\Framework\BaseTestListener;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class SymfonyTestsListener extends BaseTestListener
+class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 {
     private static $globallyEnabled = false;
     private $state = -1;

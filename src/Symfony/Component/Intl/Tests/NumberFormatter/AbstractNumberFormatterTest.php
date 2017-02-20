@@ -306,10 +306,15 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
     /**
      * @dataProvider formatTypeCurrencyProvider
-     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testFormatTypeCurrency($formatter, $value)
     {
+        if (class_exists('\PHPUnit_Framework_Error_Warning')) {
+            $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
+        } else {
+            $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
+        }
+
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
 
@@ -641,11 +646,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
     public function testParseTypeDefault()
     {
+        if (class_exists('\PHPUnit_Framework_Error_Warning')) {
+            $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
+        } else {
+            $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
+        }
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
     }
@@ -782,11 +789,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
     public function testParseTypeCurrency()
     {
+        if (class_exists('\PHPUnit_Framework_Error_Warning')) {
+            $this->setExpectedException('\PHPUnit_Framework_Error_Warning');
+        } else {
+            $this->setExpectedException('\PHPUnit\Framework\Error\Warning');
+        }
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
     }

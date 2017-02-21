@@ -13,6 +13,10 @@ namespace Symfony\Bridge\PhpUnit;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
+if (!class_exists('PHPUnit_Framework_BaseTestListener')) {
+    return;
+}
+
 /**
  * Collects and replays skipped tests.
  *

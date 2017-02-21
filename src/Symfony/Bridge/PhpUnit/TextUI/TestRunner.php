@@ -13,6 +13,10 @@ namespace Symfony\Bridge\PhpUnit\TextUI;
 
 use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 
+if (!class_exists('PHPUnit_TextUI_TestRunner')) {
+    return;
+}
+
 /**
  * {@inheritdoc}
  */

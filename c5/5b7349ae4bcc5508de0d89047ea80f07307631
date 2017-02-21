@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-20T17:33:42Z
+
+@nicolas-grekas Updated. One concern is left as setExpectedException is deprecated. I could also check if a class not in the FC layer exists and therefore conditionally use setException or expectException?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-20T17:37:40Z
+
+If needed I think I would use `PHPUnit\Framework\Exception`.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-20T21:34:31Z
+
+Updated.

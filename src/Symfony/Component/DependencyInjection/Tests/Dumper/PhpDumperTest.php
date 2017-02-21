@@ -388,7 +388,13 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->setExpectedException(RuntimeException::class, $expectedMessage);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage($expectedMessage);
+        } else {
+            $this->setExpectedException(RuntimeException::class, $expectedMessage);
+        }
+
         $dumper->dump();
     }
 

@@ -159,7 +159,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     {
         $transformer = new DateIntervalToArrayTransformer();
         $this->assertNull($transformer->reverseTransform(null));
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $transformer->reverseTransform('12345');
     }
 
@@ -167,7 +167,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     {
         $transformer = new DateIntervalToArrayTransformer();
         $input = array('years' => '1');
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
         $transformer->reverseTransform($input);
     }
 
@@ -179,7 +179,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
             'minutes' => '',
             'seconds' => '6',
         );
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException', 'This amount of "minutes" is invalid');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException', 'This amount of "minutes" is invalid');
         $transformer->reverseTransform($input);
     }
 
@@ -189,7 +189,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $input = array(
             'invert' => '1',
         );
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException', 'The value of "invert" must be boolean');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException', 'The value of "invert" must be boolean');
         $transformer->reverseTransform($input);
     }
 

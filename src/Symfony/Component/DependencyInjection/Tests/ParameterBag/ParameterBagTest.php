@@ -84,7 +84,12 @@ class ParameterBagTest extends TestCase
             'fiz' => array('bar' => array('boo' => 12)),
         ));
 
-        $this->setExpectedException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $exceptionMessage);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException');
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->setExpectedException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $exceptionMessage);
+        }
 
         $bag->get($parameterKey);
     }

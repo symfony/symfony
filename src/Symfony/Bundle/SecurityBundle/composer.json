@@ -36,7 +36,7 @@
         "symfony/twig-bundle": "~2.8|~3.0",
         "symfony/twig-bridge": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
-        "symfony/validator": "^2.8.18|^3.2.5",
+        "symfony/validator": "^3.2.5",
         "symfony/var-dumper": "~3.2",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",

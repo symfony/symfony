@@ -141,21 +141,23 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->compile($expression, array('B' => 'b', 'a'));
     }
 
-    public function testAddingFunctionAfterEval()
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRegisterAfterEval()
     {
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
-        $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
-        $result = $el->evaluate('fn()');
-        $this->assertNull($result);
+        $el->register('fn', function () {}, function () {});
     }
 
-    public function testAddingFunctionAfterCompile()
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRegisterAfterCompile()
     {
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
-        $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
-        $result = $el->compile('fn()');
-        $this->assertEmpty($result);
+        $el->register('fn', function () {}, function () {});
     }
 }

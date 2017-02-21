@@ -32,9 +32,9 @@ class Parser
     private $functions;
     private $names;
 
-    public function __construct(array &$functions)
+    public function __construct(array $functions)
     {
-        $this->functions = &$functions;
+        $this->functions = $functions;
 
         $this->unaryOperators = array(
             'not' => array('precedence' => 50),

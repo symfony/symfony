@@ -21,9 +21,9 @@ class Compiler
     private $source;
     private $functions;
 
-    public function __construct(array &$functions)
+    public function __construct(array $functions)
     {
-        $this->functions = &$functions;
+        $this->functions = $functions;
     }
 
     public function getFunction($name)

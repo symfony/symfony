@@ -25,8 +25,7 @@ class ParserTest extends TestCase
     public function testParseWithInvalidName()
     {
         $lexer = new Lexer();
-        $functions = array();
-        $parser = new Parser($functions);
+        $parser = new Parser(array());
         $parser->parse($lexer->tokenize('foo'));
     }
 
@@ -37,8 +36,7 @@ class ParserTest extends TestCase
     public function testParseWithZeroInNames()
     {
         $lexer = new Lexer();
-        $functions = array();
-        $parser = new Parser($functions);
+        $parser = new Parser(array());
         $parser->parse($lexer->tokenize('foo'), array(0));
     }
 
@@ -48,8 +46,7 @@ class ParserTest extends TestCase
     public function testParse($node, $expression, $names = array())
     {
         $lexer = new Lexer();
-        $functions = array();
-        $parser = new Parser($functions);
+        $parser = new Parser(array());
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
@@ -173,8 +170,7 @@ class ParserTest extends TestCase
     public function testParseWithInvalidPostfixData($expr, $names = array())
     {
         $lexer = new Lexer();
-        $functions = array();
-        $parser = new Parser($functions);
+        $parser = new Parser(array());
         $parser->parse($lexer->tokenize($expr), $names);
     }
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -29,9 +28,6 @@ class XmlEncoderTest extends TestCase
      */
     private $encoder;
 
-    /**
-     * @var string
-     */
     private $exampleDateTimeString = '2017-02-19T15:16:08+0300';
 
     protected function setUp()
@@ -535,40 +531,33 @@ XML;
         return $obj;
     }
 
-    /**
-     * @test
-     */
     public function testEncodeXmlWithBoolValue()
     {
-        $expectedXml = '<?xml version="1.0"?>
+        $expectedXml = <<<'XML'
+<?xml version="1.0"?>
 <response><foo>1</foo><bar>0</bar></response>
-';
+
+XML;
 
         $actualXml = $this->encoder->encode(array('foo' => true, 'bar' => false), 'xml');
 
         $this->assertEquals($expectedXml, $actualXml);
     }
 
-    /**
-     * @test
-     */
     public function testEncodeXmlWithDateTimeObjectValue()
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(array('dateTime' => new DateTime($this->exampleDateTimeString)), 'xml');
+        $actualXml = $xmlEncoder->encode(array('dateTime' => new \DateTime($this->exampleDateTimeString)), 'xml');
 
         $this->assertEquals($this->createXmlWithDateTime(), $actualXml);
     }
 
-    /**
-     * @test
-     */
     public function testEncodeXmlWithDateTimeObjectField()
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
-        $actualXml = $xmlEncoder->encode(array('foo' => array('@dateTime' => new DateTime($this->exampleDateTimeString))), 'xml');
+        $actualXml = $xmlEncoder->encode(array('foo' => array('@dateTime' => new \DateTime($this->exampleDateTimeString))), 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
@@ -595,13 +584,13 @@ XML;
         $mock
             ->expects($this->once())
             ->method('normalize')
-            ->with(new DateTime($this->exampleDateTimeString), 'xml', array())
+            ->with(new \DateTime($this->exampleDateTimeString), 'xml', array())
             ->willReturn($this->exampleDateTimeString);
 
         $mock
             ->expects($this->once())
             ->method('supportsNormalization')
-            ->with(new DateTime($this->exampleDateTimeString), 'xml')
+            ->with(new \DateTime($this->exampleDateTimeString), 'xml')
             ->willReturn(true);
 
         return $mock;

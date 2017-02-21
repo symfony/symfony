@@ -85,6 +85,26 @@ class BundleTest extends TestCase
         $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
         $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
     }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage DependencyBundle requires the following bundle(s): OtherBundle
+     */
+    public function testRequiredBundleIsNotEnabledClass()
+    {
+        $bundle = new DependencyBundle();
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.bundles', []);
+        $bundle->build($container);
+    }
+
+    public function testRequiredBundleIsEnabledClass()
+    {
+        $bundle = new DependencyBundle();
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.bundles', ['OtherBundle' => 'Fake\Namespace\For\OtherBundle']);
+        $bundle->build($container);
+    }
 }
 
 class NamedBundle extends Bundle
@@ -97,4 +117,12 @@ class NamedBundle extends Bundle
 
 class GuessedNameBundle extends Bundle
 {
+}
+
+class DependencyBundle extends Bundle
+{
+    protected function getRequiredBundles()
+    {
+        return ['OtherBundle'];
+    }
 }

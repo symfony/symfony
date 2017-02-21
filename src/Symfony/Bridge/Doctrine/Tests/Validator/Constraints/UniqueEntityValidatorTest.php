@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\DBAL\Types\Type;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Test\TestRepositoryFactory;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Employee;
@@ -26,6 +27,8 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
@@ -63,6 +66,10 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $config = DoctrineTestHelper::createTestConfiguration();
         $config->setRepositoryFactory($this->repositoryFactory);
+
+        if (!Type::hasType('string_wrapper')) {
+            Type::addType('string_wrapper', 'Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapperType');
+        }
 
         $this->em = DoctrineTestHelper::createTestEntityManager($config);
         $this->registry = $this->createRegistryMock($this->em);
@@ -150,6 +157,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Person'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Employee'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity'),
         ));
     }
 
@@ -697,6 +705,33 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.objectOne')
             ->setParameter('{{ value }}', $expectedValue)
             ->setInvalidValue($objectOne)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidateUniquenessWithCustomDoctrineTypeValue()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+        ));
+
+        $existingEntity = new SingleIntIdStringWrapperNameEntity(1, new StringWrapper('foo'));
+
+        $this->em->persist($existingEntity);
+        $this->em->flush();
+
+        $newEntity = new SingleIntIdStringWrapperNameEntity(2, new StringWrapper('foo'));
+
+        $this->validator->validate($newEntity, $constraint);
+
+        $expectedValue = 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper")';
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setParameter('{{ value }}', $expectedValue)
+            ->setInvalidValue($existingEntity->name)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\PhpUnit;
+namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\AssertionFailedError;
@@ -19,13 +19,13 @@ use PHPUnit\Util\Blacklist;
 use PHPUnit\Util\Test;
 
 /**
- * Collects and replays skipped tests.
+ * PHP 5.3 compatible trait-like shared implementation.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
-trait SymfonyTestsListenerTrait
+class SymfonyTestsListenerTrait
 {
     private static $globallyEnabled = false;
     private $state = -1;
@@ -45,13 +45,13 @@ trait SymfonyTestsListenerTrait
         if (class_exists('PHPUnit_Util_Blacklist')) {
             \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\DeprecationErrorHandler'] = 1;
             \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListenerTrait'] = 1;
             \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'] = 1;
+            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 1;
         } else {
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\DeprecationErrorHandler'] = 1;
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListenerTrait'] = 1;
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'] = 1;
+            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 1;
         }
 
         $warn = false;
@@ -92,7 +92,7 @@ trait SymfonyTestsListenerTrait
         }
     }
 
-    private function doStartTestSuite($suite)
+    public function startTestSuite($suite)
     {
         if (class_exists('PHPUnit_Util_Blacklist', false)) {
             $Test = 'PHPUnit_Util_Test';
@@ -153,7 +153,7 @@ trait SymfonyTestsListenerTrait
         }
     }
 
-    private function doAddSkippedTest($test, \Exception $e, $time)
+    public function addSkippedTest($test, \Exception $e, $time)
     {
         if (0 < $this->state) {
             if ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase) {
@@ -168,7 +168,7 @@ trait SymfonyTestsListenerTrait
         }
     }
 
-    private function doStartTest($test)
+    public function startTest($test)
     {
         if (-2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
             if (class_exists('PHPUnit_Util_Blacklist', false)) {
@@ -203,14 +203,14 @@ trait SymfonyTestsListenerTrait
         }
     }
 
-    private function doAddWarning($test, $e, $time)
+    public function addWarning($test, $e, $time)
     {
         if ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase) {
             $this->testsWithWarnings[$test->getName()] = true;
         }
     }
 
-    private function doEndTest($test, $time)
+    public function endTest($test, $time)
     {
         if (class_exists('PHPUnit_Util_Blacklist', false)) {
             $Test = 'PHPUnit_Util_Test';

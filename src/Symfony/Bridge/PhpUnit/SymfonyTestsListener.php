@@ -31,30 +31,35 @@ if (class_exists('PHPUnit_Framework_BaseTestListener')) {
  */
 class SymfonyTestsListener extends BaseTestListener
 {
-    use SymfonyTestsListenerTrait;
+    private $trait;
+
+    public function __construct(array $mockedNamespaces = array())
+    {
+        $this->trait = new Legacy\SymfonyTestsListenerTrait($mockedNamespaces);
+    }
 
     public function startTestSuite(TestSuite $suite)
     {
-        return $this->doStartTestSuite($suite);
+        return $this->trait->startTestSuite($suite);
     }
 
     public function addSkippedTest(Test $test, \Exception $e, $time)
     {
-        return $this->doAddSkippedTest($test, $e, $time);
+        return $this->trait->addSkippedTest($test, $e, $time);
     }
 
     public function startTest(Test $test)
     {
-        return $this->doStartTest($test);
+        return $this->trait->startTest($test);
     }
 
     public function addWarning(Test $test, Warning $e, $time)
     {
-        return $this->doAddWarning($test, $e, $time);
+        return $this->trait->addWarning($test, $e, $time);
     }
 
     public function endTest(Test $test, $time)
     {
-        return $this->doEndTest($test, $time);
+        return $this->trait->endTest($test, $time);
     }
 }

@@ -11,8 +11,6 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
-use Symfony\Bridge\PhpUnit\SymfonyTestsListenerTrait;
-
 /**
  * Collects and replays skipped tests.
  *
@@ -22,30 +20,35 @@ use Symfony\Bridge\PhpUnit\SymfonyTestsListenerTrait;
  */
 class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 {
-    use SymfonyTestsListenerTrait;
+    private $trait;
+
+    public function __construct(array $mockedNamespaces = array())
+    {
+        $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
+    }
 
     public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
-        return $this->doStartTestSuite($suite);
+        return $this->trait->startTestSuite($suite);
     }
 
     public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
-        return $this->doAddSkippedTest($test, $e, $time);
+        return $this->trait->addSkippedTest($test, $e, $time);
     }
 
     public function startTest(\PHPUnit_Framework_Test $test)
     {
-        return $this->doStartTest($test);
+        return $this->trait->startTest($test);
     }
 
     public function addWarning(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_Warning $e, $time)
     {
-        return $this->doAddWarning($test, $e, $time);
+        return $this->trait->addWarning($test, $e, $time);
     }
 
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        return $this->doEndTest($test, $time);
+        return $this->trait->endTest($test, $time);
     }
 }

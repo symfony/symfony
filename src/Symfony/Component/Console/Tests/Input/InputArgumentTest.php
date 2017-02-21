@@ -42,7 +42,12 @@ class InputArgumentTest extends TestCase
      */
     public function testInvalidModes($mode)
     {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Argument mode "%s" is not valid.', $mode));
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage(sprintf('Argument mode "%s" is not valid.', $mode));
+        } else {
+            $this->setExpectedException('InvalidArgumentException', sprintf('Argument mode "%s" is not valid.', $mode));
+        }
 
         new InputArgument('foo', $mode);
     }

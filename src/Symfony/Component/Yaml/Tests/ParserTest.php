@@ -42,7 +42,11 @@ class ParserTest extends TestCase
                 if (E_USER_DEPRECATED !== $type) {
                     restore_error_handler();
 
-                    return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+                    if (class_exists('PHPUnit_Util_ErrorHandler')) {
+                        return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+                    }
+
+                    return call_user_func_array('PHPUnit\Util\ErrorHandler::handleError', func_get_args());
                 }
 
                 $deprecations[] = $msg;
@@ -1381,10 +1385,12 @@ EOT;
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
-        $this->setExpectedException(
-            '\Symfony\Component\Yaml\Exception\ParseException',
-            sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber)
-        );
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\Symfony\Component\Yaml\Exception\ParseException');
+            $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        } else {
+            $this->setExpectedException('\Symfony\Component\Yaml\Exception\ParseException', sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
+        }
 
         $this->parser->parse($yaml);
     }

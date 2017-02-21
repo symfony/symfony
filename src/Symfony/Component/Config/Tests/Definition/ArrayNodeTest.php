@@ -55,7 +55,12 @@ class ArrayNodeTest extends TestCase
     public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = '')
     {
         if ($expected instanceof \Exception) {
-            $this->setExpectedException(get_class($expected), $expected->getMessage());
+            if (method_exists($this, 'expectException')) {
+                $this->expectException(get_class($expected));
+                $this->expectExceptionMessage($expected->getMessage());
+            } else {
+                $this->setExpectedException(get_class($expected), $expected->getMessage());
+            }
         }
         $node = new ArrayNode('root');
         $node->setIgnoreExtraKeys($ignore, $remove);

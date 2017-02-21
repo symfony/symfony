@@ -634,6 +634,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     $this->fail(sprintf("Expected exception:\n%s\nGot:\n%s\nWith comparison failure:\n%s", $expectedExceptionClass, 'PHPUnit_Framework_ExpectationFailedException', $e->getComparisonFailure()->getExpectedAsString()));
                 }
 
+                if ($e instanceof \PHPUnit\Framework\ExpectationFailedException) {
+                    $this->fail(sprintf("Expected exception:\n%s\nGot:\n%s\nWith comparison failure:\n%s", $expectedExceptionClass, '\PHPUnit\Framework\ExpectationFailedException', $e->getComparisonFailure()->getExpectedAsString()));
+                }
+
                 $this->assertInstanceOf($expectedExceptionClass, $e);
             }
         }

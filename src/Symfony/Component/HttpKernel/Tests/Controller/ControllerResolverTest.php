@@ -118,7 +118,12 @@ class ControllerResolverTest extends TestCase
     public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
     {
         $resolver = $this->createControllerResolver();
-        $this->setExpectedException($exceptionName, $exceptionMessage);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exceptionName);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->setExpectedException($exceptionName, $exceptionMessage);
+        }
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $controller);

@@ -47,7 +47,13 @@ class HttpKernelExtensionTest extends TestCase
         ;
         $renderer = new FragmentHandler($context);
 
-        $this->setExpectedException('InvalidArgumentException', 'The "inline" renderer does not exist.');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage('The "inline" renderer does not exist.');
+        } else {
+            $this->setExpectedException('InvalidArgumentException', 'The "inline" renderer does not exist.');
+        }
+
         $renderer->render('/foo');
     }
 

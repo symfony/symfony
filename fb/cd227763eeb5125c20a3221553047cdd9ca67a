@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-20T07:53:10Z
+
+Symfony 3.1 doesn't receive bug fixes any more. Can you rebase on the `3.2` branch and change the target branch accordingly?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-02-20T10:02:23Z
+
+Ah sorry you are right. Will rebase it later today :wink:
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-02-21T08:03:17Z
+
+@xabbuh done :wink:

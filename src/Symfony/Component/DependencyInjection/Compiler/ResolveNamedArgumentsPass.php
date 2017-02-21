@@ -45,16 +45,20 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
             $parameters = null;
             $resolvedArguments = array();
 
+            $previousIndex = null;
             foreach ($arguments as $key => $argument) {
                 if (is_int($key) || '' === $key || '$' !== $key[0]) {
                     if (!is_int($key)) {
                         @trigger_error(sprintf('Using key "%s" for defining arguments of method "%s" for service "%s" is deprecated since Symfony 3.3 and will throw an exception in 4.0. Use no keys or $named arguments instead.', $key, $method, $this->currentId), E_USER_DEPRECATED);
-
-                        $resolvedArguments[] = $argument;
-                        continue;
+                    } else {
+                        if (null !== $previousIndex && $key < $previousIndex) {
+                            @trigger_error(sprintf('Using key "%s" after the key "%s" for defining arguments of method "%s" for service "%s" is deprecated since Symfony 3.3. They will be automatically reordered in 4.0.', $key, $previousIndex, $method, $this->currentId), E_USER_DEPRECATED);
+                        } else {
+                            $previousIndex = $key;
+                        }
                     }
 
-                    $resolvedArguments[$key] = $argument;
+                    $resolvedArguments[] = $argument;
                     continue;
                 }
 

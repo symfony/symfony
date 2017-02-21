@@ -227,7 +227,7 @@ abstract class Bundle implements BundleInterface
      */
     protected function getRequiredBundles()
     {
-        return [];
+        return array();
     }
 
     private function parseClassName()

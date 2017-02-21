@@ -94,7 +94,7 @@ class BundleTest extends TestCase
     {
         $bundle = new DependencyBundle();
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.bundles', []);
+        $container->setParameter('kernel.bundles', array());
         $bundle->build($container);
     }
 
@@ -102,7 +102,7 @@ class BundleTest extends TestCase
     {
         $bundle = new DependencyBundle();
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.bundles', ['OtherBundle' => 'Fake\Namespace\For\OtherBundle']);
+        $container->setParameter('kernel.bundles', array('OtherBundle' => 'Fake\Namespace\For\OtherBundle'));
         $bundle->build($container);
     }
 }
@@ -123,6 +123,6 @@ class DependencyBundle extends Bundle
 {
     protected function getRequiredBundles()
     {
-        return ['OtherBundle'];
+        return array('OtherBundle');
     }
 }

@@ -80,9 +80,9 @@ class ScalarNodeTest extends TestCase
 
         if (method_exists($this, 'expectException')) {
             $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
-            $this->expectExceptionMessage('Invalid type for path "test". Expected scalar, but got array.\nHint: "the test value"');
+            $this->expectExceptionMessage("Invalid type for path \"test\". Expected scalar, but got array.\nHint: \"the test value\"");
         } else {
-            $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidTypeException', 'Invalid type for path "test". Expected scalar, but got array.\nHint: "the test value"');
+            $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidTypeException', "Invalid type for path \"test\". Expected scalar, but got array.\nHint: \"the test value\"");
         }
 
         $node->normalize(array());

@@ -17,6 +17,8 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Util\Blacklist;
 use PHPUnit\Util\Test;
+use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Bridge\PhpUnit\DnsMock;
 
 /**
  * PHP 5.3 compatible trait-like shared implementation.

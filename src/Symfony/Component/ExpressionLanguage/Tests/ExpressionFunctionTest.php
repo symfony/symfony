@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  */
-class ExpressionFunctionTest extends \PHPUnit_Framework_TestCase
+class ExpressionFunctionTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

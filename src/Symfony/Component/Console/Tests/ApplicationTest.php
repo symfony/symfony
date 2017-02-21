@@ -221,7 +221,14 @@ class ApplicationTest extends TestCase
         $application->add(new \Foo2Command());
 
         $expectedMsg = "The namespace \"f\" is ambiguous.\nDid you mean one of these?\n    foo\n    foo1";
-        $this->setExpectedException(CommandNotFoundException::class, $expectedMsg);
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(CommandNotFoundException::class);
+            $this->expectExceptionMessage($expectedMsg);
+        } else {
+            $this->setExpectedException(CommandNotFoundException::class, $expectedMsg);
+        }
+
         $application->findNamespace('f');
     }
 

@@ -658,4 +658,23 @@ class PhpDumperTest extends TestCase
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator.php', $dumper->dump());
     }
+
+    public function testServiceSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', 'TestServiceSubscriber')
+            ->setAutowired(true)
+            ->addArgument(new Reference('container'))
+            ->addTag('container.service_subscriber', array(
+                'key' => 'test',
+                'id' => 'TestServiceSubscriber',
+            ))
+        ;
+        $container->register('TestServiceSubscriber', 'TestServiceSubscriber');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
+    }
 }

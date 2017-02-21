@@ -11,6 +11,10 @@
 
 namespace Symfony\Bridge\PhpUnit\TextUI;
 
+if (!class_exists('PHPUnit_TextUI_Command')) {
+    return;
+}
+
 /**
  * {@inheritdoc}
  */

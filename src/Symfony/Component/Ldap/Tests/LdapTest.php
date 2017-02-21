@@ -78,7 +78,7 @@ class LdapTest extends TestCase
 
     public function testCreateWithInvalidAdapterName()
     {
-        $this->setExpectedException(DriverNotFoundException::class);
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(DriverNotFoundException::class);
         Ldap::create('foo');
     }
 }

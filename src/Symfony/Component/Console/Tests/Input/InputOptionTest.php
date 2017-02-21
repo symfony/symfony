@@ -78,7 +78,12 @@ class InputOptionTest extends TestCase
      */
     public function testInvalidModes($mode)
     {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Option mode "%s" is not valid.', $mode));
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage('sprintf(\'Option mode "%s" is not valid.\', $mode)');
+        } else {
+            $this->setExpectedException('InvalidArgumentException', 'sprintf(\'Option mode "%s" is not valid.\', $mode)');
+        }
 
         new InputOption('foo', 'f', $mode);
     }

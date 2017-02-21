@@ -105,7 +105,7 @@ class EntityUserProviderTest extends TestCase
         $user1 = new User(null, null, 'user1');
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $this->setExpectedException(
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(
             'InvalidArgumentException',
             'You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine'
         );
@@ -125,7 +125,7 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = new User(1, 2, 'user2');
-        $this->setExpectedException(
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(
             'Symfony\Component\Security\Core\Exception\UsernameNotFoundException',
             'User with id {"id1":1,"id2":2} not found'
         );

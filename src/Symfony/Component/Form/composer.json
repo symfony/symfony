@@ -18,13 +18,13 @@
     "require": {
         "php": ">=5.3.9",
         "symfony/event-dispatcher": "~2.1",
-        "symfony/intl": "~2.4",
+        "symfony/intl": "~2.7.25|^2.8.18",
         "symfony/options-resolver": "~2.6",
         "symfony/property-access": "~2.3"
     },
     "require-dev": {
         "doctrine/collections": "~1.0",
-        "symfony/validator": "^2.6.8",
+        "symfony/validator": "~2.7.25|^2.8.18",
         "symfony/http-foundation": "~2.2",
         "symfony/http-kernel": "~2.4",
         "symfony/security-csrf": "~2.4",

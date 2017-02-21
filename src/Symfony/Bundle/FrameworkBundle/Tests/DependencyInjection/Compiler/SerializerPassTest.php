@@ -36,7 +36,7 @@ class SerializerPassTest extends TestCase
             ->with('serializer.normalizer')
             ->will($this->returnValue(array()));
 
-        $this->setExpectedException('RuntimeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('RuntimeException');
 
         $serializerPass = new SerializerPass();
         $serializerPass->process($container);
@@ -63,7 +63,7 @@ class SerializerPassTest extends TestCase
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 
-        $this->setExpectedException('RuntimeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('RuntimeException');
 
         $serializerPass = new SerializerPass();
         $serializerPass->process($container);

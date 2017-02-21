@@ -67,7 +67,14 @@ class DefinitionTest extends TestCase
         $this->assertNull($def->getDecoratedService());
 
         $def = new Definition('stdClass');
-        $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage('The decorated service inner name for "foo" must be different than the service name itself.');
+        } else {
+            $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
+        }
+
         $def->setDecoratedService('foo', 'foo');
     }
 

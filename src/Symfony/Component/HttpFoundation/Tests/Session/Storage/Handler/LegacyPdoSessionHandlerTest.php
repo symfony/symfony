@@ -34,7 +34,7 @@ class LegacyPdoSessionHandlerTest extends TestCase
 
     public function testIncompleteOptions()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         $storage = new LegacyPdoSessionHandler($this->pdo, array());
     }
 
@@ -44,21 +44,21 @@ class LegacyPdoSessionHandlerTest extends TestCase
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
         $pdo->exec('CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)');
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         $storage = new LegacyPdoSessionHandler($pdo, array('db_table' => 'sessions'));
     }
 
     public function testWrongTableOptionsWrite()
     {
         $storage = new LegacyPdoSessionHandler($this->pdo, array('db_table' => 'bad_name'));
-        $this->setExpectedException('RuntimeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('RuntimeException');
         $storage->write('foo', 'bar');
     }
 
     public function testWrongTableOptionsRead()
     {
         $storage = new LegacyPdoSessionHandler($this->pdo, array('db_table' => 'bad_name'));
-        $this->setExpectedException('RuntimeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('RuntimeException');
         $storage->read('foo');
     }
 

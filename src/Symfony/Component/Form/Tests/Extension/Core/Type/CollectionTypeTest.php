@@ -70,7 +70,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
     }
 

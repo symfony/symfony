@@ -41,7 +41,7 @@ class ProfilerPassTest extends TestCase
 
         $builder = $this->createContainerMock($services);
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
 
         $profilerPass = new ProfilerPass();
         $profilerPass->process($builder);

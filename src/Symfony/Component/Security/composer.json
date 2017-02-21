@@ -35,7 +35,7 @@
         "symfony/finder": "~2.8|~3.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~2.8|~3.0",
-        "symfony/validator": "~2.8|~3.0",
+        "symfony/validator": "^2.8.18|^3.2.5",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/ldap": "~3.1",
         "psr/log": "~1.0"

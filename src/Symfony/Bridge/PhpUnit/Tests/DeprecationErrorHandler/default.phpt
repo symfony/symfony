@@ -31,6 +31,14 @@ class Test
 EOPHP
 );
 
+class PHPUnit_Util_Test
+{
+    public static function getGroups()
+    {
+        return array();
+    }
+}
+
 class FooTestCase
 {
     public function testLegacyFoo()

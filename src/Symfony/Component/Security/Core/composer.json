@@ -25,7 +25,7 @@
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/ldap": "~3.1",
-        "symfony/validator": "~2.8|~3.0",
+        "symfony/validator": "^2.8.18|^3.2.5",
         "psr/log": "~1.0"
     },
     "suggest": {

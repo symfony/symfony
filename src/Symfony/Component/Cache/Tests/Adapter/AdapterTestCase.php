@@ -13,6 +13,18 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
 
+if (!class_exists('PHPUnit_Framework_TestCase')) {
+    abstract class AdapterTestCase
+    {
+        public static function setUpBeforeClass()
+        {
+            self::markTestSkipped('cache/integration-tests is not yet compatible with namespaced phpunit versions.');
+        }
+    }
+
+    return;
+}
+
 abstract class AdapterTestCase extends CachePoolTest
 {
     protected function setUp()

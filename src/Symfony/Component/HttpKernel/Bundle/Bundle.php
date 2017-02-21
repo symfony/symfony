@@ -59,6 +59,7 @@ abstract class Bundle implements BundleInterface
      */
     public function build(ContainerBuilder $container)
     {
+        $this->checkRequiredBundles($container);
     }
 
     /**
@@ -219,12 +220,43 @@ abstract class Bundle implements BundleInterface
         }
     }
 
+    /**
+     * Lists the required bundles.
+     *
+     * @return string[]
+     */
+    protected function getRequiredBundles()
+    {
+        return [];
+    }
+
     private function parseClassName()
     {
         $pos = strrpos(static::class, '\\');
         $this->namespace = false === $pos ? '' : substr(static::class, 0, $pos);
         if (null === $this->name) {
             $this->name = false === $pos ? static::class : substr(static::class, $pos + 1);
+        }
+    }
+
+    /**
+     * Checks if the required bundles are enabled.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @throws \LogicException
+     */
+    private function checkRequiredBundles(ContainerBuilder $container)
+    {
+        $requiredBundles = $this->getRequiredBundles();
+        if (empty($requiredBundles)) {
+            return;
+        }
+        $enabledBundles = $container->getParameter('kernel.bundles');
+        $disabledBundles = array_diff($requiredBundles, array_keys($enabledBundles));
+
+        if (!empty($disabledBundles)) {
+            throw new \LogicException(sprintf('%s requires the following bundle(s): %s', $this->getName(), implode(', ', $disabledBundles)));
         }
     }
 }

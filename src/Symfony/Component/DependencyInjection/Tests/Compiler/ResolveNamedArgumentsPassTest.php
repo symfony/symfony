@@ -106,6 +106,19 @@ class ResolveNamedArgumentsPassTest extends \PHPUnit_Framework_TestCase
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);
     }
+
+    public function testCase()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments(array('$apiKey' => '123', 0 => new Reference('foo')));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+
+        $this->assertEquals(array(1 => '123', 2 => new Reference('foo')), $definition->getArguments());
+    }
 }
 
 class NoConstructor

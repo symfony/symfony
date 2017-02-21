@@ -227,7 +227,12 @@ class FormPassTest extends TestCase
         $container->setDefinition('form.extension', $extDefinition);
         $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName);
 
-        $this->setExpectedException('\InvalidArgumentException', $expectedExceptionMessage);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('\InvalidArgumentException');
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        } else {
+            $this->setExpectedException('\InvalidArgumentException', $expectedExceptionMessage);
+        }
 
         $container->compile();
     }

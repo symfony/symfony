@@ -1936,7 +1936,13 @@ class RequestTest extends TestCase
                 $this->assertSame($expectedPort, $request->getPort());
             }
         } else {
-            $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+            if (method_exists($this, 'expectException')) {
+                $this->expectException('UnexpectedValueException');
+                $this->expectExceptionMessage('Invalid Host');
+            } else {
+                $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+            }
+
             $request->getHost();
         }
     }

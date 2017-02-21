@@ -18,7 +18,7 @@ require_once __DIR__.'/../../bootstrap.php';
 
 @trigger_error('root deprecation', E_USER_DEPRECATED);
 
-class PHPUnit_Util_Test
+class Test extends \PHPUnit\Util\Test
 {
     public static function getGroups()
     {

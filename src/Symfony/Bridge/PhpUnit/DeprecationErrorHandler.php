@@ -41,6 +41,8 @@ class DeprecationErrorHandler
             return;
         }
 
+        $UtilPrefix = class_exists('PHPUnit_Util_ErrorHandler') ? 'PHPUnit_Util_' : 'PHPUnit\Util\\';
+
         $getMode = function () use ($mode) {
             static $memoizedMode = false;
 
@@ -67,23 +69,26 @@ class DeprecationErrorHandler
             'legacy' => array(),
             'other' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $getMode) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $getMode, $UtilPrefix) {
             $mode = $getMode();
             if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode) {
-                return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
+                $ErrorHandler = $UtilPrefix.'ErrorHandler';
+
+                return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
 
             $trace = debug_backtrace(true);
             $group = 'other';
 
             $i = count($trace);
-            while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_')))) {
+            while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
                 // No-op
             }
 
             if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
                 $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
+                $Test = $UtilPrefix.'Test';
 
                 if (0 !== error_reporting()) {
                     $group = 'unsilenced';
@@ -91,7 +96,7 @@ class DeprecationErrorHandler
                     || 0 === strpos($method, 'provideLegacy')
                     || 0 === strpos($method, 'getLegacy')
                     || strpos($class, '\Legacy')
-                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+                    || in_array('legacy', $Test::getGroups($class, $method), true)
                 ) {
                     $group = 'legacy';
                 } else {
@@ -128,7 +133,7 @@ class DeprecationErrorHandler
 
         if (null !== $oldErrorHandler) {
             restore_error_handler();
-            if (array('PHPUnit_Util_ErrorHandler', 'handleError') === $oldErrorHandler) {
+            if (array($UtilPrefix.'ErrorHandler', 'handleError') === $oldErrorHandler) {
                 restore_error_handler();
                 self::register($mode);
             }

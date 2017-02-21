@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-02-21T08:13:14Z
+
+Awesome :+1:
+
+---------------------------------------------------------------------------
+
+by garak at 2017-02-21T09:28:03Z
+
++1 for not applying BC policy
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-21T09:46:25Z
+
+What are the BC breaks here ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-21T09:49:37Z
+
+@stof the type hints on the listener methods and the parent class of the TextUI classes - which all switch to namespaces when phpunit 6 is used
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-21T09:54:47Z
+
+Well, the typehints are OK IMO. People are not expected to extend these classes, and the calling code is PHPUnit itself. And the signature comes from PHPUnit anyway.
+As long as there is no BC break for people registering the listener in their phpunit.xml config, this is fine with me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-21T09:55:42Z
+
+Same to me, that's what is done here :)

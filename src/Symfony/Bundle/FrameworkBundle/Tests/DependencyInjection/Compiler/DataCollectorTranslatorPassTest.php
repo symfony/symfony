@@ -11,12 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DataCollectorTranslatorPassTest extends \PHPUnit_Framework_TestCase
+class DataCollectorTranslatorPassTest extends TestCase
 {
     private $container;
     private $dataCollectorTranslatorPass;

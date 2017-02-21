@@ -62,7 +62,14 @@ class QtFileLoaderTest extends TestCase
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/empty.xlf';
-        $this->setExpectedException('Symfony\Component\Translation\Exception\InvalidResourceException', sprintf('Unable to load "%s".', $resource));
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+            $this->expectExceptionMessage(sprintf('Unable to load "%s".', $resource));
+        } else {
+            $this->setExpectedException('Symfony\Component\Translation\Exception\InvalidResourceException', sprintf('Unable to load "%s".', $resource));
+        }
+
         $loader->load($resource, 'en', 'domain1');
     }
 }

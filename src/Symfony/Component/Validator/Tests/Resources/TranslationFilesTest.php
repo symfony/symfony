@@ -20,7 +20,11 @@ class TranslationFilesTest extends TestCase
      */
     public function testTranslationFileIsValid($filePath)
     {
-        \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
+        if (class_exists('PHPUnit_Util_XML')) {
+            \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
+        } else {
+            \PHPUnit\Util\XML::loadfile($filePath, false, false, true);
+        }
     }
 
     public function provideTranslationFiles()

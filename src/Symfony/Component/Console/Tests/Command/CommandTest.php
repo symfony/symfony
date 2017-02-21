@@ -110,7 +110,12 @@ class CommandTest extends TestCase
      */
     public function testInvalidCommandNames($name)
     {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Command name "%s" is invalid.', $name));
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage(sprintf('Command name "%s" is invalid.', $name));
+        } else {
+            $this->setExpectedException('InvalidArgumentException', sprintf('Command name "%s" is invalid.', $name));
+        }
 
         $command = new \TestCommand();
         $command->setName($name);
@@ -168,7 +173,7 @@ class CommandTest extends TestCase
     public function testSetAliasesNull()
     {
         $command = new \TestCommand();
-        $this->setExpectedException('InvalidArgumentException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         $command->setAliases(null);
     }
 

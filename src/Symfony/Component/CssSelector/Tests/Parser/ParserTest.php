@@ -89,7 +89,7 @@ class ParserTest extends TestCase
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
         Parser::parseSeries($function->getArguments());
     }
 

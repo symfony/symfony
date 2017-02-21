@@ -30,7 +30,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         try {
             random_bytes(1);
         } catch (\Exception $e) {
-            throw new \PHPUnit_Framework_SkippedTestError($e->getMessage());
+            self::markTestSkipped($e->getMessage());
         }
     }
 

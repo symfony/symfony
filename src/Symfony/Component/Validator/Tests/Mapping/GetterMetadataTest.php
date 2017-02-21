@@ -21,7 +21,7 @@ class GetterMetadataTest extends TestCase
 
     public function testInvalidPropertyName()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ValidatorException');
 
         new GetterMetadata(self::CLASSNAME, 'foobar');
     }

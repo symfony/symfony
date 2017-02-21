@@ -621,7 +621,7 @@ class ContainerBuilderTest extends TestCase
         $container->registerExtension($extension = new \ProjectExtension());
         $this->assertTrue($container->getExtension('project') === $extension, '->registerExtension() registers an extension');
 
-        $this->setExpectedException('LogicException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('LogicException');
         $container->getExtension('no_registered');
     }
 

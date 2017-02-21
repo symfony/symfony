@@ -266,7 +266,12 @@ class ApplicationTest extends TestCase
      */
     public function testFindWithAmbiguousAbbreviations($abbreviation, $expectedExceptionMessage)
     {
-        $this->setExpectedException('InvalidArgumentException', $expectedExceptionMessage);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        } else {
+            $this->setExpectedException('InvalidArgumentException', $expectedExceptionMessage);
+        }
 
         $application = new Application();
         $application->add(new \FooCommand());
@@ -954,7 +959,12 @@ class ApplicationTest extends TestCase
 
     public function testRunWithError()
     {
-        $this->setExpectedException('Exception', 'dymerr');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('Exception');
+            $this->expectExceptionMessage('dymerr');
+        } else {
+            $this->setExpectedException('Exception', 'dymerr');
+        }
 
         $application = new Application();
         $application->setAutoExit(false);

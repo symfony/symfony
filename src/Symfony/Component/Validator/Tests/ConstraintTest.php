@@ -35,7 +35,7 @@ class ConstraintTest extends TestCase
 
     public function testSetNotExistingPropertyThrowsException()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
         new ConstraintA(array(
             'foo' => 'bar',
@@ -46,14 +46,14 @@ class ConstraintTest extends TestCase
     {
         $constraint = new ConstraintA();
 
-        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
         $constraint->foo = 'bar';
     }
 
     public function testInvalidAndRequiredOptionsPassed()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
         new ConstraintC(array(
             'option1' => 'default',
@@ -101,14 +101,14 @@ class ConstraintTest extends TestCase
 
     public function testSetUndefinedDefaultProperty()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         new ConstraintB('foo');
     }
 
     public function testRequiredOptionsMustBeDefined()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\MissingOptionsException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\MissingOptionsException');
 
         new ConstraintC();
     }

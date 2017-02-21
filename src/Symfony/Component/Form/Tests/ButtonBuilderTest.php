@@ -53,7 +53,7 @@ class ButtonBuilderTest extends TestCase
      */
     public function testInvalidNames($name)
     {
-        $this->setExpectedException(
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(
             '\Symfony\Component\Form\Exception\InvalidArgumentException',
             'Buttons cannot have empty names.'
         );

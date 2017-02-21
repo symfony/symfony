@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/intl": "~2.7"
+        "symfony/intl": "~2.7.25|^2.8.18"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Locale\\": "" },

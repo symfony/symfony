@@ -22,7 +22,7 @@
     "require-dev": {
         "doctrine/common": "~2.3",
         "symfony/http-foundation": "~2.3",
-        "symfony/intl": "~2.7.4|~2.8",
+        "symfony/intl": "~2.7.25|^2.8.18",
         "symfony/yaml": "^2.0.5",
         "symfony/config": "~2.2",
         "symfony/property-access": "~2.3",

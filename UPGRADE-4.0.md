@@ -207,6 +207,10 @@ FrameworkBundle
 
  * Extending `ConstraintValidatorFactory` is not supported anymore.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ControllerArgumentValueResolverPass` class
+   has been removed. Use the `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass`
+   class instead.
+
 HttpFoundation
 ---------------
 

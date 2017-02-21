@@ -85,10 +85,10 @@ class ParameterBagTest extends TestCase
         ));
 
         if (method_exists($this, 'expectException')) {
-            $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException');
+            $this->expectException(ParameterNotFoundException::class);
             $this->expectExceptionMessage($exceptionMessage);
         } else {
-            $this->setExpectedException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $exceptionMessage);
+            $this->setExpectedException(ParameterNotFoundException::class, $exceptionMessage);
         }
 
         $bag->get($parameterKey);

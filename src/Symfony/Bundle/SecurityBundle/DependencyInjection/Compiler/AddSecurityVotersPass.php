@@ -46,7 +46,6 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         $adm = $container->getDefinition($container->hasDefinition('debug.security.access.decision_manager') ? 'debug.security.access.decision_manager' : 'security.access.decision_manager');
-        $adm->addMethodCall('setVoters', array(array_values($voters)));
         $adm->addMethodCall('setVoters', array($voters));
     }
 }

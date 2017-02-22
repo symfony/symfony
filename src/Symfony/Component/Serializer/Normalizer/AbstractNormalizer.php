@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
+    use ObjectToPopulateTrait;
+
     const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
     const OBJECT_TO_POPULATE = 'object_to_populate';
     const GROUPS = 'groups';
@@ -317,14 +319,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             $format = null;
         }
 
-        if (
-            isset($context[static::OBJECT_TO_POPULATE]) &&
-            is_object($context[static::OBJECT_TO_POPULATE]) &&
-            $context[static::OBJECT_TO_POPULATE] instanceof $class
-        ) {
-            $object = $context[static::OBJECT_TO_POPULATE];
+        if (null != $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
-
             return $object;
         }
 

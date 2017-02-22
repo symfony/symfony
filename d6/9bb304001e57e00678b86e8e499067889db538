@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-22T17:01:43Z
+
+That's a BC break (probably just for tests in end-users apps, but still). I would document the change and merge it on master.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-22T17:17:39Z
+
+Change documented and rebased on master.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-22T17:24:27Z
+
+@fabpot ideally, we should skip normalized for all prototyped nodes (and even remove the explicit config), but this is a BC break.
+Transforming keys selected by the user is generally a WTF moment, especially if they need to use these keys elsewhere.
+The normalization was added to allow writing XML config files feeling native, but keys for prototyped nodes are inside attribute values, and so don't need to use dashes to feel native.
+
+I don't see a way to easily disable key normalization for prototyped nodes in an fully BC way though (even though it would break BC only for people who faced the WTF moment and decided to keep a WTF config files forever rather than using an underscore explicitly)

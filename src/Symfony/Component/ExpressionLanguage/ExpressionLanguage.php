@@ -122,7 +122,7 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
-     * @throws \LogicException when register a function after calling evaluate(), compile() or parse() the first time
+     * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
      *
      * @see ExpressionFunction
      */

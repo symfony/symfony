@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\LockInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\Lock\StoreInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
     public function testCreateLock()
     {

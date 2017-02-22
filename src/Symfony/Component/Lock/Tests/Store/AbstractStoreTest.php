@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Lock\StoreInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-abstract class AbstractStoreTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractStoreTest extends TestCase
 {
     /**
      * @return StoreInterface;
@@ -103,6 +104,8 @@ abstract class AbstractStoreTest extends \PHPUnit_Framework_TestCase
 
         $store->save($key);
         $store->save($key);
+        // just asserts it don't throw an exception
+        $this->addToAssertionCount(1);
 
         $store->delete($key);
     }

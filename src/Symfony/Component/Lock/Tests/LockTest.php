@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
@@ -19,7 +20,7 @@ use Symfony\Component\Lock\StoreInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class LockTest extends \PHPUnit_Framework_TestCase
+class LockTest extends TestCase
 {
     public function testAcquireNoBlocking()
     {

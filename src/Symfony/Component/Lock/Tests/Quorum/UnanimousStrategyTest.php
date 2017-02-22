@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Lock\Tests\Quorum;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Quorum\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class UnanimousStrategyTest extends \PHPUnit_Framework_TestCase
+class UnanimousStrategyTest extends TestCase
 {
     /** @var UnanimousStrategy */
     private $quorum;

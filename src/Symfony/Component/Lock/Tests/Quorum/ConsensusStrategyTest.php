@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Lock\Tests\Quorum;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Quorum\ConsensusStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class ConsensusStrategyTest extends \PHPUnit_Framework_TestCase
+class ConsensusStrategyTest extends TestCase
 {
     /** @var ConsensusStrategy */
     private $quorum;

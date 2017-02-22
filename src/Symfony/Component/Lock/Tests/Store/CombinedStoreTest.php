@@ -264,7 +264,7 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testputOffExpirationIgnoreNonExpiringStorage()
+    public function testPutOffExpirationIgnoreNonExpiringStorage()
     {
         $store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
         $store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -279,7 +279,7 @@ class CombinedStoreTest extends AbstractStoreTest
             ->method('canBeMet')
             ->willReturn(true);
         $this->quorum
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('isMet')
             ->with(2, 2)
             ->willReturn(true);

@@ -325,7 +325,7 @@
     {%- if errors|length > 0 -%}
     <ul>
         {%- for error in errors -%}
-            <li>{{ error.message }}</li>
+            <li>{{ translation_domain is same as(false) ? error.message : error.message|trans({}, translation_domain) }}</li>
         {%- endfor -%}
     </ul>
     {%- endif -%}

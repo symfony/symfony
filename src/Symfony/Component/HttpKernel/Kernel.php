@@ -467,6 +467,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
+     * The extension point similar to the Bundle::build() method.
+     *
+     * Use this method to register compiler passes and manipulate the container during the building process.
+     *
+     * @param ContainerBuilder $container
+     */
+    protected function build(ContainerBuilder $container)
+    {
+    }
+
+    /**
      * Gets the container class.
      *
      * @return string The container class
@@ -625,9 +636,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $container->addObjectResource($bundle);
             }
         }
+
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
         }
+
+        $this->build($container);
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));

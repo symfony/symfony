@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 
 class KernelTest extends TestCase
 {
@@ -723,6 +724,14 @@ EOF;
 
         $kernel->boot();
         $kernel->terminate(Request::create('/'), new Response());
+    }
+
+    public function testKernelWithoutBundles()
+    {
+        $kernel = new KernelWithoutBundles('test', true);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
     }
 
     /**

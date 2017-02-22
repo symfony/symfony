@@ -59,9 +59,9 @@ class CustomNormalizerTest extends TestCase
     public function testDenormalizeWithObjectToPopulateUsesProvidedObject()
     {
         $expected = new ScalarDummy();
-        $obj = $this->normalizer->denormalize('foo', ScalarDummy::class, 'json', [
+        $obj = $this->normalizer->denormalize('foo', ScalarDummy::class, 'json', array(
             'object_to_populate' => $expected,
-        ]);
+        ));
 
         $this->assertSame($expected, $obj);
         $this->assertEquals('foo', $obj->foo);

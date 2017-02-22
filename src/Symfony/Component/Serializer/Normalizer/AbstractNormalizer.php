@@ -319,8 +319,9 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             $format = null;
         }
 
-        if (null != $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
+
             return $object;
         }
 

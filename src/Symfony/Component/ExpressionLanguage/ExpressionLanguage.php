@@ -110,14 +110,14 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
-     * @throws \LogicException when register a function after calling evaluate/compilate the first time
+     * @throws \LogicException when register a function after calling evaluate(), compile() or parse() the first time
      *
      * @see ExpressionFunction
      */
     public function register($name, $compiler, $evaluator)
     {
-        if ($this->parser) {
-            throw new \LogicException('It\'s impossible to register function after calling evaluate/compilate the first time.');
+        if (null !== $this->parser) {
+            throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
         }
 
         $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);

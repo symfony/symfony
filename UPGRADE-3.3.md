@@ -113,6 +113,8 @@ SecurityBundle
  * `UserPasswordEncoderCommand::getContainer()` is deprecated, and this class won't
     extend `ContainerAwareCommand` nor implement `ContainerAwareInterface` anymore in 4.0.
 
+ * [BC BREAK] Keys of the `users` node for `in_memory` user provider are no longer normalized.
+
 Serializer
 ----------
 

@@ -52,6 +52,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
             ->children()
                 ->arrayNode('users')
                     ->useAttributeAsKey('name')
+                    ->normalizeKeys(false)
                     ->prototype('array')
                         ->children()
                             ->scalarNode('password')->defaultValue(uniqid('', true))->end()

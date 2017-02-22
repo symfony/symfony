@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------
+
+by akomm at 2016-09-30T16:36:28Z
+
+The less often you need to create an Extension in AppBundle, the better.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-30T16:39:30Z
+
+I like this a lot!
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-09-30T20:19:23Z
+
+Would it be worth to let the Kernel itself be a container extension?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-30T20:55:23Z
+
+@backbone87 which of those methods would you actually implement of the extension? https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Extension/ExtensionInterface.php
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-10-03T07:36:46Z
+
+@tgalopin in #19205 you've added the annotated class cache and in #18533 you've added the class cache warmer. However, the kernel never received a variant of this. What is this for? I noticed that it never loads the annotated classes but it does load the normal class cache. However, there's also a ClassCacheCacheWarmer that does this. @fabpot do you know what the idea behind this is?
+
+I'm wondering if something is broken here.
+
+``` php
+    protected function doLoadClassCache($name, $extension)
+    {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
+            ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
+        }
+    }
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-10-03T10:17:50Z
+
+Added tests, everything seems to work now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-03T11:51:45Z
+
+@iltar the annotated class requires an optimized composer autoloader to work, this maybe why you don't see it working?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-10-03T11:54:05Z
+
+@nicolas-grekas I was wondering why the kernel _does_ load the class cache while there's also a class cache warmer, but only a class cache warmer for the annotation variant. It feels like the kernel variant could be removed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-03T11:58:12Z
+
+Could be yes, now that the cache warmer should be working as expected in 3.2.
+The draw back is that cache warmers aren't always used, but maybe we shouldn't care :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-10-22T16:33:17Z
+
+Anything still required for this PR? @javiereguiluz had a comment about the name of the method, but the suggested name is already taken.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-22T16:46:50Z
+
+What about a `finalize()` method as well? Besides it would make sense to rename `buildContainer` to `createContainer`, so we can then later use `build/finalizeContainer` (in favor of `build/finalize`).
+
+That would fix correct naming.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-30T09:45:46Z
+
+ - Reverted the changes related to the class cache due to #20668
+ - Decided to keep the `build()` method as is:
+   - Deprecated/renaming methods in the kernel was not part of this scope (but I do agree naming could be a bit better now)
+   - The Kernel `build()` is exactly the same as the bundle `build()`, which makes it a lot more intuitive and easier to understand how it works
+ - The `build()` method for the kernel is now called last instead of first as mentioned by @stof.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-09T07:53:09Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-12T05:52:39Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-22T09:14:36Z
+
+Failure is unrelated: `Symfony\Component\Process\Tests\ProcessTest::testInputStreamWithCallable`, PR is merged against the latest master

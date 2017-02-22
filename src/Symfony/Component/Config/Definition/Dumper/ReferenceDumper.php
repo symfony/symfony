@@ -23,7 +23,7 @@ abstract class ReferenceDumper
     protected $reference;
     protected $withDoc;
 
-    function __construct($withDoc = false)
+    public function __construct($withDoc = false)
     {
         $this->withDoc = $withDoc;
     }

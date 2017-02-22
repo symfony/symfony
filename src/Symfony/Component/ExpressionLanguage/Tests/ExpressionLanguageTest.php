@@ -142,22 +142,56 @@ class ExpressionLanguageTest extends TestCase
     }
 
     /**
+     * @dataProvider getRegisterCallbacks
      * @expectedException \LogicException
      */
-    public function testRegisterAfterEval()
+    public function testRegisterAfterParse($registerCallback)
     {
         $el = new ExpressionLanguage();
-        $el->evaluate('1 + 1');
-        $el->register('fn', function () {}, function () {});
+        $el->parse('1 + 1', array());
+        $registerCallback($el);
     }
 
     /**
+     * @dataProvider getRegisterCallbacks
      * @expectedException \LogicException
      */
-    public function testRegisterAfterCompile()
+    public function testRegisterAfterEval($registerCallback)
+    {
+        $el = new ExpressionLanguage();
+        $el->evaluate('1 + 1');
+        $registerCallback($el);
+    }
+
+    /**
+     * @dataProvider getRegisterCallbacks
+     * @expectedException \LogicException
+     */
+    public function testRegisterAfterCompile($registerCallback)
     {
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
-        $el->register('fn', function () {}, function () {});
+        $registerCallback($el);
+    }
+
+    public function getRegisterCallbacks()
+    {
+        return array(
+            array(
+                function (ExpressionLanguage $el) {
+                    $el->register('fn', function () {}, function () {});
+                },
+            ),
+            array(
+                function (ExpressionLanguage $el) {
+                    $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
+                },
+            ),
+            array(
+                function (ExpressionLanguage $el) {
+                    $el->registerProvider(new TestProvider());
+                },
+            ),
+        );
     }
 }

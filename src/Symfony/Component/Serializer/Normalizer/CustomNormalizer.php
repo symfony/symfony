@@ -19,9 +19,10 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  */
 class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
-    private $cache = array();
-
+    use ObjectToPopulateTrait;
     use SerializerAwareTrait;
+
+    private $cache = array();
 
     /**
      * {@inheritdoc}
@@ -36,7 +37,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $object = new $class();
+        $object = $this->extractObjectToPopulate($class, $context) ?: new $class();
         $object->denormalize($this->serializer, $data, $format, $context);
 
         return $object;

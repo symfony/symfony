@@ -40,6 +40,10 @@ CHANGELOG
    making `Translator` works with any PSR-11 container
  * Added `framework.serializer.mapping` config option allowing to define custom 
    serialization mapping files and directories
+ * Deprecated `AddValidatorInitializersPass`, use
+   `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass` instead
+ * Deprecated `AddConstraintValidatorsPass`, use
+   `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` instead
 
 3.2.0
 -----

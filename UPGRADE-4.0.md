@@ -279,8 +279,13 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\Translation\Translator` constructor now takes the
    default locale as mandatory 3rd argument.
 
-HttpFoundation
----------------
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass` class has been
+   removed. Use the `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass`
+   class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass` class has been
+   removed. Use the `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass`
+   class instead.
 
 HttpFoundation
 --------------

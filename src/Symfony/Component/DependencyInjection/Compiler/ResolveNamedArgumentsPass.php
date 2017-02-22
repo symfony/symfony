@@ -56,15 +56,27 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 $parameters = null !== $parameters ? $parameters : $this->getParameters($class, $method);
 
+                $key = substr($key, 1);
+
+                $optional = false;
+                if ($key && '?' === $key[0]) {
+                    $optional = true;
+                    $key = substr($key, 1);
+                }
+
                 foreach ($parameters as $j => $p) {
-                    if ($key === '$'.$p->name) {
+                    if ($key === $p->name) {
                         $resolvedArguments[$j] = $argument;
 
                         continue 2;
                     }
                 }
 
-                throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s::%s" has no argument named "%s". Check your service definition.', $this->currentId, $class, $method, $key));
+                if ($optional) {
+                    continue;
+                }
+
+                throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s::%s" has no argument named "$%s". Check your service definition.', $this->currentId, $class, $method, $key));
             }
 
             if ($resolvedArguments !== $call[1]) {

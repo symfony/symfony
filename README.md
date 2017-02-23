@@ -4,8 +4,8 @@
 
 [Symfony][1] is a **PHP framework** for web applications and a set of reusable
 **PHP components**. Symfony is used by thousands of web applications (including
-BlaBlaCar.com and Spotify.com) and most of the relevant PHP projects (including
-Drupal and Magento). See [projects using Symfony][2].
+BlaBlaCar.com and Spotify.com) and most of the [popular PHP projects][2] (including
+Drupal and Magento).
 
 Installation
 ------------

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 

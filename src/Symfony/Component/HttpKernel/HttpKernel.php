@@ -242,7 +242,16 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // the developer asked for a specific status code
         if ($response->headers->has('X-Status-Code')) {
-            $response->setStatusCode($response->headers->get('X-Status-Code'));
+            // the developer asked for a specific status text
+            if ($response->headers->has('X-Status-Text')) {
+                $statusText = $response->headers->get('X-Status-Text');
+
+                $response->headers->remove('X-Status-Text');
+            } else {
+                $statusText = null;
+            }
+
+            $response->setStatusCode($response->headers->get('X-Status-Code'), $statusText);
 
             $response->headers->remove('X-Status-Code');
         } elseif (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {

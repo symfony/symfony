@@ -202,6 +202,11 @@ FrameworkBundle
    removed. Use the `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass`
    class instead.
 
+ * The `ConstraintValidatorFactory::$validators` and `$container` properties
+   have been removed.
+
+ * Extending `ConstraintValidatorFactory` is not supported anymore.
+
 HttpFoundation
 ---------------
 
@@ -243,7 +248,7 @@ HttpKernel
 
  * The `Psr6CacheClearer::addPool()` method has been removed. Pass an array of pools indexed
    by name to the constructor instead.
-   
+
  * The `LazyLoadingFragmentHandler::addRendererService()` method has been removed.
 
  * The `X-Status-Code` header method of setting a custom status code in the
@@ -310,7 +315,7 @@ Translation
 TwigBundle
 ----------
 
-* The `ContainerAwareRuntimeLoader` class has been removed. Use the 
+* The `ContainerAwareRuntimeLoader` class has been removed. Use the
   Twig `Twig_ContainerRuntimeLoader` class instead.
 
 TwigBridge

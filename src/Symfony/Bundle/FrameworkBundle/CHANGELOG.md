@@ -17,9 +17,10 @@ CHANGELOG
  * Deprecated `FormPass`, use `Symfony\Component\Form\DependencyInjection\FormPass` instead
  * Deprecated `SessionListener`
  * Deprecated `TestSessionListener`
- * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`. 
+ * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`.
    Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
  * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
+ * Deprecated extending `ConstraintValidatorFactory`
 
 3.2.0
 -----
@@ -31,7 +32,7 @@ CHANGELOG
  * Removed `symfony/asset` from the list of required dependencies in `composer.json`
  * The `Resources/public/images/*` files have been removed.
  * The `Resources/public/css/*.css` files have been removed (they are now inlined in TwigBundle).
- * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension` 
+ * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension`
 
 3.1.0
 -----

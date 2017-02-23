@@ -57,8 +57,7 @@
         </service>
 
         <service id="validator.validator_factory" class="Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory" public="false">
-            <argument type="service" id="service_container" />
-            <argument type="collection" />
+            <argument type="service-locator" /> <!-- Constraint validators locator -->
         </service>
 
         <service id="validator.expression" class="Symfony\Component\Validator\Constraints\ExpressionValidator">

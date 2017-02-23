@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddConstraintValidatorsPassTest extends TestCase
 {
@@ -55,11 +57,11 @@ class AddConstraintValidatorsPassTest extends TestCase
 
         $validatorFactoryDefinition->expects($this->once())
             ->method('replaceArgument')
-            ->with(1, array(
-                'My\Fully\Qualified\Class\Named\Validator1' => 'my_constraint_validator_service1',
-                'my_constraint_validator_alias1' => 'my_constraint_validator_service1',
-                'My\Fully\Qualified\Class\Named\Validator2' => 'my_constraint_validator_service2',
-            ));
+            ->with(0, new ServiceLocatorArgument(array(
+                'My\Fully\Qualified\Class\Named\Validator1' => new Reference('my_constraint_validator_service1'),
+                'my_constraint_validator_alias1' => new Reference('my_constraint_validator_service1'),
+                'My\Fully\Qualified\Class\Named\Validator2' => new Reference('my_constraint_validator_service2'),
+            )));
 
         $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
         $addConstraintValidatorsPass->process($container);

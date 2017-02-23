@@ -188,6 +188,7 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
    removed. Use the `Symfony\Component\Form\DependencyInjection\FormPass` class instead.
 
+<<<<<<< HEAD
  * The `Symfony\Bundle\FrameworkBundle\EventListener\SessionListener` class has been removed.
    Use the `Symfony\Component\HttpKernel\EventListener\SessionListener` class instead.
 
@@ -204,6 +205,8 @@ FrameworkBundle
 
  * The `ConstraintValidatorFactory::$validators` and `$container` properties
    have been removed.
+
+ * Extending `ConstraintValidatorFactory` is not supported anymore.
 
 HttpFoundation
 ---------------

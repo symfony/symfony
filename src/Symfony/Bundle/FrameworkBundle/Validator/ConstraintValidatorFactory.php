@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Validator;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -37,17 +37,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *     }
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @final since version 3.3
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    /**
-     * @deprecated since version 3.3, to be removed in 4.0 alongside with magic methods below
-     */
     protected $container;
-
-    /**
-     * @deprecated since version 3.3, to be removed in 4.0 alongside with magic methods below
-     */
     protected $validators;
 
     /**
@@ -77,11 +72,15 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         $name = $constraint->validatedBy();
 
         if (!isset($this->validators[$name])) {
-            if (!class_exists($name)) {
-                throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or it is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_class($constraint)));
-            }
+            if ($this->container->has($name)) {
+                $this->validators[$name] = $this->container->get($name);
+            } else {
+                if (!class_exists($name)) {
+                    throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or it is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_class($constraint)));
+                }
 
-            $this->validators[$name] = new $name();
+                $this->validators[$name] = new $name();
+            }
         } elseif (is_string($this->validators[$name])) {
             $this->validators[$name] = $this->container->get($this->validators[$name]);
         }
@@ -91,53 +90,5 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         }
 
         return $this->validators[$name];
-    }
-
-    /**
-     * @internal
-     */
-    public function __get($name)
-    {
-        if ('validators' === $name || 'container' === $name) {
-            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
-        }
-
-        return $this->$name;
-    }
-
-    /**
-     * @internal
-     */
-    public function __set($name, $value)
-    {
-        if ('validators' === $name || 'container' === $name) {
-            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
-        }
-
-        $this->$name = $value;
-    }
-
-    /**
-     * @internal
-     */
-    public function __isset($name)
-    {
-        if ('validators' === $name || 'container' === $name) {
-            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
-        }
-
-        return isset($this->$name);
-    }
-
-    /**
-     * @internal
-     */
-    public function __unset($name)
-    {
-        if ('validators' === $name || 'container' === $name) {
-            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
-        }
-
-        unset($this->$name);
     }
 }

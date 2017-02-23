@@ -23,7 +23,7 @@ class GlobFileLoader extends FileLoader
      */
     public function load($resource, $type = null)
     {
-        return $this->import($resource, null, true);
+        return $this->import($resource);
     }
 
     /**

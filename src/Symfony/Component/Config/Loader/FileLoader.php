@@ -89,7 +89,7 @@ abstract class FileLoader extends Loader
             $ret[] = $this->doImport($resource, $type, $ignoreErrors, $sourceResource);
         }
 
-        return $ct > 1 ? $ret : isset($ret[0]) ? $ret[0] : null;
+        return $ct > 1 ? $ret : (isset($ret[0]) ? $ret[0] : null);
     }
 
     /**

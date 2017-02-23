@@ -73,12 +73,18 @@ class ExpressionLanguage
      *
      * @param Expression|string $expression The expression to compile
      * @param array             $values     An array of values
+     * @param bool              $strict     Strict object/array type checking
      *
      * @return string The result of the evaluation of the expression
      */
-    public function evaluate($expression, $values = array())
+    public function evaluate($expression, $values = array(), $strict=true)
     {
-        return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
+        if (!$strict && is_object($values)) {
+            $keys = array_keys(get_object_vars($values));
+        } else {
+            $keys = array_keys($values);
+        }
+        return $this->parse($expression, $keys)->getNodes()->evaluate($this->functions, $values, $strict);
     }
 
     /**

@@ -33,9 +33,13 @@ class NameNode extends Node
         $compiler->raw('$'.$this->attributes['name']);
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
-        return $values[$this->attributes['name']];
+        $key = $this->attributes['name'];
+        if (!$strict && is_object($values)) {
+            return $values->$key;
+        }
+        return $values[$key];
     }
 
     public function toArray()

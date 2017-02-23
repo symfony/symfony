@@ -64,21 +64,29 @@ class GetAttrNode extends Node
         }
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
-                $obj = $this->nodes['node']->evaluate($functions, $values);
-                if (!is_object($obj)) {
-                    throw new \RuntimeException('Unable to get a property on a non-object.');
+                $obj = $this->nodes['node']->evaluate($functions, $values, $strict);
+                if ($strict) {
+                    if (!is_object($obj)) {
+                        throw new \RuntimeException('Unable to get a property on a non-object.');
+                    }
+                } else if (!is_array($obj) && !is_object($obj)) {
+                    throw new \RuntimeException('Unable to get a property/item on a non-object/non-array.');
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
 
+                if (is_array($obj)) {
+                    return $obj[$property];
+                }
+
                 return $obj->$property;
 
             case self::METHOD_CALL:
-                $obj = $this->nodes['node']->evaluate($functions, $values);
+                $obj = $this->nodes['node']->evaluate($functions, $values, $strict);
                 if (!is_object($obj)) {
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
@@ -86,12 +94,21 @@ class GetAttrNode extends Node
                 return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['value']), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
-                $array = $this->nodes['node']->evaluate($functions, $values);
-                if (!is_array($array) && !$array instanceof \ArrayAccess) {
-                    throw new \RuntimeException('Unable to get an item on a non-array.');
+                $array = $this->nodes['node']->evaluate($functions, $values, $strict);
+                if ($strict) {
+                    if (!is_array($array) && !$array instanceof \ArrayAccess && $strict) {
+                        throw new \RuntimeException('Unable to get an item on a non-array.');
+                    }
+                } else if (!is_object($array) && !is_array($array)) {
+                    throw new \RuntimeException('Unable to get item/property on on-array/non-object.');
                 }
 
-                return $array[$this->nodes['attribute']->evaluate($functions, $values)];
+                $item = $this->nodes['attribute']->evaluate($functions, $values, $strict);
+
+                if (is_object($array)) {
+                    return $array->$item;
+                }
+                return $array[$item];
         }
     }
 

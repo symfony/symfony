@@ -45,9 +45,9 @@ class UnaryNode extends Node
         ;
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
-        $value = $this->nodes['node']->evaluate($functions, $values);
+        $value = $this->nodes['node']->evaluate($functions, $values, $strict);
         switch ($this->attributes['operator']) {
             case 'not':
             case '!':

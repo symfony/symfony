@@ -36,7 +36,7 @@ class ConstantNode extends Node
         $compiler->repr($this->attributes['value']);
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
         return $this->attributes['value'];
     }

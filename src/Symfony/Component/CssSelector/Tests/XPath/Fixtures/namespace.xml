@@ -10,8 +10,8 @@
 
   <fruits:table id="table2">
     <fruits:tr>
-      <fruits:td>Apples 2</fruits:td>
-      <fruits:td>Bananas 2</fruits:td>
+      <fruits:td>Namespaced Apples 2</fruits:td>
+      <fruits:td>Namespaced Bananas 2</fruits:td>
     </fruits:tr>
   </fruits:table>
 </root>

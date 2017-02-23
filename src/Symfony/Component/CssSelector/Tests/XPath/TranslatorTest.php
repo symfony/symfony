@@ -50,7 +50,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($xpath, $translator->cssToXPath($css, ''));
 
-        foreach ($document->xpath($xpath) as $element) {
+        $elements = $document->xpath($xpath);
+
+        $this->assertCount(1, $elements);
+
+        foreach ($elements as $element) {
             $this->assertSame($namespace, $element->getNamespaces());
             $this->assertSame($value, (string) $element);
         }
@@ -164,8 +168,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function getXmlNamespaceTestData()
     {
         return array(
-            array('#table1 td:nth-child(2)', 'Bananas 1', "*[@id = 'table1']/descendant-or-self::*/*[local-name() = 'td' and (position() = 2)]", array('' => 'http://www.w3.org/TR/html4')),
-            array('#table2 > tr > td:nth-child(1)', 'Apples 2', "*[@id = 'table2']/tr/*[local-name() = 'td' and (position() = 1)]", array('fruits' => 'http://www.w3schools.com/fruits')),
+            array(
+              '#table1 td:nth-child(2)',
+              'Bananas 1',
+              "*[@id = 'table1']/descendant-or-self::*/*[local-name() = 'td' and (position() = 2)]",
+              array('' => 'http://www.w3.org/TR/html4'),
+            ),
+            array(
+              '#table2 > tr > td:nth-child(1)',
+              'Namespaced Apples 2',
+              "*[@id = 'table2']/tr/*[local-name() = 'td' and (position() = 1)]",
+              array('fruits' => 'http://www.w3schools.com/fruits'),
+            ),
         );
     }
 

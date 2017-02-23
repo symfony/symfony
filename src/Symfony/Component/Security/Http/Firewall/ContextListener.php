@@ -150,7 +150,7 @@ class ContextListener implements ListenerInterface
             return $token;
         }
 
-        $exceptions = [];
+        $exceptions = array();
         foreach ($this->userProviders as $provider) {
             try {
                 $refreshedUser = $provider->refreshUser($user);
@@ -165,7 +165,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 // let's try the next user provider
-                $exceptions[] = [$notFound, $provider];
+                $exceptions[] = array($notFound, $provider);
             }
         }
 
@@ -179,6 +179,8 @@ class ContextListener implements ListenerInterface
                     $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $notFound->getUsername(), 'provider' => get_class($provider)));
                 }
             }
+
+            return;
         }
 
         throw new \RuntimeException(sprintf('There is no user provider for user "%s".', get_class($user)));

@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
-use Symfony\Component\Security\Tests\Fixtures\Core\SimpleSecurityContext;
+use Symfony\Component\Security\Http\Tests\Fixtures\SimpleSecurityContext;
 
 class ContextListenerTest extends TestCase
 {
@@ -254,7 +254,9 @@ class ContextListenerTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
 
         /** @var \Symfony\Component\HttpFoundation\Request $request */
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
         $request->expects($this->any())->method('hasPreviousSession')->will($this->returnValue(true));
         $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
 
@@ -266,10 +268,10 @@ class ContextListenerTest extends TestCase
         $context = new SimpleSecurityContext();
 
         /**
-         * We are trying to refresh the "foo" user
+         * We are trying to refresh the "foo" user.
          */
         $user = new UsernamePasswordToken($provider1->loadUserByUsername('foo'), '123456', 'memory');
-        $session->set('_security_' . $key = 'key123', serialize($user));
+        $session->set('_security_'.$key = 'key123', serialize($user));
 
         $listener = new ContextListener($context, $providers, $key);
         $listener->handle($event);
@@ -277,10 +279,10 @@ class ContextListenerTest extends TestCase
         $this->assertNotNull($context->getToken());
 
         /**
-         * We are trying to refresh the "bar" user
+         * We are trying to refresh the "bar" user.
          */
         $user = new UsernamePasswordToken($provider2->loadUserByUsername('bar'), '123456', 'memory');
-        $session->set('_security_' . $key = 'key123', serialize($user));
+        $session->set('_security_'.$key = 'key123', serialize($user));
 
         $listener = new ContextListener($context, $providers, $key);
         $listener->handle($event);

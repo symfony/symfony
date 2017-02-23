@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Tests\Fixtures\Core;
+namespace Symfony\Component\Security\Http\Tests\Fixtures;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SimpleSecurityContext implements SecurityContextInterface
+class SimpleSecurityContext implements AuthorizationCheckerInterface, TokenStorageInterface
 {
     protected $token;
 

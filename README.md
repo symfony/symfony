@@ -2,8 +2,8 @@
     <img src="http://symfony.com/logos/symfony_black_02.svg">
 </a></p>
 
-[Symfony][1] is a PHP framework for web applications and a set of reusable PHP
-components. Symfony is used by thousands of web applications (including
+[Symfony][1] is a **PHP framework** for web applications and a set of reusable
+**PHP components**. Symfony is used by thousands of web applications (including
 BlaBlaCar.com and Spotify.com) and most of the relevant PHP projects (including
 Drupal and Magento). See [projects using Symfony][2].
 
@@ -43,8 +43,8 @@ Security Issues
 If you discover a security vulnerability within Symfony, please follow our
 [disclosure procedure][20].
 
-About
------
+About Us
+--------
 
 Symfony development is sponsored by [SensioLabs][21], lead by the
 [Symfony Core Team][22] and supported by thousands of [Symfony contributors][19].
@@ -70,4 +70,4 @@ Symfony development is sponsored by [SensioLabs][21], lead by the
 [19]: https://symfony.com/contributors
 [20]: https://symfony.com/security
 [21]: https://sensiolabs.com
-[22]: http://symfony.com/doc/current/contributing/code/core_team.html
+[22]: https://symfony.com/doc/current/contributing/code/core_team.html

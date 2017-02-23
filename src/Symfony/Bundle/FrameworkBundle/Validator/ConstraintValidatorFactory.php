@@ -40,7 +40,14 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0 alongside with magic methods below
+     */
     protected $container;
+
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0 alongside with magic methods below
+     */
     protected $validators;
 
     /**
@@ -84,5 +91,53 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         }
 
         return $this->validators[$name];
+    }
+
+    /**
+     * @internal
+     */
+    public function __get($name)
+    {
+        if ('validators' === $name || 'container' === $name) {
+            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
+        }
+
+        return $this->$name;
+    }
+
+    /**
+     * @internal
+     */
+    public function __set($name, $value)
+    {
+        if ('validators' === $name || 'container' === $name) {
+            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
+        }
+
+        $this->$name = $value;
+    }
+
+    /**
+     * @internal
+     */
+    public function __isset($name)
+    {
+        if ('validators' === $name || 'container' === $name) {
+            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
+        }
+
+        return isset($this->$name);
+    }
+
+    /**
+     * @internal
+     */
+    public function __unset($name)
+    {
+        if ('validators' === $name || 'container' === $name) {
+            @trigger_error(sprintf('Using the "%s::$%s" property is deprecated since version 3.3 as it will be removed/private in 4.0.', __CLASS__, $name), E_USER_DEPRECATED);
+        }
+
+        unset($this->$name);
     }
 }

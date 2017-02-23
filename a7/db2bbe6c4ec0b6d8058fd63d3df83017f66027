@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-22T10:39:31Z
+
+We need to be explicit about the supported versions (should be `^3.2.2` because of #20995) of the DependencyInjection component.

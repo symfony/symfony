@@ -188,13 +188,6 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
    removed. Use the `Symfony\Component\Form\DependencyInjection\FormPass` class instead.
 
-SecurityBundle
---------------
-
- * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` method instead.
-
- * The `FirewallMap::$map` and `$container` properties have been removed.
-
 HttpFoundation
 ---------------
 
@@ -237,6 +230,11 @@ HttpKernel
  * The `Psr6CacheClearer::addPool()` method has been removed. Pass an array of pools indexed
    by name to the constructor instead.
 
+Ldap
+----
+
+ * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`
+
 Process
 -------
 
@@ -256,6 +254,17 @@ Security
 
  * The `RoleInterface` has been removed. Extend the `Symfony\Component\Security\Core\Role\Role`
    class instead.
+
+SecurityBundle
+--------------
+
+ * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` method instead.
+
+ * The `FirewallMap::$map` and `$container` properties have been removed.
+
+ * The `UserPasswordEncoderCommand` class does not allow `null` as the first argument anymore.
+
+ * `UserPasswordEncoderCommand` does not implement `ContainerAwareInterface` anymore.
 
 Serializer
 ----------
@@ -348,6 +357,11 @@ Validator
  * The default value of the strict option of the `Choice` Constraint has been
    changed to `true` as of 4.0. If you need the previous behaviour ensure to
    set the option to `false`.
+
+Workflow
+--------
+
+ * Removed class name support in `WorkflowRegistry::add()` as second parameter.
 
 Yaml
 ----
@@ -445,20 +459,3 @@ Yaml
 
  * The constructor arguments `$offset`, `$totalNumberOfLines` and
    `$skippedLineNumbers` of the `Parser` class were removed.
-
-Ldap
-----
-
- * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`
-
-SecurityBundle
---------------
-
- * The `UserPasswordEncoderCommand` class does not allow `null` as the first argument anymore.
- 
- * `UserPasswordEncoderCommand` does not implement `ContainerAwareInterface` anymore.
-
-Workflow
---------
-
- * Removed class name support in `WorkflowRegistry::add()` as second parameter.

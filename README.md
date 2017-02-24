@@ -35,8 +35,7 @@ Contributing
 ------------
 
 Symfony is an Open Source, community-driven project with thousands of
-[Symfony contributors][19]. Join them [contributing code][17]
-or [contributing documentation][18].
+[contributors][19]. Join them [contributing code][17] or [contributing documentation][18].
 
 Security Issues
 ---------------
@@ -48,7 +47,7 @@ About Us
 --------
 
 Symfony development is sponsored by [SensioLabs][21], lead by the
-[Symfony Core Team][22] and supported by thousands of [Symfony contributors][19].
+[Symfony Core Team][22] and supported by [Symfony contributors][19].
 
 [1]: https://symfony.com
 [2]: https://symfony.com/projects

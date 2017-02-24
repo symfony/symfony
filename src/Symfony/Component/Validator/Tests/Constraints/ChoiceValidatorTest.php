@@ -13,26 +13,26 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 function choice_callback()
 {
     return array('foo', 'bar');
 }
 
-class ChoiceValidatorTest extends AbstractConstraintValidatorTest
+class ChoiceValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new ChoiceValidator();
     }
 
     public static function staticCallback()
+    {
+        return array('foo', 'bar');
+    }
+
+    public function objectMethodCallback()
     {
         return array('foo', 'bar');
     }
@@ -45,6 +45,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
             'multiple' => true,
+            'strict' => true,
         ));
 
         $this->validator->validate('asdf', $constraint);
@@ -52,7 +53,15 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Choice(array('choices' => array('foo', 'bar'))));
+        $this->validator->validate(
+            null,
+            new Choice(
+                array(
+                    'choices' => array('foo', 'bar'),
+                    'strict' => true,
+                )
+            )
+        );
 
         $this->assertNoViolation();
     }
@@ -62,7 +71,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testChoicesOrCallbackExpected()
     {
-        $this->validator->validate('foobar', new Choice());
+        $this->validator->validate('foobar', new Choice(array('strict' => true)));
     }
 
     /**
@@ -70,12 +79,12 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testValidCallbackExpected()
     {
-        $this->validator->validate('foobar', new Choice(array('callback' => 'abcd')));
+        $this->validator->validate('foobar', new Choice(array('callback' => 'abcd', 'strict' => true)));
     }
 
     public function testValidChoiceArray()
     {
-        $constraint = new Choice(array('choices' => array('foo', 'bar')));
+        $constraint = new Choice(array('choices' => array('foo', 'bar'), 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 
@@ -84,7 +93,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidChoiceCallbackFunction()
     {
-        $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
+        $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback', 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 
@@ -93,9 +102,14 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidChoiceCallbackClosure()
     {
-        $constraint = new Choice(array('callback' => function () {
-            return array('foo', 'bar');
-        }));
+        $constraint = new Choice(
+            array(
+                'strict' => true,
+                'callback' => function () {
+                    return array('foo', 'bar');
+                },
+            )
+        );
 
         $this->validator->validate('bar', $constraint);
 
@@ -104,7 +118,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidChoiceCallbackStaticMethod()
     {
-        $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback')));
+        $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback'), 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 
@@ -116,7 +130,19 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         // search $this for "staticCallback"
         $this->setObject($this);
 
-        $constraint = new Choice(array('callback' => 'staticCallback'));
+        $constraint = new Choice(array('callback' => 'staticCallback', 'strict' => true));
+
+        $this->validator->validate('bar', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidChoiceCallbackContextObjectMethod()
+    {
+        // search $this for "objectMethodCallback"
+        $this->setObject($this);
+
+        $constraint = new Choice(array('callback' => 'objectMethodCallback', 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 
@@ -128,6 +154,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'baz'),
             'multiple' => true,
+            'strict' => true,
         ));
 
         $this->validator->validate(array('baz', 'bar'), $constraint);
@@ -140,6 +167,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
             'message' => 'myMessage',
+            'strict' => true,
         ));
 
         $this->validator->validate('baz', $constraint);
@@ -157,6 +185,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             // the DB or the model
             'choices' => array(),
             'message' => 'myMessage',
+            'strict' => true,
         ));
 
         $this->validator->validate('baz', $constraint);
@@ -173,6 +202,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             'choices' => array('foo', 'bar'),
             'multipleMessage' => 'myMessage',
             'multiple' => true,
+            'strict' => true,
         ));
 
         $this->validator->validate(array('foo', 'baz'), $constraint);
@@ -191,6 +221,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             'multiple' => true,
             'min' => 2,
             'minMessage' => 'myMessage',
+            'strict' => true,
         ));
 
         $value = array('foo');
@@ -214,6 +245,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             'multiple' => true,
             'max' => 2,
             'maxMessage' => 'myMessage',
+            'strict' => true,
         ));
 
         $value = array('foo', 'bar', 'moo');
@@ -230,6 +262,9 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
+    /**
+     * @group legacy
+     */
     public function testNonStrict()
     {
         $constraint = new Choice(array(
@@ -271,6 +306,9 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
+    /**
+     * @group legacy
+     */
     public function testNonStrictWithMultipleChoices()
     {
         $constraint = new Choice(array(

@@ -26,10 +26,10 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertEquals('foo', $service->getRememberMeParameter());
     }
 
-    public function testGetKey()
+    public function testGetSecret()
     {
         $service = $this->getService();
-        $this->assertEquals('fookey', $service->getKey());
+        $this->assertEquals('foosecret', $service->getSecret());
     }
 
     public function testAutoLoginReturnsNullWhenNoCookie()
@@ -79,7 +79,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $returnedToken = $service->autoLogin($request);
 
         $this->assertSame($user, $returnedToken->getUser());
-        $this->assertSame('fookey', $returnedToken->getKey());
+        $this->assertSame('foosecret', $returnedToken->getSecret());
         $this->assertSame('fookey', $returnedToken->getProviderKey());
     }
 
@@ -285,7 +285,7 @@ class AbstractRememberMeServicesTest extends TestCase
         }
 
         return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
-            array($userProvider), 'fookey', 'fookey', $options, $logger,
+            array($userProvider), 'foosecret', 'fookey', $options, $logger,
         ));
     }
 

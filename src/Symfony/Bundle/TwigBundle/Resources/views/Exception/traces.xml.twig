@@ -1,7 +1,7 @@
         <traces>
 {% for trace in exception.trace %}
             <trace>
-{% include 'TwigBundle:Exception:trace.txt.twig' with { 'trace': trace } only %}
+{% include '@Twig/Exception/trace.txt.twig' with { 'trace': trace } only %}
 
             </trace>
 {% endfor %}

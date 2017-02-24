@@ -1,0 +1,15 @@
+ ------------ ------------------ 
+ [32m Option     [39m [32m Value            [39m 
+ ------------ ------------------ 
+  Service ID   -                 
+  Class        AutowiredService  
+  Tags         -                 
+  Public       yes               
+  Synthetic    no                
+  Lazy         no                
+  Shared       yes               
+  Abstract     no                
+  Autowire     set*              
+               addFoo            
+ ------------ ------------------ 
+

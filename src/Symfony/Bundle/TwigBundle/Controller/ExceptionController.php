@@ -11,12 +11,10 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * ExceptionController renders error or exception pages for a given
@@ -96,7 +94,7 @@ class ExceptionController
      * @param int     $code          An HTTP response status code
      * @param bool    $showException
      *
-     * @return TemplateReferenceInterface
+     * @return string
      */
     protected function findTemplate(Request $request, $format, $code, $showException)
     {
@@ -107,14 +105,14 @@ class ExceptionController
 
         // For error pages, try to find a template for the specific HTTP status code and format
         if (!$showException) {
-            $template = new TemplateReference('TwigBundle', 'Exception', $name.$code, $format, 'twig');
+            $template = sprintf('@Twig/Exception/%s%s.%s.twig', $name, $code, $format);
             if ($this->templateExists($template)) {
                 return $template;
             }
         }
 
         // try to find a template for the given format
-        $template = new TemplateReference('TwigBundle', 'Exception', $name, $format, 'twig');
+        $template = sprintf('@Twig/Exception/%s.%s.twig', $name, $format);
         if ($this->templateExists($template)) {
             return $template;
         }
@@ -122,7 +120,7 @@ class ExceptionController
         // default to a generic HTML exception
         $request->setRequestFormat('html');
 
-        return new TemplateReference('TwigBundle', 'Exception', $showException ? 'exception_full' : $name, 'html', 'twig');
+        return sprintf('@Twig/Exception/%s.html.twig', $showException ? 'exception_full' : $name);
     }
 
     // to be removed when the minimum required version of Twig is >= 3.0

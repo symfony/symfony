@@ -1,12 +1,39 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Deprecated instantiating `UserPasswordEncoderCommand` without its constructor
+   arguments fully provided.
+ * Deprecated `UserPasswordEncoderCommand::getContainer()` and relying on the
+  `ContainerAwareInterface` interface for this command.
+ * Deprecated the `FirewallMap::$map` and `$container` properties.
+
+3.2.0
+-----
+
+ * Added the `SecurityUserValueResolver` to inject the security users in actions via
+   `Symfony\Component\Security\Core\User\UserInterface` in the method signature.
+
+3.0.0
+-----
+
+ * Removed the `security.context` service.
+
+2.8.0
+-----
+
+ * deprecated the `key` setting of `anonymous`, `remember_me` and `http_digest`
+   in favor of the `secret` setting.
+ * deprecated the `intention` firewall listener setting in favor of the `csrf_token_id`.
+
 2.6.0
 -----
 
  * Added the possibility to override the default success/failure handler
    to get the provider key and the options injected
- * Deprecated the `security.context` service for the `security.token_storage` and 
+ * Deprecated the `security.context` service for the `security.token_storage` and
    `security.authorization_checker` services.
 
 2.4.0

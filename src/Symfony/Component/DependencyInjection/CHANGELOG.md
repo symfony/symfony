@@ -1,6 +1,57 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * [EXPERIMENTAL] added "instanceof" section for local interface-defined configs
+ * [EXPERIMENTAL] added "service-locator" argument for lazy loading a set of identified values and services
+ * [EXPERIMENTAL] added prototype services for PSR4-based discovery and registration
+ * added `ContainerBuilder::getReflectionClass()` for retrieving and tracking reflection class info
+ * deprecated `ContainerBuilder::getClassResource()`, use `ContainerBuilder::getReflectionClass()` or `ContainerBuilder::addObjectResource()` instead
+ * added `ContainerBuilder::fileExists()` for checking and tracking file or directory existence
+ * deprecated autowiring-types, use aliases instead
+ * [EXPERIMENTAL] added support for getter autowiring
+ * [EXPERIMENTAL] added support for getter-injection
+ * added support for omitting the factory class name in a service definition if the definition class is set
+ * deprecated case insensitivity of service identifiers
+ * added "iterator" argument type for lazy iteration over a set of values and services
+ * added "closure-proxy" argument type for turning services' methods into lazy callables
+ * added file-wide configurable defaults for service attributes "public", "tags",
+   "autowire" and "inherit-tags"
+ * added "inherit-tags" service attribute to control tags' inheritance from parent context
+ * made the "class" attribute optional, using the "id" as fallback
+ * using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
+   will not be supported anymore in 4.0
+ * deprecated the `DefinitionDecorator` class in favor of `ChildDefinition`
+ * allow config files to be loaded using a glob pattern
+
+3.2.0
+-----
+
+ * allowed to prioritize compiler passes by introducing a third argument to `PassConfig::addPass()`, to `Compiler::addPass` and to `ContainerBuilder::addCompilerPass()`
+ * added support for PHP constants in YAML configuration files
+ * deprecated the ability to set or unset a private service with the `Container::set()` method
+ * deprecated the ability to check for the existence of a private service with the `Container::has()` method
+ * deprecated the ability to request a private service with the `Container::get()` method
+
+3.0.0
+-----
+
+ * removed all deprecated codes from 2.x versions
+
+2.8.0
+-----
+
+ * deprecated the abstract ContainerAware class in favor of ContainerAwareTrait
+ * deprecated IntrospectableContainerInterface, to be merged with ContainerInterface in 3.0
+ * allowed specifying a directory to recursively load all configuration files it contains
+ * deprecated the concept of scopes
+ * added `Definition::setShared()` and `Definition::isShared()`
+ * added ResettableContainerInterface to be able to reset the container to release memory on shutdown
+ * added a way to define the priority of service decoration
+ * added support for service autowiring
+
 2.7.0
 -----
 

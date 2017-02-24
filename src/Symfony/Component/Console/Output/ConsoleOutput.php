@@ -14,15 +14,16 @@ namespace Symfony\Component\Console\Output;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
- * ConsoleOutput is the default class for all CLI output. It uses STDOUT.
+ * ConsoleOutput is the default class for all CLI output. It uses STDOUT and STDERR.
  *
- * This class is a convenient wrapper around `StreamOutput`.
+ * This class is a convenient wrapper around `StreamOutput` for both STDOUT and STDERR.
  *
  *     $output = new ConsoleOutput();
  *
  * This is equivalent to:
  *
  *     $output = new StreamOutput(fopen('php://stdout', 'w'));
+ *     $stdErr = new StreamOutput(fopen('php://stderr', 'w'));
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -139,9 +140,11 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function openOutputStream()
     {
-        $outputStream = $this->hasStdoutSupport() ? 'php://stdout' : 'php://output';
+        if (!$this->hasStdoutSupport()) {
+            return fopen('php://output', 'w');
+        }
 
-        return @fopen($outputStream, 'w') ?: fopen('php://output', 'w');
+        return @fopen('php://stdout', 'w') ?: fopen('php://output', 'w');
     }
 
     /**
@@ -149,8 +152,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function openErrorStream()
     {
-        $errorStream = $this->hasStderrSupport() ? 'php://stderr' : 'php://output';
-
-        return fopen($errorStream, 'w');
+        return fopen($this->hasStderrSupport() ? 'php://stderr' : 'php://output', 'w');
     }
 }

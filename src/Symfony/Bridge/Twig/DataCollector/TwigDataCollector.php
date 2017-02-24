@@ -74,14 +74,30 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function getHtmlCallGraph()
     {
         $dumper = new \Twig_Profiler_Dumper_Html();
+        $dump = $dumper->dump($this->getProfile());
 
-        return new \Twig_Markup($dumper->dump($this->getProfile()), 'UTF-8');
+        // needed to remove the hardcoded CSS styles
+        $dump = str_replace(array(
+            '<span style="background-color: #ffd">',
+            '<span style="color: #d44">',
+            '<span style="background-color: #dfd">',
+        ), array(
+            '<span class="status-warning">',
+            '<span class="status-error">',
+            '<span class="status-success">',
+        ), $dump);
+
+        return new \Twig_Markup($dump, 'UTF-8');
     }
 
     public function getProfile()
     {
         if (null === $this->profile) {
-            $this->profile = unserialize($this->data['profile']);
+            if (PHP_VERSION_ID >= 70000) {
+                $this->profile = unserialize($this->data['profile'], array('allowed_classes' => array('Twig_Profiler_Profile')));
+            } else {
+                $this->profile = unserialize($this->data['profile']);
+            }
         }
 
         return $this->profile;

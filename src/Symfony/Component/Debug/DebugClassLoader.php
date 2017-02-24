@@ -26,8 +26,9 @@ class DebugClassLoader
 {
     private $classLoader;
     private $isFinder;
-    private $wasFinder;
     private static $caseCheck;
+    private static $final = array();
+    private static $finalMethods = array();
     private static $deprecated = array();
     private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
     private static $darwinCache = array('/' => array('/', array()));
@@ -35,20 +36,12 @@ class DebugClassLoader
     /**
      * Constructor.
      *
-     * @param callable|object $classLoader Passing an object is @deprecated since version 2.5 and support for it will be removed in 3.0
+     * @param callable $classLoader A class loader
      */
-    public function __construct($classLoader)
+    public function __construct(callable $classLoader)
     {
-        $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
-
-        if ($this->wasFinder) {
-            @trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
-            $this->classLoader = array($classLoader, 'loadClass');
-            $this->isFinder = true;
-        } else {
-            $this->classLoader = $classLoader;
-            $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
-        }
+        $this->classLoader = $classLoader;
+        $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
 
         if (!isset(self::$caseCheck)) {
             $file = file_exists(__FILE__) ? __FILE__ : rtrim(realpath('.'), DIRECTORY_SEPARATOR);
@@ -77,11 +70,11 @@ class DebugClassLoader
     /**
      * Gets the wrapped class loader.
      *
-     * @return callable|object A class loader. Since version 2.5, returning an object is @deprecated and support for it will be removed in 3.0
+     * @return callable The wrapped class loader
      */
     public function getClassLoader()
     {
-        return $this->wasFinder ? $this->classLoader[0] : $this->classLoader;
+        return $this->classLoader;
     }
 
     /**
@@ -133,24 +126,6 @@ class DebugClassLoader
     }
 
     /**
-     * Finds a file by class name.
-     *
-     * @param string $class A class name to resolve to file
-     *
-     * @return string|null
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
-    public function findFile($class)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if ($this->wasFinder) {
-            return $this->classLoader[0]->findFile($class);
-        }
-    }
-
-    /**
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
@@ -172,19 +147,11 @@ class DebugClassLoader
                 call_user_func($this->classLoader, $class);
                 $file = false;
             }
-        } catch (\Exception $e) {
+        } finally {
             ErrorHandler::unstackErrors();
-
-            throw $e;
-        } catch (\Throwable $e) {
-            ErrorHandler::unstackErrors();
-
-            throw $e;
         }
 
-        ErrorHandler::unstackErrors();
-
-        $exists = class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
+        $exists = class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
         if ('\\' === $class[0]) {
             $class = substr($class, 1);
@@ -198,11 +165,48 @@ class DebugClassLoader
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
 
+            $parent = get_parent_class($class);
+
+            // Not an interface nor a trait
+            if (class_exists($name, false)) {
+                if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                    self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                }
+
+                if ($parent && isset(self::$final[$parent])) {
+                    @trigger_error(sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
+                }
+
+                // Inherit @final annotations
+                self::$finalMethods[$name] = $parent && isset(self::$finalMethods[$parent]) ? self::$finalMethods[$parent] : array();
+
+                foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+                    if ($method->class !== $name) {
+                        continue;
+                    }
+
+                    if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
+                        @trigger_error(sprintf('%s It may change without further notice as of its next major version. You should not extend it from %s.', self::$finalMethods[$parent][$method->name], $name), E_USER_DEPRECATED);
+                    }
+
+                    $doc = $method->getDocComment();
+                    if (false === $doc || false === strpos($doc, '@final')) {
+                        continue;
+                    }
+
+                    if (preg_match('#\n\s+\* @final(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
+                        $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                        self::$finalMethods[$name][$method->name] = sprintf('The %s::%s() method is considered final%s.', $name, $method->name, $message);
+                    }
+                }
+            }
+
             if (in_array(strtolower($refl->getShortName()), self::$php7Reserved)) {
                 @trigger_error(sprintf('%s uses a reserved class name (%s) that will break on PHP 7 and higher', $name, $refl->getShortName()), E_USER_DEPRECATED);
             } elseif (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {
+                // Don't trigger deprecations for classes in the same vendor
                 if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
                     $len = 0;
                     $ns = '';
@@ -216,16 +220,32 @@ class DebugClassLoader
                             break;
                     }
                 }
-                $parent = get_parent_class($class);
 
                 if (!$parent || strncmp($ns, $parent, $len)) {
                     if ($parent && isset(self::$deprecated[$parent]) && strncmp($ns, $parent, $len)) {
                         @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent, self::$deprecated[$parent]), E_USER_DEPRECATED);
                     }
 
-                    foreach (class_implements($class) as $interface) {
-                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !is_subclass_of($parent, $interface)) {
-                            @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, interface_exists($class) ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                    $parentInterfaces = array();
+                    $deprecatedInterfaces = array();
+                    if ($parent) {
+                        foreach (class_implements($parent) as $interface) {
+                            $parentInterfaces[$interface] = 1;
+                        }
+                    }
+
+                    foreach ($refl->getInterfaceNames() as $interface) {
+                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len)) {
+                            $deprecatedInterfaces[] = $interface;
+                        }
+                        foreach (class_implements($interface) as $interface) {
+                            $parentInterfaces[$interface] = 1;
+                        }
+                    }
+
+                    foreach ($deprecatedInterfaces as $interface) {
+                        if (!isset($parentInterfaces[$interface])) {
+                            @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                         }
                     }
                 }

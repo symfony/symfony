@@ -26,7 +26,7 @@
 
   <xsd:group name="configs">
     <xsd:choice>
-      <xsd:element name="default" nillable="true" type="element" />
+      <xsd:element name="default" nillable="true" type="default" />
       <xsd:element name="requirement" type="element" />
       <xsd:element name="option" type="element" />
       <xsd:element name="condition" type="xsd:string" />
@@ -37,8 +37,7 @@
     <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="id" type="xsd:string" use="required" />
-    <xsd:attribute name="path" type="xsd:string" />
-    <xsd:attribute name="pattern" type="xsd:string" />
+    <xsd:attribute name="path" type="xsd:string" use="required" />
     <xsd:attribute name="host" type="xsd:string" />
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
@@ -55,11 +54,93 @@
     <xsd:attribute name="methods" type="xsd:string" />
   </xsd:complexType>
 
+  <xsd:complexType name="default" mixed="true">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="bool" type="xsd:boolean" />
+      <xsd:element name="int" type="xsd:integer" />
+      <xsd:element name="float" type="xsd:float" />
+      <xsd:element name="string" type="xsd:string" />
+      <xsd:element name="list" type="list" />
+      <xsd:element name="map" type="map" />
+    </xsd:choice>
+    <xsd:attribute name="key" type="xsd:string" use="required" />
+  </xsd:complexType>
+
   <xsd:complexType name="element">
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
         <xsd:attribute name="key" type="xsd:string" use="required" />
       </xsd:extension>
     </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="list">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="bool" nillable="true" type="xsd:boolean" />
+      <xsd:element name="int" nillable="true" type="xsd:integer" />
+      <xsd:element name="float" nillable="true" type="xsd:float" />
+      <xsd:element name="string" nillable="true" type="xsd:string" />
+      <xsd:element name="list" nillable="true" type="list" />
+      <xsd:element name="map" nillable="true" type="map" />
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="map">
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="bool" nillable="true" type="map-bool-entry" />
+          <xsd:element name="int" nillable="true" type="map-int-entry" />
+          <xsd:element name="float" nillable="true" type="map-float-entry" />
+          <xsd:element name="string" nillable="true" type="map-string-entry" />
+          <xsd:element name="list" nillable="true" type="map-list-entry" />
+          <xsd:element name="map" nillable="true" type="map-map-entry" />
+      </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="map-bool-entry">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:boolean">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="map-int-entry">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="map-float-entry">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:float">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="map-string-entry">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="map-list-entry">
+    <xsd:complexContent>
+      <xsd:extension base="list">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="map-map-entry">
+    <xsd:complexContent>
+      <xsd:extension base="map">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 </xsd:schema>

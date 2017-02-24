@@ -26,4 +26,14 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
+            <arguments>
+                <array>
+                    <element key="time-sensitive"><string>Symfony\Component\Console</string></element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
 </phpunit>

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -25,7 +27,8 @@ interface FileLocatorInterface
      *
      * @return string|array The full path to the file or an array of file paths
      *
-     * @throws \InvalidArgumentException When file is not found
+     * @throws \InvalidArgumentException        If $name is empty
+     * @throws FileLocatorFileNotFoundException If a file is not found
      */
     public function locate($name, $currentPath = null, $first = true);
 }

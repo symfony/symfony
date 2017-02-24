@@ -1,6 +1,49 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added `FormPass`
+
+3.2.0
+-----
+
+ * added `CallbackChoiceLoader`
+ * implemented `ChoiceLoaderInterface` in children of `ChoiceType`
+
+3.1.0
+-----
+
+ * deprecated the "choices_as_values" option of ChoiceType
+ * deprecated support for data objects that implements both `Traversable` and
+   `ArrayAccess` in `ResizeFormListener::preSubmit` method
+ * Using callable strings as choice options in `ChoiceType` has been deprecated
+   and will be used as `PropertyPath` instead of callable in Symfony 4.0.
+ * implemented `DataTransformerInterface` in `TextType`
+ * deprecated caching loaded choice list in `LazyChoiceList::$loadedList`
+
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
+2.8.0
+-----
+
+ * added option "choice_translation_domain" to DateType, TimeType and DateTimeType.
+ * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
+ * moved data trimming logic of TrimListener into StringUtil
+ * [BC BREAK] When registering a type extension through the DI extension, the tag alias has to match the actual extended type.
+
 2.7.0
 -----
 

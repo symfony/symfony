@@ -35,9 +35,6 @@ class ExecutableFinderTest extends TestCase
         putenv('PATH='.$path);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testFind()
     {
         if (ini_get('open_basedir')) {
@@ -68,9 +65,6 @@ class ExecutableFinderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testFindWithExtraDirs()
     {
         if (ini_get('open_basedir')) {
@@ -87,9 +81,6 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testFindWithOpenBaseDir()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
@@ -108,9 +99,6 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testFindProcessInOpenBasedir()
     {
         if (ini_get('open_basedir')) {

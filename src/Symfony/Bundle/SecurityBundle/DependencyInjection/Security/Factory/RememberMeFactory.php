@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -34,8 +34,9 @@ class RememberMeFactory implements SecurityFactoryInterface
         // authentication provider
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
-            ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
-            ->addArgument($config['key'])
+            ->setDefinition($authProviderId, new ChildDefinition('security.authentication.provider.rememberme'))
+            ->replaceArgument(0, new Reference('security.user_checker.'.$id))
+            ->addArgument($config['secret'])
             ->addArgument($id)
         ;
 
@@ -55,8 +56,8 @@ class RememberMeFactory implements SecurityFactoryInterface
             ;
         }
 
-        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new ChildDefinition($templateId));
+        $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
@@ -101,7 +102,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // remember-me listener
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
         $listener->replaceArgument(5, $config['catch_exceptions']);
 
@@ -120,11 +121,13 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
-        $node->fixXmlConfig('user_provider');
-        $builder = $node->children();
+        $builder = $node
+            ->fixXmlConfig('user_provider')
+            ->children()
+        ;
 
         $builder
-            ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()

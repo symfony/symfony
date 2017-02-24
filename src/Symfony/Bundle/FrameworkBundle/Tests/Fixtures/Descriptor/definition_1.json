@@ -1,11 +1,11 @@
 {
     "class": "Full\\Qualified\\Class1",
-    "scope": "container",
     "public": true,
     "synthetic": false,
     "lazy": true,
-    "synchronized": false,
+    "shared": true,
     "abstract": true,
+    "autowire": false,
     "file": null,
     "factory_class": "Full\\Qualified\\FactoryClass",
     "factory_method": "get",

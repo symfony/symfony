@@ -18,6 +18,8 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 /**
  * Tests for the SerializerPass class.
  *
+ * @group legacy
+ *
  * @author Javier Lopez <f12loalf@gmail.com>
  */
 class SerializerPassTest extends TestCase
@@ -85,7 +87,7 @@ class SerializerPassTest extends TestCase
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
 
-        $container->expects($this->atLeastOnce())
+        $container->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
 

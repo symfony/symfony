@@ -45,8 +45,17 @@ class LazyChoiceList implements ChoiceListInterface
 
     /**
      * @var ChoiceListInterface|null
+     *
+     * @deprecated Since 3.1, to be removed in 4.0. Cache the choice list in the {@link ChoiceLoaderInterface} instead.
      */
     private $loadedList;
+
+    /**
+     * @var bool
+     *
+     * @deprecated Flag used for BC layer since 3.1. To be removed in 4.0.
+     */
+    private $loaded = false;
 
     /**
      * Creates a lazily-loaded list using the given loader.
@@ -59,7 +68,7 @@ class LazyChoiceList implements ChoiceListInterface
      * @param null|callable         $value  The callable generating the choice
      *                                      values
      */
-    public function __construct(ChoiceLoaderInterface $loader, $value = null)
+    public function __construct(ChoiceLoaderInterface $loader, callable $value = null)
     {
         $this->loader = $loader;
         $this->value = $value;
@@ -70,11 +79,23 @@ class LazyChoiceList implements ChoiceListInterface
      */
     public function getChoices()
     {
-        if (!$this->loadedList) {
-            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        if ($this->loaded) {
+            // We can safely invoke the {@link ChoiceLoaderInterface} assuming it has the list
+            // in cache when the lazy list is already loaded
+            if ($this->loadedList !== $this->loader->loadChoiceList($this->value)) {
+                @trigger_error(sprintf('Caching the choice list in %s is deprecated since 3.1 and will not happen in 4.0. Cache the list in the %s instead.', __CLASS__, ChoiceLoaderInterface::class), E_USER_DEPRECATED);
+            }
+
+            return $this->loadedList->getChoices();
         }
 
+        // BC
+        $this->loadedList = $this->loader->loadChoiceList($this->value);
+        $this->loaded = true;
+
         return $this->loadedList->getChoices();
+        // In 4.0 keep the following line only:
+        // return $this->loader->loadChoiceList($this->value)->getChoices()
     }
 
     /**
@@ -82,11 +103,22 @@ class LazyChoiceList implements ChoiceListInterface
      */
     public function getValues()
     {
-        if (!$this->loadedList) {
-            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        if ($this->loaded) {
+            // Check whether the loader has the same cache
+            if ($this->loadedList !== $this->loader->loadChoiceList($this->value)) {
+                @trigger_error(sprintf('Caching the choice list in %s is deprecated since 3.1 and will not happen in 4.0. Cache the list in the %s instead.', __CLASS__, ChoiceLoaderInterface::class), E_USER_DEPRECATED);
+            }
+
+            return $this->loadedList->getValues();
         }
 
+        // BC
+        $this->loadedList = $this->loader->loadChoiceList($this->value);
+        $this->loaded = true;
+
         return $this->loadedList->getValues();
+        // In 4.0 keep the following line only:
+        // return $this->loader->loadChoiceList($this->value)->getValues()
     }
 
     /**
@@ -94,11 +126,22 @@ class LazyChoiceList implements ChoiceListInterface
      */
     public function getStructuredValues()
     {
-        if (!$this->loadedList) {
-            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        if ($this->loaded) {
+            // Check whether the loader has the same cache
+            if ($this->loadedList !== $this->loader->loadChoiceList($this->value)) {
+                @trigger_error(sprintf('Caching the choice list in %s is deprecated since 3.1 and will not happen in 4.0. Cache the list in the %s instead.', __CLASS__, ChoiceLoaderInterface::class), E_USER_DEPRECATED);
+            }
+
+            return $this->loadedList->getStructuredValues();
         }
 
+        // BC
+        $this->loadedList = $this->loader->loadChoiceList($this->value);
+        $this->loaded = true;
+
         return $this->loadedList->getStructuredValues();
+        // In 4.0 keep the following line only:
+        // return $this->loader->loadChoiceList($this->value)->getStructuredValues();
     }
 
     /**
@@ -106,11 +149,22 @@ class LazyChoiceList implements ChoiceListInterface
      */
     public function getOriginalKeys()
     {
-        if (!$this->loadedList) {
-            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        if ($this->loaded) {
+            // Check whether the loader has the same cache
+            if ($this->loadedList !== $this->loader->loadChoiceList($this->value)) {
+                @trigger_error(sprintf('Caching the choice list in %s is deprecated since 3.1 and will not happen in 4.0. Cache the list in the %s instead.', __CLASS__, ChoiceLoaderInterface::class), E_USER_DEPRECATED);
+            }
+
+            return $this->loadedList->getOriginalKeys();
         }
 
+        // BC
+        $this->loadedList = $this->loader->loadChoiceList($this->value);
+        $this->loaded = true;
+
         return $this->loadedList->getOriginalKeys();
+        // In 4.0 keep the following line only:
+        // return $this->loader->loadChoiceList($this->value)->getOriginalKeys();
     }
 
     /**
@@ -118,11 +172,16 @@ class LazyChoiceList implements ChoiceListInterface
      */
     public function getChoicesForValues(array $values)
     {
-        if (!$this->loadedList) {
-            return $this->loader->loadChoicesForValues($values, $this->value);
+        if ($this->loaded) {
+            // Check whether the loader has the same cache
+            if ($this->loadedList !== $this->loader->loadChoiceList($this->value)) {
+                @trigger_error(sprintf('Caching the choice list in %s is deprecated since 3.1 and will not happen in 4.0. Cache the list in the %s instead.', __CLASS__, ChoiceLoaderInterface::class), E_USER_DEPRECATED);
+            }
+
+            return $this->loadedList->getChoicesForValues($values);
         }
 
-        return $this->loadedList->getChoicesForValues($values);
+        return $this->loader->loadChoicesForValues($values, $this->value);
     }
 
     /**
@@ -130,10 +189,15 @@ class LazyChoiceList implements ChoiceListInterface
      */
     public function getValuesForChoices(array $choices)
     {
-        if (!$this->loadedList) {
-            return $this->loader->loadValuesForChoices($choices, $this->value);
+        if ($this->loaded) {
+            // Check whether the loader has the same cache
+            if ($this->loadedList !== $this->loader->loadChoiceList($this->value)) {
+                @trigger_error(sprintf('Caching the choice list in %s is deprecated since 3.1 and will not happen in 4.0. Cache the list in the %s instead.', __CLASS__, ChoiceLoaderInterface::class), E_USER_DEPRECATED);
+            }
+
+            return $this->loadedList->getValuesForChoices($choices);
         }
 
-        return $this->loadedList->getValuesForChoices($choices);
+        return $this->loader->loadValuesForChoices($choices, $this->value);
     }
 }

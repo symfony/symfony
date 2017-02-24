@@ -40,28 +40,6 @@ interface ChoiceListFactoryInterface
     public function createListFromChoices($choices, $value = null);
 
     /**
-     * Creates a choice list for the given choices.
-     *
-     * The choices should be passed in the keys of the choices array. Since the
-     * choices array will be flipped, the entries of the array must be strings
-     * or integers.
-     *
-     * Optionally, a callable can be passed for generating the choice values.
-     * The callable receives the choice as first and the array key as the second
-     * argument.
-     *
-     * @param array|\Traversable $choices The choices
-     * @param null|callable      $value   The callable generating the choice
-     *                                    values
-     *
-     * @return ChoiceListInterface The choice list
-     *
-     * @deprecated Added for backwards compatibility in Symfony 2.7, to be
-     *             removed in Symfony 3.0.
-     */
-    public function createListFromFlippedChoices($choices, $value = null);
-
-    /**
      * Creates a choice list that is loaded with the given loader.
      *
      * Optionally, a callable can be passed for generating the choice values.

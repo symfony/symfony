@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -23,42 +25,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class TwigExtensionTest extends TestCase
 {
-    /**
-     * @dataProvider getFormats
-     * @group legacy
-     */
-    public function testLegacyFormResourcesConfigurationKey($format)
-    {
-        $container = $this->createContainer();
-        $container->registerExtension(new TwigExtension());
-        $this->loadFromFile($container, 'legacy-form-resources-only', $format);
-        $this->compileContainer($container);
-
-        // Form resources
-        $this->assertCount(3, $container->getParameter('twig.form.resources'));
-        $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'));
-        $this->assertContains('form_table_layout.html.twig', $container->getParameter('twig.form.resources'));
-        $this->assertContains('MyBundle:Form:my_theme.html.twig', $container->getParameter('twig.form.resources'));
-    }
-
-    /**
-     * @dataProvider getFormats
-     * @group legacy
-     */
-    public function testLegacyMergeFormResourcesConfigurationKeyWithFormThemesConfigurationKey($format)
-    {
-        $container = $this->createContainer();
-        $container->registerExtension(new TwigExtension());
-        $this->loadFromFile($container, 'legacy-merge-form-resources-with-form-themes', $format);
-        $this->compileContainer($container);
-
-        $this->assertCount(4, $container->getParameter('twig.form.resources'));
-        $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'));
-        $this->assertContains('form_table_layout.html.twig', $container->getParameter('twig.form.resources'));
-        $this->assertContains('MyBundle:Form:my_theme.html.twig', $container->getParameter('twig.form.resources'));
-        $this->assertContains('FooBundle:Form:bar.html.twig', $container->getParameter('twig.form.resources'));
-    }
-
     public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();
@@ -66,7 +32,7 @@ class TwigExtensionTest extends TestCase
         $container->loadFromExtension('twig', array());
         $this->compileContainer($container);
 
-        $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
+        $this->assertEquals('Twig_Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
 
         $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
@@ -87,7 +53,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'full', $format);
         $this->compileContainer($container);
 
-        $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file');
+        $this->assertEquals('Twig_Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
 
         // Form resources
         $resources = $container->getParameter('twig.form.resources');
@@ -98,17 +64,17 @@ class TwigExtensionTest extends TestCase
         $calls = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
         $this->assertEquals(new Reference('twig.app_variable'), $calls[0][1][1]);
-        $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
-        $this->assertEquals('baz', $calls[2][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals('@qux', $calls[2][1][1], '->load() allows escaping of service identifiers');
-        $this->assertEquals('pi', $calls[3][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals(3.14, $calls[3][1][1], '->load() registers variables as Twig globals');
+        $this->assertEquals('foo', $calls[2][1][0], '->load() registers services as Twig globals');
+        $this->assertEquals(new Reference('bar'), $calls[2][1][1], '->load() registers services as Twig globals');
+        $this->assertEquals('baz', $calls[3][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals('@qux', $calls[3][1][1], '->load() allows escaping of service identifiers');
+        $this->assertEquals('pi', $calls[4][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
         if (in_array($format, array('yml', 'php'))) {
-            $this->assertEquals('bad', $calls[4][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[4][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
+            $this->assertEquals(array('key' => 'foo'), $calls[5][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options
@@ -169,7 +135,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
-        foreach (array_slice($calls, 1) as $call) {
+        foreach (array_slice($calls, 2) as $call) {
             list($name, $value) = each($globals);
             $this->assertEquals($name, $call[1][0]);
             $this->assertSame($value, $call[1][1]);
@@ -259,6 +225,30 @@ class TwigExtensionTest extends TestCase
             'only-debug-enabled' => array(true, false, false),
             'debug-and-stopwatch-disabled' => array(false, false, false),
         );
+    }
+
+    public function testRuntimeLoader()
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig', array());
+        $container->setParameter('kernel.environment', 'test');
+        $container->setParameter('debug.file_link_format', 'test');
+        $container->setParameter('foo', 'FooClass');
+        $container->register('http_kernel', 'FooClass');
+        $container->register('templating.locator', 'FooClass');
+        $container->register('templating.name_parser', 'FooClass');
+        $container->register('foo', '%foo%')->addTag('twig.runtime');
+        $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->compile();
+
+        $loader = $container->getDefinition('twig.runtime_loader');
+        $args = $loader->getArgument(1);
+        $this->assertArrayHasKey('Symfony\Bridge\Twig\Form\TwigRenderer', $args);
+        $this->assertArrayHasKey('FooClass', $args);
+        $this->assertContains('twig.form.renderer', $args);
+        $this->assertContains('foo', $args);
     }
 
     private function createContainer()

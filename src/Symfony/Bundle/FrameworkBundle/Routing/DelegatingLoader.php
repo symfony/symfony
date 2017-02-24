@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
@@ -28,20 +27,17 @@ use Psr\Log\LoggerInterface;
 class DelegatingLoader extends BaseDelegatingLoader
 {
     protected $parser;
-    protected $logger;
     private $loading = false;
 
     /**
      * Constructor.
      *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver)
     {
         $this->parser = $parser;
-        $this->logger = $logger;
 
         parent::__construct($resolver);
     }
@@ -56,7 +52,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             // Here is the scenario:
             // - while routes are being loaded by parent::load() below, a fatal error
             //   occurs (e.g. parse error in a controller while loading annotations);
-            // - PHP abruptly empties the stack trace, bypassing all catch blocks;
+            // - PHP abruptly empties the stack trace, bypassing all catch/finally blocks;
             //   it then calls the registered shutdown functions;
             // - the ErrorHandler catches the fatal error and re-injects it for rendering
             //   thanks to HttpKernel->terminateWithException() (that calls handleException());
@@ -74,15 +70,9 @@ class DelegatingLoader extends BaseDelegatingLoader
 
         try {
             $collection = parent::load($resource, $type);
-        } catch (\Exception $e) {
+        } finally {
             $this->loading = false;
-            throw $e;
-        } catch (\Throwable $e) {
-            $this->loading = false;
-            throw $e;
         }
-
-        $this->loading = false;
 
         foreach ($collection->all() as $route) {
             if (!$controller = $route->getDefault('_controller')) {

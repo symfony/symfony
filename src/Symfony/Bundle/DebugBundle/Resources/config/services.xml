@@ -8,12 +8,13 @@
         <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="var_dumper.cloner" />
+            <argument type="service" id="var_dumper.html_dumper" />
         </service>
 
         <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
-            <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" />
+            <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
-            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
+            <argument type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
             <argument>%kernel.charset%</argument>
             <argument type="service" id="request_stack" />
             <argument>null</argument><!-- var_dumper.cli_dumper when debug.dump_destination is set -->
@@ -29,6 +30,17 @@
         <service id="var_dumper.cli_dumper" class="Symfony\Component\VarDumper\Dumper\CliDumper">
             <argument>null</argument><!-- debug.dump_destination -->
             <argument>%kernel.charset%</argument>
+            <argument>0</argument> <!-- flags -->
+        </service>
+        <service id="var_dumper.html_dumper" class="Symfony\Component\VarDumper\Dumper\HtmlDumper" public="false">
+            <argument>null</argument>
+            <argument>%kernel.charset%</argument>
+            <argument>0</argument> <!-- flags -->
+            <call method="setDisplayOptions">
+                <argument type="collection">
+                    <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
+                </argument>
+            </call>
         </service>
     </services>
 

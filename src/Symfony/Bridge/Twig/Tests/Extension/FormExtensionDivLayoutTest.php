@@ -23,26 +23,13 @@ use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
-    /**
-     * @var FormExtension
-     */
-    protected $extension;
+    use RuntimeLoaderProvider;
 
-    protected $testableFeatures = array(
-        'choice_attr',
-    );
+    private $renderer;
 
     protected function setUp()
     {
         parent::setUp();
-
-        $rendererEngine = new TwigRendererEngine(array(
-            'form_div_layout.html.twig',
-            'custom_widgets.html.twig',
-        ));
-        $renderer = new TwigRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
-
-        $this->extension = new FormExtension($renderer);
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../Resources/views/Form',
@@ -54,22 +41,20 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $environment->addGlobal('global', '');
         // the value can be any template that exists
         $environment->addGlobal('dynamic_template_name', 'child_label');
-        $environment->addExtension($this->extension);
+        $environment->addExtension(new FormExtension());
 
-        $this->extension->initRuntime($environment);
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->extension = null;
+        $rendererEngine = new TwigRendererEngine(array(
+            'form_div_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new TwigRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -84,7 +69,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -99,28 +84,20 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingDynamicExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
-        $renderer = $this->extension->renderer;
-        $renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
-        $renderer->searchAndRenderBlock($view, 'row');
+        $this->renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
+        $this->renderer->searchAndRenderBlock($view, 'row');
     }
 
     public function isSelectedChoiceProvider()
     {
-        // The commented cases should not be necessary anymore, because the
-        // choice lists should assure that both values passed here are always
-        // strings
         return array(
-//             array(true, 0, 0),
             array(true, '0', '0'),
             array(true, '1', '1'),
-//             array(true, false, 0),
-//             array(true, true, 1),
             array(true, '', ''),
-//             array(true, null, ''),
             array(true, '1.23', '1.23'),
             array(true, 'foo', 'foo'),
             array(true, 'foo10', 'foo10'),
@@ -138,17 +115,36 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     {
         $choice = new ChoiceView($choice, $choice, $choice.' label');
 
-        $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
+        $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_selected_choice($choice, $value));
+    }
+
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get">', $html);
+    }
+
+    public function testStartTagHasActionAttributeWhenActionIsZero()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '0',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
     protected function renderForm(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
-    }
-
-    protected function renderEnctype(FormView $view)
-    {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
+        return (string) $this->renderer->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -157,42 +153,42 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             $vars += array('label' => $label);
         }
 
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'errors');
+        return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_start', $vars);
+        return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_end', $vars);
+        return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->extension->renderer->setTheme($view, $themes);
+        $this->renderer->setTheme($view, $themes);
     }
 
     public static function themeBlockInheritanceProvider()
@@ -207,40 +203,5 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         return array(
             array(array('parent_label.html.twig'), array('child_label.html.twig')),
         );
-    }
-
-    public function testRange()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testRangeWithMinMaxValues()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testLabelWithoutTranslationOnButton()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testButtonlabelWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
     }
 }

@@ -27,6 +27,7 @@ class DataCollectorTranslatorTest extends TestCase
         $collector->trans('bar');
         $collector->transChoice('choice', 0);
         $collector->trans('bar_ru');
+        $collector->trans('bar_ru', array('foo' => 'bar'));
 
         $expectedMessages = array();
         $expectedMessages[] = array(
@@ -35,6 +36,8 @@ class DataCollectorTranslatorTest extends TestCase
               'locale' => 'en',
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_DEFINED,
+              'parameters' => array(),
+              'transChoiceNumber' => null,
         );
         $expectedMessages[] = array(
               'id' => 'bar',
@@ -42,6 +45,8 @@ class DataCollectorTranslatorTest extends TestCase
               'locale' => 'fr',
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+              'parameters' => array(),
+              'transChoiceNumber' => null,
         );
         $expectedMessages[] = array(
               'id' => 'choice',
@@ -49,6 +54,8 @@ class DataCollectorTranslatorTest extends TestCase
               'locale' => 'en',
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_MISSING,
+              'parameters' => array(),
+              'transChoiceNumber' => 0,
         );
         $expectedMessages[] = array(
               'id' => 'bar_ru',
@@ -56,6 +63,17 @@ class DataCollectorTranslatorTest extends TestCase
               'locale' => 'ru',
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+              'parameters' => array(),
+              'transChoiceNumber' => null,
+        );
+        $expectedMessages[] = array(
+              'id' => 'bar_ru',
+              'translation' => 'bar (ru)',
+              'locale' => 'ru',
+              'domain' => 'messages',
+              'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+              'parameters' => array('foo' => 'bar'),
+              'transChoiceNumber' => null,
         );
 
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());

@@ -18,43 +18,48 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * @group legacy
+ */
 class AddConsoleCommandPassTest extends TestCase
 {
-    public function testProcess()
+    /**
+     * @dataProvider visibilityProvider
+     */
+    public function testProcess($public)
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container->setParameter('my-command.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
 
         $definition = new Definition('%my-command.class%');
+        $definition->setPublic($public);
         $definition->addTag('console.command');
         $container->setDefinition('my-command', $definition);
 
         $container->compile();
 
         $alias = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
-        $this->assertTrue($container->hasAlias($alias));
-        $this->assertSame('my-command', (string) $container->getAlias($alias));
+        if ($container->hasAlias($alias)) {
+            $this->assertSame('my-command', (string) $container->getAlias($alias));
+        } else {
+            // The alias is replaced by a Definition by the ReplaceAliasByActualDefinitionPass
+            // in case the original service is private
+            $this->assertFalse($container->hasDefinition('my-command'));
+            $this->assertTrue($container->hasDefinition($alias));
+        }
 
+        $id = $public ? 'my-command' : 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
         $this->assertTrue($container->hasParameter('console.command.ids'));
-        $this->assertSame(array('my-command'), $container->getParameter('console.command.ids'));
+        $this->assertSame(array($id), $container->getParameter('console.command.ids'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "my-command" tagged "console.command" must be public.
-     */
-    public function testProcessThrowAnExceptionIfTheServiceIsNotPublic()
+    public function visibilityProvider()
     {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
-
-        $definition = new Definition('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
-        $definition->addTag('console.command');
-        $definition->setPublic(false);
-        $container->setDefinition('my-command', $definition);
-
-        $container->compile();
+        return array(
+            array(true),
+            array(false),
+        );
     }
 
     /**

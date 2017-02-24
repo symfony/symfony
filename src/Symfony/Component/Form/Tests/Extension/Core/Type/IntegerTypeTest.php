@@ -25,7 +25,7 @@ class IntegerTypeTest extends TestCase
 
     public function testSubmitCastsToInteger()
     {
-        $form = $this->factory->create('integer');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\IntegerType');
 
         $form->submit('1.678');
 

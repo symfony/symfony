@@ -7,14 +7,34 @@ Definitions
 ### definition_1
 
 - Class: `Full\Qualified\Class1`
-- Scope: `container`
 - Public: yes
 - Synthetic: no
 - Lazy: yes
-- Synchronized: no
+- Shared: yes
 - Abstract: yes
+- Autowire: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+
+### definition_autowired
+
+- Class: `AutowiredService`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowire: yes
+
+### definition_autowired_with_methods
+
+- Class: `AutowiredService`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowire: `set*`, `addFoo`
 
 
 Aliases

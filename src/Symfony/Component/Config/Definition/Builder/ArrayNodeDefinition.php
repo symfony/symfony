@@ -24,6 +24,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 {
     protected $performDeepMerging = true;
     protected $ignoreExtraKeys = false;
+    protected $removeExtraKeys = true;
     protected $children = array();
     protected $prototype;
     protected $atLeastOne = false;
@@ -76,6 +77,62 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function prototype($type)
     {
         return $this->prototype = $this->getNodeBuilder()->node(null, $type)->setParent($this);
+    }
+
+    /**
+     * @return VariableNodeDefinition
+     */
+    public function variablePrototype()
+    {
+        return $this->prototype('variable');
+    }
+
+    /**
+     * @return ScalarNodeDefinition
+     */
+    public function scalarPrototype()
+    {
+        return $this->prototype('scalar');
+    }
+
+    /**
+     * @return BooleanNodeDefinition
+     */
+    public function booleanPrototype()
+    {
+        return $this->prototype('boolean');
+    }
+
+    /**
+     * @return IntegerNodeDefinition
+     */
+    public function integerPrototype()
+    {
+        return $this->prototype('integer');
+    }
+
+    /**
+     * @return FloatNodeDefinition
+     */
+    public function floatPrototype()
+    {
+        return $this->prototype('float');
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    public function arrayPrototype()
+    {
+        return $this->prototype('array');
+    }
+
+    /**
+     * @return EnumNodeDefinition
+     */
+    public function enumPrototype()
+    {
+        return $this->prototype('enum');
     }
 
     /**
@@ -284,11 +341,14 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * you want to send an entire configuration array through a special
      * tree that processes only part of the array.
      *
+     * @param bool $remove Whether to remove the extra keys
+     *
      * @return $this
      */
-    public function ignoreExtraKeys()
+    public function ignoreExtraKeys($remove = true)
     {
         $this->ignoreExtraKeys = true;
+        $this->removeExtraKeys = $remove;
 
         return $this;
     }
@@ -393,7 +453,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
-        $node->setIgnoreExtraKeys($this->ignoreExtraKeys);
+        $node->setIgnoreExtraKeys($this->ignoreExtraKeys, $this->removeExtraKeys);
         $node->setNormalizeKeys($this->normalizeKeys);
 
         if (null !== $this->normalization) {

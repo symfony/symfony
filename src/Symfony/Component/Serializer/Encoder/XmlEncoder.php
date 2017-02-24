@@ -30,15 +30,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     private $format;
     private $context;
     private $rootNodeName = 'response';
+    private $loadOptions;
 
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string $rootNodeName
+     * @param string   $rootNodeName
+     * @param int|null $loadOptions  A bit field of LIBXML_* constants
      */
-    public function __construct($rootNodeName = 'response')
+    public function __construct($rootNodeName = 'response', $loadOptions = null)
     {
         $this->rootNodeName = $rootNodeName;
+        $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
     }
 
     /**
@@ -81,7 +84,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
-        $dom->loadXML($data, LIBXML_NONET | LIBXML_NOBLANKS);
+        $dom->loadXML($data, $this->loadOptions);
 
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);
@@ -389,7 +392,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                     }
                 } elseif (is_numeric($key) || !$this->isElementNameValid($key)) {
                     $append = $this->appendNode($parentNode, $data, 'item', $key);
-                } else {
+                } elseif (null !== $data || !isset($this->context['remove_empty_tags']) || false === $this->context['remove_empty_tags']) {
                     $append = $this->appendNode($parentNode, $data, $key);
                 }
             }

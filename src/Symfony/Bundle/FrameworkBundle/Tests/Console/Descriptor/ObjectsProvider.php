@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -105,6 +108,23 @@ class ObjectsProvider
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
+                ->addArgument(new Reference('definition2'))
+                ->addArgument('%parameter%')
+                ->addArgument(new Definition('inline_service', array('arg1', 'arg2')))
+                ->addArgument(array(
+                    'foo',
+                    new Reference('definition2'),
+                    new Definition('inline_service'),
+                ))
+                ->addArgument(new IteratorArgument(array(
+                    new Reference('definition_1'),
+                    new Reference('definition_2'),
+                )))
+                ->addArgument(new ClosureProxyArgument('definition1', 'get'))
+                ->addArgument(new ServiceLocatorArgument(array(
+                    'def1' => new Reference('definition_1'),
+                    'def2' => new Reference('definition_2'),
+                )))
                 ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
             'definition_2' => $definition2
                 ->setPublic(false)
@@ -115,41 +135,11 @@ class ObjectsProvider
                 ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
                 ->addTag('tag1', array('attr3' => 'val3'))
                 ->addTag('tag2')
+                ->addMethodCall('setMailer', array(new Reference('mailer')))
                 ->setFactory(array(new Reference('factory.service'), 'get')),
-        );
-    }
-
-    /**
-     * @deprecated since version 2.7, to be removed in 3.0
-     *
-     * @internal
-     */
-    public static function getLegacyContainerDefinitions()
-    {
-        $definition1 = new Definition('Full\\Qualified\\Class1');
-        $definition2 = new Definition('Full\\Qualified\\Class2');
-
-        return array(
-            'legacy_synchronized_service_definition_1' => $definition1
-                ->setPublic(true)
-                ->setSynthetic(false)
-                ->setLazy(true)
-                ->setSynchronized(true)
-                ->setAbstract(true)
-                ->setFactoryClass('Full\\Qualified\\FactoryClass', 'get')
-                ->setFactoryMethod('get'),
-            'legacy_synchronized_service_definition_2' => $definition2
-                ->setPublic(false)
-                ->setSynthetic(true)
-                ->setFile('/path/to/file')
-                ->setLazy(false)
-                ->setSynchronized(false)
-                ->setAbstract(false)
-                ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
-                ->addTag('tag1', array('attr3' => 'val3'))
-                ->addTag('tag2')
-                ->setFactoryService('factory.service')
-                ->setFactoryMethod('get'),
+            'definition_autowired' => (new Definition('AutowiredService'))->setAutowired(true),
+            'definition_autowired_with_methods' => (new Definition('AutowiredService'))
+                ->setAutowiredCalls(array('__construct', 'set*', 'addFoo')),
         );
     }
 
@@ -165,8 +155,8 @@ class ObjectsProvider
     {
         $eventDispatcher = new EventDispatcher();
 
-        $eventDispatcher->addListener('event1', 'global_function');
-        $eventDispatcher->addListener('event1', function () { return 'Closure'; });
+        $eventDispatcher->addListener('event1', 'global_function', 255);
+        $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return array('event_dispatcher_1' => $eventDispatcher);

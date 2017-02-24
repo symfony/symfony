@@ -19,6 +19,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
+/**
+ * @group time-sensitive
+ */
 class ClientTest extends TestCase
 {
     public function testDoRequest()
@@ -58,8 +61,8 @@ class ClientTest extends TestCase
         $m->setAccessible(true);
 
         $expected = array(
-            'foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly',
-            'foo1=bar1; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly',
+            'foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; max-age='.(strtotime('Sun, 15-Feb-2009 20:00:00 GMT') - time()).'; path=/foo; domain=http://example.com; secure; httponly',
+            'foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; max-age='.(strtotime('Sun, 15-Feb-2009 20:00:00 GMT') - time()).'; path=/foo; domain=http://example.com; secure; httponly',
         );
 
         $response = new Response();

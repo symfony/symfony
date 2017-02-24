@@ -11,23 +11,17 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * SerializerAware Encoder implementation.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since version 3.2, to be removed in 4.0. Use the SerializerAwareTrait instead.
  */
 abstract class SerializerAwareEncoder implements SerializerAwareInterface
 {
-    protected $serializer;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        $this->serializer = $serializer;
-    }
+    use SerializerAwareTrait;
 }

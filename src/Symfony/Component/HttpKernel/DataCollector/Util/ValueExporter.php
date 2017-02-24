@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector\Util;
 
+@trigger_error('The '.__NAMESPACE__.'\ValueExporter class is deprecated since version 3.2 and will be removed in 4.0. Use the VarDumper component instead.', E_USER_DEPRECATED);
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 3.2, to be removed in 4.0. Use the VarDumper component instead.
  */
 class ValueExporter
 {
@@ -32,7 +36,7 @@ class ValueExporter
         }
 
         if (is_object($value)) {
-            if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+            if ($value instanceof \DateTimeInterface) {
                 return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ATOM));
             }
 
@@ -58,7 +62,13 @@ class ValueExporter
                 return sprintf("[\n%s%s\n%s]", $indent, implode(sprintf(", \n%s", $indent), $a), str_repeat('  ', $depth - 1));
             }
 
-            return sprintf('[%s]', implode(', ', $a));
+            $s = sprintf('[%s]', implode(', ', $a));
+
+            if (80 > strlen($s)) {
+                return $s;
+            }
+
+            return sprintf("[\n%s%s\n]", $indent, implode(sprintf(",\n%s", $indent), $a));
         }
 
         if (is_resource($value)) {

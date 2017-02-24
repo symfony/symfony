@@ -12,7 +12,7 @@
 
         <!-- DataCollector -->
         <service id="data_collector.translation" class="Symfony\Component\Translation\DataCollector\TranslationDataCollector">
-            <tag name="data_collector" template="@WebProfiler/Collector/translation.html.twig" id="translation" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/translation.html.twig" id="translation" priority="275" />
             <argument type="service" id="translator.data_collector" />
         </service>
     </services>

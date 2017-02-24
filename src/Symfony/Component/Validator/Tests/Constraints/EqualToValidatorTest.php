@@ -13,18 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new EqualToValidator();
@@ -33,6 +27,11 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
     protected function createConstraint(array $options)
     {
         return new EqualTo($options);
+    }
+
+    protected function getErrorCode()
+    {
+        return EqualTo::NOT_EQUAL_ERROR;
     }
 
     /**

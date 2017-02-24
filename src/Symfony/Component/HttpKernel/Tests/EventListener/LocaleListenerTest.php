@@ -28,7 +28,7 @@ class LocaleListenerTest extends TestCase
 
     public function testDefaultLocaleWithoutSession()
     {
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request = Request::create('/'));
 
         $listener->onKernelRequest($event);
@@ -42,7 +42,7 @@ class LocaleListenerTest extends TestCase
         $request->cookies->set('foo', 'value');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -61,7 +61,7 @@ class LocaleListenerTest extends TestCase
         $request = Request::create('/');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', $router, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelRequest($this->getEvent($request));
     }
 
@@ -81,7 +81,7 @@ class LocaleListenerTest extends TestCase
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FinishRequestEvent')->disableOriginalConstructor()->getMock();
 
-        $listener = new LocaleListener('fr', $router, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelFinishRequest($event);
     }
 
@@ -89,7 +89,7 @@ class LocaleListenerTest extends TestCase
     {
         $request = Request::create('/');
         $request->setLocale('de');
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);

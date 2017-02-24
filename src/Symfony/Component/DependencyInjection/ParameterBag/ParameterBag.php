@@ -81,7 +81,23 @@ class ParameterBag implements ParameterBagInterface
                 }
             }
 
-            throw new ParameterNotFoundException($name, null, null, null, $alternatives);
+            $nonNestedAlternative = null;
+            if (!count($alternatives) && false !== strpos($name, '.')) {
+                $namePartsLength = array_map('strlen', explode('.', $name));
+                $key = substr($name, 0, -1 * (1 + array_pop($namePartsLength)));
+                while (count($namePartsLength)) {
+                    if ($this->has($key)) {
+                        if (is_array($this->get($key))) {
+                            $nonNestedAlternative = $key;
+                        }
+                        break;
+                    }
+
+                    $key = substr($key, 0, -1 * (1 + array_pop($namePartsLength)));
+                }
+            }
+
+            throw new ParameterNotFoundException($name, null, null, null, $alternatives, $nonNestedAlternative);
         }
 
         return $this->parameters[$name];
@@ -189,40 +205,40 @@ class ParameterBag implements ParameterBagInterface
         // as the preg_replace_callback throw an exception when trying
         // a non-string in a parameter value
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
-            $key = strtolower($match[1]);
+            $key = $match[1];
+            $lcKey = strtolower($key);
 
-            if (isset($resolving[$key])) {
+            if (isset($resolving[$lcKey])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
-            $resolving[$key] = true;
+            $resolving[$lcKey] = true;
 
             return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
 
-        $self = $this;
-
-        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {
+        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($resolving, $value) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
             }
 
-            $key = strtolower($match[1]);
-            if (isset($resolving[$key])) {
+            $key = $match[1];
+            $lcKey = strtolower($key);
+            if (isset($resolving[$lcKey])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
-            $resolved = $self->get($key);
+            $resolved = $this->get($key);
 
             if (!is_string($resolved) && !is_numeric($resolved)) {
                 throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
             }
 
             $resolved = (string) $resolved;
-            $resolving[$key] = true;
+            $resolving[$lcKey] = true;
 
-            return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);
+            return $this->isResolved() ? $resolved : $this->resolveString($resolved, $resolving);
         }, $value);
     }
 

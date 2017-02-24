@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * deprecated interface `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed
+ * deprecated methods `Logger::crit()`, `Logger::emerg()`, `Logger::err()` and `Logger::warn()` have been removed
+
 2.4.0
 -----
 

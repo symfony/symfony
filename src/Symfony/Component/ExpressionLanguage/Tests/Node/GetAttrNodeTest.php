@@ -44,6 +44,19 @@ class GetAttrNodeTest extends AbstractNodeTest
         );
     }
 
+    public function getDumpData()
+    {
+        return array(
+            array('foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
+            array('foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
+
+            array('foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+
+            array('foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
+            array('foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
+        );
+    }
+
     protected function getArrayNode()
     {
         $array = new ArrayNode();

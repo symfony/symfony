@@ -40,7 +40,7 @@
       <argument>%foo_bar%</argument>
       <configurator service="foo.baz" method="configure"/>
     </service>
-    <service id="foo_bar" class="%foo_class%" scope="prototype"/>
+    <service id="foo_bar" class="%foo_class%" shared="false"/>
     <service id="method_call1" class="Bar\FooClass">
       <file>%path%foo.php</file>
       <call method="setBar">
@@ -84,9 +84,18 @@
     <service id="configured_service" class="stdClass">
       <configurator service="configurator_service" method="configureStdClass"/>
     </service>
+    <service id="configurator_service_simple" class="ConfClass" public="false">
+      <argument>bar</argument>
+    </service>
+    <service id="configured_service_simple" class="stdClass">
+      <configurator service="configurator_service_simple" method="configureStdClass"/>
+    </service>
     <service id="decorated" class="stdClass"/>
     <service id="decorator_service" class="stdClass" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
+    <service id="deprecated_service" class="stdClass">
+      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.</deprecated>
+    </service>
     <service id="new_factory" class="FactoryClass" public="false">
       <property name="foo">bar</property>
     </service>
@@ -99,6 +108,40 @@
     </service>
     <service id="service_from_static_method" class="Bar\FooClass">
       <factory class="Bar\FooClass" method="getInstance"/>
+    </service>
+    <service id="factory_simple" class="SimpleFactoryClass" public="false">
+      <argument>foo</argument>
+    </service>
+    <service id="factory_service_simple" class="Bar">
+      <factory service="factory_simple" method="getInstance"/>
+    </service>
+    <service id="lazy_context" class="LazyContext">
+      <argument type="iterator">
+        <argument>foo</argument>
+        <argument type="service" id="foo.baz"/>
+        <argument type="collection">
+          <argument key="%foo%">foo is %foo%</argument>
+          <argument key="foobar">%foo%</argument>
+        </argument>
+        <argument>true</argument>
+        <argument type="service" id="service_container"/>
+      </argument>
+    </service>
+    <service id="lazy_context_ignore_invalid_ref" class="LazyContext">
+      <argument type="iterator">
+        <argument type="service" id="foo.baz"/>
+        <argument type="service" id="invalid" on-invalid="ignore"/>
+      </argument>
+    </service>
+    <service id="closure_proxy" class="BarClass">
+      <argument type="closure-proxy" id="closure_proxy" method="getBaz"/>
+    </service>
+    <service id="service_locator" class="Bar">
+      <argument type="service-locator">
+        <argument key="bar" type="service" id="bar"/>
+        <argument key="invalid" type="service" id="invalid" on-invalid="ignore"/>
+        <argument key="container" type="service" id="service_container"/>
+      </argument>
     </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>

@@ -88,6 +88,9 @@ class TwigExtension extends Extension
             }
         }
 
+        $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
+        $container->getDefinition('twig.template_iterator')->replaceArgument(2, $config['paths']);
+
         $bundleHierarchy = $this->getBundleHierarchy($container);
 
         foreach ($bundleHierarchy as $name => $bundle) {
@@ -104,7 +107,7 @@ class TwigExtension extends Extension
             }
         }
 
-        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+        if ($container->fileExists($dir = $container->getParameter('kernel.root_dir').'/Resources/views', false)) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
 
@@ -132,16 +135,18 @@ class TwigExtension extends Extension
 
         $container->getDefinition('twig')->replaceArgument(1, $config);
 
-        $this->addClassesToCompile(array(
-            'Twig_Environment',
-            'Twig_Extension',
-            'Twig_Extension_Core',
-            'Twig_Extension_Escaper',
-            'Twig_Extension_Optimizer',
-            'Twig_LoaderInterface',
-            'Twig_Markup',
-            'Twig_Template',
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Twig_Environment',
+                'Twig_Extension',
+                'Twig_Extension_Core',
+                'Twig_Extension_Escaper',
+                'Twig_Extension_Optimizer',
+                'Twig_LoaderInterface',
+                'Twig_Markup',
+                'Twig_Template',
+            ));
+        }
     }
 
     private function getBundleHierarchy(ContainerBuilder $container)
@@ -157,11 +162,11 @@ class TwigExtension extends Extension
                 );
             }
 
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+            if ($container->fileExists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views', false)) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
 
-            if (is_dir($dir = $bundle['path'].'/Resources/views')) {
+            if ($container->fileExists($dir = $bundle['path'].'/Resources/views', false)) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -67,7 +68,7 @@ class SwitchUserListenerTest extends TestCase
      */
     public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
     {
-        $token = $this->getToken(array($this->getMockBuilder('Symfony\Component\Security\Core\Role\RoleInterface')->getMock()));
+        $token = $this->getToken(array(new Role('the role')));
 
         $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('_exit'));
@@ -217,7 +218,7 @@ class SwitchUserListenerTest extends TestCase
      */
     public function testSwitchUserIsDisallowed()
     {
-        $token = $this->getToken(array($this->getMockBuilder('Symfony\Component\Security\Core\Role\RoleInterface')->getMock()));
+        $token = $this->getToken(array(new Role('the role')));
 
         $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
@@ -232,7 +233,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUser()
     {
-        $token = $this->getToken(array($this->getMockBuilder('Symfony\Component\Security\Core\Role\RoleInterface')->getMock()));
+        $token = $this->getToken(array(new Role('the role')));
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->any())->method('getRoles')->will($this->returnValue(array()));
 
@@ -262,7 +263,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserKeepsOtherQueryStringParameters()
     {
-        $token = $this->getToken(array($this->getMockBuilder('Symfony\Component\Security\Core\Role\RoleInterface')->getMock()));
+        $token = $this->getToken(array(new Role('the role')));
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->any())->method('getRoles')->will($this->returnValue(array()));
 

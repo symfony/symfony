@@ -141,26 +141,30 @@ class ControllerResolverTest extends BaseControllerResolverTest
      */
     public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
     {
+        // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected excetion and not use the regex
+        $resolver = $this->createControllerResolver();
         if (method_exists($this, 'expectException')) {
             $this->expectException($exceptionName);
-            $this->expectExceptionMessage($exceptionMessage);
+            $this->expectExceptionMessageRegExp($exceptionMessage);
         } else {
-            $this->setExpectedException($exceptionName, $exceptionMessage);
+            $this->setExpectedExceptionRegExp($exceptionName, $exceptionMessage);
         }
 
-        parent::testGetControllerOnNonUndefinedFunction($controller);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $controller);
+        $resolver->getController($request);
     }
 
     public function getUndefinedControllers()
     {
         return array(
-            array('foo', '\LogicException', 'Unable to parse the controller name "foo".'),
-            array('oof::bar', '\InvalidArgumentException', 'Class "oof" does not exist.'),
-            array('stdClass', '\LogicException', 'Unable to parse the controller name "stdClass".'),
+            array('foo', '\LogicException', '/Unable to parse the controller name "foo"\./'),
+            array('oof::bar', '\InvalidArgumentException', '/Class "oof" does not exist\./'),
+            array('stdClass', '\LogicException', '/Unable to parse the controller name "stdClass"\./'),
             array(
                 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',
                 '\InvalidArgumentException',
-                'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar" for URI "/" is not callable.',
+                '/.?[cC]ontroller(.*?) for URI "\/" is not callable\.( Expected method(.*) Available methods)?/',
             ),
         );
     }

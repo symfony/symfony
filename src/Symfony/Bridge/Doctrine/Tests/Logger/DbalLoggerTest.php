@@ -133,9 +133,6 @@ class DbalLoggerTest extends TestCase
         ));
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testLogUTF8LongString()
     {
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();

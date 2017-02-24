@@ -11,52 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\Serializer\DependencyInjection\SerializerPass instead.', SerializerPass::class), E_USER_DEPRECATED);
+
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass as BaseSerializerPass;
 
 /**
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
  * encoders and normalizers to the Serializer service.
  *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseSerializerPass} instead.
+ *
  * @author Javier Lopez <f12loalf@gmail.com>
  */
-class SerializerPass implements CompilerPassInterface
+class SerializerPass extends BaseSerializerPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('serializer')) {
-            return;
-        }
-
-        // Looks for all the services tagged "serializer.normalizer" and adds them to the Serializer service
-        $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
-        $container->getDefinition('serializer')->replaceArgument(0, $normalizers);
-
-        // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
-        $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
-        $container->getDefinition('serializer')->replaceArgument(1, $encoders);
-    }
-
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
-    {
-        $services = $container->findTaggedServiceIds($tagName);
-
-        if (empty($services)) {
-            throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));
-        }
-
-        $sortedServices = array();
-        foreach ($services as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
-            }
-        }
-
-        krsort($sortedServices);
-
-        // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
-    }
 }

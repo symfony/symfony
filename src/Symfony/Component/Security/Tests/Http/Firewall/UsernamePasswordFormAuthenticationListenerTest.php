@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Security;
 
 class UsernamePasswordFormAuthenticationListenerTest extends TestCase
 {
@@ -49,7 +49,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         ;
 
         $listener = new UsernamePasswordFormAuthenticationListener(
-            $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')->getMock(),
+            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
             $authenticationManager,
             $this->getMockBuilder('Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock(),
             $httpUtils,
@@ -72,8 +72,8 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     public function getUsernameForLength()
     {
         return array(
-            array(str_repeat('x', SecurityContextInterface::MAX_USERNAME_LENGTH + 1), false),
-            array(str_repeat('x', SecurityContextInterface::MAX_USERNAME_LENGTH - 1), true),
+            array(str_repeat('x', Security::MAX_USERNAME_LENGTH + 1), false),
+            array(str_repeat('x', Security::MAX_USERNAME_LENGTH - 1), true),
         );
     }
 }

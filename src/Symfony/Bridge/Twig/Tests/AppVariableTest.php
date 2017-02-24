@@ -68,6 +68,17 @@ class AppVariableTest extends TestCase
         $this->assertEquals($request, $this->appVariable->getRequest());
     }
 
+    public function testGetToken()
+    {
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $this->appVariable->setTokenStorage($tokenStorage);
+
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $tokenStorage->method('getToken')->willReturn($token);
+
+        $this->assertEquals($token, $this->appVariable->getToken());
+    }
+
     public function testGetUser()
     {
         $this->setTokenStorage($user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock());
@@ -80,6 +91,14 @@ class AppVariableTest extends TestCase
         $this->setTokenStorage($user = 'username');
 
         $this->assertNull($this->appVariable->getUser());
+    }
+
+    public function testGetTokenWithNoToken()
+    {
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $this->appVariable->setTokenStorage($tokenStorage);
+
+        $this->assertNull($this->appVariable->getToken());
     }
 
     public function testGetUserWithNoToken()
@@ -104,6 +123,14 @@ class AppVariableTest extends TestCase
     public function testDebugNotSet()
     {
         $this->appVariable->getDebug();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetTokenWithTokenStorageNotSet()
+    {
+        $this->appVariable->getToken();
     }
 
     /**

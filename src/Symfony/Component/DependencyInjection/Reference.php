@@ -20,20 +20,22 @@ class Reference
 {
     private $id;
     private $invalidBehavior;
-    private $strict;
 
     /**
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
-     * @param bool   $strict          Sets how this reference is validated
      *
      * @see Container
      */
-    public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
+    public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $this->id = strtolower($id);
+        if (!is_string($id)) {
+            $type = is_object($id) ? get_class($id) : gettype($id);
+            $id = (string) $id;
+            @trigger_error(sprintf('Non-string identifiers are deprecated since Symfony 3.3 and won\'t be supported in 4.0 for Reference to "%s" ("%s" given.) Cast it to string beforehand.', $id, $type), E_USER_DEPRECATED);
+        }
+        $this->id = $id;
         $this->invalidBehavior = $invalidBehavior;
-        $this->strict = $strict;
     }
 
     /**
@@ -52,15 +54,5 @@ class Reference
     public function getInvalidBehavior()
     {
         return $this->invalidBehavior;
-    }
-
-    /**
-     * Returns true when this Reference is strict.
-     *
-     * @return bool
-     */
-    public function isStrict()
-    {
-        return $this->strict;
     }
 }

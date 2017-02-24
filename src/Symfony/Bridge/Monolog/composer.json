@@ -16,13 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": ">=5.5.9",
         "monolog/monolog": "~1.11",
-        "symfony/http-kernel": "~2.4"
+        "symfony/http-kernel": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/console": "~2.4",
-        "symfony/event-dispatcher": "~2.2"
+        "symfony/console": "~2.8|~3.0",
+        "symfony/event-dispatcher": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",
@@ -38,7 +38,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

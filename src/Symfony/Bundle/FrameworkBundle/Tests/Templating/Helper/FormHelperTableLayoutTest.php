@@ -27,9 +27,29 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
-    protected $testableFeatures = array(
-        'choice_attr',
-    );
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get">', $html);
+    }
+
+    public function testStartTagHasActionAttributeWhenActionIsZero()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '0',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="0">', $html);
+    }
 
     protected function getExtensions()
     {
@@ -65,15 +85,6 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->form($view, $vars);
-    }
-
-    protected function renderEnctype(FormView $view)
-    {
-        if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
-            $this->markTestSkipped(sprintf('Deprecated method %s->enctype() is not implemented.', get_class($form)));
-        }
-
-        return (string) $form->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -114,40 +125,5 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->engine->get('form')->setTheme($view, $themes);
-    }
-
-    public function testRange()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testRangeWithMinMaxValues()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testLabelWithoutTranslationOnButton()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testButtonlabelWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
     }
 }

@@ -45,7 +45,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassIdAndNameToViewWithParent()
     {
-        $view = $this->factory->createNamedBuilder('parent', 'form')
+        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('child', $this->getTestedType())
             ->getForm()
             ->createView();
@@ -57,8 +57,8 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassIdAndNameToViewWithGrandParent()
     {
-        $builder = $this->factory->createNamedBuilder('parent', 'form')
-            ->add('child', 'form');
+        $builder = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\FormType');
         $builder->get('child')->add('grand_child', $this->getTestedType());
         $view = $builder->getForm()->createView();
 
@@ -80,7 +80,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testInheritTranslationDomainFromParent()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
                 'translation_domain' => 'domain',
             ))
             ->add('child', $this->getTestedType())
@@ -93,7 +93,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPreferOwnTranslationDomain()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
                 'translation_domain' => 'parent_domain',
             ))
             ->add('child', $this->getTestedType(), array(
@@ -107,7 +107,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testDefaultTranslationDomain()
     {
-        $view = $this->factory->createNamedBuilder('parent', 'form')
+        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('child', $this->getTestedType())
             ->getForm()
             ->createView();

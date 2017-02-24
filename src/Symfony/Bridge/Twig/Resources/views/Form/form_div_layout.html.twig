@@ -57,7 +57,7 @@
     {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {%- if placeholder is not none -%}
-            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? placeholder|trans({}, translation_domain) }}</option>
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
         {%- endif -%}
         {%- if preferred_choices|length > 0 -%}
             {% set options = preferred_choices %}
@@ -130,6 +130,41 @@
     {%- endif -%}
 {%- endblock time_widget -%}
 
+{%- block dateinterval_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_errors(form) -}}
+            <table class="{{ table_class|default('') }}">
+                <thead>
+                    <tr>
+                        {%- if with_years %}<th>{{ form_label(form.years) }}</th>{% endif -%}
+                        {%- if with_months %}<th>{{ form_label(form.months) }}</th>{% endif -%}
+                        {%- if with_weeks %}<th>{{ form_label(form.weeks) }}</th>{% endif -%}
+                        {%- if with_days %}<th>{{ form_label(form.days) }}</th>{% endif -%}
+                        {%- if with_hours %}<th>{{ form_label(form.hours) }}</th>{% endif -%}
+                        {%- if with_minutes %}<th>{{ form_label(form.minutes) }}</th>{% endif -%}
+                        {%- if with_seconds %}<th>{{ form_label(form.seconds) }}</th>{% endif -%}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {%- if with_years %}<td>{{ form_widget(form.years) }}</td>{% endif -%}
+                        {%- if with_months %}<td>{{ form_widget(form.months) }}</td>{% endif -%}
+                        {%- if with_weeks %}<td>{{ form_widget(form.weeks) }}</td>{% endif -%}
+                        {%- if with_days %}<td>{{ form_widget(form.days) }}</td>{% endif -%}
+                        {%- if with_hours %}<td>{{ form_widget(form.hours) }}</td>{% endif -%}
+                        {%- if with_minutes %}<td>{{ form_widget(form.minutes) }}</td>{% endif -%}
+                        {%- if with_seconds %}<td>{{ form_widget(form.seconds) }}</td>{% endif -%}
+                    </tr>
+                </tbody>
+            </table>
+            {%- if with_invert %}{{ form_widget(form.invert) }}{% endif -%}
+        </div>
+    {%- endif -%}
+{%- endblock dateinterval_widget -%}
+
 {%- block number_widget -%}
     {# type="number" doesn't work with floats #}
     {%- set type = type|default('text') -%}
@@ -175,6 +210,11 @@
     {{ block('form_widget_simple') }}
 {%- endblock email_widget -%}
 
+{%- block range_widget -%}
+    {% set type = type|default('range') %}
+    {{- block('form_widget_simple') -}}
+{%- endblock range_widget %}
+
 {%- block button_widget -%}
     {%- if label is empty -%}
         {%- if label_format is not empty -%}
@@ -186,7 +226,7 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}
@@ -268,7 +308,7 @@
     {%- else -%}
         {% set form_method = "POST" %}
     {%- endif -%}
-    <form name="{{ name }}" method="{{ form_method|lower }}" action="{{ action }}"{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    <form name="{{ name }}" method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
@@ -280,10 +320,6 @@
     {%- endif -%}
     </form>
 {%- endblock form_end -%}
-
-{%- block form_enctype -%}
-    {% if multipart %}enctype="multipart/form-data"{% endif %}
-{%- endblock form_enctype -%}
 
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
@@ -313,13 +349,12 @@
 
 {%- block widget_attributes -%}
     id="{{ id }}" name="{{ full_name }}"
-    {%- if read_only %} readonly="readonly"{% endif -%}
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
-    {%- for attrname, attrvalue in attr if 'readonly' != attrname or not read_only -%}
+    {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}
@@ -333,7 +368,7 @@
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}
@@ -347,7 +382,7 @@
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}
@@ -360,7 +395,7 @@
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}

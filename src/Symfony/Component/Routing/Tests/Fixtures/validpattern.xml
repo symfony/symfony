@@ -11,5 +11,14 @@
         <condition>context.getMethod() == "GET"</condition>
     </route>
 
+    <route id="blog_show_legacy" path="/blog/{slug}" host="{locale}.example.com">
+        <default key="_controller">MyBundle:Blog:show</default>
+        <requirement key="_method">GET|POST|put|OpTiOnS</requirement>
+        <requirement key="_scheme">hTTps</requirement>
+        <requirement key="locale">\w+</requirement>
+        <option key="compiler_class">RouteCompiler</option>
+        <condition>context.getMethod() == "GET"</condition>
+    </route>
+
     <route id="blog_show_inherited" path="/blog/{slug}" />
 </routes>

@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentType extends AbstractType
@@ -32,20 +31,8 @@ class PercentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $scale = function (Options $options) {
-            if (null !== $options['precision']) {
-                @trigger_error('The form option "precision" is deprecated since version 2.7 and will be removed in 3.0. Use "scale" instead.', E_USER_DEPRECATED);
-
-                return $options['precision'];
-            }
-
-            return 0;
-        };
-
         $resolver->setDefaults(array(
-            // deprecated as of Symfony 2.7, to be removed in Symfony 3.0.
-            'precision' => null,
-            'scale' => $scale,
+            'scale' => 0,
             'type' => 'fractional',
             'compound' => false,
         ));
@@ -61,7 +48,7 @@ class PercentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'percent';
     }

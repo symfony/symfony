@@ -26,7 +26,7 @@ class LocaleTypeTest extends TestCase
 
     public function testLocalesAreSelectable()
     {
-        $form = $this->factory->create('locale');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LocaleType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

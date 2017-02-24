@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -176,7 +177,11 @@ abstract class KernelTestCase extends TestCase
     protected static function ensureKernelShutdown()
     {
         if (null !== static::$kernel) {
+            $container = static::$kernel->getContainer();
             static::$kernel->shutdown();
+            if ($container instanceof ResettableContainerInterface) {
+                $container->reset();
+            }
         }
     }
 

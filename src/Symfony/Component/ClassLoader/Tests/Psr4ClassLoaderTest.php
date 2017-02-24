@@ -14,6 +14,9 @@ namespace Symfony\Component\ClassLoader\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ClassLoader\Psr4ClassLoader;
 
+/**
+ * @group legacy
+ */
 class Psr4ClassLoaderTest extends TestCase
 {
     /**

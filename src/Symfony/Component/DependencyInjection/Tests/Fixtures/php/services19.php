@@ -1,18 +1,21 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * ProjectServiceContainer.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
  */
 class ProjectServiceContainer extends Container
 {
@@ -24,11 +27,29 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct();
+        $this->services = array();
         $this->methodMap = array(
             'service_from_anonymous_factory' => 'getServiceFromAnonymousFactoryService',
             'service_with_method_call_and_factory' => 'getServiceWithMethodCallAndFactoryService',
         );
+
+        $this->aliases = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped frozen container.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isFrozen()
+    {
+        return true;
     }
 
     /**
@@ -41,7 +62,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getServiceFromAnonymousFactoryService()
     {
-        return $this->services['service_from_anonymous_factory'] = call_user_func(array(new \Bar\FooClass(), 'getInstance'));
+        return $this->services['service_from_anonymous_factory'] = (new \Bar\FooClass())->getInstance();
     }
 
     /**

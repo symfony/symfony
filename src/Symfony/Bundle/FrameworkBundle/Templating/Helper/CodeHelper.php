@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -27,9 +28,9 @@ class CodeHelper extends Helper
     /**
      * Constructor.
      *
-     * @param string $fileLinkFormat The format for links to source files
-     * @param string $rootDir        The project root directory
-     * @param string $charset        The charset
+     * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
+     * @param string                   $rootDir        The project root directory
+     * @param string                   $charset        The charset
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
@@ -154,11 +155,7 @@ class CodeHelper extends Helper
      */
     public function formatFile($file, $line, $text = null)
     {
-        if (PHP_VERSION_ID >= 50400) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-        } else {
-            $flags = ENT_QUOTES;
-        }
+        $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
         if (null === $text) {
             $file = trim($file);
@@ -189,8 +186,8 @@ class CodeHelper extends Helper
      */
     public function getFileLink($file, $line)
     {
-        if ($this->fileLinkFormat && is_file($file)) {
-            return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
+        if ($fmt = $this->fileLinkFormat) {
+            return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
         }
 
         return false;
@@ -198,10 +195,8 @@ class CodeHelper extends Helper
 
     public function formatFileFromText($text)
     {
-        $that = $this;
-
-        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
-            return 'in '.$that->formatFile($match[2], $match[3]);
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
+            return 'in '.$this->formatFile($match[2], $match[3]);
         }, $text);
     }
 

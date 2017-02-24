@@ -4,13 +4,14 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="twig.loader.filesystem" class="%twig.loader.filesystem.class%" public="false">
+        <service id="twig.loader.filesystem" class="Symfony\Bundle\TwigBundle\Loader\FilesystemLoader" public="false">
             <argument type="service" id="templating.locator" />
             <argument type="service" id="templating.name_parser" />
+            <argument /> <!-- project's root dir -->
             <tag name="twig.loader"/>
         </service>
 
-        <service id="templating.engine.twig" class="%templating.engine.twig.class%" public="false">
+        <service id="templating.engine.twig" class="Symfony\Bundle\TwigBundle\TwigEngine" public="false">
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="templating.locator" />

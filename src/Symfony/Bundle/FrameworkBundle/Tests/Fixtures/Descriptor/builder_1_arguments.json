@@ -1,0 +1,125 @@
+{
+    "definitions": {
+        "definition_1": {
+            "class": "Full\\Qualified\\Class1",
+            "public": true,
+            "synthetic": false,
+            "lazy": true,
+            "shared": true,
+            "abstract": true,
+            "autowire": false,
+            "arguments": [
+                {
+                    "type": "service",
+                    "id": "definition2"
+                },
+                "%parameter%",
+                {
+                    "class": "inline_service",
+                    "public": true,
+                    "synthetic": false,
+                    "lazy": false,
+                    "shared": true,
+                    "abstract": false,
+                    "autowire": false,
+                    "arguments": [
+                        "arg1",
+                        "arg2"
+                    ],
+                    "file": null,
+                    "tags": []
+                },
+                [
+                    "foo",
+                    {
+                        "type": "service",
+                        "id": "definition2"
+                    },
+                    {
+                        "class": "inline_service",
+                        "public": true,
+                        "synthetic": false,
+                        "lazy": false,
+                        "shared": true,
+                        "abstract": false,
+                        "autowire": false,
+                        "arguments": [],
+                        "file": null,
+                        "tags": []
+                    }
+                ],
+                [
+                    {
+                        "type": "service",
+                        "id": "definition_1"
+                    },
+                    {
+                        "type": "service",
+                        "id": "definition_2"
+                    }
+                ],
+                [
+                    {
+                        "type": "service",
+                        "id": "definition1"
+                    },
+                    "get"
+                ],
+                {
+                    "def1": {
+                        "type": "service",
+                        "id": "definition_1"
+                    },
+                    "def2": {
+                        "type": "service",
+                        "id": "definition_2"
+                    }
+                }
+            ],
+            "file": null,
+            "factory_class": "Full\\Qualified\\FactoryClass",
+            "factory_method": "get",
+            "tags": []
+        },
+        "definition_autowired": {
+            "class": "AutowiredService",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": true,
+            "arguments": [],
+            "file": null,
+            "tags": []
+        },
+        "definition_autowired_with_methods": {
+            "class": "AutowiredService",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": [
+                "set*",
+                "addFoo"
+            ],
+            "arguments": [],
+            "file": null,
+            "tags": []
+        }
+    },
+    "aliases": {
+        "alias_1": {
+            "service": "service_1",
+            "public": true
+        },
+        "alias_2": {
+            "service": "service_2",
+            "public": false
+        }
+    },
+    "services": {
+        "service_container": "Symfony\\Component\\DependencyInjection\\ContainerBuilder"
+    }
+}

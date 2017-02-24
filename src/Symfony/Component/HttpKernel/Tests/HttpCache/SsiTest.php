@@ -40,10 +40,10 @@ class SsiTest extends TestCase
 
         $request = Request::create('/');
         $ssi->addSurrogateCapability($request);
-        $this->assertEquals('symfony2="SSI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $this->assertEquals('symfony="SSI/1.0"', $request->headers->get('Surrogate-Capability'));
 
         $ssi->addSurrogateCapability($request);
-        $this->assertEquals('symfony2="SSI/1.0", symfony2="SSI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $this->assertEquals('symfony="SSI/1.0", symfony="SSI/1.0"', $request->headers->get('Surrogate-Capability'));
     }
 
     public function testAddSurrogateControl()

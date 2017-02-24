@@ -27,7 +27,7 @@ services:
         configurator: ['@foo.baz', configure]
     foo_bar:
         class: '%foo_class%'
-        scope: prototype
+        shared: false
     method_call1:
         class: Bar\FooClass
         file: '%path%foo.php'
@@ -67,6 +67,13 @@ services:
     configured_service:
         class: stdClass
         configurator: ['@configurator_service', configureStdClass]
+    configurator_service_simple:
+        class: ConfClass
+        public: false
+        arguments: ['bar']
+    configured_service_simple:
+        class: stdClass
+        configurator: ['@configurator_service_simple', configureStdClass]
     decorated:
         class: stdClass
     decorator_service:
@@ -76,6 +83,9 @@ services:
         class: stdClass
         decorates: decorated
         decoration_inner_name: decorated.pif-pouf
+    deprecated_service:
+        class: stdClass
+        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
     new_factory:
         class: FactoryClass
         public: false
@@ -90,5 +100,24 @@ services:
     service_from_static_method:
         class: Bar\FooClass
         factory: [Bar\FooClass, getInstance]
+    factory_simple:
+        class: SimpleFactoryClass
+        public: false
+        arguments: ['foo']
+    factory_service_simple:
+        class: Bar
+        factory: ['@factory_simple', getInstance]
+    lazy_context:
+        class: LazyContext
+        arguments: [!iterator [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']]
+    lazy_context_ignore_invalid_ref:
+        class: LazyContext
+        arguments: [!iterator ['@foo.baz', '@?invalid']]
+    closure_proxy:
+        class: BarClass
+        arguments: [!closure_proxy ['@closure_proxy', getBaz]]
     alias_for_foo: '@foo'
     alias_for_alias: '@foo'
+    service_locator:
+        class: Bar
+        arguments: [!service_locator { bar: '@bar', invalid: '@?invalid', container: '@service_container' }]

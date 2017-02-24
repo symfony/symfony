@@ -16,49 +16,66 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/asset": "~2.7",
-        "symfony/dependency-injection": "^2.6.2",
-        "symfony/config": "~2.4",
-        "symfony/event-dispatcher": "~2.5",
-        "symfony/finder": "^2.0.5",
-        "symfony/http-foundation": "~2.7",
-        "symfony/http-kernel": "~2.7.25|^2.8.18",
-        "symfony/filesystem": "~2.3",
-        "symfony/routing": "~2.7.24|^2.8.17",
-        "symfony/security-core": "~2.6.13|~2.7.9|~2.8",
-        "symfony/security-csrf": "~2.6",
-        "symfony/stopwatch": "~2.3",
-        "symfony/templating": "~2.1",
-        "symfony/translation": "~2.7",
-        "doctrine/annotations": "~1.0"
+        "php": ">=5.5.9",
+        "symfony/cache": "~3.3",
+        "symfony/class-loader": "~3.2",
+        "symfony/dependency-injection": "~3.3",
+        "symfony/config": "~3.3",
+        "symfony/event-dispatcher": "~3.3",
+        "symfony/http-foundation": "~3.3",
+        "symfony/http-kernel": "~3.3",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/filesystem": "~2.8|~3.0",
+        "symfony/finder": "~2.8|~3.0",
+        "symfony/routing": "~3.1.10|^3.2.3",
+        "symfony/security-core": "~2.8|~3.0",
+        "symfony/security-csrf": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
+        "doctrine/cache": "~1.0"
     },
     "require-dev": {
-        "symfony/browser-kit": "~2.4",
-        "symfony/console": "~2.7",
-        "symfony/css-selector": "^2.0.5",
-        "symfony/dom-crawler": "^2.0.5",
-        "symfony/intl": "~2.3",
-        "symfony/security": "~2.6",
-        "symfony/form": "~2.7.25|^2.8.18",
-        "symfony/class-loader": "~2.1",
-        "symfony/expression-language": "~2.6",
-        "symfony/process": "^2.0.5",
-        "symfony/validator": "~2.5",
-        "symfony/yaml": "^2.0.5",
+        "symfony/asset": "~2.8|~3.0",
+        "symfony/browser-kit": "~2.8|~3.0",
+        "symfony/console": "~3.3",
+        "symfony/css-selector": "~2.8|~3.0",
+        "symfony/dom-crawler": "~2.8|~3.0",
+        "symfony/polyfill-intl-icu": "~1.0",
+        "symfony/security": "~2.8|~3.0",
+        "symfony/form": "~3.3",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/process": "~2.8|~3.0",
+        "symfony/security-core": "~3.2",
+        "symfony/security-csrf": "~2.8|~3.0",
+        "symfony/serializer": "~3.3",
+        "symfony/translation": "~2.8|~3.0",
+        "symfony/templating": "~2.8|~3.0",
+        "symfony/validator": "~3.2",
+        "symfony/yaml": "~3.2",
+        "symfony/property-info": "~3.3",
+        "doctrine/annotations": "~1.0",
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "twig/twig": "~1.26|~2.0",
         "sensio/framework-extra-bundle": "^3.0.2"
     },
     "conflict": {
-        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
+        "phpdocumentor/reflection-docblock": "<3.0",
+        "phpdocumentor/type-resolver": "<0.2.0",
+        "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
+        "symfony/asset": "<3.3",
+        "symfony/console": "<3.3",
+        "symfony/serializer": "<3.3",
+        "symfony/form": "<3.3",
+        "symfony/property-info": "<3.3"
     },
     "suggest": {
+        "ext-apcu": "For best performance of the system caches",
         "symfony/console": "For using the console commands",
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",
         "symfony/validator": "For using validation",
         "symfony/yaml": "For using the debug:config and lint:yaml commands",
-        "symfony/process": "For using the server:run, server:start, server:stop, and server:status commands",
-        "doctrine/cache": "For using alternative cache drivers"
+        "symfony/property-info": "For using the property_info service",
+        "symfony/process": "For using the server:run, server:start, server:stop, and server:status commands"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },
@@ -69,7 +86,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

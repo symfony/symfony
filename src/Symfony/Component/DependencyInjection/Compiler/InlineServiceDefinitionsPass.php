@@ -11,23 +11,18 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Inline service definitions where this is possible.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InlineServiceDefinitionsPass implements RepeatablePassInterface
+class InlineServiceDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
     private $repeatedPass;
-    private $graph;
-    private $compiler;
-    private $formatter;
-    private $currentId;
 
     /**
      * {@inheritdoc}
@@ -38,88 +33,39 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     }
 
     /**
-     * Processes the ContainerBuilder for inline service definitions.
-     *
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    protected function processValue($value, $isRoot = false)
     {
-        $this->compiler = $container->getCompiler();
-        $this->formatter = $this->compiler->getLoggingFormatter();
-        $this->graph = $this->compiler->getServiceReferenceGraph();
+        if ($value instanceof ArgumentInterface) {
+            $this->processValue($value->getValues());
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            $this->currentId = $id;
-
-            $definition->setArguments(
-                $this->inlineArguments($container, $definition->getArguments())
-            );
-
-            $definition->setMethodCalls(
-                $this->inlineArguments($container, $definition->getMethodCalls())
-            );
-
-            $definition->setProperties(
-                $this->inlineArguments($container, $definition->getProperties())
-            );
-
-            $configurator = $this->inlineArguments($container, array($definition->getConfigurator()));
-            $definition->setConfigurator($configurator[0]);
-
-            $factory = $this->inlineArguments($container, array($definition->getFactory()));
-            $definition->setFactory($factory[0]);
+            return $value;
         }
-    }
+        if ($value instanceof Reference && $this->container->hasDefinition($id = (string) $value)) {
+            $definition = $this->container->getDefinition($id);
 
-    /**
-     * Processes inline arguments.
-     *
-     * @param ContainerBuilder $container The ContainerBuilder
-     * @param array            $arguments An array of arguments
-     *
-     * @return array
-     */
-    private function inlineArguments(ContainerBuilder $container, array $arguments)
-    {
-        foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
-                $arguments[$k] = $this->inlineArguments($container, $argument);
-            } elseif ($argument instanceof Reference) {
-                if (!$container->hasDefinition($id = (string) $argument)) {
-                    continue;
+            if ($this->isInlineableDefinition($id, $definition, $this->container->getCompiler()->getServiceReferenceGraph())) {
+                $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
+
+                if ($definition->isShared()) {
+                    return $definition;
                 }
-
-                if ($this->isInlineableDefinition($container, $id, $definition = $container->getDefinition($id))) {
-                    $this->compiler->addLogMessage($this->formatter->formatInlineService($this, $id, $this->currentId));
-
-                    if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
-                        $arguments[$k] = $definition;
-                    } else {
-                        $arguments[$k] = clone $definition;
-                    }
-                }
-            } elseif ($argument instanceof Definition) {
-                $argument->setArguments($this->inlineArguments($container, $argument->getArguments()));
-                $argument->setMethodCalls($this->inlineArguments($container, $argument->getMethodCalls()));
-                $argument->setProperties($this->inlineArguments($container, $argument->getProperties()));
+                $value = clone $definition;
             }
         }
 
-        return $arguments;
+        return parent::processValue($value, $isRoot);
     }
 
     /**
      * Checks if the definition is inlineable.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id
-     * @param Definition       $definition
-     *
      * @return bool If the definition is inlineable
      */
-    private function isInlineableDefinition(ContainerBuilder $container, $id, Definition $definition)
+    private function isInlineableDefinition($id, Definition $definition, ServiceReferenceGraph $graph)
     {
-        if (ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {
+        if (!$definition->isShared()) {
             return true;
         }
 
@@ -127,7 +73,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return false;
         }
 
-        if (!$this->graph->hasNode($id)) {
+        if (!$graph->hasNode($id)) {
             return true;
         }
 
@@ -136,7 +82,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
         }
 
         $ids = array();
-        foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
+        foreach ($graph->getNode($id)->getInEdges() as $edge) {
             $ids[] = $edge->getSourceNode()->getId();
         }
 
@@ -148,10 +94,6 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return false;
         }
 
-        if (count($ids) > 1 && $definition->getFactoryService(false)) {
-            return false;
-        }
-
-        return $container->getDefinition(reset($ids))->getScope() === $definition->getScope();
+        return true;
     }
 }

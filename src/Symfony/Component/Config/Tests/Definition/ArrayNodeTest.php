@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
@@ -36,19 +37,35 @@ class ArrayNodeTest extends TestCase
         $node->normalize(array('foo' => 'bar'));
     }
 
-    /**
-     * Tests that no exception is thrown for an unrecognized child if the
-     * ignoreExtraKeys option is set to true.
-     *
-     * Related to testExceptionThrownOnUnrecognizedChild
-     */
-    public function testIgnoreExtraKeysNoException()
+    public function ignoreAndRemoveMatrixProvider()
     {
-        $node = new ArrayNode('roo');
-        $node->setIgnoreExtraKeys(true);
+        $unrecognizedOptionException = new InvalidConfigurationException('Unrecognized option "foo" under "root"');
 
-        $node->normalize(array('foo' => 'bar'));
-        $this->assertTrue(true, 'No exception was thrown when setIgnoreExtraKeys is true');
+        return array(
+            array(true, true, array(), 'no exception is thrown for an unrecognized child if the ignoreExtraKeys option is set to true'),
+            array(true, false, array('foo' => 'bar'), 'extra keys are not removed when ignoreExtraKeys second option is set to false'),
+            array(false, true, $unrecognizedOptionException),
+            array(false, false, $unrecognizedOptionException),
+        );
+    }
+
+    /**
+     * @dataProvider ignoreAndRemoveMatrixProvider
+     */
+    public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = '')
+    {
+        if ($expected instanceof \Exception) {
+            if (method_exists($this, 'expectException')) {
+                $this->expectException(get_class($expected));
+                $this->expectExceptionMessage($expected->getMessage());
+            } else {
+                $this->setExpectedException(get_class($expected), $expected->getMessage());
+            }
+        }
+        $node = new ArrayNode('root');
+        $node->setIgnoreExtraKeys($ignore, $remove);
+        $result = $node->normalize(array('foo' => 'bar'));
+        $this->assertSame($expected, $result, $message);
     }
 
     /**

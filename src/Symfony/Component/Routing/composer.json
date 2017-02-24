@@ -16,26 +16,27 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/config": "~2.7",
-        "symfony/http-foundation": "~2.3",
-        "symfony/yaml": "^2.0.5",
-        "symfony/expression-language": "~2.4",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/config": "<2.7"
+        "symfony/config": "<2.8"
     },
     "suggest": {
         "symfony/http-foundation": "For using a Symfony Request object",
         "symfony/config": "For using the all-in-one router or any loader",
         "symfony/yaml": "For using the YAML loader",
         "symfony/expression-language": "For using expression matching",
-        "doctrine/annotations": "For using the annotation loader"
+        "doctrine/annotations": "For using the annotation loader",
+        "symfony/dependency-injection": "For loading routes from a service"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Routing\\": "" },
@@ -46,7 +47,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

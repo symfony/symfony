@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Constraints\Deprecated\UuidValidator as Deprecated;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -56,21 +54,6 @@ class UuidValidator extends ConstraintValidator
 
     const LOOSE_MAX_LENGTH = 39;
     const LOOSE_FIRST_HYPHEN_POSITION = 4;
-
-    /**
-     * @deprecated since version 2.6, to be removed in 3.0
-     */
-    const STRICT_PATTERN = '/^[a-f0-9]{8}-[a-f0-9]{4}-[%s][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i';
-
-    /**
-     * @deprecated since version 2.6, to be removed in 3.0
-     */
-    const LOOSE_PATTERN = '/^[a-f0-9]{4}(?:-?[a-f0-9]{4}){7}$/i';
-
-    /**
-     * @deprecated since version 2.6, to be removed in 3.0
-     */
-    const STRICT_UUID_LENGTH = 36;
 
     /**
      * {@inheritdoc}
@@ -119,17 +102,10 @@ class UuidValidator extends ConstraintValidator
         for ($i = 0; $i < $l; ++$i) {
             // Check length
             if (!isset($trimmed[$i])) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::TOO_SHORT_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::TOO_SHORT_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::TOO_SHORT_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -139,17 +115,10 @@ class UuidValidator extends ConstraintValidator
             //     ^    ^    ^    ^    ^    ^    ^
             if ('-' === $trimmed[$i]) {
                 if ($i !== $h) {
-                    if ($this->context instanceof ExecutionContextInterface) {
-                        $this->context->buildViolation($constraint->message)
-                            ->setParameter('{{ value }}', $this->formatValue($value))
-                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                            ->addViolation();
-                    } else {
-                        $this->buildViolation($constraint->message)
-                            ->setParameter('{{ value }}', $this->formatValue($value))
-                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                            ->addViolation();
-                    }
+                    $this->context->buildViolation($constraint->message)
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                        ->addViolation();
 
                     return;
                 }
@@ -167,17 +136,10 @@ class UuidValidator extends ConstraintValidator
 
             // Check characters
             if (!ctype_xdigit($trimmed[$i])) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -185,17 +147,10 @@ class UuidValidator extends ConstraintValidator
 
         // Check length again
         if (isset($trimmed[$i])) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::TOO_LONG_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::TOO_LONG_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::TOO_LONG_ERROR)
+                ->addViolation();
         }
     }
 
@@ -214,17 +169,10 @@ class UuidValidator extends ConstraintValidator
         for ($i = 0; $i < self::STRICT_LENGTH; ++$i) {
             // Check length
             if (!isset($value[$i])) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::TOO_SHORT_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::TOO_SHORT_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::TOO_SHORT_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -234,17 +182,10 @@ class UuidValidator extends ConstraintValidator
             //         ^    ^    ^    ^
             if ('-' === $value[$i]) {
                 if ($i !== $h) {
-                    if ($this->context instanceof ExecutionContextInterface) {
-                        $this->context->buildViolation($constraint->message)
-                            ->setParameter('{{ value }}', $this->formatValue($value))
-                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                            ->addViolation();
-                    } else {
-                        $this->buildViolation($constraint->message)
-                            ->setParameter('{{ value }}', $this->formatValue($value))
-                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                            ->addViolation();
-                    }
+                    $this->context->buildViolation($constraint->message)
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                        ->addViolation();
 
                     return;
                 }
@@ -260,34 +201,20 @@ class UuidValidator extends ConstraintValidator
 
             // Check characters
             if (!ctype_xdigit($value[$i])) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
+                    ->addViolation();
 
                 return;
             }
 
             // Missing hyphen
             if ($i === $h) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -295,32 +222,18 @@ class UuidValidator extends ConstraintValidator
 
         // Check length again
         if (isset($value[$i])) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::TOO_LONG_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::TOO_LONG_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::TOO_LONG_ERROR)
+                ->addViolation();
         }
 
         // Check version
         if (!in_array($value[self::STRICT_VERSION_POSITION], $constraint->versions)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::INVALID_VERSION_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::INVALID_VERSION_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::INVALID_VERSION_ERROR)
+                ->addViolation();
         }
 
         // Check variant - first two bits must equal "10"
@@ -328,17 +241,10 @@ class UuidValidator extends ConstraintValidator
         // & 0b1100 (12)
         // = 0b1000 (8)
         if ((hexdec($value[self::STRICT_VARIANT_POSITION]) & 12) !== 8) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::INVALID_VARIANT_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Uuid::INVALID_VARIANT_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::INVALID_VARIANT_ERROR)
+                ->addViolation();
         }
     }
 }

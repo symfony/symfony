@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added command line arrays in the `Process` class
+ * added `$env` argument to `Process::start()`, `run()`, `mustRun()` and `restart()` methods
+ * deprecated the `ProcessUtils::escapeArgument()` method
+ * deprecated not inheriting environment variables
+ * deprecated configuring `proc_open()` options
+ * deprecated configuring enhanced Windows compatibility
+ * deprecated configuring enhanced sigchild compatibility
+
 2.5.0
 -----
 

@@ -64,6 +64,7 @@ class XmlDescriptor extends Descriptor
 
         $commandXML->setAttribute('id', $command->getName());
         $commandXML->setAttribute('name', $command->getName());
+        $commandXML->setAttribute('hidden', $command->isHidden() ? 1 : 0);
 
         $commandXML->appendChild($usagesXML = $dom->createElement('usages'));
 
@@ -103,7 +104,7 @@ class XmlDescriptor extends Descriptor
 
         $rootXml->appendChild($commandsXML = $dom->createElement('commands'));
 
-        $description = new ApplicationDescription($application, $namespace);
+        $description = new ApplicationDescription($application, $namespace, true);
 
         if ($namespace) {
             $commandsXML->setAttribute('namespace', $namespace);

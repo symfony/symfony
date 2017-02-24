@@ -26,7 +26,7 @@ class CountryTypeTest extends TestCase
 
     public function testCountriesAreSelectable()
     {
-        $form = $this->factory->create('country');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
@@ -40,7 +40,7 @@ class CountryTypeTest extends TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $form = $this->factory->create('country', 'country');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType', 'Symfony\Component\Form\Extension\Core\Type\CountryType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

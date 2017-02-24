@@ -16,19 +16,23 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/intl": "~2.7.25|^2.8.18",
-        "symfony/options-resolver": "~2.6",
-        "symfony/property-access": "~2.3"
+        "php": ">=5.5.9",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/intl": "^2.8.18|^3.2.5",
+        "symfony/options-resolver": "~2.8|~3.0",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/property-access": "~2.8|~3.0"
     },
     "require-dev": {
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~2.7.25|^2.8.18",
-        "symfony/http-foundation": "~2.2",
-        "symfony/http-kernel": "~2.4",
-        "symfony/security-csrf": "~2.4",
-        "symfony/translation": "^2.0.5"
+        "symfony/validator": "^2.8.18|^3.2.5",
+        "symfony/dependency-injection": "~3.2",
+        "symfony/config": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/security-csrf": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
+        "symfony/var-dumper": "~3.2"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
@@ -51,7 +55,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

@@ -332,14 +332,98 @@ class Filesystem
         }
 
         if (!$ok && true !== @symlink($originDir, $targetDir)) {
-            $report = error_get_last();
-            if (is_array($report)) {
-                if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
-                    throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?', 0, null, $targetDir);
-                }
-            }
-            throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
+            $this->linkException($originDir, $targetDir, 'symbolic');
         }
+    }
+
+    /**
+     * Creates a hard link, or several hard links to a file.
+     *
+     * @param string          $originFile  The original file
+     * @param string|string[] $targetFiles The target file(s)
+     *
+     * @throws FileNotFoundException When original file is missing or not a file
+     * @throws IOException           When link fails, including if link already exists
+     */
+    public function hardlink($originFile, $targetFiles)
+    {
+        if (!$this->exists($originFile)) {
+            throw new FileNotFoundException(null, 0, null, $originFile);
+        }
+
+        if (!is_file($originFile)) {
+            throw new FileNotFoundException(sprintf('Origin file "%s" is not a file', $originFile));
+        }
+
+        foreach ($this->toIterator($targetFiles) as $targetFile) {
+            if (is_file($targetFile)) {
+                if (fileinode($originFile) === fileinode($targetFile)) {
+                    continue;
+                }
+                $this->remove($targetFile);
+            }
+
+            if (true !== @link($originFile, $targetFile)) {
+                $this->linkException($originFile, $targetFile, 'hard');
+            }
+        }
+    }
+
+    /**
+     * @param string $origin
+     * @param string $target
+     * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
+     */
+    private function linkException($origin, $target, $linkType)
+    {
+        $report = error_get_last();
+        if (is_array($report)) {
+            if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
+                throw new IOException(sprintf('Unable to create %s link due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?', $linkType), 0, null, $target);
+            }
+        }
+        throw new IOException(sprintf('Failed to create %s link from "%s" to "%s".', $linkType, $origin, $target), 0, null, $target);
+    }
+
+    /**
+     * Resolves links in paths.
+     *
+     * With $canonicalize = false (default)
+     *      - if $path does not exist or is not a link, returns null
+     *      - if $path is a link, returns the next direct target of the link without considering the existence of the target
+     *
+     * With $canonicalize = true
+     *      - if $path does not exist, returns null
+     *      - if $path exists, returns its absolute fully resolved final version
+     *
+     * @param string $path         A filesystem path
+     * @param bool   $canonicalize Whether or not to return a canonicalized path
+     *
+     * @return string|null
+     */
+    public function readlink($path, $canonicalize = false)
+    {
+        if (!$canonicalize && !is_link($path)) {
+            return;
+        }
+
+        if ($canonicalize) {
+            if (!$this->exists($path)) {
+                return;
+            }
+
+            if ('\\' === DIRECTORY_SEPARATOR) {
+                $path = readlink($path);
+            }
+
+            return realpath($path);
+        }
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            return realpath($path);
+        }
+
+        return readlink($path);
     }
 
     /**
@@ -483,16 +567,66 @@ class Filesystem
     }
 
     /**
+     * Creates a temporary file with support for custom stream wrappers.
+     *
+     * @param string $dir    The directory where the temporary filename will be created
+     * @param string $prefix The prefix of the generated temporary filename
+     *                       Note: Windows uses only the first three characters of prefix
+     *
+     * @return string The new temporary filename (with path), or throw an exception on failure
+     */
+    public function tempnam($dir, $prefix)
+    {
+        list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
+
+        // If no scheme or scheme is "file" or "gs" (Google Cloud) create temp file in local filesystem
+        if (null === $scheme || 'file' === $scheme || 'gs' === $scheme) {
+            $tmpFile = @tempnam($hierarchy, $prefix);
+
+            // If tempnam failed or no scheme return the filename otherwise prepend the scheme
+            if (false !== $tmpFile) {
+                if (null !== $scheme && 'gs' !== $scheme) {
+                    return $scheme.'://'.$tmpFile;
+                }
+
+                return $tmpFile;
+            }
+
+            throw new IOException('A temporary file could not be created.');
+        }
+
+        // Loop until we create a valid temp file or have reached 10 attempts
+        for ($i = 0; $i < 10; ++$i) {
+            // Create a unique filename
+            $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true);
+
+            // Use fopen instead of file_exists as some streams do not support stat
+            // Use mode 'x+' to atomically check existence and create to avoid a TOCTOU vulnerability
+            $handle = @fopen($tmpFile, 'x+');
+
+            // If unsuccessful restart the loop
+            if (false === $handle) {
+                continue;
+            }
+
+            // Close the file if it was successfully opened
+            @fclose($handle);
+
+            return $tmpFile;
+        }
+
+        throw new IOException('A temporary file could not be created.');
+    }
+
+    /**
      * Atomically dumps content into a file.
      *
-     * @param string   $filename The file to be written to
-     * @param string   $content  The data to write into the file
-     * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
-     *                           Deprecated since version 2.3.12, to be removed in 3.0.
+     * @param string $filename The file to be written to
+     * @param string $content  The data to write into the file
      *
-     * @throws IOException If the file cannot be written to.
+     * @throws IOException If the file cannot be written to
      */
-    public function dumpFile($filename, $content, $mode = 0666)
+    public function dumpFile($filename, $content)
     {
         $dir = dirname($filename);
 
@@ -504,20 +638,41 @@ class Filesystem
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
         }
 
-        $tmpFile = tempnam($dir, basename($filename));
+        // Will create a temp file with 0600 access rights
+        // when the filesystem supports chmod.
+        $tmpFile = $this->tempnam($dir, basename($filename));
 
         if (false === @file_put_contents($tmpFile, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
         }
 
-        if (null !== $mode) {
-            if (func_num_args() > 2) {
-                @trigger_error('Support for modifying file permissions is deprecated since version 2.3.12 and will be removed in 3.0.', E_USER_DEPRECATED);
-            }
-
-            $this->chmod($tmpFile, $mode);
-        }
+        @chmod($tmpFile, 0666 & ~umask());
         $this->rename($tmpFile, $filename, true);
+    }
+
+    /**
+     * Appends content to an existing file.
+     *
+     * @param string $filename The file to which to append content
+     * @param string $content  The content to append
+     *
+     * @throws IOException If the file is not writable
+     */
+    public function appendToFile($filename, $content)
+    {
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        }
+
+        if (!is_writable($dir)) {
+            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
+        }
+
+        if (false === @file_put_contents($filename, $content, FILE_APPEND)) {
+            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+        }
     }
 
     /**
@@ -532,5 +687,19 @@ class Filesystem
         }
 
         return $files;
+    }
+
+    /**
+     * Gets a 2-tuple of scheme (may be null) and hierarchical part of a filename (e.g. file:///tmp -> array(file, tmp)).
+     *
+     * @param string $filename The filename to be parsed
+     *
+     * @return array The filename scheme and hierarchical part
+     */
+    private function getSchemeAndHierarchy($filename)
+    {
+        $components = explode('://', $filename, 2);
+
+        return 2 === count($components) ? array($components[0], $components[1]) : array(null, $components[0]);
     }
 }

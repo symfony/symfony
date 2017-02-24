@@ -92,10 +92,6 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             foreach ($route->getRequirements() as $name => $value) {
-                if ('_scheme' === $name || '_method' === $name) {
-                    continue; // ignore deprecated requirements to not trigger deprecation warnings
-                }
-
                 $route->setRequirement($name, $this->resolve($value));
             }
 
@@ -148,6 +144,10 @@ class Router extends BaseRouter implements WarmableInterface
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
+            }
+
+            if (preg_match('/^env\(\w+\)$/', $match[1])) {
+                throw new RuntimeException(sprintf('Using "%%%s%%" is not allowed in routing configuration.', $match[1]));
             }
 
             $resolved = $container->getParameter($match[1]);

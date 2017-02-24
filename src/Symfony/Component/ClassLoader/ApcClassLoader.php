@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\ClassLoader;
 
+@trigger_error('The '.__NAMESPACE__.'\ApcClassLoader class is deprecated since version 3.3 and will be removed in 4.0. Use `composer install --apcu-autoloader` instead.', E_USER_DEPRECATED);
+
 /**
  * ApcClassLoader implements a wrapping autoloader cached in APC for PHP 5.3.
  *
  * It expects an object implementing a findFile method to find the file. This
  * allows using it as a wrapper around the other loaders of the component (the
- * ClassLoader and the UniversalClassLoader for instance) but also around any
- * other autoloaders following this convention (the Composer one for instance).
+ * ClassLoader for instance) but also around any other autoloaders following
+ * this convention (the Composer one for instance).
  *
  *     // with a Symfony autoloader
  *     use Symfony\Component\ClassLoader\ClassLoader;
@@ -44,6 +46,8 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0. Use `composer install --apcu-autoloader` instead.
  */
 class ApcClassLoader
 {

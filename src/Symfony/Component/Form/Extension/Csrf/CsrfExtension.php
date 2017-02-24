@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Csrf;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -47,14 +44,8 @@ class CsrfExtension extends AbstractExtension
      * @param TranslatorInterface       $translator        The translator for translating error messages
      * @param null|string               $translationDomain The translation domain for translating
      */
-    public function __construct($tokenManager, TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct(CsrfTokenManagerInterface $tokenManager, TranslatorInterface $translator = null, $translationDomain = null)
     {
-        if ($tokenManager instanceof CsrfProviderInterface) {
-            $tokenManager = new CsrfProviderAdapter($tokenManager);
-        } elseif (!$tokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($tokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
-        }
-
         $this->tokenManager = $tokenManager;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;

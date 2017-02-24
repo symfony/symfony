@@ -26,7 +26,7 @@ class DebugClassLoaderTest extends TestCase
 
     protected function setUp()
     {
-        $this->errorReporting = error_reporting(E_ALL | E_STRICT);
+        $this->errorReporting = error_reporting(E_ALL);
         $this->loader = new ClassLoader();
         spl_autoload_register(array($this->loader, 'loadClass'), true, true);
         DebugClassLoader::enable();
@@ -108,8 +108,6 @@ class DebugClassLoaderTest extends TestCase
             $this->fail('ContextErrorException expected');
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
-            restore_error_handler();
-            restore_exception_handler();
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
             if (PHP_VERSION_ID < 70000) {
                 $this->assertRegExp('/^Runtime Notice: Declaration/', $exception->getMessage());
@@ -118,11 +116,9 @@ class DebugClassLoaderTest extends TestCase
                 $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_WARNING, $exception->getSeverity());
             }
-        } catch (\Exception $exception) {
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-
-            throw $exception;
         }
     }
 
@@ -203,6 +199,28 @@ class DebugClassLoaderTest extends TestCase
         );
     }
 
+    public function testInterfaceExtendsDeprecatedInterface()
+    {
+        set_error_handler(function () { return false; });
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\NonDeprecatedInterfaceClass', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_NOTICE,
+            'message' => '',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
+
     public function testDeprecatedSuperInSameNamespace()
     {
         set_error_handler(function () { return false; });
@@ -250,6 +268,50 @@ class DebugClassLoaderTest extends TestCase
 
         $this->assertSame($xError, $lastError);
     }
+
+    public function testExtendedFinalClass()
+    {
+        set_error_handler(function () { return false; });
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\ExtendsFinalClass', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'The Symfony\Component\Debug\Tests\Fixtures\FinalClass class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from Test\Symfony\Component\Debug\Tests\ExtendsFinalClass.',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
+
+    public function testExtendedFinalMethod()
+    {
+        set_error_handler(function () { return false; });
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists(__NAMESPACE__.'\\Fixtures\\ExtendedFinalMethod', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'The Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod() method is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod.',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
 }
 
 class ClassLoader
@@ -283,14 +345,24 @@ class ClassLoader
             return $fixtureDir.'notPsr0Bis.php';
         } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
             return $fixtureDir.'DeprecatedInterface.php';
+        } elseif (__NAMESPACE__.'\Fixtures\FinalClass' === $class) {
+            return $fixtureDir.'FinalClass.php';
+        } elseif (__NAMESPACE__.'\Fixtures\FinalMethod' === $class) {
+            return $fixtureDir.'FinalMethod.php';
+        } elseif (__NAMESPACE__.'\Fixtures\ExtendedFinalMethod' === $class) {
+            return $fixtureDir.'ExtendedFinalMethod.php';
         } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
             eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\DeprecatedInterface {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\NonDeprecatedInterfaceClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class NonDeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\NonDeprecatedInterface {}');
         } elseif ('Test\\'.__NAMESPACE__.'\Float' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\ExtendsFinalClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsFinalClass extends \\'.__NAMESPACE__.'\Fixtures\FinalClass {}');
         }
     }
 }

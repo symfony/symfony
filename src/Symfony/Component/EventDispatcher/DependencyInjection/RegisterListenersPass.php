@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\EventDispatcher\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
@@ -58,19 +61,15 @@ class RegisterListenersPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
             $def = $container->getDefinition($id);
-            if (!$def->isPublic()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event listeners are lazy-loaded.', $id));
-            }
-
             if ($def->isAbstract()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
+                throw new InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
             }
 
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
+                    throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
                 }
 
                 if (!isset($event['method'])) {
@@ -81,18 +80,16 @@ class RegisterListenersPass implements CompilerPassInterface
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
                 }
 
-                $definition->addMethodCall('addListenerService', array($event['event'], array($id, $event['method']), $priority));
+                $definition->addMethodCall('addListener', array($event['event'], new ClosureProxyArgument($id, $event['method']), $priority));
             }
         }
 
+        $extractingDispatcher = new ExtractingEventDispatcher();
+
         foreach ($container->findTaggedServiceIds($this->subscriberTag) as $id => $attributes) {
             $def = $container->getDefinition($id);
-            if (!$def->isPublic()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event subscribers are lazy-loaded.', $id));
-            }
-
             if ($def->isAbstract()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event subscribers are lazy-loaded.', $id));
+                throw new InvalidArgumentException(sprintf('The service "%s" must not be abstract as event subscribers are lazy-loaded.', $id));
             }
 
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
@@ -101,13 +98,33 @@ class RegisterListenersPass implements CompilerPassInterface
 
             if (!is_subclass_of($class, $interface)) {
                 if (!class_exists($class, false)) {
-                    throw new \InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
                 }
 
-                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
+            $container->addObjectResource($class);
 
-            $definition->addMethodCall('addSubscriberService', array($id, $class));
+            $r = new \ReflectionClass($class);
+            $extractingDispatcher->addSubscriber($r->newInstanceWithoutConstructor());
+            foreach ($extractingDispatcher->listeners as $args) {
+                $args[1] = new ClosureProxyArgument($id, $args[1]);
+                $definition->addMethodCall('addListener', $args);
+            }
+            $extractingDispatcher->listeners = array();
         }
+    }
+}
+
+/**
+ * @internal
+ */
+class ExtractingEventDispatcher extends EventDispatcher
+{
+    public $listeners = array();
+
+    public function addListener($eventName, $listener, $priority = 0)
+    {
+        $this->listeners[] = array($eventName, $listener[1], $priority);
     }
 }

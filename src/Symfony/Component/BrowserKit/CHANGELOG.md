@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Client HTTP user agent has been changed to 'Symfony BrowserKit'
+
 2.3.0
 -----
 

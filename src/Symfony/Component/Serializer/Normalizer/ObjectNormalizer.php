@@ -14,8 +14,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -24,16 +23,16 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ObjectNormalizer extends AbstractNormalizer
+class ObjectNormalizer extends AbstractObjectNormalizer
 {
     /**
      * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
-        parent::__construct($classMetadataFactory, $nameConverter);
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -41,125 +40,68 @@ class ObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    protected function extractAttributes($object, $format = null, array $context = array())
     {
-        return is_object($data) && !$data instanceof \Traversable;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws CircularReferenceException
-     */
-    public function normalize($object, $format = null, array $context = array())
-    {
-        if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object);
-        }
-
-        $data = array();
-        $attributes = $this->getAllowedAttributes($object, $context, true);
-
         // If not using groups, detect manually
-        if (false === $attributes) {
-            $attributes = array();
+        $attributes = array();
 
-            // methods
-            $reflClass = new \ReflectionClass($object);
-            foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-                if (
-                    !$reflMethod->isStatic() &&
-                    !$reflMethod->isConstructor() &&
-                    !$reflMethod->isDestructor() &&
-                    0 === $reflMethod->getNumberOfRequiredParameters()
-                ) {
-                    $name = $reflMethod->getName();
-
-                    if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
-                        // getters and hassers
-                        $attributes[lcfirst(substr($name, 3))] = true;
-                    } elseif (strpos($name, 'is') === 0) {
-                        // issers
-                        $attributes[lcfirst(substr($name, 2))] = true;
-                    }
-                }
-            }
-
-            // properties
-            foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-                if (!$reflProperty->isStatic()) {
-                    $attributes[$reflProperty->getName()] = true;
-                }
-            }
-
-            $attributes = array_keys($attributes);
-        }
-
-        foreach ($attributes as $attribute) {
-            if (in_array($attribute, $this->ignoredAttributes)) {
+        // methods
+        $reflClass = new \ReflectionClass($object);
+        foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
+            if (
+                $reflMethod->getNumberOfRequiredParameters() !== 0 ||
+                $reflMethod->isStatic() ||
+                $reflMethod->isConstructor() ||
+                $reflMethod->isDestructor()
+            ) {
                 continue;
             }
 
-            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+            $name = $reflMethod->name;
+            $attributeName = null;
 
-            if (isset($this->callbacks[$attribute])) {
-                $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
+            if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
+                // getters and hassers
+                $attributeName = lcfirst(substr($name, 3));
+            } elseif (strpos($name, 'is') === 0) {
+                // issers
+                $attributeName = lcfirst(substr($name, 2));
             }
 
-            if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
-                }
-
-                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+            if (null !== $attributeName && $this->isAllowedAttribute($object, $attributeName, $format, $context)) {
+                $attributes[$attributeName] = true;
             }
-
-            if ($this->nameConverter) {
-                $attribute = $this->nameConverter->normalize($attribute);
-            }
-
-            $data[$attribute] = $attributeValue;
         }
 
-        return $data;
+        // properties
+        foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
+            if ($reflProperty->isStatic() || !$this->isAllowedAttribute($object, $reflProperty->name, $format, $context)) {
+                continue;
+            }
+
+            $attributes[$reflProperty->name] = true;
+        }
+
+        return array_keys($attributes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
     {
-        return class_exists($type);
+        return $this->propertyAccessor->getValue($object, $attribute);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
     {
-        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
-        $normalizedData = $this->prepareForDenormalization($data);
-
-        $reflectionClass = new \ReflectionClass($class);
-        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
-
-        foreach ($normalizedData as $attribute => $value) {
-            if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
-            }
-
-            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
-
-            if ($allowed && !$ignored) {
-                try {
-                    $this->propertyAccessor->setValue($object, $attribute, $value);
-                } catch (NoSuchPropertyException $exception) {
-                    // Properties not found are ignored
-                }
-            }
+        try {
+            $this->propertyAccessor->setValue($object, $attribute, $value);
+        } catch (NoSuchPropertyException $exception) {
+            // Properties not found are ignored
         }
-
-        return $object;
     }
 }

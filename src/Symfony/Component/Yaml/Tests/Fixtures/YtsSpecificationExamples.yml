@@ -509,15 +509,23 @@ test: Integers
 spec: 2.19
 yaml: |
   canonical: 12345
-  decimal: +12,345
   octal: 014
   hexadecimal: 0xC
 php: |
   array(
     'canonical' => 12345,
-    'decimal' => 12345.0,
     'octal' => 014,
     'hexadecimal' => 0xC
+  )
+---
+test: Decimal Integer
+deprecated: true
+spec: 2.19
+yaml: |
+  decimal: +12,345
+php: |
+  array(
+    'decimal' => 12345.0,
   )
 ---
 # FIX: spec shows parens around -inf and NaN
@@ -526,7 +534,6 @@ spec: 2.20
 yaml: |
   canonical: 1.23015e+3
   exponential: 12.3015e+02
-  fixed: 1,230.15
   negative infinity: -.inf
   not a number: .NaN
   float as whole number: !!float 1
@@ -534,10 +541,19 @@ php: |
   array(
     'canonical' => 1230.15,
     'exponential' => 1230.15,
-    'fixed' => 1230.15,
     'negative infinity' => log(0),
     'not a number' => -log(0),
     'float as whole number' => (float) 1
+  )
+---
+test: Fixed Floating point
+deprecated: true
+spec: 2.20
+yaml: |
+  fixed: 1,230.15
+php: |
+  array(
+    'fixed' => 1230.15,
   )
 ---
 test: Miscellaneous
@@ -1532,29 +1548,43 @@ php: |
 test: Integer
 yaml: |
    canonical: 12345
-   decimal: +12,345
    octal: 014
    hexadecimal: 0xC
 php: |
    array(
      'canonical' => 12345,
-     'decimal' => 12345.0,
      'octal' => 12,
      'hexadecimal' => 12
    )
+---
+test: Decimal
+deprecated: true
+yaml: |
+   decimal: +12,345
+php: |
+   array(
+     'decimal' => 12345.0,
+   )
+---
+test: Fixed Float
+deprecated: true
+yaml: |
+   fixed: 1,230.15
+php: |
+  array(
+    'fixed' => 1230.15,
+  )
 ---
 test: Float
 yaml: |
    canonical: 1.23015e+3
    exponential: 12.3015e+02
-   fixed: 1,230.15
    negative infinity: -.inf
    not a number: .NaN
 php: |
   array(
     'canonical' => 1230.15,
     'exponential' => 1230.15,
-    'fixed' => 1230.15,
     'negative infinity' => log(0),
     'not a number' => -log(0)
   )

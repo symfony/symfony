@@ -1,11 +1,16 @@
-<comment>Service Id</comment>       -
-<comment>Class</comment>            Full\Qualified\Class1
-<comment>Tags</comment>             -
-<comment>Scope</comment>            container
-<comment>Public</comment>           yes
-<comment>Synthetic</comment>        no
-<comment>Lazy</comment>             yes
-<comment>Synchronized</comment>     no
-<comment>Abstract</comment>         yes
-<comment>Factory Class</comment>    Full\Qualified\FactoryClass
-<comment>Factory Method</comment>   get
+ ---------------- ----------------------------- 
+ [32m Option         [39m [32m Value                       [39m 
+ ---------------- ----------------------------- 
+  Service ID       -                            
+  Class            Full\Qualified\Class1        
+  Tags             -                            
+  Public           yes                          
+  Synthetic        no                           
+  Lazy             yes                          
+  Shared           yes                          
+  Abstract         yes                          
+  Autowire         no                           
+  Factory Class    Full\Qualified\FactoryClass  
+  Factory Method   get                          
+ ---------------- ----------------------------- 
+

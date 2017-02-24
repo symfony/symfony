@@ -1,0 +1,10 @@
+- Class: `Full\Qualified\Class1`
+- Public: yes
+- Synthetic: no
+- Lazy: yes
+- Shared: yes
+- Abstract: yes
+- Autowire: no
+- Arguments: yes
+- Factory Class: `Full\Qualified\FactoryClass`
+- Factory Method: `get`

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
@@ -324,6 +325,23 @@ class RequestTest extends TestCase
             $request = new Request();
             $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
         }
+    }
+
+    /**
+     * @dataProvider getFormatToMimeTypeMapProvider
+     */
+    public function testGetMimeTypesFromFormat($format, $mimeTypes)
+    {
+        if (null !== $format) {
+            $this->assertEquals($mimeTypes, Request::getMimeTypes($format));
+        }
+    }
+
+    public function testGetMimeTypesFromInexistentFormat()
+    {
+        $request = new Request();
+        $this->assertNull($request->getMimeType('foo'));
+        $this->assertEquals(array(), Request::getMimeTypes('foo'));
     }
 
     public function testGetFormatWithCustomMimeType()
@@ -1266,6 +1284,25 @@ class RequestTest extends TestCase
         $this->assertEquals('/path%20test/info', $request->getPathInfo());
     }
 
+    public function testGetParameterPrecedence()
+    {
+        $request = new Request();
+        $request->attributes->set('foo', 'attr');
+        $request->query->set('foo', 'query');
+        $request->request->set('foo', 'body');
+
+        $this->assertSame('attr', $request->get('foo'));
+
+        $request->attributes->remove('foo');
+        $this->assertSame('query', $request->get('foo'));
+
+        $request->query->remove('foo');
+        $this->assertSame('body', $request->get('foo'));
+
+        $request->request->remove('foo');
+        $this->assertNull($request->get('foo'));
+    }
+
     public function testGetPreferredLanguage()
     {
         $request = new Request();
@@ -1407,6 +1444,9 @@ class RequestTest extends TestCase
         $request = new Request();
         $this->assertNull($request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
+
+        $request = new Request(array('_format' => 'foo'));
+        $this->assertEquals('html', $request->getRequestFormat());
     }
 
     public function testHasSession()
@@ -1833,8 +1873,8 @@ class RequestTest extends TestCase
         try {
             $request->getHost();
             $this->fail('Request::getHost() should throw an exception when host is not trusted.');
-        } catch (\UnexpectedValueException $e) {
-            $this->assertEquals('Untrusted Host "evil.com"', $e->getMessage());
+        } catch (SuspiciousOperationException $e) {
+            $this->assertEquals('Untrusted Host "evil.com".', $e->getMessage());
         }
 
         // trusted hosts
@@ -1898,10 +1938,10 @@ class RequestTest extends TestCase
             }
         } else {
             if (method_exists($this, 'expectException')) {
-                $this->expectException('UnexpectedValueException');
+                $this->expectException(SuspiciousOperationException::class);
                 $this->expectExceptionMessage('Invalid Host');
             } else {
-                $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+                $this->setExpectedException(SuspiciousOperationException::class, 'Invalid Host');
             }
 
             $request->getHost();
@@ -1926,6 +1966,32 @@ class RequestTest extends TestCase
         return array(
             array('a'.str_repeat('.a', 40000)),
             array(str_repeat(':', 101)),
+        );
+    }
+
+    /**
+     * @dataProvider methodIdempotentProvider
+     */
+    public function testMethodIdempotent($method, $idempotent)
+    {
+        $request = new Request();
+        $request->setMethod($method);
+        $this->assertEquals($idempotent, $request->isMethodIdempotent());
+    }
+
+    public function methodIdempotentProvider()
+    {
+        return array(
+            array('HEAD', true),
+            array('GET', true),
+            array('POST', false),
+            array('PUT', true),
+            array('PATCH', false),
+            array('DELETE', true),
+            array('PURGE', true),
+            array('OPTIONS', true),
+            array('TRACE', true),
+            array('CONNECT', false),
         );
     }
 
@@ -1955,6 +2021,10 @@ class RequestTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Checking only for cacheable HTTP methods with Symfony\Component\HttpFoundation\Request::isMethodSafe() is deprecated since version 3.2 and will throw an exception in 4.0. Disable checking only for cacheable methods by calling the method with `false` as first argument or use the Request::isMethodCacheable() instead.
+     */
     public function testMethodSafeChecksCacheable()
     {
         $request = new Request();

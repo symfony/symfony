@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ComparisonTest_Class
 {
@@ -32,14 +33,10 @@ class ComparisonTest_Class
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
-abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintValidatorTest
+abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTestCase
 {
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
-        if (PHP_VERSION_ID < 50500) {
-            return $comparisons;
-        }
-
         $result = $comparisons;
 
         // Duplicate all tests involving DateTime objects to be tested with
@@ -129,10 +126,6 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
         // Make sure we have the correct version loaded
         if ($dirtyValue instanceof \DateTime || $dirtyValue instanceof \DateTimeInterface) {
             IntlTestHelper::requireIntl($this);
-
-            if (PHP_VERSION_ID < 50304 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
-                $this->markTestSkipped('Intl supports formatting DateTime objects since 5.3.4');
-            }
         }
 
         $constraint = $this->createConstraint(array('value' => $comparedValue));
@@ -144,6 +137,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
             ->setParameter('{{ value }}', $dirtyValueAsString)
             ->setParameter('{{ compared_value }}', $comparedValueString)
             ->setParameter('{{ compared_value_type }}', $comparedValueType)
+            ->setCode($this->getErrorCode())
             ->assertRaised();
     }
 
@@ -174,4 +168,11 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
      * @return Constraint
      */
     abstract protected function createConstraint(array $options);
+
+    /**
+     * @return string|null
+     */
+    protected function getErrorCode()
+    {
+    }
 }

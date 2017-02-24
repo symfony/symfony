@@ -29,6 +29,7 @@ class DebugExtensionTest extends TestCase
             array(
                 'id' => 'dump',
                 'template' => '@Debug/Profiler/dump.html.twig',
+                'priority' => 240,
             ),
         );
 

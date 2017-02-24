@@ -1,0 +1,13 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    cache:
+        app: cache.adapter.redis
+        default_redis_provider: "redis://%redis_host%"
+        pools:
+            cache.pool1:
+                public: true
+            cache.pool2:
+                public: true
+                clearer: ~

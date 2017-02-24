@@ -13,55 +13,33 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
-use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\PathPackage;
-use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
-use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
+use Symfony\Component\Asset\Preload\PreloadManager;
 
+/**
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
 class AssetExtensionTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetAssetUrl()
+    public function testGetAndPreloadAssetUrl()
     {
-        $extension = $this->createExtension(new Package(new StaticVersionStrategy('22', '%s?version=%s')));
+        if (!class_exists(PreloadManager::class)) {
+            $this->markTestSkipped('Requires Asset 3.3+.');
+        }
 
-        $this->assertEquals('me.png?version=42', $extension->getAssetUrl('me.png', null, false, '42'));
-        $this->assertEquals('http://localhost/me.png?version=22', $extension->getAssetUrl('me.png', null, true));
-        $this->assertEquals('http://localhost/me.png?version=42', $extension->getAssetUrl('me.png', null, true, '42'));
+        $preloadManager = new PreloadManager();
+        $extension = new AssetExtension(new Packages(), $preloadManager);
+
+        $this->assertEquals('/foo.css', $extension->preload('/foo.css', 'style', true));
+        $this->assertEquals('</foo.css>; rel=preload; as=style; nopush', $preloadManager->buildLinkValue());
     }
 
     /**
-     * @group legacy
+     * @expectedException \RuntimeException
      */
-    public function testGetAssetUrlWithPackageSubClass()
+    public function testNoConfiguredPreloadManager()
     {
-        $extension = $this->createExtension(new PathPackage('foo', new StaticVersionStrategy('22', '%s?version=%s')));
-
-        $this->assertEquals('/foo/me.png?version=42', $extension->getAssetUrl('me.png', null, false, 42));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetAssetUrlWithEmptyVersionStrategy()
-    {
-        $extension = $this->createExtension(new PathPackage('foo', new EmptyVersionStrategy()));
-
-        $this->assertEquals('/foo/me.png?42', $extension->getAssetUrl('me.png', null, false, 42));
-    }
-
-    private function createExtension(Package $package)
-    {
-        $foundationExtension = $this->getMockBuilder('Symfony\Bridge\Twig\Extension\HttpFoundationExtension')->disableOriginalConstructor()->getMock();
-        $foundationExtension
-            ->expects($this->any())
-            ->method('generateAbsoluteUrl')
-            ->will($this->returnCallback(function ($arg) { return 'http://localhost/'.$arg; }))
-        ;
-
-        return new AssetExtension(new Packages($package), $foundationExtension);
+        $extension = new AssetExtension(new Packages());
+        $extension->preload('/foo.css');
     }
 }

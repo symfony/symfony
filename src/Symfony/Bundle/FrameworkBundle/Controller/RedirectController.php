@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +24,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RedirectController extends ContainerAware
+class RedirectController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * Redirects to another route with the given name.
      *

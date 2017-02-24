@@ -76,6 +76,21 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
+    public function testIfEmptyExpression()
+    {
+        $test = $this->getTestBuilder()
+            ->ifEmpty()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test, array('key' => array()));
+
+        $test = $this->getTestBuilder()
+            ->ifEmpty()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value', $test);
+    }
+
     public function testIfArrayExpression()
     {
         $test = $this->getTestBuilder()

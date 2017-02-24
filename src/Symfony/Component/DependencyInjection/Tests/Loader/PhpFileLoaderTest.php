@@ -23,7 +23,8 @@ class PhpFileLoaderTest extends TestCase
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        $this->assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
     }
 
     public function testLoad()

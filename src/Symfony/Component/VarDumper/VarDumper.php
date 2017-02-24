@@ -38,12 +38,8 @@ class VarDumper
         return call_user_func(self::$handler, $var);
     }
 
-    public static function setHandler($callable)
+    public static function setHandler(callable $callable = null)
     {
-        if (null !== $callable && !is_callable($callable, true)) {
-            throw new \InvalidArgumentException('Invalid PHP callback.');
-        }
-
         $prevHandler = self::$handler;
         self::$handler = $callable;
 

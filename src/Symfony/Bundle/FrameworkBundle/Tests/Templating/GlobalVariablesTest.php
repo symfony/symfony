@@ -26,16 +26,30 @@ class GlobalVariablesTest extends TestCase
         $this->globals = new GlobalVariables($this->container);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetSecurity()
+    public function testGetTokenNoTokenStorage()
     {
-        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')->getMock();
+        $this->assertNull($this->globals->getToken());
+    }
 
-        $this->assertNull($this->globals->getSecurity());
-        $this->container->set('security.context', $securityContext);
-        $this->assertSame($securityContext, $this->globals->getSecurity());
+    public function testGetTokenNoToken()
+    {
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $this->container->set('security.token_storage', $tokenStorage);
+        $this->assertNull($this->globals->getToken());
+    }
+
+    public function testGetToken()
+    {
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+
+        $this->container->set('security.token_storage', $tokenStorage);
+
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue('token'));
+
+        $this->assertSame('token', $this->globals->getToken());
     }
 
     public function testGetUserNoTokenStorage()

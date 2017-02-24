@@ -133,7 +133,7 @@ class MessageCatalogueTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException \Symfony\Component\Translation\Exception\LogicException
      */
     public function testAddFallbackCatalogueWithParentCircularReference()
     {
@@ -145,7 +145,7 @@ class MessageCatalogueTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException \Symfony\Component\Translation\Exception\LogicException
      */
     public function testAddFallbackCatalogueWithFallbackCircularReference()
     {
@@ -159,7 +159,7 @@ class MessageCatalogueTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException \Symfony\Component\Translation\Exception\LogicException
      */
     public function testAddCatalogueWhenLocaleIsNotTheSameAsTheCurrentOne()
     {

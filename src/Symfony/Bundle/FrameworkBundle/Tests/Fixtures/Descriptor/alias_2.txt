@@ -1,1 +1,3 @@
-This service is an alias for the service <info>service_2</info>
+
+[39;49m // [39;49mThis service is an alias for the service [32mservice_2[39m                                                                  
+

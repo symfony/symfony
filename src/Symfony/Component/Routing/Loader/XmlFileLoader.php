@@ -107,43 +107,14 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
-        if ('' === ($id = $node->getAttribute('id')) || (!$node->hasAttribute('pattern') && !$node->hasAttribute('path'))) {
+        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('path')) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
-        }
-
-        if ($node->hasAttribute('pattern')) {
-            if ($node->hasAttribute('path')) {
-                throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
-            }
-
-            @trigger_error(sprintf('The "pattern" option in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', $path), E_USER_DEPRECATED);
-
-            $node->setAttribute('path', $node->getAttribute('pattern'));
-            $node->removeAttribute('pattern');
         }
 
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
-
-        if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
-                $methods = explode('|', $requirements['_method']);
-            }
-
-            unset($requirements['_method']);
-            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" attribute instead.', $id, $path), E_USER_DEPRECATED);
-        }
-
-        if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
-                $schemes = explode('|', $requirements['_scheme']);
-            }
-
-            unset($requirements['_scheme']);
-            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" attribute instead.', $id, $path), E_USER_DEPRECATED);
-        }
 
         $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
         $collection->add($id, $route);
@@ -231,12 +202,16 @@ class XmlFileLoader extends FileLoader
         $condition = null;
 
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
+            if ($node !== $n->parentNode) {
+                continue;
+            }
+
             switch ($n->localName) {
                 case 'default':
                     if ($this->isElementValueNull($n)) {
                         $defaults[$n->getAttribute('key')] = null;
                     } else {
-                        $defaults[$n->getAttribute('key')] = trim($n->textContent);
+                        $defaults[$n->getAttribute('key')] = $this->parseDefaultsConfig($n, $path);
                     }
 
                     break;
@@ -255,6 +230,103 @@ class XmlFileLoader extends FileLoader
         }
 
         return array($defaults, $requirements, $options, $condition);
+    }
+
+    /**
+     * Parses the "default" elements.
+     *
+     * @param \DOMElement $element The "default" element to parse
+     * @param string      $path    Full path of the XML file being processed
+     *
+     * @return array|bool|float|int|string|null The parsed value of the "default" element
+     */
+    private function parseDefaultsConfig(\DOMElement $element, $path)
+    {
+        if ($this->isElementValueNull($element)) {
+            return;
+        }
+
+        // Check for existing element nodes in the default element. There can
+        // only be a single element inside a default element. So this element
+        // (if one was found) can safely be returned.
+        foreach ($element->childNodes as $child) {
+            if (!$child instanceof \DOMElement) {
+                continue;
+            }
+
+            if (self::NAMESPACE_URI !== $child->namespaceURI) {
+                continue;
+            }
+
+            return $this->parseDefaultNode($child, $path);
+        }
+
+        // If the default element doesn't contain a nested "bool", "int", "float",
+        // "string", "list", or "map" element, the element contents will be treated
+        // as the string value of the associated default option.
+        return trim($element->textContent);
+    }
+
+    /**
+     * Recursively parses the value of a "default" element.
+     *
+     * @param \DOMElement $node The node value
+     * @param string      $path Full path of the XML file being processed
+     *
+     * @return array|bool|float|int|string The parsed value
+     *
+     * @throws \InvalidArgumentException when the XML is invalid
+     */
+    private function parseDefaultNode(\DOMElement $node, $path)
+    {
+        if ($this->isElementValueNull($node)) {
+            return;
+        }
+
+        switch ($node->localName) {
+            case 'bool':
+                return 'true' === trim($node->nodeValue) || '1' === trim($node->nodeValue);
+            case 'int':
+                return (int) trim($node->nodeValue);
+            case 'float':
+                return (float) trim($node->nodeValue);
+            case 'string':
+                return trim($node->nodeValue);
+            case 'list':
+                $list = array();
+
+                foreach ($node->childNodes as $element) {
+                    if (!$element instanceof \DOMElement) {
+                        continue;
+                    }
+
+                    if (self::NAMESPACE_URI !== $element->namespaceURI) {
+                        continue;
+                    }
+
+                    $list[] = $this->parseDefaultNode($element, $path);
+                }
+
+                return $list;
+            case 'map':
+                $map = array();
+
+                foreach ($node->childNodes as $element) {
+                    if (!$element instanceof \DOMElement) {
+                        continue;
+                    }
+
+                    if (self::NAMESPACE_URI !== $element->namespaceURI) {
+                        continue;
+                    }
+
+                    $map[$element->getAttribute('key')] = $this->parseDefaultNode($element, $path);
+                }
+
+                return $map;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "bool", "int", "float", "string", "list", or "map".', $node->localName, $path));
+        }
     }
 
     private function isElementValueNull(\DOMElement $element)

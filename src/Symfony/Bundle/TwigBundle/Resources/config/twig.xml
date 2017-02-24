@@ -4,36 +4,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="twig.class">Twig_Environment</parameter>
-        <parameter key="twig.loader.filesystem.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
-        <parameter key="twig.loader.chain.class">Twig_Loader_Chain</parameter>
-        <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
-        <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
-        <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
-        <parameter key="twig.extension.actions.class">Symfony\Bundle\TwigBundle\Extension\ActionsExtension</parameter>
-        <parameter key="twig.extension.code.class">Symfony\Bridge\Twig\Extension\CodeExtension</parameter>
-        <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
-        <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
-        <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
-        <parameter key="twig.extension.httpkernel.class">Symfony\Bridge\Twig\Extension\HttpKernelExtension</parameter>
-        <parameter key="twig.extension.debug.stopwatch.class">Symfony\Bridge\Twig\Extension\StopwatchExtension</parameter>
-        <parameter key="twig.extension.expression.class">Symfony\Bridge\Twig\Extension\ExpressionExtension</parameter>
-        <parameter key="twig.form.engine.class">Symfony\Bridge\Twig\Form\TwigRendererEngine</parameter>
-        <parameter key="twig.form.renderer.class">Symfony\Bridge\Twig\Form\TwigRenderer</parameter>
-        <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
-        <parameter key="twig.exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
-        <parameter key="twig.controller.exception.class">Symfony\Bundle\TwigBundle\Controller\ExceptionController</parameter>
-        <parameter key="twig.controller.preview_error.class">Symfony\Bundle\TwigBundle\Controller\PreviewErrorController</parameter>
-    </parameters>
-
     <services>
-        <service id="twig" class="%twig.class%">
+        <service id="twig" class="Twig_Environment">
             <argument type="service" id="twig.loader" />
             <argument /> <!-- Twig options -->
             <call method="addGlobal">
                 <argument>app</argument>
                 <argument type="service" id="twig.app_variable" />
+            </call>
+            <call method="addRuntimeLoader">
+                <argument type="service" id="twig.runtime_loader" />
             </call>
             <configurator service="twig.configurator.environment" method="configure" />
         </service>
@@ -45,18 +25,32 @@
             <call method="setRequestStack"><argument type="service" id="request_stack" on-invalid="ignore" /></call>
         </service>
 
-        <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
+        <service id="twig.cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer" public="false">
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.finder" on-invalid="ignore" />
+            <argument type="collection" /> <!-- Twig paths -->
+        </service>
+
+        <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator" public="false">
+            <argument type="service" id="kernel" />
+            <argument>%kernel.root_dir%</argument>
+            <argument type="collection" /> <!-- Twig paths -->
+        </service>
+
+        <service id="twig.template_cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer" public="false">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="twig.template_iterator" />
         </service>
 
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
-            <argument type="collection" />
+            <argument type="collection" /> <!-- paths -->
+            <argument /> <!-- project's root dir -->
             <tag name="twig.loader"/>
         </service>
 
-        <service id="twig.loader.chain" class="%twig.loader.chain.class%" public="false"/>
+        <service id="twig.loader.chain" class="Twig_Loader_Chain" public="false"/>
 
         <service id="twig.extension.profiler" class="Symfony\Bridge\Twig\Extension\ProfilerExtension" public="false">
             <argument type="service" id="twig.profile" />
@@ -66,50 +60,44 @@
         <service id="twig.profile" class="Twig_Profiler_Profile" />
 
         <service id="data_collector.twig" class="Symfony\Bridge\Twig\DataCollector\TwigDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="257" />
             <argument type="service" id="twig.profile" />
         </service>
 
-        <service id="twig.extension.trans" class="%twig.extension.trans.class%" public="false">
+        <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TranslationExtension" public="false">
             <argument type="service" id="translator" />
         </service>
 
         <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
             <argument type="service" id="assets.packages" />
-            <argument type="service" id="twig.extension.httpfoundation" />
+            <argument type="service" id="assets.preload_manager" on-invalid="ignore" />
         </service>
 
-        <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">
-            <argument type="service" id="fragment.handler" />
-        </service>
-
-        <service id="twig.extension.code" class="%twig.extension.code.class%" public="false">
+        <service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">
             <tag name="twig.extension" />
-            <argument /> <!-- %templating.helper.code.file_link_format% -->
+            <argument type="service" id="debug.file_link_formatter" on-invalid="ignore" />
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>
 
-        <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
+        <service id="twig.extension.routing" class="Symfony\Bridge\Twig\Extension\RoutingExtension" public="false">
             <argument type="service" id="router" />
         </service>
 
-        <service id="twig.extension.yaml" class="%twig.extension.yaml.class%" public="false">
-            <tag name="twig.extension" />
-        </service>
+        <service id="twig.extension.yaml" class="Symfony\Bridge\Twig\Extension\YamlExtension" public="false" />
 
-        <service id="twig.extension.debug.stopwatch" class="%twig.extension.debug.stopwatch.class%" public="false">
-            <tag name="twig.extension" />
+        <service id="twig.extension.debug.stopwatch" class="Symfony\Bridge\Twig\Extension\StopwatchExtension" public="false">
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="twig.extension.expression" class="%twig.extension.expression.class%" public="false">
-            <tag name="twig.extension" />
-        </service>
+        <service id="twig.extension.expression" class="Symfony\Bridge\Twig\Extension\ExpressionExtension" public="false" />
 
-        <service id="twig.extension.httpkernel" class="%twig.extension.httpkernel.class%" public="false">
+        <service id="twig.extension.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelExtension" public="false" />
+
+        <service id="twig.runtime.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelRuntime">
             <argument type="service" id="fragment.handler" />
+            <tag name="twig.runtime" />
         </service>
 
         <service id="twig.extension.httpfoundation" class="Symfony\Bridge\Twig\Extension\HttpFoundationExtension" public="false">
@@ -119,24 +107,24 @@
 
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
 
-        <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">
+        <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
             <argument type="service" id="twig" />
             <tag name="translation.extractor" alias="twig" />
         </service>
 
-        <service id="twig.exception_listener" class="%twig.exception_listener.class%">
+        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="twig.controller.exception" class="%twig.controller.exception.class%">
+        <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController">
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="twig.controller.preview_error" class="%twig.controller.preview_error.class%">
+        <service id="twig.controller.preview_error" class="Symfony\Bundle\TwigBundle\Controller\PreviewErrorController">
             <argument type="service" id="http_kernel" />
             <argument>%twig.exception_listener.controller%</argument>
         </service>
@@ -148,6 +136,12 @@
             <argument /> <!-- decimals, set in TwigExtension -->
             <argument /> <!-- decimal point, set in TwigExtension -->
             <argument /> <!-- thousands separator, set in TwigExtension -->
+        </service>
+
+        <service id="twig.runtime_loader" class="Symfony\Bundle\TwigBundle\ContainerAwareRuntimeLoader" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /> <!-- the mapping between class names and service names -->
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

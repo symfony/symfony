@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for 24 hour format (1-24).
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class Hour2401Transformer extends HourTransformer
 {

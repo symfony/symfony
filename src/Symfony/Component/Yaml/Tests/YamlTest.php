@@ -25,18 +25,6 @@ class YamlTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacyParseFromFile()
-    {
-        $filename = __DIR__.'/Fixtures/index.yml';
-        $contents = file_get_contents($filename);
-        $parsedByFilename = Yaml::parse($filename);
-        $parsedByContents = Yaml::parse($contents);
-        $this->assertEquals($parsedByFilename, $parsedByContents);
-    }
-
-    /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The indentation must be greater than zero
      */

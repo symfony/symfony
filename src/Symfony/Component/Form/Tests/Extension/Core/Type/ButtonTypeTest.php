@@ -18,11 +18,11 @@ class ButtonTypeTest extends BaseTypeTest
 {
     public function testCreateButtonInstances()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\Button', $this->factory->create('button'));
+        $this->assertInstanceOf('Symfony\Component\Form\Button', $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ButtonType'));
     }
 
     protected function getTestedType()
     {
-        return 'button';
+        return 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
     }
 }

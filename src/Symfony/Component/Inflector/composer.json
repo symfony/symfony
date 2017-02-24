@@ -1,0 +1,40 @@
+{
+    "name": "symfony/inflector",
+    "type": "library",
+    "description": "Symfony Inflector Component",
+    "keywords": [
+        "string",
+        "inflection",
+        "singularize",
+        "pluralize",
+        "words",
+        "symfony"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bernhard Schussek",
+            "email": "bschussek@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Inflector\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.3-dev"
+        }
+    }
+}

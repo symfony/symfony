@@ -34,11 +34,11 @@ class AnonymousAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testAuthenticateWhenKeyIsNotValid()
+    public function testAuthenticateWhenSecretIsNotValid()
     {
         $provider = $this->getProvider('foo');
 
-        $this->assertNull($provider->authenticate($this->getSupportedToken('bar')));
+        $provider->authenticate($this->getSupportedToken('bar'));
     }
 
     public function testAuthenticate()
@@ -49,19 +49,19 @@ class AnonymousAuthenticationProviderTest extends TestCase
         $this->assertSame($token, $provider->authenticate($token));
     }
 
-    protected function getSupportedToken($key)
+    protected function getSupportedToken($secret)
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setMethods(array('getKey'))->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setMethods(array('getSecret'))->disableOriginalConstructor()->getMock();
         $token->expects($this->any())
-              ->method('getKey')
-              ->will($this->returnValue($key))
+              ->method('getSecret')
+              ->will($this->returnValue($secret))
         ;
 
         return $token;
     }
 
-    protected function getProvider($key)
+    protected function getProvider($secret)
     {
-        return new AnonymousAuthenticationProvider($key);
+        return new AnonymousAuthenticationProvider($secret);
     }
 }

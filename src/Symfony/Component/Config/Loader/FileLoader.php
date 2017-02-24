@@ -14,6 +14,9 @@ namespace Symfony\Component\Config\Loader;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Glob;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -79,20 +82,92 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {
+        $ret = array();
+        $ct = 0;
+        foreach ($this->glob($resource, false, $_, $ignoreErrors) as $resource => $info) {
+            ++$ct;
+            $ret[] = $this->doImport($resource, $type, $ignoreErrors, $sourceResource);
+        }
+
+        return $ct > 1 ? $ret : isset($ret[0]) ? $ret[0] : null;
+    }
+
+    /**
+     * @internal
+     */
+    protected function glob($resource, $recursive, &$prefix = null, $ignoreErrors = false)
+    {
+        if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
+            if (!$recursive) {
+                $prefix = null;
+
+                yield $resource => new \SplFileInfo($resource);
+
+                return;
+            }
+            $prefix = $resource;
+            $resource = '';
+        } elseif (0 === $i) {
+            $prefix = '.';
+            $resource = '/'.$resource;
+        } else {
+            $prefix = dirname(substr($resource, 0, 1 + $i));
+            $resource = substr($resource, strlen($prefix));
+        }
+
+        try {
+            $prefix = $this->locator->locate($prefix, $this->currentDir, true);
+        } catch (FileLocatorFileNotFoundException $e) {
+            if (!$ignoreErrors) {
+                throw $e;
+            }
+
+            return;
+        }
+        $prefix = realpath($prefix) ?: $prefix;
+
+        if (false === strpos($resource, '/**/') && (defined('GLOB_BRACE') || false === strpos($resource, '{'))) {
+            foreach (glob($prefix.$resource, defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $path) {
+                if ($recursive && is_dir($path)) {
+                    $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS;
+                    foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, $flags)) as $path => $info) {
+                        if ($info->isFile()) {
+                            yield $path => $info;
+                        }
+                    }
+                } elseif (is_file($path)) {
+                    yield $path => new \SplFileInfo($path);
+                }
+            }
+
+            return;
+        }
+
+        if (!class_exists(Finder::class)) {
+            throw new LogicException(sprintf('Extended glob pattern "%s" cannot be used as the Finder component is not installed.', $resource));
+        }
+
+        $finder = new Finder();
+        $regex = Glob::toRegex($resource);
+        if ($recursive) {
+            $regex = substr_replace($regex, '(/|$)', -2, 1);
+        }
+
+        $prefixLen = strlen($prefix);
+        foreach ($finder->followLinks()->in($prefix) as $path => $info) {
+            if (preg_match($regex, substr($path, $prefixLen)) && $info->isFile()) {
+                yield $path => $info;
+            }
+        }
+    }
+
+    private function doImport($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+    {
         try {
             $loader = $this->resolve($resource, $type);
 
             if ($loader instanceof self && null !== $this->currentDir) {
-                // we fallback to the current locator to keep BC
-                // as some some loaders do not call the parent __construct()
-                // @deprecated should be removed in 3.0
-                $locator = $loader->getLocator();
-                if (null === $locator) {
-                    @trigger_error('Not calling the parent constructor in '.get_class($loader).' which extends '.__CLASS__.' is deprecated since version 2.7 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
-                    $locator = $this->locator;
-                }
-
-                $resource = $locator->locate($resource, $this->currentDir, false);
+                $resource = $loader->getLocator()->locate($resource, $this->currentDir, false);
             }
 
             $resources = is_array($resource) ? $resource : array($resource);
@@ -110,15 +185,9 @@ abstract class FileLoader extends Loader
 
             try {
                 $ret = $loader->load($resource, $type);
-            } catch (\Exception $e) {
+            } finally {
                 unset(self::$loading[$resource]);
-                throw $e;
-            } catch (\Throwable $e) {
-                unset(self::$loading[$resource]);
-                throw $e;
             }
-
-            unset(self::$loading[$resource]);
 
             return $ret;
         } catch (FileLoaderImportCircularReferenceException $e) {

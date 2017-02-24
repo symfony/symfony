@@ -16,29 +16,35 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/security": "~2.7",
-        "symfony/security-acl": "~2.7",
-        "symfony/http-kernel": "~2.7"
+        "php": ">=5.5.9",
+        "symfony/security": "~3.3",
+        "symfony/dependency-injection": "~3.3",
+        "symfony/http-kernel": "~3.2",
+        "symfony/polyfill-php70": "~1.0"
     },
     "require-dev": {
-        "symfony/browser-kit": "~2.4",
-        "symfony/console": "~2.7",
-        "symfony/css-selector": "^2.0.5",
-        "symfony/dependency-injection": "^2.6.6",
-        "symfony/dom-crawler": "^2.0.5",
-        "symfony/form": "~2.7.15|^2.8.8",
-        "symfony/framework-bundle": "~2.7.25|^2.8.18",
-        "symfony/http-foundation": "~2.7",
-        "symfony/twig-bundle": "~2.7",
-        "symfony/twig-bridge": "^2.7.4",
-        "symfony/process": "^2.0.5",
-        "symfony/validator": "~2.5",
-        "symfony/yaml": "^2.0.5",
-        "symfony/expression-language": "~2.6",
-        "doctrine/doctrine-bundle": "~1.2",
-        "twig/twig": "~1.28|~2.0",
-        "ircmaxell/password-compat": "~1.0"
+        "symfony/asset": "~2.8|~3.0",
+        "symfony/browser-kit": "~2.8|~3.0",
+        "symfony/console": "~3.2",
+        "symfony/css-selector": "~2.8|~3.0",
+        "symfony/dom-crawler": "~2.8|~3.0",
+        "symfony/form": "^2.8.18|^3.2.5",
+        "symfony/framework-bundle": "^3.2.5",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/security-acl": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
+        "symfony/twig-bundle": "~2.8|~3.0",
+        "symfony/twig-bridge": "~2.8|~3.0",
+        "symfony/process": "~2.8|~3.0",
+        "symfony/validator": "^3.2.5",
+        "symfony/var-dumper": "~3.2",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "doctrine/doctrine-bundle": "~1.4",
+        "twig/twig": "~1.28|~2.0"
+    },
+    "suggest": {
+        "symfony/security-acl": "For using the ACL functionality of this bundle"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },
@@ -49,7 +55,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

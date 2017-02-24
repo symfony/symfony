@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class GetAttrNode extends Node
 {
     const PROPERTY_CALL = 1;
@@ -87,6 +92,20 @@ class GetAttrNode extends Node
                 }
 
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];
+        }
+    }
+
+    public function toArray()
+    {
+        switch ($this->attributes['type']) {
+            case self::PROPERTY_CALL:
+                return array($this->nodes['node'], '.', $this->nodes['attribute']);
+
+            case self::METHOD_CALL:
+                return array($this->nodes['node'], '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')');
+
+            case self::ARRAY_CALL:
+                return array($this->nodes['node'], '[', $this->nodes['attribute'], ']');
         }
     }
 }

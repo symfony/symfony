@@ -36,7 +36,7 @@ class AnonymousAuthenticationListenerTest extends TestCase
             ->method('authenticate')
         ;
 
-        $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheKey', null, $authenticationManager);
+        $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheSecret', null, $authenticationManager);
         $listener->handle($this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock());
     }
 
@@ -49,14 +49,14 @@ class AnonymousAuthenticationListenerTest extends TestCase
             ->will($this->returnValue(null))
         ;
 
-        $anonymousToken = new AnonymousToken('TheKey', 'anon.', array());
+        $anonymousToken = new AnonymousToken('TheSecret', 'anon.', array());
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
         $authenticationManager
             ->expects($this->once())
             ->method('authenticate')
             ->with($this->callback(function ($token) {
-                return 'TheKey' === $token->getKey();
+                return 'TheSecret' === $token->getSecret();
             }))
             ->will($this->returnValue($anonymousToken))
         ;
@@ -67,7 +67,7 @@ class AnonymousAuthenticationListenerTest extends TestCase
             ->with($anonymousToken)
         ;
 
-        $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheKey', null, $authenticationManager);
+        $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheSecret', null, $authenticationManager);
         $listener->handle($this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock());
     }
 
@@ -82,7 +82,7 @@ class AnonymousAuthenticationListenerTest extends TestCase
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
 
-        $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheKey', $logger, $authenticationManager);
+        $listener = new AnonymousAuthenticationListener($tokenStorage, 'TheSecret', $logger, $authenticationManager);
         $listener->handle($this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock());
     }
 }

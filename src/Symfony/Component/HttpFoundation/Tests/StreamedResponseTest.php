@@ -91,15 +91,6 @@ class StreamedResponseTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testSetCallbackNonCallable()
-    {
-        $response = new StreamedResponse(null);
-        $response->setCallback(null);
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetContent()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });

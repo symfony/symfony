@@ -1,13 +1,12 @@
 framework:
     secret: s3cr3t
     default_locale: fr
+    csrf_protection: true
     form:
         csrf_protection:
             field_name: _csrf
     http_method_override: false
     trusted_proxies: ['127.0.0.1', '10.0.0.1']
-    csrf_protection:
-        enabled:    true
     esi:
         enabled: true
     profiler:
@@ -24,7 +23,8 @@ framework:
         cookie_path:      /
         cookie_domain:    example.com
         cookie_secure:    true
-        cookie_httponly:  true
+        cookie_httponly:  false
+        use_cookies:      true
         gc_probability:  1
         gc_divisor:      108
         gc_maxlifetime:  90000
@@ -36,17 +36,23 @@ framework:
         form:
             resources:    [theme1, theme2]
         hinclude_default_template: global_hinclude_template
+    assets:
+        version: v1
     translator:
         enabled:  true
         fallback: fr
+        paths: ['%kernel.root_dir%/Fixtures/translations']
     validation:
         enabled: true
-        cache:   apc
     annotations:
         cache:   file
         debug:   true
         file_cache_dir: '%kernel.cache_dir%/annotations'
-    serializer: { enabled: true }
+    serializer:
+         enabled:        true
+         enable_annotations: true
+         name_converter: serializer.name_converter.camel_case_to_snake_case
+    property_info: ~
     ide: file%%link%%format
     request:
         formats:

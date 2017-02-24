@@ -47,7 +47,7 @@ class MainConfigurationTest extends TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
+        $processor->processConfiguration($configuration, array($config));
     }
 
     /**
@@ -66,7 +66,7 @@ class MainConfigurationTest extends TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
+        $processor->processConfiguration($configuration, array($config));
     }
 
     public function testCsrfAliases()
@@ -75,8 +75,8 @@ class MainConfigurationTest extends TestCase
             'firewalls' => array(
                 'stub' => array(
                     'logout' => array(
-                        'csrf_provider' => 'a_token_generator',
-                        'intention' => 'a_token_id',
+                        'csrf_token_generator' => 'a_token_generator',
+                        'csrf_token_id' => 'a_token_id',
                     ),
                 ),
             ),
@@ -92,18 +92,21 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testCsrfOriginalAndAliasValueCausesException()
+    public function testDefaultUserCheckers()
+    {
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $processedConfig = $processor->processConfiguration($configuration, array(static::$minimalConfig));
+
+        $this->assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
+    }
+
+    public function testUserCheckers()
     {
         $config = array(
             'firewalls' => array(
                 'stub' => array(
-                    'logout' => array(
-                        'csrf_token_id' => 'a_token_id',
-                        'intention' => 'old_name',
-                    ),
+                    'user_checker' => 'app.henk_checker',
                 ),
             ),
         );
@@ -112,5 +115,7 @@ class MainConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
         $processedConfig = $processor->processConfiguration($configuration, array($config));
+
+        $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 }

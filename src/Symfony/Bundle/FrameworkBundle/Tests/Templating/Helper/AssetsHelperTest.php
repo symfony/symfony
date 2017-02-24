@@ -15,39 +15,31 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class AssetsHelperTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetUrl()
-    {
-        $versionStrategy = new StaticVersionStrategy('22', '%s?version=%s');
-        $package = new Package($versionStrategy);
-        $imagePackage = new PathPackage('images', $versionStrategy);
-        $packages = new Packages($package, array('images' => $imagePackage));
-        $helper = new AssetsHelper($packages);
+    private $helper;
 
-        $this->assertEquals('me.png?version=42', $helper->getUrl('me.png', null, '42'));
-        $this->assertEquals('/images/me.png?version=42', $helper->getUrl('me.png', 'images', '42'));
+    protected function setUp()
+    {
+        $fooPackage = new Package(new StaticVersionStrategy('42', '%s?v=%s'));
+        $barPackage = new Package(new StaticVersionStrategy('22', '%s?%s'));
+
+        $packages = new Packages($fooPackage, array('bar' => $barPackage));
+
+        $this->helper = new AssetsHelper($packages);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetVersion()
+    public function testGetUrl()
     {
-        $package = new Package(new StaticVersionStrategy('22'));
-        $imagePackage = new Package(new StaticVersionStrategy('42'));
-        $packages = new Packages($package, array('images' => $imagePackage));
-        $helper = new AssetsHelper($packages);
+        $this->assertEquals('me.png?v=42', $this->helper->getUrl('me.png'));
+        $this->assertEquals('me.png?22', $this->helper->getUrl('me.png', 'bar'));
+    }
 
-        $this->assertEquals('22', $helper->getVersion());
-        $this->assertEquals('22', $helper->getVersion('/foo'));
-        $this->assertEquals('42', $helper->getVersion('images'));
-        $this->assertEquals('42', $helper->getVersion('/foo', 'images'));
+    public function testGetVersion()
+    {
+        $this->assertEquals('42', $this->helper->getVersion('/'));
+        $this->assertEquals('22', $this->helper->getVersion('/', 'bar'));
     }
 }

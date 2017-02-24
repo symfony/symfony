@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
@@ -58,7 +57,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Container implements IntrospectableContainerInterface
+class Container implements ResettableContainerInterface
 {
     /**
      * @var ParameterBagInterface
@@ -67,21 +66,24 @@ class Container implements IntrospectableContainerInterface
 
     protected $services = array();
     protected $methodMap = array();
+    protected $privates = array();
     protected $aliases = array();
-    protected $scopes = array();
-    protected $scopeChildren = array();
-    protected $scopedServices = array();
-    protected $scopeStacks = array();
     protected $loading = array();
 
+    /**
+     * @internal
+     */
+    protected $normalizedIds = array();
+
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
+    private $envCache = array();
 
     /**
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
-        $this->parameterBag = $parameterBag ?: new ParameterBag();
+        $this->parameterBag = $parameterBag ?: new EnvPlaceholderParameterBag();
     }
 
     /**
@@ -164,31 +166,13 @@ class Container implements IntrospectableContainerInterface
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
-     * @param string $scope   The scope of the service
-     *
-     * @throws RuntimeException         When trying to set a service in an inactive scope
-     * @throws InvalidArgumentException When trying to set a service in the prototype scope
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER)
+    public function set($id, $service)
     {
-        if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
-        }
-
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if ('service_container' === $id) {
-            // BC: 'service_container' is no longer a self-reference but always
-            // $this, so ignore this call.
-            // @todo Throw InvalidArgumentException in next major release.
-            return;
-        }
-        if (self::SCOPE_CONTAINER !== $scope) {
-            if (!isset($this->scopedServices[$scope])) {
-                throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
-            }
-
-            $this->scopedServices[$scope][$id] = $service;
+            throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
         if (isset($this->aliases[$id])) {
@@ -197,16 +181,23 @@ class Container implements IntrospectableContainerInterface
 
         $this->services[$id] = $service;
 
-        if (method_exists($this, $method = 'synchronize'.strtr($id, $this->underscoreMap).'Service')) {
-            $this->$method();
+        if (null === $service) {
+            unset($this->services[$id]);
         }
 
-        if (null === $service) {
-            if (self::SCOPE_CONTAINER !== $scope) {
-                unset($this->scopedServices[$scope][$id]);
+        if (isset($this->privates[$id])) {
+            if (null === $service) {
+                @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+                unset($this->privates[$id]);
+            } else {
+                @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
-
-            unset($this->services[$id]);
+        } elseif (isset($this->methodMap[$id])) {
+            if (null === $service) {
+                @trigger_error(sprintf('Unsetting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            } else {
+                @trigger_error(sprintf('Setting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
         }
     }
 
@@ -220,18 +211,38 @@ class Container implements IntrospectableContainerInterface
     public function has($id)
     {
         for ($i = 2;;) {
-            if ('service_container' === $id
-                || isset($this->aliases[$id])
-                || isset($this->services[$id])
-                || array_key_exists($id, $this->services)
-            ) {
+            if ('service_container' === $id) {
                 return true;
             }
-            if (--$i && $id !== $lcId = strtolower($id)) {
-                $id = $lcId;
-            } else {
-                return method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service');
+            if (isset($this->aliases[$id])) {
+                $id = $this->aliases[$id];
             }
+            if (isset($this->services[$id])) {
+                return true;
+            }
+
+            if (isset($this->privates[$id])) {
+                @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
+
+            if (isset($this->methodMap[$id])) {
+                return true;
+            }
+
+            if (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
+                $id = $normalizedId;
+                continue;
+            }
+
+            // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
+            // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
+            if (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service')) {
+                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
+
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -257,7 +268,7 @@ class Container implements IntrospectableContainerInterface
         // Attempt to retrieve the service by checking first aliases then
         // available services. Service IDs are case insensitive, however since
         // this method can be called thousands of times during a request, avoid
-        // calling strtolower() unless necessary.
+        // calling $this->normalizeId($id) unless necessary.
         for ($i = 2;;) {
             if ('service_container' === $id) {
                 return $this;
@@ -266,7 +277,7 @@ class Container implements IntrospectableContainerInterface
                 $id = $this->aliases[$id];
             }
             // Re-use shared service instance if it exists.
-            if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
+            if (isset($this->services[$id])) {
                 return $this->services[$id];
             }
 
@@ -276,10 +287,13 @@ class Container implements IntrospectableContainerInterface
 
             if (isset($this->methodMap[$id])) {
                 $method = $this->methodMap[$id];
-            } elseif (--$i && $id !== $lcId = strtolower($id)) {
-                $id = $lcId;
+            } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
+                $id = $normalizedId;
                 continue;
-            } elseif (method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
+            } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
+                // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
+                // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
+                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
                 // $method is set to the right value, proceed
             } else {
                 if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
@@ -300,28 +314,21 @@ class Container implements IntrospectableContainerInterface
 
                 return;
             }
+            if (isset($this->privates[$id])) {
+                @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
 
             $this->loading[$id] = true;
 
             try {
                 $service = $this->$method();
             } catch (\Exception $e) {
-                unset($this->loading[$id]);
-                unset($this->services[$id]);
-
-                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                    return;
-                }
-
-                throw $e;
-            } catch (\Throwable $e) {
-                unset($this->loading[$id]);
                 unset($this->services[$id]);
 
                 throw $e;
+            } finally {
+                unset($this->loading[$id]);
             }
-
-            unset($this->loading[$id]);
 
             return $service;
         }
@@ -336,19 +343,25 @@ class Container implements IntrospectableContainerInterface
      */
     public function initialized($id)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if ('service_container' === $id) {
-            // BC: 'service_container' was a synthetic service previously.
-            // @todo Change to false in next major release.
-            return true;
+            return false;
         }
 
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
         }
 
-        return isset($this->services[$id]) || array_key_exists($id, $this->services);
+        return isset($this->services[$id]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->services = array();
     }
 
     /**
@@ -359,164 +372,21 @@ class Container implements IntrospectableContainerInterface
     public function getServiceIds()
     {
         $ids = array();
-        foreach (get_class_methods($this) as $method) {
-            if (preg_match('/^get(.+)Service$/', $method, $match)) {
-                $ids[] = self::underscore($match[1]);
+
+        if (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class) {
+            // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
+            // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
+            @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
+
+            foreach (get_class_methods($this) as $method) {
+                if (preg_match('/^get(.+)Service$/', $method, $match)) {
+                    $ids[] = self::underscore($match[1]);
+                }
             }
         }
         $ids[] = 'service_container';
 
-        return array_unique(array_merge($ids, array_keys($this->services)));
-    }
-
-    /**
-     * This is called when you enter a scope.
-     *
-     * @param string $name
-     *
-     * @throws RuntimeException         When the parent scope is inactive
-     * @throws InvalidArgumentException When the scope does not exist
-     */
-    public function enterScope($name)
-    {
-        if (!isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
-        }
-
-        if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
-        }
-
-        // check if a scope of this name is already active, if so we need to
-        // remove all services of this scope, and those of any of its child
-        // scopes from the global services map
-        if (isset($this->scopedServices[$name])) {
-            $services = array($this->services, $name => $this->scopedServices[$name]);
-            unset($this->scopedServices[$name]);
-
-            foreach ($this->scopeChildren[$name] as $child) {
-                if (isset($this->scopedServices[$child])) {
-                    $services[$child] = $this->scopedServices[$child];
-                    unset($this->scopedServices[$child]);
-                }
-            }
-
-            // update global map
-            $this->services = call_user_func_array('array_diff_key', $services);
-            array_shift($services);
-
-            // add stack entry for this scope so we can restore the removed services later
-            if (!isset($this->scopeStacks[$name])) {
-                $this->scopeStacks[$name] = new \SplStack();
-            }
-            $this->scopeStacks[$name]->push($services);
-        }
-
-        $this->scopedServices[$name] = array();
-    }
-
-    /**
-     * This is called to leave the current scope, and move back to the parent
-     * scope.
-     *
-     * @param string $name The name of the scope to leave
-     *
-     * @throws InvalidArgumentException if the scope is not active
-     */
-    public function leaveScope($name)
-    {
-        if (!isset($this->scopedServices[$name])) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
-        }
-
-        // remove all services of this scope, or any of its child scopes from
-        // the global service map
-        $services = array($this->services, $this->scopedServices[$name]);
-        unset($this->scopedServices[$name]);
-
-        foreach ($this->scopeChildren[$name] as $child) {
-            if (isset($this->scopedServices[$child])) {
-                $services[] = $this->scopedServices[$child];
-                unset($this->scopedServices[$child]);
-            }
-        }
-
-        // update global map
-        $this->services = call_user_func_array('array_diff_key', $services);
-
-        // check if we need to restore services of a previous scope of this type
-        if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
-            $services = $this->scopeStacks[$name]->pop();
-            $this->scopedServices += $services;
-
-            if ($this->scopeStacks[$name]->isEmpty()) {
-                unset($this->scopeStacks[$name]);
-            }
-
-            foreach ($services as $array) {
-                foreach ($array as $id => $service) {
-                    $this->set($id, $service, $name);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds a scope to the container.
-     *
-     * @param ScopeInterface $scope
-     *
-     * @throws InvalidArgumentException
-     */
-    public function addScope(ScopeInterface $scope)
-    {
-        $name = $scope->getName();
-        $parentScope = $scope->getParentName();
-
-        if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
-        }
-        if (isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
-        }
-        if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
-        }
-
-        $this->scopes[$name] = $parentScope;
-        $this->scopeChildren[$name] = array();
-
-        // normalize the child relations
-        while ($parentScope !== self::SCOPE_CONTAINER) {
-            $this->scopeChildren[$parentScope][] = $name;
-            $parentScope = $this->scopes[$parentScope];
-        }
-    }
-
-    /**
-     * Returns whether this container has a certain scope.
-     *
-     * @param string $name The name of the scope
-     *
-     * @return bool
-     */
-    public function hasScope($name)
-    {
-        return isset($this->scopes[$name]);
-    }
-
-    /**
-     * Returns whether this scope is currently active.
-     *
-     * This does not actually check if the passed scope actually exists.
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function isScopeActive($name)
-    {
-        return isset($this->scopedServices[$name]);
+        return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->services)));
     }
 
     /**
@@ -541,5 +411,64 @@ class Container implements IntrospectableContainerInterface
     public static function underscore($id)
     {
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), str_replace('_', '.', $id)));
+    }
+
+    /**
+     * Fetches a variable from the environment.
+     *
+     * @param string The name of the environment variable
+     *
+     * @return scalar The value to use for the provided environment variable name
+     *
+     * @throws EnvNotFoundException When the environment variable is not found and has no default value
+     */
+    protected function getEnv($name)
+    {
+        if (isset($this->envCache[$name]) || array_key_exists($name, $this->envCache)) {
+            return $this->envCache[$name];
+        }
+        if (isset($_ENV[$name])) {
+            return $this->envCache[$name] = $_ENV[$name];
+        }
+        if (false !== $env = getenv($name)) {
+            return $this->envCache[$name] = $env;
+        }
+        if (!$this->hasParameter("env($name)")) {
+            throw new EnvNotFoundException($name);
+        }
+
+        return $this->envCache[$name] = $this->getParameter("env($name)");
+    }
+
+    /**
+     * Returns the case sensitive id used at registration time.
+     *
+     * @param string $id
+     *
+     * @return string
+     *
+     * @internal
+     */
+    public function normalizeId($id)
+    {
+        if (!is_string($id)) {
+            $type = is_object($id) ? get_class($id) : gettype($id);
+            $id = (string) $id;
+            @trigger_error(sprintf('Non-string service identifiers are deprecated since Symfony 3.3 and won\'t be supported in 4.0 for service "%s" ("%s" given.) Cast it to string beforehand.', $id, $type), E_USER_DEPRECATED);
+        }
+        if (isset($this->normalizedIds[$normalizedId = strtolower($id)])) {
+            $normalizedId = $this->normalizedIds[$normalizedId];
+            if ($id !== $normalizedId) {
+                @trigger_error(sprintf('Service identifiers will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.3.', $id, $normalizedId), E_USER_DEPRECATED);
+            }
+        } else {
+            $normalizedId = $this->normalizedIds[$normalizedId] = $id;
+        }
+
+        return $normalizedId;
+    }
+
+    private function __clone()
+    {
     }
 }

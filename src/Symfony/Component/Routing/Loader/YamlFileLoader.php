@@ -27,7 +27,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition',
     );
     private $yamlParser;
 
@@ -77,17 +77,6 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($parsedConfig as $name => $config) {
-            if (isset($config['pattern'])) {
-                if (isset($config['path'])) {
-                    throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
-                }
-
-                @trigger_error(sprintf('The "pattern" option in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', $path), E_USER_DEPRECATED);
-
-                $config['path'] = $config['pattern'];
-                unset($config['pattern']);
-            }
-
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {
@@ -125,24 +114,6 @@ class YamlFileLoader extends FileLoader
         $schemes = isset($config['schemes']) ? $config['schemes'] : array();
         $methods = isset($config['methods']) ? $config['methods'] : array();
         $condition = isset($config['condition']) ? $config['condition'] : null;
-
-        if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
-                $methods = explode('|', $requirements['_method']);
-            }
-
-            unset($requirements['_method']);
-            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', $name, $path), E_USER_DEPRECATED);
-        }
-
-        if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
-                $schemes = explode('|', $requirements['_scheme']);
-            }
-
-            unset($requirements['_scheme']);
-            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', $name, $path), E_USER_DEPRECATED);
-        }
 
         $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 

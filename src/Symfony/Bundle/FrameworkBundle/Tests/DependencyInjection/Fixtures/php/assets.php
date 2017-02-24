@@ -20,9 +20,9 @@ $container->loadFromExtension('framework', array(
             'bar' => array(
                 'base_urls' => array('https://bar2.example.com'),
             ),
-            'bar_null_version' => array(
-                'version' => null,
-                'base_urls' => array('https://bar3.example.com'),
+            'bar_version_strategy' => array(
+                'base_urls' => array('https://bar2.example.com'),
+                'version_strategy' => 'assets.custom_version_strategy',
             ),
         ),
     ),

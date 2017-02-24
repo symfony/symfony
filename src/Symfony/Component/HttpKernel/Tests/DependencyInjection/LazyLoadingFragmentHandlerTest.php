@@ -30,7 +30,7 @@ class LazyLoadingFragmentHandlerTest extends TestCase
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($this->once())->method('get')->will($this->returnValue($renderer));
 
-        $handler = new LazyLoadingFragmentHandler($container, false, $requestStack);
+        $handler = new LazyLoadingFragmentHandler($container, $requestStack, false);
         $handler->addRendererService('foo', 'foo');
 
         $handler->render('/foo', 'foo');

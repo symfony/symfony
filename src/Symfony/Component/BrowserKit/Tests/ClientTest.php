@@ -433,7 +433,7 @@ class ClientTest extends TestCase
     {
         $headers = array(
             'HTTP_HOST' => 'www.example.com',
-            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
+            'HTTP_USER_AGENT' => 'Symfony BrowserKit',
             'CONTENT_TYPE' => 'application/vnd.custom+xml',
             'HTTPS' => false,
         );
@@ -460,7 +460,7 @@ class ClientTest extends TestCase
     {
         $headers = array(
             'HTTP_HOST' => 'www.example.com:8080',
-            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
+            'HTTP_USER_AGENT' => 'Symfony BrowserKit',
             'HTTPS' => false,
             'HTTP_REFERER' => 'http://www.example.com:8080/',
         );
@@ -472,6 +472,22 @@ class ClientTest extends TestCase
         $client->request('GET', 'http://www.example.com:8080/');
 
         $this->assertEquals($headers, $client->getRequest()->getServer());
+    }
+
+    public function testIsFollowingRedirects()
+    {
+        $client = new TestClient();
+        $this->assertTrue($client->isFollowingRedirects(), '->getFollowRedirects() returns default value');
+        $client->followRedirects(false);
+        $this->assertFalse($client->isFollowingRedirects(), '->getFollowRedirects() returns assigned value');
+    }
+
+    public function testGetMaxRedirects()
+    {
+        $client = new TestClient();
+        $this->assertEquals(-1, $client->getMaxRedirects(), '->getMaxRedirects() returns default value');
+        $client->setMaxRedirects(3);
+        $this->assertEquals(3, $client->getMaxRedirects(), '->getMaxRedirects() returns assigned value');
     }
 
     public function testFollowRedirectWithPostMethod()
@@ -587,7 +603,7 @@ class ClientTest extends TestCase
     {
         $client = new TestClient();
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
         $this->assertEquals('testvalue', $client->getServerParameter('testkey', 'testvalue'));
     }
 
@@ -596,7 +612,7 @@ class ClientTest extends TestCase
         $client = new TestClient();
 
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $client->setServerParameter('HTTP_HOST', 'testhost');
         $this->assertEquals('testhost', $client->getServerParameter('HTTP_HOST'));
@@ -610,7 +626,7 @@ class ClientTest extends TestCase
         $client = new TestClient();
 
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $client->request('GET', 'https://www.example.com/https/www.example.com', array(), array(), array(
             'HTTP_HOST' => 'testhost',
@@ -620,7 +636,7 @@ class ClientTest extends TestCase
         ));
 
         $this->assertEquals('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+        $this->assertEquals('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
         $this->assertEquals('http://www.example.com/https/www.example.com', $client->getRequest()->getUri());
 

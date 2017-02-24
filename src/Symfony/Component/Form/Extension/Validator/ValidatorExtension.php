@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Form\Extension\Validator;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
  * Extension supporting the Symfony Validator component in forms.
@@ -28,22 +26,9 @@ class ValidatorExtension extends AbstractExtension
 {
     private $validator;
 
-    /**
-     * @param ValidatorInterface|LegacyValidatorInterface $validator
-     *
-     * @throws UnexpectedTypeException If $validator is invalid
-     */
-    public function __construct($validator)
+    public function __construct(ValidatorInterface $validator)
     {
-        // 2.5 API
-        if ($validator instanceof ValidatorInterface) {
-            $metadata = $validator->getMetadataFor('Symfony\Component\Form\Form');
-        // 2.4 API
-        } elseif ($validator instanceof LegacyValidatorInterface) {
-            $metadata = $validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
-        } else {
-            throw new UnexpectedTypeException($validator, 'Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
-        }
+        $metadata = $validator->getMetadataFor('Symfony\Component\Form\Form');
 
         // Register the form constraints in the validator programmatically.
         // This functionality is required when using the Form component without
@@ -59,13 +44,7 @@ class ValidatorExtension extends AbstractExtension
 
     public function loadTypeGuesser()
     {
-        // 2.5 API
-        if ($this->validator instanceof ValidatorInterface) {
-            return new ValidatorTypeGuesser($this->validator);
-        }
-
-        // 2.4 API
-        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+        return new ValidatorTypeGuesser($this->validator);
     }
 
     protected function loadTypeExtensions()

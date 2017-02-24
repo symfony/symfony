@@ -88,10 +88,8 @@ class File extends Constraint
 
     private function normalizeBinaryFormat($maxSize)
     {
-        $sizeInt = (int) $maxSize;
-
         if (ctype_digit((string) $maxSize)) {
-            $this->maxSize = $sizeInt;
+            $this->maxSize = (int) $maxSize;
             $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
         } elseif (preg_match('/^\d++k$/i', $maxSize)) {
             $this->maxSize = $sizeInt * 1000;

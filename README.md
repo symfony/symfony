@@ -1,5 +1,5 @@
 <p align="center"><a href="https://symfony.com" target="_blank">
-    <img src="http://symfony.com/logos/symfony_black_02.svg">
+    <img src="https://symfony.com/logos/symfony_black_02.svg">
 </a></p>
 
 [Symfony][1] is a **PHP framework** for web applications and a set of reusable
@@ -13,8 +13,8 @@ Installation
 * [Install Symfony][4] with Composer or with our own installer (see
   [requirements details][3]).
 * Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
-Support" (LTS) versions and has a [release process][6] that is predictable and
-business-friendly.
+  Support" (LTS) versions and has a [release process][6] that is predictable and
+  business-friendly.
 
 Documentation
 -------------

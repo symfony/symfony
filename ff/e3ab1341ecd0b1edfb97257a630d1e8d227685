@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fbourigault at 2017-02-24T07:40:23Z
+
+A reference to the symfony-demo project seems relevant :) If the demo is hosted live somewhere, linking to  this live hosted version would be awesome!
+
+---------------------------------------------------------------------------
+
+by Wirone at 2017-02-24T08:54:34Z
+
+What about adding some badges about code coverage or build status?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-24T08:55:38Z
+
+@Wirone Fabien has always been against badges in the readme.
+
+@javiereguiluz there is nothing talking about community reviews anymore. Is it intended ?
+
+---------------------------------------------------------------------------
+
+by Wirone at 2017-02-24T08:57:25Z
+
+@stof ok, I didn't know. Just asking ;-)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-24T08:58:14Z
+
+Due to https://github.com/composer/packagist/issues/764, the rendering of the readme on Packagist will become weird with this new content, as it will remove the ``Installation`` here.
+We should either keep a top-level title, or contribute a fix in Packagist.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-24T09:38:15Z
+
+Answering the pending comments:
+
+@fbourigault I've added a mention to the Symfony Demo (in the docs section ... I can't find a better place)
+@stof yes, let's remove the community reviews because it's a second-level information. We link to contribute code/docs, which is the important thing, and there we link to the community reviews, etc.
+@Wirone we know that badges are popular, but for Symfony we decided that they don't provide much useful information.
+@stof yes, let's fix the Packagist issue in their repository
+
+---
+
+So, we're good to go :)

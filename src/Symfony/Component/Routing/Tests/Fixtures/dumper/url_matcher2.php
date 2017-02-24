@@ -24,8 +24,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     {
         $allow = array();
         $pathinfo = rawurldecode($pathinfo);
+        $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
+        $requestMethod = $context->getMethod();
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
@@ -35,7 +37,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                if (!in_array($requestMethod, array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_bar;
                 }
@@ -46,7 +48,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                if (!in_array($requestMethod, array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_barhead;
                 }
@@ -70,7 +72,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 }
 
                 // baz3
-                if (rtrim($pathinfo, '/') === '/test/baz3') {
+                if ($trimmedPathinfo === '/test/baz3') {
                     if (substr($pathinfo, -1) !== '/') {
                         return $this->redirect($pathinfo.'/', 'baz3');
                     }
@@ -91,7 +93,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($this->context->getMethod() != 'POST') {
+                if ($requestMethod != 'POST') {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
@@ -102,7 +104,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($this->context->getMethod() != 'PUT') {
+                if ($requestMethod != 'PUT') {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }
@@ -174,7 +176,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             }
 
             // hey
-            if (rtrim($pathinfo, '/') === '/multi/hey') {
+            if ($trimmedPathinfo === '/multi/hey') {
                 if (substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'hey');
                 }
@@ -207,7 +209,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        $host = $this->context->getHost();
+        $host = $context->getHost();
 
         if (preg_match('#^a\\.example\\.com$#si', $host, $hostMatches)) {
             // route1
@@ -322,7 +324,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         // secure
         if ($pathinfo === '/secure') {
             $requiredSchemes = array (  'https' => 0,);
-            if (!isset($requiredSchemes[$this->context->getScheme()])) {
+            if (!isset($requiredSchemes[$context->getScheme()])) {
                 return $this->redirect($pathinfo, 'secure', key($requiredSchemes));
             }
 
@@ -332,7 +334,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         // nonsecure
         if ($pathinfo === '/nonsecure') {
             $requiredSchemes = array (  'http' => 0,);
-            if (!isset($requiredSchemes[$this->context->getScheme()])) {
+            if (!isset($requiredSchemes[$context->getScheme()])) {
                 return $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes));
             }
 

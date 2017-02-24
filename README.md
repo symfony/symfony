@@ -10,8 +10,8 @@ Drupal and Magento).
 Installation
 ------------
 
-* Symfony requires PHP 5.3.9 or higher. See [requirements details][3].
-* [Install Symfony][4] with Composer or with our own installer.
+* [Install Symfony][4] with Composer or with our own installer (see
+  [requirements details][3]).
 * Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
 Support" (LTS) versions and has a [release process][6] that is predictable and
 business-friendly.

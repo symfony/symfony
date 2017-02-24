@@ -20,6 +20,7 @@ Documentation
 -------------
 
 * Read the [Getting Started guide][7] if you are new to Symfony.
+* Try the [Symfony Demo application][23] to learn Symfony in practice.
 * Master Symfony with the [Guides and Tutorials][8], the [Components docs][9]
   and the [Best Practices][10] reference.
 
@@ -71,3 +72,4 @@ Symfony development is sponsored by [SensioLabs][21], lead by the
 [20]: https://symfony.com/security
 [21]: https://sensiolabs.com
 [22]: https://symfony.com/doc/current/contributing/code/core_team.html
+[23]: https://github.com/symfony/symfony-demo

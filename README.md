@@ -34,9 +34,9 @@ Community
 Contributing
 ------------
 
-Symfony is an Open Source, community-driven project. Join us [contributing code][17]
-or [contributing documentation][18] and you'll end up in the [Symfony contributors][19]
-Hall of Fame.
+Symfony is an Open Source, community-driven project with thousands of
+[Symfony contributors][19]. Join them [contributing code][17]
+or [contributing documentation][18].
 
 Security Issues
 ---------------

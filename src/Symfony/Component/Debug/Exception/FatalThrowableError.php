@@ -31,14 +31,7 @@ class FatalThrowableError extends FatalErrorException
             $severity = E_ERROR;
         }
 
-        \ErrorException::__construct(
-            $message,
-            $e->getCode(),
-            $severity,
-            $e->getFile(),
-            $e->getLine()
-        );
-
+        parent::__construct($message,$e->getCode(),$severity,$e->getFile(),$e->getLine());
         $this->setTrace($e->getTrace());
     }
 }

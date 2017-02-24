@@ -17,6 +17,8 @@ use Psr\Cache\CacheItemPoolInterface;
  * Adds a PSR-6 cache layer on top of an extractor.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since version 3.3
  */
 class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 {

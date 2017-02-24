@@ -11,9 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Config;
 
+@trigger_error('The '.__NAMESPACE__.'\AutowireServiceResource class is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 
+/**
+ * @deprecated since version 3.3, to be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.
+ */
 class AutowireServiceResource implements SelfCheckingResourceInterface, \Serializable
 {
     private $class;
@@ -60,7 +65,11 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
 
     public function unserialize($serialized)
     {
-        list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized);
+        if (PHP_VERSION_ID >= 70000) {
+            list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized, array('allowed_classes' => false));
+        } else {
+            list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized);
+        }
     }
 
     /**

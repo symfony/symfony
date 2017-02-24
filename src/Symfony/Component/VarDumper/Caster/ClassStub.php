@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
+
 /**
  * Represents a PHP class identifier.
  *
@@ -36,6 +38,10 @@ class ClassStub extends ConstStub
             if (null !== $callable) {
                 if ($callable instanceof \Closure) {
                     $r = new \ReflectionFunction($callable);
+
+                    if (preg_match('#^/\*\* @closure-proxy ([^: ]++)::([^: ]++) \*/$#', $r->getDocComment(), $m)) {
+                        $r = array($m[1], $m[2]);
+                    }
                 } elseif (is_object($callable)) {
                     $r = array($callable, '__invoke');
                 } elseif (is_array($callable)) {
@@ -60,6 +66,18 @@ class ClassStub extends ConstStub
             }
         } catch (\ReflectionException $e) {
             return;
+        }
+
+        if (interface_exists(InheritanceProxyInterface::class, false)) {
+            $c = $r instanceof \ReflectionMethod ? $r->getDeclaringClass() : $r;
+            if ($c instanceof \ReflectionClass && $c->implementsInterface(InheritanceProxyInterface::class)) {
+                $p = $c->getParentClass();
+                $this->value = $identifier = str_replace($c->name, $p->name.'@proxy', $identifier);
+                if (0 < $i = strrpos($identifier, '\\')) {
+                    $this->attr['ellipsis'] = strlen($identifier) - $i;
+                }
+                $r = $r instanceof \ReflectionMethod ? $p->getMethod($r->name) : $p;
+            }
         }
 
         if ($f = $r->getFileName()) {

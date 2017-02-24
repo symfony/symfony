@@ -27,7 +27,7 @@
 
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager" public="false">
-            <argument type="collection" />
+            <argument /> <!-- providers -->
             <argument>%security.authentication.manager.erase_credentials%</argument>
             <call method="setEventDispatcher">
                 <argument type="service" id="event_dispatcher" />
@@ -67,6 +67,7 @@
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager" public="false">
             <argument type="collection" />
         </service>
+        <service id="Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface" alias="security.access.decision_manager" public="false" />
 
         <service id="security.role_hierarchy" class="Symfony\Component\Security\Core\Role\RoleHierarchy" public="false">
             <argument>%security.role_hierarchy.roles%</argument>
@@ -104,8 +105,8 @@
         </service>
 
         <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
-            <argument type="service" id="service_container" />
-            <argument type="collection" />
+            <argument /> <!-- Firewall context locator -->
+            <argument /> <!-- Request matchers -->
         </service>
 
         <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">

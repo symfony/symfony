@@ -43,7 +43,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         }
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals($expected, $definition->getArgument(1));
+        $this->assertEquals($expected, $definition->getArgument(1)->getValues());
     }
 
     public function testReturningEmptyArrayWhenNoService()
@@ -53,7 +53,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container->setDefinition('argument_resolver', $definition);
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals(array(), $definition->getArgument(1));
+        $this->assertEquals(array(), $definition->getArgument(1)->getValues());
     }
 
     public function testNoArgumentResolver()

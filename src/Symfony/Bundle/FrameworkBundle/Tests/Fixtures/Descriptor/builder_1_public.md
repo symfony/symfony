@@ -12,9 +12,29 @@ Definitions
 - Lazy: yes
 - Shared: yes
 - Abstract: yes
-- Autowired: no
+- Autowire: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+
+### definition_autowired
+
+- Class: `AutowiredService`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowire: yes
+
+### definition_autowired_with_methods
+
+- Class: `AutowiredService`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowire: `set*`, `addFoo`
 
 
 Aliases

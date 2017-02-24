@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
+if (PHP_VERSION_ID >= 70000) {
+    @trigger_error('The '.__NAMESPACE__.'\AddClassesToCachePass class is deprecated since version 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
+}
+
 use Composer\Autoload\ClassLoader;
 use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,6 +25,8 @@ use Symfony\Component\HttpKernel\Kernel;
  * Sets the classes to compile in the cache for the container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0.
  */
 class AddClassesToCachePass implements CompilerPassInterface
 {

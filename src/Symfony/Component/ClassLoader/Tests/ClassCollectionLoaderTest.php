@@ -21,6 +21,9 @@ require_once __DIR__.'/Fixtures/ClassesWithParents/CInterface.php';
 require_once __DIR__.'/Fixtures/ClassesWithParents/B.php';
 require_once __DIR__.'/Fixtures/ClassesWithParents/A.php';
 
+/**
+ * @group legacy
+ */
 class ClassCollectionLoaderTest extends TestCase
 {
     public function testTraitDependencies()

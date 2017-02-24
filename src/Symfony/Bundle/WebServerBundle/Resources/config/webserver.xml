@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="web_server.command.server_run" class="Symfony\Bundle\WebServerBundle\Command\ServerRunCommand">
+            <argument>%kernel.root_dir%/../web</argument>
+            <argument>%kernel.environment%</argument>
+            <tag name="console.command" />
+        </service>
+
+        <service id="web_server.command.server_start" class="Symfony\Bundle\WebServerBundle\Command\ServerStartCommand">
+            <argument>%kernel.root_dir%/../web</argument>
+            <argument>%kernel.environment%</argument>
+            <tag name="console.command" />
+        </service>
+
+        <service id="web_server.command.server_stop" class="Symfony\Bundle\WebServerBundle\Command\ServerStopCommand">
+            <tag name="console.command" />
+        </service>
+
+        <service id="web_server.command.server_status" class="Symfony\Bundle\WebServerBundle\Command\ServerStatusCommand">
+            <tag name="console.command" />
+        </service>
+    </services>
+
+</container>

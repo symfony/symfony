@@ -88,11 +88,24 @@
             </call>
         </service>
 
+        <service id="cache.adapter.memcached" class="Symfony\Component\Cache\Adapter\MemcachedAdapter" abstract="true">
+            <tag name="cache.pool" provider="cache.default_memcached_provider" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- Memcached connection service -->
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
             <tag name="kernel.cache_clearer" />
         </service>
 
+        <service id="cache.global_clearer" parent="cache.default_clearer" />
         <service id="cache.app_clearer" alias="cache.default_clearer" />
+        <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" public="false" />
 
     </services>
 </container>

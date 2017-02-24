@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -27,7 +27,7 @@ class LdapFactory implements UserProviderFactoryInterface
     public function create(ContainerBuilder $container, $id, $config)
     {
         $container
-            ->setDefinition($id, new DefinitionDecorator('security.user.provider.ldap'))
+            ->setDefinition($id, new ChildDefinition('security.user.provider.ldap'))
             ->replaceArgument(0, new Reference($config['service']))
             ->replaceArgument(1, $config['base_dn'])
             ->replaceArgument(2, $config['search_dn'])

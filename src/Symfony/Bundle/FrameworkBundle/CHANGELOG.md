@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Changed default configuration for
+   assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
+   `canBeDisabled()` when Flex is used
+ * The server:* commands and their associated router files were moved to WebServerBundle
+ * Translation related services are not loaded anymore when the `framework.translator` option
+   is disabled.
+ * Added `GlobalVariables::getToken()`
+ * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass`. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ * Added configurable paths for validation files
+ * Deprecated `SerializerPass`, use `Symfony\Component\Serializer\DependencyInjection\SerializerPass` instead
+ * Deprecated `FormPass`, use `Symfony\Component\Form\DependencyInjection\FormPass` instead
+
 3.2.0
 -----
 

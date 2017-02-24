@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,6 +25,8 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
@@ -61,6 +66,10 @@ class PhpDumper extends Dumper
     private $docStar;
     private $serviceIdToMethodNameMap;
     private $usedMethodNames;
+    private $baseClass;
+    private $inheritanceProxies = array();
+    private $useInstantiateProxy;
+    private $salt;
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -72,6 +81,10 @@ class PhpDumper extends Dumper
      */
     public function __construct(ContainerBuilder $container)
     {
+        if (!$container->isFrozen()) {
+            @trigger_error('Dumping an uncompiled ContainerBuilder is deprecated since version 3.3 and will not be supported anymore in 4.0. Compile the container beforehand.', E_USER_DEPRECATED);
+        }
+
         parent::__construct($container);
 
         $this->inlinedDefinitions = new \SplObjectStorage();
@@ -112,7 +125,11 @@ class PhpDumper extends Dumper
             'debug' => true,
         ), $options);
 
+        $this->salt = substr(strtr(base64_encode(md5($options['namespace'].'\\'.$options['class'].'+'.$options['base_class'], true)), '+/', '__'), 0, -2);
+        $this->inheritanceProxies = array();
+        $this->useInstantiateProxy = false;
         $this->initializeMethodNamesMap($options['base_class']);
+        $this->baseClass = $options['base_class'];
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -158,6 +175,7 @@ class PhpDumper extends Dumper
             $this->addProxyClasses()
         ;
         $this->targetDirRegex = null;
+        $this->inheritanceProxies = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -259,6 +277,10 @@ class PhpDumper extends Dumper
                 $proxyCode = substr(Kernel::stripComments($proxyCode), 5);
             }
             $code .= $proxyCode;
+        }
+
+        foreach ($this->inheritanceProxies as $proxyClass => $proxyCode) {
+            $code .= sprintf("\nclass %s extends %s", $proxyClass, $proxyCode);
         }
 
         return $code;
@@ -474,6 +496,78 @@ class PhpDumper extends Dumper
         return $calls;
     }
 
+    private function addServiceOverriddenMethods($id, Definition $definition)
+    {
+        $class = $this->container->getReflectionClass($definition->getClass());
+        if ($class->isFinal()) {
+            throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" cannot be marked as final.', $id, $class->name));
+        }
+
+        if ($r = $class->getConstructor()) {
+            if ($r->isAbstract()) {
+                throw new RuntimeException(sprintf('Unable to configure service "%s": the constructor of the "%s" class cannot be abstract.', $id, $class->name));
+            }
+            if (!$r->isPublic()) {
+                throw new RuntimeException(sprintf('Unable to configure service "%s": the constructor of the "%s" class must be public.', $id, $class->name));
+            }
+            if (!$r->isFinal()) {
+                if (0 < $r->getNumberOfParameters()) {
+                    $constructor = implode('($container'.$this->salt.', ', explode('(', InheritanceProxyHelper::getSignature($r, $call), 2));
+                } else {
+                    $constructor = $r->name.'($container'.$this->salt.')';
+                    $call = $r->name.'()';
+                }
+                $constructor = sprintf("\n    public function %s\n    {\n        \$this->container%3\$s = \$container%3\$s;\n        parent::%s;\n    }\n", $constructor, $call, $this->salt);
+            } else {
+                $constructor = '';
+            }
+        } else {
+            $constructor = sprintf("\n    public function __construct(\$container%1\$s)\n    {\n        \$this->container%1\$s = \$container%1\$s;\n    }\n", $this->salt);
+        }
+
+        return $constructor.$this->addServiceOverriddenGetters($id, $definition, $class);
+    }
+
+    private function addServiceOverriddenGetters($id, Definition $definition, \ReflectionClass $class)
+    {
+        $getters = '';
+
+        foreach ($definition->getOverriddenGetters() as $name => $returnValue) {
+            $r = InheritanceProxyHelper::getGetterReflector($class, $name, $id);
+
+            $getter = array();
+            $getter[] = sprintf('%s function %s', $r->isProtected() ? 'protected' : 'public', InheritanceProxyHelper::getSignature($r));
+            $getter[] = '{';
+
+            if (false === strpos($dumpedReturnValue = $this->dumpValue($returnValue), '$this')) {
+                $getter[] = sprintf('    return %s;', $dumpedReturnValue);
+            } else {
+                $getter[] = sprintf('    if (null === $g = &$this->getters%s[__FUNCTION__]) {', $this->salt);
+                $getter[] = sprintf('        $g = \Closure::bind(function () { return %s; }, %2$s, %2$s);', $dumpedReturnValue, '$this->container'.$this->salt);
+                $getter[] = '    }';
+                $getter[] = '';
+                foreach (explode("\n", $this->wrapServiceConditionals($returnValue, "        return \$g();\n", $isUnconditional, '$this->container'.$this->salt)) as $code) {
+                    if ($code) {
+                        $getter[] = substr($code, 4);
+                    }
+                }
+                if (!$isUnconditional) {
+                    $getter[] = '';
+                    $getter[] = sprintf('    return parent::%s();', $r->name);
+                }
+            }
+
+            $getter[] = '}';
+            $getter[] = '';
+
+            foreach ($getter as $code) {
+                $getters .= $code ? "\n    ".$code : "\n";
+            }
+        }
+
+        return $getters;
+    }
+
     private function addServiceProperties($id, Definition $definition, $variableName = 'instance')
     {
         $code = '';
@@ -576,15 +670,16 @@ class PhpDumper extends Dumper
      */
     private function addService($id, Definition $definition)
     {
+        if ($definition->isSynthetic()) {
+            return '';
+        }
         $this->definitionVariables = new \SplObjectStorage();
         $this->referenceVariables = array();
         $this->variableCount = 0;
 
         $return = array();
 
-        if ($definition->isSynthetic()) {
-            $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
-        } elseif ($class = $definition->getClass()) {
+        if ($class = $definition->getClass()) {
             $class = $this->container->resolveEnvPlaceholders($class);
             $return[] = sprintf('@return %s A %s instance', 0 === strpos($class, '%') ? 'object' : '\\'.ltrim($class, '\\'), ltrim($class, '\\'));
         } elseif ($definition->getFactory()) {
@@ -665,25 +760,21 @@ EOF;
 
         $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $methodName) : '';
 
-        if ($definition->isSynthetic()) {
-            $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
-        } else {
-            if ($definition->isDeprecated()) {
-                $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
-            }
-
-            $code .=
-                $this->addServiceInclude($id, $definition).
-                $this->addServiceLocalTempVariables($id, $definition).
-                $this->addServiceInlinedDefinitions($id, $definition).
-                $this->addServiceInstance($id, $definition).
-                $this->addServiceInlinedDefinitionsSetup($id, $definition).
-                $this->addServiceProperties($id, $definition).
-                $this->addServiceMethodCalls($id, $definition).
-                $this->addServiceConfigurator($id, $definition).
-                $this->addServiceReturn($id, $definition)
-            ;
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
         }
+
+        $code .=
+            $this->addServiceInclude($id, $definition).
+            $this->addServiceLocalTempVariables($id, $definition).
+            $this->addServiceInlinedDefinitions($id, $definition).
+            $this->addServiceInstance($id, $definition).
+            $this->addServiceInlinedDefinitionsSetup($id, $definition).
+            $this->addServiceProperties($id, $definition).
+            $this->addServiceMethodCalls($id, $definition).
+            $this->addServiceConfigurator($id, $definition).
+            $this->addServiceReturn($id, $definition)
+        ;
 
         $this->definitionVariables = null;
         $this->referenceVariables = null;
@@ -722,6 +813,9 @@ EOF;
         }
 
         if (null !== $definition->getFactory()) {
+            if ($definition->getOverriddenGetters()) {
+                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": factories and overridden getters are incompatible with each other.', $id));
+            }
             $callable = $definition->getFactory();
             if (is_array($callable)) {
                 if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $callable[1])) {
@@ -754,10 +848,31 @@ EOF;
         }
 
         if (false !== strpos($class, '$')) {
+            if ($definition->getOverriddenGetters()) {
+                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names and overridden getters are incompatible with each other.', $id));
+            }
+
             return sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
         }
+        $class = $this->dumpLiteralClass($class);
 
-        return sprintf("        $return{$instantiation}new %s(%s);\n", $this->dumpLiteralClass($class), implode(', ', $arguments));
+        if ($definition->getOverriddenGetters()) {
+            $inheritanceProxy = "    private \$container{$this->salt};\n    private \$getters{$this->salt};\n";
+            $inheritanceProxy = sprintf("%s implements \\%s\n{\n%s%s}\n", $class, InheritanceProxyInterface::class, $inheritanceProxy, $this->addServiceOverriddenMethods($id, $definition));
+            $class = 'SymfonyProxy_'.md5($inheritanceProxy);
+            $this->inheritanceProxies[$class] = $inheritanceProxy;
+            $constructor = $this->container->getReflectionClass($definition->getClass())->getConstructor();
+
+            if ($constructor && $constructor->isFinal()) {
+                $this->useInstantiateProxy = true;
+                $useConstructor = $constructor->getDeclaringClass()->isInternal() ? "defined('HHVM_VERSION')" : 'true';
+
+                return sprintf("        $return{$instantiation}\$this->instantiateProxy(%s::class, array(%s), %s);\n", $class, implode(', ', $arguments), $useConstructor);
+            }
+            array_unshift($arguments, '$this');
+        }
+
+        return sprintf("        $return{$instantiation}new %s(%s);\n", $class, implode(', ', $arguments));
     }
 
     /**
@@ -777,18 +892,22 @@ EOF;
         return <<<EOF
 <?php
 $namespaceLine
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 $bagClass
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /*{$this->docStar}
  * $class.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
  */
 class $class extends $baseClass
 {
@@ -819,6 +938,7 @@ EOF;
 
 EOF;
 
+        $code .= $this->addNormalizedIds();
         $code .= $this->addMethodMap();
         $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
@@ -854,6 +974,7 @@ EOF;
         }
 
         $code .= "\n        \$this->services = array();\n";
+        $code .= $this->addNormalizedIds();
         $code .= $this->addMethodMap();
         $code .= $this->addAliases();
 
@@ -906,13 +1027,34 @@ EOF;
     }
 
     /**
+     * Adds the normalizedIds property definition.
+     *
+     * @return string
+     */
+    private function addNormalizedIds()
+    {
+        if (!$normalizedIds = $this->container->getNormalizedIds()) {
+            return '';
+        }
+
+        $code = "        \$this->normalizedIds = array(\n";
+        ksort($normalizedIds);
+        foreach ($normalizedIds as $id => $normalizedId) {
+            $code .= '            '.$this->export($id).' => '.$this->export($normalizedId).",\n";
+        }
+
+        return $code."        );\n";
+    }
+
+    /**
      * Adds the methodMap property definition.
      *
      * @return string
      */
     private function addMethodMap()
     {
-        if (!$definitions = $this->container->getDefinitions()) {
+        $definitions = $this->container->getDefinitions();
+        if (!$definitions || !$definitions = array_filter($definitions, function ($def) { return !$def->isSynthetic(); })) {
             return '';
         }
 
@@ -1172,6 +1314,34 @@ EOF;
      */
     private function endClass()
     {
+        if ($this->useInstantiateProxy) {
+            return sprintf(<<<'EOF'
+
+    private function instantiateProxy($class, $args, $useConstructor)
+    {
+        static $reflectionCache;
+
+        if (null === $r = &$reflectionCache[$class]) {
+            $r[0] = new \ReflectionClass($class);
+            $r[1] = $r[0]->getProperty('container%s');
+            $r[1]->setAccessible(true);
+            $r[2] = $r[0]->getConstructor();
+        }
+        $service = $useConstructor ? $r[0]->newInstanceWithoutConstructor() : $r[0]->newInstanceArgs($args);
+        $r[1]->setValue($service, $this);
+        if ($r[2] && $useConstructor) {
+            $r[2]->invokeArgs($service, $args);
+        }
+
+        return $service;
+    }
+}
+
+EOF
+                , $this->salt
+            );
+        }
+
         return <<<'EOF'
 }
 
@@ -1183,24 +1353,43 @@ EOF;
      *
      * @param string $value
      * @param string $code
+     * @param bool   &$isUnconditional
+     * @param string $containerRef
      *
      * @return string
      */
-    private function wrapServiceConditionals($value, $code)
+    private function wrapServiceConditionals($value, $code, &$isUnconditional = null, $containerRef = '$this')
     {
-        if (!$services = ContainerBuilder::getServiceConditionals($value)) {
+        if ($isUnconditional = !$condition = $this->getServiceConditionals($value, $containerRef)) {
             return $code;
-        }
-
-        $conditions = array();
-        foreach ($services as $service) {
-            $conditions[] = sprintf("\$this->has('%s')", $service);
         }
 
         // re-indent the wrapped code
         $code = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code)));
 
-        return sprintf("        if (%s) {\n%s        }\n", implode(' && ', $conditions), $code);
+        return sprintf("        if (%s) {\n%s        }\n", $condition, $code);
+    }
+
+    /**
+     * Get the conditions to execute for conditional services.
+     *
+     * @param string $value
+     * @param string $containerRef
+     *
+     * @return null|string
+     */
+    private function getServiceConditionals($value, $containerRef = '$this')
+    {
+        if (!$services = ContainerBuilder::getServiceConditionals($value)) {
+            return null;
+        }
+
+        $conditions = array();
+        foreach ($services as $service) {
+            $conditions[] = sprintf("%s->has('%s')", $containerRef, $service);
+        }
+
+        return implode(' && ', $conditions);
     }
 
     /**
@@ -1245,6 +1434,7 @@ EOF;
             $definitions = array_merge(
                 $this->getDefinitionsFromArguments($definition->getArguments()),
                 $this->getDefinitionsFromArguments($definition->getMethodCalls()),
+                $this->getDefinitionsFromArguments($definition->getOverriddenGetters()),
                 $this->getDefinitionsFromArguments($definition->getProperties()),
                 $this->getDefinitionsFromArguments(array($definition->getConfigurator())),
                 $this->getDefinitionsFromArguments(array($definition->getFactory()))
@@ -1348,12 +1538,46 @@ EOF;
             }
 
             return sprintf('array(%s)', implode(', ', $code));
+        } elseif ($value instanceof ServiceLocatorArgument) {
+            $code = "\n";
+            foreach ($value->getValues() as $k => $v) {
+                $code .= sprintf("            %s => function () { return %s; },\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));
+            }
+            $code .= '        ';
+
+            return sprintf('new ServiceLocator(array(%s))', $code);
+        } elseif ($value instanceof IteratorArgument) {
+            $countCode = array();
+            $countCode[] = 'function () {';
+            $operands = array(0);
+
+            $code = array();
+            $code[] = 'new RewindableGenerator(function () {';
+            foreach ($value->getValues() as $k => $v) {
+                ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
+                $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
+                foreach (explode("\n", $v) as $v) {
+                    if ($v) {
+                        $code[] = '    '.$v;
+                    }
+                }
+            }
+
+            $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
+            $countCode[] = '        }';
+
+            $code[] = sprintf('        }, %s)', count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
+
+            return implode("\n", $code);
         } elseif ($value instanceof Definition) {
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables->offsetGet($value), $interpolate);
             }
-            if (count($value->getMethodCalls()) > 0) {
+            if ($value->getMethodCalls()) {
                 throw new RuntimeException('Cannot dump definitions which have method calls.');
+            }
+            if ($value->getOverriddenGetters()) {
+                throw new RuntimeException('Cannot dump definitions which have overridden getters.');
             }
             if (null !== $value->getConfigurator()) {
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');
@@ -1398,6 +1622,30 @@ EOF;
             }
 
             return sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments));
+        } elseif ($value instanceof ClosureProxyArgument) {
+            list($reference, $method) = $value->getValues();
+            $method = substr($this->dumpLiteralClass($this->dumpValue($method)), 1);
+
+            if ('service_container' === (string) $reference) {
+                $class = $this->baseClass;
+            } elseif (!$this->container->hasDefinition((string) $reference) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+                return 'null';
+            } else {
+                $class = substr($this->dumpLiteralClass($this->dumpValue($this->container->findDefinition((string) $reference)->getClass())), 1);
+            }
+            if (false !== strpos($class, '$') || false !== strpos($method, '$')) {
+                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names or methods, and closure-proxies are incompatible with each other.', $reference));
+            }
+            if (!method_exists($class, $method)) {
+                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" does not exist.', $reference, $class, $method));
+            }
+            $r = $this->container->getReflectionClass($class)->getMethod($method);
+            if (!$r->isPublic()) {
+                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $reference, $class, $method));
+            }
+            $signature = preg_replace('/^(&?)[^(]*/', '$1', InheritanceProxyHelper::getSignature($r, $call));
+
+            return sprintf("/** @closure-proxy %s::%s */ function %s {\n            return %s->%s;\n        }", $class, $method, $signature, $this->dumpValue($reference), $call);
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -1483,19 +1731,24 @@ EOF;
         }
 
         if ($this->container->hasDefinition($id) && !$this->container->getDefinition($id)->isPublic()) {
-            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? \$this->{$this->generateMethodName($id)}())" on PHP>=7.0
-
-            return "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : \$this->{$this->generateMethodName($id)}()) && false ?: '_'}";
-        }
-        if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-            return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
+            $code = sprintf('$this->%s()', $this->generateMethodName($id));
+        } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+            $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
             if ($this->container->hasAlias($id)) {
                 $id = (string) $this->container->getAlias($id);
             }
 
-            return sprintf('$this->get(\'%s\')', $id);
+            $code = sprintf('$this->get(\'%s\')', $id);
         }
+
+        if ($this->container->hasDefinition($id) && (!$this->container->getDefinition($id)->isPublic() || $this->container->getDefinition($id)->isShared())) {
+            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? $code)" on PHP>=7.0
+
+            $code = "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : $code) && false ?: '_'}";
+        }
+
+        return $code;
     }
 
     /**
@@ -1508,12 +1761,10 @@ EOF;
         $this->serviceIdToMethodNameMap = array();
         $this->usedMethodNames = array();
 
-        try {
-            $reflectionClass = new \ReflectionClass($class);
+        if ($reflectionClass = $this->container->getReflectionClass($class)) {
             foreach ($reflectionClass->getMethods() as $method) {
                 $this->usedMethodNames[strtolower($method->getName())] = true;
             }
-        } catch (\ReflectionException $e) {
         }
     }
 

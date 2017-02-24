@@ -88,9 +88,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         if (null === $twig = $this->getTwigEnvironment()) {
-            $io->error('The Twig environment needs to be set.');
-
-            return 1;
+            throw new \RuntimeException('The Twig environment needs to be set.');
         }
 
         $filenames = $input->getArgument('filename');

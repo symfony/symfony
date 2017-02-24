@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added double-star matching to Glob::toRegex()
+
 3.0.0
 -----
 

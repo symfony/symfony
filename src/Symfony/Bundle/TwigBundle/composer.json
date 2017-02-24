@@ -26,7 +26,7 @@
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",
         "symfony/stopwatch": "~2.8|~3.0",
-        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dependency-injection": "~3.3",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
         "symfony/form": "~2.8|~3.0",
@@ -35,6 +35,9 @@
         "symfony/yaml": "~2.8|~3.0",
         "symfony/framework-bundle": "^3.2.2",
         "doctrine/annotations": "~1.0"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<3.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },
@@ -45,7 +48,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

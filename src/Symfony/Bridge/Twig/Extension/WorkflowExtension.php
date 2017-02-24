@@ -32,6 +32,7 @@ class WorkflowExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('workflow_can', array($this, 'canTransition')),
             new \Twig_SimpleFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
+            new \Twig_SimpleFunction('workflow_has_marked_place', array($this, 'hasMarkedPlace')),
         );
     }
 
@@ -43,6 +44,11 @@ class WorkflowExtension extends \Twig_Extension
     public function getEnabledTransitions($object, $name = null)
     {
         return $this->workflowRegistry->get($object, $name)->getEnabledTransitions($object);
+    }
+
+    public function hasMarkedPlace($object, $place, $name = null)
+    {
+        return $this->workflowRegistry->get($object, $name)->getMarking($object)->has($place);
     }
 
     public function getName()

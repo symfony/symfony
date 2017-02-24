@@ -8,7 +8,6 @@
             "shared": true,
             "abstract": true,
             "autowire": false,
-            "autowiring_types": [],
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
@@ -22,7 +21,6 @@
             "shared": true,
             "abstract": false,
             "autowire": false,
-            "autowiring_types": [],
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
@@ -48,6 +46,31 @@
                     "parameters": []
                 }
             ]
+        },
+        "definition_autowired": {
+            "class": "AutowiredService",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": true,
+            "file": null,
+            "tags": []
+        },
+        "definition_autowired_with_methods": {
+            "class": "AutowiredService",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": [
+                "set*",
+                "addFoo"
+            ],
+            "file": null,
+            "tags": []
         }
     },
     "aliases": {

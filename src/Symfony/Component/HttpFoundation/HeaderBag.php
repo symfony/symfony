@@ -40,14 +40,14 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function __toString()
     {
-        if (!$this->headers) {
+        if (!$headers = $this->all()) {
             return '';
         }
 
-        $max = max(array_map('strlen', array_keys($this->headers))) + 1;
+        ksort($headers);
+        $max = max(array_map('strlen', array_keys($headers))) + 1;
         $content = '';
-        ksort($this->headers);
-        foreach ($this->headers as $name => $values) {
+        foreach ($headers as $name => $values) {
             $name = implode('-', array_map('ucfirst', explode('-', $name)));
             foreach ($values as $value) {
                 $content .= sprintf("%-{$max}s %s\r\n", $name.':', $value);
@@ -74,7 +74,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function keys()
     {
-        return array_keys($this->headers);
+        return array_keys($this->all());
     }
 
     /**
@@ -112,8 +112,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     public function get($key, $default = null, $first = true)
     {
         $key = str_replace('_', '-', strtolower($key));
+        $headers = $this->all();
 
-        if (!array_key_exists($key, $this->headers)) {
+        if (!array_key_exists($key, $headers)) {
             if (null === $default) {
                 return $first ? null : array();
             }
@@ -122,10 +123,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ($first) {
-            return count($this->headers[$key]) ? $this->headers[$key][0] : $default;
+            return count($headers[$key]) ? $headers[$key][0] : $default;
         }
 
-        return $this->headers[$key];
+        return $headers[$key];
     }
 
     /**
@@ -161,7 +162,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function has($key)
     {
-        return array_key_exists(str_replace('_', '-', strtolower($key)), $this->headers);
+        return array_key_exists(str_replace('_', '-', strtolower($key)), $this->all());
     }
 
     /**

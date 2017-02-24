@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * @group legacy
+ */
 class AddConsoleCommandPassTest extends TestCase
 {
     /**

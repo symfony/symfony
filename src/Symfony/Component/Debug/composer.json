@@ -23,7 +23,6 @@
         "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
     },
     "require-dev": {
-        "symfony/class-loader": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0"
     },
     "autoload": {
@@ -35,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

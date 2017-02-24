@@ -29,7 +29,7 @@ class IniFileLoader extends FileLoader
     {
         $path = $this->locator->locate($resource);
 
-        $this->container->addResource(new FileResource($path));
+        $this->container->fileExists($path);
 
         // first pass to catch parsing errors
         $result = parse_ini_file($path, true);
@@ -52,7 +52,15 @@ class IniFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'ini' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'ini' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'ini' === $type;
     }
 
     /**

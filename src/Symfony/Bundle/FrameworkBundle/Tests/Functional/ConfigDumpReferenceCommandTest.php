@@ -40,6 +40,39 @@ class ConfigDumpReferenceCommandTest extends WebTestCase
         $this->assertContains('    custom:', $tester->getDisplay());
     }
 
+    public function testDumpAtPath()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array(
+            'name' => 'test',
+            'path' => 'array',
+        ));
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertSame(<<<'EOL'
+# Default configuration for extension with alias: "test" at path "array"
+array:
+    child1:               ~
+    child2:               ~
+
+
+EOL
+            , $tester->getDisplay(true));
+    }
+
+    public function testDumpAtPathXml()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array(
+            'name' => 'test',
+            'path' => 'array',
+            '--format' => 'xml',
+        ));
+
+        $this->assertSame(1, $ret);
+        $this->assertContains('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
+    }
+
     /**
      * @return CommandTester
      */

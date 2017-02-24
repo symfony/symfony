@@ -97,16 +97,16 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $childOptions = array('id' => $options['id'], 'as_array' => true);
+        $childOptions = array_merge($options, array('id' => $options['id'], 'as_array' => true));
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $childOptions);
+            $this->describeContainerAlias($service, $childOptions, $builder);
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
@@ -129,6 +129,7 @@ class MarkdownDescriptor extends Descriptor
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -149,7 +150,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, array('id' => $id));
+                $this->describeContainerDefinition($service, array('id' => $id, 'show_arguments' => $showArguments));
             }
         }
 
@@ -181,11 +182,22 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
             ."\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no')
             ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no')
-            ."\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no')
         ;
 
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+        $autowiredCalls = array_filter($definition->getAutowiredCalls(), function ($method) {
+            return $method !== '__construct';
+        });
+        $output .= "\n".'- Autowire: ';
+        $output .= $definition->isAutowired() ? ($autowiredCalls ? implode(', ', array_map(function ($method) {
+            return "`$method`";
+        }, $autowiredCalls)) : 'yes') : 'no';
+
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
             $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
+        }
+
+        if (isset($options['show_arguments']) && $options['show_arguments']) {
+            $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
         }
 
         if ($definition->getFile()) {
@@ -229,12 +241,23 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
-        $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
+        if (!isset($options['id'])) {
+            return $this->write($output);
+        }
+
+        $this->write(sprintf("### %s\n\n%s\n", $options['id'], $output));
+
+        if (!$builder) {
+            return;
+        }
+
+        $this->write("\n");
+        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, array('id' => (string) $alias)));
     }
 
     /**

@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -105,6 +108,23 @@ class ObjectsProvider
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
+                ->addArgument(new Reference('definition2'))
+                ->addArgument('%parameter%')
+                ->addArgument(new Definition('inline_service', array('arg1', 'arg2')))
+                ->addArgument(array(
+                    'foo',
+                    new Reference('definition2'),
+                    new Definition('inline_service'),
+                ))
+                ->addArgument(new IteratorArgument(array(
+                    new Reference('definition_1'),
+                    new Reference('definition_2'),
+                )))
+                ->addArgument(new ClosureProxyArgument('definition1', 'get'))
+                ->addArgument(new ServiceLocatorArgument(array(
+                    'def1' => new Reference('definition_1'),
+                    'def2' => new Reference('definition_2'),
+                )))
                 ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
             'definition_2' => $definition2
                 ->setPublic(false)
@@ -117,6 +137,9 @@ class ObjectsProvider
                 ->addTag('tag2')
                 ->addMethodCall('setMailer', array(new Reference('mailer')))
                 ->setFactory(array(new Reference('factory.service'), 'get')),
+            'definition_autowired' => (new Definition('AutowiredService'))->setAutowired(true),
+            'definition_autowired_with_methods' => (new Definition('AutowiredService'))
+                ->setAutowiredCalls(array('__construct', 'set*', 'addFoo')),
         );
     }
 

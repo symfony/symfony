@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added `File\Stream`, to be passed to `BinaryFileResponse` when the size of the served file is unknown,
+   disabling `Range` and `Content-Length` handling, switching to chunked encoding instead
+ * added the `Cookie::fromString()` method that allows to create a cookie from a
+   raw header string
+
 3.1.0
 -----
 

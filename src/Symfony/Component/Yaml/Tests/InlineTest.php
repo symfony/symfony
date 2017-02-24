@@ -694,6 +694,10 @@ class InlineTest extends TestCase
         $this->assertEquals($longStringWithQuotes, $arrayFromYaml['longStringWithQuotes']);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.
+     */
     public function testOmittedMappingKeyIsParsedAsColon()
     {
         $this->assertSame(array(':' => 'foo'), Inline::parse('{: foo}'));

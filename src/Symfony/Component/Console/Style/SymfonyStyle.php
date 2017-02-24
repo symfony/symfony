@@ -63,13 +63,14 @@ class SymfonyStyle extends OutputStyle
      * @param string|null  $style    The style to apply to the whole block
      * @param string       $prefix   The prefix for the block
      * @param bool         $padding  Whether to add vertical padding
+     * @param bool         $escape   Whether to escape the message
      */
-    public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false)
+    public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false, $escape = true)
     {
         $messages = is_array($messages) ? array_values($messages) : array($messages);
 
         $this->autoPrependBlock();
-        $this->writeln($this->createBlock($messages, $type, $style, $prefix, $padding, true));
+        $this->writeln($this->createBlock($messages, $type, $style, $prefix, $padding, $escape));
         $this->newLine();
     }
 
@@ -133,11 +134,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function comment($message)
     {
-        $messages = is_array($message) ? array_values($message) : array($message);
-
-        $this->autoPrependBlock();
-        $this->writeln($this->createBlock($messages, null, null, '<fg=default;bg=default> // </>'));
-        $this->newLine();
+        $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false);
     }
 
     /**
@@ -335,6 +332,16 @@ class SymfonyStyle extends OutputStyle
     {
         parent::newLine($count);
         $this->bufferedOutput->write(str_repeat("\n", $count));
+    }
+
+    /**
+     * Returns a new instance which makes use of stderr if available.
+     *
+     * @return self
+     */
+    public function getErrorStyle()
+    {
+        return new self($this->input, $this->getErrorOutput());
     }
 
     /**

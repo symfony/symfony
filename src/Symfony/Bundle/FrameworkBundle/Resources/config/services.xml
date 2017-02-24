@@ -8,6 +8,8 @@
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
         </service>
+        <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" public="false" />
+        <service id="Symfony\Component\EventDispatcher\EventDispatcher" alias="event_dispatcher" public="false" />
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel">
             <argument type="service" id="event_dispatcher" />
@@ -23,7 +25,6 @@
         </service>
 
         <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer">
-            <tag name="kernel.cache_warmer" />
             <argument type="collection">
                 <argument>Symfony\Component\HttpFoundation\ParameterBag</argument>
                 <argument>Symfony\Component\HttpFoundation\HeaderBag</argument>
@@ -31,19 +32,17 @@
                 <argument>Symfony\Component\HttpFoundation\ServerBag</argument>
                 <argument>Symfony\Component\HttpFoundation\Request</argument>
                 <argument>Symfony\Component\HttpKernel\Kernel</argument>
-                <argument>Symfony\Component\ClassLoader\ClassCollectionLoader</argument>
-                <argument>Symfony\Component\ClassLoader\ApcClassLoader</argument>
             </argument>
+            <deprecated>The "%service_id%" option is deprecated since version 3.3, to be removed in 4.0.</deprecated>
         </service>
 
         <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
             <argument type="collection" />
         </service>
 
-        <service id="service_container" synthetic="true">
-            <autowiring-type>Symfony\Component\DependencyInjection\ContainerInterface</autowiring-type>
-            <autowiring-type>Symfony\Component\DependencyInjection\Container</autowiring-type>
-        </service>
+        <service id="Psr\Container\ContainerInterface" alias="service_container" public="false" />
+        <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false" />
+        <service id="Symfony\Component\DependencyInjection\Container" alias="service_container" public="false" />
 
         <service id="kernel" synthetic="true" />
 
@@ -52,6 +51,9 @@
         <service id="file_locator" class="Symfony\Component\HttpKernel\Config\FileLocator">
             <argument type="service" id="kernel" />
             <argument>%kernel.root_dir%/Resources</argument>
+            <argument type="collection">
+                <argument>%kernel.root_dir%</argument>
+            </argument>
         </service>
 
         <service id="uri_signer" class="Symfony\Component\HttpKernel\UriSigner">

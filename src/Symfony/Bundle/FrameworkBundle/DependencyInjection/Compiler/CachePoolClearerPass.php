@@ -26,16 +26,45 @@ final class CachePoolClearerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->getParameterBag()->remove('cache.prefix.seed');
+        $poolsByClearer = array();
+        $pools = array();
 
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $attributes) {
+            $pools[$id] = new Reference($id);
             foreach (array_reverse($attributes) as $attr) {
                 if (isset($attr['clearer'])) {
-                    $clearer = $container->getDefinition($attr['clearer']);
-                    $clearer->addMethodCall('addPool', array(new Reference($id)));
+                    $poolsByClearer[$attr['clearer']][$id] = $pools[$id];
                 }
-                if (array_key_exists('clearer', $attr)) {
+                if (!empty($attr['unlazy'])) {
+                    $container->getDefinition($id)->setLazy(false);
+                }
+                if (array_key_exists('clearer', $attr) || array_key_exists('unlazy', $attr)) {
                     break;
                 }
+            }
+        }
+
+        $container->getDefinition('cache.global_clearer')->addArgument($pools);
+
+        foreach ($poolsByClearer as $clearer => $pools) {
+            $clearer = $container->getDefinition($clearer);
+            $clearer->addArgument($pools);
+        }
+
+        if (!$container->has('cache.annotations')) {
+            return;
+        }
+        $factory = array(AbstractAdapter::class, 'createSystemCache');
+        $annotationsPool = $container->getDefinition('cache.annotations');
+        if ($factory !== $annotationsPool->getFactory() || 4 !== count($annotationsPool->getArguments())) {
+            return;
+        }
+        if ($container->has('monolog.logger.cache')) {
+            $annotationsPool->addArgument(new Reference('monolog.logger.cache'));
+        } elseif ($container->has('cache.system')) {
+            $systemPool = $container->getDefinition('cache.system');
+            if ($factory === $systemPool->getFactory() && 5 <= count($systemArgs = $systemPool->getArguments())) {
+                $annotationsPool->addArgument($systemArgs[4]);
             }
         }
     }

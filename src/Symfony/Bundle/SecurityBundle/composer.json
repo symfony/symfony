@@ -17,26 +17,26 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/security": "~3.2",
+        "symfony/security": "~3.3",
+        "symfony/dependency-injection": "~3.3",
         "symfony/http-kernel": "~3.2",
         "symfony/polyfill-php70": "~1.0"
     },
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",
         "symfony/browser-kit": "~2.8|~3.0",
-        "symfony/console": "~2.8|~3.0",
+        "symfony/console": "~3.2",
         "symfony/css-selector": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",
         "symfony/form": "^2.8.18|^3.2.5",
         "symfony/framework-bundle": "^3.2.5",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/security-acl": "~2.8|~3.0",
-        "symfony/templating": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",
         "symfony/twig-bundle": "~2.8|~3.0",
         "symfony/twig-bridge": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
-        "symfony/validator": "^2.8.18|^3.2.5",
+        "symfony/validator": "^3.2.5",
         "symfony/var-dumper": "~3.2",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
@@ -55,7 +55,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

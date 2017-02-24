@@ -26,7 +26,8 @@
     "require-dev": {
         "doctrine/collections": "~1.0",
         "symfony/validator": "^2.8.18|^3.2.5",
-        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dependency-injection": "~3.2",
+        "symfony/config": "~2.7|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/security-csrf": "~2.8|~3.0",
@@ -54,7 +55,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

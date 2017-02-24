@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -22,7 +22,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('parent', 'foo')->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
-        $container->setDefinition('child', new DefinitionDecorator('parent'))
+        $container->setDefinition('child', new ChildDefinition('parent'))
             ->replaceArgument(0, 'a')
             ->setProperty('foo', 'bar')
             ->setClass('bar')
@@ -31,7 +31,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertNotInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $def);
+        $this->assertNotInstanceOf(ChildDefinition::class, $def);
         $this->assertEquals('bar', $def->getClass());
         $this->assertEquals(array('a', 'b'), $def->getArguments());
         $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
@@ -47,7 +47,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
             ->addMethodCall('bar', array('foo'))
         ;
 
@@ -70,7 +70,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -89,7 +89,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -108,7 +108,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -127,7 +127,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -145,7 +145,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
             ->setShared(false)
         ;
 
@@ -165,12 +165,12 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child2', new DefinitionDecorator('child1'))
+            ->setDefinition('child2', new ChildDefinition('child1'))
             ->replaceArgument(1, 'b')
         ;
 
         $container
-            ->setDefinition('child1', new DefinitionDecorator('parent'))
+            ->setDefinition('child1', new ChildDefinition('parent'))
             ->replaceArgument(0, 'a')
         ;
 
@@ -187,7 +187,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container->register('parent', 'stdClass');
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+        $container->setDefinition('child1', new ChildDefinition('parent'))
             ->setLazy(true)
         ;
 
@@ -204,7 +204,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
             ->setLazy(true)
         ;
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'));
+        $container->setDefinition('child1', new ChildDefinition('parent'));
 
         $this->process($container);
 
@@ -215,15 +215,17 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent', 'stdClass');
+        $container->register('parent', 'stdClass')
+            ->setAutowiredCalls(array('foo'))
+        ;
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'))
-            ->setAutowired(true)
+        $container->setDefinition('child1', new ChildDefinition('parent'))
+            ->setAutowiredCalls(array('baz'))
         ;
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('child1')->isAutowired());
+        $this->assertEquals(array('baz'), $container->getDefinition('child1')->getAutowiredCalls());
     }
 
     public function testSetAutowiredOnServiceIsParent()
@@ -231,14 +233,14 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('parent', 'stdClass')
-            ->setAutowired(true)
+            ->setAutowiredCalls(array('__construct', 'set*'))
         ;
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'));
+        $container->setDefinition('child1', new ChildDefinition('parent'));
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('child1')->isAutowired());
+        $this->assertEquals(array('__construct', 'set*'), $container->getDefinition('child1')->getAutowiredCalls());
     }
 
     public function testDeepDefinitionsResolving()
@@ -247,11 +249,11 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container->register('parent', 'parentClass');
         $container->register('sibling', 'siblingClass')
-            ->setConfigurator(new DefinitionDecorator('parent'), 'foo')
-            ->setFactory(array(new DefinitionDecorator('parent'), 'foo'))
-            ->addArgument(new DefinitionDecorator('parent'))
-            ->setProperty('prop', new DefinitionDecorator('parent'))
-            ->addMethodCall('meth', array(new DefinitionDecorator('parent')))
+            ->setConfigurator(new ChildDefinition('parent'), 'foo')
+            ->setFactory(array(new ChildDefinition('parent'), 'foo'))
+            ->addArgument(new ChildDefinition('parent'))
+            ->setProperty('prop', new ChildDefinition('parent'))
+            ->addMethodCall('meth', array(new ChildDefinition('parent')))
         ;
 
         $this->process($container);
@@ -283,7 +285,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container->register('parent', 'stdClass');
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+        $container->setDefinition('child1', new ChildDefinition('parent'))
             ->setDecoratedService('foo', 'foo_inner', 5)
         ;
 
@@ -299,7 +301,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
             ->setDeprecated(true)
         ;
 
-        $container->setDefinition('decorated_deprecated_parent', new DefinitionDecorator('deprecated_parent'));
+        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'));
 
         $this->process($container);
 
@@ -313,7 +315,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
             ->setDeprecated(true)
         ;
 
-        $container->setDefinition('decorated_deprecated_parent', new DefinitionDecorator('deprecated_parent'))
+        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'))
             ->setDeprecated(false)
         ;
 
@@ -322,6 +324,9 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
+    /**
+     * @group legacy
+     */
     public function testProcessMergeAutowiringTypes()
     {
         $container = new ContainerBuilder();
@@ -332,7 +337,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
             ->addAutowiringType('Bar')
         ;
 
@@ -351,7 +356,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container->register('parent', 'ParentClass');
         $container->setAlias('parent_alias', 'parent');
-        $container->setDefinition('child', new DefinitionDecorator('parent_alias'));
+        $container->setDefinition('child', new ChildDefinition('parent_alias'));
 
         $this->process($container);
 

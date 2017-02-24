@@ -1,7 +1,11 @@
 <?php
 
 require_once __DIR__.'/../includes/classes.php';
+require_once __DIR__.'/../includes/foo.php';
 
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -128,6 +132,26 @@ $container
 $container
     ->register('factory_service_simple', 'Bar')
     ->setFactory(array(new Reference('factory_simple'), 'getInstance'))
+;
+$container
+    ->register('lazy_context', 'LazyContext')
+    ->setArguments(array(new IteratorArgument(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))))
+;
+$container
+    ->register('lazy_context_ignore_invalid_ref', 'LazyContext')
+    ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
+;
+$container
+    ->register('closure_proxy', 'BarClass')
+    ->setArguments(array(new ClosureProxyArgument('closure_proxy', 'getBaz')))
+;
+$container
+    ->register('service_locator', 'Bar')
+    ->setArguments(array(new ServiceLocatorArgument(array(
+        'bar' => new Reference('bar'),
+        'invalid' => new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE), 
+        'container' => new Reference('service_container'),
+    ))))
 ;
 
 return $container;

@@ -38,6 +38,21 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer = new AbstractObjectNormalizerDummy();
         $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), array());
     }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\ExtraAttributesException
+     * @expectedExceptionMessage Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).
+     */
+    public function testDenormalizeWithExtraAttributes()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy();
+        $normalizer->denormalize(
+            array('fooFoo' => 'foo', 'fooBar' => 'bar'),
+            __NAMESPACE__.'\Dummy',
+            'any',
+            array('allow_extra_attributes' => false)
+        );
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

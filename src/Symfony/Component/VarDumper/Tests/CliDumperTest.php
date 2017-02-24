@@ -109,6 +109,67 @@ EOTXT
     }
 
     /**
+     * @dataProvider provideDumpWithCommaFlagTests
+     */
+    public function testDumpWithCommaFlag($expected, $flags)
+    {
+        $dumper = new CliDumper(null, null, $flags);
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $var = array(
+            'array' => array('a', 'b'),
+            'string' => 'hello',
+            'multiline string' => "this\nis\na\multiline\nstring",
+        );
+
+        $dump = $dumper->dump($cloner->cloneVar($var), true);
+
+        $this->assertSame($expected, $dump);
+    }
+
+    public function provideDumpWithCommaFlagTests()
+    {
+        $expected = <<<'EOTXT'
+array:3 [
+  "array" => array:2 [
+    0 => "a",
+    1 => "b"
+  ],
+  "string" => "hello",
+  "multiline string" => """
+    this\n
+    is\n
+    a\multiline\n
+    string
+    """
+]
+
+EOTXT;
+
+        yield array($expected, CliDumper::DUMP_COMMA_SEPARATOR);
+
+        $expected = <<<'EOTXT'
+array:3 [
+  "array" => array:2 [
+    0 => "a",
+    1 => "b",
+  ],
+  "string" => "hello",
+  "multiline string" => """
+    this\n
+    is\n
+    a\multiline\n
+    string
+    """,
+]
+
+EOTXT;
+
+        yield array($expected, CliDumper::DUMP_TRAILING_COMMA);
+    }
+
+    /**
      * @requires extension xml
      */
     public function testXmlResource()

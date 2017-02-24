@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Parser;
 
 class YamlDumperTest extends TestCase
 {
@@ -63,8 +64,10 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services24.yml', $dumper->dump());
     }
 
-    private function assertEqualYamlStructure($yaml, $expected, $message = '')
+    private function assertEqualYamlStructure($expected, $yaml, $message = '')
     {
-        $this->assertEquals(Yaml::parse($expected), Yaml::parse($yaml), $message);
+        $parser = new Parser();
+
+        $this->assertEquals($parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS), $parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS), $message);
     }
 }

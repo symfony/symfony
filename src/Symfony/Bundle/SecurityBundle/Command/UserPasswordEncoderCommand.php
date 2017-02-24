@@ -15,10 +15,14 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\User\User;
 
 /**
  * Encode a user's password.
@@ -27,6 +31,31 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  */
 class UserPasswordEncoderCommand extends ContainerAwareCommand
 {
+    private $encoderFactory;
+    private $userClasses;
+
+    public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = array())
+    {
+        if (null === $encoderFactory) {
+            @trigger_error(sprintf('Passing null as the first argument of "%s" is deprecated since version 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $this->encoderFactory = $encoderFactory;
+        $this->userClasses = $userClasses;
+
+        parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.3 and "%s" won\'t implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -36,7 +65,7 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
             ->setName('security:encode-password')
             ->setDescription('Encodes a password.')
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to encode.')
-            ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.', 'Symfony\Component\Security\Core\User\User')
+            ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.')
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the encoder generate one.')
             ->setHelp(<<<EOF
 
@@ -55,8 +84,9 @@ security:
         AppBundle\Entity\User: bcrypt
 </comment>
 
-If you execute the command non-interactively, the default Symfony User class
-is used and a random salt is generated to encode the password:
+If you execute the command non-interactively, the first available configured
+user class under the <comment>security.encoders</comment> key is used and a random salt is
+generated to encode the password:
 
   <info>php %command.full_name% --no-interaction [password]</info>
 
@@ -85,14 +115,16 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
 
-        $input->isInteractive() ? $io->title('Symfony Password Encoder Utility') : $io->newLine();
+        $input->isInteractive() ? $errorIo->title('Symfony Password Encoder Utility') : $errorIo->newLine();
 
         $password = $input->getArgument('password');
-        $userClass = $input->getArgument('user-class');
+        $userClass = $this->getUserClass($input, $io);
         $emptySalt = $input->getOption('empty-salt');
 
-        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($userClass);
+        $encoderFactory = $this->encoderFactory ?: parent::getContainer()->get('security.encoder_factory');
+        $encoder = $encoderFactory->getEncoder($userClass);
         $bcryptWithoutEmptySalt = !$emptySalt && $encoder instanceof BCryptPasswordEncoder;
 
         if ($bcryptWithoutEmptySalt) {
@@ -101,12 +133,12 @@ EOF
 
         if (!$password) {
             if (!$input->isInteractive()) {
-                $io->error('The password must not be empty.');
+                $errorIo->error('The password must not be empty.');
 
                 return 1;
             }
             $passwordQuestion = $this->createPasswordQuestion();
-            $password = $io->askQuestion($passwordQuestion);
+            $password = $errorIo->askQuestion($passwordQuestion);
         }
 
         $salt = null;
@@ -114,9 +146,9 @@ EOF
         if ($input->isInteractive() && !$emptySalt) {
             $emptySalt = true;
 
-            $io->note('The command will take care of generating a salt for you. Be aware that some encoders advise to let them generate their own salt. If you\'re using one of those encoders, please answer \'no\' to the question below. '.PHP_EOL.'Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.');
+            $errorIo->note('The command will take care of generating a salt for you. Be aware that some encoders advise to let them generate their own salt. If you\'re using one of those encoders, please answer \'no\' to the question below. '.PHP_EOL.'Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.');
 
-            if ($io->confirm('Confirm salt generation ?')) {
+            if ($errorIo->confirm('Confirm salt generation ?')) {
                 $salt = $this->generateSalt();
                 $emptySalt = false;
             }
@@ -136,12 +168,12 @@ EOF
         $io->table(array('Key', 'Value'), $rows);
 
         if (!$emptySalt) {
-            $io->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
+            $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
         } elseif ($bcryptWithoutEmptySalt) {
-            $io->note('Bcrypt encoder used: the encoder generated its own built-in salt.');
+            $errorIo->note('Bcrypt encoder used: the encoder generated its own built-in salt.');
         }
 
-        $io->success('Password encoding succeeded');
+        $errorIo->success('Password encoding succeeded');
     }
 
     /**
@@ -165,5 +197,31 @@ EOF
     private function generateSalt()
     {
         return base64_encode(random_bytes(30));
+    }
+
+    private function getUserClass(InputInterface $input, SymfonyStyle $io)
+    {
+        if (null !== $userClass = $input->getArgument('user-class')) {
+            return $userClass;
+        }
+
+        if (empty($this->userClasses)) {
+            if (null === $this->encoderFactory) {
+                // BC to be removed and simply keep the exception whenever there is no configured user classes in 4.0
+                return User::class;
+            }
+
+            throw new \RuntimeException('There are no configured encoders for the "security" extension.');
+        }
+
+        if (!$input->isInteractive() || 1 === count($this->userClasses)) {
+            return reset($this->userClasses);
+        }
+
+        $userClasses = $this->userClasses;
+        natcasesort($userClasses);
+        $userClasses = array_values($userClasses);
+
+        return $io->choice('For which user class would you like to encode a password?', $userClasses, reset($userClasses));
     }
 }

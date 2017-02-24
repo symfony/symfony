@@ -16,6 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\WarmedClass;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
+/**
+ * @group legacy
+ */
 class ClassCacheCacheWarmerTest extends TestCase
 {
     public function testWithDeclaredClasses()

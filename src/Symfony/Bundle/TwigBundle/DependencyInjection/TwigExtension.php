@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -108,10 +107,9 @@ class TwigExtension extends Extension
             }
         }
 
-        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+        if ($container->fileExists($dir = $container->getParameter('kernel.root_dir').'/Resources/views', false)) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
-        $container->addResource(new FileExistenceResource($dir));
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
@@ -137,16 +135,18 @@ class TwigExtension extends Extension
 
         $container->getDefinition('twig')->replaceArgument(1, $config);
 
-        $this->addClassesToCompile(array(
-            'Twig_Environment',
-            'Twig_Extension',
-            'Twig_Extension_Core',
-            'Twig_Extension_Escaper',
-            'Twig_Extension_Optimizer',
-            'Twig_LoaderInterface',
-            'Twig_Markup',
-            'Twig_Template',
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Twig_Environment',
+                'Twig_Extension',
+                'Twig_Extension_Core',
+                'Twig_Extension_Escaper',
+                'Twig_Extension_Optimizer',
+                'Twig_LoaderInterface',
+                'Twig_Markup',
+                'Twig_Template',
+            ));
+        }
     }
 
     private function getBundleHierarchy(ContainerBuilder $container)
@@ -162,15 +162,13 @@ class TwigExtension extends Extension
                 );
             }
 
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+            if ($container->fileExists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views', false)) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
-            $container->addResource(new FileExistenceResource($dir));
 
-            if (is_dir($dir = $bundle['path'].'/Resources/views')) {
+            if ($container->fileExists($dir = $bundle['path'].'/Resources/views', false)) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
-            $container->addResource(new FileExistenceResource($dir));
 
             if (null === $bundle['parent']) {
                 continue;

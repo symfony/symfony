@@ -240,6 +240,10 @@ class WorkflowTest extends TestCase
             'workflow.workflow_name.enter',
             'workflow.workflow_name.enter.b',
             'workflow.workflow_name.enter.c',
+            'workflow.entered',
+            'workflow.workflow_name.entered',
+            'workflow.workflow_name.entered.b',
+            'workflow.workflow_name.entered.c',
             // Following events are fired because of announce() method
             'workflow.guard',
             'workflow.workflow_name.guard',

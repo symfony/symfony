@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ClassLoader;
 
+@trigger_error('The '.__NAMESPACE__.'\ClassLoader class is deprecated since version 3.3 and will be removed in 4.0. Use Composer instead.', E_USER_DEPRECATED);
+
 /**
  * ClassLoader implements an PSR-0 class loader.
  *
@@ -36,6 +38,8 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0.
  */
 class ClassLoader
 {

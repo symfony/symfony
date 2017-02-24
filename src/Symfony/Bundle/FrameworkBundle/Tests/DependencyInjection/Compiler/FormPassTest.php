@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\AbstractType;
 
 /**
+ * @group legacy
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormPassTest extends TestCase

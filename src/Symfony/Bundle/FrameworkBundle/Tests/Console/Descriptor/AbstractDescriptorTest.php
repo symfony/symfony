@@ -80,6 +80,24 @@ abstract class AbstractDescriptorTest extends TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getContainerDefinitions());
     }
 
+    /** @dataProvider getDescribeContainerDefinitionWithArgumentsShownTestData */
+    public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $definition, array('show_arguments' => true));
+    }
+
+    public function getDescribeContainerDefinitionWithArgumentsShownTestData()
+    {
+        $definitions = ObjectsProvider::getContainerDefinitions();
+        $definitionsWithArgs = array();
+
+        foreach ($definitions as $key => $definition) {
+            $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
+        }
+
+        return $this->getDescriptionTestData($definitionsWithArgs);
+    }
+
     /** @dataProvider getDescribeContainerAliasTestData */
     public function testDescribeContainerAlias(Alias $alias, $expectedDescription)
     {
@@ -89,6 +107,35 @@ abstract class AbstractDescriptorTest extends TestCase
     public function getDescribeContainerAliasTestData()
     {
         return $this->getDescriptionTestData(ObjectsProvider::getContainerAliases());
+    }
+
+    /** @dataProvider getDescribeContainerDefinitionWhichIsAnAliasTestData */
+    public function testDescribeContainerDefinitionWhichIsAnAlias(Alias $alias, $expectedDescription, ContainerBuilder $builder, $options = array())
+    {
+        $this->assertDescription($expectedDescription, $builder, $options);
+    }
+
+    public function getDescribeContainerDefinitionWhichIsAnAliasTestData()
+    {
+        $builder = current(ObjectsProvider::getContainerBuilders());
+        $builder->setDefinition('service_1', $builder->getDefinition('definition_1'));
+        $builder->setDefinition('service_2', $builder->getDefinition('definition_2'));
+
+        $aliases = ObjectsProvider::getContainerAliases();
+        $aliasesWithDefinitions = array();
+        foreach ($aliases as $name => $alias) {
+            $aliasesWithDefinitions[str_replace('alias_', 'alias_with_definition_', $name)] = $alias;
+        }
+
+        $i = 0;
+        $data = $this->getDescriptionTestData($aliasesWithDefinitions);
+        foreach ($aliases as $name => $alias) {
+            $data[$i][] = $builder;
+            $data[$i][] = array('id' => $name);
+            ++$i;
+        }
+
+        return $data;
     }
 
     /** @dataProvider getDescribeContainerParameterTestData */
@@ -169,6 +216,7 @@ abstract class AbstractDescriptorTest extends TestCase
             'public' => array('show_private' => false),
             'tag1' => array('show_private' => true, 'tag' => 'tag1'),
             'tags' => array('group_by' => 'tags', 'show_private' => true),
+            'arguments' => array('show_private' => false, 'show_arguments' => true),
         );
 
         $data = array();

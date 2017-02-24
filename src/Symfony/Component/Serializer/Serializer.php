@@ -138,7 +138,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function normalize($data, $format = null, array $context = array())
     {
         // If a normalizer supports the given data, use it
-        if ($normalizer = $this->getNormalizer($data, $format)) {
+        if ($normalizer = $this->getNormalizer($data, $format, $context)) {
             return $normalizer->normalize($data, $format, $context);
         }
 
@@ -177,31 +177,58 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null/*, array $context = array()*/)
     {
-        return null !== $this->getNormalizer($data, $format);
+        if (func_num_args() > 2) {
+            $context = func_get_arg(2);
+        } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a third `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
+            $context = array();
+        }
+
+        return null !== $this->getNormalizer($data, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
     {
-        return null !== $this->getDenormalizer($data, $type, $format);
+        if (func_num_args() > 3) {
+            $context = func_get_arg(3);
+        } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a fourth `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
+            $context = array();
+        }
+
+        return null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
     /**
      * Returns a matching normalizer.
      *
-     * @param mixed  $data   Data to get the serializer for
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @param mixed  $data    data to get the serializer for
+     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
+     * @param array  $context options available to the normalizer
      *
      * @return NormalizerInterface|null
      */
-    private function getNormalizer($data, $format)
+    private function getNormalizer($data, $format, array $context)
     {
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format)) {
+            if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format, $context)) {
                 return $normalizer;
             }
         }
@@ -210,16 +237,17 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Returns a matching denormalizer.
      *
-     * @param mixed  $data   data to restore
-     * @param string $class  the expected class to instantiate
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
+     * @param mixed  $data    data to restore
+     * @param string $class   the expected class to instantiate
+     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
+     * @param array  $context options available to the denormalizer
      *
      * @return DenormalizerInterface|null
      */
-    private function getDenormalizer($data, $class, $format)
+    private function getDenormalizer($data, $class, $format, array $context)
     {
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $class, $format)) {
+            if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $class, $format, $context)) {
                 return $normalizer;
             }
         }
@@ -260,7 +288,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        if ($normalizer = $this->getDenormalizer($data, $class, $format)) {
+        if ($normalizer = $this->getDenormalizer($data, $class, $format, $context)) {
             return $normalizer->denormalize($data, $class, $format, $context);
         }
 
@@ -270,16 +298,42 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding($format/*, array $context = array()*/)
     {
-        return $this->encoder->supportsEncoding($format);
+        if (func_num_args() > 1) {
+            $context = func_get_arg(1);
+        } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
+            $context = array();
+        }
+
+        return $this->encoder->supportsEncoding($format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding($format/*, array $context = array()*/)
     {
-        return $this->decoder->supportsDecoding($format);
+        if (func_num_args() > 1) {
+            $context = func_get_arg(1);
+        } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
+            $context = array();
+        }
+
+        return $this->decoder->supportsDecoding($format, $context);
     }
 }

@@ -21,7 +21,7 @@
 
         <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver" public="false">
             <argument type="service" id="argument_metadata_factory" />
-            <argument type="collection" />
+            <argument /> <!-- argument value resolvers -->
         </service>
 
         <service id="argument_resolver.request_attribute" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver" public="false">

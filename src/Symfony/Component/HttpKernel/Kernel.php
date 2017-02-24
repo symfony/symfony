@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\Config\Loader\GlobFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
@@ -58,15 +59,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '3.2.5-DEV';
-    const VERSION_ID = 30205;
+    const VERSION = '3.3.0-DEV';
+    const VERSION_ID = 30300;
     const MAJOR_VERSION = 3;
-    const MINOR_VERSION = 2;
-    const RELEASE_VERSION = 5;
+    const MINOR_VERSION = 3;
+    const RELEASE_VERSION = 0;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '07/2017';
-    const END_OF_LIFE = '01/2018';
+    const END_OF_MAINTENANCE = '01/2018';
+    const END_OF_LIFE = '07/2018';
 
     /**
      * Constructor.
@@ -321,17 +322,29 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string $name      The cache name prefix
      * @param string $extension File extension of the resulting file
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         $this->loadClassCache = array($name, $extension);
     }
 
     /**
      * @internal
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setClassCache(array $classes)
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         file_put_contents($this->getCacheDir().'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
     }
 
@@ -375,8 +388,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return 'UTF-8';
     }
 
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0.
+     */
     protected function doLoadClassCache($name, $extension)
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
             ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
@@ -444,6 +464,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 array_pop($bundleMap);
             }
         }
+    }
+
+    /**
+     * The extension point similar to the Bundle::build() method.
+     *
+     * Use this method to register compiler passes and manipulate the container during the building process.
+     *
+     * @param ContainerBuilder $container
+     */
+    protected function build(ContainerBuilder $container)
+    {
     }
 
     /**
@@ -579,7 +610,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $container->merge($cont);
         }
 
-        $container->addCompilerPass(new AddClassesToCachePass($this));
+        if (PHP_VERSION_ID < 70000) {
+            $container->addCompilerPass(new AddClassesToCachePass($this));
+        }
         $container->addResource(new EnvParametersResource('SYMFONY__'));
 
         return $container;
@@ -603,9 +636,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $container->addObjectResource($bundle);
             }
         }
+
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
         }
+
+        $this->build($container);
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
@@ -665,6 +701,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             new YamlFileLoader($container, $locator),
             new IniFileLoader($container, $locator),
             new PhpFileLoader($container, $locator),
+            new GlobFileLoader($locator),
             new DirectoryLoader($container, $locator),
             new ClosureLoader($container),
         ));
@@ -742,7 +779,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function unserialize($data)
     {
-        list($environment, $debug) = unserialize($data);
+        if (PHP_VERSION_ID >= 70000) {
+            list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
+        } else {
+            list($environment, $debug) = unserialize($data);
+        }
 
         $this->__construct($environment, $debug);
     }

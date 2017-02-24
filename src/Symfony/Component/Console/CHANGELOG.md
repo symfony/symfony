@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+* added `ExceptionListener`
+* added `AddConsoleCommandPass` (originally in FrameworkBundle)
+
 3.2.0
 ------
 

@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -40,7 +42,7 @@ class XmlFileLoader extends FileLoader
 
         $xml = $this->parseFileToDOM($path);
 
-        $this->container->addResource(new FileResource($path));
+        $this->container->fileExists($path);
 
         // anonymous services
         $this->processAnonymousServices($xml, $path);
@@ -55,7 +57,11 @@ class XmlFileLoader extends FileLoader
         $this->loadFromExtensions($xml);
 
         // services
-        $this->parseDefinitions($xml, $path);
+        try {
+            $this->parseDefinitions($xml, $path);
+        } finally {
+            $this->instanceof = array();
+        }
     }
 
     /**
@@ -63,7 +69,15 @@ class XmlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'xml' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'xml' === $type;
     }
 
     /**
@@ -96,7 +110,7 @@ class XmlFileLoader extends FileLoader
         $defaultDirectory = dirname($file);
         foreach ($imports as $import) {
             $this->setCurrentDir($defaultDirectory);
-            $this->import($import->getAttribute('resource'), null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
+            $this->import($import->getAttribute('resource'), XmlUtils::phpize($import->getAttribute('type')) ?: null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
         }
     }
 
@@ -111,15 +125,75 @@ class XmlFileLoader extends FileLoader
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
 
-        if (false === $services = $xpath->query('//container:services/container:service')) {
+        if (false === $services = $xpath->query('//container:services/container:service|//container:services/container:prototype')) {
             return;
         }
+        $this->setCurrentDir(dirname($file));
 
+        $this->instanceof = array();
+        $this->isLoadingInstanceof = true;
+        $instanceof = $xpath->query('//container:services/container:instanceof');
+        foreach ($instanceof as $service) {
+            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, array()));
+        }
+
+        $this->isLoadingInstanceof = false;
+        $defaults = $this->getServiceDefaults($xml, $file);
         foreach ($services as $service) {
-            if (null !== $definition = $this->parseDefinition($service, $file)) {
-                $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
+            if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
+                if ('prototype' === $service->tagName) {
+                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'));
+                } else {
+                    $this->setDefinition((string) $service->getAttribute('id'), $definition);
+                }
             }
         }
+    }
+
+    /**
+     * Get service defaults.
+     *
+     * @return array
+     */
+    private function getServiceDefaults(\DOMDocument $xml, $file)
+    {
+        $xpath = new \DOMXPath($xml);
+        $xpath->registerNamespace('container', self::NS);
+
+        if (null === $defaultsNode = $xpath->query('//container:services/container:defaults')->item(0)) {
+            return array();
+        }
+        $defaults = array(
+            'tags' => $this->getChildren($defaultsNode, 'tag'),
+            'autowire' => $this->getChildren($defaultsNode, 'autowire'),
+        );
+
+        foreach ($defaults['tags'] as $tag) {
+            if ('' === $tag->getAttribute('name')) {
+                throw new InvalidArgumentException(sprintf('The tag name for tag "<defaults>" in %s must be a non-empty string.', $file));
+            }
+        }
+        if ($defaultsNode->hasAttribute('public')) {
+            $defaults['public'] = XmlUtils::phpize($defaultsNode->getAttribute('public'));
+        }
+        if ($defaultsNode->hasAttribute('inherit-tags')) {
+            $defaults['inherit-tags'] = XmlUtils::phpize($defaultsNode->getAttribute('inherit-tags'));
+        }
+        if (!$defaultsNode->hasAttribute('autowire')) {
+            foreach ($defaults['autowire'] as $k => $v) {
+                $defaults['autowire'][$k] = $v->textContent;
+            }
+
+            return $defaults;
+        }
+        if ($defaults['autowire']) {
+            throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for tag "<defaults>" in %s.', $file));
+        }
+        if (XmlUtils::phpize($defaultsNode->getAttribute('autowire'))) {
+            $defaults['autowire'][] = '__construct';
+        }
+
+        return $defaults;
     }
 
     /**
@@ -127,10 +201,11 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMElement $service
      * @param string      $file
+     * @param array       $defaults
      *
      * @return Definition|null
      */
-    private function parseDefinition(\DOMElement $service, $file)
+    private function parseDefinition(\DOMElement $service, $file, array $defaults = array())
     {
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
@@ -138,19 +213,36 @@ class XmlFileLoader extends FileLoader
             $public = true;
             if ($publicAttr = $service->getAttribute('public')) {
                 $public = XmlUtils::phpize($publicAttr);
+            } elseif (isset($defaults['public'])) {
+                $public = $defaults['public'];
             }
             $this->container->setAlias((string) $service->getAttribute('id'), new Alias($alias, $public));
 
             return;
         }
 
-        if ($parent = $service->getAttribute('parent')) {
-            $definition = new DefinitionDecorator($parent);
+        if ($this->isLoadingInstanceof) {
+            $definition = new ChildDefinition('');
+        } elseif ($parent = $service->getAttribute('parent')) {
+            $definition = new ChildDefinition($parent);
+
+            if ($value = $service->getAttribute('inherit-tags')) {
+                $definition->setInheritTags(XmlUtils::phpize($value));
+            } elseif (isset($defaults['inherit-tags'])) {
+                $definition->setInheritTags($defaults['inherit-tags']);
+            }
+            $defaults = array();
         } else {
             $definition = new Definition();
         }
 
-        foreach (array('class', 'shared', 'public', 'synthetic', 'lazy', 'abstract') as $key) {
+        if ($publicAttr = $service->getAttribute('public')) {
+            $definition->setPublic(XmlUtils::phpize($publicAttr));
+        } elseif (isset($defaults['public'])) {
+            $definition->setPublic($defaults['public']);
+        }
+
+        foreach (array('class', 'shared', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 $method = 'set'.$key;
                 $definition->$method(XmlUtils::phpize($value));
@@ -169,8 +261,9 @@ class XmlFileLoader extends FileLoader
             $definition->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
         }
 
-        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
+        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', false, $definition instanceof ChildDefinition));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
+        $definition->setOverriddenGetters($this->getArgumentsAsPhp($service, 'getter'));
 
         if ($factories = $this->getChildren($service, 'factory')) {
             $factory = $factories[0];
@@ -184,7 +277,7 @@ class XmlFileLoader extends FileLoader
                 } elseif ($childService = $factory->getAttribute('service')) {
                     $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
                 } else {
-                    $class = $factory->getAttribute('class');
+                    $class = $factory->hasAttribute('class') ? $factory->getAttribute('class') : null;
                 }
 
                 $definition->setFactory(array($class, $factory->getAttribute('method')));
@@ -214,7 +307,19 @@ class XmlFileLoader extends FileLoader
             $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument'));
         }
 
-        foreach ($this->getChildren($service, 'tag') as $tag) {
+        $tags = $this->getChildren($service, 'tag');
+
+        if (empty($defaults['tags'])) {
+            // no-op
+        } elseif (!$value = $service->getAttribute('inherit-tags')) {
+            if (!$tags) {
+                $tags = $defaults['tags'];
+            }
+        } elseif (XmlUtils::phpize($value)) {
+            $tags = array_merge($tags, $defaults['tags']);
+        }
+
+        foreach ($tags as $tag) {
             $parameters = array();
             foreach ($tag->attributes as $name => $node) {
                 if ('name' === $name) {
@@ -237,6 +342,21 @@ class XmlFileLoader extends FileLoader
 
         foreach ($this->getChildren($service, 'autowiring-type') as $type) {
             $definition->addAutowiringType($type->textContent);
+        }
+
+        $autowiredCalls = array();
+        foreach ($this->getChildren($service, 'autowire') as $tag) {
+            $autowiredCalls[] = $tag->textContent;
+        }
+
+        if ($autowiredCalls && $service->hasAttribute('autowire')) {
+            throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for service "%s" in %s.', $service->getAttribute('id'), $file));
+        }
+
+        if ($autowiredCalls) {
+            $definition->setAutowiredCalls($autowiredCalls);
+        } elseif (!$service->hasAttribute('autowire') && !empty($defaults['autowire'])) {
+            $definition->setAutowiredCalls($defaults['autowire']);
         }
 
         if ($value = $service->getAttribute('decorates')) {
@@ -285,10 +405,10 @@ class XmlFileLoader extends FileLoader
         $xpath->registerNamespace('container', self::NS);
 
         // anonymous services as arguments/properties
-        if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
+        if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]|//container:getter[@type="service"][not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $id = sprintf('%s_%d', hash('sha256', $file), ++$count);
+                $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
                 $node->setAttribute('id', $id);
 
                 if ($services = $this->getChildren($node, 'service')) {
@@ -306,17 +426,17 @@ class XmlFileLoader extends FileLoader
         if (false !== $nodes = $xpath->query('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $id = sprintf('%s_%d', hash('sha256', $file), ++$count);
+                $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
                 $node->setAttribute('id', $id);
                 $definitions[$id] = array($node, $file, true);
             }
         }
 
         // resolve definitions
-        krsort($definitions);
-        foreach ($definitions as $id => list($domElement, $file, $wild)) {
+        uksort($definitions, 'strnatcmp');
+        foreach (array_reverse($definitions) as $id => list($domElement, $file, $wild)) {
             if (null !== $definition = $this->parseDefinition($domElement, $file)) {
-                $this->container->setDefinition($id, $definition);
+                $this->setDefinition($id, $definition);
             }
 
             if (true === $wild) {
@@ -338,7 +458,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return mixed
      */
-    private function getArgumentsAsPhp(\DOMElement $node, $name, $lowercase = true)
+    private function getArgumentsAsPhp(\DOMElement $node, $name, $lowercase = true, $isChildDefinition = false)
     {
         $arguments = array();
         foreach ($this->getChildren($node, $name) as $arg) {
@@ -346,10 +466,10 @@ class XmlFileLoader extends FileLoader
                 $arg->setAttribute('key', $arg->getAttribute('name'));
             }
 
-            // this is used by DefinitionDecorator to overwrite a specific
+            // this is used by ChildDefinition to overwrite a specific
             // argument of the parent definition
             if ($arg->hasAttribute('index')) {
-                $key = 'index_'.$arg->getAttribute('index');
+                $key = ($isChildDefinition ? 'index_' : '').$arg->getAttribute('index');
             } elseif (!$arg->hasAttribute('key')) {
                 // Append an empty argument, then fetch its key to overwrite it later
                 $arguments[] = null;
@@ -364,29 +484,42 @@ class XmlFileLoader extends FileLoader
                 }
             }
 
+            $onInvalid = $arg->getAttribute('on-invalid');
+            $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            if ('ignore' == $onInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            } elseif ('null' == $onInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            }
+
             switch ($arg->getAttribute('type')) {
                 case 'service':
-                    $onInvalid = $arg->getAttribute('on-invalid');
-                    $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-                    if ('ignore' == $onInvalid) {
-                        $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-                    } elseif ('null' == $onInvalid) {
-                        $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+                    if ($arg->hasAttribute('strict')) {
+                        @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since version 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), E_USER_DEPRECATED);
                     }
 
-                    if ($strict = $arg->getAttribute('strict')) {
-                        $strict = XmlUtils::phpize($strict);
-                    } else {
-                        $strict = true;
-                    }
-
-                    $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior, $strict);
+                    $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
                     break;
                 case 'expression':
                     $arguments[$key] = new Expression($arg->nodeValue);
                     break;
+                case 'closure-proxy':
+                    $arguments[$key] = new ClosureProxyArgument($arg->getAttribute('id'), $arg->getAttribute('method'), $invalidBehavior);
+                    break;
                 case 'collection':
                     $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, false);
+                    break;
+                case 'iterator':
+                    $arguments[$key] = new IteratorArgument($this->getArgumentsAsPhp($arg, $name, false));
+                    break;
+                case 'service-locator':
+                    $values = $this->getArgumentsAsPhp($arg, $name, false);
+                    foreach ($values as $v) {
+                        if (!$v instanceof Reference) {
+                            throw new InvalidArgumentException('"service-locator" argument values must be services.');
+                        }
+                    }
+                    $arguments[$key] = new ServiceLocatorArgument($values);
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;

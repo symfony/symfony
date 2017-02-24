@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -24,73 +23,26 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class CheckReferenceValidityPass implements CompilerPassInterface
+class CheckReferenceValidityPass extends AbstractRecursivePass
 {
-    private $container;
-    private $currentId;
-
-    /**
-     * Processes the ContainerBuilder to validate References.
-     *
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
+    protected function processValue($value, $isRoot = false)
     {
-        $this->container = $container;
-
-        foreach ($container->getDefinitions() as $id => $definition) {
-            if ($definition->isSynthetic() || $definition->isAbstract()) {
-                continue;
-            }
-
-            $this->currentId = $id;
-
-            $this->validateReferences($definition->getArguments());
-            $this->validateReferences($definition->getMethodCalls());
-            $this->validateReferences($definition->getProperties());
+        if ($isRoot && $value instanceof Definition && ($value->isSynthetic() || $value->isAbstract())) {
+            return $value;
         }
-    }
+        if ($value instanceof Reference && $this->container->hasDefinition((string) $value)) {
+            $targetDefinition = $this->container->getDefinition((string) $value);
 
-    /**
-     * Validates an array of References.
-     *
-     * @param array $arguments An array of Reference objects
-     *
-     * @throws RuntimeException when there is a reference to an abstract definition.
-     */
-    private function validateReferences(array $arguments)
-    {
-        foreach ($arguments as $argument) {
-            if (is_array($argument)) {
-                $this->validateReferences($argument);
-            } elseif ($argument instanceof Reference) {
-                $targetDefinition = $this->getDefinition((string) $argument);
-
-                if (null !== $targetDefinition && $targetDefinition->isAbstract()) {
-                    throw new RuntimeException(sprintf(
-                        'The definition "%s" has a reference to an abstract definition "%s". '
-                       .'Abstract definitions cannot be the target of references.',
-                       $this->currentId,
-                       $argument
-                    ));
-                }
+            if ($targetDefinition->isAbstract()) {
+                throw new RuntimeException(sprintf(
+                    'The definition "%s" has a reference to an abstract definition "%s". '
+                   .'Abstract definitions cannot be the target of references.',
+                   $this->currentId,
+                   $value
+                ));
             }
         }
-    }
 
-    /**
-     * Returns the Definition given an id.
-     *
-     * @param string $id Definition identifier
-     *
-     * @return Definition
-     */
-    private function getDefinition($id)
-    {
-        if (!$this->container->hasDefinition($id)) {
-            return;
-        }
-
-        return $this->container->getDefinition($id);
+        return parent::processValue($value, $isRoot);
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * deprecated the component: use Composer instead
+
 3.0.0
 -----
 

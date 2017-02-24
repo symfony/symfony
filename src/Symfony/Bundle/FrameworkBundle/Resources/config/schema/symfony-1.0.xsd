@@ -176,12 +176,19 @@
     <xsd:complexType name="validation">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="static-method" type="xsd:string" />
+            <xsd:element name="mapping" type="validation_mapping" />
         </xsd:choice>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="static-method" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validation_mapping">
+        <xsd:sequence>
+            <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="annotations">
@@ -215,6 +222,7 @@
             <xsd:element name="default-doctrine-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="default-psr6-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="default-redis-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="default-memcached-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="pool" type="cache_pool" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
@@ -231,13 +239,14 @@
     <xsd:complexType name="workflow">
         <xsd:sequence>
             <xsd:element name="marking-store" type="marking_store" />
-            <xsd:element name="support" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="support" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="place" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="transition" type="transition" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="type" type="workflow_type" />
         <xsd:attribute name="initial-place" type="xsd:string" />
+        <xsd:attribute name="support-strategy" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">

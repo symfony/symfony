@@ -75,7 +75,7 @@
         <div class="sf-toolbar-info-group">
             <div class="sf-toolbar-info-piece sf-toolbar-info-php">
                 <b>PHP version</b>
-                <span>
+                <span{% if collector.phpversionextra %} title="{{ collector.phpversion ~ collector.phpversionextra }}"{% endif %}>
                     {{ collector.phpversion }}
                     &nbsp; <a href="{{ path('_profiler_phpinfo') }}">View phpinfo()</a>
                 </span>
@@ -84,7 +84,8 @@
             <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
                 <b>PHP Extensions</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasaccelerator ? 'green' : 'red' }}">accel</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasapcu ? 'green' : 'red' }}">APCu</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.haszendopcache ? 'green' : 'red' }}">OPcache</span>
             </div>
 
             <div class="sf-toolbar-info-piece">
@@ -181,46 +182,71 @@
                 </div>
             {% endif %}
         </div>
+
+        {% set symfony_status = { dev: 'Unstable Version', stable: 'Stable Version', eom: 'Maintenance Ended', eol: 'Version Expired' } %}
+        {% set symfony_status_class = { dev: 'warning', stable: 'success', eom: 'warning', eol: 'error' } %}
+        <table>
+            <thead class="small">
+                <tr>
+                    <th>Symfony Status</th>
+                    <th>Bugs {{ collector.symfonystate in ['eom', 'eol'] ? 'were' : 'are' }} fixed until</th>
+                    <th>Security issues {{ collector.symfonystate == 'eol' ? 'were' : 'are' }} fixed until</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="font-normal">
+                        <span class="label status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
+                    </td>
+                    <td class="font-normal">{{ collector.symfonyeom }}</td>
+                    <td class="font-normal">{{ collector.symfonyeol }}</td>
+                    <td class="font-normal">
+                        <a href="https://symfony.com/roadmap?version={{ collector.symfonyminorversion }}#checker">View roadmap</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     {% endif %}
 
     <h2>PHP Configuration</h2>
 
     <div class="metrics">
         <div class="metric">
-            <span class="value">{{ collector.phpversion }}</span>
+            <span class="value">{{ collector.phpversion }}{% if collector.phpversionextra %} <span class="unit">{{ collector.phpversionextra }}</span>{% endif %}</span>
             <span class="label">PHP version</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasaccelerator ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">PHP acceleration</span>
+            <span class="value">{{ collector.phparchitecture }} <span class="unit">bits</span></span>
+            <span class="label">Architecture</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">Xdebug</span>
+            <span class="value">{{ collector.phpintllocale }}</span>
+            <span class="label">Intl locale</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.phptimezone }}</span>
+            <span class="label">Timezone</span>
         </div>
     </div>
 
-    <div class="metrics metrics-horizontal">
+    <div class="metrics">
         <div class="metric">
             <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
             <span class="label">OPcache</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapc ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">APC</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="label">APCu</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxcache ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">XCache</span>
-        </div>
-
-        <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haseaccelerator ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">EAccelerator</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="label">Xdebug</span>
         </div>
     </div>
 

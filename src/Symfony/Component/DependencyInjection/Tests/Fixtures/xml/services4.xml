@@ -9,5 +9,6 @@
     <import resource="../ini/parameters.ini" />
     <import resource="../ini/parameters2.ini" />
     <import resource="../yaml/services13.yml" />
+    <import resource="../yaml/yaml_with_wrong_ext.ini" type="yaml"/>
   </imports>
 </container>

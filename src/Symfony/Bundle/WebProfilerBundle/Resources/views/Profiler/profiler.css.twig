@@ -166,6 +166,10 @@ table thead th {
 table thead th.key {
     width: 19%;
 }
+table thead.small th {
+    font-size: 12px;
+    padding: 4px 10px;
+}
 
 table tbody th,
 table tbody td {
@@ -478,7 +482,8 @@ tr.status-warning td {
     margin-top: -4px;
     vertical-align: middle;
 }
-#header h1 svg path {
+#header h1 svg path,
+#header h1 svg .sf-svg-path {
     fill: #FFF;
 }
 #header .search {
@@ -523,7 +528,8 @@ tr.status-warning td {
     color: #FFF;
 }
 
-#summary dl.metadata {
+#summary dl.metadata,
+#summary dl.metadata a {
     margin: 5px 0 0;
     color: rgba(255, 255, 255, 0.75);
 }
@@ -665,7 +671,8 @@ tr.status-warning td {
     height: 24px;
     max-width: 24px;
 }
-#menu-profiler li a .label .icon svg path {
+#menu-profiler li a .label .icon svg path,
+#menu-profiler li a .label .icon svg .sf-svg-path {
     fill: #DDD;
 }
 #menu-profiler li a .label strong {
@@ -692,7 +699,9 @@ tr.status-warning td {
     color: #FFF;
 }
 #menu-profiler li.selected a .icon svg path,
-#menu-profiler li a:hover .icon svg path {
+#menu-profiler li.selected a .icon svg .sf-svg-path,
+#menu-profiler li a:hover .icon svg path,
+#menu-profiler li a:hover .icon svg .sf-svg-path {
     fill: #FFF;
 }
 
@@ -913,6 +922,9 @@ table.logs .metadata {
     white-space: normal;
     font-size: inherit;
     line-height: inherit;
+}
+#collector-content .dump-inline .sf-dump:after {
+    display: none;
 }
 
 #collector-content .sf-dump .trace {

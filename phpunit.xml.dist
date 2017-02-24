@@ -16,6 +16,7 @@
         <env name="LDAP_HOST" value="127.0.0.1" />
         <env name="LDAP_PORT" value="3389" />
         <env name="REDIS_HOST" value="localhost" />
+        <env name="MEMCACHED_HOST" value="localhost" />
     </php>
 
     <testsuites>
@@ -61,6 +62,8 @@
                         <array>
                             <element><string>Cache\IntegrationTests</string></element>
                             <element><string>Doctrine\Common\Cache</string></element>
+                            <element><string>Symfony\Component\Cache</string></element>
+                            <element><string>Symfony\Component\Cache\Traits</string></element>
                             <element><string>Symfony\Component\Console</string></element>
                             <element><string>Symfony\Component\HttpFoundation</string></element>
                         </array>

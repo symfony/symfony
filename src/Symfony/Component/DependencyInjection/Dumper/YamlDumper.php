@@ -12,7 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\Yaml\Dumper as YmlDumper;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -105,7 +110,7 @@ class YamlDumper extends Dumper
         }
 
         $autowiringTypesCode = '';
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
             $autowiringTypesCode .= sprintf("            - %s\n", $this->dumper->dump($autowiringType));
         }
         if ($autowiringTypesCode) {
@@ -122,6 +127,10 @@ class YamlDumper extends Dumper
 
         if ($definition->getProperties()) {
             $code .= sprintf("        properties: %s\n", $this->dumper->dump($this->dumpValue($definition->getProperties()), 0));
+        }
+
+        if ($definition->getOverriddenGetters()) {
+            $code .= sprintf("        getters:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getOverriddenGetters()), 0));
         }
 
         if ($definition->getMethodCalls()) {
@@ -245,6 +254,20 @@ class YamlDumper extends Dumper
      */
     private function dumpValue($value)
     {
+        if ($value instanceof ArgumentInterface) {
+            if ($value instanceof IteratorArgument) {
+                $tag = 'iterator';
+            } elseif ($value instanceof ClosureProxyArgument) {
+                $tag = 'closure_proxy';
+            } elseif ($value instanceof ServiceLocatorArgument) {
+                $tag = 'service_locator';
+            } else {
+                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_class($value)));
+            }
+
+            return new TaggedValue($tag, $this->dumpValue($value->getValues()));
+        }
+
         if (is_array($value)) {
             $code = array();
             foreach ($value as $k => $v) {

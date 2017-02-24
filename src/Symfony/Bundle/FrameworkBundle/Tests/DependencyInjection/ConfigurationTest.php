@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
+use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
@@ -177,7 +178,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
             ),
             'form' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
                 'csrf_protection' => array(
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
@@ -201,17 +202,20 @@ class ConfigurationTest extends TestCase
                 ),
             ),
             'translator' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
                 'fallbacks' => array('en'),
                 'logging' => true,
                 'paths' => array(),
             ),
             'validation' => array(
-                'enabled' => false,
-                'enable_annotations' => false,
+                'enabled' => !class_exists(FullStack::class),
+                'enable_annotations' => !class_exists(FullStack::class),
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email' => false,
+                'mapping' => array(
+                    'paths' => array(),
+                ),
             ),
             'annotations' => array(
                 'cache' => 'php_array',
@@ -220,8 +224,8 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
             ),
             'serializer' => array(
-                'enabled' => false,
-                'enable_annotations' => false,
+                'enabled' => !class_exists(FullStack::class),
+                'enable_annotations' => !class_exists(FullStack::class),
             ),
             'property_access' => array(
                 'magic_call' => false,
@@ -259,7 +263,7 @@ class ConfigurationTest extends TestCase
                 'loaders' => array(),
             ),
             'assets' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
                 'version_strategy' => null,
                 'version' => null,
                 'version_format' => '%%s?%%s',
@@ -273,6 +277,7 @@ class ConfigurationTest extends TestCase
                 'system' => 'cache.adapter.system',
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
+                'default_memcached_provider' => 'memcached://localhost',
             ),
             'workflows' => array(),
             'php_errors' => array(

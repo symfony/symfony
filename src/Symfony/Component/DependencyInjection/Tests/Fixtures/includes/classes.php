@@ -97,3 +97,13 @@ class DummyProxyDumper implements ProxyDumper
         return '';
     }
 }
+
+class LazyContext
+{
+    public $lazyValues;
+
+    public function __construct($lazyValues)
+    {
+        $this->lazyValues = $lazyValues;
+    }
+}

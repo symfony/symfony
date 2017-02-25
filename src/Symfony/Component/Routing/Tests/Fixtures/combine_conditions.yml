@@ -1,0 +1,4 @@
+app_v1:
+    resource: 'combine_conditions_imported.yml'
+    condition: 'request.attributes.get("version") >= 1.0'
+    combine_conditions: true

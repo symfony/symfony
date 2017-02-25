@@ -30,6 +30,7 @@ class Route
     private $methods = array();
     private $schemes = array();
     private $condition;
+    private $combineConditions;
 
     /**
      * Constructor.
@@ -142,5 +143,15 @@ class Route
     public function getCondition()
     {
         return $this->condition;
+    }
+
+    public function setCombineConditions($combine = true)
+    {
+        $this->combineConditions = $combine;
+    }
+
+    public function getCombineConditions()
+    {
+        return $this->combineConditions;
     }
 }

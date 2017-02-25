@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass;
 
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
@@ -178,6 +179,55 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertSame($classRouteData['path'].$methodRouteData['path'], $route->getPath(), '->load concatenates class and method route path');
         $this->assertEquals(array_merge($classRouteData['schemes'], $methodRouteData['schemes']), $route->getSchemes(), '->load merges class and method route schemes');
         $this->assertEquals(array_merge($classRouteData['methods'], $methodRouteData['methods']), $route->getMethods(), '->load merges class and method route methods');
+    }
+
+    public function testRouteLoadWithCombinedConditions()
+    {
+        $classRouteData = array(
+            'condition' => 'request.attributes.get("version") >= 1',
+            'combine_conditions' => true,
+        );
+
+        $methodRouteData = array(
+            'name' => 'route1',
+            'condition' => 'context.getMethod() == "GET"',
+        );
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getClassAnnotation')
+            ->will($this->returnValue($this->getAnnotatedRoute($classRouteData)))
+        ;
+        $this->reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue(array($this->getAnnotatedRoute($methodRouteData))))
+        ;
+
+        $routeCollection = $this->loader->load(BarClass::class);
+        $route = $routeCollection->get($methodRouteData['name']);
+
+        $this->assertSame('(context.getMethod() == "GET") and (request.attributes.get("version") >= 1)', $route->getCondition(), '->load combines class and method conditions');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unexpected "combineConditions" attribute on "Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass::routeAction()" method Route annotation.
+     */
+    public function testThrowsExceptionOnMethodRouteAnnotationWithCombineCondition()
+    {
+        $this->reader
+            ->expects($this->once())
+            ->method('getClassAnnotation')
+            ->will($this->returnValue($this->getAnnotatedRoute(array())))
+        ;
+        $this->reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue(array($this->getAnnotatedRoute(array('combine_conditions' => true)))))
+        ;
+
+        $this->loader->load(BarClass::class);
     }
 
     private function getAnnotatedRoute($data)

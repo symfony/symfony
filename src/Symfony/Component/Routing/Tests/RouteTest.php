@@ -181,6 +181,8 @@ class RouteTest extends TestCase
         $this->assertSame('', $route->getCondition());
         $route->setCondition('context.getMethod() == "GET"');
         $this->assertSame('context.getMethod() == "GET"', $route->getCondition());
+        $route->addCondition('request.attributes.has(\'foo\')');
+        $this->assertSame('(context.getMethod() == "GET") and (request.attributes.has(\'foo\'))', $route->getCondition());
     }
 
     public function testCompile()

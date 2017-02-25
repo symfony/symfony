@@ -52,6 +52,7 @@
     <xsd:attribute name="host" type="xsd:string" />
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
+    <xsd:attribute name="combine-conditions" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="default" mixed="true">

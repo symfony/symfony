@@ -108,7 +108,12 @@ EOF;
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
         \$request = \$this->request;
-        \$requestMethod = \$context->getMethod();
+        \$requestMethod = \$isLikeGetMethod = \$context->getMethod();
+        
+        if (\$requestMethod === 'HEAD') {
+            \$isLikeGetMethod = 'GET';
+        }
+
 
 $code
 
@@ -219,11 +224,6 @@ EOF;
         $hostMatches = false;
         $methods = $route->getMethods();
 
-        // GET and HEAD are equivalent
-        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-            $methods[] = 'HEAD';
-        }
-
         $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));
         $regex = $compiledRoute->getRegex();
 
@@ -265,20 +265,40 @@ EOF;
 EOF;
 
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
+
         if ($methods) {
             if (1 === count($methods)) {
-                $code .= <<<EOF
-            if (\$requestMethod != '$methods[0]') {
+                if ($methods[0] === 'HEAD') {
+                    $code .= <<<EOF
+            if (\$requestMethod != 'HEAD') {
+                \$allow[] = 'HEAD';
+                goto $gotoname;
+            }
+
+
+EOF;
+                } else {
+                    $code .= <<<EOF
+            if (\$isLikeGetMethod != '$methods[0]') {
                 \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
 
 
 EOF;
+                }
             } else {
+                $methodVariable = 'requestMethod';
+
+                if (in_array('GET', $methods)) {
+                    // Since we treat HEAD requests like GET requests we don't need to match it.
+                    $methodVariable = 'isLikeGetMethod';
+                    $methods = array_filter($methods, function ($method) { return $method != 'HEAD'; });
+                }
+
                 $methods = implode("', '", $methods);
                 $code .= <<<EOF
-            if (!in_array(\$requestMethod, array('$methods'))) {
+            if (!in_array(\$$methodVariable, array('$methods'))) {
                 \$allow = array_merge(\$allow, array('$methods'));
                 goto $gotoname;
             }

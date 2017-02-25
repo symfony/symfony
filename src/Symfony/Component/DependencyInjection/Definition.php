@@ -38,7 +38,7 @@ class Definition
     private $abstract = false;
     private $lazy = false;
     private $decoratedService;
-    private $autowiredCalls = array();
+    private $autowired = false;
     private $autowiringTypes = array();
 
     protected $arguments;
@@ -737,25 +737,11 @@ class Definition
      */
     public function isAutowired()
     {
-        return !empty($this->autowiredCalls);
-    }
-
-    /**
-     * Gets autowired methods.
-     *
-     * @return string[]
-     */
-    public function getAutowiredCalls()
-    {
-        return $this->autowiredCalls;
+        return $this->autowired;
     }
 
     /**
      * Sets autowired.
-     *
-     * Allowed values:
-     *   - true: constructor autowiring, same as $this->setAutowiredCalls(array('__construct'))
-     *   - false: no autowiring, same as $this->setAutowiredCalls(array())
      *
      * @param bool $autowired
      *
@@ -763,22 +749,7 @@ class Definition
      */
     public function setAutowired($autowired)
     {
-        return $this->setAutowiredCalls($autowired ? array('__construct') : array());
-    }
-
-    /**
-     * Sets autowired methods.
-     *
-     * Example of allowed value:
-     *   - array('__construct', 'set*', 'initialize'): autowire whitelisted methods only
-     *
-     * @param string[] $autowiredCalls
-     *
-     * @return $this
-     */
-    public function setAutowiredCalls(array $autowiredCalls)
-    {
-        $this->autowiredCalls = $autowiredCalls;
+        $this->autowired = (bool) $autowired;
 
         return $this;
     }

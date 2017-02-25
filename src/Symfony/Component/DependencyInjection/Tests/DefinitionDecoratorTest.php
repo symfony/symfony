@@ -73,14 +73,14 @@ class DefinitionDecoratorTest extends TestCase
         $this->assertEquals(array('lazy' => true), $def->getChanges());
     }
 
-    public function testSetAutowiredCalls()
+    public function testSetAutowired()
     {
         $def = new DefinitionDecorator('foo');
 
         $this->assertFalse($def->isAutowired());
-        $this->assertSame($def, $def->setAutowiredCalls(array('foo', 'bar')));
-        $this->assertEquals(array('foo', 'bar'), $def->getAutowiredCalls());
-        $this->assertEquals(array('autowired_calls' => true), $def->getChanges());
+        $this->assertSame($def, $def->setAutowired(true));
+        $this->assertTrue($def->isAutowired());
+        $this->assertSame(array('autowired' => true), $def->getChanges());
     }
 
     public function testSetArgument()

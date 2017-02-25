@@ -498,21 +498,7 @@ class YamlFileLoader extends FileLoader
         }
 
         $autowire = isset($service['autowire']) ? $service['autowire'] : (isset($defaults['autowire']) ? $defaults['autowire'] : null);
-        if (is_array($autowire)) {
-            $autowiredCalls = array();
-
-            foreach ($autowire as $v) {
-                if (is_string($v)) {
-                    $autowiredCalls[] = $v;
-                } else {
-                    throw new InvalidArgumentException(sprintf('Parameter "autowire" must be boolean or string[] for service "%s" in %s. Check your YAML syntax.', $id, $file));
-                }
-            }
-
-            if ($autowiredCalls) {
-                $definition->setAutowiredCalls($autowiredCalls);
-            }
-        } elseif (null !== $autowire) {
+        if (null !== $autowire) {
             $definition->setAutowired($autowire);
         }
 

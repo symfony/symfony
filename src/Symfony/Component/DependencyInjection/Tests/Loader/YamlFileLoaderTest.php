@@ -373,10 +373,6 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services23.yml');
 
         $this->assertTrue($container->getDefinition('bar_service')->isAutowired());
-        $this->assertEquals(array('__construct'), $container->getDefinition('bar_service')->getAutowiredCalls());
-
-        $loader->load('services27.yml');
-        $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredCalls());
     }
 
     public function testClassFromId()

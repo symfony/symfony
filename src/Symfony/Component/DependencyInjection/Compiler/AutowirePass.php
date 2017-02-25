@@ -99,7 +99,7 @@ class AutowirePass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if (!$value instanceof Definition || !$value->getAutowiredCalls()) {
+        if (!$value instanceof Definition || !$value->isAutowired()) {
             return parent::processValue($value, $isRoot);
         }
 
@@ -107,7 +107,7 @@ class AutowirePass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass, $value->getAutowiredCalls());
+        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
         $methodCalls = $value->getMethodCalls();
 
         if ($constructor = $reflectionClass->getConstructor()) {
@@ -142,48 +142,44 @@ class AutowirePass extends AbstractRecursivePass
      * Gets the list of methods to autowire.
      *
      * @param \ReflectionClass $reflectionClass
-     * @param string[]         $autowiredMethods
      *
      * @return \ReflectionMethod[]
      */
-    private function getMethodsToAutowire(\ReflectionClass $reflectionClass, array $autowiredMethods)
+    private function getMethodsToAutowire(\ReflectionClass $reflectionClass)
     {
         $found = array();
-        $regexList = array();
         $methodsToAutowire = array();
 
         if ($reflectionMethod = $reflectionClass->getConstructor()) {
-            $methodsToAutowire[$lcMethod = strtolower($reflectionMethod->name)] = $reflectionMethod;
-            unset($autowiredMethods['__construct']);
-        }
-        if (!$autowiredMethods) {
-            return $methodsToAutowire;
-        }
-
-        foreach ($autowiredMethods as $pattern) {
-            $regexList[] = '/^'.str_replace('\*', '.*', preg_quote($pattern, '/')).'$/i';
+            $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
         }
 
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $reflectionMethod) {
             if ($reflectionMethod->isStatic()) {
                 continue;
             }
-
-            foreach ($regexList as $k => $regex) {
-                if (preg_match($regex, $reflectionMethod->name)) {
-                    $found[] = $autowiredMethods[$k];
-                    $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
-                    continue 2;
-                }
-            }
-
             if ($reflectionMethod->isAbstract() && !$reflectionMethod->getNumberOfParameters()) {
                 $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
+                continue;
             }
-        }
+            $r = $reflectionMethod;
 
-        if ($notFound = array_diff($autowiredMethods, $found)) {
-            $this->container->log($this, sprintf('Autowiring\'s patterns "%s" for service "%s" don\'t match any method.', implode('", "', $notFound), $this->currentId));
+            while (true) {
+                if (false !== $doc = $r->getDocComment()) {
+                    if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
+                        $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
+                        break;
+                    }
+                    if (false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
+                        break;
+                    }
+                }
+                try {
+                    $r = $r->getPrototype();
+                } catch (\ReflectionException $e) {
+                    break; // method has no prototype
+                }
+            }
         }
 
         return $methodsToAutowire;
@@ -247,6 +243,9 @@ class AutowirePass extends AbstractRecursivePass
         foreach ($reflectionMethod->getParameters() as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
+            }
+            if (self::MODE_OPTIONAL === $mode && $parameter->isOptional() && !array_key_exists($index, $arguments)) {
+                break;
             }
             if (method_exists($parameter, 'isVariadic') && $parameter->isVariadic()) {
                 continue;

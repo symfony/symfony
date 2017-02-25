@@ -12,7 +12,7 @@ Definitions
 - Lazy: yes
 - Shared: yes
 - Abstract: yes
-- Autowire: no
+- Autowired: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
 
@@ -24,7 +24,7 @@ Definitions
 - Lazy: no
 - Shared: yes
 - Abstract: no
-- Autowire: no
+- Autowired: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -35,26 +35,6 @@ Definitions
 - Tag: `tag1`
     - Attr3: val3
 - Tag: `tag2`
-
-### definition_autowired
-
-- Class: `AutowiredService`
-- Public: yes
-- Synthetic: no
-- Lazy: no
-- Shared: yes
-- Abstract: no
-- Autowire: yes
-
-### definition_autowired_with_methods
-
-- Class: `AutowiredService`
-- Public: yes
-- Synthetic: no
-- Lazy: no
-- Shared: yes
-- Abstract: no
-- Autowire: `set*`, `addFoo`
 
 
 Aliases

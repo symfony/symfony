@@ -137,9 +137,6 @@ class ObjectsProvider
                 ->addTag('tag2')
                 ->addMethodCall('setMailer', array(new Reference('mailer')))
                 ->setFactory(array(new Reference('factory.service'), 'get')),
-            'definition_autowired' => (new Definition('AutowiredService'))->setAutowired(true),
-            'definition_autowired_with_methods' => (new Definition('AutowiredService'))
-                ->setAutowiredCalls(array('__construct', 'set*', 'addFoo')),
         );
     }
 

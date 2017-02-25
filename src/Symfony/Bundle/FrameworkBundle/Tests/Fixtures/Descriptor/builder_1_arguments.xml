@@ -29,12 +29,5 @@
       <argument key="def2" type="service" id="definition_2"/>
     </argument>
   </definition>
-  <definition id="definition_autowired" class="AutowiredService" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="true" file=""/>
-  <definition id="definition_autowired_with_methods" class="AutowiredService" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="true" file="">
-    <autowired-calls>
-      <autowired-call>set*</autowired-call>
-      <autowired-call>addFoo</autowired-call>
-    </autowired-calls>
-  </definition>
   <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerBuilder"/>
 </container>

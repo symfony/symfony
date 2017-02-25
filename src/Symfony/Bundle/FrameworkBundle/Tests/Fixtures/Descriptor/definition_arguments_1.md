@@ -4,7 +4,7 @@
 - Lazy: yes
 - Shared: yes
 - Abstract: yes
-- Autowire: no
+- Autowired: no
 - Arguments: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`

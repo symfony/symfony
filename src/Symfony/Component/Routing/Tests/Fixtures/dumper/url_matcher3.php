@@ -27,7 +27,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
-        $requestMethod = $context->getMethod();
+        $requestMethod = $isLikeGetMethod = $context->getMethod();
+
+        if ($requestMethod === 'HEAD') {
+            $isLikeGetMethod = 'GET';
+        }
+
 
         if (0 === strpos($pathinfo, '/rootprefix')) {
             // static

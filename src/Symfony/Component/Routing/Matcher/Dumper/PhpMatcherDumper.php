@@ -109,7 +109,7 @@ EOF;
         \$context = \$this->context;
         \$request = \$this->request;
         \$requestMethod = \$isLikeGetMethod = \$context->getMethod();
-        
+
         if (\$requestMethod === 'HEAD') {
             \$isLikeGetMethod = 'GET';
         }

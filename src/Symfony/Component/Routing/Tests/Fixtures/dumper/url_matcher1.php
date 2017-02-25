@@ -27,7 +27,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
-        $requestMethod = $context->getMethod();
+        $requestMethod = $isLikeGetMethod = $context->getMethod();
+
+        if ($requestMethod === 'HEAD') {
+            $isLikeGetMethod = 'GET';
+        }
+
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
@@ -37,8 +42,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($requestMethod, array('GET', 'HEAD'))) {
-                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                if (!in_array($isLikeGetMethod, array('GET'))) {
+                    $allow = array_merge($allow, array('GET'));
                     goto not_bar;
                 }
 
@@ -48,8 +53,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($requestMethod, array('GET', 'HEAD'))) {
-                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                if ($isLikeGetMethod != 'GET') {
+                    $allow[] = 'GET';
                     goto not_barhead;
                 }
 
@@ -85,7 +90,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($requestMethod != 'POST') {
+                if ($isLikeGetMethod != 'POST') {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
@@ -96,7 +101,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($requestMethod != 'PUT') {
+                if ($isLikeGetMethod != 'PUT') {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -423,6 +424,10 @@ class XmlDescriptor extends Descriptor
 
             if (is_string($argumentKey)) {
                 $argumentXML->setAttribute('key', $argumentKey);
+            }
+
+            if ($argument instanceof ServiceClosureArgument) {
+                $argument = $argument->getValues()[0];
             }
 
             if ($argument instanceof Reference) {

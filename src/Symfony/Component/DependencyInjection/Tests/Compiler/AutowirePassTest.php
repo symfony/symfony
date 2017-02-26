@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AbstractGetterOverriding;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\GetterOverriding;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -516,6 +517,22 @@ class AutowirePassTest extends TestCase
             array(new Reference('app_a')),
             $methodCalls[0][1]
         );
+    }
+
+    public function testTtypedReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('bar', Bar::class)
+            ->setAutowired(true)
+            ->setProperty('a', array(new TypedReference(A::class, A::class)))
+        ;
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(A::class, $container->getDefinition('autowired.'.A::class)->getClass());
     }
 
     /**

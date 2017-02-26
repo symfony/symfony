@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -53,7 +54,9 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      */
     private function processValue($value, $rootLevel = 0, $level = 0)
     {
-        if ($value instanceof ArgumentInterface) {
+        if ($value instanceof ServiceClosureArgument) {
+            $value->setValues($this->processValue($value->getValues(), 1, 1));
+        } elseif ($value instanceof ArgumentInterface) {
             $value->setValues($this->processValue($value->getValues(), $rootLevel, 1 + $level));
         } elseif ($value instanceof Definition) {
             if ($value->isSynthetic() || $value->isAbstract()) {

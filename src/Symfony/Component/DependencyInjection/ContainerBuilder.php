@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -1140,11 +1141,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as $k => $v) {
                 $value[$k] = $this->resolveServices($v);
             }
+        } elseif ($value instanceof ServiceClosureArgument) {
+            $reference = $value->getValues()[0];
+            $value = function () use ($reference) {
+                return $this->resolveServices($reference);
+            };
         } elseif ($value instanceof ServiceLocatorArgument) {
             $parameterBag = $this->getParameterBag();
             $services = array();
             foreach ($value->getValues() as $k => $v) {
-                if ($v->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE && !$this->has((string) $v)) {
+                if ($v && $v->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE && !$this->has((string) $v)) {
                     continue;
                 }
                 $services[$k] = function () use ($v, $parameterBag) {

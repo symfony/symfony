@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Guesses constructor arguments of services definitions and try to instantiate services if necessary.
@@ -39,6 +40,7 @@ class AutowirePass extends AbstractRecursivePass
     private $types;
     private $ambiguousServiceTypes = array();
     private $usedTypes = array();
+    private $currentDefinition;
 
     /**
      * {@inheritdoc}
@@ -100,43 +102,55 @@ class AutowirePass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if (!$value instanceof Definition || !$value->isAutowired()) {
-            return parent::processValue($value, $isRoot);
-        }
-
-        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
-            return parent::processValue($value, $isRoot);
-        }
-
-        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
-        $methodCalls = $value->getMethodCalls();
-
-        if ($constructor = $reflectionClass->getConstructor()) {
-            array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
-        } elseif ($value->getArguments()) {
-            throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name));
-        }
-
-        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
-        $overriddenGetters = $this->autowireOverridenGetters($value->getOverriddenGetters(), $autowiredMethods);
-
-        if ($constructor) {
-            list(, $arguments) = array_shift($methodCalls);
-
-            if ($arguments !== $value->getArguments()) {
-                $value->setArguments($arguments);
+        if ($value instanceof TypedReference && $this->currentDefinition->isAutowired() && !$this->container->has((string) $value)) {
+            if ($ref = $this->getAutowiredReference($value->getType(), $value->canBeAutoregistered())) {
+                $value = new TypedReference((string) $ref, $value->getType(), $value->getInvalidBehavior(), $value->canBeAutoregistered());
             }
         }
-
-        if ($methodCalls !== $value->getMethodCalls()) {
-            $value->setMethodCalls($methodCalls);
+        if (!$value instanceof Definition) {
+            return parent::processValue($value, $isRoot);
         }
 
-        if ($overriddenGetters !== $value->getOverriddenGetters()) {
-            $value->setOverriddenGetters($overriddenGetters);
-        }
+        $parentDefinition = $this->currentDefinition;
+        $this->currentDefinition = $value;
 
-        return parent::processValue($value, $isRoot);
+        try {
+            if (!$value->isAutowired() || !$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
+                return parent::processValue($value, $isRoot);
+            }
+
+            $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
+            $methodCalls = $value->getMethodCalls();
+
+            if ($constructor = $reflectionClass->getConstructor()) {
+                array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
+            } elseif ($value->getArguments()) {
+                throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name));
+            }
+
+            $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
+            $overriddenGetters = $this->autowireOverridenGetters($value->getOverriddenGetters(), $autowiredMethods);
+
+            if ($constructor) {
+                list(, $arguments) = array_shift($methodCalls);
+
+                if ($arguments !== $value->getArguments()) {
+                    $value->setArguments($arguments);
+                }
+            }
+
+            if ($methodCalls !== $value->getMethodCalls()) {
+                $value->setMethodCalls($methodCalls);
+            }
+
+            if ($overriddenGetters !== $value->getOverriddenGetters()) {
+                $value->setOverriddenGetters($overriddenGetters);
+            }
+
+            return parent::processValue($value, $isRoot);
+        } finally {
+            $this->currentDefinition = $parentDefinition;
+        }
     }
 
     /**
@@ -465,7 +479,7 @@ class AutowirePass extends AbstractRecursivePass
 
         $this->populateAvailableType($argumentId, $argumentDefinition);
 
-        $this->processValue($argumentDefinition);
+        $this->processValue($argumentDefinition, true);
         $this->currentId = $currentId;
 
         return new Reference($argumentId);

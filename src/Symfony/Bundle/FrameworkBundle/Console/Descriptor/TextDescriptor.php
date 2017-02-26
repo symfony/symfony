@@ -16,6 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -324,6 +325,9 @@ class TextDescriptor extends Descriptor
         $argumentsInformation = array();
         if ($showArguments && ($arguments = $definition->getArguments())) {
             foreach ($arguments as $argument) {
+                if ($argument instanceof ServiceClosureArgument) {
+                    $argument = $argument->getValues()[0];
+                }
                 if ($argument instanceof Reference) {
                     $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
                 } elseif ($argument instanceof IteratorArgument) {

@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -34,6 +35,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
@@ -1158,6 +1160,23 @@ class ContainerBuilderTest extends TestCase
 
         $definition = $container->register('\\foo');
         $container->compile();
+    }
+
+    public function testServiceLocator()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', ServiceLocator::class)
+            ->addArgument(array(
+                'bar' => new ServiceClosureArgument(new Reference('bar_service')),
+                'baz' => new ServiceClosureArgument(new TypedReference('baz_service', 'stdClass')),
+            ))
+        ;
+        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
+        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->compile();
+
+        $this->assertInstanceOf(ServiceLocator::class, $foo = $container->get('foo_service'));
+        $this->assertSame($container->get('bar_service'), $foo->get('bar'));
     }
 }
 

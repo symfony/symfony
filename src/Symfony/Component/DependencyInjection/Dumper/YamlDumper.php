@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -254,6 +255,9 @@ class YamlDumper extends Dumper
      */
     private function dumpValue($value)
     {
+        if ($value instanceof ServiceClosureArgument) {
+            $value = $value->getValues()[0];
+        }
         if ($value instanceof ArgumentInterface) {
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';

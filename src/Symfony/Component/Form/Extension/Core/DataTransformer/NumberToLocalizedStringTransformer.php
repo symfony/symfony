@@ -266,7 +266,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         if (null !== $this->precision && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding
             $roundingCoef = pow(10, $this->precision);
-            $number *= $roundingCoef;
+            $number = bcmul($number, $roundingCoef, 6);
 
             switch ($this->roundingMode) {
                 case self::ROUND_CEILING:

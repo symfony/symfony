@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
  * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Changed default configuration for
    assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to

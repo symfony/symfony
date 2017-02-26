@@ -10,9 +10,11 @@ yaml: |
         a: Steve
         b: Clark
         c: Brian
+        e: notnull
     bar:
         a: before
         d: other
+        e: ~
         <<: *foo
         b: new
         x: Oren
@@ -46,13 +48,13 @@ yaml: |
             <<: *nestedref
 php: |
     array(
-        'foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian'),
-        'bar' => array('a' => 'before', 'd' => 'other', 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
+        'foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'e' => 'notnull'),
+        'bar' => array('a' => 'before', 'd' => 'other', 'e' => null, 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
         'duplicate' => array('foo' => 'bar'),
         'foo2' => array('a' => 'Ballmer'),
         'ding' => array('fi', 'fei', 'fo', 'fam'),
-        'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'),
-        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'),
+        'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'e' => 'notnull', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'),
+        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'e' => 'notnull', 'fi', 'fei', 'fo', 'fam'),
         'taz' => array('a' => 'Steve', 'w' => array('p' => 1234)),
         'nested' => array('a' => 'Steve', 'w' => array('p' => 12345), 'd' => 'Doug', 'z' => array('p' => 12345))
     )

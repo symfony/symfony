@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * Represents a service locator able to lazy load a given range of services.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
- *
- * @experimental in version 3.3
  */
 class ServiceLocatorArgument implements ArgumentInterface
 {

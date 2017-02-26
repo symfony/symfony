@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in version 3.3
  */
 class ServiceLocator implements PsrContainerInterface
 {

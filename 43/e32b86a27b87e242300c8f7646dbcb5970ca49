@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-05T18:42:47Z
+
+I think fabbot.io is giving false positives, I haven't touched those lines and I think they are correct the way they are
+
+/cc @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T18:44:14Z
+
+Indeed, can you try to rebase to see if that fixes the issue?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-05T18:46:35Z
+
+@fabpot
+> [braces] Is not configurable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T18:52:40Z
+
+Opps, I thought that FriendsOfPHP/PHP-CS-Fixer#2421 was already merged but I was wrong :(
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-06T08:26:22Z
+
+For now I'm 👎 about this proposal. My reasons:
+
+* The fact that this makes easier to get the flashBag() is irrelevant to me. 99% of the times you don't have to get the FlashBag, you just add new flash messages. That's why we have `$this->addFlash()`
+* Currently, getting the session is simple (`$request->getSession()`) so there isn't much to optimize there (unlike other parts such as Security, which could be heavily optimize).
+* It's not a very technical reason ... but to me it doesn't feel natural to get the Session in that way in Symfony. We all know that this is a Request + Response framework ... so I expect controller to get the Request and the routing parameters. Using the `Session $session` typehint looks "non-native". If I get this feature, why not add `Doctrine $em` as a valid typehint to get the entity manager too?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-06T08:39:15Z
+
+> The fact that this makes easier to get the flashBag() is irrelevant to me. 99% of the times you don't have to get the FlashBag, you just add new flash messages. That's why we have $this->addFlash()
+
+Except that I don't extend the base controller, so this is of no use for me. Everyone using Controller as a Service will run into this problem.
+
+> Currently, getting the session is simple ($request->getSession()) so there isn't much to optimize there (unlike other parts such as Security, which could be heavily optimize).
+
+It's not about optimization, but about type-hints (see #21159, it lists all issues related). `getFlashBag()` can only be received by duck-typing.
+
+> It's not a very technical reason ... but to me it doesn't feel natural to get the Session in that way in Symfony. We all know that this is a Request + Response framework ... so I expect controller to get the Request and the routing parameters. Using the Session $session typehint looks "non-native". If I get this feature, why not add Doctrine $em as a valid typehint to get the entity manager too?
+
+If you ask me:
+ - **Constructor** stateless dependencies, e.g. services, things that are the same no matter what action is called.
+ - **Action** stateful dependencies, e.g. entities, parameters or other objects that can have different states each time it gets called.
+
+The session can be different each time it's called, therefore it shouldn't be a constructor dependency. However, when using the `Request::getSession()`, you don't have access to `getFlashBag()`, which is `Session` specific.
+
+> why not add Doctrine $em as a valid typehint to get the entity manager too?
+
+Doctrine/The EM is a stateless dependency and not an object with contextual value.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-06T10:38:14Z
+
+I like this proposal. It's a step toward #10557
+
+---------------------------------------------------------------------------
+
+by umulmrum at 2017-02-22T08:18:34Z
+
+Just stumbled across this PR and would like to support it :+1:
+
+It currently feels quite wrong to use the session flashbag when using controllers as services instead of extending the base controller (I regard container injection as anti-pattern, even in controllers).
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-22T09:12:45Z
+
+Rebased against the master, all is green now

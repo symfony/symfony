@@ -330,8 +330,6 @@ class TextDescriptor extends Descriptor
             foreach ($arguments as $argument) {
                 if ($argument instanceof Reference) {
                     $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
-                } elseif ($argument instanceof Definition) {
-                    $argumentsInformation[] = 'Inlined Service';
                 } elseif ($argument instanceof IteratorArgument) {
                     $argumentsInformation[] = sprintf('Iterator (%d element(s))', count($argument->getValues()));
                 } elseif ($argument instanceof ServiceLocatorArgument) {
@@ -339,6 +337,8 @@ class TextDescriptor extends Descriptor
                 } elseif ($argument instanceof ClosureProxyArgument) {
                     list($reference, $method) = $argument->getValues();
                     $argumentsInformation[] = sprintf('ClosureProxy(Service(%s)::%s())', $reference, $method);
+                } elseif ($argument instanceof Definition) {
+                    $argumentsInformation[] = 'Inlined Service';
                 } else {
                     $argumentsInformation[] = is_array($argument) ? sprintf('Array (%d element(s))', count($argument)) : $argument;
                 }

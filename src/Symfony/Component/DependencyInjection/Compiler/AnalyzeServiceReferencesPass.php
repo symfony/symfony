@@ -74,7 +74,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
 
         if ($value instanceof ArgumentInterface) {
             $this->lazy = true;
-            parent::processValue($value);
+            parent::processValue($value->getValues());
             $this->lazy = $lazy;
 
             return $value;

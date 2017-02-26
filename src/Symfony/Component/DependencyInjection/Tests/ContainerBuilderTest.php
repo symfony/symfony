@@ -454,7 +454,7 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertInstanceOf(ServiceLocator::class, $locator);
         $this->assertInstanceOf('stdClass', $locator->get('bar'));
-        $this->assertNull($locator->get('invalid'));
+        $this->assertFalse($locator->has('invalid'));
         $this->assertSame($locator->get('bar'), $locator('bar'), '->get() should be used when invoking ServiceLocator');
     }
 

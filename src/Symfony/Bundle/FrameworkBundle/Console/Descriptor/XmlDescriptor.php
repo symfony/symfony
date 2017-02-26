@@ -440,8 +440,6 @@ class XmlDescriptor extends Descriptor
             if ($argument instanceof Reference) {
                 $argumentXML->setAttribute('type', 'service');
                 $argumentXML->setAttribute('id', (string) $argument);
-            } elseif ($argument instanceof Definition) {
-                $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
             } elseif ($argument instanceof IteratorArgument) {
                 $argumentXML->setAttribute('type', 'iterator');
 
@@ -459,6 +457,8 @@ class XmlDescriptor extends Descriptor
                 $argumentXML->setAttribute('type', 'closure-proxy');
                 $argumentXML->setAttribute('id', (string) $reference);
                 $argumentXML->setAttribute('method', $method);
+            } elseif ($argument instanceof Definition) {
+                $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
             } elseif (is_array($argument)) {
                 $argumentXML->setAttribute('type', 'collection');
 

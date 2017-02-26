@@ -638,7 +638,6 @@ class AutowirePassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "setter_injection_collision". Multiple services exist for this interface (c1, c2).
-     * @expectedExceptionCode 1
      */
     public function testSetterInjectionCollisionThrowsException()
     {

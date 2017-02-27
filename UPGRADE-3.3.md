@@ -70,12 +70,21 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
    deprecated and will be removed in 4.0. Use the `Symfony\Component\Form\DependencyInjection\FormPass`
    class instead.
+   
+ * The `Symfony\Bundle\FrameworkBundle\EventListener\SessionListener` class has been deprecated
+   and will be removed in 4.0. Use the `Symfony\Component\HttpKernel\EventListener\SessionListener` instead.
+   
+ * The `Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener` class has been deprecated
+   and will be removed in 4.0. Use the `Symfony\Component\HttpKernel\EventListener\TestSessionListener` instead.
 
 HttpKernel
 -----------
 
  * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array of pools indexed
    by name to the constructor instead.
+   
+ * The `LazyLoadingFragmentHandler::addRendererService()` method has been deprecated and
+   will be removed in 4.0.
 
 Process
 -------
@@ -126,6 +135,12 @@ TwigBridge
 
  * The `TwigRendererEngine::setEnvironment()` method has been deprecated and will be removed
    in 4.0. Pass the Twig Environment as second argument of the constructor instead.
+
+TwigBundle
+----------
+
+* The `ContainerAwareRuntimeLoader` class has been deprecated and will be removed in 4.0.
+  Use the Twig `Twig_ContainerRuntimeLoader` class instead.
 
 Workflow
 --------

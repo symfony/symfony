@@ -187,6 +187,12 @@ FrameworkBundle
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
    removed. Use the `Symfony\Component\Form\DependencyInjection\FormPass` class instead.
+   
+ * The `Symfony\Bundle\FrameworkBundle\EventListener\SessionListener` class has been removed. 
+   Use the `Symfony\Component\HttpKernel\EventListener\SessionListener` instead.
+   
+ * The `Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener` class has been removed.
+   Use the `Symfony\Component\HttpKernel\EventListener\TestSessionListener` instead.
 
 HttpFoundation
 ---------------
@@ -229,6 +235,9 @@ HttpKernel
 
  * The `Psr6CacheClearer::addPool()` method has been removed. Pass an array of pools indexed
    by name to the constructor instead.
+   
+ * The `LazyLoadingFragmentHandler::addRendererService()` method has been removed.
+
 
 Ldap
 ----
@@ -284,6 +293,12 @@ Translation
 -----------
 
  * Removed the backup feature from the file dumper classes.
+
+TwigBundle
+----------
+
+* The `ContainerAwareRuntimeLoader` class has been removed. Use the 
+  Twig `Twig_ContainerRuntimeLoader` class instead.
 
 TwigBridge
 ----------

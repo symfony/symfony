@@ -61,6 +61,9 @@ class Workflow
                 throw new LogicException(sprintf('The Marking is empty and there is no initial place for workflow "%s".', $this->name));
             }
             $marking->mark($this->definition->getInitialPlace());
+
+            // update the subject with the new marking
+            $this->markingStore->setMarking($subject, $marking);
         }
 
         // check that the subject has a known place
@@ -76,9 +79,6 @@ class Workflow
             }
         }
 
-        // Because the marking could have been initialized, we update the subject
-        $this->markingStore->setMarking($subject, $marking);
-
         return $marking;
     }
 
@@ -92,7 +92,7 @@ class Workflow
      */
     public function can($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject, $this->getMarking($subject));
+        $transitions = $this->getEnabledTransitions($subject);
 
         foreach ($transitions as $transition) {
             if ($transitionName === $transition->getName()) {
@@ -116,7 +116,7 @@ class Workflow
      */
     public function apply($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject, $this->getMarking($subject));
+        $transitions = $this->getEnabledTransitions($subject);
 
         // We can shortcut the getMarking method in order to boost performance,
         // since the "getEnabledTransitions" method already checks the Marking

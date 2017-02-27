@@ -297,7 +297,7 @@ EOF;
                 }
 
                 if (1 === count($methods)) {
-                        $code .= <<<EOF
+                    $code .= <<<EOF
             if ('$methods[0]' !== \$$methodVariable) {
                 \$allow[] = '$methods[0]';
                 goto $gotoname;

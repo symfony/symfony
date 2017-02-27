@@ -1391,6 +1391,18 @@ class ProcessTest extends TestCase
         $this->assertSame('456', $p2->getOutput());
     }
 
+    public function testSetBadEnv()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(array('bad%%' => '123'));
+        $process->inheritEnvironmentVariables(true);
+
+        $process->run();
+
+        $this->assertSame('hello'.PHP_EOL, $process->getOutput());
+        $this->assertSame('', $process->getErrorOutput());
+    }
+
     public function testInheritEnvEnabled()
     {
         $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo serialize($_SERVER);'), null, array('BAR' => 'BAZ'));

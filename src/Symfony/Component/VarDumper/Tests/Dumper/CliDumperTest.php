@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarDumper\Tests;
+namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -25,7 +25,7 @@ class CliDumperTest extends TestCase
 
     public function testGet()
     {
-        require __DIR__.'/Fixtures/dumb-var.php';
+        require __DIR__.'/../Fixtures/dumb-var.php';
 
         $dumper = new CliDumper('php://output');
         $dumper->setColors(false);
@@ -75,8 +75,8 @@ array:24 [
     +"bar": "bar"
   }
   "closure" => Closure {{$r}
-    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
+    class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {{$r} …}
     parameters: {
       \$a: {}
       &\$b: {
@@ -297,7 +297,7 @@ EOTXT
     {
         $out = fopen('php://memory', 'r+b');
 
-        require_once __DIR__.'/Fixtures/Twig.php';
+        require_once __DIR__.'/../Fixtures/Twig.php';
         $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()));
 
         $dumper = new CliDumper();

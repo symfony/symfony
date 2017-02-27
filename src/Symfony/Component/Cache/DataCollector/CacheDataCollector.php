@@ -45,20 +45,13 @@ class CacheDataCollector extends DataCollector
         $empty = array('calls' => array(), 'config' => array(), 'options' => array(), 'statistics' => array());
         $this->data = array('instances' => $empty, 'total' => $empty);
         foreach ($this->instances as $name => $instance) {
-            $calls = $instance->getCalls();
-            foreach ($calls as $call) {
-                if (isset($call->result)) {
-                    $call->result = $this->cloneVar($call->result);
-                }
-                if (isset($call->argument)) {
-                    $call->argument = $this->cloneVar($call->argument);
-                }
-            }
-            $this->data['instances']['calls'][$name] = $calls;
+            $this->data['instances']['calls'][$name] = $instance->getCalls();
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics'] = $this->calculateTotalStatistics();
+
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**
@@ -133,7 +126,7 @@ class CacheDataCollector extends DataCollector
                     $statistics[$name]['misses'] += $count - $call->misses;
                 } elseif ('hasItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
-                    if (false === $call->result->getRawData()[0][0]) {
+                    if (false === $call->result) {
                         $statistics[$name]['misses'] += 1;
                     } else {
                         $statistics[$name]['hits'] += 1;

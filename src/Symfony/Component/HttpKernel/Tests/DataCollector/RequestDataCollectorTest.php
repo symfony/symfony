@@ -48,11 +48,11 @@ class RequestDataCollectorTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
         $this->assertSame('html', $c->getFormat());
         $this->assertEquals('foobar', $c->getRoute());
-        $this->assertEquals(array('name' => $cloner->cloneVar(array('name' => 'foo'))->seek('name')), $c->getRouteParams());
+        $this->assertEquals(array('name' => 'foo'), $c->getRouteParams());
         $this->assertSame(array(), $c->getSessionAttributes());
         $this->assertSame('en', $c->getLocale());
-        $this->assertEquals($cloner->cloneVar($request->attributes->get('resource')), $attributes->get('resource'));
-        $this->assertEquals($cloner->cloneVar($request->attributes->get('object')), $attributes->get('object'));
+        $this->assertContains(__FILE__, $attributes->get('resource'));
+        $this->assertSame('stdClass', $attributes->get('object')->getType());
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getResponseHeaders());
         $this->assertSame('OK', $c->getStatusText());
@@ -95,7 +95,7 @@ class RequestDataCollectorTest extends TestCase
         $this->injectController($c, $callable, $request);
         $c->collect($request, $response);
 
-        $this->assertSame($expected, $c->getController(), sprintf('Testing: %s', $name));
+        $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
     }
 
     public function provideControllerCallables()

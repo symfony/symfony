@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     private $data;
     private $position = 0;
@@ -34,10 +34,146 @@ class Data
     }
 
     /**
+     * @return string The type of the value.
+     */
+    public function getType()
+    {
+        $item = $this->data[$this->position][$this->key];
+
+        if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
+            $item = $item->value;
+        }
+        if (!$item instanceof Stub) {
+            return gettype($item);
+        }
+        if (Stub::TYPE_STRING === $item->type) {
+            return 'string';
+        }
+        if (Stub::TYPE_ARRAY === $item->type) {
+            return 'array';
+        }
+        if (Stub::TYPE_OBJECT === $item->type) {
+            return $item->class;
+        }
+        if (Stub::TYPE_RESOURCE === $item->type) {
+            return $item->class.' resource';
+        }
+    }
+
+    /**
+     * @param bool $recursive Whether values should be resolved recursively or not.
+     *
+     * @return scalar|array|null|Data[] A native representation of the original value.
+     */
+    public function getValue($recursive = false)
+    {
+        $item = $this->data[$this->position][$this->key];
+
+        if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
+            $item = $item->value;
+        }
+        if (!$item instanceof Stub) {
+            return $item;
+        }
+        if (Stub::TYPE_STRING === $item->type) {
+            return $item->value;
+        }
+
+        $children = $item->position ? $this->data[$item->position] : array();
+
+        foreach ($children as $k => $v) {
+            if ($recursive && !$v instanceof Stub) {
+                continue;
+            }
+            $children[$k] = clone $this;
+            $children[$k]->key = $k;
+            $children[$k]->position = $item->position;
+
+            if ($recursive) {
+                if ($v instanceof Stub && Stub::TYPE_REF === $v->type && $v->value instanceof Stub) {
+                    $recursive = (array) $recursive;
+                    if (isset($recursive[$v->value->position])) {
+                        continue;
+                    }
+                    $recursive[$v->value->position] = true;
+                }
+                $children[$k] = $children[$k]->getValue($recursive);
+            }
+        }
+
+        return $children;
+    }
+
+    public function count()
+    {
+        return count($this->getValue());
+    }
+
+    public function getIterator()
+    {
+        if (!is_array($value = $this->getValue())) {
+            throw new \LogicException(sprintf('%s object holds non-iterable type "%s".', self::class, gettype($value)));
+        }
+
+        foreach ($value as $k => $v) {
+            yield $k => $v;
+        }
+    }
+
+    public function __get($key)
+    {
+        if (null !== $data = $this->seek($key)) {
+            $item = $data->data[$data->position][$data->key];
+
+            return $item instanceof Stub || array() === $item ? $data : $item;
+        }
+    }
+
+    public function __isset($key)
+    {
+        return null !== $this->seek($key);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->__isset($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->__get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        throw new \BadMethodCallException(self::class.' objects are immutable.');
+    }
+
+    public function offsetUnset($key)
+    {
+        throw new \BadMethodCallException(self::class.' objects are immutable.');
+    }
+
+    public function __toString()
+    {
+        $value = $this->getValue();
+
+        if (!is_array($value)) {
+            return (string) $value;
+        }
+
+        return sprintf('%s (count=%d)', $this->getType(), count($value));
+    }
+
+    /**
      * @return array The raw data structure
+     *
+     * @deprecated since version 3.3. Use array or object access instead.
      */
     public function getRawData()
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the array or object access instead.', __METHOD__));
+
         return $this->data;
     }
 
@@ -97,6 +233,9 @@ class Data
     {
         $item = $this->data[$this->position][$this->key];
 
+        if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
+            $item = $item->value;
+        }
         if (!$item instanceof Stub || !$item->position) {
             return;
         }

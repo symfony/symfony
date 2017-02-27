@@ -48,6 +48,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         if (null !== $this->logger) {
             $this->data = $this->computeErrorsCount();
             $this->data['logs'] = $this->sanitizeLogs($this->logger->getLogs());
+            $this->data = $this->cloneVar($this->data);
         }
     }
 
@@ -100,7 +101,6 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
         foreach ($logs as $log) {
             if (!$this->isSilencedOrDeprecationErrorLog($log)) {
-                $log['context'] = $log['context'] ? $this->cloneVar($log['context']) : $log['context'];
                 $sanitizedLogs[] = $log;
 
                 continue;
@@ -112,8 +112,6 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             if (isset($sanitizedLogs[$errorId])) {
                 ++$sanitizedLogs[$errorId]['errorCount'];
             } else {
-                $log['context'] = $log['context'] ? $this->cloneVar($log['context']) : $log['context'];
-
                 $log += array(
                     'errorCount' => 1,
                     'scream' => $exception instanceof SilencedErrorContext,

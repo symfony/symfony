@@ -42,8 +42,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($isLikeGetMethod, array('GET'))) {
-                    $allow = array_merge($allow, array('GET'));
+                if ('GET' !== $isLikeGetMethod) {
+                    $allow[] = 'GET';
                     goto not_bar;
                 }
 

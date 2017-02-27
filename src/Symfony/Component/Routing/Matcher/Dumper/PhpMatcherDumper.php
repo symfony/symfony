@@ -296,8 +296,18 @@ EOF;
                     $methods = array_filter($methods, function ($method) { return 'HEAD' !== $method; });
                 }
 
-                $methods = implode("', '", $methods);
-                $code .= <<<EOF
+                if (1 === count($methods)) {
+                        $code .= <<<EOF
+            if ('$methods[0]' !== \$$methodVariable) {
+                \$allow[] = '$methods[0]';
+                goto $gotoname;
+            }
+
+
+EOF;
+                } else {
+                    $methods = implode("', '", $methods);
+                    $code .= <<<EOF
             if (!in_array(\$$methodVariable, array('$methods'))) {
                 \$allow = array_merge(\$allow, array('$methods'));
                 goto $gotoname;
@@ -305,6 +315,7 @@ EOF;
 
 
 EOF;
+                }
             }
         }
 

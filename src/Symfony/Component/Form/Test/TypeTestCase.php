@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Form\Test;
 
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class TypeTestCase extends FormIntegrationTestCase
 {
@@ -32,6 +34,20 @@ abstract class TypeTestCase extends FormIntegrationTestCase
 
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
+    }
+
+    protected function getTypeExtensions()
+    {
+        $typeExtensions = array();
+
+        if (interface_exists(ValidatorInterface::class)) {
+            $validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
+            $validator->expects($this->any())->method('validate')->will($this->returnValue(array()));
+
+            $typeExtensions[] = new FormTypeValidatorExtension($validator);
+        }
+
+        return $typeExtensions;
     }
 
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)

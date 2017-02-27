@@ -93,10 +93,14 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
             $def->setAutowiredCalls(array_merge($autowiredCalls, $def->getAutowiredCalls()));
         }
 
-        // merge tags
-        foreach ($definition->getTags() as $k => $v) {
-            foreach ($v as $v) {
-                $def->addTag($k, $v);
+        // prepend instanceof tags
+        $tailTags = $def->getTags();
+        if ($headTags = $definition->getTags()) {
+            $def->setTags($headTags);
+            foreach ($tailTags as $k => $v) {
+                foreach ($v as $v) {
+                    $def->addTag($k, $v);
+                }
             }
         }
     }

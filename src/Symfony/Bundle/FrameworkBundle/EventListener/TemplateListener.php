@@ -12,14 +12,13 @@
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\Template;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponseInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Listener to convert a template reference to a Response.
- *
  * @author Pierre du Plessis <pdples@gmail.com>
  */
 class TemplateListener implements EventSubscriberInterface
@@ -42,18 +41,16 @@ class TemplateListener implements EventSubscriberInterface
     {
         $result = $event->getControllerResult();
 
-        if (!$result instanceof Template) {
+        if (!$result instanceof TemplatedResponseInterface) {
             return;
         }
 
-        $response = $this->templating->renderResponse($result->getTemplate(), $result->getParameters());
+        $response = $result->getResponse($this->templating);
 
-        if ($statusCode = $result->getStatusCode()) {
-            $response->setStatusCode($statusCode);
-        }
+        if (!$response instanceof Response) {
+            $msg = sprintf('The method %s::getResponse() must return a response (%s given).', get_class($result), is_object($response) ? get_class($response) : gettype($response));
 
-        if ($headers = $result->getHeaders()) {
-            $response->headers->add($headers);
+            throw new \LogicException($msg);
         }
 
         $event->setResponse($response);

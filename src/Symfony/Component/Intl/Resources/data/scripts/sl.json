@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "Arab": "arabski",
         "Armi": "imperialno-aramejski",
@@ -35,6 +35,7 @@
         "Grek": "grški",
         "Gujr": "gudžaratski",
         "Guru": "gurmuki",
+        "Hanb": "Hanb",
         "Hang": "hangul",
         "Hani": "kanji",
         "Hano": "hanunski",
@@ -47,6 +48,7 @@
         "Hung": "staroogrski",
         "Inds": "induški",
         "Ital": "staroitalski",
+        "Jamo": "Jamo",
         "Java": "javanski",
         "Jpan": "japonski",
         "Kali": "karenski",

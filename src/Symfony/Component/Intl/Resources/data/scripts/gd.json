@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.76",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Albàinis Chabhcasach",
@@ -49,6 +49,7 @@
         "Hrkt": "Katakana no Hiragana",
         "Hung": "Seann-Ungarais",
         "Ital": "Seann-Eadailtis",
+        "Jamo": "Jamo",
         "Java": "Deàbhanais",
         "Jpan": "Seapanais",
         "Jurc": "Jurchen",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.18",
+    "Version": "2.1.28.80",
     "Names": {
         "AC": "Isla de la Ascensión",
         "AD": "Andorra",
@@ -44,7 +44,7 @@
         "CF": "República Centroafricana",
         "CG": "República del Congo",
         "CH": "Suiza",
-        "CI": "Costa de Marfil",
+        "CI": "Côte d’Ivoire",
         "CK": "Islas Cook",
         "CL": "Chile",
         "CM": "Camerún",
@@ -216,7 +216,7 @@
         "SX": "Sint Maarten",
         "SY": "Siria",
         "SZ": "Suazilandia",
-        "TA": "Tristán da Cunha",
+        "TA": "Tristán de Acuña",
         "TC": "Islas Turcas y Caicos",
         "TD": "Chad",
         "TF": "Territorios Australes Franceses",
@@ -224,7 +224,7 @@
         "TH": "Tailandia",
         "TJ": "Tayikistán",
         "TK": "Tokelau",
-        "TL": "Timor Oriental",
+        "TL": "Timor-Leste",
         "TM": "Turkmenistán",
         "TN": "Túnez",
         "TO": "Tonga",

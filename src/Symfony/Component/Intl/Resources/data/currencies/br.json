@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.76",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "roubl nevez Belarus (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "roubl Belarus"
+        ],
         "BYR": [
             "BYR",
-            "roubl Belarus"
+            "roubl Belarus (2000–2016)"
         ],
         "BZD": [
             "BZD",

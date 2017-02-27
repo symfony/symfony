@@ -301,7 +301,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getName()
     {
         if (null === $this->name) {
-            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+            $dirName = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+            $this->name = false !== strpos($dirName[0], '0123456789') ? '_'.$dirName : $dirName;
         }
 
         return $this->name;
@@ -479,12 +480,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function getContainerClass()
     {
-        $className = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
-        if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $className)) { // class name must start with a letter or underscore
-            return '_'.$className;
-        }
-
-        return $className;
+        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
     }
 
     /**

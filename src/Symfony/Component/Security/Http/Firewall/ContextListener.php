@@ -44,10 +44,24 @@ class ContextListener implements ListenerInterface
     private $registered;
     private $trustResolver;
 
-    public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
+    /**
+     * @param TokenStorageInterface                         $tokenStorage
+     * @param UserProviderInterface|UserProviderInterface[] $userProviders
+     * @param string                                        $contextKey
+     * @param LoggerInterface|null                          $logger
+     * @param EventDispatcherInterface|null                 $dispatcher
+     * @param AuthenticationTrustResolverInterface|null     $trustResolver
+     */
+    public function __construct(TokenStorageInterface $tokenStorage, $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
+        }
+
+        if (is_array($userProviders)) {
+            @trigger_error(sprintf('Being able to pass multiple user providers to the constructor of %s is deprecated since version 3.3 and will not be supported anymore in 4.0. Only pass the user provider for the current firewall context instead.', __CLASS__), E_USER_DEPRECATED);
+        } else {
+            $userProviders = array($userProviders);
         }
 
         foreach ($userProviders as $userProvider) {

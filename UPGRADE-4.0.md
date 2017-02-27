@@ -252,6 +252,9 @@ Process
 Security
 --------
 
+ * Dropped support for passing multiple user providers to the `ContextListener`. Pass only the user provider responsible
+   for the active firewall instead.
+
  * The `RoleInterface` has been removed. Extend the `Symfony\Component\Security\Core\Role\Role`
    class instead.
 

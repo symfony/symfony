@@ -94,6 +94,9 @@ Process
 Security
 --------
 
+ * Deprecated the ability to pass multiple user providers to the `ContextListener`. Pass only the user provider responsible
+   for the active firewall instead.
+
  * The `RoleInterface` has been deprecated. Extend the `Symfony\Component\Security\Core\Role\Role`
    class in your custom role implementations instead.
 

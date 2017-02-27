@@ -36,12 +36,12 @@ abstract class AbstractNumberFormatterTest extends TestCase
         return array(
             array(100, 'ALL', '100'),
             array(100, 'BRL', '100.00'),
-            array(100, 'CRC', '100'),
+            array(100, 'CRC', '100.00'),
             array(100, 'JPY', '100'),
             array(100, 'CHF', '100'),
             array(-100, 'ALL', '-100'),
             array(-100, 'BRL', '-100'),
-            array(-100, 'CRC', '-100'),
+            array(-100, 'CRC', '-100.00'),
             array(-100, 'JPY', '-100'),
             array(-100, 'CHF', '-100'),
             array(1000.12, 'ALL', '1,000.12'),
@@ -90,9 +90,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
     public function formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider()
     {
         return array(
-            array(100, 'CRC', 'CRC', '%s100'),
-            array(-100, 'CRC', 'CRC', '-%s100'),
-            array(1000.12, 'CRC', 'CRC', '%s1,000'),
+            array(100, 'CRC', 'CRC', '%s100.00'),
+            array(-100, 'CRC', 'CRC', '-%s100.00'),
+            array(1000.12, 'CRC', 'CRC', '%s1,000.12'),
         );
     }
 

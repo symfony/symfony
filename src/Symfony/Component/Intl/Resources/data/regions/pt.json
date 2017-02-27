@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "AC": "Ilha de Ascensão",
         "AD": "Andorra",
@@ -197,7 +197,7 @@
         "RW": "Ruanda",
         "SA": "Arábia Saudita",
         "SB": "Ilhas Salomão",
-        "SC": "Seychelles",
+        "SC": "Seicheles",
         "SD": "Sudão",
         "SE": "Suécia",
         "SG": "Cingapura",
@@ -236,6 +236,7 @@
         "UA": "Ucrânia",
         "UG": "Uganda",
         "UM": "Ilhas Menores Distantes dos EUA",
+        "UN": "Nações Unidas",
         "US": "Estados Unidos",
         "UY": "Uruguai",
         "UZ": "Uzbequistão",

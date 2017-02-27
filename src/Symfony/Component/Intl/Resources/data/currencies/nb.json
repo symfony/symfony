@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.79",
+    "Version": "2.1.30.7",
     "Names": {
         "ADP": [
             "ADP",
@@ -15,7 +15,7 @@
         ],
         "AFN": [
             "AFN",
-            "afghansk afghani"
+            "afghanske afghani"
         ],
         "ALK": [
             "ALK",
@@ -217,9 +217,13 @@
             "BYB",
             "hviterussiske nye rubler (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "hviterussiske rubler"
+        ],
         "BYR": [
             "BYR",
-            "hviterussiske rubler"
+            "hviterussiske rubler (2000–2016)"
         ],
         "BZD": [
             "BZD",

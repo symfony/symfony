@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.29.44",
     "Names": {
         "AED": [
             "AED",
@@ -7,7 +7,7 @@
         ],
         "AFN": [
             "AFN",
-            "Afg‘oniston afg‘oni"
+            "Afg‘oniston afg‘oniysi"
         ],
         "ALL": [
             "ALL",
@@ -19,7 +19,7 @@
         ],
         "ANG": [
             "ANG",
-            "Niderland antil guldeni"
+            "Niderlandiya antil guldeni"
         ],
         "AOA": [
             "AOA",
@@ -93,9 +93,13 @@
             "BWP",
             "Botsvana pulasi"
         ],
+        "BYN": [
+            "BYN",
+            "Belarus rubli"
+        ],
         "BYR": [
             "BYR",
-            "Belarus rubli"
+            "Belarus rubli (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -155,7 +159,7 @@
         ],
         "DOP": [
             "DOP",
-            "Dominikan pesosi"
+            "Dominikana pesosi"
         ],
         "DZD": [
             "DZD",
@@ -231,7 +235,7 @@
         ],
         "HTG": [
             "HTG",
-            "Gaiti gurdasi"
+            "Gaiti gurdi"
         ],
         "HUF": [
             "HUF",
@@ -255,7 +259,7 @@
         ],
         "IRR": [
             "IRR",
-            "Eron riali"
+            "Eron riyoli"
         ],
         "ISK": [
             "ISK",
@@ -279,11 +283,11 @@
         ],
         "KGS": [
             "KGS",
-            "Qirg‘iziston so‘mi"
+            "Qirg‘iziston somi"
         ],
         "KHR": [
             "KHR",
-            "Kamboja rieli"
+            "Kambodja rieli"
         ],
         "KMF": [
             "KMF",
@@ -299,7 +303,7 @@
         ],
         "KWD": [
             "KWD",
-            "Quvayt dinori"
+            "Kuvayt dinori"
         ],
         "KYD": [
             "KYD",
@@ -367,7 +371,7 @@
         ],
         "MRO": [
             "MRO",
-            "Mavritaniya ugiyasi"
+            "Mavritaniya uqiyasi"
         ],
         "MUR": [
             "MUR",
@@ -395,7 +399,7 @@
         ],
         "NAD": [
             "NAD",
-            "Nambiya dollari"
+            "Namibiya dollari"
         ],
         "NGN": [
             "NGN",
@@ -419,7 +423,7 @@
         ],
         "OMR": [
             "OMR",
-            "Ummon riali"
+            "Ummon riyoli"
         ],
         "PAB": [
             "PAB",
@@ -451,7 +455,7 @@
         ],
         "QAR": [
             "QAR",
-            "Qatar riali"
+            "Qatar riyoli"
         ],
         "RON": [
             "RON",
@@ -543,7 +547,7 @@
         ],
         "TOP": [
             "TOP",
-            "Tonga pangasi"
+            "Tonga paangasi"
         ],
         "TRY": [
             "TRY",
@@ -579,7 +583,7 @@
         ],
         "UZS": [
             "soʻm",
-            "Oʻzbekiston soʻmi"
+            "O‘zbekiston so‘mi"
         ],
         "VEF": [
             "VEF",
@@ -615,7 +619,7 @@
         ],
         "YER": [
             "YER",
-            "Yaman riali"
+            "Yaman riyoli"
         ],
         "ZAR": [
             "ZAR",

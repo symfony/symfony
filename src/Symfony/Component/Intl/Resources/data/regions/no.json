@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.79",
+    "Version": "2.1.30.7",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Christmasøya",
         "CY": "Kypros",
-        "CZ": "Tsjekkia",
+        "CZ": "Den tsjekkiske republikk",
         "DE": "Tyskland",
         "DG": "Diego Garcia",
         "DJ": "Djibouti",
@@ -236,6 +236,7 @@
         "UA": "Ukraina",
         "UG": "Uganda",
         "UM": "USAs ytre øyer",
+        "UN": "FN",
         "US": "USA",
         "UY": "Uruguay",
         "UZ": "Usbekistan",

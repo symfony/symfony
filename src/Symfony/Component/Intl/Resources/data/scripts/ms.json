@@ -1,11 +1,11 @@
 {
-    "Version": "2.1.24.16",
+    "Version": "2.1.28.79",
     "Names": {
         "Arab": "Arab",
         "Armn": "Armenia",
         "Bali": "Bali",
         "Bamu": "Bamu",
-        "Beng": "Bengali",
+        "Beng": "Benggala",
         "Bopo": "Bopomofo",
         "Brai": "Braille",
         "Cans": "Cans",
@@ -16,12 +16,15 @@
         "Grek": "Greek",
         "Gujr": "Gujarat",
         "Guru": "Gurmukhi",
+        "Hanb": "Hanb",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hans": "Ringkas",
         "Hant": "Tradisional",
         "Hebr": "Ibrani",
         "Hira": "Hiragana",
+        "Hrkt": "Ejaan sukuan Jepun",
+        "Jamo": "Jamo",
         "Jpan": "Jepun",
         "Kana": "Katakana",
         "Khmr": "Khmer",
@@ -39,9 +42,11 @@
         "Thaa": "Thaana",
         "Thai": "Thai",
         "Tibt": "Tibet",
+        "Zmth": "Tatatanda matematik",
+        "Zsye": "Emoji",
         "Zsym": "Simbol",
         "Zxxx": "Tidak ditulis",
-        "Zyyy": "Biasa",
-        "Zzzz": "Skrip Tidak Diketahui"
+        "Zyyy": "Lazim",
+        "Zzzz": "Tulisan Tidak Diketahui"
     }
 }

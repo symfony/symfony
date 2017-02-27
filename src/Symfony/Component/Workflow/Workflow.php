@@ -62,7 +62,7 @@ class Workflow
             }
             $marking->mark($this->definition->getInitialPlace());
 
-            // Because the marking could have been initialized, we update the subject
+            // update the subject with the new marking
             $this->markingStore->setMarking($subject, $marking);
         }
 

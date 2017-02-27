@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-20T10:28:21Z
+
+Note that this PR is a follow up of #19986 and #20675.
+Note also that in this PR, I removed any limits on the number of collected items. This adds much more details to the nested structures of profiler panels.
+
+I tried this on Symfony Demo, route `admin_post_new`. The new behavior is enligthened by the increase of the number of calls to the `AbstractCloner::castObject` method. The net result is a ~20% slow down, as we do more:
+https://blackfire.io/profiles/compare/1dd13c84-d3be-4697-856d-7e57c381b856/graph
+
+Now, if we remove the same limits on master, the profile shows a ~30% increase:
+https://blackfire.io/profiles/compare/43c2e0b8-0675-4a45-93d5-387d561623c6/graph
+
+Before trying to add some limits again to fit the same performance budget as already on master, could someone try this patch on a form-heavy page?
+@gharlan especially since you reported #19978.
+Here is the patch against 3.2 to help testing:
+https://github.com/symfony/symfony/compare/3.2...nicolas-grekas:data-get32
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-20T10:37:36Z
+
+I did not review the code, but I'm :+1: for the feature.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-27T19:46:54Z
+
+Here we are, PR is ready, and Blackfire is great! It allowed me to find nested problems.
+
+![capture du 2017-02-27 20-46-35](https://cloud.githubusercontent.com/assets/243674/23376824/dcaa05ce-fd2d-11e6-9406-6d5a28c93815.png)
+
+https://blackfire.io/profiles/compare/afd80c91-2d53-4104-9f4d-7fbc04e86b46/graph

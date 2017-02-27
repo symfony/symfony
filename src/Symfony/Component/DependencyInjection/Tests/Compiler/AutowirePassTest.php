@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AbstractGetterOverriding;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\GetterOverriding;
 
@@ -517,6 +518,27 @@ class AutowirePassTest extends TestCase
             array('setFoo', 'notASetter'),
             $actualMethodNameCalls
         );
+    }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testAbstractGetterOverriding()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('getter_overriding', AbstractGetterOverriding::class)
+            ->setAutowired(true)
+        ;
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $overridenGetters = $container->getDefinition('getter_overriding')->getOverriddenGetters();
+        $this->assertEquals(array(
+            'abstractgetfoo' => new Reference('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Foo'),
+        ), $overridenGetters);
     }
 
     /**

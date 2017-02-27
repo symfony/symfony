@@ -491,6 +491,28 @@
                         toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
                     });
                 }
+            },
+
+            createHelp: function() {
+                var helps = document.querySelectorAll('[data-help]');
+
+                for (var i = 0; i < helps.length; i++) {
+                    var root = document.createElement('div');
+                    Sfjs.addClass(root, 'help');
+                    var container = document.createElement('div');
+                    root.appendChild(container);
+                    helps[i].appendChild(root);
+
+                    // Add links
+                    var links = JSON.parse(helps[i].getAttribute('data-help'));
+                    for (var key in links) {
+                        var link = document.createElement('a');
+                        link.textContent = key;
+                        link.setAttribute('href', links[key]);
+                        link.setAttribute('target', '_blank');
+                        container.appendChild(link);
+                    }
+                }
             }
         };
     })();
@@ -499,6 +521,7 @@
         Sfjs.createTabs();
         Sfjs.createToggles();
         Sfjs.renderAjaxRequests();
+        Sfjs.createHelp();
     });
 
 /*]]>*/</script>

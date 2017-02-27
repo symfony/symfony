@@ -14,6 +14,8 @@ namespace Symfony\Bundle\WebProfilerBundle\Twig;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Twig extension for the profiler.
@@ -26,6 +28,11 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
      * @var ValueExporter
      */
     private $valueExporter;
+
+    /**
+     * @var array
+     */
+    private $helpLinks;
 
     /**
      * @var HtmlDumper
@@ -72,6 +79,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         return array(
             new \Twig_SimpleFunction('profiler_dump', $profilerDump, array('is_safe' => array('html'), 'needs_environment' => true)),
             new \Twig_SimpleFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
+            new \Twig_SimpleFunction('help_attrs', array($this, 'help'), array('is_safe' => array('html'))),
         );
     }
 
@@ -118,6 +126,26 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         }
 
         return $this->valueExporter->exportValue($value);
+    }
+
+    public function help($category)
+    {
+        if (!$this->helpLinks) {
+            $this->helpLinks = Yaml::parse(file_get_contents(__DIR__.'/../Resources/config/help.yml'));
+        }
+
+        if (!isset($this->helpLinks[$category])) {
+            throw new \Exception(sprintf('Help "%s" not found', $category));
+        }
+
+        $links = $this->helpLinks[$category];
+        array_walk($links, function (&$link) {
+            $link = sprintf($link, Kernel::MAJOR_VERSION.'.'.Kernel::MINOR_VERSION);
+        });
+
+        $html = 'data-help = "'.htmlspecialchars(json_encode($links, JSON_UNESCAPED_SLASHES)).'"';
+
+        return $html;
     }
 
     /**

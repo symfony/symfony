@@ -998,3 +998,65 @@ table.logs .metadata {
         margin-left: 2px;
     }
 }
+
+{# Help tooltip
+   ========================================================================= #}
+
+.help {
+    display: inline-block;
+    text-align: center;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    width: 21px;
+    height: 21px;
+    font-size: 13px;
+    line-height: 23px;
+    cursor: default;
+    margin: 0 5px;
+    vertical-align: middle;
+    border: 1px solid #c1c1c1;
+    text-shadow: 0 0 2px #444444;
+}
+
+.help:before {
+    content: '?';
+    font-weight: bold;
+    color: #fff;
+}
+
+.help:hover div {
+    display: block;
+}
+
+.help div {
+    display: none;
+    background-color: #e0e0e0;
+    padding: 8px;
+    width: auto;
+    position: absolute;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+    border: 1px solid #444444;
+    color: #FFF;
+    font-size: 13px;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.help div:before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-bottom-color: #444444;
+    left: 4px;
+    top: -12px;
+}
+
+.help div a {
+    color: black;
+    padding: 0 5px;
+    text-shadow: none;
+    font-weight: bold;
+}

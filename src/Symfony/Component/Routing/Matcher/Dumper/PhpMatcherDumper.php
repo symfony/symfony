@@ -229,10 +229,10 @@ EOF;
 
         if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#'.(substr($regex, -1) === 'u' ? 'u' : ''), $regex, $m)) {
             if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
-                $conditions[] = sprintf('$trimmedPathinfo === %s', var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
+                $conditions[] = sprintf('%s === $trimmedPathinfo', var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
-                $conditions[] = sprintf('$pathinfo === %s', var_export(str_replace('\\', '', $m['url']), true));
+                $conditions[] = sprintf('%s === $pathinfo', var_export(str_replace('\\', '', $m['url']), true));
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
@@ -270,7 +270,7 @@ EOF;
             if (1 === count($methods)) {
                 if ($methods[0] === 'HEAD') {
                     $code .= <<<EOF
-            if (\$requestMethod != 'HEAD') {
+            if ('HEAD' !== \$requestMethod) {
                 \$allow[] = 'HEAD';
                 goto $gotoname;
             }
@@ -279,7 +279,7 @@ EOF;
 EOF;
                 } else {
                     $code .= <<<EOF
-            if (\$isLikeGetMethod != '$methods[0]') {
+            if ('$methods[0]' !== \$isLikeGetMethod) {
                 \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
@@ -293,7 +293,7 @@ EOF;
                 if (in_array('GET', $methods)) {
                     // Since we treat HEAD requests like GET requests we don't need to match it.
                     $methodVariable = 'isLikeGetMethod';
-                    $methods = array_filter($methods, function ($method) { return $method != 'HEAD'; });
+                    $methods = array_filter($methods, function ($method) { return 'HEAD' !== $method; });
                 }
 
                 $methods = implode("', '", $methods);

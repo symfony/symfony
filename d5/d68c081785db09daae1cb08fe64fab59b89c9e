@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-27T18:23:24Z
+
+As far as I remember correctly, the listener must be registered as soon as possible so that namespaced function injection work all the time (for Clock/DnsMock). If the double registration doesn't have any adverse side effect, I'd prefer be careful here, that can be tricky :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-27T18:40:14Z
+
+I noticed this behaviour when working on #21786 (`startTest()` being called twice). If we need to keep the registration logic as is, I will look into another solution over there.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-27T18:46:29Z
+
+What we could do is creating the object before calling the parent method. This should trigger the registration of our `ClockMock` and `DnsMock` (see https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/PhpUnit/Legacy/SymfonyTestsListenerTrait.php#L70 and https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/PhpUnit/Legacy/SymfonyTestsListenerTrait.php#L75). The other calls of `register()` happen during execution of the listener inside `startTestSuite()` and `startTest()` anyway. We will then just decide later if we actually need to register the listener. That should work, shouldn't it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-27T20:02:34Z
+
+So, the listener will now still be built before calling the parent method. However, it will only be actually registered if that did not happen through the PHPUnit config.

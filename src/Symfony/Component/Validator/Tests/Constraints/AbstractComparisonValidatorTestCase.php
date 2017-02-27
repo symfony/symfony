@@ -128,7 +128,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
         if ($dirtyValue instanceof \DateTime || $dirtyValue instanceof \DateTimeInterface) {
-            IntlTestHelper::requireIntl($this);
+            IntlTestHelper::requireIntl($this, '57.1');
 
             if (PHP_VERSION_ID < 50304 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
                 $this->markTestSkipped('Intl supports formatting DateTime objects since 5.3.4');

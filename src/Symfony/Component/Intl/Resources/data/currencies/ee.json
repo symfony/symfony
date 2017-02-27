@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.7",
+    "Version": "2.1.28.76",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "belarusiaga ruble yeytɔ (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "belarusiaga ruble"
+        ],
         "BYR": [
             "BYR",
-            "belarusiaga ruble"
+            "belarusiaga ruble (2000–2016)"
         ],
         "BZD": [
             "BZD",

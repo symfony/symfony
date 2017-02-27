@@ -1,11 +1,33 @@
 {
     "Names": {
+        "az_Latn": "azerbaiyano (latín)",
+        "az_Latn_AZ": "azerbaiyano (latín, Azerbaiyán)",
+        "bs_Latn": "bosnio (latín)",
+        "bs_Latn_BA": "bosnio (latín, Bosnia-Herzegovina)",
+        "en_UM": "inglés (Islas Ultramarinas de EE.UU.)",
+        "es_IC": "español (Islas Canarias)",
         "eu": "vasco",
         "eu_ES": "vasco (España)",
+        "fr_CI": "francés (Costa de Marfil)",
+        "gu": "gujarati",
+        "gu_IN": "gujarati (India)",
+        "lo": "laosiano",
+        "lo_LA": "laosiano (Laos)",
+        "pt_TL": "portugués (Timor Oriental)",
+        "rm": "retorrománico",
+        "rm_CH": "retorrománico (Suiza)",
+        "sr_Latn": "serbio (latín)",
+        "sr_Latn_BA": "serbio (latín, Bosnia-Herzegovina)",
+        "sr_Latn_ME": "serbio (latín, Montenegro)",
+        "sr_Latn_RS": "serbio (latín, Serbia)",
+        "sr_Latn_XK": "serbio (latín, Kosovo)",
         "sw": "swahili",
         "sw_CD": "swahili (República Democrática del Congo)",
         "sw_KE": "swahili (Kenia)",
         "sw_TZ": "swahili (Tanzania)",
-        "sw_UG": "swahili (Uganda)"
+        "sw_UG": "swahili (Uganda)",
+        "uz_Latn": "uzbeko (latín)",
+        "uz_Latn_UZ": "uzbeko (latín, Uzbekistán)",
+        "yi": "yídish"
     }
 }

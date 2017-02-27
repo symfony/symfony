@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.12",
+    "Version": "2.1.28.79",
     "Names": {
         "ADP": [
             "ADP",
@@ -213,9 +213,13 @@
             "BYB",
             "Đồng Rúp Mới của Belarus (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Rúp Belarus"
+        ],
         "BYR": [
             "BYR",
-            "Rúp Belarus"
+            "Rúp Belarus (2000–2016)"
         ],
         "BZD": [
             "BZD",

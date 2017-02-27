@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.30.6",
     "Names": {
         "AED": [
             "AED",
@@ -193,9 +193,13 @@
             "BWP",
             "Pula Botswana"
         ],
+        "BYN": [
+            "BYN",
+            "Rwbl Belarws"
+        ],
         "BYR": [
             "BYR",
-            "Rwbl Belarws"
+            "Rwbl Belarws (2000–2016)"
         ],
         "BZD": [
             "BZD",

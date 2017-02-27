@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "Arab": "arabă",
         "Armn": "armeană",
@@ -25,6 +25,7 @@
         "Grek": "greacă",
         "Gujr": "gujarati",
         "Guru": "gurmukhi",
+        "Hanb": "hanb",
         "Hang": "hangul",
         "Hani": "han",
         "Hans": "simplificată",
@@ -35,6 +36,7 @@
         "Hung": "maghiară veche",
         "Inds": "indus",
         "Ital": "italică veche",
+        "Jamo": "jamo",
         "Java": "javaneză",
         "Jpan": "japoneză",
         "Kana": "katakana",
@@ -68,6 +70,8 @@
         "Xpeo": "persană veche",
         "Xsux": "cuneiformă sumero-akkadiană",
         "Zinh": "moștenită",
+        "Zmth": "notație matematică",
+        "Zsye": "emoji",
         "Zsym": "simboluri",
         "Zxxx": "nescrisă",
         "Zyyy": "comună",

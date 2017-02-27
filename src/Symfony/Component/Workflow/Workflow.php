@@ -92,7 +92,7 @@ class Workflow
      */
     public function can($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject, $this->getMarking($subject));
+        $transitions = $this->getEnabledTransitions($subject);
 
         foreach ($transitions as $transition) {
             if ($transitionName === $transition->getName()) {
@@ -116,7 +116,7 @@ class Workflow
      */
     public function apply($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject, $this->getMarking($subject));
+        $transitions = $this->getEnabledTransitions($subject);
 
         // We can shortcut the getMarking method in order to boost performance,
         // since the "getEnabledTransitions" method already checks the Marking

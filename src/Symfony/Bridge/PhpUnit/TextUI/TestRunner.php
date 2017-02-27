@@ -27,9 +27,16 @@ class TestRunner extends \PHPUnit_TextUI_TestRunner
      */
     protected function handleConfiguration(array &$arguments)
     {
-        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
-        $arguments['listeners'][] = new SymfonyTestsListener();
+        $listener = new SymfonyTestsListener();
 
-        return parent::handleConfiguration($arguments);
+        $result = parent::handleConfiguration($arguments);
+
+        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
+
+        if (!array_filter($arguments['listeners'], function ($listener) { return $listener instanceof SymfonyTestsListener; })) {
+            $arguments['listeners'][] = $listener;
+        }
+
+        return $result;
     }
 }

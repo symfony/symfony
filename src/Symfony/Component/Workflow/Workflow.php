@@ -61,7 +61,7 @@ class Workflow
                 throw new LogicException(sprintf('The Marking is empty and there is no initial place for workflow "%s".', $this->name));
             }
             $marking->mark($this->definition->getInitialPlace());
-            
+
             // Because the marking could have been initialized, we update the subject
             $this->markingStore->setMarking($subject, $marking);
         }

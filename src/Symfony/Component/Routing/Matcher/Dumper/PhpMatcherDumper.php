@@ -109,6 +109,7 @@ EOF;
         \$context = \$this->context;
         \$request = \$this->request;
         \$requestMethod = \$isLikeGetMethod = \$context->getMethod();
+        \$schema = \$context->getScheme();
 
         if (\$requestMethod === 'HEAD') {
             \$isLikeGetMethod = 'GET';
@@ -336,7 +337,7 @@ EOF;
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
+            if (!isset(\$requiredSchemes[\$schema])) {
                 return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
             }
 

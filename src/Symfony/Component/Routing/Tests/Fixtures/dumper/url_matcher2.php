@@ -27,11 +27,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
-        $requestMethod = $isLikeGetMethod = $context->getMethod();
+        $requestMethod = $canonicalMethod = $context->getMethod();
         $schema = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
-            $isLikeGetMethod = 'GET';
+            $canonicalMethod = 'GET';
         }
 
 
@@ -43,7 +43,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if ('GET' !== $isLikeGetMethod) {
+                if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_bar;
                 }
@@ -54,7 +54,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if ('GET' !== $isLikeGetMethod) {
+                if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_barhead;
                 }
@@ -99,7 +99,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ('POST' !== $isLikeGetMethod) {
+                if ('POST' !== $canonicalMethod) {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
@@ -110,7 +110,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ('PUT' !== $isLikeGetMethod) {
+                if ('PUT' !== $canonicalMethod) {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }

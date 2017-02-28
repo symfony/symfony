@@ -27,11 +27,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
-        $requestMethod = $isLikeGetMethod = $context->getMethod();
+        $requestMethod = $canonicalMethod = $context->getMethod();
         $schema = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
-            $isLikeGetMethod = 'GET';
+            $canonicalMethod = 'GET';
         }
 
 

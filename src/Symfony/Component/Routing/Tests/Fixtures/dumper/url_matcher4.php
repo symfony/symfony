@@ -27,11 +27,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
-        $requestMethod = $isLikeGetMethod = $context->getMethod();
+        $requestMethod = $canonicalMethod = $context->getMethod();
         $schema = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
-            $isLikeGetMethod = 'GET';
+            $canonicalMethod = 'GET';
         }
 
 
@@ -48,7 +48,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // head_and_get
         if ('/head_and_get' === $pathinfo) {
-            if ('GET' !== $isLikeGetMethod) {
+            if ('GET' !== $canonicalMethod) {
                 $allow[] = 'GET';
                 goto not_head_and_get;
             }
@@ -83,7 +83,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                 // put_and_get_and_head
                 if ('/put_and_post' === $pathinfo) {
-                    if (!in_array($isLikeGetMethod, array('PUT', 'GET'))) {
+                    if (!in_array($canonicalMethod, array('PUT', 'GET'))) {
                         $allow = array_merge($allow, array('PUT', 'GET'));
                         goto not_put_and_get_and_head;
                     }

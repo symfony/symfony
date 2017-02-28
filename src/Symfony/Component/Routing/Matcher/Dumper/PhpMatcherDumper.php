@@ -108,11 +108,11 @@ EOF;
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
         \$request = \$this->request;
-        \$requestMethod = \$isLikeGetMethod = \$context->getMethod();
+        \$requestMethod = \$canonicalMethod = \$context->getMethod();
         \$schema = \$context->getScheme();
 
         if ('HEAD' === \$requestMethod) {
-            \$isLikeGetMethod = 'GET';
+            \$canonicalMethod = 'GET';
         }
 
 
@@ -280,7 +280,7 @@ EOF;
 EOF;
                 } else {
                     $code .= <<<EOF
-            if ('$methods[0]' !== \$isLikeGetMethod) {
+            if ('$methods[0]' !== \$canonicalMethod) {
                 \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
@@ -293,7 +293,7 @@ EOF;
 
                 if (in_array('GET', $methods)) {
                     // Since we treat HEAD requests like GET requests we don't need to match it.
-                    $methodVariable = 'isLikeGetMethod';
+                    $methodVariable = 'canonicalMethod';
                     $methods = array_filter($methods, function ($method) { return 'HEAD' !== $method; });
                 }
 

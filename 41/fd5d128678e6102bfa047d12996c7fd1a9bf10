@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T09:22:22Z
+
+Thanks for working on this @Deamon. Tests were broken before this PR, they have been fixed meantime,  could you rebase against master so we could see if builds are green?
+
+Also I suggest to wait that at least one of the opened PRs on this subject is merged before moving the remaining passes of the todo list, the goal has been validated by maintainers but the approach might still be challenged, it would be too bad to rework several PRs in this case.
+
+---------------------------------------------------------------------------
+
+by Deamon at 2017-01-23T13:43:19Z
+
+@chalasr, it's a pleasure :)
+And as you suggested, I'll wait to continue other changes. I understand that the approach still in discussion.
+
+I pushed again but it fails, I might need to update a constraint in a composer.json file somewhere maybe this one : `src/Symfony/Component/DependencyInjection/composer.json` line 33 and maybe a conflict in the same file ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T14:01:51Z
+
+@Deamon It fails because of:
+
+> Fatal error: Trait 'Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait' not found in /home/travis/build/symfony/symfony/src/Symfony/Component/Config/DependencyInjection/ConfigCachePass.php
+
+This trait is part of the DI component since 3.2, so what is needed is to add `"symfony/dependency-injection": "~3.2"` as dev requirement in the Config composer.json, sort as the trait exists even with low deps.
+
+> maybe a conflict in the same file
+
+Since it must be ok to use the DI component along with the Config one without using the compiler pass introduced here, this one should not involve any conflict AFAIK.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-16T18:34:14Z
+
+@Daemon The existing PRs regarding the same ticket have been merged, we are now sure about the right approach: add a constructor to the moved compiler pass (the new one) taking the service id in which collected services are injected as argument defaulting to the service id used in the framework (here `$factoryServiceId = 'config_cache_factory'`) and the collected tag(s) as other arguments defaulting to their name in the framework (here `$resourceCheckerTag = 'config_cache.resource_checker'`), see merged PRs for inspiration.
+
+Would you mind rebasing this and make the change?
+
+---------------------------------------------------------------------------
+
+by Deamon at 2017-02-17T14:24:18Z
+
+@chalasr I'll do that ASAP
+
+---------------------------------------------------------------------------
+
+by Deamon at 2017-02-26T21:27:11Z
+
+@chalasr, PR rebased and updated with a constructor inspired from other PR and your suggestions.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-27T19:57:28Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Deamon at 2017-02-27T23:12:59Z
+
+@chalasr everything has been corrected.
+Travis do not pass for HHVM apparently due to timeout, is there a way to restart the failing test ?

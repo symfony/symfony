@@ -70,7 +70,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
 
         foreach ($this->keys as $key) {
             if (isset($array[$key]) && '' !== $array[$key] && false !== $array[$key] && array() !== $array[$key]) {
-                if (!$compare($array[$key], $result)) {
+                if (!$compare($result, $array[$key], $key)) {
                     throw new TransformationFailedException(
                         'All values in the array should be the same'
                     );

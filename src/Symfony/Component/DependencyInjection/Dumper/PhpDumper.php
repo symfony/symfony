@@ -1105,11 +1105,7 @@ EOF;
     private function addAliases()
     {
         if (!$aliases = $this->container->getAliases()) {
-            if ($this->container->isFrozen()) {
-                return "\n        \$this->aliases = array();\n";
-            } else {
-                return '';
-            }
+            return $this->container->isFrozen() ? "\n        \$this->aliases = array();\n" : '';
         }
 
         $code = "        \$this->aliases = array(\n";
@@ -1674,9 +1670,9 @@ EOF;
             }
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        } else {
-            return $this->export($value);
         }
+
+        return $this->export($value);
     }
 
     /**

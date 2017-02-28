@@ -275,7 +275,7 @@ class XmlFileLoader extends FileLoader
                 if (isset($factoryService[0])) {
                     $class = $this->parseDefinition($factoryService[0], $file);
                 } elseif ($childService = $factory->getAttribute('service')) {
-                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
+                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
                 } else {
                     $class = $factory->hasAttribute('class') ? $factory->getAttribute('class') : null;
                 }
@@ -294,7 +294,7 @@ class XmlFileLoader extends FileLoader
                 if (isset($configuratorService[0])) {
                     $class = $this->parseDefinition($configuratorService[0], $file);
                 } elseif ($childService = $configurator->getAttribute('service')) {
-                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
+                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
                 } else {
                     $class = $configurator->getAttribute('class');
                 }

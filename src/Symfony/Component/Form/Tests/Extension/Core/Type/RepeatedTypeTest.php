@@ -220,7 +220,7 @@ class RepeatedTypeTest extends BaseTypeTest
             'compare' => $callable,
         ));
 
-        $this->assertEquals($callable, $form->getConfig()->getOption('compare'));
+        $this->assertSame($callable, $form->getConfig()->getOption('compare'));
     }
 
     public function compare($value1, $value2)
@@ -238,10 +238,10 @@ class RepeatedTypeTest extends BaseTypeTest
 
         $form->submit($input);
 
-        $this->assertEquals('foo', $form['first']->getViewData());
-        $this->assertEquals('foo', $form['second']->getViewData());
+        $this->assertSame('foo', $form['first']->getViewData());
+        $this->assertSame('foo', $form['second']->getViewData());
         $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($input, $form->getViewData());
-        $this->assertEquals('foo', $form->getData());
+        $this->assertSame($input, $form->getViewData());
+        $this->assertSame('foo', $form->getData());
     }
 }

@@ -26,7 +26,7 @@
     "require-dev": {
         "doctrine/collections": "~1.0",
         "symfony/validator": "^2.8.18|^3.2.5",
-        "symfony/dependency-injection": "~3.2",
+        "symfony/dependency-injection": "~3.3",
         "symfony/config": "~2.7|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
@@ -36,7 +36,7 @@
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
-        "symfony/dependency-injection": "<3.2",
+        "symfony/dependency-injection": "<3.3",
         "symfony/doctrine-bridge": "<2.7",
         "symfony/framework-bundle": "<2.7",
         "symfony/twig-bridge": "<2.7",

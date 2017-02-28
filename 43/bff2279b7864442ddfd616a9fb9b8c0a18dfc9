@@ -1,0 +1,319 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-05T19:11:53Z
+
+I see two issues here:
+- the first, minor, is that the vendor dir is not always called "vendors"
+- the second is more serious: any code in vendors is always called by some code in userland. Code don't get called magically - but because userland asked for it - thus there is not such thing as "vendor deprecations" vs others. Or do you have a way to decide that works reliably?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-05T19:28:30Z
+
+1. Yes that's an issue (see my todo list), maybe I can work around that with another env var?
+2. Not an issue IMO, I'm only looking at the first file of the stack trace, which is the one where `trigger_error` is written. Quoting the [manual](http://php.net/manual/en/function.set-error-handler.php) : "The third parameter is optional, errfile, which contains the filename that the error was raised in, as a string. " So to sum up, a deprecation is a "vendor deprecations" iff the `trigger_error` that raises it is written in a file that lives in `vendor`
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-05T19:43:36Z
+
+Third issue, even more minor, some people might have a `vendor` directory inside their `src` (why not). Might be solvable with `__DIR__` though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-05T20:28:30Z
+
+> I'm only looking at the first file of the stack trace
+
+That means you target deprecations triggered by code in src/. Ok.
+
+For vendors, see my PR about ComposerResource.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-05T20:32:51Z
+
+> I'm only looking at the first file of the stack trace
+
+Actually that was wrong and has nothing to do with the stack trace, I'm looking at the `$errfile` argument of the error handler function. So if I have a file in `src`, that calls a function from the `vendor` dir, that has a `trigger_error` in it, `$errfile` will be `vendor/callee.php`, and not `src/caller.php`, right?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-05T20:34:12Z
+
+> For vendors, see my PR about ComposerResource.
+
+[link for the lazy](https://github.com/symfony/symfony/pull/21505)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-05T20:42:06Z
+
+[link for the laziest](https://github.com/nicolas-grekas/symfony/blob/e930f4064460bcfa4b1c19fc37881354dac920a2/src/Symfony/Component/Config/Resource/ComposerResource.php#L85-L93) 😄
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-05T20:51:16Z
+
+Maybe I should explain a bit more the goal of this PR, I feel I'm being unclear.
+
+This is going to used way more in libs than in project, that seldom use deprecation notices themselves. @nicolas-grekas I think that's why you talk about userland vs vendors.
+
+Let there be lib X, that has n dependencies. Anytime any of the n dependencies introduces a new deprecation, I have to fix it, and *no PR can be merged during that time*, unless I use `SYMFONY_DEPRECATIONS_HELPER=weak`.
+
+And that's what I do most of the time, because I don't want to shift the burden of fixing these to anyone who wants to contribute anything unrelated to the vendor lib, and has the bad luck of doing so at the wrong time.
+
+Now let's suppose a contributor submits a new PR, and let's suppose that that PR introduces a deprecation notice in *the codebase of the lib* , and by that I don't mean a deprecated call to another lib, I mean a call to `trigger_error` directly. Then they must be careful to mark all corresponding tests with `@group legacy`, and fix all calls throughout the codebase of the lib so that they use the new way of doing things.
+
+In my experience, many people forget to do that, and deprecations are introduced, that could easily be avoided. See [this PR](https://github.com/sonata-project/SonataAdminBundle/pull/4310/files) where I end up doing the work that should have been done by the contributor from the start.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-06T16:46:41Z
+
+Doc PR would be really nice before merging since the use case should be explained there :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-06T16:53:58Z
+
+@greg0ire the issue is that your logic looks wrong. Vendor deprecations must not be distinguished based on the location of the deprecation, but based on the caller location.
+You will almost never call your own deprecated code, as you are also the one deprecating it. However, you are very likely to be calling a deprecated method of one of your dependency. In this case, ``trigger_error`` is inside the vendor folder, but the place needing to be fixed is inside your own code.
+And using the backtrace to identify whether it is called from your own code or no is fragile, because your code may not be the direct caller. We have cases in Symfony where we have more classes between your own code and the code triggering the deprecation for instance, while the fix is still needed in your own code, for instance when asking to migrate from a type name to a class name to reference form types in Symfony 2.8
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-06T16:57:18Z
+
+> You will almost never call your own deprecated code, as you are also the one deprecating it
+
+That's precisely the case I'm trying to help fix however. [There are contributors that contribute new deprecations, and forget to fix these calls. Then it get merged, but could have easily be prevented. Also, there are tests that are marked with `@group Legacy` (note the capital), which does not work either. That could also have been prevented easily. Or they just outright forget to mark tests with `@group legacy` That's what I want to catch here.](https://github.com/sonata-project/SonataAdminBundle/pull/4310/files)
+
+> And using the backtrace to identify whether it is called from your own code or no is fragile
+
+I'm not doing that (I think). I'm not indentify the caller location, I'm identifying the callee location. When developing a lib, the lib is always calling others or itself, but no other lib is calling my lib. So in that case, I think it's safe to want to know "is there any call to a deprecated method **of my lib** in the codebase **of my lib**?"
+
+| horizontally: caller / vertically: callee | my lib                                                                                                               | my dependency                                                                                                                                    |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| my lib                                    | This is the case I want to catch. It can only be introduced in new contributions that come with a deprecation notice | Cannot happen in the context of testing a library. If it happens, it means the dependency knows the lib, and that we have a circular dependency. |
+| my dependency                             | This is the case I don't want to catch, because it would make the build fail randomly                                | Can't happen either in the context of testing lib.                                                                                               |                                                                                 |   |   |
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-06T23:21:38Z
+
+> Doc PR would be really nice before merging since the use case should be explained there :)
+
+Didn't notice your comment. Will do!
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-07T22:26:13Z
+
+[Here is the docs PR](https://github.com/symfony/symfony-docs/pull/7453)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-07T22:33:17Z
+
+Thanks, just posted a few short notes
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-08T22:42:26Z
+
+I changed the code so that other modes output is no longer split into vendors / non-vendors.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-08T22:49:54Z
+
+I fixed the colorization issue, deprecation notices are always in yellow now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-12T19:22:38Z
+
+fabbot reports errors that should be fixed.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-12T19:54:41Z
+
+@fab{b,p}ot  : fixed
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-12T20:16:48Z
+
+@ogizanagi : should I do something similar to [this](https://github.com/symfony/symfony/pull/21505/files#diff-a10c9afd8feaccd1ff66ffd54e2835bcR1500)? Also, not sure what `ComposerResource::getVendors()` returns… does it return one entry per library? Or can there be several `vendor` dirs (named differently of course)? Also, I don't understand what the `strpbrk(substr($path, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)` part is about.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-12T21:09:13Z
+
+> not sure what ComposerResource::getVendors() returns… does it return one entry per library? Or can there be several vendor dirs (named differently of course)?
+
+Yes, one entry per vendor directory, as you can have multiple vendor dirs. For instance the global composer install one + the project one. Personally, I'm always in this situation because I use `auto_prepend_file=${HOME}/.composer/vendor/autoload.php` in my php.ini file.
+
+> I don't understand what the strpbrk(substr($path, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR) part is about.
+
+I think it's about checking the given path is **in** the vendor dir, and not just the dir itself. `strpbrk` is probably used rather than `in_array` or anything else for some performances reasons. But actually, I'm not 100% sure of the intents. @nicolas-grekas would answer you far better than me 😄
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-12T22:12:36Z
+
+Pushed a new version with a more robust vendor dir detection, and customisable vendor dirs.
+Can someone explain to me how to run the tests for this particular class? I've found `./src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/*.phpt` but can't figure out how these are used.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-14T19:50:02Z
+
+How can I tell fabbot not to try to fix purposefully broken code? It wants to do this :
+
+```diff
+diff -ru src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_non_vendor.phpt src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_non_vendor.phpt
+--- src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_non_vendor.phpt	2017-02-14 19:47:58.381296941 +0000
++++ src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_non_vendor.phpt	2017-02-14 19:47:58.985277835 +0000
+@@ -31,14 +31,14 @@
+     public function testLegacyFoo()
+     {
+         @trigger_error('silenced foo deprecation', E_USER_DEPRECATED);
+-        trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+-        trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
++        @trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
++        @trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+     }
+
+     public function testNonLegacyBar()
+     {
+         @trigger_error('silenced bar deprecation', E_USER_DEPRECATED);
+-        trigger_error('unsilenced bar deprecation', E_USER_DEPRECATED);
++        @trigger_error('unsilenced bar deprecation', E_USER_DEPRECATED);
+     }
+ }
+
+diff -ru src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_vendor.phpt src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_vendor.phpt
+--- src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_vendor.phpt	2017-02-14 19:47:58.525292385 +0000
++++ src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_vendor.phpt	2017-02-14 19:47:59.193271256 +0000
+@@ -24,13 +24,13 @@
+     public function testLegacyFoo()
+     {
+         @trigger_error('silenced foo deprecation', E_USER_DEPRECATED);
+-        trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
++        @trigger_error('unsilenced foo deprecation', E_USER_DEPRECATED);
+     }
+
+     public function testNonLegacyBar()
+     {
+         @trigger_error('silenced bar deprecation', E_USER_DEPRECATED);
+-        trigger_error('unsilenced bar deprecation', E_USER_DEPRECATED);
++        @trigger_error('unsilenced bar deprecation', E_USER_DEPRECATED);
+     }
+ }
+```
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-14T22:13:49Z
+
+> How can I tell fabbot not to try to fix purposefully broken code?
+
+I can see that there are no required checks, so I guess you can just ignore it when merging?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-14T22:20:15Z
+
+Pushed a new, less intrusive test based on @stof . Now I just need to figure out why the low deps build fails with :
+
+> THE ERROR HANDLER HAS CHANGED!
+
+🤔
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-14T22:47:29Z
+
+I don't reproduce the failing build with
+
+```
+cd  src/Symfony/Bridge/PhpUnit
+composer update --prefer-lowest
+phpunit src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak_vendors_on_vendor.phpt
+```
+
+Why not? I'm stuck… can anyone help? What is this message supposed to mean? That there's a bug in the error handler? I noticed this build does `phpenv 5.3`, but I can't find anything in the code that is not 5.3 compliant.
+
+EDIT : I finally reproduced that locally on a travis docker image.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-15T21:49:40Z
+
+Ok so I got more details with `error_get_last()`
+
+```
++array(4) {
++  ["type"]=>
++  int(1)
++  ["message"]=>
++  string(50) "Cannot access self:: when no class scope is active"
++  ["file"]=>
++  string(85) "/home/travis/builds/me/symfony/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler.php"
++  ["line"]=>
++  int(92)
++}
+```
+
+Should I make a PR to add it inside this if? It could have saved me hours :P
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-15T22:05:11Z
+
+This is ready for review @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-17T19:12:17Z
+
+I pushed a new version with `inVendors` as a closure, so that it is not exposed publicly.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-18T11:01:57Z
+
+@nicolas-grekas rebase done, fixable fabbot.io errors fixed, and code snippet copied.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-18T11:07:20Z
+
+The low deps build is unhappy. There must be something non php 5.3 compliant in there… It's a good occasion to improve the error message, using `error_get_last()`
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-18T11:22:04Z
+
+@nicolas-grekas I got rid from more references to `self` that can't work with php 5.3, using the same trick as in the other closure. There's also a new commit that `var_dump`s `error_get_last()` in case of deprecation error failure. You can see how it looks like here : https://travis-ci.org/symfony/symfony/jobs/202907646#L4552 Should I keep this commit? Improve it (with maybe `$colorize` and `var_export`)? Move it to a separate PR? There are no new fabbot.io deprecations.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-21T14:47:53Z
+
+I rebased again, can anyone review and remove the "Needs work" label? This is supposed to be finished.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-21T17:15:35Z
+
+Changed the poor man's error handler from `var_dump` to `print_r` after discussing with @Nek-
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-27T17:11:54Z
+
+This is supposed to be ready on my end, please review again.

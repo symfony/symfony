@@ -11,15 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest as BaseControllerResolverTest;
+use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
-class ControllerResolverTest extends BaseControllerResolverTest
+class ControllerResolverTest extends ContainerControllerResolverTest
 {
     public function testGetControllerOnContainerAware()
     {
@@ -55,7 +56,7 @@ class ControllerResolverTest extends BaseControllerResolverTest
             ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction'))
         ;
 
-        $resolver = $this->createControllerResolver(null, $parser);
+        $resolver = $this->createControllerResolver(null, null, $parser);
         $request = Request::create('/');
         $request->attributes->set('_controller', $shortName);
 
@@ -66,110 +67,7 @@ class ControllerResolverTest extends BaseControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
-    public function testGetControllerService()
-    {
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->will($this->returnValue($this))
-        ;
-
-        $resolver = $this->createControllerResolver(null, null, $container);
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'foo:controllerMethod1');
-
-        $controller = $resolver->getController($request);
-
-        $this->assertInstanceOf(get_class($this), $controller[0]);
-        $this->assertSame('controllerMethod1', $controller[1]);
-    }
-
-    public function testGetControllerInvokableService()
-    {
-        $invokableController = new InvokableController('bar');
-
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('has')
-            ->with('foo')
-            ->will($this->returnValue(true))
-        ;
-        $container->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->will($this->returnValue($invokableController))
-        ;
-
-        $resolver = $this->createControllerResolver(null, null, $container);
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'foo');
-
-        $controller = $resolver->getController($request);
-
-        $this->assertEquals($invokableController, $controller);
-    }
-
-    public function testGetControllerInvokableServiceWithClassNameAsName()
-    {
-        $invokableController = new InvokableController('bar');
-        $className = __NAMESPACE__.'\InvokableController';
-
-        $container = $this->createMockContainer();
-        $container->expects($this->once())
-            ->method('has')
-            ->with($className)
-            ->will($this->returnValue(true))
-        ;
-        $container->expects($this->once())
-            ->method('get')
-            ->with($className)
-            ->will($this->returnValue($invokableController))
-        ;
-
-        $resolver = $this->createControllerResolver(null, null, $container);
-        $request = Request::create('/');
-        $request->attributes->set('_controller', $className);
-
-        $controller = $resolver->getController($request);
-
-        $this->assertEquals($invokableController, $controller);
-    }
-
-    /**
-     * @dataProvider getUndefinedControllers
-     */
-    public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
-    {
-        // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected excetion and not use the regex
-        $resolver = $this->createControllerResolver();
-        if (method_exists($this, 'expectException')) {
-            $this->expectException($exceptionName);
-            $this->expectExceptionMessageRegExp($exceptionMessage);
-        } else {
-            $this->setExpectedExceptionRegExp($exceptionName, $exceptionMessage);
-        }
-
-        $request = Request::create('/');
-        $request->attributes->set('_controller', $controller);
-        $resolver->getController($request);
-    }
-
-    public function getUndefinedControllers()
-    {
-        return array(
-            array('foo', '\LogicException', '/Unable to parse the controller name "foo"\./'),
-            array('oof::bar', '\InvalidArgumentException', '/Class "oof" does not exist\./'),
-            array('stdClass', '\LogicException', '/Unable to parse the controller name "stdClass"\./'),
-            array(
-                'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',
-                '\InvalidArgumentException',
-                '/.?[cC]ontroller(.*?) for URI "\/" is not callable\.( Expected method(.*) Available methods)?/',
-            ),
-        );
-    }
-
-    protected function createControllerResolver(LoggerInterface $logger = null, ControllerNameParser $parser = null, ContainerInterface $container = null)
+    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null)
     {
         if (!$parser) {
             $parser = $this->createMockParser();
@@ -208,17 +106,6 @@ class ContainerAwareController implements ContainerAwareInterface
     }
 
     public function testAction()
-    {
-    }
-
-    public function __invoke()
-    {
-    }
-}
-
-class InvokableController
-{
-    public function __construct($bar) // mandatory argument to prevent automatic instantiation
     {
     }
 

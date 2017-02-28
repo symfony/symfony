@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.7",
+    "Version": "2.1.29.44",
     "Names": {
         "Afak": "Defaka",
         "Arab": "Arabysk",
@@ -55,6 +55,7 @@
         "Hung": "Aldhongaars",
         "Inds": "Indus",
         "Ital": "Ald-italysk",
+        "Jamo": "Jamo",
         "Java": "Javaansk",
         "Jpan": "Japans",
         "Jurc": "Jurchen",

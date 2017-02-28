@@ -24,7 +24,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         parent::setUp();
 
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, '57.1');
 
         \Locale::setDefault('de_AT');
 

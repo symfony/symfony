@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "AED": [
             "AED",
@@ -43,7 +43,7 @@
         ],
         "BAM": [
             "BAM",
-            "Convertible Mark ya Bosnia na Hezegovina"
+            "Mark Inayoweza Kubadilishwa ya Bosnia na Hezegovina"
         ],
         "BBD": [
             "BBD",
@@ -93,9 +93,13 @@
             "BWP",
             "Pula ya Botswana"
         ],
+        "BYN": [
+            "BYN",
+            "Ruble ya Belarusi"
+        ],
         "BYR": [
             "BYR",
-            "Ruble ya Belarusi"
+            "Ruble ya Belarusi (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -251,7 +255,7 @@
         ],
         "ILS": [
             "₪",
-            "Sheqel Mpya ya Israeli"
+            "Shekeli Mpya ya Israel"
         ],
         "INR": [
             "₹",
@@ -619,7 +623,7 @@
         ],
         "XAF": [
             "FCFA",
-            "CFA faranga ya BEAC"
+            "Faranga ya Afrika ya Kati CFA"
         ],
         "XCD": [
             "EC$",
@@ -627,7 +631,7 @@
         ],
         "XOF": [
             "CFA",
-            "CFA faranga za BCEAO"
+            "Faranga ya Afrika Magharibi CFA"
         ],
         "XPF": [
             "CFPF",

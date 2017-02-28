@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Albania Kaukasia",
@@ -41,8 +41,9 @@
         "Goth": "Gothic",
         "Gran": "Grantha",
         "Grek": "Yunani",
-        "Gujr": "Gujarati",
+        "Gujr": "Gujarat",
         "Guru": "Gurmukhi",
+        "Hanb": "Hanb",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hano": "Hanunoo",
@@ -56,6 +57,7 @@
         "Hung": "Hungaria Kuno",
         "Inds": "Indus",
         "Ital": "Italia Lama",
+        "Jamo": "Jamo",
         "Java": "Jawa",
         "Jpan": "Jepang",
         "Jurc": "Jurchen",
@@ -158,6 +160,7 @@
         "Yiii": "Yi",
         "Zinh": "Warisan",
         "Zmth": "Notasi Matematika",
+        "Zsye": "Emoji",
         "Zsym": "Simbol",
         "Zxxx": "Tidak Tertulis",
         "Zyyy": "Umum",

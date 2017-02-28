@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.29.88",
     "Names": {
         "AC": "Ascension-saari",
         "AD": "Andorra",
@@ -209,7 +209,7 @@
         "SM": "San Marino",
         "SN": "Senegal",
         "SO": "Somalia",
-        "SR": "Surinam",
+        "SR": "Suriname",
         "SS": "Etelä-Sudan",
         "ST": "São Tomé ja Príncipe",
         "SV": "El Salvador",
@@ -236,6 +236,7 @@
         "UA": "Ukraina",
         "UG": "Uganda",
         "UM": "Yhdysvaltain erillissaaret",
+        "UN": "Yhdistyneet kansakunnat",
         "US": "Yhdysvallat",
         "UY": "Uruguay",
         "UZ": "Uzbekistan",

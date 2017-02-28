@@ -26,7 +26,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class XliffLintCommand extends Command
 {
-    private $parser;
     private $format;
     private $displayCorrectFiles;
     private $directoryIteratorProvider;
@@ -212,15 +211,6 @@ EOF
         }
 
         return $inputs;
-    }
-
-    private function getParser()
-    {
-        if (!$this->parser) {
-            $this->parser = new Parser();
-        }
-
-        return $this->parser;
     }
 
     private function getDirectoryIterator($directory)

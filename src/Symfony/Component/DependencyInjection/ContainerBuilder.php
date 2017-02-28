@@ -118,6 +118,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $vendors;
 
     /**
+     * @var \ReflectionClass[] a list of class reflectors
+     */
+    private $classReflectors;
+
+    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want

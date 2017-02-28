@@ -70,7 +70,7 @@ abstract class Helper implements HelperInterface
     public static function substr($string, $from, $length = null)
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            return substr($string);
+            return substr($string, $from, $length);
         }
 
         return mb_substr($string, $from, $length, $encoding);

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-02-27T16:39:15Z
+
+@hhamon I get it, yoda-ing it now :P
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-02-27T16:48:37Z
+
+@hhamon I've corrected the non-yoda to yoda statement, I've also corrected the ones which I didn't change into yoda statements.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-02-27T16:59:25Z
+
+@stof I've corrected the case where only one method is present after filtering out the HEAD method.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-02-27T18:32:43Z
+
+Perhaps it would be good to rename `isGetLikeMethod` to `methodWhereHeadMatchesGet`? Might be a bit verbose, but in this case I think being explicit is preferable. WDYT @stof?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-02-27T18:33:20Z
+
+I've also added another test fixture which more clearly demonstrates the effect of the method optimisation.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-02-28T11:43:00Z
+
+Tests currently seem to be failing because master is broken.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-28T17:29:29Z
+
+👍

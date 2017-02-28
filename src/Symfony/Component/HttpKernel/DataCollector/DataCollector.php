@@ -102,7 +102,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     protected function varToString($var)
     {
-        @trigger_error(sprintf('The %() method is deprecated since version 3.2 and will be removed in 4.0. Use cloneVar() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use cloneVar() instead.', __METHOD__), E_USER_DEPRECATED);
 
         if (null === $this->valueExporter) {
             $this->valueExporter = new ValueExporter();

@@ -38,7 +38,7 @@ class ApcuAdapter extends AbstractAdapter
             CacheItem::validateKey($version);
 
             if (!apcu_exists($version.'@'.$namespace)) {
-                $this->clear($namespace);
+                $this->doClear($namespace);
                 apcu_add($version.'@'.$namespace, null);
             }
         }

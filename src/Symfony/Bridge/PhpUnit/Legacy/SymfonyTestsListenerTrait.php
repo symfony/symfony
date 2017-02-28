@@ -38,6 +38,7 @@ class SymfonyTestsListenerTrait
     private $gatheredDeprecations = array();
     private $previousErrorHandler;
     private $testsWithWarnings;
+    private $reportUselessTests;
 
     /**
      * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive or dns-sensitive)
@@ -172,6 +173,10 @@ class SymfonyTestsListenerTrait
     public function startTest($test)
     {
         if (-2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+            if (null !== $test->getTestResultObject()) {
+                $this->reportUselessTests = $test->getTestResultObject()->isStrictAboutTestsThatDoNotTestAnything();
+            }
+
             if (class_exists('PHPUnit_Util_Blacklist', false)) {
                 $Test = 'PHPUnit_Util_Test';
                 $AssertionFailedError = 'PHPUnit_Framework_AssertionFailedError';
@@ -197,7 +202,10 @@ class SymfonyTestsListenerTrait
             if (isset($annotations['method']['expectedDeprecation'])) {
                 if (!in_array('legacy', $groups, true)) {
                     $test->getTestResultObject()->addError($test, new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.'), 0);
+                } else {
+                    $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
                 }
+
                 $this->expectedDeprecations = $annotations['method']['expectedDeprecation'];
                 $this->previousErrorHandler = set_error_handler(array($this, 'handleError'));
             }
@@ -225,6 +233,11 @@ class SymfonyTestsListenerTrait
         $className = get_class($test);
         $classGroups = $Test::getGroups($className);
         $groups = $Test::getGroups($className, $test->getName(false));
+
+        if (null !== $this->reportUselessTests) {
+            $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything($this->reportUselessTests);
+            $this->reportUselessTests = null;
+        }
 
         if ($this->expectedDeprecations) {
             restore_error_handler();

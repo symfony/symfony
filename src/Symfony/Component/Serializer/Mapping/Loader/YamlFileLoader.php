@@ -79,12 +79,12 @@ class YamlFileLoader extends FileLoader
 
                 if (isset($data['groups'])) {
                     if (!is_array($data['groups'])) {
-                        throw new MappingException('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                        throw new MappingException(sprintf('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     foreach ($data['groups'] as $group) {
                         if (!is_string($group)) {
-                            throw new MappingException('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException(sprintf('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                         }
 
                         $attributeMetadata->addGroup($group);

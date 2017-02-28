@@ -1438,6 +1438,11 @@ class RequestTest extends TestCase
         $request = new Request();
         $this->assertEquals('html', $request->getRequestFormat());
 
+        // Ensure that setting different default values over time is possible,
+        // aka. setRequestFormat determines the state.
+        $this->assertEquals('json', $request->getRequestFormat('json'));
+        $this->assertEquals('html', $request->getRequestFormat('html'));
+
         $request = new Request();
         $this->assertNull($request->getRequestFormat(null));
 

@@ -287,4 +287,13 @@ class XmlFileLoaderTest extends TestCase
             $route->getDefault('map')
         );
     }
+
+    public function testLoadWithCombinedConditions()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('combine_conditions.xml');
+
+        $this->assertSame('request.attributes.get("version") >= 1.0', $routeCollection->get('without_condition')->getCondition());
+        $this->assertSame('(context.getMethod() == "GET") and (request.attributes.get("version") >= 1.0)', $routeCollection->get('with_condition')->getCondition());
+    }
 }

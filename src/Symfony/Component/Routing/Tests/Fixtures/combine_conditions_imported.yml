@@ -1,0 +1,6 @@
+with_condition:
+    path: /with_condition
+    condition: 'context.getMethod() == "GET"'
+
+without_condition:
+    path: /without_condition

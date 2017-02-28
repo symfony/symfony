@@ -550,6 +550,26 @@ class Route implements \Serializable
     }
 
     /**
+     * Adds a condition.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $condition The condition to add
+     *
+     * @return $this
+     */
+    public function addCondition($condition)
+    {
+        if ($this->condition) {
+            $condition = sprintf('(%s) and (%s)', $this->condition, $condition);
+        }
+
+        $this->setCondition($condition);
+
+        return $this;
+    }
+
+    /**
      * Compiles the route.
      *
      * @return CompiledRoute A CompiledRoute instance

@@ -132,6 +132,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
     {
+        if (null !== $annot->getCombineConditions()) {
+            throw new \InvalidArgumentException(sprintf('Unexpected "combineConditions" attribute on "%s::%s()" method Route annotation. This attribute can only be set on a class Route annotation.', $method->getDeclaringClass()->getName(), $method->getName()));
+        }
+
         $name = $annot->getName();
         if (null === $name) {
             $name = $this->getDefaultRouteName($class, $method);
@@ -154,11 +158,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $condition = $annot->getCondition();
-        if (null === $condition) {
-            $condition = $globals['condition'];
-        }
 
         $route = $this->createRoute($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+
+        if (null === $condition || $globals['combine_conditions']) {
+            $route->addCondition($globals['condition']);
+        }
 
         $this->configureRoute($route, $class, $method, $annot);
 
@@ -217,6 +222,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'methods' => array(),
             'host' => '',
             'condition' => '',
+            'combine_conditions' => false,
         );
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
@@ -251,6 +257,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
             if (null !== $annot->getCondition()) {
                 $globals['condition'] = $annot->getCondition();
             }
+
+            $globals['combine_conditions'] = null !== $annot->getCombineConditions() ? $annot->getCombineConditions() : false;
         }
 
         return $globals;

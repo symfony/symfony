@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-16T13:20:46Z
+
+This PR fixes a bug in Symfony 3.3 that prevents autowiring compiler passes to autowire the service container in a service. The bug mostly occurs when you use `setter` methods autowiring when defining regular Symfony controller classes as services.
+
+```yaml
+services:
+
+    AppBundle\Controller\:
+        resource: '../../src/AppBundle/Controller'
+        autowire: ['get*', 'set*']
+```
+
+If the controller class still extends the base Symfony controller class (or implements the `ContainerAwareInterface`), the service container will be injected through the `setContainer` autowired method.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-16T14:11:14Z
+
+Looks like fabbot.io violations is a false positive due to a fixtures file,
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-17T22:24:48Z
+
+@nicolas-grekas can you review please.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-18T08:21:11Z
+
+Just wondering: should we also add these three aliases to the defaults also?
+```xml
+        <service id="Psr\Container\ContainerInterface" alias="service_container" public="false" />
+        <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false" />
+        <service id="Symfony\Component\DependencyInjection\Container" alias="service_container" public="false" />
+```
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-18T10:07:55Z
+
+What do you mean?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-18T10:09:17Z
+
+I mean add three calls after the new one, to
+`setAlias(ContainerInterface::class/etc, new Alias('service_container', false))`
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-19T16:35:56Z
+
+I'm on it.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-19T17:42:57Z
+
+@nicolas-grekas better?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-19T17:52:34Z
+
+yes! you can also clean `web.xml` in FrameworkBundle and that will be good to me.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-19T17:57:44Z
+
+Shall we use autowire in `web.xml`? I can see only one reference to the service container that is injected into the `ControllerResolver` object.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-19T18:09:43Z
+
+I think you're talking about the `services.xml` file in FrameworkBundle to cleanup.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-19T20:10:37Z
+
+@nicolas-grekas done ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-19T23:25:11Z
+
+Missing test case fix:
+https://travis-ci.org/symfony/symfony/jobs/203205123#L3297
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-22T09:35:41Z
+
+Review from Symfony Core Team member is welcome.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-22T11:27:45Z
+
+:+1: for the added aliases too

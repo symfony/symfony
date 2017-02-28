@@ -1029,11 +1029,7 @@ EOF;
     private function addAliases()
     {
         if (!$aliases = $this->container->getAliases()) {
-            if ($this->container->isFrozen()) {
-                return "\n        \$this->aliases = array();\n";
-            } else {
-                return '';
-            }
+            return $this->container->isFrozen() ? "\n        \$this->aliases = array();\n" : '';
         }
 
         $code = "        \$this->aliases = array(\n";
@@ -1402,9 +1398,9 @@ EOF;
                     $service = $this->dumpValue($value->getFactoryService(false));
 
                     return sprintf('%s->%s(%s)', 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService(false)), $value->getFactoryMethod(false), implode(', ', $arguments));
-                } else {
-                    throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }
+
+                throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
             }
 
             $class = $value->getClass();
@@ -1442,9 +1438,9 @@ EOF;
             }
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        } else {
-            return $this->export($value);
         }
+
+        return $this->export($value);
     }
 
     /**
@@ -1513,13 +1509,13 @@ EOF;
 
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
-        } else {
-            if ($this->container->hasAlias($id)) {
-                $id = (string) $this->container->getAlias($id);
-            }
-
-            return sprintf('$this->get(\'%s\')', $id);
         }
+
+        if ($this->container->hasAlias($id)) {
+            $id = (string) $this->container->getAlias($id);
+        }
+
+        return sprintf('$this->get(\'%s\')', $id);
     }
 
     /**

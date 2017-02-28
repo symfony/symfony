@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-28T12:56:45Z
+
+I'm not fan of the Psr11 prefix. What about ServiceLocatorControllerResolver? ContainerControllerResolver? ServiceControllerResolver?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-28T12:59:13Z
+
+Why not. What is your own preference? What do others think?
+
+I like `ServiceControllerResolver`.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-28T13:00:55Z
+
+I prefer ContainerControllerResolver actually. ``Service`` alone looks a bit weird to me
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-28T16:44:18Z
+
+Renamed to `ContainerControllerResolver`. That's the psr title after all :)

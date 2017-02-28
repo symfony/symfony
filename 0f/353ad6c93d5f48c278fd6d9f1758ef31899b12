@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-02-24T22:37:10Z
+
+FYI, you can get a cleaner diff on Github by appending the `w=1` query param to the url to ignore whitespaces: https://github.com/symfony/symfony/pull/21754/files?w=1 😉
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-25T10:40:53Z
+
+does this apply on a lower supported branch? (2.7, 2.8 or 3.2?) that'd help reduce future merge conflicts.
+
+---------------------------------------------------------------------------
+
+by gadelat at 2017-02-25T12:11:27Z
+
+@nicolas-grekas Sure. I haven't done it because I thought we are supposed to submit only bugfixes against lower versions. Want me to submit new PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-25T13:11:40Z
+
+no need to create a new PR, you can rebase your branch and change the base branch of the PR (see "Edit" button near title)
+
+---------------------------------------------------------------------------
+
+by gadelat at 2017-02-25T13:48:25Z
+
+Rebased onto 3.2. Older are conflicting.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-27T15:32:37Z
+
+I looked at it, that applies to 2.7 - of course it conflicts - but that is easily resolved :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-27T15:35:41Z
+
+and we should indeed apply it on 2.7. It is better to have a conflict once (to propagate the reduced nesting to all branches) than to have it for all future bug fixes in this code.
+
+---------------------------------------------------------------------------
+
+by gadelat at 2017-02-27T21:45:32Z
+
+rebased onto 2.7

@@ -11,15 +11,19 @@
 
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
-use Symfony\Component\HttpKernel\EventListener\TestSessionListener as BaseTestSessionListener;
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\HttpKernel\EventListener\TestSessionListener instead.', TestSessionListener::class), E_USER_DEPRECATED);
+
+use Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * TestSessionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0.
  */
-class TestSessionListener extends BaseTestSessionListener
+class TestSessionListener extends AbstractTestSessionListener
 {
     protected $container;
 

@@ -39,7 +39,7 @@ class TestSessionListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\TestSessionListener');
+        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
         $this->session = $this->getSession();
     }
 

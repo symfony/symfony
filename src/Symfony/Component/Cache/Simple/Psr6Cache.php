@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheException as Psr6CacheException;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\CacheException as SimpleCacheException;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
@@ -30,7 +31,7 @@ class Psr6Cache implements CacheInterface
     {
         $this->pool = $pool;
 
-        if ($pool instanceof Adapter\AdapterInterface) {
+        if ($pool instanceof AbstractAdapter) {
             $this->createCacheItem = \Closure::bind(
                 function ($key, $value, $allowInt = false) {
                     if ($allowInt && is_int($key)) {
@@ -38,14 +39,12 @@ class Psr6Cache implements CacheInterface
                     } else {
                         CacheItem::validateKey($key);
                     }
-                    $item = new CacheItem();
-                    $item->key = $key;
-                    $item->value = $value;
+                    $f = $this->createCacheItem;
 
-                    return $item;
+                    return $f($key, $value, false);
                 },
-                null,
-                CacheItem::class
+                $pool,
+                AbstractAdapter::class
             );
         }
     }

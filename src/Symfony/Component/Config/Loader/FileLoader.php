@@ -144,7 +144,7 @@ abstract class FileLoader extends Loader
         }
 
         if (!class_exists(Finder::class)) {
-            throw new LogicException(sprintf('Extended glob pattern "%s" cannot be used as the Finder component is not installed.', $resource));
+            throw new \LogicException(sprintf('Extended glob pattern "%s" cannot be used as the Finder component is not installed.', $resource));
         }
 
         $finder = new Finder();

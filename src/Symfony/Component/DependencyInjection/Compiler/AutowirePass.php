@@ -113,7 +113,7 @@ class AutowirePass extends AbstractRecursivePass
         if ($constructor = $reflectionClass->getConstructor()) {
             array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
         } elseif ($value->getArguments()) {
-            throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name, $method));
+            throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name));
         }
 
         $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);

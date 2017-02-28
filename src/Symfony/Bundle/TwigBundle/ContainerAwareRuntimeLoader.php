@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
-@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use the Twig_ContainerRuntimeLoader class instead.'), ContainerAwareRuntimeLoader::class);
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use the Twig_ContainerRuntimeLoader class instead.', ContainerAwareRuntimeLoader::class), E_USER_DEPRECATED);
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

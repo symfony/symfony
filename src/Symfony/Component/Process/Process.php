@@ -151,7 +151,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
-        $this->setCommandline($commandline);
+        $this->setCommandLine($commandline);
         $this->cwd = $cwd;
 
         // on Windows, if the cwd changed via chdir(), proc_open defaults to the dir where PHP was started
@@ -309,7 +309,7 @@ class Process implements \IteratorAggregate
             }
             $env = null;
         } elseif (null !== $env) {
-            @trigger_error(sprintf('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
         }
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
             $this->options['bypass_shell'] = true;
@@ -1291,7 +1291,7 @@ class Process implements \IteratorAggregate
     public function inheritEnvironmentVariables($inheritEnv = true)
     {
         if (!$inheritEnv) {
-            @trigger_error(sprintf('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
         }
 
         $this->inheritEnv = (bool) $inheritEnv;

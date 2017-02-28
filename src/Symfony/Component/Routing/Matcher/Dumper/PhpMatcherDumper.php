@@ -105,8 +105,16 @@ EOF;
     {
         \$allow = array();
         \$pathinfo = rawurldecode(\$pathinfo);
+        \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
         \$request = \$this->request;
+        \$requestMethod = \$canonicalMethod = \$context->getMethod();
+        \$scheme = \$context->getScheme();
+
+        if ('HEAD' === \$requestMethod) {
+            \$canonicalMethod = 'GET';
+        }
+
 
 $code
 
@@ -133,7 +141,7 @@ EOF;
         foreach ($groups as $collection) {
             if (null !== $regex = $collection->getAttribute('host_regex')) {
                 if (!$fetchedHost) {
-                    $code .= "        \$host = \$this->context->getHost();\n\n";
+                    $code .= "        \$host = \$context->getHost();\n\n";
                     $fetchedHost = true;
                 }
 
@@ -217,20 +225,15 @@ EOF;
         $hostMatches = false;
         $methods = $route->getMethods();
 
-        // GET and HEAD are equivalent
-        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-            $methods[] = 'HEAD';
-        }
-
         $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));
         $regex = $compiledRoute->getRegex();
 
         if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#'.(substr($regex, -1) === 'u' ? 'u' : ''), $regex, $m)) {
             if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
-                $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
+                $conditions[] = sprintf('%s === $trimmedPathinfo', var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
-                $conditions[] = sprintf('$pathinfo === %s', var_export(str_replace('\\', '', $m['url']), true));
+                $conditions[] = sprintf('%s === $pathinfo', var_export(str_replace('\\', '', $m['url']), true));
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
@@ -263,26 +266,57 @@ EOF;
 EOF;
 
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
+
         if ($methods) {
             if (1 === count($methods)) {
-                $code .= <<<EOF
-            if (\$this->context->getMethod() != '$methods[0]') {
+                if ($methods[0] === 'HEAD') {
+                    $code .= <<<EOF
+            if ('HEAD' !== \$requestMethod) {
+                \$allow[] = 'HEAD';
+                goto $gotoname;
+            }
+
+
+EOF;
+                } else {
+                    $code .= <<<EOF
+            if ('$methods[0]' !== \$canonicalMethod) {
                 \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
 
 
 EOF;
+                }
             } else {
-                $methods = implode("', '", $methods);
-                $code .= <<<EOF
-            if (!in_array(\$this->context->getMethod(), array('$methods'))) {
+                $methodVariable = 'requestMethod';
+
+                if (in_array('GET', $methods)) {
+                    // Since we treat HEAD requests like GET requests we don't need to match it.
+                    $methodVariable = 'canonicalMethod';
+                    $methods = array_filter($methods, function ($method) { return 'HEAD' !== $method; });
+                }
+
+                if (1 === count($methods)) {
+                    $code .= <<<EOF
+            if ('$methods[0]' !== \$$methodVariable) {
+                \$allow[] = '$methods[0]';
+                goto $gotoname;
+            }
+
+
+EOF;
+                } else {
+                    $methods = implode("', '", $methods);
+                    $code .= <<<EOF
+            if (!in_array(\$$methodVariable, array('$methods'))) {
                 \$allow = array_merge(\$allow, array('$methods'));
                 goto $gotoname;
             }
 
 
 EOF;
+                }
             }
         }
 
@@ -303,7 +337,7 @@ EOF;
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+            if (!isset(\$requiredSchemes[\$scheme])) {
                 return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
             }
 

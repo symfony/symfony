@@ -279,10 +279,59 @@ class PhpMatcherDumperTest extends TestCase
         $route->setCondition('context.getMethod() == "GET"');
         $rootprefixCollection->add('with-condition', $route);
 
+        /* test case 4 */
+        $headMatchCasesCollection = new RouteCollection();
+        $headMatchCasesCollection->add('just_head', new Route(
+            '/just_head',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('HEAD')
+        ));
+        $headMatchCasesCollection->add('head_and_get', new Route(
+            '/head_and_get',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('GET', 'HEAD')
+        ));
+        $headMatchCasesCollection->add('post_and_head', new Route(
+            '/post_and_get',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('POST', 'HEAD')
+        ));
+        $headMatchCasesCollection->add('put_and_post', new Route(
+            '/put_and_post',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('PUT', 'POST')
+        ));
+        $headMatchCasesCollection->add('put_and_get_and_head', new Route(
+            '/put_and_post',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('PUT', 'GET', 'HEAD')
+        ));
+
         return array(
            array($collection, 'url_matcher1.php', array()),
            array($redirectCollection, 'url_matcher2.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($rootprefixCollection, 'url_matcher3.php', array()),
+           array($headMatchCasesCollection, 'url_matcher4.php', array()),
         );
     }
 }

@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-17T09:49:02Z
+
+Thanks for the reviews.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-17T20:33:09Z
+
+I tried to address all of your comments about keeping old behaviors working and tested.
+Changleog/upgrades have been updated and @nicolas-grekas's awesome fix applied as a separate commit.
+Tests are broken until twig publishes a new release (should happen soon AFAIK).
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-20T20:43:34Z
+
+#21690 made me realize that the loaded services do not need to be public anymore, updated this to remove the corresponding checks.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-21T14:52:58Z
+
+Could it be unwise to make the core depend on an experimental feature? Would this make it difficult to remove that feature later (or influence us *not* to remove it) if we decided to?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-21T14:59:20Z
+
+@weaverryan I made a comment in the same direction :) You were faster than me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-21T15:07:28Z
+
+@weaverryan @fabpot experimental should get out of their lab status by proving their usefulness. How better can we prove that than by having core requiring it? eg the iterator+service-locator+closure-proxy argument types are all experimental features and they've already been used to deprecate a bunch of boilerplate code - see eg ContainerAwareEventDispatcher. The policy you're describing should then be applied retroactively. Please advise.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-21T15:16:50Z
+
+I think there is a difference between using the experimental feature (+1) and deprecating the old way too fast (-1).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-21T18:02:55Z
+
+Removed all deprecations from this PR.
+We should also reference somewhere all the things that should be deprecated once the experimental period ends but, even with that, it'll probably be quite hard to do it correctly later.
+The same should apply for #21690 I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-23T11:58:21Z
+
+@fabpot what about using a special `@experimental-deprecated` tag (or similar) to help implementers make their pull request correct?
+There is a *big* issue with not deprecating in the same PR: it does not enforce upgrading the code base to the new way anymore. Currently, the CI fails if this happens. This is going to be a huge mess soon if we keep things as is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-25T13:16:12Z
+
+Thinking a bit more about this, here is my stand on this PR:
+getter injection does not fit here because of "cons" "3." in http://symfony.com/blog/new-in-symfony-3-3-getter-injection (the "using eval()" part):
+> Since PHP (unlike other languages) doesn't provide any way to create proxies at runtime, it requires either hand written code, a dumped container, or using eval() for runtime-based DICs;
+
+Instead, I propose to move the FrameworkBundle class in HttpKernel, PSR-11 style (ie use a service locator), and deprecate the fwb class in this same PR altogether - service locator is not experimental anymore to me in practice - it already proved useful in so many cases.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-25T14:26:15Z
+
+Sounds good to me.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-26T10:40:16Z
+
+*SessionListener deprecated and moved to HttpKernel, note that the naming change was required.
+Status: needs review

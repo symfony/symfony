@@ -468,13 +468,10 @@ class YamlFileLoader extends FileLoader
 
             if ('=' === substr($value, -1)) {
                 $value = substr($value, 0, -1);
-                $strict = false;
-            } else {
-                $strict = true;
             }
 
             if (null !== $invalidBehavior) {
-                $value = new Reference($value, $invalidBehavior, $strict);
+                $value = new Reference($value, $invalidBehavior);
             }
         }
 

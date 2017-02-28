@@ -45,48 +45,48 @@ class YamlFileLoader extends FileLoader
             return false;
         }
 
-        if (isset($this->classes[$classMetadata->getName()])) {
-            $yaml = $this->classes[$classMetadata->getName()];
+        if (!isset($this->classes[$classMetadata->getName()])) {
+            return false;
+        }
 
-            if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
-                $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $yaml = $this->classes[$classMetadata->getName()];
 
-                foreach ($yaml['attributes'] as $attribute => $data) {
-                    if (isset($attributesMetadata[$attribute])) {
-                        $attributeMetadata = $attributesMetadata[$attribute];
-                    } else {
-                        $attributeMetadata = new AttributeMetadata($attribute);
-                        $classMetadata->addAttributeMetadata($attributeMetadata);
+        if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
+            $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+            foreach ($yaml['attributes'] as $attribute => $data) {
+                if (isset($attributesMetadata[$attribute])) {
+                    $attributeMetadata = $attributesMetadata[$attribute];
+                } else {
+                    $attributeMetadata = new AttributeMetadata($attribute);
+                    $classMetadata->addAttributeMetadata($attributeMetadata);
+                }
+
+                if (isset($data['groups'])) {
+                    if (!is_array($data['groups'])) {
+                        throw new MappingException(sprintf('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
-                    if (isset($data['groups'])) {
-                        if (!is_array($data['groups'])) {
-                            throw new MappingException('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                    foreach ($data['groups'] as $group) {
+                        if (!is_string($group)) {
+                            throw new MappingException(sprintf('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                         }
 
-                        foreach ($data['groups'] as $group) {
-                            if (!is_string($group)) {
-                                throw new MappingException('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
-                            }
-
-                            $attributeMetadata->addGroup($group);
-                        }
+                        $attributeMetadata->addGroup($group);
                     }
 
                     if (isset($data['max_depth'])) {
                         if (!is_int($data['max_depth'])) {
-                            throw new MappingException('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                            throw new MappingException(sprintf('The "max_depth" value must be an integer in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                         }
 
                         $attributeMetadata->setMaxDepth($data['max_depth']);
                     }
                 }
             }
-
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     /**

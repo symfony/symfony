@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-23T01:25:30Z
+
+Please, to add `Routing` and `DX` to label list, thanks.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-23T15:40:40Z
+
+I've removed the route name constraint because it's auto generated if `null`. Now the minor route definition can be:
+```
+use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * @Route("/hello")
+ */
+class Hello
+{
+    public function __invoke()
+    {
+        return new Response('Hello World!');
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-24T11:50:13Z
+
+It would be nice to make the `service` argument optional. It should default to the class FQN, it allows to omit this argument when using the new convention of using FQN as id (and it's actually how `ActionBundle` works).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-25T00:46:19Z
+
+To make the `service` argument optional (default FQCN) **we have to check before, whether this class is registered or not**, otherwise [`AnnotatedRouteControllerLoader`][1] doesn't know about it and the results (`AppBundle\Controller\Hello:__invoke`) could be a _`You have requested a non-existent service "AppBundle\Controller\Hello"`_ exception:
+```
+protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+{
+    // controller
+    $classAnnot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass);
+    if ($classAnnot instanceof FrameworkExtraBundleRoute && $service = $classAnnot->getService()) {
+        $route->setDefault('_controller', $service.':'.$method->getName());
+    } else {
+        $route->setDefault('_controller', $class->getName().'::'.$method->getName());
+    }
+
+    //...
+}
+```
+---
+
+**What is the best place to do that?**
+
+  [1]: https://github.com/sensiolabs/SensioFrameworkExtraBundle/blob/3.0/Routing/AnnotatedRouteControllerLoader.php#L40
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-26T13:04:19Z
+
+> What is the best place to do that?
+
+Not sure if it makes sense, but I think `_controller` should be set to the controller FQCN, which would ends in [ControllerResolver.php#L89](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Controller/ControllerResolver.php#L89), which should be the one responsible for validating it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-26T14:42:58Z
+
+@dunglas, @chalasr thanks, it's clearer now, I just created a PR (https://github.com/sensiolabs/SensioFrameworkExtraBundle/pull/464) to make it possible (combining the two PRs):
+
+```
+/**
+ * @Route("/hello", name="hello")
+ */
+class Hello
+{
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    public function __invoke()
+    {
+        $this->logger->info('log entry...');
+
+        return new Response('Controller as service!');
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-27T13:40:25Z
+
+I've finished here for now, It's ready for review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-28T14:01:41Z
+
+@dunglas done! (https://github.com/sensiolabs/SensioFrameworkExtraBundle/issues/464 merged!)

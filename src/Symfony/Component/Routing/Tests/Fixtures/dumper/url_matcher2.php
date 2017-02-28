@@ -30,7 +30,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $requestMethod = $isLikeGetMethod = $context->getMethod();
         $schema = $context->getScheme();
 
-        if ($requestMethod === 'HEAD') {
+        if ('HEAD' === $requestMethod) {
             $isLikeGetMethod = 'GET';
         }
 

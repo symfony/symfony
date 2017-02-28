@@ -111,7 +111,7 @@ EOF;
         \$requestMethod = \$isLikeGetMethod = \$context->getMethod();
         \$schema = \$context->getScheme();
 
-        if (\$requestMethod === 'HEAD') {
+        if ('HEAD' === \$requestMethod) {
             \$isLikeGetMethod = 'GET';
         }
 

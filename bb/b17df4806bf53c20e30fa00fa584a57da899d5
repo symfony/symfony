@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-27T15:59:30Z
+
+Looks like you opened your PR against the wrong branch or forgot to rebase it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-27T20:39:10Z
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-28T07:38:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by izzyp at 2017-02-28T11:45:11Z
+
+@lyrixx
+
+Q: how often do you release patches?
+
+Is there a specific timeline for v3.2.5?
+
+(new to symfony dev cycle, couldn't find this detailed anywhere..)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-28T11:56:54Z
+
+@izzyp we do patch releases once a month (except when a security issue requires us to release an extra one faster)

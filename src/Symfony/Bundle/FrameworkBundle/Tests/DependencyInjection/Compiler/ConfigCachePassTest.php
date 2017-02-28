@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
 
@@ -41,11 +42,11 @@ class ConfigCachePassTest extends TestCase
 
         $definition->expects($this->once())
             ->method('replaceArgument')
-            ->with(0, array(
+            ->with(0, new IteratorArgument(array(
                     new Reference('checker_1'),
                     new Reference('checker_2'),
                     new Reference('checker_3'),
-                ));
+                )));
 
         $pass = new ConfigCachePass();
         $pass->process($container);

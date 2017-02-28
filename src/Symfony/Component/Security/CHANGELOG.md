@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Deprecated the ability to pass multiple user providers to the `ContextListener`. Pass only the user provider responsible
+   for the active firewall instead.
+
 3.2.0
 -----
 

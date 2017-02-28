@@ -434,7 +434,7 @@ class SecurityExtension extends Extension
 
         $listenerId = 'security.context_listener.'.count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
-        $listener->replaceArgument(1, array(new Reference($providerId)));
+        $listener->replaceArgument(1, new Reference($providerId));
         $listener->replaceArgument(2, $contextKey);
 
         return $this->contextListeners[$contextKey] = $listenerId;

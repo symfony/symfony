@@ -7,6 +7,7 @@ CHANGELOG
  * added `ReflectionClassResource` class
  * added second `$exists` constructor argument to `ClassExistenceResource`
  * made `ClassExistenceResource` work with interfaces and traits
+ * added `ConfigCachePass` (originally in FrameworkBundle)
 
 3.0.0
 -----

@@ -40,7 +40,7 @@
         "symfony/doctrine-bridge": "<2.7",
         "symfony/framework-bundle": "<2.7",
         "symfony/twig-bridge": "<2.7",
-        "symfony/var-dumper": "~3.3"
+        "symfony/var-dumper": "<3.3"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

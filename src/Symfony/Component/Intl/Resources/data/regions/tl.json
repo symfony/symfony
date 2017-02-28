@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "AC": "Acsencion island",
         "AD": "Andorra",
@@ -102,7 +102,7 @@
         "HR": "Croatia",
         "HT": "Haiti",
         "HU": "Hungary",
-        "IC": "Canary Island",
+        "IC": "Canary Islands",
         "ID": "Indonesia",
         "IE": "Ireland",
         "IL": "Israel",
@@ -236,6 +236,7 @@
         "UA": "Ukraine",
         "UG": "Uganda",
         "UM": "U.S. Outlying Islands",
+        "UN": "Nagkakaisang Bansa",
         "US": "Estados Unidos",
         "UY": "Uruguay",
         "UZ": "Uzbekistan",

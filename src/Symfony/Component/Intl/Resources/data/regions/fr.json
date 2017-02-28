@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.79",
+    "Version": "2.1.28.79",
     "Names": {
         "AC": "Île de l’Ascension",
         "AD": "Andorre",
@@ -236,6 +236,7 @@
         "UA": "Ukraine",
         "UG": "Ouganda",
         "UM": "Îles mineures éloignées des États-Unis",
+        "UN": "Nations Unies",
         "US": "États-Unis",
         "UY": "Uruguay",
         "UZ": "Ouzbékistan",

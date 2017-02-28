@@ -1,10 +1,27 @@
 {
-    "Version": "2.1.21.97",
+    "Version": "2.1.27.99",
     "Names": {
+        "ace": "achenés",
+        "ady": "adigeo",
+        "arp": "arapajó",
         "eu": "vasco",
+        "grc": "griego clásico",
+        "gu": "gujarati",
+        "hsb": "sorbio alto",
+        "ht": "haitiano",
+        "kea": "Criollo (Cabo Verde)",
+        "lo": "laosiano",
         "luo": "luo",
+        "prg": "prusiano antiguo",
+        "rm": "retorrománico",
+        "shu": "árabe (Chad)",
         "sw": "swahili",
-        "sw_CD": "swahili del Congo",
-        "vai": "vai"
+        "sw_CD": "swahili (Congo)",
+        "tzm": "tamazight del Marruecos Central",
+        "vai": "vai",
+        "wal": "walamo",
+        "wuu": "wu",
+        "yi": "yídish",
+        "zun": "zuni"
     }
 }

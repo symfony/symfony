@@ -125,7 +125,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
         if ($dirtyValue instanceof \DateTime || $dirtyValue instanceof \DateTimeInterface) {
-            IntlTestHelper::requireIntl($this);
+            IntlTestHelper::requireIntl($this, '57.1');
         }
 
         $constraint = $this->createConstraint(array('value' => $comparedValue));

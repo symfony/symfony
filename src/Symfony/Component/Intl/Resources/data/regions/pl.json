@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "AC": "Wyspa Wniebowstąpienia",
         "AD": "Andora",
@@ -29,7 +29,7 @@
         "BJ": "Benin",
         "BL": "Saint-Barthélemy",
         "BM": "Bermudy",
-        "BN": "Brunei Darussalam",
+        "BN": "Brunei",
         "BO": "Boliwia",
         "BQ": "Niderlandy Karaibskie",
         "BR": "Brazylia",
@@ -236,6 +236,7 @@
         "UA": "Ukraina",
         "UG": "Uganda",
         "UM": "Dalekie Wyspy Mniejsze Stanów Zjednoczonych",
+        "UN": "Organizacja Narodów Zjednoczonych",
         "US": "Stany Zjednoczone",
         "UY": "Urugwaj",
         "UZ": "Uzbekistan",

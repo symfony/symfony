@@ -389,4 +389,17 @@ class PhpDumperTest extends TestCase
         $dumper->setProxyDumper(new DummyProxyDumper());
         $dumper->dump();
     }
+
+    public function testDumpContainerBuilderWithFrozenConstructorIncludingPrivateServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
+        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
+        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_private_frozen.php', $dumper->dump());
+    }
 }

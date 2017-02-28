@@ -855,6 +855,7 @@ EOF;
 
         $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
+        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'

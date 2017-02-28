@@ -28,7 +28,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $context = $this->context;
         $request = $this->request;
         $requestMethod = $canonicalMethod = $context->getMethod();
-        $schema = $context->getScheme();
+        $scheme = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
@@ -330,7 +330,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         // secure
         if ('/secure' === $pathinfo) {
             $requiredSchemes = array (  'https' => 0,);
-            if (!isset($requiredSchemes[$schema])) {
+            if (!isset($requiredSchemes[$scheme])) {
                 return $this->redirect($pathinfo, 'secure', key($requiredSchemes));
             }
 
@@ -340,7 +340,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         // nonsecure
         if ('/nonsecure' === $pathinfo) {
             $requiredSchemes = array (  'http' => 0,);
-            if (!isset($requiredSchemes[$schema])) {
+            if (!isset($requiredSchemes[$scheme])) {
                 return $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes));
             }
 

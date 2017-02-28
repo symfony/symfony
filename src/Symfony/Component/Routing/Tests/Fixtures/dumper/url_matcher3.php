@@ -28,7 +28,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $context = $this->context;
         $request = $this->request;
         $requestMethod = $canonicalMethod = $context->getMethod();
-        $schema = $context->getScheme();
+        $scheme = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';

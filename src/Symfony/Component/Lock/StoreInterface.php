@@ -31,9 +31,9 @@ interface StoreInterface
     public function save(Key $key);
 
     /**
-     * Wait a key becomes free, then stores the resource.
+     * Waits a key becomes free, then stores the resource.
      *
-     * If the store does not supports this feature it should thrown an NotSupportedException.
+     * If the store does not support this feature it should throw a NotSupportedException.
      *
      * @param Key $key key to lock
      *
@@ -45,7 +45,7 @@ interface StoreInterface
     /**
      * Extends the ttl of a resource.
      *
-     * If the store does not supports this feature it should thrown an NotSupportedException.
+     * If the store does not support this feature it should throw a NotSupportedException.
      *
      * @param Key   $key key to lock
      * @param float $ttl amount of second to keep the lock in the store

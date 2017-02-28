@@ -12,7 +12,7 @@
 namespace Symfony\Component\Lock\Exception;
 
 /**
- * NotSupportedException is thrown when a unsupported method is called.
+ * NotSupportedException is thrown when an unsupported method is called.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

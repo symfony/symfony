@@ -81,7 +81,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             return;
         }
 
-        $this->logger->warning('Failed to store the "{resource}" lock. Quorum has not been met', array('resource' => $key, 'success' => $successCount, 'failure' => $failureCount));
+        $this->logger->warning('Failed to store the "{resource}" lock. Quorum has not been met.', array('resource' => $key, 'success' => $successCount, 'failure' => $failureCount));
 
         // clean up potential locks
         $this->delete($key);
@@ -91,7 +91,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks', get_class($this)));
+        throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
     }
 
     /**
@@ -121,7 +121,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             return;
         }
 
-        $this->logger->warning('Failed to define the expiration for the "{resource}" lock. Quorum has not been met', array('resource' => $key, 'success' => $successCount, 'failure' => $failureCount));
+        $this->logger->warning('Failed to define the expiration for the "{resource}" lock. Quorum has not been met.', array('resource' => $key, 'success' => $successCount, 'failure' => $failureCount));
 
         // clean up potential locks
         $this->delete($key);

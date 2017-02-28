@@ -65,7 +65,7 @@ class RedisStore implements StoreInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks', get_class($this)));
+        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
     }
 
     /**
@@ -112,7 +112,7 @@ class RedisStore implements StoreInterface
     }
 
     /**
-     * Evaluate a script in the corresponding redis client.
+     * Evaluates a script in the corresponding redis client.
      *
      * @param string $script
      * @param string $resource
@@ -135,7 +135,7 @@ class RedisStore implements StoreInterface
     }
 
     /**
-     * Retrieve an unique token for the given key.
+     * Retrieves an unique token for the given key.
      *
      * @param Key $key
      *

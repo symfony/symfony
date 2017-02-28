@@ -61,6 +61,11 @@ final class Key
         unset($this->state[$stateKey]);
     }
 
+    /**
+     * @param $stateKey
+     *
+     * @return mixed
+     */
     public function getState($stateKey)
     {
         return $this->state[$stateKey];

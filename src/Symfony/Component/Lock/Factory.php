@@ -16,7 +16,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
 /**
- * Factory provide method to create locks.
+ * Factory provides method to create locks.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -34,12 +34,12 @@ class Factory implements LoggerAwareInterface
     }
 
     /**
-     * Create a lock for the given resource.
+     * Creates a lock for the given resource.
      *
      * @param string $resource The resource to lock
      * @param float  $ttl      maximum expected lock duration
      *
-     * @return LockInterface
+     * @return Lock
      */
     public function createLock($resource, $ttl = 300.0)
     {

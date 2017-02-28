@@ -68,7 +68,7 @@ class MemcachedStore implements StoreInterface
 
     public function waitAndSave(Key $key)
     {
-        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks', get_class($this)));
+        throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
     }
 
     /**
@@ -80,7 +80,7 @@ class MemcachedStore implements StoreInterface
             throw new InvalidArgumentException(sprintf('%s() expects a TTL greater or equals to 1. Got %s.', __METHOD__, $ttl));
         }
 
-        // Interface define a float value but Store required an integer.
+        // Interface defines a float value but Store required an integer.
         $ttl = (int) ceil($ttl);
 
         $token = $this->getToken($key);

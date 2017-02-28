@@ -67,7 +67,7 @@ class TemplateManager
      *
      * @param Profile $profile
      *
-     * @return Twig_Template[]
+     * @return \Twig_Template[]
      *
      * @deprecated not used anymore internally
      */

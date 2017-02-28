@@ -28,6 +28,11 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        $this->normalizedIds = array(
+            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
+            'symfony\\component\\dependencyinjection\\container' => 'Symfony\\Component\\DependencyInjection\\Container',
+            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
+        );
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
@@ -64,6 +69,9 @@ class ProjectServiceContainer extends Container
             'new_factory' => true,
         );
         $this->aliases = array(
+            'Psr\\Container\\ContainerInterface' => 'service_container',
+            'Symfony\\Component\\DependencyInjection\\Container' => 'service_container',
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => 'service_container',
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
         );

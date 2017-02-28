@@ -15,6 +15,7 @@ require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -25,6 +26,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -42,6 +44,22 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
+    public function testDefaultRegisteredDefinitions()
+    {
+        $builder = new ContainerBuilder();
+
+        $this->assertCount(1, $builder->getDefinitions());
+        $this->assertTrue($builder->hasDefinition('service_container'));
+
+        $definition = $builder->getDefinition('service_container');
+        $this->assertInstanceOf(Definition::class, $definition);
+        $this->assertTrue($definition->isSynthetic());
+        $this->assertSame(ContainerInterface::class, $definition->getClass());
+        $this->assertTrue($builder->hasAlias(PsrContainerInterface::class));
+        $this->assertTrue($builder->hasAlias(ContainerInterface::class));
+        $this->assertTrue($builder->hasAlias(Container::class));
+    }
+
     public function testDefinitions()
     {
         $builder = new ContainerBuilder();
@@ -203,7 +221,18 @@ class ContainerBuilderTest extends TestCase
         $builder->register('foo', 'stdClass');
         $builder->bar = $bar = new \stdClass();
         $builder->register('bar', 'stdClass');
-        $this->assertEquals(array('foo', 'bar', 'service_container'), $builder->getServiceIds(), '->getServiceIds() returns all defined service ids');
+        $this->assertEquals(
+            array(
+                'service_container',
+                'foo',
+                'bar',
+                'Psr\Container\ContainerInterface',
+                'Symfony\Component\DependencyInjection\ContainerInterface',
+                'Symfony\Component\DependencyInjection\Container',
+            ),
+            $builder->getServiceIds(),
+            '->getServiceIds() returns all defined service ids'
+        );
     }
 
     public function testAliases()
@@ -251,7 +280,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->set('foobar', 'stdClass');
         $builder->set('moo', 'stdClass');
-        $this->assertCount(0, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
+        $this->assertCount(3, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
     }
 
     public function testSetAliases()
@@ -538,7 +567,7 @@ class ContainerBuilderTest extends TestCase
         $config->setDefinition('baz', new Definition('BazClass'));
         $config->setAlias('alias_for_foo', 'foo');
         $container->merge($config);
-        $this->assertEquals(array('foo', 'bar', 'baz'), array_keys($container->getDefinitions()), '->merge() merges definitions already defined ones');
+        $this->assertEquals(array('service_container', 'foo', 'bar', 'baz'), array_keys($container->getDefinitions()), '->merge() merges definitions already defined ones');
 
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']));

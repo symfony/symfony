@@ -5,3 +5,16 @@ parameters:
     escape: '@@escapeme'
     values: [true, false, null, 0, 1000.3, 'true', 'false', 'null']
 
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        synthetic: true
+    Psr\Container\ContainerInterface:
+        alias: service_container
+        public: false
+    Symfony\Component\DependencyInjection\ContainerInterface:
+        alias: service_container
+        public: false
+    Symfony\Component\DependencyInjection\Container:
+        alias: service_container
+        public: false

@@ -57,4 +57,12 @@ class MoneyTypeTest extends TestCase
         $this->assertSame('{{ widget }} £', $view1->vars['money_pattern']);
         $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
     }
+
+    public function testSubmitNull()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType');
+        $form->submit(null);
+
+        $this->assertNull($form->getData());
+    }
 }

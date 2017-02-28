@@ -34,4 +34,12 @@ class LocaleTypeTest extends TestCase
         $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'English (United Kingdom)'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'), $choices, '', false, false);
     }
+
+    public function testSubmitNull()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LocaleType');
+        $form->submit(null);
+
+        $this->assertNull($form->getData());
+    }
 }

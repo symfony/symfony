@@ -45,4 +45,12 @@ class LanguageTypeTest extends TestCase
 
         $this->assertNotContains(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices, '', false, false);
     }
+
+    public function testSubmitNull()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LanguageType');
+        $form->submit(null);
+
+        $this->assertNull($form->getData());
+    }
 }

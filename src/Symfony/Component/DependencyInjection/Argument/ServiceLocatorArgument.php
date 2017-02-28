@@ -39,7 +39,7 @@ class ServiceLocatorArgument implements ArgumentInterface
     public function setValues(array $values)
     {
         foreach ($values as $v) {
-            if (!$v instanceof Reference) {
+            if (!$v instanceof Reference && null !== $v) {
                 throw new InvalidArgumentException('Values of a ServiceLocatorArgument must be Reference objects.');
             }
         }

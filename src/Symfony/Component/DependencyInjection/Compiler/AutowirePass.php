@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -252,13 +253,7 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if (method_exists($parameter, 'getType')) {
-                if ($typeName = $parameter->getType()) {
-                    $typeName = $typeName->isBuiltin() ? null : ($typeName instanceof \ReflectionNamedType ? $typeName->getName() : $typeName->__toString());
-                }
-            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $typeName)) {
-                $typeName = 'callable' === $typeName[1] || 'array' === $typeName[1] ? null : $typeName[1];
-            }
+            $typeName = InheritanceProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
 
             if (!$typeName) {
                 // no default value? Then fail
@@ -278,52 +273,23 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if ($this->container->has($typeName) && !$this->container->findDefinition($typeName)->isAbstract()) {
-                $arguments[$index] = new Reference($typeName);
-                $didAutowire = true;
-
-                continue;
-            }
-
-            if (null === $this->types) {
-                $this->populateAvailableTypes();
-            }
-
-            if (isset($this->types[$typeName])) {
-                $value = new Reference($this->types[$typeName]);
+            if ($value = $this->getAutowiredReference($typeName)) {
                 $didAutowire = true;
                 $this->usedTypes[$typeName] = $this->currentId;
-            } elseif ($typeHint = $this->container->getReflectionClass($typeName, true)) {
-                try {
-                    $value = $this->createAutowiredDefinition($typeHint);
-                    $didAutowire = true;
-                    $this->usedTypes[$typeName] = $this->currentId;
-                } catch (RuntimeException $e) {
-                    if ($parameter->allowsNull()) {
-                        $value = null;
-                    } elseif ($parameter->isDefaultValueAvailable()) {
-                        $value = $parameter->getDefaultValue();
-                    } else {
-                        // The exception code is set to 1 if the exception must be thrown even if it's an optional setter
-                        if (1 === $e->getCode() || self::MODE_REQUIRED === $mode) {
-                            throw $e;
-                        }
-
-                        return array();
-                    }
-                }
-            } else {
-                // Typehint against a non-existing class
-
-                if (!$parameter->isDefaultValueAvailable()) {
-                    if (self::MODE_REQUIRED === $mode) {
-                        throw new RuntimeException(sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": Class %s does not exist.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $typeName));
-                    }
-
-                    return array();
-                }
-
+            } elseif ($parameter->isDefaultValueAvailable()) {
                 $value = $parameter->getDefaultValue();
+            } elseif ($parameter->allowsNull()) {
+                $value = null;
+            } elseif (self::MODE_REQUIRED === $mode) {
+                if ($classOrInterface = class_exists($typeName, false) ? 'class' : (interface_exists($typeName, false) ? 'interface' : null)) {
+                    $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeName, $this->currentId, $classOrInterface);
+                } else {
+                    $message = sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": Class %s does not exist.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $typeName);
+                }
+
+                throw new RuntimeException($message);
+            } else {
+                return array();
             }
 
             $arguments[$index] = $value;
@@ -356,42 +322,39 @@ class AutowirePass extends AbstractRecursivePass
                 || 0 !== $reflectionMethod->getNumberOfParameters()
                 || $reflectionMethod->isFinal()
                 || $reflectionMethod->returnsReference()
-                || !$returnType = $reflectionMethod->getReturnType()
+                || !($typeName = InheritanceProxyHelper::getTypeHint($reflectionMethod, null, true))
+                || !($typeRef = $this->getAutowiredReference($typeName))
             ) {
                 continue;
             }
-            $typeName = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : $returnType->__toString();
 
-            if ($this->container->has($typeName) && !$this->container->findDefinition($typeName)->isAbstract()) {
-                $overridenGetters[$lcMethod] = new Reference($typeName);
-                continue;
-            }
-
-            if (null === $this->types) {
-                $this->populateAvailableTypes();
-            }
-
-            if (isset($this->types[$typeName])) {
-                $value = new Reference($this->types[$typeName]);
-            } elseif ($returnType = $this->container->getReflectionClass($typeName, true)) {
-                try {
-                    $value = $this->createAutowiredDefinition($returnType);
-                } catch (RuntimeException $e) {
-                    if (1 === $e->getCode()) {
-                        throw $e;
-                    }
-
-                    continue;
-                }
-            } else {
-                continue;
-            }
-
-            $overridenGetters[$lcMethod] = $value;
+            $overridenGetters[$lcMethod] = $typeRef;
             $this->usedTypes[$typeName] = $this->currentId;
         }
 
         return $overridenGetters;
+    }
+
+    /**
+     * @return Reference|null A reference to the service matching the given type, if any
+     */
+    private function getAutowiredReference($typeName, $autoRegister = true)
+    {
+        if ($this->container->has($typeName) && !$this->container->findDefinition($typeName)->isAbstract()) {
+            return new Reference($typeName);
+        }
+
+        if (null === $this->types) {
+            $this->populateAvailableTypes();
+        }
+
+        if (isset($this->types[$typeName])) {
+            return new Reference($this->types[$typeName]);
+        }
+
+        if ($autoRegister && $class = $this->container->getReflectionClass($typeName, true)) {
+            return $this->createAutowiredDefinition($class);
+        }
     }
 
     /**
@@ -477,7 +440,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @param \ReflectionClass $typeHint
      *
-     * @return Reference A reference to the registered definition
+     * @return Reference|null A reference to the registered definition
      *
      * @throws RuntimeException
      */
@@ -487,12 +450,11 @@ class AutowirePass extends AbstractRecursivePass
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $matchingServices = implode(', ', $this->ambiguousServiceTypes[$typeHint->name]);
 
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $this->currentId, $classOrInterface, $matchingServices), 1);
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $this->currentId, $classOrInterface, $matchingServices));
         }
 
         if (!$typeHint->isInstantiable()) {
-            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $this->currentId, $classOrInterface));
+            return;
         }
 
         $currentId = $this->currentId;
@@ -504,14 +466,8 @@ class AutowirePass extends AbstractRecursivePass
 
         $this->populateAvailableType($argumentId, $argumentDefinition);
 
-        try {
-            $this->processValue($argumentDefinition);
-            $this->currentId = $currentId;
-        } catch (RuntimeException $e) {
-            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
-            $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $this->currentId, $classOrInterface);
-            throw new RuntimeException($message, 0, $e);
-        }
+        $this->processValue($argumentDefinition);
+        $this->currentId = $currentId;
 
         return new Reference($argumentId);
     }

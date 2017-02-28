@@ -63,12 +63,7 @@ class InheritanceProxyHelper
             if ($p->isPassedByReference()) {
                 $k = '&'.$k;
             }
-            if (method_exists($p, 'getType')) {
-                $type = $p->getType();
-            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $p, $type)) {
-                $type = $type[1];
-            }
-            if ($type && $type = self::getTypeHint($type, $r)) {
+            if ($type = self::getTypeHint($r, $p)) {
                 $k = $type.' '.$k;
             }
             if ($type && $p->allowsNull()) {
@@ -91,46 +86,55 @@ class InheritanceProxyHelper
         }
         $call = ($r->isClosure() ? '' : $r->name).'('.implode(', ', $call).')';
 
-        if ($type = method_exists($r, 'getReturnType') ? $r->getReturnType() : null) {
-            $type = ': '.($type->allowsNull() ? '?' : '').self::getTypeHint($type, $r);
+        if ($type = self::getTypeHint($r)) {
+            $type = ': '.($r->getReturnType()->allowsNull() ? '?' : '').$type;
         }
 
         return ($r->returnsReference() ? '&' : '').($r->isClosure() ? '' : $r->name).'('.implode(', ', $signature).')'.$type;
     }
 
     /**
-     * @param $type \ReflectionType|string $type As returned by ReflectionParameter::getType() - or string on PHP 5
-     *
      * @return string|null The FQCN or builtin name of the type hint, or null when the type hint references an invalid self|parent context
      */
-    public static function getTypeHint($type, \ReflectionFunctionAbstract $r)
+    public static function getTypeHint(\ReflectionFunctionAbstract $r, \ReflectionParameter $p = null, $noBuiltin = false)
     {
-        if (is_string($type)) {
-            $name = $type;
+        if ($p instanceof \ReflectionParameter) {
+            if (method_exists($p, 'getType')) {
+                $type = $p->getType();
+            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $p, $type)) {
+                $name = $type = $type[1];
 
-            if ('callable' === $name || 'array' === $name) {
-                return $name;
+                if ('callable' === $name || 'array' === $name) {
+                    return $noBuiltin ? null : $name;
+                }
             }
         } else {
+            $type = method_exists($r, 'getReturnType') ? $r->getReturnType() : null;
+        }
+        if (!$type) {
+            return;
+        }
+        if (!is_string($type)) {
             $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
 
             if ($type->isBuiltin()) {
-                return $name;
+                return $noBuiltin ? null : $name;
             }
         }
         $lcName = strtolower($name);
+        $prefix = $noBuiltin ? '' : '\\';
 
         if ('self' !== $lcName && 'parent' !== $lcName) {
-            return '\\'.$name;
+            return $prefix.$name;
         }
         if (!$r instanceof \ReflectionMethod) {
             return;
         }
         if ('self' === $lcName) {
-            return '\\'.$r->getDeclaringClass()->name;
+            return $prefix.$r->getDeclaringClass()->name;
         }
         if ($parent = $r->getDeclaringClass()->getParentClass()) {
-            return '\\'.$parent->name;
+            return $prefix.$parent->name;
         }
     }
 

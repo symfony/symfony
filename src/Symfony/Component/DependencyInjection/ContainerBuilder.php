@@ -1127,6 +1127,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $parameterBag = $this->getParameterBag();
             $services = array();
             foreach ($value->getValues() as $k => $v) {
+                if ($v->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE && !$this->has((string) $v)) {
+                    continue;
+                }
                 $services[$k] = function () use ($v, $parameterBag) {
                     return $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($v)));
                 };

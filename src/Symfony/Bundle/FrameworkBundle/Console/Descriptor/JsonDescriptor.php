@@ -399,12 +399,12 @@ class JsonDescriptor extends Descriptor
             );
         }
 
-        if ($value instanceof Definition) {
-            return $this->getContainerDefinitionData($value, $omitTags, $showArguments);
-        }
-
         if ($value instanceof ArgumentInterface) {
             return $this->describeValue($value->getValues(), $omitTags, $showArguments);
+        }
+
+        if ($value instanceof Definition) {
+            return $this->getContainerDefinitionData($value, $omitTags, $showArguments);
         }
 
         return $value;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -1286,6 +1287,8 @@ EOF;
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
                 $value = $this->exportParameters($value, $path.'/'.$key, $indent + 4);
+            } elseif ($value instanceof ArgumentInterface) {
+                throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain special arguments. "%s" found in "%s".', get_class($value), $path.'/'.$key));
             } elseif ($value instanceof Variable) {
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain variable references. Variable "%s" found in "%s".', $value, $path.'/'.$key));
             } elseif ($value instanceof Definition) {
@@ -1458,6 +1461,8 @@ EOF;
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument));
+            } elseif ($argument instanceof ArgumentInterface) {
+                $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument->getValues()));
             } elseif ($argument instanceof Definition) {
                 $definitions = array_merge(
                     $definitions,

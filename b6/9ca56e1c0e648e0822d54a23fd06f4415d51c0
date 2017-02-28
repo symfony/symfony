@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2017-02-27T15:04:13Z
+
+Obviously there is a missing unit test for this and this is why we didn't spot the problem earlier. I'm adding some.

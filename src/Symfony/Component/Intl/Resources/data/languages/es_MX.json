@@ -1,6 +1,32 @@
 {
-    "Version": "2.1.19.94",
+    "Version": "2.1.28.76",
     "Names": {
-        "ba": "bashkir"
+        "ace": "acehnés",
+        "arp": "arapaho",
+        "ba": "bashkir",
+        "bas": "basa",
+        "bax": "bamun",
+        "bho": "bhojpuri",
+        "dum": "neerlandés medieval",
+        "enm": "inglés medieval",
+        "eu": "euskera",
+        "frm": "francés medieval",
+        "gan": "gan (China)",
+        "gmh": "alemán de la alta edad media",
+        "grc": "griego antiguo",
+        "hak": "kejia (China)",
+        "hsn": "xiang (China)",
+        "lo": "lao",
+        "mga": "irlandés medieval",
+        "nan": "min nan (Chino)",
+        "nso": "sotho septentrional",
+        "pa": "punyabí",
+        "rn": "kiroundi",
+        "shu": "árabe chadiano",
+        "ss": "siswati",
+        "sw": "suajili",
+        "sw_CD": "suajili del Congo",
+        "wo": "wolof",
+        "zgh": "tamazight marroquí estándar"
     }
 }

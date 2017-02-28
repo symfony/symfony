@@ -34,13 +34,10 @@ class PhpDumperTest extends TestCase
 
     public function testDump()
     {
-        $dumper = new PhpDumper($container = new ContainerBuilder());
+        $dumper = new PhpDumper(new ContainerBuilder());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
-
-        $container = new ContainerBuilder();
-        new PhpDumper($container);
     }
 
     public function testDumpOptimizationString()

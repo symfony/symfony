@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "Belarus-Rubel (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Weißrussischer Rubel"
+        ],
         "BYR": [
             "BYR",
-            "Weißrussischer Rubel"
+            "Weißrussischer Rubel (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -295,7 +299,7 @@
         ],
         "CVE": [
             "CVE",
-            "Kap-Verde-Escudo"
+            "Cabo-Verde-Escudo"
         ],
         "CYP": [
             "CYP",
@@ -775,7 +779,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruanischer Neuer Sol"
+            "Peruanischer Sol"
         ],
         "PES": [
             "PES",

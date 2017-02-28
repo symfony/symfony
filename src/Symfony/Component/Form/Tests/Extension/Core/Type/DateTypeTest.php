@@ -514,7 +514,7 @@ class DateTypeTest extends TestCase
     public function testMonthsOptionShortFormat()
     {
         // we test against "de_AT", so we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, '57.1');
 
         \Locale::setDefault('de_AT');
 

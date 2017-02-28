@@ -287,7 +287,7 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireIntl($this, '57.1');
 
         $constraint = new Range(array(
             'min' => 'March 10, 2014',
@@ -310,7 +310,7 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireIntl($this, '57.1');
 
         $constraint = new Range(array(
             'max' => 'March 20, 2014',
@@ -333,7 +333,7 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireIntl($this, '57.1');
 
         $constraint = new Range(array(
             'min' => 'March 10, 2014',
@@ -358,7 +358,7 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireIntl($this, '57.1');
 
         $constraint = new Range(array(
             'min' => 'March 10, 2014',

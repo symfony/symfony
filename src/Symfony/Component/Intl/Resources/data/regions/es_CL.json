@@ -1,6 +1,10 @@
 {
-    "Version": "2.1.21.28",
+    "Version": "2.1.27.99",
     "Names": {
-        "EH": "Sahara Occidental"
+        "BA": "Bosnia y Herzegovina",
+        "EH": "Sahara Occidental",
+        "TA": "Tristán de Acuña",
+        "TL": "Timor-Leste",
+        "UM": "Islas menores alejadas de EE. UU."
     }
 }

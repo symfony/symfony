@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.81",
+    "Version": "2.1.28.79",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "Wit-Russische nieuwe roebel (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Wit-Russische roebel"
+        ],
         "BYR": [
             "BYR",
-            "Wit-Russische roebel"
+            "Wit-Russische roebel (2000–2016)"
         ],
         "BZD": [
             "BZD",

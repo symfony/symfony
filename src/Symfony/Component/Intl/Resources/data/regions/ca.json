@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.79",
     "Names": {
         "AC": "Illa de l’Ascensió",
         "AD": "Andorra",
@@ -185,7 +185,7 @@
         "PM": "Saint-Pierre-et-Miquelon",
         "PN": "Illes Pitcairn",
         "PR": "Puerto Rico",
-        "PS": "Palestina",
+        "PS": "territoris palestins",
         "PT": "Portugal",
         "PW": "Palau",
         "PY": "Paraguai",
@@ -236,6 +236,7 @@
         "UA": "Ucraïna",
         "UG": "Uganda",
         "UM": "Illes Perifèriques Menors dels EUA",
+        "UN": "Nacions Unides",
         "US": "Estats Units",
         "UY": "Uruguai",
         "UZ": "Uzbekistan",

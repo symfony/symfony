@@ -83,6 +83,8 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected)
     {
+        IntlTestHelper::requireIntl($this, '58.1');
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -90,9 +92,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
     public function formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider()
     {
         return array(
-            array(100, 'CRC', 'CRC', '%s100'),
-            array(-100, 'CRC', 'CRC', '-%s100'),
-            array(1000.12, 'CRC', 'CRC', '%s1,000'),
+            array(100, 'CRC', 'CRC', '%s100.00'),
+            array(-100, 'CRC', 'CRC', '-%s100.00'),
+            array(1000.12, 'CRC', 'CRC', '%s1,000.12'),
         );
     }
 

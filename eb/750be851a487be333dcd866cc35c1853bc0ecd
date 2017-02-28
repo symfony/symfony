@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-27T22:00:15Z
+
+Being able to pass multiple user providers to the context listener doesn't make much sense. I suggest to deprecate this possibility entirely (see #21792).

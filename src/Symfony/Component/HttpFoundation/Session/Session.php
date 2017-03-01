@@ -250,7 +250,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * Gets the attributebag interface.
      *
-     * Note that this method we added to help with IDE autocompletion.
+     * Note that this method was added to help with IDE autocompletion.
      *
      * @return AttributeBagInterface
      */

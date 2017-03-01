@@ -702,4 +702,20 @@ class InlineTest extends TestCase
     {
         $this->assertSame(array(':' => 'foo'), Inline::parse('{: foo}'));
     }
+
+    /**
+     * @dataProvider getTestsForNullValues
+     */
+    public function testParseMissingMappingValueAsNull($yaml, $expected)
+    {
+        $this->assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function getTestsForNullValues()
+    {
+        return array(
+            'null before closing curly brace' => array('{foo:}', array('foo' => null)),
+            'null before comma' => array('{foo:, bar: baz}', array('foo' => null, 'bar' => 'baz')),
+        );
+    }
 }

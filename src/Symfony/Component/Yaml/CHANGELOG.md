@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * Omitted mapping values will be parsed as `null`.
+
  * Omitting the key of a mapping is deprecated and will throw a `ParseException` in Symfony 4.0.
 
  * Added support for dumping empty PHP arrays as YAML sequences:

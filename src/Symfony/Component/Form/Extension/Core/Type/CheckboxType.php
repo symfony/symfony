@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
@@ -57,9 +58,14 @@ class CheckboxType extends AbstractType
 
         $resolver->setDefaults(array(
             'value' => '1',
-            'empty_data' => $emptyData,
             'compound' => false,
+            'empty_data' => $emptyData,
         ));
+
+        $resolver->setNormalizer('force_submit', function (Options $options) {
+            // If pre set data is true, we need to ensure that $emptyData will be submitted
+            return isset($options['data']) && (bool) $options['data'];
+        });
     }
 
     /**

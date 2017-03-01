@@ -136,6 +136,49 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('', $form->getViewData());
     }
 
+    public function testSubmitNestedCheckBoxWithEmptyValueAndFalseUnchecked()
+    {
+        $form = $this->factory->create('form', array(
+                'check' => true,
+            ))
+            ->add('check', 'checkbox', array(
+                'value' => '',
+            ))
+        ;
+
+        $form->submit(null);
+
+        $this->assertFalse($form->get('check')->getData());
+        $this->assertNull($form->get('check')->getViewData());
+    }
+
+    public function testSubmitNestedCheckBoxWithEmptyValueAndFalseUncheckedWithClearMissingFalse()
+    {
+        $form = $this->factory->create('form', array(
+                'check' => true,
+            ))
+            ->add('check', 'checkbox', array(
+                'value' => '',
+            ))
+        ;
+
+        $form->submit(null, false);
+
+        $this->assertFalse($form->get('check')->getData());
+        $this->assertNull($form->get('check')->getViewData());
+    }
+
+    public function testSubmitNestedCheckboxWithEmptyValueAndTrueCheckedWithClearMissingFalse()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->submit(true, false);
+
+        $this->assertTrue($form->getData());
+        $this->assertSame('', $form->getViewData());
+    }
+
     /**
      * @dataProvider provideCustomModelTransformerData
      */

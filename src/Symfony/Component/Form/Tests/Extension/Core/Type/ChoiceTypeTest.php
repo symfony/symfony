@@ -2283,4 +2283,43 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         // In this case the 'choice_label' closure returns null and not the closure from the first choice type.
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
+
+    public function testSubmitDoesMapChoiceDataIfNotClearMissingWhenExpanded()
+    {
+        $builder = $this->factory->createBuilder('form', array('foo' => 'bar'));
+
+        $form = $builder->add('foo', 'choice', array(
+            'choices' => array(
+                'bar' => 'BAR',
+                'baz' => 'BAZ',
+            ),
+            'expanded' => true,
+        ))
+            ->getForm();
+
+        $this->assertSame(array('foo' => 'bar'), $form->getData());
+
+        $form->submit(array('foo' => 'baz'), false);
+
+        $this->assertSame(array('foo' => 'baz'), $form->getData());
+    }
+
+    public function testSubmitDoesMapChoiceDataIfNotClearMissingWhenCollapsed()
+    {
+        $builder = $this->factory->createBuilder('form', array('foo' => 'bar'));
+
+        $form = $builder->add('foo', 'choice', array(
+            'choices' => array(
+                'bar' => 'BAR',
+                'baz' => 'BAZ',
+            ),
+        ))
+            ->getForm();
+
+        $this->assertSame(array('foo' => 'bar'), $form->getData());
+
+        $form->submit(array('foo' => 'baz'), false);
+
+        $this->assertSame(array('foo' => 'baz'), $form->getData());
+    }
 }

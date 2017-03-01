@@ -207,6 +207,16 @@ FrameworkBundle
 
  * Extending `ConstraintValidatorFactory` is not supported anymore.
 
+ * Class parameters related to routing have been removed
+    * router.options.generator_class
+    * router.options.generator_base_class
+    * router.options.generator_dumper_class
+    * router.options.matcher_class
+    * router.options.matcher_base_class
+    * router.options.matcher_dumper_class
+    * router.options.matcher.cache_class
+    * router.options.generator.cache_class
+
 HttpFoundation
 ---------------
 

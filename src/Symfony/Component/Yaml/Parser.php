@@ -61,7 +61,7 @@ class Parser
      */
     public function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
     {
-        if (!self::preg_match('//u', $value)) {
+        if (false === preg_match('//u', $value)) {
             throw new ParseException('The YAML value does not appear to be valid UTF-8.');
         }
         $this->currentLineNb = -1;
@@ -127,7 +127,6 @@ class Parser
             } elseif (self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
                 && (false === strpos($values['key'], ' #')
                     || in_array($values['key'][0], array('"', "'")))) {
-
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence', $this->currentLineNb + 1, $this->currentLine);
                 }
@@ -269,7 +268,7 @@ class Parser
                     return $value;
                 }
 
-                throw new ParseException("Unable to parse", $this->getRealCurrentLineNb() + 1, $this->currentLine);
+                throw new ParseException('Unable to parse', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
         }
 
@@ -794,9 +793,12 @@ class Parser
      * in the YAML engine
      *
      * @throws ParseException on a PCRE internal error
+     *
      * @see preg_last_error()
+     *
+     * @internal
      */
-    static function preg_match($pattern, $subject, &$matches = null, $flags = 0, $offset = 0)
+    public static function preg_match($pattern, $subject, &$matches = null, $flags = 0, $offset = 0)
     {
         $ret = preg_match($pattern, $subject, $matches, $flags, $offset);
         if ($ret === false) {
@@ -822,6 +824,7 @@ class Parser
 
             throw new ParseException($error);
         }
+
         return $ret;
     }
 }

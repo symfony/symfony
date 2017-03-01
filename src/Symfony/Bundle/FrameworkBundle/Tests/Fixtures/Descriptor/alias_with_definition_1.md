@@ -11,6 +11,6 @@
 - Lazy: yes
 - Shared: yes
 - Abstract: yes
-- Autowire: no
+- Autowired: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`

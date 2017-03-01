@@ -589,10 +589,6 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services23.xml');
 
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
-        $this->assertEquals(array('__construct'), $container->getDefinition('bar')->getAutowiredCalls());
-
-        $loader->load('services27.xml');
-        $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredCalls());
     }
 
     public function testGetter()
@@ -602,16 +598,6 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services31.xml');
 
         $this->assertEquals(array('getbar' => array('bar' => new Reference('bar'))), $container->getDefinition('foo')->getOverriddenGetters());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     */
-    public function testAutowireAttributeAndTag()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services28.xml');
     }
 
     public function testClassFromId()
@@ -695,18 +681,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
-    public function testDefaultsWithAutowiredCalls()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services30.xml');
-
-        $this->assertSame(array('__construct'), $container->getDefinition('with_defaults')->getAutowiredCalls());
-        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults')->getAutowiredCalls());
-        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults_child')->getAutowiredCalls());
-        $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getAutowiredCalls());
-    }
-
     public function testNamedArguments()
     {
         $container = new ContainerBuilder();
@@ -729,7 +703,7 @@ class XmlFileLoaderTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition(Bar::class);
-        $this->assertSame(array('__construct', 'set*'), $definition->getAutowiredCalls());
+        $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
     }

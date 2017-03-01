@@ -1,4 +1,0 @@
-services:
-    autowire_array:
-        class: Foo
-        autowire: ['set*', 'bar']

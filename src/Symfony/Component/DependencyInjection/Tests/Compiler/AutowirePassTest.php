@@ -463,7 +463,7 @@ class AutowirePassTest extends TestCase
         // manually configure *one* call, to override autowiring
         $container
             ->register('setter_injection', SetterInjection::class)
-            ->setAutowiredCalls(array('set*'))
+            ->setAutowired(true)
             ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'))
         ;
 
@@ -472,13 +472,9 @@ class AutowirePassTest extends TestCase
 
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
-        // grab the call method names
-        $actualMethodNameCalls = array_map(function ($call) {
-            return $call[0];
-        }, $methodCalls);
         $this->assertEquals(
             array('setWithCallsConfigured', 'setFoo', 'setDependencies'),
-            $actualMethodNameCalls
+            array_column($methodCalls, 0)
         );
 
         // test setWithCallsConfigured args
@@ -503,7 +499,8 @@ class AutowirePassTest extends TestCase
 
         $container
             ->register('setter_injection', SetterInjection::class)
-            ->setAutowiredCalls(array('setFoo', 'notASetter'))
+            ->setAutowired(true)
+            ->addMethodCall('notASetter', array())
         ;
 
         $pass = new AutowirePass();
@@ -511,12 +508,13 @@ class AutowirePassTest extends TestCase
 
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
-        $actualMethodNameCalls = array_map(function ($call) {
-            return $call[0];
-        }, $methodCalls);
         $this->assertEquals(
-            array('setFoo', 'notASetter'),
-            $actualMethodNameCalls
+            array('notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured'),
+            array_column($methodCalls, 0)
+        );
+        $this->assertEquals(
+            array(new Reference('app_a')),
+            $methodCalls[0][1]
         );
     }
 
@@ -552,7 +550,7 @@ class AutowirePassTest extends TestCase
         $container
             ->register('getter_overriding', GetterOverriding::class)
             ->setOverriddenGetter('getExplicitlyDefined', new Reference('b'))
-            ->setAutowiredCalls(array('get*'))
+            ->setAutowired(true)
         ;
 
         $pass = new AutowirePass();
@@ -579,7 +577,7 @@ class AutowirePassTest extends TestCase
 
         $container
             ->register('getter_overriding', GetterOverriding::class)
-            ->setAutowiredCalls(array('getFoo'))
+            ->setAutowired(true)
         ;
 
         $pass = new AutowirePass();
@@ -646,23 +644,10 @@ class AutowirePassTest extends TestCase
         $container->register('c1', CollisionA::class);
         $container->register('c2', CollisionB::class);
         $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollision::class);
-        $aDefinition->setAutowiredCalls(array('set*'));
+        $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
         $pass->process($container);
-    }
-
-    public function testLogUnusedPatterns()
-    {
-        $container = new ContainerBuilder();
-
-        $definition = $container->register('foo', Foo::class);
-        $definition->setAutowiredCalls(array('not', 'exist*'));
-
-        $pass = new AutowirePass();
-        $pass->process($container);
-
-        $this->assertEquals(array(AutowirePass::class.': Autowiring\'s patterns "not", "exist*" for service "foo" don\'t match any method.'), $container->getCompiler()->getLog());
     }
 
     public function testEmptyStringIsKept()
@@ -899,52 +884,63 @@ class ClassChangedConstructorArgs extends ClassForResource
     }
 }
 
-class SetterInjection
+class SetterInjection extends SetterInjectionParent
 {
+    /**
+     * @required
+     */
     public function setFoo(Foo $foo)
     {
         // should be called
     }
 
+    /** @inheritdoc*/
     public function setDependencies(Foo $foo, A $a)
     {
         // should be called
     }
 
+    /**
+     * @required*/
     public function setBar()
     {
         // should not be called
     }
 
+    /**	@required <tab> prefix is on purpose */
     public function setNotAutowireable(NotARealClass $n)
     {
         // should not be called
     }
 
+    /** @required */
     public function setArgCannotAutowire($foo)
     {
         // should not be called
     }
 
+    /** @required */
     public function setOptionalNotAutowireable(NotARealClass $n = null)
     {
         // should not be called
     }
 
+    /** @required */
     public function setOptionalNoTypeHint($foo = null)
     {
         // should not be called
     }
 
+    /** @required */
     public function setOptionalArgNoAutowireable($other = 'default_val')
     {
         // should not be called
     }
 
+    /** {@inheritdoc} */
     public function setWithCallsConfigured(A $a)
     {
         // this method has a calls configured on it
-        // should not be called
     }
 
     public function notASetter(A $a)
@@ -952,14 +948,37 @@ class SetterInjection
         // should be called only when explicitly specified
     }
 
+    /** @required */
     protected function setProtectedMethod(A $a)
     {
         // should not be called
     }
 }
 
+class SetterInjectionParent
+{
+    /** @required*/
+    public function setDependencies(Foo $foo, A $a)
+    {
+        // should be called
+    }
+
+    public function notASetter(A $a)
+    {
+        // @required should be ignored when the child does not add @inheritdoc
+    }
+
+    /** @required */
+    public function setWithCallsConfigured(A $a)
+    {
+    }
+}
+
 class SetterInjectionCollision
 {
+    /**
+     * @required
+     */
     public function setMultipleInstancesForOneArg(CollisionInterface $collision)
     {
         // The CollisionInterface cannot be autowired - there are multiple

@@ -307,18 +307,12 @@ class DefinitionTest extends TestCase
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isAutowired());
+
         $def->setAutowired(true);
         $this->assertTrue($def->isAutowired());
-        $this->assertEquals(array('__construct'), $def->getAutowiredCalls());
 
-        $def->setAutowiredCalls(array('foo'));
         $def->setAutowired(false);
-        $this->assertSame(array(), $def->getAutowiredCalls());
         $this->assertFalse($def->isAutowired());
-
-        $def->setAutowiredCalls(array('getFoo', 'getBar'));
-        $this->assertEquals(array('getFoo', 'getBar'), $def->getAutowiredCalls());
-        $this->assertTrue($def->isAutowired());
     }
 
     /**

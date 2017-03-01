@@ -165,7 +165,6 @@ class XmlFileLoader extends FileLoader
         }
         $defaults = array(
             'tags' => $this->getChildren($defaultsNode, 'tag'),
-            'autowire' => $this->getChildren($defaultsNode, 'autowire'),
         );
 
         foreach ($defaults['tags'] as $tag) {
@@ -173,24 +172,14 @@ class XmlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The tag name for tag "<defaults>" in %s must be a non-empty string.', $file));
             }
         }
+        if ($defaultsNode->hasAttribute('autowire')) {
+            $defaults['autowire'] = XmlUtils::phpize($defaultsNode->getAttribute('autowire'));
+        }
         if ($defaultsNode->hasAttribute('public')) {
             $defaults['public'] = XmlUtils::phpize($defaultsNode->getAttribute('public'));
         }
         if ($defaultsNode->hasAttribute('inherit-tags')) {
             $defaults['inherit-tags'] = XmlUtils::phpize($defaultsNode->getAttribute('inherit-tags'));
-        }
-        if (!$defaultsNode->hasAttribute('autowire')) {
-            foreach ($defaults['autowire'] as $k => $v) {
-                $defaults['autowire'][$k] = $v->textContent;
-            }
-
-            return $defaults;
-        }
-        if ($defaults['autowire']) {
-            throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for tag "<defaults>" in %s.', $file));
-        }
-        if (XmlUtils::phpize($defaultsNode->getAttribute('autowire'))) {
-            $defaults['autowire'][] = '__construct';
         }
 
         return $defaults;
@@ -251,6 +240,8 @@ class XmlFileLoader extends FileLoader
 
         if ($value = $service->getAttribute('autowire')) {
             $definition->setAutowired(XmlUtils::phpize($value));
+        } elseif (isset($defaults['autowire'])) {
+            $definition->setAutowired($defaults['autowire']);
         }
 
         if ($files = $this->getChildren($service, 'file')) {
@@ -342,21 +333,6 @@ class XmlFileLoader extends FileLoader
 
         foreach ($this->getChildren($service, 'autowiring-type') as $type) {
             $definition->addAutowiringType($type->textContent);
-        }
-
-        $autowiredCalls = array();
-        foreach ($this->getChildren($service, 'autowire') as $tag) {
-            $autowiredCalls[] = $tag->textContent;
-        }
-
-        if ($autowiredCalls && $service->hasAttribute('autowire')) {
-            throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for service "%s" in %s.', $service->getAttribute('id'), $file));
-        }
-
-        if ($autowiredCalls) {
-            $definition->setAutowiredCalls($autowiredCalls);
-        } elseif (!$service->hasAttribute('autowire') && !empty($defaults['autowire'])) {
-            $definition->setAutowiredCalls($defaults['autowire']);
         }
 
         if ($value = $service->getAttribute('decorates')) {

@@ -82,16 +82,8 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
         if (isset($changes['abstract'])) {
             $def->setAbstract($definition->isAbstract());
         }
-        if (isset($changes['autowired_calls'])) {
-            $autowiredCalls = $def->getAutowiredCalls();
-        }
 
         ResolveDefinitionTemplatesPass::mergeDefinition($def, $definition);
-
-        // merge autowired calls
-        if (isset($changes['autowired_calls'])) {
-            $def->setAutowiredCalls(array_merge($autowiredCalls, $def->getAutowiredCalls()));
-        }
 
         // prepend instanceof tags
         $tailTags = $def->getTags();

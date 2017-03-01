@@ -216,16 +216,16 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('parent', 'stdClass')
-            ->setAutowiredCalls(array('foo'))
+            ->setAutowired(true)
         ;
 
         $container->setDefinition('child1', new ChildDefinition('parent'))
-            ->setAutowiredCalls(array('baz'))
+            ->setAutowired(false)
         ;
 
         $this->process($container);
 
-        $this->assertEquals(array('baz'), $container->getDefinition('child1')->getAutowiredCalls());
+        $this->assertFalse($container->getDefinition('child1')->isAutowired());
     }
 
     public function testSetAutowiredOnServiceIsParent()
@@ -233,14 +233,14 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('parent', 'stdClass')
-            ->setAutowiredCalls(array('__construct', 'set*'))
+            ->setAutowired(true)
         ;
 
         $container->setDefinition('child1', new ChildDefinition('parent'));
 
         $this->process($container);
 
-        $this->assertEquals(array('__construct', 'set*'), $container->getDefinition('child1')->getAutowiredCalls());
+        $this->assertTrue($container->getDefinition('child1')->isAutowired());
     }
 
     public function testDeepDefinitionsResolving()

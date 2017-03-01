@@ -220,12 +220,8 @@ class JsonDescriptor extends Descriptor
             'lazy' => $definition->isLazy(),
             'shared' => $definition->isShared(),
             'abstract' => $definition->isAbstract(),
+            'autowire' => $definition->isAutowired(),
         );
-
-        $autowiredCalls = array_values(array_filter($definition->getAutowiredCalls(), function ($method) {
-            return $method !== '__construct';
-        }));
-        $data['autowire'] = $definition->isAutowired() ? ($autowiredCalls ?: true) : false;
 
         foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
             $data['autowiring_types'][] = $autowiringType;

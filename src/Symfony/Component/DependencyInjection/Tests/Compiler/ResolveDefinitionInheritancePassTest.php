@@ -123,23 +123,6 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $this->assertTrue($container->getDefinition('parent')->isLazy());
     }
 
-    public function testSetAutowiredOnServiceHasParent()
-    {
-        $container = new ContainerBuilder();
-
-        $def = $container->register('parent', 'stdClass')
-            ->setAutowiredCalls(array('foo'))
-        ;
-
-        $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setAutowiredCalls(array('bar')),
-        ));
-
-        $this->process($container);
-
-        $this->assertEquals(array('foo', 'bar'), $def->getAutowiredCalls());
-    }
-
     public function testProcessInheritTags()
     {
         $container = new ContainerBuilder();

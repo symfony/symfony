@@ -23,31 +23,37 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
  */
 class GetterOverriding
 {
+    /** @required */
     public function getFoo(): ?Foo
     {
         // should be called
     }
 
+    /** @required */
     protected function getBar(): Bar
     {
         // should be called
     }
 
+    /** @required */
     public function getNoTypeHint()
     {
         // should not be called
     }
 
+    /** @required */
     public function getUnknown(): NotExist
     {
         // should not be called
     }
 
+    /** @required */
     public function getExplicitlyDefined(): B
     {
         // should be called but not autowired
     }
 
+    /** @required */
     public function getScalar(): string
     {
         // should not be called

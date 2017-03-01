@@ -139,15 +139,20 @@ FrameworkBundle
    deprecated and will be removed in 4.0. Use `Symfony\Component\Config\DependencyInjection\ConfigCachePass`
    class instead.
 
-
 HttpKernel
 -----------
 
- * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array of pools indexed
-   by name to the constructor instead.
-   
- * The `LazyLoadingFragmentHandler::addRendererService()` method has been deprecated and
-   will be removed in 4.0.
+ * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array
+   of pools indexed by name to the constructor instead.
+
+ * The `LazyLoadingFragmentHandler::addRendererService()` method has been
+   deprecated and will be removed in 4.0.
+
+ * The `X-Status-Code` header method of setting a custom status code in the
+   response when handling exceptions has been removed. There is now a new
+   `GetResponseForExceptionEvent::allowCustomResponseCode()` method instead,
+   which will tell the Kernel to use the response code set on the event's
+   response object.
 
 Process
 -------

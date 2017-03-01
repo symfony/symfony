@@ -243,6 +243,12 @@ HttpKernel
    
  * The `LazyLoadingFragmentHandler::addRendererService()` method has been removed.
 
+ * The `X-Status-Code` header method of setting a custom status code in the
+   response when handling exceptions has been removed. There is now a new
+   `GetResponseForExceptionEvent::allowCustomResponseCode()` method instead,
+   which will tell the Kernel to use the response code set on the event's
+   response object.
+
 Ldap
 ----
 

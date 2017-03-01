@@ -143,6 +143,11 @@ FrameworkBundle
    deprecated and will be removed in 4.0. Use the `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass`
    class instead.
 
+ * The `ConstraintValidatorFactory::$validators` and `$container` properties
+   have been deprecated and will be removed in 4.0.
+
+ * Extending `ConstraintValidatorFactory` is deprecated and won't be supported in 4.0.
+
 HttpKernel
 -----------
 

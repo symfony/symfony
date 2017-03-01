@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Validator;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -37,6 +37,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *     }
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @final since version 3.3
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
@@ -70,11 +72,15 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         $name = $constraint->validatedBy();
 
         if (!isset($this->validators[$name])) {
-            if (!class_exists($name)) {
-                throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or it is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_class($constraint)));
-            }
+            if ($this->container->has($name)) {
+                $this->validators[$name] = $this->container->get($name);
+            } else {
+                if (!class_exists($name)) {
+                    throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or it is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_class($constraint)));
+                }
 
-            $this->validators[$name] = new $name();
+                $this->validators[$name] = new $name();
+            }
         } elseif (is_string($this->validators[$name])) {
             $this->validators[$name] = $this->container->get($this->validators[$name]);
         }

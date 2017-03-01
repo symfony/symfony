@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AddConstraintValidatorsPass implements CompilerPassInterface
 {
@@ -25,23 +26,19 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
 
         $validators = array();
         foreach ($container->findTaggedServiceIds('validator.constraint_validator') as $id => $attributes) {
-            if (isset($attributes[0]['alias'])) {
-                $validators[$attributes[0]['alias']] = $id;
-            }
-
             $definition = $container->getDefinition($id);
 
-            if (!$definition->isPublic()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" must be public as it can be lazy-loaded.', $id));
-            }
-
             if ($definition->isAbstract()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" must not be abstract as it can be lazy-loaded.', $id));
+                continue;
             }
 
-            $validators[$definition->getClass()] = $id;
+            if (isset($attributes[0]['alias'])) {
+                $validators[$attributes[0]['alias']] = new Reference($id);
+            }
+
+            $validators[$definition->getClass()] = new Reference($id);
         }
 
-        $container->getDefinition('validator.validator_factory')->replaceArgument(1, $validators);
+        $container->getDefinition('validator.validator_factory')->replaceArgument(0, new ServiceLocatorArgument($validators));
     }
 }

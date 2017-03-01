@@ -160,6 +160,22 @@ class ChoiceType extends AbstractType
             // transformation is merged back into the original collection
             $builder->addEventSubscriber(new MergeCollectionListener(true, true));
         }
+
+        // To avoid issues when the submitted choices are arrays (i.e. array to string conversions),
+        // we have to ensure that all elements of the submitted choice data are strings or null.
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+
+            if (!is_array($data)) {
+                return;
+            }
+
+            foreach ($data as $v) {
+                if (null !== $v && !is_string($v)) {
+                    throw new TransformationFailedException('All choices submitted must be NULL or strings.');
+                }
+            }
+        }, 256);
     }
 
     /**
@@ -505,8 +521,8 @@ class ChoiceType extends AbstractType
      * "choice_label" closure by default.
      *
      * @param array|\Traversable $choices      The choice labels indexed by choices
-     * @param object             $choiceLabels The object that receives the choice labels
-     *                                         indexed by generated keys.
+     * @param object             $choiceLabels the object that receives the choice labels
+     *                                         indexed by generated keys
      * @param int                $nextKey      The next generated key
      *
      * @return array The choices in a normalized array with labels replaced by generated keys

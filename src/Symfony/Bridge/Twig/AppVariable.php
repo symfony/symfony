@@ -145,4 +145,35 @@ class AppVariable
 
         return $this->debug;
     }
+
+    /**
+     * Returns some or all the existing flash messages:
+     *  * getFlashes() returns all the flash messages
+     *  * getFlashes('notice') returns a simple array with flash messages of that type
+     *  * getFlashes(array('notice', 'error')) returns a nested array of type => messages.
+     *
+     * @return array
+     */
+    public function getFlashes($types = null)
+    {
+        // needed to avoid starting the session automatically when looking for flash messages
+        try {
+            $session = $this->getSession();
+            if (null === $session || !$session->isStarted()) {
+                return array();
+            }
+        } catch (\RuntimeException $e) {
+            return array();
+        }
+
+        if (null === $types || '' === $types || array() === $types) {
+            return $session->getFlashBag()->all();
+        }
+
+        if (is_string($types)) {
+            return $session->getFlashBag()->get($types);
+        }
+
+        return array_intersect_key($session->getFlashBag()->all(), array_flip($types));
+    }
 }

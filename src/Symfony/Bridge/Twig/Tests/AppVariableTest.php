@@ -5,6 +5,7 @@ namespace Symfony\Bridge\Twig\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class AppVariableTest extends TestCase
@@ -157,6 +158,62 @@ class AppVariableTest extends TestCase
         $this->appVariable->getSession();
     }
 
+    public function testGetFlashesWithNoRequest()
+    {
+        $this->setRequestStack(null);
+
+        $this->assertEquals(array(), $this->appVariable->getFlashes());
+    }
+
+    public function testGetFlashesWithNoSessionStarted()
+    {
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request->method('getSession')->willReturn(new Session());
+
+        $this->setRequestStack($request);
+
+        $this->assertEquals(array(), $this->appVariable->getFlashes());
+    }
+
+    public function testGetFlashes()
+    {
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals($flashMessages, $this->appVariable->getFlashes(null));
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals($flashMessages, $this->appVariable->getFlashes(''));
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals($flashMessages, $this->appVariable->getFlashes(array()));
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals(array(), $this->appVariable->getFlashes('this-does-not-exist'));
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals(array(), $this->appVariable->getFlashes(array('this-does-not-exist')));
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals($flashMessages['notice'], $this->appVariable->getFlashes('notice'));
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals(
+            array('notice' => $flashMessages['notice']),
+            $this->appVariable->getFlashes(array('notice'))
+        );
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals(
+            array('notice' => $flashMessages['notice']),
+            $this->appVariable->getFlashes(array('notice', 'this-does-not-exist'))
+        );
+
+        $flashMessages = $this->setFlashMessages();
+        $this->assertEquals(
+            array('notice' => $flashMessages['notice'], 'error' => $flashMessages['error']),
+            $this->appVariable->getFlashes(array('notice', 'error'))
+        );
+    }
+
     protected function setRequestStack($request)
     {
         $requestStackMock = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
@@ -174,5 +231,26 @@ class AppVariableTest extends TestCase
         $tokenStorage->method('getToken')->willReturn($token);
 
         $token->method('getUser')->willReturn($user);
+    }
+
+    private function setFlashMessages()
+    {
+        $flashMessages = array(
+            'notice' => array('Notice #1 message'),
+            'warning' => array('Warning #1 message'),
+            'error' => array('Error #1 message', 'Error #2 message'),
+        );
+        $flashBag = new FlashBag();
+        $flashBag->initialize($flashMessages);
+
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->getMock();
+        $session->method('isStarted')->willReturn(true);
+        $session->method('getFlashBag')->willReturn($flashBag);
+
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request->method('getSession')->willReturn($session);
+        $this->setRequestStack($request);
+
+        return $flashMessages;
     }
 }

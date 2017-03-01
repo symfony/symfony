@@ -33,7 +33,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($eventName, EventInterface $event = null)
     {
         if (null === $event) {
             $event = new Event();
@@ -161,11 +161,11 @@ class EventDispatcher implements EventDispatcherInterface
      * This method can be overridden to add functionality that is executed
      * for each listener.
      *
-     * @param callable[] $listeners The event listeners
-     * @param string     $eventName The name of the event to dispatch
-     * @param Event      $event     The event object to pass to the event handlers/listeners
+     * @param callable[]     $listeners The event listeners
+     * @param string         $eventName The name of the event to dispatch
+     * @param EventInterface $event     The event object to pass to the event handlers/listeners
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function doDispatch($listeners, $eventName, EventInterface $event)
     {
         foreach ($listeners as $listener) {
             if ($event->isPropagationStopped()) {

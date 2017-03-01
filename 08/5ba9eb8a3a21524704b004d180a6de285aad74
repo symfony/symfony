@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-01T10:45:24Z
+
+Happy new year ! Best wishes :)
+
+About your change, why not replacing the `+` [here](https://github.com/xabbuh/symfony/blob/f172cce793109461cc309ab2d903bb830ed28ec9/src/Symfony/Component/Yaml/Inline.php#L312)  by a `*` ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-01T13:12:24Z
+
+Happy new year for you too! :)
+
+> About your change, why not replacing the + here by a * ?
+
+That's indeed much better. I updated the code accordingly.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-01T14:41:48Z
+
+Having a `null` key should be forbidden at the same time as it is not supported by PHP. Not sure how to do it as `{: foo}` and `{'': foo}` will be considered the same way while only the second one should be valid.
+Same applies for other constants btw `{false: foo}` should not be valid in a PHP parser but it is equivalent to `{'false': foo}` currently (keys are not evaluated).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T13:39:01Z
+
+@xabbuh any comments regarding the last comment by @GuilhemN?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-16T22:24:37Z
+
+@GuilhemN @fabpot As far as I understand the specs the key cannot be omitted in a mapping and it will never be treated as a boolean value (correct me if I am wrong). The YAML parser at http://yaml-online-parser.appspot.com/ seem to confirm this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T22:37:23Z
+
+@xabbuh I think that's exactly the problem mentioned by @GuilhemN
+
+You can add the following test, which is valid YAML (and works great):
+
+```php
+            'empty key is allowed' => array('{"": "foo"}', array("" => "foo")),
+```
+
+But this one should fail (but it does not):
+
+```php
+            'null key is not allowed' => array('{: "foo"}', array(null => "foo")),
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-17T07:55:05Z
+
+That's indeed an issue. I opened #21643 to fix this in older maintained versions too (this one should be merged into `master` as it IMO is a new feature).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T15:14:41Z
+
+@xabbuh Can you rebase and add a note in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-01T15:38:14Z
+
+done

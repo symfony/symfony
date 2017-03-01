@@ -1755,7 +1755,6 @@ class ChoiceTypeTest extends TypeTestCase
             'choices' => $this->choices,
             'multiple' => $multiple,
             'expanded' => $expanded,
-            'choices_as_values' => true,
         ));
 
         $form->submit($submissionData);

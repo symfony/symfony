@@ -161,7 +161,7 @@ class AppVariable
             if (null !== $session && !$session->isStarted()) {
                 return array();
             }
-        } catch(\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             return array();
         }
 

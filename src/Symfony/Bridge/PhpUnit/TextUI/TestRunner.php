@@ -38,7 +38,17 @@ class TestRunner extends BaseRunner
 
         $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
 
-        if (!array_filter($arguments['listeners'], function ($listener) { return $listener instanceof SymfonyTestsListener; })) {
+        $registeredLocally = false;
+
+        foreach ($arguments['listeners'] as $registeredListener) {
+            if ($registeredListener instanceof SymfonyTestsListener) {
+                $registeredListener->globalListenerDisabled();
+                $registeredLocally = true;
+                break;
+            }
+        }
+
+        if (!$registeredLocally) {
             $arguments['listeners'][] = $listener;
         }
 

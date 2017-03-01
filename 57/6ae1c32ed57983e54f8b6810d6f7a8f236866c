@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-13T17:32:45Z
+
+How does this help users of the HttpFoundation component given that it adds an additional method call?
+
+---------------------------------------------------------------------------
+
+by gmponos at 2017-01-14T10:55:40Z
+
+It does not help the user of the component. It's more of a
+- DocBlock matter. User can easily spot that he gets an `AttributeBagInterface`. When I visited the class to see internally how it works I had to spent some more time to figure out why does it call a function from an Interface that does not support it.
+- Offers better autocompletion in IDE.
+- If you ever change something you will need to change one line rather `n` lines.
+
+As I said it does not offer something to the user. It's a matter of taste. I will understand if you don't like it.
+
+Furthermore I was also sceptical if the method should be private or public.

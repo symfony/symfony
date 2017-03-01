@@ -198,6 +198,9 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass` class has been removed.
    Use `Symfony\Component\Config\DependencyInjection\ConfigCachePass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass` class has been
+   removed. Use the `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass`
+   class instead.
 
 HttpFoundation
 ---------------

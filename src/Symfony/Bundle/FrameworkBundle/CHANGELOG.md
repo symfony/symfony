@@ -19,6 +19,7 @@ CHANGELOG
  * Deprecated `TestSessionListener`
  * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`. 
    Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
+ * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
 
 3.2.0
 -----

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-24T11:15:24Z
+
+@javiereguiluz fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-24T14:03:31Z
+
+CS should be fixed. But more important, what's the point?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-24T14:40:09Z
+
+@fabpot : the point is being dry. I wrongly opened #21747 to fix a bug that had already been fixed, and was told that while I was at it, I should refactor this piece of code that is pretty repetitive. With this change, adding new units like `G` or `Gi` should be way easier / less error prone. Once I noticed I was using outdated code, I closed the PR, and was told (on slack) that I should make a PR to not throw away these changes that were deemed good although they do not fix any bug.
+
+Note how there is less code after the change, the diffstat says "+10 −15"

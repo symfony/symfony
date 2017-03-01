@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by issei-m at 2017-01-19T11:28:19Z
+
+@HeahDude Just I've fixed point of mentioned by you.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-09T15:49:20Z
+
+One last thing that I missed during my previous review: Please move the data provider after the test method.
+
+---------------------------------------------------------------------------
+
+by issei-m at 2017-02-10T03:47:54Z
+
+@xabbuh It's done. Thanks for your advice!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-10T08:38:48Z
+
+:+1:
+
+Status: Reviewed

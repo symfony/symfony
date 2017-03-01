@@ -523,7 +523,7 @@ class Filesystem
                 @chmod($tmpFile, 0666 & ~umask());
             }
         }
-        
+
         $this->rename($tmpFile, $filename, true);
     }
 

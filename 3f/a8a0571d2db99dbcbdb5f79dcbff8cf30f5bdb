@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-25T18:50:12Z
+
+I like it! It removes 2 things I don't like:
+
+* I never liked the `autowire` key with actual args (`autowire: [setFoo,getBar]`). It moves more config into YAML, with limited benefit.
+
+* Since the `set*` thing has proven to be a "gotcha", we should definitely remove it: we're trying to walk a balance of added convenience, but no significant "wtf" increases!
+
+> There is only one tweak required to make this work: don't autowire optional arguments for method calls - or that'd be a BC break. To my PoV that's even better: this makes autowiring fit a "do the minimum to make it work" strategy. A really good one to me.
+
+Yes! I agree - autowiring should do as little as possible (based on the code you've written).
+
+And explaining autowiring should now be pretty simple!
+
+>By adding `autowire: true`, Symfony will read the type-hints on your `__construct()`
+>method and automatically try to inject services that match those type-hints. You can
+>also tell Symfony to automatically call (and autowire) other methods (e.g. `setLogger()`)
+>by adding an `@required` annotation above the method. This also works for
+>getter-injected methods.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-02-26T00:14:31Z
+
+I like the autowire feature, but I don't like this proposal. Our company has no annotations policy, so if I understand correctly this means no autowire for us.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-02-26T08:13:36Z
+
+> just declare a method call, but don't define its arguments
+
+Some of my first thoughts :) https://github.com/symfony/symfony/pull/19631#issuecomment-240105587 i think it's a good convention :+1:
+
+> don't autowire optional arguments for method calls
+
+With named arguments we could define optional ones, override required ones, and let autowiring fill in the remaining required ones.. right?
+
+And shouldnt this be allowed by the annotation-form as well? I.e. `@MethodCall({'$arg': '@ref'})` (i think i'd prefer `@MethodCall` over `@Required`).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-02-26T08:34:10Z
+
+I see `@required` is a specific built-in feature, where i was thinking of annotation support like we do for routes/validation (ie. `@DI\MethodCall`, etc.), my bad. Im not even sure we should go that way..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-26T10:32:46Z
+
+> so if I understand correctly this means no autowire for us.
+
+@mvrhov I think you did not understand correctly: if you don't want to use the annotation, that won't prevent you from using autowiring. First, constructor autowiring doesn't require it. Then, for setters and getters, that will just make you declare which of them to autowire in the DI config, instead of in the code. It has to be somewhere. The annotation allows code authors to help autowiring users so that they can save these DI config lines. Only that.
+
+> With named arguments we could define optional ones, override required ones, and let autowiring fill in the remaining required ones.. right?
+
+@ro0NL Right!
+
+> And shouldnt this be allowed by the annotation-form as well? I.e. `@MethodCall({'$arg': '@ref'})` (i think i'd prefer `@MethodCall` over `@Required`)
+
+Yes, this shouldn't be allowed, because this is moving the DI configuration right into the code - which is *not* what this PR does - and it a totally different topic.
+
+> I see @required is a specific built-in feature, where i was thinking of annotation support like we do for routes/validation (ie. `@DI\MethodCall`, etc.), my bad. Im not even sure we should go that way..
+
+Same here, we shouldn't go that way to me, too much added complexity for no benefit at all.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-26T12:59:56Z
+
+I will see a lot of people remove `@required` from the docblock because:
+ - It's not something used in docblocks
+ - It's not in the expected annotation format used by Doctrine Annotations
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T18:01:24Z
+
+First of all, I'm really happy that we will remove the `get*` and `set*` support in the autowire configuration. I did test them and it just does not work well in real-life projects.
+
+That being said, having "something" to autowire dependencies in a lazy-way would be a great feature for Symfony 3.3. And we are almost there. I've migrated several projects and implemented all the new features of the container, and I have to say that this is really a joy to work with (I actually encourage anyone to try it on their projects and give feedback).
+
+The proposed `@required` annotation fits a hole that would finish our container enhancement journey quite nicely. It's a very elegant solution for what we are trying to do.
+
+If we look at the semantic of the proposed `@required` annotation closely, I think it's very different from the annotations we manage in `FrameworkExtraBundle`. It seems to me that it is more similar to the `@deprecated` or `@final` annotations.
+
+Those annotations gather generic and purely descriptive semantic about some methods/classes, they have nothing specific about Symfony and can/could be used by any PHP code. Note that we use the semantic they convey in the Debug component, in DebugClassLoader, to give a better DX, so we have a precedent here.
+
+I think all of this applies also to the `@required` annotation: it can benefit to any PHP code, and allows to declare which parts of a class are required for full instantiation, apart from the constructor. While the generalization of this annotation is not the target, it sounded like an important criteria to understand its usefulness to me. This is to be opposed to Doctrine annotations, which convey domain specific semantics, and thus wouldn't be suited here.
+
+The fact that this annotation is not yet standardized shouldn't prevent us from adopting it (we did so for `@final` already).
+
+This is also very different from previous proposals that tried to move configuration into annotations. Using the `@required` annotation when present is purely optional and is only triggered when you enable the autowiring.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T19:34:46Z
+
+👍

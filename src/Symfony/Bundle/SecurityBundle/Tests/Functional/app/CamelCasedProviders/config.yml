@@ -1,0 +1,30 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+doctrine:
+    dbal:
+        driver:   pdo_sqlite
+        memory:   true
+        charset:  UTF8
+
+    orm:
+        entity_managers:
+            default:
+
+                auto_mapping: true
+
+security:
+    providers:
+        camelCasedName:
+            entity:
+                class: Symfony\Component\Security\Core\User\User
+
+    firewalls:
+        default:
+            anonymous: ~
+            provider: camelCasedName
+
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+

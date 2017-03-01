@@ -473,7 +473,7 @@ class AutowirePassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            array('setWithCallsConfigured', 'setFoo', 'setDependencies'),
+            array('setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'),
             array_column($methodCalls, 0)
         );
 
@@ -509,7 +509,7 @@ class AutowirePassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            array('notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured'),
+            array('notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'),
             array_column($methodCalls, 0)
         );
         $this->assertEquals(
@@ -953,6 +953,10 @@ class SetterInjection extends SetterInjectionParent
     {
         // should not be called
     }
+
+    public function setChildMethodWithoutDocBlock(A $a)
+    {
+    }
 }
 
 class SetterInjectionParent
@@ -970,6 +974,11 @@ class SetterInjectionParent
 
     /** @required */
     public function setWithCallsConfigured(A $a)
+    {
+    }
+
+    /** @required */
+    public function setChildMethodWithoutDocBlock(A $a)
     {
     }
 }

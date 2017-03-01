@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-25T12:28:09Z
+
+Applies to 2.7, isn't it?
+
+---------------------------------------------------------------------------
+
+by rubenrua at 2017-02-27T20:00:32Z
+
+Yes, new pull request?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-27T20:10:47Z
+
+@rubenrua No need for a new PR. You can rebase your changes onto the `2.7` branch and then changed the target path here.
+
+---------------------------------------------------------------------------
+
+by rubenrua at 2017-02-28T13:03:57Z
+
+Rebase done

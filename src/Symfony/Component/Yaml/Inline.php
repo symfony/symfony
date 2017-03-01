@@ -296,7 +296,7 @@ class Inline
      *
      * @internal
      */
-    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = array())
+    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = array(), $legacyOmittedKeySupport = false)
     {
         if (in_array($scalar[$i], array('"', "'"))) {
             // quoted scalar
@@ -318,7 +318,7 @@ class Inline
                 if (preg_match('/[ \t]+#/', $output, $match, PREG_OFFSET_CAPTURE)) {
                     $output = substr($output, 0, $match[0][1]);
                 }
-            } elseif (preg_match('/^(.*?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
+            } elseif (preg_match('/^(.'.($legacyOmittedKeySupport ? '+' : '*').'?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
                 $output = $match[1];
                 $i += strlen($output);
             } else {
@@ -475,7 +475,7 @@ class Inline
             }
 
             // key
-            $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false);
+            $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false, array(), true);
 
             if (':' !== $key && false === $i = strpos($mapping, ':', $i)) {
                 break;

@@ -245,7 +245,7 @@ EOF;
                 $hasTrailingSlash = true;
             }
             
-            if(!preg_match('#^'.preg_quote('#^/(?P<', '#').'([A-Za-z0-9_]+)'.preg_quote('>.*)?$#s', '#').'$#', $regex)) {
+            if (!preg_match('#^'.preg_quote('#^/(?P<', '#').'([A-Za-z0-9_]+)'.preg_quote('>.*)?$#s', '#').'$#', $regex)) {
                 $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
 
                 $matches = true;

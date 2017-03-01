@@ -1,0 +1,302 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-10T15:39:18Z
+
+I don't know if it makes sense, but I expected an empty string in the third example (instead of `null`).
+
+In fact, that was my original problem: there is a command that defines a default value for the "prefix" option. I want to use an empty string as the prefix, but there's no way to tell the command that I want an empty string.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T16:10:19Z
+
+:+1: for empty string when given empty..
+
+```
+cmd --foo     => ""
+cmd           => null
+cmd --foo bar => "bar"
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-10T16:10:38Z
+
+Yeah, problem is that the conversion of empty strings to null is a feature (https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Input/ArgvInput.php#L224).
+So, should we change this behavior? If we agree, I'll try to do it here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T16:15:21Z
+
+Imo. the distinction between `null/default` and `""` makes sense when compared to the command line.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-10T16:18:28Z
+
+@ro0NL I think we are talking about different behaviors.
+
+You say:
+
+```
+command            ==> foo = null
+command --foo      ==> foo = empty string
+command --foo=""   ==> foo = empty string
+```
+
+And this is what I say:
+
+```
+command            ==> foo = null
+command --foo      ==> foo = null
+command --foo=""   ==> foo = empty string
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T16:30:45Z
+
+Yep.. you're right. Maybe even better :+1:
+
+However i considered it (for my own usecase :angel:) as follow
+
+- `cmd` (foo is default)
+- `cmd --foo=""` (foo is given)
+- `cmd --foo="bar"` (foo is given)
+- `cmd --foo` (foo is null)
+
+In the last scenario i'd like to throw if the command is running non-interactively (`--foo` requires a value by design), otherwise, if interactive, and `--foo` is passed, i'd like to _ask_ a value.
+
+But you're right, this is a different look at it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T16:34:49Z
+
+We actually talking about the same :) `--foo (null)` and `--foo="" ("")` I wrote it down wrong :)
+
+:+1:
+
+edit: depends though.. i vote for `--foo` (when given) being `NULL` at all time, *not* the default value (which can be null).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-10T17:03:24Z
+
+>  i vote for --foo (when given) being NULL at all time
+
+It's what this actually fixes:
+```php
+// before
+cmd          // $input->getOption('foo') gives the default value
+cmd --foo    // $input->getOption('foo') gives the default value
+cmd --foo="" // $input->getOption('foo') gives the default value
+
+// after
+cmd          // $input->getOption('foo') gives the default value
+cmd --foo    //  $input->getOption('foo') gives NULL
+cmd --foo="" // $input->getOption('foo') gives NULL (remaining problem, should give an empty string)
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T17:52:23Z
+
+My bad :), your last _after_ example sounds really good (with the correct empty string handling).
+
+Maybe for the input definition we could/should make things opt-in? `InputOption::VALUE_NULL` or so, otherwise im :+1:  for the behavior change.
+
+Ie. `--foo` being NULL vs. default will be a never ending discussion i guess. One can expect both actually..
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-10T18:23:17Z
+
+> Ie. --foo being NULL vs. default will be a never ending discussion i guess. One can expect both actually..
+
+IMHO it must be `null`. You already get the default by calling `cmd` without the option. Why would you add the option then if you expect the default?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T18:27:52Z
+
+I tend to agree null makes more sense as well.. as it's rather explicit. However, i could understand one saying "no value means the default value", as we technically did not pass a value. Other then `null` of course.. or is it void? ;-)
+
+Anyway.. concerning BC.. what about making the behavior opt-in? `VALUE_NULL` could differ between giving `null` (new behavior), or default (old behavior).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-10T19:05:33Z
+
+> what about making the behavior opt-in?
+
+It would add too much complexity to something already quite complex imho, from a code pov as well as from a usage one: reading `VALUE_NULL` is quite confusing to me, since other constants `VALUE_OPTIONAL` and `VALUE_REQUIRED` are not about using or not the default value but only that the option must take a value or not.
+I would say it's a minor behavior break which is acceptable and quite easy to fix (i.e. don't pass `--prefix` with no value if your option has a default value, no code to change).
+
+About empty strings, I think we can't handle them while keeping a consistent behavior.
+Fact is that running `cmd --foo=""` or `cmd --foo=` gives the _same_ result when looking at `$argv`, i.e. `array('cmd', '--foo=');`. So what do we do for the later, null or empty string?
+It looks like a PHP limitation (don't know about other languages) and we have to make a choice, giving always `null` or always an empty string. I prefer `null`, as the current implementation gives, fixable using a `--no-prefix` option.
+
+This fixes the fact that default value is used when giving an empty value, another issue could be opened for the fact that null is returned for an empty string, but I'm afraid we can't fix without totally changing the way we get and parse the input (and I don't see how actually).
+/cc @javiereguiluz @fabpot
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T19:23:55Z
+
+> I would say it's a minor behavior break which is acceptable and quite easy to fix
+
+:+1:
+
+Imo. `--foo=` equals `--foo=""`. The trailing `=` is trivial here.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-10T19:27:14Z
+
+@ro0NL I don't think it's the same: An empty string is not the same as null. To me, `--foo` and `--foo=` means that there is no value, so `null`.  However, `--foo=''` is different because we are passing an empty string as the value, so there is a value and it's an empty string.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-10T19:36:08Z
+
+But quotes are optional.. `--foo=bar` equals `--foo="bar"` as well (and equals `--foo bar`).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-10T21:46:53Z
+
+> However, --foo='' is different because we are passing an empty string as the value, so there is a value and it's an empty string
+
+Sadly, regarding php it is not:
+```php
+// php cli.php --foo='bar'
+dump(getopt('', ['foo::'])); // ["foo" => "bar"]
+dump($argv); // [0 => "cli.php", 1 => "--foo=bar"]
+
+//  php cli.php  --foo=
+dump(getopt('', ['foo::'])); // []
+dump($argv);  // [0 => "cli.php", 1 => "--foo="]
+
+//  php cli.php --foo=''
+dump(getopt('', ['foo::'])); // []
+dump($argv); // [0 => "cli.php", 1 => "--foo="]
+```
+
+But:
+
+```php
+//  php cli.php --foo="''"
+dump(getopt('', ['foo::'])); // []
+dump($argv); // [0 => "cli.php", 1 => "--foo=''"]
+```
+
+edit: For the record, I tried some of the most used CLI packages ([hoa/console](https://github.com/hoa/console), [auraphp/Aura.Cli](https://github.com/auraphp/aura.cli), [nategood/commando](https://github.com/nategood/commando) and [c9s/CLIFramework](https://github.com/c9s/CLIFramework)) and none of them behave "perfectly" regarding our need. The fact we use `null` for no-value and not an empty string looks debatable and could be reconsidered, both have pros and cons.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-11T08:07:35Z
+
+@chalasr OK. It's clear now that this problem has no solution because of PHP. We should instead add a note in the docs explaining that you cannot pass an empty string as the value of an option. Thanks for investigating this!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-14T21:43:44Z
+
+@javiereguiluz As explained in https://github.com/symfony/symfony/issues/21215#issuecomment-272637683, there is actually 2 different issues:
+- Passing an option with no value or an empty value actually returns the default value of the option, so we can't know if the option was explicitly specified or not
+- Passing an option with only quotes (empty string) is not detectable when using `=` as separator
+
+The former can be solved by returning `null` instead of the default value (or any other empty value, but the current implementation uses `null`), unlocking the ability to know that the option was specified but empty, letting up to the developer to change `null` to an empty value of any primitive type, or use the default value. That is what is proposed here.
+
+The latter is either full white or full black: we have to use an empty value of a predefined primitive type (currently `null`) to return when the option is specified with no value or an empty string.
+We could have returned an empty string instead of null (as we are forced to return the same in all cases i.e. `cmd --foo`, `--foo=`, `--foo=""` and `--foo ""`), ~~but I do think it's not a big deal~~ (fixed), as one would complain that he wants `null` when using `--foo`, for sure.
+However, it is no more a blocking issue as soon as we have the fix made here, because we are aware of that the option has been specified empty, so we can easily convert `null` to the value of our choice (some CLI libraries allow to set a type on the option beforehand for handling these cases differently depending on the need, it could be a way to improve the situation in a next time, not sure it's worth it though).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-15T08:50:35Z
+
+The implicit empty string to null conversion as mentioned before, should be fixed at least imo.; looking at https://github.com/symfony/symfony/blob/v3.2.2/src/Symfony/Component/Console/Input/ArgvInput.php#L145 we already detect the difference between a value an no value depending on `=`. So this works counter-wise.
+
+Including this PR the only drawback seems we cant differ between `--foo` and `--foo ""`, which right now doesnt work either (gives default, after it gives null).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-15T11:33:32Z
+
+I looked at improving the situation for empty strings, here is what I end up with:
+
+Code
+```php
+$application = new Application();
+$application
+    ->register('echo')
+    ->addOption('prefix', null, InputOption::VALUE_OPTIONAL, null, 'my-default')
+    ->addArgument('value', InputArgument::REQUIRED)
+    ->setCode(function ($input, $output) {
+        var_dump($input->getOption('prefix'));
+    });
+
+$application->run();
+```
+
+Before this PR
+![before](http://image.prntscr.com/image/157d9c6c054240da8b0dce54c9ce24d6.png)
+
+After
+![after](http://image.prntscr.com/image/4aeded77f8084d3c985687fc8cc7b54e.png)
+
+We get the default value only when don't passing the option explicitly.
+I think we are good. What do you think?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-15T11:54:59Z
+
+Looks really good :) can you confirm `--opt-long --opt-long2` are both `null`? Or vice-versa... does `--opt-long "" --opt-long2` works out?
+
+I think the latter is an edge case where you get `null` for `--opt-long` right?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-15T12:03:39Z
+
+@ro0NL works out!
+
+```php
+->addOption('opt-long', null, InputOption::VALUE_OPTIONAL, null, 'my-default1')
+->addOption('opt-long2', null, InputOption::VALUE_OPTIONAL, null, 'my-default2')
+->setCode(function ($input, $output) {
+    var_dump($input->getOption('opt-long'));
+    var_dump($input->getOption('opt-long2'));
+});
+```
+
+![long-opts](http://image.prntscr.com/image/30de513a22734b5fb388ad4632d219f3.png)
+/cc @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-20T17:07:44Z
+
+Any thought here?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-28T16:00:26Z
+
+changelog updated, ping deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-28T22:04:33Z
+
+This looks like a BC break to me (and the fact that you added a note in the CHANGELOG confirms that feeling). So, I think that's not something that can be merged in 2.7, master would be ok if clearly documented.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-28T23:24:13Z
+
+@fabpot rebased on master and documented.

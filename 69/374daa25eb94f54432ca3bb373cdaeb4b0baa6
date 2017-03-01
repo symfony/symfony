@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-23T19:20:47Z
+
+Considering your comment, I think it's better to delay this change to 4.0 and to just deprecate `ConstraintValidatorFactory::$container` and `ConstraintValidatorFactory::$validators` for now, it will be much easier to do this way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-23T19:37:37Z
+
+Is there any BC break really?
+I mean, code that exists won't suddenly get a PSR11-only object injected, will they?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-23T19:41:28Z
+
+If someone uses `$container` he would receive a psr-11 only container as I updated the first argument to a service locator.
+I think we can change the type hint now but we can't update the service config to a service locator before 4.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-23T19:43:08Z
+
+> If someone uses $container he would receive a psr-11 only container as I updated the first argument to a service locator
+
+BC breaks are about existing code - ie already written ones - that may break because of a change here. How can this change break existing code?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-23T20:01:24Z
+
+Anyone extending this code and wiring it on its own doesn't have to check that what it receives is a symfony container until now since we guarantee it, after this change such code would work by luck if it relies on any method that is not part of the PSR-11 replacement. It would truly break only when decorating the service of this factory, maybe we don't care.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-23T20:23:35Z
+
+@chalasr as discussed with @nicolas-grekas, there is no bc break as it won't break existing code: the only time the container will no longer be an instance of the symfony container when upgrading will be when using the `validator.validator_factory` service but it doesn't matter as we know it's not extended (its class is fixed).
+So maybe a class extending `ConstraintValidatorFactory` won't support the psr-11 container but that's not truly a bc break as it won't break existing code, the container will always be a symfony container, only new code could be broken but that's not part of bc.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-23T20:26:35Z
+
+Pleased to see one more container injection removed then.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-24T09:45:59Z
+
+The Validator's CHANGELOG should mention the deprecation
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-25T09:37:12Z
+
+Changelog updated ☺
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-28T13:00:43Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-03-01T16:05:43Z
+
+@nicolas-grekas done.
+
+Also, abstract definitions are now ignored and I improved the test readability by removing mocks.

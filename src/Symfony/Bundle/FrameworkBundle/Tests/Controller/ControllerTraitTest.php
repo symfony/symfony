@@ -35,13 +35,14 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @requires PHP 7
  */
-class ControllerTraitTest extends \PHPUnit_Framework_TestCase
+class ControllerTraitTest extends PHPUnitTestCase
 {
     public function testGenerateUrl()
     {

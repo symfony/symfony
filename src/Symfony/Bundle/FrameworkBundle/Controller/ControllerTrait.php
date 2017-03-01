@@ -46,21 +46,33 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 trait ControllerTrait
 {
+    /**
+     * @required
+     */
     protected function getRouter(): RouterInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', RouterInterface::class));
     }
 
+    /**
+     * @required
+     */
     protected function getRequestStack(): RequestStack
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', RequestStack::class));
     }
 
+    /**
+     * @required
+     */
     protected function getHttpKernel(): HttpKernelInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', HttpKernelInterface::class));
     }
 
+    /**
+     * @required
+     */
     protected function getSerializer(): SerializerInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', SerializerInterface::class));
@@ -70,38 +82,56 @@ trait ControllerTrait
      * An instance of the Session implementation (and not the interface) is returned because getFlashBag is not part of
      * the interface.
      *
-     * @return Session
+     * @required
      */
     protected function getSession(): Session
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', Session::class));
     }
 
+    /**
+     * @required
+     */
     protected function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', AuthorizationCheckerInterface::class));
     }
 
+    /**
+     * @required
+     */
     protected function getTwig(): \Twig_Environment
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', \Twig_Environment::class));
     }
 
+    /**
+     * @required
+     */
     protected function getDoctrine(): ManagerRegistry
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', ManagerRegistry::class));
     }
 
+    /**
+     * @required
+     */
     protected function getFormFactory(): FormFactoryInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', FormFactoryInterface::class));
     }
 
+    /**
+     * @required
+     */
     protected function getTokenStorage(): TokenStorageInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', TokenStorageInterface::class));
     }
 
+    /**
+     * @required
+     */
     protected function getCsrfTokenManager(): CsrfTokenManagerInterface
     {
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', CsrfTokenManagerInterface::class));

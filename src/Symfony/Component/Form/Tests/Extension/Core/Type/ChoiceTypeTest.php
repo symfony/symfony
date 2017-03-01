@@ -2305,10 +2305,11 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'choices' => $this->choices,
             'multiple' => $multiple,
             'expanded' => $expanded,
+            'choices_as_values' => true,
         ));
 
         $form->submit($submissionData);

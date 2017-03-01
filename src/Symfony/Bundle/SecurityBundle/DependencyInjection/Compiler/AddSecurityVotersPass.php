@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -39,7 +40,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
             throw new LogicException('No security voters found. You need to tag at least one with "security.voter"');
         }
 
-        $adm = $container->getDefinition($container->hasDefinition('debug.security.access.decision_manager') ? 'debug.security.access.decision_manager' : 'security.access.decision_manager');
-        $adm->addMethodCall('setVoters', array($voters));
+        $adm = $container->getDefinition('security.access.decision_manager');
+        $adm->replaceArgument(0, new IteratorArgument($voters));
     }
 }

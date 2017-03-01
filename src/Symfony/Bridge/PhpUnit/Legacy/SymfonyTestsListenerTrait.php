@@ -240,6 +240,10 @@ class SymfonyTestsListenerTrait
         }
 
         if ($this->expectedDeprecations) {
+            if (!in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE), true)) {
+                $test->addToAssertionCount(count($this->expectedDeprecations));
+            }
+
             restore_error_handler();
 
             if (!in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE, $BaseTestRunner::STATUS_FAILURE, $BaseTestRunner::STATUS_ERROR), true)) {

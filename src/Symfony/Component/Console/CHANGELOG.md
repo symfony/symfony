@@ -6,6 +6,8 @@ CHANGELOG
 
 * added `ExceptionListener`
 * added `AddConsoleCommandPass` (originally in FrameworkBundle)
+* [BC BREAK] `Input::getOption()` no longer returns the default value for options
+  with value optional explicitly passed empty
 
 3.2.0
 ------

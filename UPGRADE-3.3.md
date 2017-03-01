@@ -6,6 +6,62 @@ ClassLoader
 
  * The component is deprecated and will be removed in 4.0. Use Composer instead.
 
+Console
+-------
+
+* `Input::getOption()` no longer returns the default value for options
+  with value optional explicitly passed empty.
+
+  For:
+
+  ```php
+  protected function configure()
+  {
+      $this
+          // ...
+          ->setName('command')
+          ->addOption('foo', null, InputOption::VALUE_OPTIONAL, '', 'default')
+       ;
+  }
+
+  protected function execute(InputInterface $input, OutputInterface $output)
+  {
+      var_dump($input->getOption('foo'));
+  }
+  ```
+
+  Before:
+
+  ```
+  $ php console.php command
+  "default"
+
+  $ php console.php command --foo
+  "default"
+
+  $ php console.php command --foo ""
+  "default"
+
+  $ php console.php command --foo=
+  "default"
+  ```
+
+  After:
+
+  ```
+  $ php console.php command
+  "default"
+
+  $ php console.php command --foo
+  NULL
+
+  $ php console.php command --foo ""
+  ""
+
+  $ php console.php command --foo=
+  ""
+  ```
+
 Debug
 -----
 

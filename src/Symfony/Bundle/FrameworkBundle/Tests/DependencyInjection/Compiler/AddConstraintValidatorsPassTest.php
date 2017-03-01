@@ -23,7 +23,7 @@ class AddConstraintValidatorsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $validatorFactory = $container->register('validator.validator_factory')
-            ->setArguments(array(new ServiceLocatorArgument()));
+            ->setArguments(array(new ServiceLocatorArgument(array())));
 
         $container->register('my_constraint_validator_service1', Validator1::class)
             ->addTag('validator.constraint_validator', array('alias' => 'my_constraint_validator_alias1'));

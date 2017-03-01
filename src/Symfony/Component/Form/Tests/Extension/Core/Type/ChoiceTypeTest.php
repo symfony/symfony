@@ -13,8 +13,10 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\Form\Test\TypeTestCase;
 
-class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+class ChoiceTypeTest extends TypeTestCase
 {
     private $choices = array(
         'Bernhard' => 'a',
@@ -1742,5 +1744,32 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         // in the custom choice type, so $choiceLabels->labels remains empty array.
         // In this case the 'choice_label' closure returns null and not the closure from the first choice type.
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
+    }
+
+    /**
+     * @dataProvider invalidNestedValueTestMatrix
+     */
+    public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'choices' => $this->choices,
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'choices_as_values' => true,
+        ));
+
+        $form->submit($submissionData);
+        $this->assertFalse($form->isSynchronized());
+        $this->assertEquals('All choices submitted must be NULL or strings.', $form->getTransformationFailure()->getMessage());
+    }
+
+    public function invalidNestedValueTestMatrix()
+    {
+        return array(
+            'non-multiple, non-expanded' => array(false, false, array(array())),
+            'non-multiple, expanded' => array(false, true, array(array())),
+            'multiple, non-expanded' => array(true, false, array(array())),
+            'multiple, expanded' => array(true, true, array(array())),
+        );
     }
 }

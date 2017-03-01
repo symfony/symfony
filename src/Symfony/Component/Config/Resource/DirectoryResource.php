@@ -90,8 +90,15 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
                 continue;
             }
 
+            // for broken links
+            try {
+                $fileMTime = $file->getMTime();
+            } catch (\RuntimeException $e) {
+                continue;
+            }
+
             // early return if a file's mtime exceeds the passed timestamp
-            if ($timestamp < $file->getMTime()) {
+            if ($timestamp < $fileMTime) {
                 return false;
             }
         }

@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-09-02T16:45:12Z
+
+The build failure in AppVeyor is not look related to these changes.
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-09-28T01:34:12Z
+
+@jameshalsall If you could rebase your PR so the Conflict can be resolved, I think we could switch this to Reviewed!
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-09-28T07:54:37Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-09-28T12:15:31Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-24T19:25:35Z
+
+Some notes from my research about this (I wanted to understand why it was not used more in Symfony itself):
+- The special `X-Status-Code` header was added in 788e5eb to fix silexphp/Silex#438. So Silex documentation should be updated as this is documented here: silexphp/Silex@902c374
+- The only use case in Symfony itself was added later on via #6957
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-10T00:31:21Z
+
+@jameshalsall Can you take into accounts the comment so that we can finish this one?
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-11-10T10:06:36Z
+
+@fabpot yeah this is on my list, I'll get to it over the weekend
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-11-14T18:51:52Z
+
+@fabpot after reviewing the `FormAuthenticationEntryPoint` usage of `X-Status-Code` header it does indeed use this functionality, so we need to replace it with the new method of marking the event as allowing custom response codes. The `start()` method on this class is defined in the `AuthenticationEntryPointInterface`, and there are multiple concrete entry point implementations. We don't currently have access to the event object inside the `start()` method (see [here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Http/Firewall/BasicAuthenticationListener.php#L90) for an example of where it is used), and it wouldn't make sense to provide it in my opinion.
+
+The options that I can see are:
+1. Always allow custom response codes, so always call `$event->allowCustomResponseCode();` before we call `AuthenticationEntryPointInterface::start()` in the authentication listeners.
+2. Move the `allowCustomResponseCode()` logic to the response itself (this may cause BC issues)
+3. Pass the event object to the `AuthenticationEntryPointInterface::start()` method, so the entry point can determine whether or not it needs to allow a custom response code.
+
+Hopefully you can see a more elegant solution to this issue than me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-15T20:42:27Z
+
+Thanks for investigating that thoroughly. Without reading the code, the first option seems better to me, but it means that we now must be sure that all implementation set the right status code on the Response object (not sure if we can consider this a BC break).
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-11-16T13:38:23Z
+
+Great, I will work on this then and add relevant tests.
+
+I think this overlaps into Silex too, in that Silex also doesn't have the event object available in order to control the response code. That may need solving outside the scope of this PR however - so when this gets merged I can open an issue on the Silex repo and begin working on a fix for it.
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-11-16T21:23:46Z
+
+@fabpot I believe this is ready for re-review now. I've checked each of the `AuthenticationEntryPointInterface` implementations and they are setting response codes where applicable. Tests have been updated accordingly.
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-11-22T18:39:28Z
+
+There's a new issue I need to fix on this when using `deps=LOW`, the Security component is expecting that `GetResponseForExceptionEvent::allowCustomResponseCode()` will always be available, so need to handle the case when it's not.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T14:41:04Z
+
+@jameshalsall Do you have time to finish this one?
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2017-02-17T09:41:13Z
+
+@fabpot I will get to this early next week - it's completely slipped my mind
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2017-02-20T22:46:15Z
+
+@fabpot this is ready for re-review now
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-22T17:00:13Z
+
+Also, we need to work on a PR on Silex to be sure that the code proposed here works there as well.

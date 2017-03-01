@@ -145,4 +145,37 @@ class AppVariable
 
         return $this->debug;
     }
+
+    /**
+     * Returns some or all the existing flash messages. The method is variadic:
+     * if no arguments are passed, all flashes are returned; if one or more
+     * arguments are passed, only the flashes that belong to that category are
+     * returned; e.g. getFlashes('notice') or getFlashes('notice', 'error').
+     *
+     * @return array
+     */
+    public function getFlashes()
+    {
+        try {
+            $session = $this->getSession();
+            if (null !== $session && !$session->isStarted()) {
+                return array();
+            }
+        } catch(\RuntimeException $e) {
+            return array();
+        }
+
+        if (0 === func_num_args()) {
+            return $session->getFlashBag()->all();
+        }
+
+        $flashes = array();
+        foreach ($session->getFlashBag()->all() as $key => $message) {
+            if (in_array($key, func_get_args())) {
+                $flashes[$key][] = $message;
+            }
+        }
+
+        return $flashes;
+    }
 }

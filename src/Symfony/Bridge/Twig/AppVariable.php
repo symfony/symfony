@@ -169,6 +169,10 @@ class AppVariable
             return $session->getFlashBag()->all();
         }
 
+        if (1 === func_num_args()) {
+            return $session->getFlashBag()->get(func_get_arg(0));
+        }
+
         $flashes = array();
         foreach ($session->getFlashBag()->all() as $key => $message) {
             if (in_array($key, func_get_args())) {

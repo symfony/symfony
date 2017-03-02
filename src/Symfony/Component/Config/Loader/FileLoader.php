@@ -129,8 +129,18 @@ abstract class FileLoader extends Loader
         if (false === strpos($resource, '/**/') && (defined('GLOB_BRACE') || false === strpos($resource, '{'))) {
             foreach (glob($prefix.$resource, defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $path) {
                 if ($recursive && is_dir($path)) {
-                    $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS;
-                    foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, $flags)) as $path => $info) {
+                    $files = iterator_to_array(new \RecursiveIteratorIterator(
+                        new \RecursiveCallbackFilterIterator(
+                            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
+                            function (\SplFileInfo $file) { return '.' !== $file->getBasename()[0]; }
+                        ),
+                        \RecursiveIteratorIterator::LEAVES_ONLY
+                    ));
+                    usort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
+                        return (string) $a > (string) $b ? 1 : -1;
+                    });
+
+                    foreach ($files as $path => $info) {
                         if ($info->isFile()) {
                             yield $path => $info;
                         }
@@ -154,7 +164,7 @@ abstract class FileLoader extends Loader
         }
 
         $prefixLen = strlen($prefix);
-        foreach ($finder->followLinks()->in($prefix) as $path => $info) {
+        foreach ($finder->followLinks()->sortByName()->in($prefix) as $path => $info) {
             if (preg_match($regex, substr($path, $prefixLen)) && $info->isFile()) {
                 yield $path => $info;
             }

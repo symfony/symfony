@@ -38,6 +38,11 @@ class SymfonyTestsListener extends BaseTestListener
         $this->trait = new Legacy\SymfonyTestsListenerTrait($mockedNamespaces);
     }
 
+    public function globalListenerDisabled()
+    {
+        $this->trait->globalListenerDisabled();
+    }
+
     public function startTestSuite(TestSuite $suite)
     {
         return $this->trait->startTestSuite($suite);

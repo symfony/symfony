@@ -41,6 +41,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * The recommended way of injecting dependencies is trough getter injection.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  *
  * @experimental in version 3.3
  */

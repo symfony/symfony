@@ -1,0 +1,246 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-17T09:14:41Z
+
+Tests will be green when #18206 will be merged.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-17T10:39:17Z
+
+@dunglas PR #16863 does not deprecate the `Controller` class either.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-17T10:42:55Z
+
+@derrabus right, sorry about that I edit the description.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-17T10:44:03Z
+
+@iltar I'd like to see the trait to be split as well (see #16863), to make those helpers reusable in non-controller classes like event listeners for instance. If this PR gets merged, I will rebase my PR onto it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-17T11:00:24Z
+
+The trait introduces some logic to fetch the depedency from the container if it hasn't been set via a setter. I don't see this logic being covered by the tests.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-17T11:14:15Z
+
+@derrabus I've added such tests in separate PRs: #18206, #18204, #18203
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-27T16:31:03Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-29T13:40:40Z
+
+:-1: Unless I'm missing something, this would require (if you're autowiring your controller) _all_ of these services to be eagerly instantiated in order to render your controller. Most are common services, but not all of them (form factory, serializer, etc).
+
+I understand why some people might find this useful. I would rather see an approach that:
+
+A) Completely leaves the `Controller` alone. I see you made the trait look for a `$this->container` property as a fallback, but it's just weird - checking for a property _and_ also falling back to the container just don't look compatible.
+
+B) Introduce smaller traits that have some of the shortcuts of the controller. And sure, you could wrap those up into one "big" trait for convenience. But even that, I would only include the _most_ common services - like `router`, `logger` - not `serializer`, `form.factory`, etc.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-29T14:12:02Z
+
+The check for the container in A is basically for BC and ease the maintenance (it allows to use the trait in the abstract controller class).
+
+B is useless. This trait is just a set of proxy method. If you want only some dependencies, just inject services you use in the constructor.
+
+Closing for now.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-29T21:47:20Z
+
+@dunglas Yea, I know that (A) was for BC - it makes sense, but it's just a little magic, with the trait looking for a property that's named `$container`.
+
+About (B), it doesn't look useless to me. It brings 2 advantages: (A) RAD (using a trait is even less work than adding a constructor arg, though not a _ton_ less work) and (B) familiarity/consistency: people can use the same shortcut methods - like `generateUrl()` - that they use in normal controllers.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-30T06:45:45Z
+
+For A, it allows us to maintain only one trait, and it works without autowiring with any class having a `$container` property (the convention in Symfony). IMO it's the best solution on the long term to be compatible both with the legacy and enable new usages. Add a new method to the trait (like the `json` one in 3.1), and it will be also available in the traditional `abstract` controller. The same apply for bug fixes and so on.
+
+For B, IMO there are 2 kind of users:
+1. Newcomers and developers using Symfony as a RAD tool (my case, most of the time): they don't care about performance optimization and will always include the `ControllerTrait` because it's the easiest and quickest to use (and it works exactly like the good old `abstract` controller)
+2. Advanced developers who care about performance, code quality and maintainability (my case on some projects): they will always carefully choose which dependencies to inject in their controllers and will explicitly inject them in the constructor (autowiring helps here, but traits are useless for them).
+
+For instance, take a look at the `RenderHelperTrait` created by @derrabus in #16863: https://github.com/derrabus/symfony/blob/master-controller-trait/src/Symfony/Bundle/FrameworkBundle/Templating/RenderHelperTrait.php
+
+It does almost nothing except choosing between Twig and the old templating system. I don't get the point of importing this trait instead of injecting directly an instance of `\Twig_Environment` in the constructor.
+
+However I do get the interest of using this `ControllerTrait` because it imports automatically all common dependencies of a controller (thanks to setter autowiring).
+
+To summarize, with this all-in-one trait I need to be aware of its existence and I can create easily controllers with all common dependencies autowired. With separated traits, I must be aware of all the existing traits and this not different than being aware of all dependencies directly (that can be autowired too).
+
+But - I maybe missing something and I would have this merged before the feature freeze. @derrabus and you find a benefit to separated traits. What can we do to make you reconsider your :-1:? Do you want I that I split this all-in-one trait in separate traits like in #16863?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-03-30T08:54:10Z
+
+From a developer perspective I'm not really sure whether having multiple traits as in #16863 or only having one trait is preferable. Having multiple traits looks preferable to me if your controller/service/action class would only need one trait (for instance to follow [ADR](http://pmjones.io/adr/)).
+
+In addition, the traits are great for testing because you can [change method visibility](http://php.net/manual/en/language.oop5.traits.php#language.oop5.traits.visibility). If developers start working with Symfony, the abstract controller probably is one of the first things they will see while navigating through the source code. So in my opinion it should reflect the best practice, is there a specific one related to using traits? :+1:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-30T14:42:25Z
+
+The `Controller` class does not have a single resposibility. It's a collection of glue code, a façade to all kinds of framework functionality. This makes it easy to use for unexperienced developers, but also allows rapid prototyping. It is also a good compromise, if you need to code a small app that will be in use for a couple of weeks/months and scrapped afterwards. Both are problems many agencies have, for instance.
+
+Using the `Controller` class is not wrong per se. But I think, we both agree, that you should not use it if high maintainability and framework decoupling are your goals.
+
+`Controller` is not and never will be a class with a fixed set of dependencies. This is why the `Controller` class opts-out of the dependency injection pattern pulls its dependencies on demand. This way, more of this glue code may be added in a later Symfony release with very low impact on existing applications.
+
+I still think that autowiring the `Controller` class is a very bad idea. Whether you do this via a trait or directly does not matter to me. Let me explain why.
+
+By eagerly injecting all possible dependencies, you will inevitably inject services that won't be used by the controller.
+- Some of these dependencies will already be present (like `router` for instance), so it won't hurt to inject them.
+- Others might not be present at all because the corresponding bundle is missing (Security, Monolog, Doctrine) or the specific feature has been disabled (`templating`, `serializer`). This will work out as long as the autowiring does not fail on missing dependencies.
+- Others need to be instantiated first which might have a performance impact. See sensiolabs/SensioFrameworkExtraBundle#369 for such a case. Any later version of the framework might add additional dependencies, so each new framework release might slow down existing controllers even more.
+
+Until now, performance was not an issue with the `Controller` class. But by autowiring all kinds of services instead of just the container, you're introducing performance issues. This is why I already said in my PR that I think autowiring won't be helpful for a `ControllerTrait`.
+
+So now this PR does an interesting trick. The trait is theoretically autowirable, but this autowiring is not actually done yet because the `Controller` class still receives the container and the trait still has a fallback to the container. So it's a kind-of-hybrid approach. This leaves all existing implementations unaffected by the change. But _if_ you autowire a class using the trait, you will gain the negative impacts mentioned above with (unless I'm missing something essential) no real benefit.
+
+Now talking about splitting the trait by topic/dependency. Yes, you're right, those traits do almost nothing. And this is exactly the point. Traits should imho only implement glue code that I would otherwise copy&paste. As soon as it contains real logic, class composition should be preferred over a trait.
+
+So what's the benefit of such a small trait then? First of all, reusability for other classes than controllers:
+- A trait with templating glue code might not only be helpful in controllers, but also in view listeners like FrameworkExtraBundle's [TemplateViewListener](https://github.com/sensiolabs/SensioFrameworkExtraBundle/blob/507a15f56fa7699f6cc8c2c7de4080b19ce22546/EventListener/TemplateListener.php).
+- In one of my projects I already use a trait that provides the very handy `redirectToRoute()` method, so I can use it in some event listeners subscribed to the `kernel.request` event or in custom authentication modules.
+
+Getting back to controllers, setter autowiring would again start make sense to me on the small traits. I would only `use` a trait with `router` glue code in a controller class that actually calls methods of that trait. I could then implement a controller without container dependency and just by adding the trait, the router would be magically present. Not sure if I would make use of this, but I kind-of like the idea.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-30T19:31:38Z
+
+@dunglas If you're considering to split your trait and since splitting the trait is something I've already done in #16863, maybe we should join forces before you're duplicating my effort? Adding setters to my traits and moving the container-aware magic to `Controller` or `ControllerTrait` shouldn't be too hard.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-30T19:51:11Z
+
+@derrabus why not if there is a consensus about that. Let's see the opinion of @symfony/deciders before wasting our time.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-30T20:05:06Z
+
+Great! I just gave it a try on the router trait: https://github.com/derrabus/symfony/commit/b4827663271686218ce946d1001e41b7d148df75
+
+Would this work for you? If this is the way to go, I could apply this pattern to the other traits as well.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-04-01T15:46:17Z
+
+With all the autowiring improvements (and the DunglasActionBundle), I'm not sure of the best path forward. Things like the autodiscovery of autowireable services (i.e. DunglasActionBundle) need to be tried in the wild and taught to beginners to see how it looks/feels.
+
+For that reason, I don't think we should consider this PR and others like #18300 for 3.1. _If_ setter injection (#17608) were merged, then this could be implemented in DunglasActionBundle, and we could try and test it for the future.
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-12-15T15:44:59Z
+
+I would like to try this feature in practice before merging, since it is great change that may go wrong.
+
+**So I've implemented these traits for Controllers in a bundle**:
+- http://www.tomasvotruba.cz/blog/2016/12/12/decouple-controller-from-symfony-using-smart-traits/
+- https://github.com/Symplify/ControllerAutowire
+
+Feel free to try it and write your experience and what was good and bad.
+
+It might help to discuss this PR in more real-world way.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-15T17:36:35Z
+
+Hi,
+
+Nice! If you want to test this PR in particular, I'm also maintaining a temporary fork with some pending autowiring related things (including this PR): https://github.com/dunglas/symfony/tree/autowiring
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-21T08:50:31Z
+
+The PR now uses getter injection (#20973) to benefit form lazy service loading by default. The performance penalty of using setter injection is gone!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-11T07:43:06Z
+
+To enable getter autowiring support in this `ControllerTrait`, we need PHP 7+ (for return types). I've reverted changes made to the `Controller` class to let it compatible with PHP 5 (it doesn't use the new trait anymore).
+
+There is some code duplication between the trait and the controller class. It will make the maintenance a bit harder, on the other hand it removes the magic check on the `$container` property in the trait. If we want to avoid this duplication, maybe should we think to deprecate the `Controller` class and promote the new trait instead.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-13T09:23:48Z
+
+* Marked as experimental
+* Templating support removed
+* Rebased
+
+Now that #21031 and #21289 have been merged, this PR is ready to be merged too. cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-18T12:16:11Z
+
+A great step forward. 👍
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-02-27T04:11:13Z
+
+@dunglas How does one unit test any class with getter injection? Do you need to implement a class that extends the code you want to test with implementations for all the getters? Or are there other methods for this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-27T06:53:05Z
+
+Looks like you missed http://symfony.com/blog/new-in-symfony-3-3-getter-injection :)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-02-27T06:54:13Z
+
+@nicolas-grekas I did; thanks! :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-02T19:49:40Z
+
+@dunglas Can you also add a note in the CHANGELOG (specifying that this new feature requires PHP 7, and perhaps mentioning the few differences with the Controller base class)? Thanks.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-03-02T20:09:16Z
+
+done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-02T20:10:19Z
+
+👍

@@ -147,15 +147,16 @@ class AppVariable
     }
 
     /**
-     * Returns some or all the existing flash messages. The method is variadic:
-     * if no arguments are passed, all flashes are returned; if one or more
-     * arguments are passed, only the flashes that belong to that category are
-     * returned; e.g. getFlashes('notice') or getFlashes('notice', 'error').
+     * Returns some or all the existing flash messages:
+     *  * getFlashes() returns all the flash messages
+     *  * getFlashes('notice') returns a simple array with flash messages of that type
+     *  * getFlashes(array('notice', 'error')) returns a nested array of type => messages
      *
      * @return array
      */
-    public function getFlashes()
+    public function getFlashes($types = null)
     {
+        // needed to avoid starting the session automatically when looking for flash messages
         try {
             $session = $this->getSession();
             if (null !== $session && !$session->isStarted()) {
@@ -165,21 +166,14 @@ class AppVariable
             return array();
         }
 
-        if (0 === func_num_args()) {
+        if (null === $types) {
             return $session->getFlashBag()->all();
         }
 
-        if (1 === func_num_args()) {
-            return $session->getFlashBag()->get(func_get_arg(0));
+        if (1 === count($types)) {
+            return $session->getFlashBag()->get($types[0]);
         }
 
-        $flashes = array();
-        foreach ($session->getFlashBag()->all() as $key => $message) {
-            if (in_array($key, func_get_args())) {
-                $flashes[$key][] = $message;
-            }
-        }
-
-        return $flashes;
+        return array_intersect($session->getFlashBag()->all(), array_flip($types));
     }
 }

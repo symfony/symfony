@@ -68,6 +68,12 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
+    public function globalListenerDisabled()
+    {
+        self::$globallyEnabled = false;
+        $this->state = -1;
+    }
+
     public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
         $suiteName = $suite->getName();

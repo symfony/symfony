@@ -51,7 +51,6 @@ trait ControllerTrait
      */
     protected function getRouter(): RouterInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', RouterInterface::class));
     }
 
     /**
@@ -59,7 +58,6 @@ trait ControllerTrait
      */
     protected function getRequestStack(): RequestStack
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', RequestStack::class));
     }
 
     /**
@@ -67,7 +65,6 @@ trait ControllerTrait
      */
     protected function getHttpKernel(): HttpKernelInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', HttpKernelInterface::class));
     }
 
     /**
@@ -75,7 +72,6 @@ trait ControllerTrait
      */
     protected function getSerializer(): SerializerInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', SerializerInterface::class));
     }
 
     /**
@@ -86,7 +82,6 @@ trait ControllerTrait
      */
     protected function getSession(): Session
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', Session::class));
     }
 
     /**
@@ -94,7 +89,6 @@ trait ControllerTrait
      */
     protected function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', AuthorizationCheckerInterface::class));
     }
 
     /**
@@ -102,7 +96,6 @@ trait ControllerTrait
      */
     protected function getTwig(): \Twig_Environment
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', \Twig_Environment::class));
     }
 
     /**
@@ -110,7 +103,6 @@ trait ControllerTrait
      */
     protected function getDoctrine(): ManagerRegistry
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', ManagerRegistry::class));
     }
 
     /**
@@ -118,7 +110,6 @@ trait ControllerTrait
      */
     protected function getFormFactory(): FormFactoryInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', FormFactoryInterface::class));
     }
 
     /**
@@ -126,7 +117,6 @@ trait ControllerTrait
      */
     protected function getTokenStorage(): TokenStorageInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', TokenStorageInterface::class));
     }
 
     /**
@@ -134,7 +124,6 @@ trait ControllerTrait
      */
     protected function getCsrfTokenManager(): CsrfTokenManagerInterface
     {
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', CsrfTokenManagerInterface::class));
     }
 
     /**
@@ -200,26 +189,22 @@ trait ControllerTrait
     }
 
     /**
-     * Returns a JsonResponse that uses the serializer component if enabled, or json_encode.
+     * Returns a JsonResponse that uses the serializer component.
      *
      * @param mixed $data    The response data
      * @param int   $status  The status code to use for the Response
      * @param array $headers Array of extra headers to add
-     * @param array $context Context to pass to serializer when using serializer component
+     * @param array $context Context to pass to serializer
      *
      * @return JsonResponse
      */
     protected function json($data, int $status = 200, array $headers = array(), array $context = array()): JsonResponse
     {
-        try {
-            $json = $this->getSerializer()->serialize($data, 'json', array_merge(array(
-                'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-            ), $context));
+        $json = $this->getSerializer()->serialize($data, 'json', array_merge(array(
+            'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
+        ), $context));
 
-            return new JsonResponse($json, $status, $headers, true);
-        } catch (\LogicException $e) {
-            return new JsonResponse($data, $status, $headers);
-        }
+        return new JsonResponse($json, $status, $headers, true);
     }
 
     /**

@@ -147,15 +147,6 @@ class ControllerTraitTest extends PHPUnitTestCase
         $this->assertNull($controller->getUser());
     }
 
-    public function testJson()
-    {
-        $controller = new UseControllerTraitController();
-
-        $response = $controller->json(array());
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals('[]', $response->getContent());
-    }
-
     public function testJsonWithSerializer()
     {
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();

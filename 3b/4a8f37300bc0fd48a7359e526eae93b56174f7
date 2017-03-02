@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-01T19:44:47Z
+
+I think we need to dump the class name all the time. At least this is what Monolog does in this case:
+https://github.com/Seldaek/monolog/blob/master/src/Monolog/Formatter/NormalizerFormatter.php#L101-L120
+
+---------------------------------------------------------------------------
+
+by FractalizeR at 2016-12-02T08:15:11Z
+
+Monolog in that source does both. It uses class name as a key, and __toString() call result as a value.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T12:42:27Z
+
+@FractalizeR that's what I meant :) And I think that's wise.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T14:21:16Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T15:44:50Z
+
+@FractalizeR Any news? Are still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by FractalizeR at 2017-03-01T15:59:01Z
+
+Yeah, sure. But I am at lost who makes a decision about how this PR should really look like. I'm ready to make desired modifications, but someone responsible needs to tell me what needs to be adjusted.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T16:05:32Z
+
+I think we all agree that we need to keep the class name, even when there is a string representation.
+
+---------------------------------------------------------------------------
+
+by FractalizeR at 2017-03-01T17:21:07Z
+
+Can we, then, use the following representation for objects, implementing `__toString()`
+
+```
+(object) className: '__toString() return result'
+```
+?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T17:30:05Z
+
+@FractalizeR I think that makes sense.
+
+---------------------------------------------------------------------------
+
+by FractalizeR at 2017-03-02T09:06:13Z
+
+Done. Some tests fail, but this is not due my PR, but several other components. Looks like some PR was merged without ensuring tests pass.

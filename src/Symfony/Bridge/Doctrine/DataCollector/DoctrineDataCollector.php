@@ -160,6 +160,7 @@ class DoctrineDataCollector extends DataCollector
     {
         if (is_object($var)) {
             $className = get_class($var);
+
             return method_exists($var, '__toString') ?
                 array(sprintf('Object(%s): "%s"', $className, $var->__toString()), false) :
                 array(sprintf('Object(%s)', $className), false);

@@ -305,6 +305,8 @@ class NumberToLocalizedStringTransformerTest extends TestCase
             array(1, '123,44', 123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
             array(1, '-123,45', -123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
             array(1, '-123,44', -123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(2, '37.37', 37.37, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(2, '2.01', 2.01, NumberToLocalizedStringTransformer::ROUND_DOWN),
             // round halves (.5) to the next even number
             array(0, '1234,6', 1235, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
             array(0, '1234,5', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),

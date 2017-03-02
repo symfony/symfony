@@ -136,7 +136,7 @@ abstract class FileLoader extends Loader
                         ),
                         \RecursiveIteratorIterator::LEAVES_ONLY
                     ));
-                    usort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
+                    uasort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
                         return (string) $a > (string) $b ? 1 : -1;
                     });
 

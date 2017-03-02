@@ -1,0 +1,187 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2017-02-26T13:44:00Z
+
+To apply that change it means the BCMath extension must be enabled. I don't expect to be an issue as it's shipped by default in most PHP installations, but it might be good to either make `bcmath` required in the `composer.json` or add a polyfill.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-26T19:47:49Z
+
+@theofidry sadly anything that starts with *"this just needs a simple PHP extension enabled..."* is an issue. Requiring a whole PHP extension for this small feature is a no-go ... so we should go for a polyfill ... or enable this feature conditionally if BCmath is available?
+
+---------------------------------------------------------------------------
+
+by foaly-nr1 at 2017-02-26T19:54:04Z
+
+I suggest we enable this conditionally as it's covering an edge case. Something along the lines of:
+```php
+$number = function_exists('bcmul') ? bcmul($number, $roundingCoef, 6) : $number * $roundingCoef;
+```
+or
+```php
+if (function_exists('bcmul')) {
+    $number = bcmul($number, $roundingCoef, 6);
+} else {
+    $number *= $roundingCoef;
+}
+```
+
+We could then isolate the test and skip it if BC Math isn't available.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-28T13:46:07Z
+
+This works without bcmath:
+
+```diff
+--- a/src/Symfony/Component/Form/Extension/Core/DataTransformer/NumberToLocalizedStringTransformer.php
++++ b/src/Symfony/Component/Form/Extension/Core/DataTransformer/NumberToLocalizedStringTransformer.php
+@@ -265,34 +265,34 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
+     {
+         if (null !== $this->precision && null !== $this->roundingMode) {
+             // shift number to maintain the correct scale during rounding
+-            $roundingCoef = pow(10, $this->precision);
++            $roundingCoef = pow(10, $this->precision + 1);
+             $number *= $roundingCoef;
+
+             switch ($this->roundingMode) {
+                 case self::ROUND_CEILING:
+-                    $number = ceil($number);
++                    $number = ceil(ceil($number) / 10);
+                     break;
+                 case self::ROUND_FLOOR:
+-                    $number = floor($number);
++                    $number = floor(floor($number) / 10);
+                     break;
+                 case self::ROUND_UP:
+-                    $number = $number > 0 ? ceil($number) : floor($number);
++                    $number = $number > 0 ? ceil(ceil($number) / 10) : floor(floor($number) / 10);
+                     break;
+                 case self::ROUND_DOWN:
+-                    $number = $number > 0 ? floor($number) : ceil($number);
++                    $number = $number > 0 ? floor(floor($number) / 10) : ceil(ceil($number) / 10);
+                     break;
+                 case self::ROUND_HALF_EVEN:
+-                    $number = round($number, 0, PHP_ROUND_HALF_EVEN);
++                    $number = round(round($number, 0, PHP_ROUND_HALF_EVEN) / 10, 0, PHP_ROUND_HALF_EVEN);
+                     break;
+                 case self::ROUND_HALF_UP:
+-                    $number = round($number, 0, PHP_ROUND_HALF_UP);
++                    $number = round(round($number, 0, PHP_ROUND_HALF_UP) / 10, 0, PHP_ROUND_HALF_UP);
+                     break;
+                 case self::ROUND_HALF_DOWN:
+-                    $number = round($number, 0, PHP_ROUND_HALF_DOWN);
++                    $number = round(round($number, 0, PHP_ROUND_HALF_DOWN) / 10, 0, PHP_ROUND_HALF_DOWN);
+                     break;
+             }
+
+-            $number /= $roundingCoef;
++            $number /= $roundingCoef / 10;
+         }
+
+         return $number;
+```
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-02-28T18:02:59Z
+
+@nicolas-grekas I don't think this solves the issue :wink: It may work for the `37.37` case but due to the limited precision of `float` numbers it fails for other numbers.
+
+Example test case that fails with your code inside `NumberToLocalizedStringTransformerTest::reverseTransformWithRoundingProvider`:
+
+```php
+array(2, '2.01', 2.01, NumberToLocalizedStringTransformer::ROUND_DOWN),
+```
+Gives:
+
+```
+There was 1 failure:
+
+1) Symfony\Component\Form\Tests\Extension\Core\DataTransformer\NumberToLocalizedStringTransformerTest::testReverseTransformWithRounding with data set #33 (2, '2.01', 2.0099999999999998, 2)
+Failed asserting that 2.0 matches expected 2.0099999999999998.
+```
+
+I found this case using a little script:
+
+```php
+<?php
+
+$i = 1;
+
+while(true) {
+    $i += 0.01;
+
+    $i = (string) $i;
+
+    $number = $i * 1000;
+    $floored = floor($number);
+
+    var_dump($i);
+    var_dump($number);
+    var_dump($floored);
+
+    if ((string) $floored !== (string) $number) {
+        echo "FAIL!" . PHP_EOL;
+        die;
+    }
+
+    echo '----------' . PHP_EOL;
+}
+```
+
+==>
+
+```
+...
+string(4) "2.01"
+float(2010)
+float(2009)
+FAIL!
+```
+
+I don't think this can be solved without using a calculation with "arbitrary precision" like bcmath.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-02-28T19:16:39Z
+
+Interesting is that this seems to work as well:
+
+```diff
+--- a/src/Symfony/Component/Form/Extension/Core/DataTransformer/NumberToLocalizedStringTransformer.php
++++ b/src/Symfony/Component/Form/Extension/Core/DataTransformer/NumberToLocalizedStringTransformer.php
+@@ -242,7 +242,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
+         if (null !== $this->scale && null !== $this->roundingMode) {
+             // shift number to maintain the correct scale during rounding
+             $roundingCoef = pow(10, $this->scale);
+-            $number *= $roundingCoef;
++            $number = (string) ($number * $roundingCoef);
+
+             switch ($this->roundingMode) {
+                 case self::ROUND_CEILING:
+```
+
+So far I could not find a case where it fails :yum:
+
+I guess this is quite similar to the `bcmul` solution as it stores the result of the multiplication as a string to avoid precision issues?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-02T10:47:32Z
+
+@foaly-nr1 would you update you PR using @dmaicher's patch, and add the test case he's suggesting also?
+
+---------------------------------------------------------------------------
+
+by foaly-nr1 at 2017-03-02T10:53:17Z
+
+@nicolas-grekas on it.
+
+---------------------------------------------------------------------------
+
+by foaly-nr1 at 2017-03-02T11:30:46Z
+
+Just rebased but tests are still failing as the 2.7 build is currently broken.

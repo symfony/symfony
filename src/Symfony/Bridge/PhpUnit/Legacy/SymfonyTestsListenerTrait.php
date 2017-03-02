@@ -94,6 +94,12 @@ class SymfonyTestsListenerTrait
         }
     }
 
+    public function globalListenerDisabled()
+    {
+        self::$globallyEnabled = false;
+        $this->state = -1;
+    }
+
     public function startTestSuite($suite)
     {
         if (class_exists('PHPUnit_Util_Blacklist', false)) {

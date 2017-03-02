@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Controller\UseControllerTraitController;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -35,7 +36,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -1230,6 +1230,84 @@ class ApplicationTest extends TestCase
         $this->assertEquals('some test value', $extraValue);
     }
 
+    public function testAddArgumentFromConsoleCommandEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getCommand()->addArgument('arg', InputArgument::REQUIRED);
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application
+            ->register('foo')
+            ->addOption('opt', null, InputOption::VALUE_REQUIRED)
+            ->setCode(function (InputInterface $input, OutputInterface $output) {
+                $output->write('foo.');
+            })
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--opt' => 'opt-val', 'arg' => 'arg-val'));
+
+        $this->assertSame('arg-val', $tester->getInput()->getArgument('arg'));
+        $this->assertSame('opt-val', $tester->getInput()->getOption('opt'));
+    }
+
+    public function testSetArgumentFromConsoleCommandEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getInput()->setArgument('arg', 'overridden-val');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application
+            ->register('foo')
+            ->addArgument('arg', null, InputArgument::REQUIRED)
+            ->setCode(function (InputInterface $input, OutputInterface $output) {
+                $output->write('foo.');
+            })
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', 'arg' => 'original-val'));
+
+        $this->assertSame('overridden-val', $tester->getInput()->getArgument('arg'));
+    }
+
+    public function testAddAndSetArgumentFromConsoleCommandEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getCommand()->addArgument('extra', InputArgument::REQUIRED);
+            $event->getInput()->setArgument('extra', 'overridden-arg');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application
+            ->register('foo')
+            ->addOption('opt', null, InputOption::VALUE_REQUIRED)
+            ->setCode(function (InputInterface $input, OutputInterface $output) {
+                $output->write('foo.');
+            })
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--opt' => 'opt-val'));
+
+        $this->assertSame('overridden-arg', $tester->getInput()->getArgument('extra'));
+        $this->assertSame('opt-val', $tester->getInput()->getOption('opt'));
+    }
+
     /**
      * @group legacy
      */

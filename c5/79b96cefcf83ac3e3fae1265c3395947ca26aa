@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-02T09:21:56Z
+
+I also think we should really skip them.
+~~On the implementation side, would the `FilesystemIterator::SKIP_DOTS` flag work?~~
+Note also that this would be consistent with how `glob()` and `Finder` work.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-03-02T09:22:50Z
+
+> On the implementation side, would the FilesystemIterator::SKIP_DOTS flag work?
+
+Skip dots only skips `.` and `..`.
+
+Status: Needs Work
+
+Doctrine bridge tests are failing now ;)
+
+Edit: Doctrine bridge tests are failing for a different reason. Looking into it.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-03-02T11:19:39Z
+
+Doctrine annotations problem should be fixed by https://github.com/symfony/symfony/pull/21825 and https://github.com/symfony/symfony/pull/21826

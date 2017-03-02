@@ -128,7 +128,12 @@ class DoctrineDataCollectorTest extends TestCase
             array(new \DateTime('2011-09-11'), array('date'), '2011-09-11', true),
             array(fopen(__FILE__, 'r'), array(), 'Resource(stream)', false),
             array(new \stdClass(), array(), 'Object(stdClass)', false),
-            array(new StringRepresentableClass('presentation test'), array(), 'presentation test', false),
+            array(
+                new StringRepresentableClass('presentation test'),
+                array(),
+                'Object(Symfony\Bridge\Doctrine\Tests\DataCollector\StringRepresentableClass): "presentation test"',
+                false,
+            ),
         );
     }
 

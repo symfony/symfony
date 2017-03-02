@@ -159,9 +159,10 @@ class DoctrineDataCollector extends DataCollector
     private function sanitizeParam($var)
     {
         if (is_object($var)) {
+            $className = get_class($var);
             return method_exists($var, '__toString') ?
-                array($var->__toString(), false) :
-                array(sprintf('Object(%s)', get_class($var)), false);
+                array(sprintf('Object(%s): "%s"', $className, $var->__toString()), false) :
+                array(sprintf('Object(%s)', $className), false);
         }
 
         if (is_array($var)) {

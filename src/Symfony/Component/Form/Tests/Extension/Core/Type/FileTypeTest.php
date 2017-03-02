@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+use Symfony\Component\Form\Test\TypeTestCase;
+
+class FileTypeTest extends TypeTestCase
 {
     /**
      * @group legacy

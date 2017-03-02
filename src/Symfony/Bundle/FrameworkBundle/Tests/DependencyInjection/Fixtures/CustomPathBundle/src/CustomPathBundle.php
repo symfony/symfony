@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
-class CustomPathBundle extends \Symfony\Component\HttpKernel\Bundle\Bundle
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class CustomPathBundle extends Bundle
 {
     public function getPath()
     {

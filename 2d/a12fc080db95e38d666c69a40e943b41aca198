@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-03T14:19:22Z
+
+This should not cause a single BC break afaik
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-03-03T14:37:18Z
+
+You are correct. Technically this is not a BC break. But **strictly** speaking one could believe the intention was `\InvalidArgumentException` instead of `Symfony\Component\Translation\Exception\InvalidArgumentException`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-03T14:43:23Z
+
+Should we apply this on the lowest supported branch where it goes ?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-03-03T14:44:32Z
+
+I think so. But it is your call. That is why I wrote "master"
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-03T15:01:52Z
+
+I think this is more of an "improvement" than a feature or bugfix. Sadly there's no mention of this in the symfony docs/semver. However, I do think it falls under the following:
+
+> Coding standard and refactoring: Coding standard fixes or code refactoring are not recommended but can be accepted for **consistency with the existing code base**, if they are not too invasive, and if merging them on master would not lead to complex branch merging
+
+ - https://symfony.com/doc/current/contributing/code/maintenance.html
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-03T15:16:31Z
+
+< 3.2 actually throws `\InvalidArgumentException`
+
+So for 2.7 you need to update the actual throws as well (https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Translation/Translator.php#L463)
+
+Otherwise this could be 3.2 without any BC issue (it's a doc fix, at least for the current implementations ^^).
+
+[ref](https://github.com/symfony/symfony/pull/20012)

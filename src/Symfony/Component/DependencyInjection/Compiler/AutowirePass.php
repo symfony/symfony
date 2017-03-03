@@ -456,19 +456,21 @@ class AutowirePass extends AbstractRecursivePass
             return;
         }
 
-        $currentId = $this->currentId;
-        $this->currentId = $argumentId = sprintf('autowired.%s', $typeHint->name);
-
-        $argumentDefinition = $this->container->register($argumentId, $typeHint->name);
+        $argumentDefinition = $this->container->register($typeHint->name, $typeHint->name);
         $argumentDefinition->setPublic(false);
         $argumentDefinition->setAutowired(true);
+        $argumentDefinition->addTag('autoregistered');
 
-        $this->populateAvailableType($argumentId, $argumentDefinition);
+        if (null !== $this->types) {
+            $this->populateAvailableType($typeHint->name, $argumentDefinition);
+        }
 
-        $this->processValue($argumentDefinition);
+        $currentId = $this->currentId;
+        $this->currentId = $typeHint->name;
+        $this->processValue($argumentDefinition, true);
         $this->currentId = $currentId;
 
-        return new Reference($argumentId);
+        return new Reference($typeHint->name);
     }
 
     /**

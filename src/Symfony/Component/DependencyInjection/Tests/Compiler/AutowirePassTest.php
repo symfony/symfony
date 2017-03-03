@@ -234,16 +234,18 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
 
         $this->assertCount(1, $container->getDefinition('coop_tilleuls')->getArguments());
-        $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas', $container->getDefinition('coop_tilleuls')->getArgument(0));
+        $this->assertEquals(Dunglas::class, $container->getDefinition('coop_tilleuls')->getArgument(0));
 
-        $dunglasDefinition = $container->getDefinition('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas');
+        $dunglasDefinition = $container->getDefinition(Dunglas::class);
         $this->assertEquals(__NAMESPACE__.'\Dunglas', $dunglasDefinition->getClass());
+        $this->assertTrue($dunglasDefinition->isAutowired());
         $this->assertFalse($dunglasDefinition->isPublic());
+        $this->assertSame(array('autoregistered' => array(array())), $dunglasDefinition->getTags());
         $this->assertCount(1, $dunglasDefinition->getArguments());
-        $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Lille', $dunglasDefinition->getArgument(0));
+        $this->assertEquals(Lille::class, $dunglasDefinition->getArgument(0));
 
-        $lilleDefinition = $container->getDefinition('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Lille');
-        $this->assertEquals(__NAMESPACE__.'\Lille', $lilleDefinition->getClass());
+        $lilleDefinition = $container->getDefinition(Lille::class);
+        $this->assertEquals(Lille::class, $lilleDefinition->getClass());
     }
 
     public function testResolveParameter()
@@ -535,7 +537,7 @@ class AutowirePassTest extends TestCase
 
         $overridenGetters = $container->getDefinition('getter_overriding')->getOverriddenGetters();
         $this->assertEquals(array(
-            'abstractgetfoo' => new Reference('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Foo'),
+            'abstractgetfoo' => new Reference(Foo::class),
         ), $overridenGetters);
     }
 
@@ -559,8 +561,8 @@ class AutowirePassTest extends TestCase
         $overridenGetters = $container->getDefinition('getter_overriding')->getOverriddenGetters();
         $this->assertEquals(array(
             'getexplicitlydefined' => new Reference('b'),
-            'getfoo' => new Reference('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Foo'),
-            'getbar' => new Reference('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Bar'),
+            'getfoo' => new Reference(Foo::class),
+            'getbar' => new Reference(Bar::class),
         ), $overridenGetters);
     }
 
@@ -670,7 +672,7 @@ class AutowirePassTest extends TestCase
      * @dataProvider provideAutodiscoveredAutowiringOrder
      *
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB).
+     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB).
      */
     public function testAutodiscoveredAutowiringOrder($class)
     {

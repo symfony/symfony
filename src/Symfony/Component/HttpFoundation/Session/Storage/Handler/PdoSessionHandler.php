@@ -196,8 +196,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
         $this->lockMode = isset($options['lock_mode']) ? $options['lock_mode'] : $this->lockMode;
 
-        if ($this->lifetimeCol !== false) {
-            @trigger_error('Using the "db_lifetime_col" option is deprecated since version 3.3 as it will be removed in 4.0.', E_USER_DEPRECATED);
+        if (false !== $this->lifetimeCol) {
+            @trigger_error(sprintf('The "%s" column is deprecated since version 3.3 and won\'t be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.', $this->lifetimeCol), E_USER_DEPRECATED);
         }
     }
 
@@ -217,7 +217,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
         // connect if we are not yet
         $this->getConnection();
 
-        if ($this->lifetimeCol === false) {
+        if (false === $this->lifetimeCol) {
             switch ($this->driver) {
                 case 'mysql':
                     // We use varbinary for the ID column because it prevents unwanted conversions:
@@ -225,13 +225,13 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     // - trailing space removal
                     // - case-insensitivity
                     // - language processing like é == e
-                    $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8_bin, ENGINE = InnoDB";
+                    $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->timeCol INTEGER UNSIGNED NOT NULL, KEY {$this->table}_{$this->timeCol}_idx ($this->timeCol)) COLLATE utf8_bin, ENGINE = InnoDB";
                     break;
                 case 'sqlite':
-                    $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->timeCol INTEGER NOT NULL)";
+                    $sql = "BEGIN; CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->timeCol INTEGER NOT NULL); CREATE INDEX {$this->table}_{$this->timeCol}_idx ON $this->table  ($this->timeCol); COMMIT";
                     break;
                 case 'pgsql':
-                    $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(128) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->timeCol INTEGER NOT NULL)";
+                    $sql = "BEGIN; CREATE TABLE $this->table ($this->idCol VARCHAR(128) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->timeCol INTEGER NOT NULL); CREATE INDEX {$this->table}_{$this->timeCol}_idx ON $this->table ($this->timeCol); COMMIT";
                     break;
                 case 'oci':
                     $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR2(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->timeCol INTEGER NOT NULL)";
@@ -245,11 +245,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
         } else {
             switch ($this->driver) {
                 case 'mysql':
-                    // We use varbinary for the ID column because it prevents unwanted conversions:
-                    // - character set conversions between server and client
-                    // - trailing space removal
-                    // - case-insensitivity
-                    // - language processing like é == e
                     $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol MEDIUMINT NOT NULL, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8_bin, ENGINE = InnoDB";
                     break;
                 case 'sqlite':
@@ -426,7 +421,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $this->gcCalled = false;
 
             // delete the session records that have expired
-            $sql = "DELETE FROM $this->table WHERE $this->timeCol < :time";
+            if (false === $this->lifetimeCol) {
+                $sql = "DELETE FROM $this->table WHERE $this->timeCol < :time";
+            } else {
+                $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol < :time";
+            }
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
@@ -547,7 +546,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $sessionRows = $selectStmt->fetchAll(\PDO::FETCH_NUM);
 
             if ($sessionRows) {
-                if ($sessionRows[0][1] < time()) {
+                if ($sessionRows[0][1] < time() || (isset($sessionRows[0][2]) && $sessionRows[0][1] + $sessionRows[0][2] < time())) {
                     $this->sessionExpired = true;
 
                     return '';
@@ -699,7 +698,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     {
         $mergeSql = null;
 
-        if ($this->lifetimeCol === false) {
+        if (false === $this->lifetimeCol) {
             switch (true) {
                 case 'mysql' === $this->driver:
                     $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) ".

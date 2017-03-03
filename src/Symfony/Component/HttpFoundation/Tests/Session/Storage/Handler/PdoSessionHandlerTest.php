@@ -37,14 +37,30 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         return 'sqlite:'.$this->dbFile;
     }
 
-    protected function getMemorySqlitePdo()
+    protected function getPdoMemorySqlite(array $attributes = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION))
     {
         $pdo = new \PDO('sqlite::memory:');
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
-        $storage->createTable();
+
+        foreach ($attributes as $i => $v) {
+            $pdo->setAttribute($i, $v);
+        }
 
         return $pdo;
+    }
+
+    private function getSessionHandler($pdoOrDsn = null, array $options = array('db_lifetime_col' => false), $createTable = true)
+    {
+        if (null === $pdoOrDsn) {
+            $pdoOrDsn = $this->getPdoMemorySqlite();
+        }
+
+        $storage = new PdoSessionHandler($pdoOrDsn, $options);
+
+        if (true === $createTable) {
+            $storage->createTable();
+        }
+
+        return $storage;
     }
 
     /**
@@ -52,18 +68,29 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrongPdoErrMode()
     {
-        $pdo = $this->getMemorySqlitePdo();
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
-
-        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
+        $this->getSessionHandler($this->getPdoMemorySqlite(array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_SILENT)));
     }
 
     /**
      * @expectedException \RuntimeException
      */
-    public function testInexistentTable()
+    public function testNonexistentTable()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_table' => 'inexistent_table', 'db_lifetime_col' => false));
+        $this->doTestNonexistentTable($this->getSessionHandler(null, array('db_lifetime_col' => false, 'db_table' => 'nonexistent_table'), false));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     * @expectedException \RuntimeException
+     */
+    public function testLegacyNonexistentTable()
+    {
+        $this->doTestNonexistentTable($this->getSessionHandler(null, array('db_lifetime_col' => 'foobar', 'db_table' => 'nonexistent_table'), false));
+    }
+
+    private function doTestNonexistentTable(PdoSessionHandler $storage)
+    {
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
@@ -75,16 +102,23 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateTableTwice()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
+        $storage = $this->getSessionHandler();
+        $storage->createTable();
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \RuntimeException
+     */
+    public function testLegacyCreateTableTwice()
+    {
+        $storage = $this->getSessionHandler();
         $storage->createTable();
     }
 
     public function testWithLazyDsnConnection()
     {
-        $dsn = $this->getPersistentSqliteDsn();
-
-        $storage = new PdoSessionHandler($dsn, array('db_lifetime_col' => false));
-        $storage->createTable();
+        $storage = $this->getSessionHandler($this->getPersistentSqliteDsn());
         $storage->open('', 'sid');
         $data = $storage->read('id');
         $storage->write('id', 'data');
@@ -99,10 +133,23 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testWithLazySavePathConnection()
     {
+        $this->doTestReadWriteReadWithNullByte($this->getSessionHandler(null, array('db_lifetime_col' => false), false));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacyWithLazySavePathConnection()
+    {
+        $this->doTestReadWriteReadWithNullByte($this->getSessionHandler(null, array('db_lifetime_col' => 'foobar'), false));
+    }
+
+    private function doTestWithLazySavePathConnection(PdoSessionHandler $storage)
+    {
         $dsn = $this->getPersistentSqliteDsn();
 
         // Open is called with what ini_set('session.save_path', $dsn) would mean
-        $storage = new PdoSessionHandler(null, array('db_lifetime_col' => false));
         $storage->open($dsn, 'sid');
         $storage->createTable();
         $data = $storage->read('id');
@@ -118,10 +165,24 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testReadWriteReadWithNullByte()
     {
+        $this->doTestReadWriteReadWithNullByte($this->getSessionHandler(null, array('db_lifetime_col' => false), false));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacyReadWriteReadWithNullByte()
+    {
+        $this->doTestReadWriteReadWithNullByte($this->getSessionHandler(null, array('db_lifetime_col' => 'foobar'), false));
+    }
+
+    private function doTestReadWriteReadWithNullByte(PdoSessionHandler $storage)
+    {
         $sessionData = 'da'."\0".'ta';
 
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
         $storage->open('', 'sid');
+        $storage->createTable();
         $readData = $storage->read('id');
         $storage->write('id', $sessionData);
         $storage->close();
@@ -190,7 +251,20 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testReadingRequiresExactlySameId()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
+        $this->doTestReadingRequiresExactlySameId($this->getSessionHandler());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacyReadingRequiresExactlySameId()
+    {
+        $this->doTestReadingRequiresExactlySameId($this->getSessionHandler(null, array('db_lifetime_col' => 'foobar')));
+    }
+
+    private function doTestReadingRequiresExactlySameId(PdoSessionHandler $storage)
+    {
         $storage->open('', 'sid');
         $storage->write('id', 'data');
         $storage->write('test', 'data');
@@ -210,13 +284,25 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('', $readDataExtraSpace, 'Retrieval by ID requires spaces as-is');
     }
 
+    public function testWriteDifferentSessionIdThanRead()
+    {
+        $this->doTestWriteDifferentSessionIdThanRead($this->getSessionHandler());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacyWriteDifferentSessionIdThanRead()
+    {
+        $this->doTestWriteDifferentSessionIdThanRead($this->getSessionHandler(null, array('db_lifetime_col' => 'foobar')));
+    }
+
     /**
      * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace).
      */
-    public function testWriteDifferentSessionIdThanRead()
+    private function doTestWriteDifferentSessionIdThanRead(PdoSessionHandler $storage)
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
-        $storage->open('', 'sid');
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->destroy('id');
@@ -232,8 +318,20 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testWrongUsageStillWorks()
     {
-        // wrong method sequence that should no happen, but still works
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
+        $this->doTestWrongUsageStillWorks($this->getSessionHandler());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacyWrongUsageStillWorks()
+    {
+        $this->doTestWrongUsageStillWorks($this->getSessionHandler(null, array('db_lifetime_col' => 'foobar')));
+    }
+
+    private function doTestWrongUsageStillWorks(PdoSessionHandler $storage)
+    {
         $storage->write('id', 'data');
         $storage->write('other_id', 'other_data');
         $storage->destroy('inexistent');
@@ -248,9 +346,24 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testSessionDestroy()
     {
-        $pdo = $this->getMemorySqlitePdo();
-        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
+        $storage = $this->getSessionHandler($pdo = $this->getPdoMemorySqlite());
 
+        $this->doTestSessionDestroy($pdo, $storage);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacySessionDestroy()
+    {
+        $storage = $this->getSessionHandler($pdo = $this->getPdoMemorySqlite(), array('db_lifetime_col' => 'foobar'));
+
+        $this->doTestSessionDestroy($pdo, $storage);
+    }
+
+    private function doTestSessionDestroy(\PDO $pdo, PdoSessionHandler $storage)
+    {
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
@@ -271,9 +384,25 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testSessionGC()
     {
+        $storage = $this->getSessionHandler($pdo = $this->getPdoMemorySqlite());
+
+        $this->doTestSessionGC($pdo, $storage);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "%s" column is deprecated since version 3.3 and won't be used anymore in 4.0. Migrate your session database then set the "db_lifetime_col" option to false to opt-in for the new behavior.
+     */
+    public function testLegacySessionGC()
+    {
+        $storage = $this->getSessionHandler($pdo = $this->getPdoMemorySqlite(), array('db_lifetime_col' => 'foobar'));
+
+        $this->doTestSessionGC($pdo, $storage);
+    }
+
+    private function doTestSessionGC(\PDO $pdo, PdoSessionHandler $storage)
+    {
         $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
-        $pdo = $this->getMemorySqlitePdo();
-        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
 
         $storage->open('', 'sid');
         $storage->read('id');
@@ -300,7 +429,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConnection()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
+        $storage = $this->getSessionHandler();
 
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);

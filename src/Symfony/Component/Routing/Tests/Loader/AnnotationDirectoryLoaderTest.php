@@ -44,6 +44,8 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
     {
         $this->expectAnnotationsToBeReadFrom(array(
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+            'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BazClass',
+            'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BazClass',
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\FooClass',
         ));
 

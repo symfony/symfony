@@ -68,6 +68,36 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
+     * Adds values to an entry's multi-valued attribute from the LDAP server.
+     *
+     * @throws NotBoundException
+     * @throws LdapException
+     */
+    public function addAttributeValues(Entry $entry, string $attribute, array $values)
+    {
+        $con = $this->getConnectionResource();
+
+        if (!@ldap_mod_add($con, $entry->getDn(), array($attribute => $values))) {
+            throw new LdapException(sprintf('Could not add values to entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)));
+        }
+    }
+
+    /**
+     * Removes values from an entry's multi-valued attribute from the LDAP server.
+     *
+     * @throws NotBoundException
+     * @throws LdapException
+     */
+    public function removeAttributeValues(Entry $entry, string $attribute, array $values)
+    {
+        $con = $this->getConnectionResource();
+
+        if (!@ldap_mod_del($con, $entry->getDn(), array($attribute => $values))) {
+            throw new LdapException(sprintf('Could not remove values from entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)));
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rename(Entry $entry, $newRdn, $removeOldRdn = true)

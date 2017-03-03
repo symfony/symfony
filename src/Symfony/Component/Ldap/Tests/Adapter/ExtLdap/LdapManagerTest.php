@@ -192,4 +192,50 @@ class LdapManagerTest extends LdapTestCase
 
         $this->executeSearchQuery(1);
     }
+
+    public function testLdapAddRemoveAttributeValues()
+    {
+        $entryManager = $this->adapter->getEntryManager();
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $entryManager->addAttributeValues($entry, 'mail', array('fabpot@example.org', 'fabpot2@example.org'));
+
+        $result = $this->executeSearchQuery(1);
+        $newEntry = $result[0];
+
+        $this->assertCount(4, $newEntry->getAttribute('mail'));
+
+        $entryManager->removeAttributeValues($newEntry, 'mail', array('fabpot@example.org', 'fabpot2@example.org'));
+
+        $result = $this->executeSearchQuery(1);
+        $newNewEntry = $result[0];
+
+        $this->assertCount(2, $newNewEntry->getAttribute('mail'));
+    }
+
+    public function testLdapRemoveAttributeValuesError()
+    {
+        $entryManager = $this->adapter->getEntryManager();
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
+
+        $entryManager->removeAttributeValues($entry, 'mail', array('fabpot@example.org'));
+    }
+
+    public function testLdapAddAttributeValuesError()
+    {
+        $entryManager = $this->adapter->getEntryManager();
+
+        $result = $this->executeSearchQuery(1);
+        $entry = $result[0];
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
+
+        $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
+    }
 }

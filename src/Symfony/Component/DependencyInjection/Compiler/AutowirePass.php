@@ -39,6 +39,7 @@ class AutowirePass extends AbstractRecursivePass
     private $types;
     private $ambiguousServiceTypes = array();
     private $usedTypes = array();
+    private $currentDefinition;
 
     /**
      * {@inheritdoc}
@@ -100,43 +101,57 @@ class AutowirePass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if (!$value instanceof Definition || !$value->isAutowired()) {
-            return parent::processValue($value, $isRoot);
-        }
+        if ($value instanceof Reference && $this->currentDefinition->isAutowired() && !$this->container->has($id = (string) $value)) {
+            $regex = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/';
 
-        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
-            return parent::processValue($value, $isRoot);
-        }
-
-        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
-        $methodCalls = $value->getMethodCalls();
-
-        if ($constructor = $reflectionClass->getConstructor()) {
-            array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
-        } elseif ($value->getArguments()) {
-            throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name));
-        }
-
-        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
-        $overriddenGetters = $this->autowireOverridenGetters($value->getOverriddenGetters(), $autowiredMethods);
-
-        if ($constructor) {
-            list(, $arguments) = array_shift($methodCalls);
-
-            if ($arguments !== $value->getArguments()) {
-                $value->setArguments($arguments);
+            if (preg_match($regex, $id) && $reflectionClass = $this->container->getReflectionClass($id, true)) {
+                $this->createAutowiredDefinition($reflectionClass);
             }
         }
-
-        if ($methodCalls !== $value->getMethodCalls()) {
-            $value->setMethodCalls($methodCalls);
+        if (!$value instanceof Definition) {
+            return parent::processValue($value, $isRoot);
         }
 
-        if ($overriddenGetters !== $value->getOverriddenGetters()) {
-            $value->setOverriddenGetters($overriddenGetters);
-        }
+        $parentDefinition = $this->currentDefinition;
+        $this->currentDefinition = $value;
 
-        return parent::processValue($value, $isRoot);
+        try {
+            if (!$value->isAutowired() || !$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
+                return parent::processValue($value, $isRoot);
+            }
+
+            $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
+            $methodCalls = $value->getMethodCalls();
+
+            if ($constructor = $reflectionClass->getConstructor()) {
+                array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
+            } elseif ($value->getArguments()) {
+                throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name));
+            }
+
+            $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
+            $overriddenGetters = $this->autowireOverridenGetters($value->getOverriddenGetters(), $autowiredMethods);
+
+            if ($constructor) {
+                list(, $arguments) = array_shift($methodCalls);
+
+                if ($arguments !== $value->getArguments()) {
+                    $value->setArguments($arguments);
+                }
+            }
+
+            if ($methodCalls !== $value->getMethodCalls()) {
+                $value->setMethodCalls($methodCalls);
+            }
+
+            if ($overriddenGetters !== $value->getOverriddenGetters()) {
+                $value->setOverriddenGetters($overriddenGetters);
+            }
+
+            return parent::processValue($value, $isRoot);
+        } finally {
+            $this->currentDefinition = $parentDefinition;
+        }
     }
 
     /**

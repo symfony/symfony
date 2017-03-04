@@ -88,7 +88,8 @@
                     }
 
                     Sfjs.setPreference('toolbar/displayState', 'block');
-                })
+                });
+                Sfjs.renderAjaxRequests();
             },
             function(xhr) {
                 if (xhr.status !== 0) {

@@ -42,6 +42,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
             $this->guesserServiceIds = $guesserServiceIds;
             $this->typeServiceIds = $typeExtensionServices;
             $typeExtensionServices = $guesserServices;
+            $guesserServices = $guesserServiceIds;
         }
 
         $this->typeContainer = $typeContainer;

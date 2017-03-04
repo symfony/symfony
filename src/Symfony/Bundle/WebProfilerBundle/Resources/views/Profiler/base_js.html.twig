@@ -88,12 +88,11 @@
         var successStreak = 4;
         var pendingRequests = 0;
         var renderAjaxRequests = function() {
-            var requestCounter = document.querySelector('.sf-toolbar-ajax-requests');
+            var requestCounter = document.querySelector('.sf-toolbar-ajax-request-counter');
             if (!requestCounter) {
                 return;
             }
             requestCounter.textContent = requestStack.length;
-            requestCounter.className = 'sf-toolbar-ajax-requests sf-toolbar-value';
 
             var infoSpan = document.querySelector(".sf-toolbar-ajax-info");
             if (infoSpan) {

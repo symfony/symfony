@@ -13,6 +13,7 @@ CHANGELOG
 
  * deprecated `DataCollector::varToString()`, use `cloneVar()` instead
  * changed surrogate capability name in `AbstractSurrogate::addSurrogateCapability` to 'symfony'
+ * Added `ControllerArgumentValueResolverPass`
 
 3.1.0
 -----

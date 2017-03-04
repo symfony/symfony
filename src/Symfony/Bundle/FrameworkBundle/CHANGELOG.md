@@ -27,6 +27,8 @@ CHANGELOG
    `render()`, `renderView()` and `stream()` methods can only use Twig (using the Templating component is not supported).
    The `json()` method requires the Serializer component (use `Symfony\Component\HttpFoundation\JsonResponse` directly if
    you do not want to use the Serializer).
+ * Deprecated `ControllerArgumentValueResolverPass`. Use 
+   `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
 
 3.2.0
 -----

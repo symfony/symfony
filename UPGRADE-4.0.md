@@ -217,6 +217,10 @@ FrameworkBundle
     * router.options.matcher.cache_class
     * router.options.generator.cache_class
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ControllerArgumentValueResolverPass` class
+   has been removed. Use the `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass`
+   class instead.
+
 HttpFoundation
 ---------------
 

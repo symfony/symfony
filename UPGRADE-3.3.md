@@ -43,7 +43,7 @@ FrameworkBundle
 HttpFoundation
 --------------
 
- * The `PdoSessionHandler` option `db_lifetime_col` has been deprecated.
+ * The `PdoSessionHandler` option `db_lifetime_col` has been deprecated in favor of `db_time_col` (an indexed time column).
 
 HttpKernel
 -----------

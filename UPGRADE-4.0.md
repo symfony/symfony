@@ -165,7 +165,9 @@ SecurityBundle
  * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` method instead.
 
 HttpFoundation
----------------
+--------------
+
+ * The `PdoSessionHandler` option `db_lifetime_col` has been removed in favor of `db_time_col` (an indexed time column).
 
  * Extending the following methods of `Response`
    is no longer possible (these methods are now `final`):

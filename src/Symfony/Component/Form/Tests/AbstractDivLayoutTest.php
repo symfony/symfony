@@ -453,7 +453,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamedBuilder('name', 'form')
             ->add($this->factory
                 ->createNamedBuilder('child', 'form', null, array('error_bubbling' => false))
-                ->add('grandChild', 'form')
+                ->add('grandChild', 'text')
             )
             ->getForm();
 

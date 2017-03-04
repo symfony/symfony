@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T20:03:41Z
+
+Can you also add a note in the Routing component CHANGELOG stating that these parameters are deprecated? And also a note in UPGRADE-3.3.md? Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-03T13:43:44Z
+
+is there a way to trigger a deprecation warning (in a late compiler pass maybe) when these parameters are replaced with values different than the default ones ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-04T10:37:43Z
+
+@stof I don't remember doing so when we removed such params in 3.0, did we? Not sure it's really worth it.

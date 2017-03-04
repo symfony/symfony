@@ -96,7 +96,7 @@
 
             var infoSpan = document.querySelector(".sf-toolbar-ajax-info");
             if (infoSpan) {
-                infoSpan.textContent = requestStack.length + ' AJAX request' + (requestStack.length > 1 ? 's' : '');
+                infoSpan.textContent = requestStack.length + ' AJAX request' + (requestStack.length !== 1 ? 's' : '');
             }
 
             var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');

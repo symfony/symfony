@@ -14,6 +14,8 @@ namespace Symfony\Component\Form\Tests\Extension\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
+use Symfony\Component\Form\FormTypeGuesserChain;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 
 class DependencyInjectionExtensionTest extends TestCase
 {
@@ -105,6 +107,49 @@ class DependencyInjectionExtensionTest extends TestCase
         $extension = new DependencyInjectionExtension($container, array(), array('test' => array('extension')), array());
 
         $extension->getTypeExtensions('test');
+    }
+
+    public function testGetTypeGuesser()
+    {
+        $container = $this->createContainerMock();
+        $extension = new DependencyInjectionExtension($container, array(), array($this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()));
+
+        $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
+    }
+
+    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
+    {
+        $container = $this->createContainerMock();
+        $extension = new DependencyInjectionExtension($container, array(), array());
+
+        $this->assertNull($extension->getTypeGuesser());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyGetTypeGuesser()
+    {
+        $container = $this->createContainerMock();
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('foo')
+            ->willReturn($this->getMockBuilder(FormTypeGuesserInterface::class)->getMock());
+        $extension = new DependencyInjectionExtension($container, array(), array(), array('foo'));
+
+        $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
+    {
+        $container = $this->createContainerMock();
+        $extension = new DependencyInjectionExtension($container, array(), array(), array());
+
+        $this->assertNull($extension->getTypeGuesser());
     }
 
     private function createContainerMock()

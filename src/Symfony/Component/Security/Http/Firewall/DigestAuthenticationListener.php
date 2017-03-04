@@ -205,7 +205,7 @@ class DigestData
         } elseif ('auth' === $this->elements['qop']) {
             $digest .= ':'.$this->elements['nc'].':'.$this->elements['cnonce'].':'.$this->elements['qop'];
         } else {
-            throw new \InvalidArgumentException('This method does not support a qop: "%s".', $this->elements['qop']);
+            throw new \InvalidArgumentException(sprintf('This method does not support a qop: "%s".', $this->elements['qop']));
         }
         $digest .= ':'.$a2Md5;
 

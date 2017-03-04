@@ -198,6 +198,8 @@
                     statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
                 }
                 statusCodeElem.textContent = request.statusCode;
+            } else {
+                statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
             }
 
             if (request.duration) {
@@ -270,6 +272,7 @@
                             finishAjaxRequest(idx);
                         }, function (e){
                             stackElement.error = true;
+                            finishAjaxRequest(idx);
                         });
                         startAjaxRequest(idx);
                     }

@@ -147,6 +147,16 @@ FrameworkBundle
    have been deprecated and will be removed in 4.0.
 
  * Extending `ConstraintValidatorFactory` is deprecated and won't be supported in 4.0.
+ 
+ * Class parameters related to routing have been deprecated and will be removed in 4.0.
+     * router.options.generator_class
+     * router.options.generator_base_class
+     * router.options.generator_dumper_class
+     * router.options.matcher_class
+     * router.options.matcher_base_class
+     * router.options.matcher_dumper_class
+     * router.options.matcher.cache_class
+     * router.options.generator.cache_class
 
 HttpKernel
 -----------

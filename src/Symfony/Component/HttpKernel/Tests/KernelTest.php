@@ -331,7 +331,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $this->assertEquals('Fixtures', $kernel->getName());
+        $this->assertEquals('fortest', $kernel->getName());
     }
 
     public function testOverrideGetName()

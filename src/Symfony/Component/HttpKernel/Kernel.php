@@ -268,7 +268,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getName()
     {
         if (null === $this->name) {
-            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+            $classParts = explode('\\', get_class($this));
+            $this->name = strtolower(str_replace('Kernel', '', array_pop($classParts)));
         }
 
         return $this->name;

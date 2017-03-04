@@ -19,6 +19,13 @@ namespace Symfony\Component\Console\Input;
 interface InputInterface
 {
     /**
+     * @see hasParameterOption()
+     */
+    const OPTION_FLAG_DEFAULT = 0;
+    const OPTION_FLAG_POSIX = 1;
+    const POSIX_OPTIONS_END = '--';
+
+    /**
      * Returns the first argument from the raw parameters (not parsed).
      *
      * @return string The value of the first argument or null otherwise
@@ -32,10 +39,16 @@ interface InputInterface
      * before they have been validated. It must be used carefully.
      *
      * @param string|array $values The values to look for in the raw parameters (can be an array)
+     * @param int          $flags  Parse flags
+     *
+     *   How far to look for options:
+     *
+     *     OPTION_FLAG_DEFAULT: (default) scan all arguments incl. operands
+     *     OPTION_FLAG_POSIX: Do not search for option(s) after POSIX_OPTIONS_END ("--")
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values);
+    public function hasParameterOption($values, $flags = self::OPTION_FLAG_DEFAULT);
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -43,12 +56,15 @@ interface InputInterface
      * This method is to be used to introspect the input parameters
      * before they have been validated. It must be used carefully.
      *
+     * @see hasParameterOption() for $flags
+     *
      * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
      * @param mixed        $default The default value to return if no result is found
+     * @param int          $flags   Parse flags
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false);
+    public function getParameterOption($values, $default = false, $flags = self::OPTION_FLAG_DEFAULT);
 
     /**
      * Binds the current Input instance with the given arguments and options.

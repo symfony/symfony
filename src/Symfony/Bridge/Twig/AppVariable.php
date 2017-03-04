@@ -159,23 +159,21 @@ class AppVariable
         // needed to avoid starting the session automatically when looking for flash messages
         try {
             $session = $this->getSession();
-            if (null !== $session && !$session->isStarted()) {
+            if (null === $session || !$session->isStarted()) {
                 return array();
             }
         } catch (\RuntimeException $e) {
             return array();
         }
 
-        if (null === $types || empty($types)) {
+        if (empty($types)) {
             return $session->getFlashBag()->all();
         }
 
-        $types = (array) $types;
-
-        if (1 === count($types)) {
-            return $session->getFlashBag()->get($types[0]);
+        if (is_string($types)) {
+            return $session->getFlashBag()->get($types);
         }
 
-        return array_intersect($session->getFlashBag()->all(), array_flip($types));
+        return array_intersect_key($session->getFlashBag()->all(), array_flip($types));
     }
 }

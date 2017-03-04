@@ -159,7 +159,7 @@ FrameworkBundle
      * router.options.generator.cache_class
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ControllerArgumentValueResolverPass` class
-   has been removed. Use the `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass`
+   has been deprecated and will be removed in 4.0. Use the `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass`
    class instead.
 
 HttpKernel

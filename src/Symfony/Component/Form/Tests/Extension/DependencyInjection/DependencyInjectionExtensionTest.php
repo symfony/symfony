@@ -81,7 +81,7 @@ class DependencyInjectionExtensionTest extends TestCase
                 throw new ServiceNotFoundException($id);
             });
 
-        $extension = new DependencyInjectionExtension($container, array('test' => array('extension1', 'extension2'), 'other' => array('extension3')), array(), array());
+        $extension = new DependencyInjectionExtension($container, array(), array('test' => array('extension1', 'extension2'), 'other' => array('extension3')), array());
 
         $this->assertTrue($extension->hasTypeExtensions('test'));
         $this->assertFalse($extension->hasTypeExtensions('unknown'));
@@ -102,7 +102,7 @@ class DependencyInjectionExtensionTest extends TestCase
             ->with('extension')
             ->willReturn($this->createFormTypeExtensionMock('unmatched'));
 
-        $extension = new DependencyInjectionExtension($container, array('test' => array('extension')), array(), array());
+        $extension = new DependencyInjectionExtension($container, array(), array('test' => array('extension')), array());
 
         $extension->getTypeExtensions('test');
     }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-28T22:14:53Z
+
+LGTM, should be merged in 2.7 though (can you change the branch target of the PR?)

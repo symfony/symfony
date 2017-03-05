@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2017-02-01T10:13:32Z
+
+Many thanks @HeahDude :+1:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-02-01T11:40:16Z
+
+Please wait before merging.
+
+Status: I need to check something
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-02-01T13:46:44Z
+
+@HeahDude, This solution force `null` for empty string (good), but what if the dev needs to change this behavior through a callable `choice_value` option?
+
+I wondering removing [these](https://github.com/HeahDude/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/Type/CountryType.php#L82-L85) optimization could solves the problem instead of current solution, because `$value` will be `null` always unless you pass a custom `choice_value` option?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-02-01T14:01:56Z
+
+@yceruto I don't really understand what you want to improve here.
+
+Indeed `$value` depends on `choice_value` option. The filtering added in this PR just prevents to handle empty string because there is no such need with countries, locales, etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-06T12:01:40Z
+
+Status update @HeahDude ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-02-06T20:09:05Z
+
+I'll be very busy this week, but now I've missed today's releases so I guess there is no rush.
+
+Status: needs extra work in 2.7 :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T14:49:07Z
+
+@HeahDude  Any news?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-05T17:23:40Z
+
+Finally see #21879 which adds the failing tests. Will need a rebase once this other is merged.

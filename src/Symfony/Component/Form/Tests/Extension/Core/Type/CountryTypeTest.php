@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class CountryTypeTest extends TestCase
+class CountryTypeTest extends BaseTypeTest
 {
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CountryType';
+
     protected function setUp()
     {
         IntlTestHelper::requireIntl($this, false);
@@ -36,9 +37,8 @@ class CountryTypeTest extends TestCase
 
     public function testCountriesAreSelectable()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType');
-        $view = $form->createView();
-        $choices = $view->vars['choices'];
+        $choices = $this->factory->create(static::TESTED_TYPE)
+            ->createView()->vars['choices'];
 
         // Don't check objects for identity
         $this->assertContains(new ChoiceView('DE', 'DE', 'Germany'), $choices, '', false, false);
@@ -50,14 +50,18 @@ class CountryTypeTest extends TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType', 'Symfony\Component\Form\Extension\Core\Type\CountryType');
-        $view = $form->createView();
-        $choices = $view->vars['choices'];
+        $choices = $this->factory->create(static::TESTED_TYPE, 'country')
+            ->createView()->vars['choices'];
 
         foreach ($choices as $choice) {
             if ('ZZ' === $choice->value) {
                 $this->fail('Should not contain choice "ZZ"');
             }
         }
+    }
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        parent::testSubmitNull($expected, $norm, '');
     }
 }

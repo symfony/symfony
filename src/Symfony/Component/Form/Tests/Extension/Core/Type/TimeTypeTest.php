@@ -13,10 +13,11 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
-class TimeTypeTest extends TestCase
+class TimeTypeTest extends BaseTypeTest
 {
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimeType';
+
     /**
      * @group legacy
      */
@@ -29,7 +30,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitDateTime()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime',
@@ -50,7 +51,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitString()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'string',
@@ -69,7 +70,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitTimestamp()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'timestamp',
@@ -90,7 +91,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitArray()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'array',
@@ -109,7 +110,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitDatetimeSingleText()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime',
@@ -124,7 +125,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitDatetimeSingleTextWithoutMinutes()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime',
@@ -140,7 +141,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitArraySingleText()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'array',
@@ -160,7 +161,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitArraySingleTextWithoutMinutes()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'array',
@@ -180,7 +181,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitArraySingleTextWithSeconds()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'array',
@@ -202,7 +203,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitStringSingleText()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'string',
@@ -217,7 +218,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitStringSingleTextWithoutMinutes()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'string',
@@ -233,7 +234,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitWithSecondsAndBrowserOmissionSeconds()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'string',
@@ -249,7 +250,7 @@ class TimeTypeTest extends TestCase
 
     public function testSetDataWithoutMinutes()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime',
@@ -263,7 +264,7 @@ class TimeTypeTest extends TestCase
 
     public function testSetDataWithSeconds()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime',
@@ -277,7 +278,7 @@ class TimeTypeTest extends TestCase
 
     public function testSetDataDifferentTimezones()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'America/New_York',
             'view_timezone' => 'Asia/Hong_Kong',
             'input' => 'string',
@@ -303,7 +304,7 @@ class TimeTypeTest extends TestCase
 
     public function testSetDataDifferentTimezonesDateTime()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'America/New_York',
             'view_timezone' => 'Asia/Hong_Kong',
             'input' => 'datetime',
@@ -330,7 +331,7 @@ class TimeTypeTest extends TestCase
 
     public function testHoursOption()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'hours' => array(6, 7),
         ));
 
@@ -344,7 +345,7 @@ class TimeTypeTest extends TestCase
 
     public function testIsMinuteWithinRangeReturnsTrueIfWithin()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'minutes' => array(6, 7),
         ));
 
@@ -358,7 +359,7 @@ class TimeTypeTest extends TestCase
 
     public function testIsSecondWithinRangeReturnsTrueIfWithin()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
@@ -375,7 +376,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
         ));
 
@@ -391,7 +392,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -409,7 +410,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
         ));
 
@@ -425,7 +426,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -443,7 +444,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -461,7 +462,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -479,7 +480,7 @@ class TimeTypeTest extends TestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -497,12 +498,12 @@ class TimeTypeTest extends TestCase
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', new \DateTime());
+        $this->factory->create(static::TESTED_TYPE, new \DateTime());
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
         ));
 
@@ -512,7 +513,7 @@ class TimeTypeTest extends TestCase
 
     public function testSingleTextWidgetWithSecondsShouldHaveRightStepAttribute()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
             'with_seconds' => true,
         ));
@@ -524,7 +525,7 @@ class TimeTypeTest extends TestCase
 
     public function testSingleTextWidgetWithSecondsShouldNotOverrideStepAttribute()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
             'with_seconds' => true,
             'attr' => array(
@@ -539,7 +540,7 @@ class TimeTypeTest extends TestCase
 
     public function testDontPassHtml5TypeIfHtml5NotAllowed()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
             'html5' => false,
         ));
@@ -550,7 +551,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
             'with_seconds' => true,
         ));
@@ -563,7 +564,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassNoPlaceholderToViewIfRequired()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => true,
             'with_seconds' => true,
         ));
@@ -576,7 +577,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassPlaceholderAsString()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'placeholder' => 'Empty',
             'with_seconds' => true,
         ));
@@ -592,7 +593,7 @@ class TimeTypeTest extends TestCase
      */
     public function testPassEmptyValueBC()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'empty_value' => 'Empty',
             'with_seconds' => true,
         ));
@@ -608,7 +609,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassPlaceholderAsArray()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'placeholder' => array(
                 'hour' => 'Empty hour',
                 'minute' => 'Empty minute',
@@ -625,7 +626,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
             'placeholder' => array(
                 'hour' => 'Empty hour',
@@ -642,7 +643,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => true,
             'placeholder' => array(
                 'hour' => 'Empty hour',
@@ -671,7 +672,7 @@ class TimeTypeTest extends TestCase
     public function testHourErrorsBubbleUp($widget)
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => $widget,
         ));
         $form['hour']->addError($error);
@@ -686,7 +687,7 @@ class TimeTypeTest extends TestCase
     public function testMinuteErrorsBubbleUp($widget)
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => $widget,
         ));
         $form['minute']->addError($error);
@@ -701,7 +702,7 @@ class TimeTypeTest extends TestCase
     public function testSecondErrorsBubbleUp($widget)
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => $widget,
             'with_seconds' => true,
         ));
@@ -716,7 +717,7 @@ class TimeTypeTest extends TestCase
      */
     public function testInitializeWithSecondsAndWithoutMinutes()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'with_minutes' => false,
             'with_seconds' => true,
         ));
@@ -727,7 +728,7 @@ class TimeTypeTest extends TestCase
      */
     public function testThrowExceptionIfHoursIsInvalid()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'hours' => 'bad value',
         ));
     }
@@ -737,7 +738,7 @@ class TimeTypeTest extends TestCase
      */
     public function testThrowExceptionIfMinutesIsInvalid()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'minutes' => 'bad value',
         ));
     }
@@ -747,14 +748,14 @@ class TimeTypeTest extends TestCase
      */
     public function testThrowExceptionIfSecondsIsInvalid()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'seconds' => 'bad value',
         ));
     }
 
     public function testPassDefaultChoiceTranslationDomain()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType');
+        $form = $this->factory->create(static::TESTED_TYPE);
 
         $view = $form->createView();
         $this->assertFalse($view['hour']->vars['choice_translation_domain']);
@@ -763,7 +764,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassChoiceTranslationDomainAsString()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_translation_domain' => 'messages',
             'with_seconds' => true,
         ));
@@ -776,7 +777,7 @@ class TimeTypeTest extends TestCase
 
     public function testPassChoiceTranslationDomainAsArray()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_translation_domain' => array(
                 'hour' => 'foo',
                 'second' => 'test',
@@ -788,5 +789,12 @@ class TimeTypeTest extends TestCase
         $this->assertSame('foo', $view['hour']->vars['choice_translation_domain']);
         $this->assertFalse($view['minute']->vars['choice_translation_domain']);
         $this->assertSame('test', $view['second']->vars['choice_translation_domain']);
+    }
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        $view = array('hour' => '', 'minute' => '');
+
+        parent::testSubmitNull($expected, $norm, $view);
     }
 }

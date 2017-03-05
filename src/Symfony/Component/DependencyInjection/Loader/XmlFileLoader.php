@@ -61,6 +61,7 @@ class XmlFileLoader extends FileLoader
             $this->parseDefinitions($xml, $path);
         } finally {
             $this->instanceof = array();
+            $this->fqcnReferences = array();
         }
     }
 
@@ -146,6 +147,12 @@ class XmlFileLoader extends FileLoader
                 } else {
                     $this->setDefinition((string) $service->getAttribute('id'), $definition);
                 }
+            }
+        }
+        foreach ($this->fqcnReferences as $class) {
+            if (!$this->container->has($class)) {
+                $service = new \DOMElement('service', '<tag name="autoregistered" />');
+                $this->setDefinition($class, $this->parseDefinition($service, $file, $defaults));
             }
         }
     }
@@ -266,7 +273,7 @@ class XmlFileLoader extends FileLoader
                 if (isset($factoryService[0])) {
                     $class = $this->parseDefinition($factoryService[0], $file);
                 } elseif ($childService = $factory->getAttribute('service')) {
-                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+                    $class = $this->createReference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
                 } else {
                     $class = $factory->hasAttribute('class') ? $factory->getAttribute('class') : null;
                 }
@@ -285,7 +292,7 @@ class XmlFileLoader extends FileLoader
                 if (isset($configuratorService[0])) {
                     $class = $this->parseDefinition($configuratorService[0], $file);
                 } elseif ($childService = $configurator->getAttribute('service')) {
-                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+                    $class = $this->createReference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
                 } else {
                     $class = $configurator->getAttribute('class');
                 }
@@ -473,8 +480,7 @@ class XmlFileLoader extends FileLoader
                     if ($arg->hasAttribute('strict')) {
                         @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since version 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), E_USER_DEPRECATED);
                     }
-
-                    $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
+                    $arguments[$key] = $this->createReference($arg->getAttribute('id'), $invalidBehavior);
                     break;
                 case 'expression':
                     $arguments[$key] = new Expression($arg->nodeValue);

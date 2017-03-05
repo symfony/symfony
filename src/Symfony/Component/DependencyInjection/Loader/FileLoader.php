@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\FileLocatorInterface;
 
@@ -28,6 +30,7 @@ abstract class FileLoader extends BaseFileLoader
     protected $container;
     protected $isLoadingInstanceof = false;
     protected $instanceof = array();
+    protected $fqcnReferences = array();
 
     /**
      * @param ContainerBuilder     $container A ContainerBuilder instance
@@ -80,6 +83,19 @@ abstract class FileLoader extends BaseFileLoader
         } else {
             $this->container->setDefinition($id, $definition->setInstanceofConditionals($this->instanceof));
         }
+    }
+
+    /**
+     * @return Reference
+     */
+    protected function createReference($id, $invalidBehavior)
+    {
+        if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $id)) {
+            return new Reference($id, $invalidBehavior);
+        }
+        $this->fqcnReferences[] = $id;
+
+        return new TypedReference($id, $id, $invalidBehavior);
     }
 
     private function findClasses($namespace, $resource)

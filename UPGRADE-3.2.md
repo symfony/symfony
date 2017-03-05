@@ -21,9 +21,9 @@ DependencyInjection
 ExpressionLanguage
 -------------------
 
-* Passing a `ParserCacheInterface` instance to the `ExpressionLanguage` has been
-  deprecated and will not be supported in Symfony 4.0. You should use the
-  `CacheItemPoolInterface` interface instead.
+ * Passing a `ParserCacheInterface` instance to the `ExpressionLanguage` has been
+   deprecated and will not be supported in Symfony 4.0. You should use the
+   `CacheItemPoolInterface` interface instead.
 
 Form
 ----

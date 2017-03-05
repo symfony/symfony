@@ -1536,7 +1536,7 @@ class Request
     }
 
     /**
-     * Returns the original protocol version.
+     * Returns the protocol version.
      *
      * If the application is behind a proxy, the protocol version used in the
      * requests between the client and the proxy and between the proxy and the
@@ -1546,7 +1546,7 @@ class Request
      *
      * @return string
      */
-    public function getOriginalProtocolVersion()
+    public function getProtocolVersion()
     {
         if ($this->isFromTrustedProxy()) {
             preg_match('~^(HTTP/)?([1-9]\.[0-9]) ~', $this->headers->get('Via'), $matches);

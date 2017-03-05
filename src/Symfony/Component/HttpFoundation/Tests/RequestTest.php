@@ -2052,9 +2052,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider originalProtocolVersionProvider
+     * @dataProvider protocolVersionProvider
      */
-    public function testOriginalProtocolVersion($serverProtocol, $trustedProxy, $via, $expected)
+    public function testProtocolVersion($serverProtocol, $trustedProxy, $via, $expected)
     {
         if ($trustedProxy) {
             Request::setTrustedProxies(array('1.1.1.1'));
@@ -2065,10 +2065,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $request->headers->set('Via', $via);
 
-        $this->assertSame($expected, $request->getOriginalProtocolVersion());
+        $this->assertSame($expected, $request->getProtocolVersion());
     }
 
-    public function originalProtocolVersionProvider()
+    public function protocolVersionProvider()
     {
         return array(
             'untrusted without via' => array('HTTP/2.0', false, '', 'HTTP/2.0'),

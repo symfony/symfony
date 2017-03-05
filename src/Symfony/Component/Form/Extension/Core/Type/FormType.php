@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\DataMapper\CallbackFormDataToObjectConverter;
+use Symfony\Component\Form\Extension\Core\DataMapper\FormDataToObjectConverterInterface;
+use Symfony\Component\Form\Extension\Core\DataMapper\SimpleObjectMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -43,6 +46,15 @@ class FormType extends BaseType
 
         $isDataOptionSet = array_key_exists('data', $options);
 
+        $dataMapper = null;
+        if ($options['compound']) {
+            $dataMapper = new PropertyPathMapper($this->propertyAccessor);
+
+            if (isset($options['simple_object_mapper'])) {
+                $dataMapper = new SimpleObjectMapper($options['simple_object_mapper'], $dataMapper);
+            }
+        }
+
         $builder
             ->setRequired($options['required'])
             ->setErrorBubbling($options['error_bubbling'])
@@ -54,7 +66,7 @@ class FormType extends BaseType
             ->setCompound($options['compound'])
             ->setData($isDataOptionSet ? $options['data'] : null)
             ->setDataLocked($isDataOptionSet)
-            ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
+            ->setDataMapper($dataMapper)
             ->setMethod($options['method'])
             ->setAction($options['action']);
 
@@ -133,6 +145,11 @@ class FormType extends BaseType
 
             if (null !== $class) {
                 return function (FormInterface $form) use ($class) {
+                    // If the "SimpleObjectMapper" is used, the "empty_data" option value should be null:
+                    if ($form->getConfig()->getDataMapper() instanceof SimpleObjectMapper) {
+                        return;
+                    }
+
                     return $form->isEmpty() && !$form->isRequired() ? null : new $class();
                 };
             }
@@ -153,6 +170,18 @@ class FormType extends BaseType
         // errors should bubble up by default
         $errorBubbling = function (Options $options) {
             return $options['compound'];
+        };
+
+        $simpleObjectMapperNormalizer = function (Options $options, $value) {
+            if (null === $value) {
+                return;
+            }
+
+            if (!$value instanceof FormDataToObjectConverterInterface && is_callable($value)) {
+                return new CallbackFormDataToObjectConverter($value);
+            }
+
+            return $value;
         };
 
         // If data is given, the form is locked to that data
@@ -180,10 +209,14 @@ class FormType extends BaseType
             'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
+            'simple_object_mapper' => null,
         ));
+
+        $resolver->setNormalizer('simple_object_mapper', $simpleObjectMapperNormalizer);
 
         $resolver->setAllowedTypes('label_attr', 'array');
         $resolver->setAllowedTypes('upload_max_size_message', array('callable'));
+        $resolver->setAllowedTypes('simple_object_mapper', array(FormDataToObjectConverterInterface::class, 'null', 'callable'));
     }
 
     /**

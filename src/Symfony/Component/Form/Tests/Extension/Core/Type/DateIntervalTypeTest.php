@@ -13,228 +13,199 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
-class DateIntervalTypeTest extends TestCase
+class DateIntervalTypeTest extends BaseTypeTest
 {
+    const TESTED_TYPE = DateIntervalType::class;
+
     public function testSubmitDateInterval()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'dateinterval',
-            )
-        );
-        $form->submit(
-            array(
-                'years' => '7',
-                'months' => '6',
-                'days' => '5',
-            )
-        );
-        $dateInterval = new \DateInterval('P7Y6M5D');
-        $this->assertDateIntervalEquals($dateInterval, $form->getData());
+        $form = $this->factory->create(static::TESTED_TYPE, null, array('input' => 'dateinterval'));
+
+        $form->submit(array(
+            'years' => '7',
+            'months' => '6',
+            'days' => '5',
+        ));
+
+        $this->assertDateIntervalEquals(new \DateInterval('P7Y6M5D'), $form->getData());
     }
 
     public function testSubmitString()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'string',
-            )
-        );
-        $form->submit(
-            array(
-                'years' => '7',
-                'months' => '6',
-                'days' => '5',
-            )
-        );
-        $this->assertEquals('P7Y6M5D', $form->getData());
+        $form = $this->factory->create(static::TESTED_TYPE, null, array('input' => 'string'));
+
+        $form->submit(array(
+            'years' => '7',
+            'months' => '6',
+            'days' => '5',
+        ));
+
+        $this->assertSame('P7Y6M5D', $form->getData());
     }
 
     public function testSubmitArray()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'array',
-            )
-        );
-        $form->submit(
-            array(
-                'years' => '7',
-                'months' => '6',
-                'days' => '5',
-            )
-        );
-        $this->assertEquals(array('years' => '7', 'months' => '6', 'days' => '5'), $form->getData());
-    }
+        $form = $this->factory->create(static::TESTED_TYPE, null, array('input' => 'array'));
 
-    public function testSubmitWithoutMonths()
-    {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'dateinterval',
-                'with_months' => false,
-            )
-        );
-        $form->setData(new \DateInterval('P7Y5D'));
         $input = array(
             'years' => '7',
             'months' => '6',
             'days' => '5',
         );
+
         $form->submit($input);
-        $this->assertDateIntervalEquals(new \DateInterval('P7Y5D'), $form->getData());
+
+        $this->assertSame($input, $form->getData());
+    }
+
+    public function testSubmitWithoutMonths()
+    {
+        $interval = new \DateInterval('P7Y5D');
+
+        $form = $this->factory->create(static::TESTED_TYPE, $interval, array(
+            'input' => 'dateinterval',
+            'with_months' => false,
+        ));
+
+        $form->submit(array(
+            'years' => '7',
+            'months' => '6',
+            'days' => '5',
+        ));
+
+        $this->assertDateIntervalEquals($interval, $form->getData());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testSubmitWithTime()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'dateinterval',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_seconds' => true,
-            )
-        );
-        $form->setData(new \DateInterval('P7Y6M5DT4H3M2S'));
-        $input = array(
+        $interval = new \DateInterval('P7Y6M5DT4H3M2S');
+        $form = $this->factory->create(static::TESTED_TYPE, $interval, array(
+            'input' => 'dateinterval',
+            'with_hours' => true,
+            'with_minutes' => true,
+            'with_seconds' => true,
+        ));
+
+        $form->submit(array(
             'years' => '7',
             'months' => '6',
             'days' => '5',
             'hours' => '4',
             'minutes' => '3',
             'seconds' => '2',
-        );
-        $form->submit($input);
-        $this->assertDateIntervalEquals(new \DateInterval('P7Y6M5DT4H3M2S'), $form->getData());
+        ));
+
+        $this->assertDateIntervalEquals($interval, $form->getData());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testSubmitWithWeeks()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'dateinterval',
-                'with_years' => false,
-                'with_months' => false,
-                'with_weeks' => true,
-                'with_days' => false,
-            )
-        );
-        $form->setData(new \DateInterval('P0Y'));
-        $input = array(
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateInterval('P0Y'), array(
+            'input' => 'dateinterval',
+            'with_years' => false,
+            'with_months' => false,
+            'with_weeks' => true,
+            'with_days' => false,
+        ));
+
+        $form->submit(array(
             'weeks' => '30',
-        );
-        $form->submit($input);
+        ));
+
         $this->assertDateIntervalEquals(new \DateInterval('P30W'), $form->getData());
     }
 
     public function testSubmitWithInvert()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'dateinterval',
-                'with_invert' => true,
-            )
-        );
-        $input = array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'input' => 'dateinterval',
+            'with_invert' => true,
+        ));
+
+        $form->submit(array(
             'years' => '7',
             'months' => '6',
             'days' => '5',
             'invert' => true,
-        );
-        $form->submit($input);
+        ));
+
         $interval = new \DateInterval('P7Y6M5D');
         $interval->invert = 1;
+
         $this->assertDateIntervalEquals($interval, $form->getData());
     }
 
     public function testSubmitStringSingleText()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'string',
-                'widget' => 'single_text',
-            )
-        );
-        $form->submit('P7Y6M5D');
-        $this->assertEquals('P7Y6M5D', $form->getData());
-        $this->assertEquals('P7Y6M5D', $form->getViewData());
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'input' => 'string',
+            'widget' => 'single_text',
+        ));
+
+        $interval = 'P7Y6M5D';
+
+        $form->submit($interval);
+
+        $this->assertSame($interval, $form->getData());
+        $this->assertSame($interval, $form->getViewData());
     }
 
     public function testSubmitStringSingleTextWithSeconds()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'string',
-                'widget' => 'single_text',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_seconds' => true,
-            )
-        );
-        $form->submit('P7Y6M5DT4H3M2S');
-        $this->assertEquals('P7Y6M5DT4H3M2S', $form->getData());
-        $this->assertEquals('P7Y6M5DT4H3M2S', $form->getViewData());
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_hours' => true,
+            'with_minutes' => true,
+            'with_seconds' => true,
+        ));
+
+        $interval = 'P7Y6M5DT4H3M2S';
+
+        $form->submit($interval);
+
+        $this->assertSame($interval, $form->getData());
+        $this->assertSame($interval, $form->getViewData());
     }
 
     public function testSubmitArrayInteger()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'widget' => 'integer',
-                'with_invert' => true,
-            )
-        );
-        $input = array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => 'integer',
+            'with_invert' => true,
+        ));
+
+        $years = '7';
+
+        $form->submit(array(
             'years' => '7',
             'months' => '6',
             'days' => '5',
             'invert' => true,
-        );
-        $form->submit($input);
-        $this->assertSame('7', $form['years']->getData());
-        $this->assertSame('7', $form['years']->getViewData());
+        ));
+
+        $this->assertSame($years, $form['years']->getData());
+        $this->assertSame($years, $form['years']->getViewData());
     }
 
     public function testInitializeWithDateInterval()
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateIntervalType', new \DateInterval('P0Y'));
+        $this->factory->create(static::TESTED_TYPE, new \DateInterval('P0Y'));
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'required' => false,
-                'with_seconds' => true,
-            )
-        );
-        $view = $form->createView();
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'required' => false,
+            'with_seconds' => true,
+        ))
+            ->createView();
+
         $this->assertSame('', $view['years']->vars['placeholder']);
         $this->assertSame('', $view['months']->vars['placeholder']);
         $this->assertSame('', $view['days']->vars['placeholder']);
@@ -243,15 +214,12 @@ class DateIntervalTypeTest extends TestCase
 
     public function testPassNoPlaceholderToViewIfRequired()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'required' => true,
-                'with_seconds' => true,
-            )
-        );
-        $view = $form->createView();
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'required' => true,
+            'with_seconds' => true,
+        ))
+            ->createView();
+
         $this->assertNull($view['years']->vars['placeholder']);
         $this->assertNull($view['months']->vars['placeholder']);
         $this->assertNull($view['days']->vars['placeholder']);
@@ -260,15 +228,12 @@ class DateIntervalTypeTest extends TestCase
 
     public function testPassPlaceholderAsString()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'placeholder' => 'Empty',
-                'with_seconds' => true,
-            )
-        );
-        $view = $form->createView();
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'placeholder' => 'Empty',
+            'with_seconds' => true,
+        ))
+            ->createView();
+
         $this->assertSame('Empty', $view['years']->vars['placeholder']);
         $this->assertSame('Empty', $view['months']->vars['placeholder']);
         $this->assertSame('Empty', $view['days']->vars['placeholder']);
@@ -277,24 +242,21 @@ class DateIntervalTypeTest extends TestCase
 
     public function testPassPlaceholderAsArray()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'placeholder' => array(
-                    'years' => 'Empty years',
-                    'months' => 'Empty months',
-                    'days' => 'Empty days',
-                    'hours' => 'Empty hours',
-                    'minutes' => 'Empty minutes',
-                    'seconds' => 'Empty seconds',
-                ),
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_seconds' => true,
-            )
-        );
-        $view = $form->createView();
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'placeholder' => array(
+                'years' => 'Empty years',
+                'months' => 'Empty months',
+                'days' => 'Empty days',
+                'hours' => 'Empty hours',
+                'minutes' => 'Empty minutes',
+                'seconds' => 'Empty seconds',
+            ),
+            'with_hours' => true,
+            'with_minutes' => true,
+            'with_seconds' => true,
+        ))
+            ->createView();
+
         $this->assertSame('Empty years', $view['years']->vars['placeholder']);
         $this->assertSame('Empty months', $view['months']->vars['placeholder']);
         $this->assertSame('Empty days', $view['days']->vars['placeholder']);
@@ -305,23 +267,20 @@ class DateIntervalTypeTest extends TestCase
 
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'required' => false,
-                'placeholder' => array(
-                    'years' => 'Empty years',
-                    'days' => 'Empty days',
-                    'hours' => 'Empty hours',
-                    'seconds' => 'Empty seconds',
-                ),
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_seconds' => true,
-            )
-        );
-        $view = $form->createView();
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'required' => false,
+            'placeholder' => array(
+                'years' => 'Empty years',
+                'days' => 'Empty days',
+                'hours' => 'Empty hours',
+                'seconds' => 'Empty seconds',
+            ),
+            'with_hours' => true,
+            'with_minutes' => true,
+            'with_seconds' => true,
+        ))
+            ->createView();
+
         $this->assertSame('Empty years', $view['years']->vars['placeholder']);
         $this->assertSame('', $view['months']->vars['placeholder']);
         $this->assertSame('Empty days', $view['days']->vars['placeholder']);
@@ -332,23 +291,20 @@ class DateIntervalTypeTest extends TestCase
 
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'required' => true,
-                'placeholder' => array(
-                    'years' => 'Empty years',
-                    'days' => 'Empty days',
-                    'hours' => 'Empty hours',
-                    'seconds' => 'Empty seconds',
-                ),
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_seconds' => true,
-            )
-        );
-        $view = $form->createView();
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'required' => true,
+            'placeholder' => array(
+                'years' => 'Empty years',
+                'days' => 'Empty days',
+                'hours' => 'Empty hours',
+                'seconds' => 'Empty seconds',
+            ),
+            'with_hours' => true,
+            'with_minutes' => true,
+            'with_seconds' => true,
+        ))
+            ->createView();
+
         $this->assertSame('Empty years', $view['years']->vars['placeholder']);
         $this->assertNull($view['months']->vars['placeholder']);
         $this->assertSame('Empty days', $view['days']->vars['placeholder']);
@@ -360,24 +316,23 @@ class DateIntervalTypeTest extends TestCase
     public function testDateTypeChoiceErrorsBubbleUp()
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateIntervalType', null);
+        $form = $this->factory->create(static::TESTED_TYPE, null);
+
         $form['years']->addError($error);
+
         $this->assertSame(array(), iterator_to_array($form['years']->getErrors()));
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     public function testTranslationsAreDisabledForChoiceWidget()
     {
-        $form = $this->factory->create(
-            DateIntervalType::class,
-            null,
-            array(
-                'widget' => 'choice',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_seconds' => true,
-            )
-        );
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'widget' => 'choice',
+            'with_hours' => true,
+            'with_minutes' => true,
+            'with_seconds' => true,
+        ));
+
         $this->assertFalse($form->get('years')->getConfig()->getOption('choice_translation_domain'));
         $this->assertFalse($form->get('months')->getConfig()->getOption('choice_translation_domain'));
         $this->assertFalse($form->get('days')->getConfig()->getOption('choice_translation_domain'));
@@ -388,15 +343,21 @@ class DateIntervalTypeTest extends TestCase
 
     public function testInvertDoesNotInheritRequiredOption()
     {
-        $form = $this->factory->create(
-            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
-            null,
-            array(
-                'input' => 'dateinterval',
-                'with_invert' => true,
-                'required' => true,
-            )
-        );
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'input' => 'dateinterval',
+            'with_invert' => true,
+            'required' => true,
+        ));
+
         $this->assertFalse($form->get('invert')->getConfig()->getOption('required'));
+    }
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        parent::testSubmitNull($expected, $norm, array(
+            'years' => '',
+            'months' => '',
+            'days' => '',
+        ));
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class Router extends BaseRouter implements WarmableInterface
 {
     private $container;
+    private $collectedParameters = array();
 
     /**
      * Constructor.
@@ -53,6 +55,7 @@ class Router extends BaseRouter implements WarmableInterface
         if (null === $this->collection) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
             $this->resolveParameters($this->collection);
+            $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
         }
 
         return $this->collection;
@@ -153,6 +156,8 @@ class Router extends BaseRouter implements WarmableInterface
             $resolved = $container->getParameter($match[1]);
 
             if (is_string($resolved) || is_numeric($resolved)) {
+                $this->collectedParameters[$match[1]] = $resolved;
+
                 return (string) $resolved;
             }
 

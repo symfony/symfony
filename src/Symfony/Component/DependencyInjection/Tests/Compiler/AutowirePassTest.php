@@ -518,6 +518,22 @@ class AutowirePassTest extends TestCase
         );
     }
 
+    public function testInstanceofConditionals()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('bar', Bar::class)
+            ->setAutowired(true)
+            ->setInstanceofConditionals(array(123 => 456))
+        ;
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(array(123 => 456), $container->getDefinition('autowired.'.Foo::class)->getInstanceofConditionals());
+    }
+
     /**
      * @requires PHP 7.0
      */

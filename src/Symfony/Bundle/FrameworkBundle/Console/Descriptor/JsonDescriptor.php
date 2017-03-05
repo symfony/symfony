@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -386,6 +387,10 @@ class JsonDescriptor extends Descriptor
             }
 
             return $data;
+        }
+
+        if ($value instanceof ServiceClosureArgument) {
+            $value = $value->getValues()[0];
         }
 
         if ($value instanceof Reference) {

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -1540,10 +1542,12 @@ EOF;
             }
 
             return sprintf('array(%s)', implode(', ', $code));
+        } elseif ($value instanceof ServiceClosureArgument) {
+            return $this->dumpServiceClosure($value->getValues()[0], $interpolate, false);
         } elseif ($value instanceof ServiceLocatorArgument) {
             $code = "\n";
             foreach ($value->getValues() as $k => $v) {
-                $code .= sprintf("            %s => function () { return %s; },\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));
+                $code .= sprintf("            %s => %s,\n", $this->dumpValue($k, $interpolate), $this->dumpServiceClosure($v, $interpolate, true));
             }
             $code .= '        ';
 
@@ -1679,6 +1683,27 @@ EOF;
         }
 
         return $this->export($value);
+    }
+
+    private function dumpServiceClosure(Reference $reference, $interpolate, $oneLine)
+    {
+        $type = '';
+        if (PHP_VERSION_ID >= 70000 && $reference instanceof TypedReference) {
+            $type = $reference->getType();
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $reference->getInvalidBehavior()) {
+                $type = ': \\'.$type;
+            } elseif (PHP_VERSION_ID >= 70100) {
+                $type = ': ?\\'.$type;
+            } else {
+                $type = '';
+            }
+        }
+
+        if ($oneLine) {
+            return sprintf('function ()%s { return %s; }', $type, $this->dumpValue($reference, $interpolate));
+        }
+
+        return sprintf("function ()%s {\n            return %s;\n        }", $type, $this->dumpValue($reference, $interpolate));
     }
 
     /**

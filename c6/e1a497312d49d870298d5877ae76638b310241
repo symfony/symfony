@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-28T17:11:49Z
+
+@stof I updated this PR so that ServiceLocatorArgument doesn't need to be a Definition anymore. I now use a new ServiceClosureArgument type instead. See updated PR description.
+How does it look to you? The PR only needs tests now to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-28T22:28:15Z
+
+Tests added, PR ready
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-04T23:16:48Z
+
+I realized that there is a way to decouple autowiring and typed references.
+Thus, I renamed the previously called `AutowirableReference` to `TypedReference`.
+These will be autowired only if their holding-definition is itself autowired.
+Independently from autowiring, these references allow to generate return-type-hinted service-locator factories, making things more strict thus more robust for the user.

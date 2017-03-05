@@ -11,6 +11,7 @@ Console
 
  * Setting unknown style options is deprecated and will throw an exception in
    Symfony 4.0.
+
  * The `QuestionHelper::setInputStream()` method is deprecated and will be
    removed in Symfony 4.0. Use `StreamableInputInterface::setStream()` or
    `CommandTester::setInputs()` instead.

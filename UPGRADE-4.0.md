@@ -6,6 +6,7 @@ Console
 
  * Setting unknown style options is not supported anymore and throws an
    exception.
+
  * The `QuestionHelper::setInputStream()` method is removed. Use
    `StreamableInputInterface::setStream()` or `CommandTester::setInputs()`
    instead.

@@ -762,6 +762,24 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
+    public function testKernelRootDirNameStartingWithANumber()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRootDir'))
+            ->getMock();
+
+        $kernel
+            ->expects($this->any())
+            ->method('getRootDir')
+            ->will($this->returnValue(__DIR__.'/Fixtures/123'));
+
+        $kernel->__construct('dev', false);
+
+        $kernel->boot();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $kernel->getContainer());
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      *

@@ -67,7 +67,7 @@ class FullTransformer
             'k' => new Hour2401Transformer(),
             'm' => new MinuteTransformer(),
             's' => new SecondTransformer(),
-            'z' => new TimeZoneTransformer(),
+            'z' => new TimezoneTransformer(),
         );
     }
 

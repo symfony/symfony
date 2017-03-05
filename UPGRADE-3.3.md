@@ -294,6 +294,11 @@ TwigBundle
 
 * The `ContainerAwareRuntimeLoader` class has been deprecated and will be removed in 4.0.
   Use the Twig `Twig_ContainerRuntimeLoader` class instead.
+  
+Validator
+---------
+
+ * `DateValidator` and `TimeValidator` have been deprecated. Use `DateTimeValidator` instead.
 
 Workflow
 --------

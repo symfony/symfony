@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+@trigger_error('The '.__NAMESPACE__.'\Time class is deprecated since version 3.3 and will be removed in 4.0. Use '.__NAMESPACE__.'\DateTime instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -18,6 +20,8 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Since version 3.3, to be removed in 4.0. Use Symfony\Component\Validator\Constraints\DateTimeValidator instead.
  */
 class Time extends Constraint
 {

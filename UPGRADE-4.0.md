@@ -494,6 +494,8 @@ Validator
    changed to `true` as of 4.0. If you need the previous behaviour ensure to
    set the option to `false`.
 
+ * `DateValidator` and `TimeValidator` have been removed. Use `DateTimeValidator` instead.
+
 Workflow
 --------
 

@@ -22,7 +22,15 @@ use Symfony\Component\Validator\Constraint;
 class DateTime extends Constraint
 {
     const INVALID_FORMAT_ERROR = '1a9da513-2640-4f84-9b6a-4d99dcddc628';
+
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0.
+     */
     const INVALID_DATE_ERROR = 'd52afa47-620d-4d99-9f08-f4d85b36e33c';
+
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0.
+     */
     const INVALID_TIME_ERROR = '5e797c9d-74f7-4098-baa3-94390c447b27';
 
     protected static $errorNames = array(
@@ -33,4 +41,12 @@ class DateTime extends Constraint
 
     public $format = 'Y-m-d H:i:s';
     public $message = 'This value is not a valid datetime.';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'format';
+    }
 }

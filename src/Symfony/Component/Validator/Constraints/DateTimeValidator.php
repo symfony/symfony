@@ -12,13 +12,14 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Diego Saint Esteben <diego@saintesteben.me>
  */
-class DateTimeValidator extends DateValidator
+class DateTimeValidator extends ConstraintValidator
 {
     /**
      * @deprecated since version 3.1, to be removed in 4.0.
@@ -48,32 +49,13 @@ class DateTimeValidator extends DateValidator
 
         $errors = \DateTime::getLastErrors();
 
-        if (0 < $errors['error_count']) {
+        if (0 < $errors['error_count'] || 0 < $errors['warning_count']) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(DateTime::INVALID_FORMAT_ERROR)
                 ->addViolation();
 
             return;
-        }
-
-        foreach ($errors['warnings'] as $warning) {
-            if ('The parsed date was invalid' === $warning) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_DATE_ERROR)
-                    ->addViolation();
-            } elseif ('The parsed time was invalid' === $warning) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_TIME_ERROR)
-                    ->addViolation();
-            } else {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_FORMAT_ERROR)
-                    ->addViolation();
-            }
         }
     }
 }

@@ -12,6 +12,52 @@ Console
  * Setting unknown style options is not supported anymore and throws an
    exception.
 
+ * The `QuestionHelper::setInputStream()` method is removed. Use
+   `StreamableInputInterface::setStream()` or `CommandTester::setInputs()`
+   instead.
+
+   Before:
+
+   ```php
+   $input = new ArrayInput();
+
+   $questionHelper->setInputStream($stream);
+   $questionHelper->ask($input, $output, $question);
+   ```
+
+   After:
+
+   ```php
+   $input = new ArrayInput();
+   $input->setStream($stream);
+
+   $questionHelper->ask($input, $output, $question);
+   ```
+
+   Before:
+
+   ```php
+   $commandTester = new CommandTester($command);
+
+   $stream = fopen('php://memory', 'r+', false);
+   fputs($stream, "AppBundle\nYes");
+   rewind($stream);
+
+   $command->getHelper('question')->setInputStream($stream);
+
+   $commandTester->execute();
+   ```
+
+   After:
+
+   ```php
+   $commandTester = new CommandTester($command);
+
+   $commandTester->setInputs(array('AppBundle', 'Yes'));
+
+   $commandTester->execute();
+   ```
+
 Debug
 -----
 

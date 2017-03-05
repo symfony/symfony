@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-02T14:14:48Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-14T14:15:45Z
+
+Instead of relying on some external error handler to trigger the exception, I'd suggest to register a temporary error handler that does the throw.
+
+---------------------------------------------------------------------------
+
+by digilist at 2017-02-18T23:03:37Z
+
+That is a good idea! The code is much cleaner now.

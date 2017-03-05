@@ -18,6 +18,8 @@ use Symfony\Component\Form\Test\TypeTestCase;
  */
 abstract class BaseTypeTest extends TypeTestCase
 {
+    const TESTED_TYPE = '';
+
     public function testPassDisabledAsOption()
     {
         $form = $this->factory->create($this->getTestedType(), null, array('disabled' => true));
@@ -47,7 +49,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassIdAndNameToViewWithParent()
     {
-        $view = $this->factory->createNamedBuilder('parent', 'form')
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', $this->getTestedType())
             ->getForm()
             ->createView();
@@ -59,8 +61,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassIdAndNameToViewWithGrandParent()
     {
-        $builder = $this->factory->createNamedBuilder('parent', 'form')
-            ->add('child', 'form');
+        $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', FormTypeTest::TESTED_TYPE);
         $builder->get('child')->add('grand_child', $this->getTestedType());
         $view = $builder->getForm()->createView();
 
@@ -71,10 +73,10 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassTranslationDomainToView()
     {
-        $form = $this->factory->create($this->getTestedType(), null, array(
+        $view = $this->factory->create($this->getTestedType(), null, array(
             'translation_domain' => 'domain',
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame('domain', $view->vars['translation_domain']);
     }
@@ -82,7 +84,7 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testInheritTranslationDomainFromParent()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
                 'translation_domain' => 'domain',
             ))
             ->add('child', $this->getTestedType())
@@ -95,7 +97,7 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testPreferOwnTranslationDomain()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
                 'translation_domain' => 'parent_domain',
             ))
             ->add('child', $this->getTestedType(), array(
@@ -109,7 +111,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testDefaultTranslationDomain()
     {
-        $view = $this->factory->createNamedBuilder('parent', 'form')
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', $this->getTestedType())
             ->getForm()
             ->createView();
@@ -119,19 +121,32 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassLabelToView()
     {
-        $form = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'));
-        $view = $form->createView();
+        $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'))
+            ->createView();
 
         $this->assertSame('My label', $view->vars['label']);
     }
 
     public function testPassMultipartFalseToView()
     {
-        $form = $this->factory->create($this->getTestedType());
-        $view = $form->createView();
+        $view = $this->factory->create($this->getTestedType())
+            ->createView();
 
         $this->assertFalse($view->vars['multipart']);
     }
 
-    abstract protected function getTestedType();
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        $form = $this->factory->create($this->getTestedType());
+        $form->submit(null);
+
+        $this->assertSame($expected, $form->getData());
+        $this->assertSame($norm, $form->getNormData());
+        $this->assertSame($view, $form->getViewData());
+    }
+
+    protected function getTestedType()
+    {
+        return static::TESTED_TYPE;
+    }
 }

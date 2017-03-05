@@ -11,16 +11,17 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
-class CollectionTypeTest extends TypeTestCase
+class CollectionTypeTest extends BaseTypeTest
 {
+    const TESTED_TYPE = 'collection';
+
     public function testContainsNoChildByDefault()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
         ));
 
         $this->assertCount(0, $form);
@@ -28,8 +29,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testSetDataAdjustsSize()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
             'options' => array(
                 'attr' => array('maxlength' => 20),
             ),
@@ -57,8 +58,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
         ));
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
@@ -66,8 +67,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testNotResizedIfSubmittedWithMissingData()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
         $form->submit(array('foo@bar.com'));
@@ -80,8 +81,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testResizedDownIfSubmittedWithMissingDataAndAllowDelete()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
             'allow_delete' => true,
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -95,8 +96,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
             'allow_delete' => true,
             'delete_empty' => true,
         ));
@@ -112,8 +113,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testDontAddEmptyDataIfDeleteEmpty()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'delete_empty' => true,
         ));
@@ -129,8 +130,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testNoDeleteEmptyIfDeleteNotAllowed()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
             'allow_delete' => false,
             'delete_empty' => true,
         ));
@@ -144,7 +145,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()
     {
-        $form = $this->factory->create('collection', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => new AuthorType(),
             // If the field is not required, no new Author will be created if the
             // form is completely empty
@@ -167,8 +168,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testNotResizedIfSubmittedWithExtraData()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
         ));
         $form->setData(array('foo@bar.com'));
         $form->submit(array('foo@foo.com', 'bar@bar.com'));
@@ -180,8 +181,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testResizedUpIfSubmittedWithExtraDataAndAllowAdd()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'text',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => TextTypeTest::TESTED_TYPE,
             'allow_add' => true,
         ));
         $form->setData(array('foo@bar.com'));
@@ -196,8 +197,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testAllowAddButNoPrototype()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => FormTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => false,
         ));
@@ -208,8 +209,8 @@ class CollectionTypeTest extends TypeTestCase
     public function testPrototypeMultipartPropagation()
     {
         $form = $this->factory
-            ->create('collection', null, array(
-                'type' => 'file',
+            ->create(static::TESTED_TYPE, null, array(
+                'type' => FileTypeTest::TESTED_TYPE,
                 'allow_add' => true,
                 'prototype' => true,
             ))
@@ -220,8 +221,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testGetDataDoesNotContainsPrototypeNameBeforeDataAreSet()
     {
-        $form = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'prototype' => true,
             'allow_add' => true,
         ));
@@ -232,8 +233,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testGetDataDoesNotContainsPrototypeNameAfterDataAreSet()
     {
-        $form = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
         ));
@@ -245,16 +246,16 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testPrototypeNameOption()
     {
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => FormTypeTest::TESTED_TYPE,
             'prototype' => true,
             'allow_add' => true,
         ));
 
         $this->assertSame('__name__', $form->getConfig()->getAttribute('prototype')->getName(), '__name__ is the default');
 
-        $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'type' => FormTypeTest::TESTED_TYPE,
             'prototype' => true,
             'allow_add' => true,
             'prototype_name' => '__test__',
@@ -265,8 +266,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testPrototypeDefaultLabel()
     {
-        $form = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
@@ -277,8 +278,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testPrototypeDefaultRequired()
     {
-        $form = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
@@ -289,8 +290,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testPrototypeSetNotRequired()
     {
-        $form = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
@@ -303,14 +304,14 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testPrototypeSetNotRequiredIfParentNotRequired()
     {
-        $child = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $child = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
         ));
 
-        $parent = $this->factory->create('form', array(), array(
+        $parent = $this->factory->create(FormTypeTest::TESTED_TYPE, array(), array(
             'required' => false,
         ));
 
@@ -322,8 +323,8 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testPrototypeNotOverrideRequiredByEntryOptionsInFavorOfParent()
     {
-        $child = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $child = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
@@ -332,7 +333,7 @@ class CollectionTypeTest extends TypeTestCase
             ),
         ));
 
-        $parent = $this->factory->create('form', array(), array(
+        $parent = $this->factory->create(FormTypeTest::TESTED_TYPE, array(), array(
             'required' => false,
         ));
 
@@ -341,5 +342,10 @@ class CollectionTypeTest extends TypeTestCase
         $this->assertFalse($parent->createView()->vars['required'], 'Parent is not required');
         $this->assertFalse($child->createView()->vars['required'], 'Child is not required');
         $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
+    }
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        parent::testSubmitNull(array(), array(), array());
     }
 }

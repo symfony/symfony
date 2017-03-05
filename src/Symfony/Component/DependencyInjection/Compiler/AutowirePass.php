@@ -100,6 +100,13 @@ class AutowirePass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
+        if ($value instanceof Reference && !$this->container->has($id = (string) $value)) {
+            if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $id) && $reflectionClass = $this->container->getReflectionClass($id, true)) {
+                $this->createAutowiredDefinition($reflectionClass);
+            }
+
+            return parent::processValue($value, $isRoot);
+        }
         if (!$value instanceof Definition || !$value->isAutowired()) {
             return parent::processValue($value, $isRoot);
         }
@@ -456,19 +463,21 @@ class AutowirePass extends AbstractRecursivePass
             return;
         }
 
-        $currentId = $this->currentId;
-        $this->currentId = $argumentId = sprintf('autowired.%s', $typeHint->name);
-
-        $argumentDefinition = $this->container->register($argumentId, $typeHint->name);
+        $argumentDefinition = $this->container->register($typeHint->name, $typeHint->name);
         $argumentDefinition->setPublic(false);
         $argumentDefinition->setAutowired(true);
+        $argumentDefinition->addTag('autoregistered');
 
-        $this->populateAvailableType($argumentId, $argumentDefinition);
+        if (null !== $this->types) {
+            $this->populateAvailableType($typeHint->name, $argumentDefinition);
+        }
 
-        $this->processValue($argumentDefinition);
+        $currentId = $this->currentId;
+        $this->currentId = $typeHint->name;
+        $this->processValue($argumentDefinition, true);
         $this->currentId = $currentId;
 
-        return new Reference($argumentId);
+        return new Reference($typeHint->name);
     }
 
     /**

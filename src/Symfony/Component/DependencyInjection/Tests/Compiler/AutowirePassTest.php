@@ -518,6 +518,22 @@ class AutowirePassTest extends TestCase
         );
     }
 
+    public function testInvalidReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('bar', Bar::class)
+            ->setAutowired(true)
+            ->setProperty('a', array(new Reference(A::class)))
+        ;
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(A::class, $container->getDefinition('autowired.'.A::class)->getClass());
+    }
+
     /**
      * @requires PHP 7.0
      */

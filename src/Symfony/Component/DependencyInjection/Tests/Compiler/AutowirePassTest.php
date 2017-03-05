@@ -519,7 +519,7 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    public function testTtypedReference()
+    public function testTypedReference()
     {
         $container = new ContainerBuilder();
 

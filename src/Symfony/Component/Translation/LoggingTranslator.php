@@ -119,8 +119,8 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      */
     private function log($id, $domain, $locale)
     {
-        if (false === $domain) {
-            return;
+        if (null === $domain) {
+            $domain = 'messages';
         }
 
         $id = (string) $id;

@@ -14,6 +14,8 @@ namespace Symfony\Component\Workflow\EventListener;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
@@ -80,19 +82,23 @@ class GuardListener
             throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow %s.', $event->getWorkflowName()));
         }
 
-        if (null !== $this->roleHierarchy) {
-            $roles = $this->roleHierarchy->getReachableRoles($token->getRoles());
+        if (method_exists($token, 'getRoleNames')) {
+            $roles = $token->getRoleNames();
         } else {
-            $roles = $token->getRoles();
+            $roles = array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles(false));
+        }
+
+        if ($this->roleHierarchy instanceof RoleHierarchy) {
+            $roles = $this->roleHierarchy->getReachableRoleNames($roles);
+        } elseif (null !== $this->roleHierarchy) {
+            $roles = $this->roleHierarchy->getReachableRoles($token->getRoles(false));
         }
 
         $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'subject' => $event->getSubject(),
-            'roles' => array_map(function ($role) {
-                return $role->getRole();
-            }, $roles),
+            'roles' => $roles,
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function

@@ -4,6 +4,13 @@ CHANGELOG
 4.3.0
 -----
 
+* The `Role` and `SwitchUserRole` classes are deprecated and will be removed in 5.0. Use strings for roles
+  instead.
+* The `RoleHierarchyInterface` is deprecated and will be removed in 5.0.
+* The `getReachableRoles()` method of the `RoleHierarchy` class is deprecated and will be removed in 5.0.
+  Use the `getReachableRoleNames()` method instead.
+* The `getRoles()` method of the `TokenInterface` is deprecated. Tokens must implement the `getRoleNames()`
+  method instead and return roles as strings.
 * Made the `serialize()` and `unserialize()` methods of `AbstractToken` and
   `AuthenticationException` final, use `getState()`/`setState()` instead
 

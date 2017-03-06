@@ -17,8 +17,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -122,7 +122,7 @@ class SwitchUserListener implements ListenerInterface
         $token = $this->tokenStorage->getToken();
         $originalToken = $this->getOriginalToken($token);
 
-        if (false !== $originalToken) {
+        if (null !== $originalToken) {
             if ($token->getUsername() === $username) {
                 return $token;
             }
@@ -146,9 +146,9 @@ class SwitchUserListener implements ListenerInterface
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken());
+        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken(), false);
 
-        $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
+        $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
 
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);
@@ -169,7 +169,7 @@ class SwitchUserListener implements ListenerInterface
      */
     private function attemptExitUser(Request $request)
     {
-        if (false === $original = $this->getOriginalToken($this->tokenStorage->getToken())) {
+        if (null === ($currentToken = $this->tokenStorage->getToken()) || null === $original = $this->getOriginalToken($currentToken)) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 
@@ -183,19 +183,18 @@ class SwitchUserListener implements ListenerInterface
         return $original;
     }
 
-    /**
-     * Gets the original Token from a switched one.
-     *
-     * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
-     */
-    private function getOriginalToken(TokenInterface $token)
+    private function getOriginalToken(TokenInterface $token): ?TokenInterface
     {
-        foreach ($token->getRoles() as $role) {
+        if ($token instanceof SwitchUserToken) {
+            return $token->getOriginalToken();
+        }
+
+        foreach ($token->getRoles(false) as $role) {
             if ($role instanceof SwitchUserRole) {
                 return $role->getSource();
             }
         }
 
-        return false;
+        return null;
     }
 }

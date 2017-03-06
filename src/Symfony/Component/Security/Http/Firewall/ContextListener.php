@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -189,10 +190,14 @@ class ContextListener implements ListenerInterface
                 if (null !== $this->logger) {
                     $context = ['provider' => \get_class($provider), 'username' => $refreshedUser->getUsername()];
 
-                    foreach ($token->getRoles() as $role) {
-                        if ($role instanceof SwitchUserRole) {
-                            $context['impersonator_username'] = $role->getSource()->getUsername();
-                            break;
+                    if ($token instanceof SwitchUserToken) {
+                        $context['impersonator_username'] = $token->getOriginalToken()->getUsername();
+                    } else {
+                        foreach ($token->getRoles(false) as $role) {
+                            if ($role instanceof SwitchUserRole) {
+                                $context['impersonator_username'] = $role->getSource(false)->getUsername();
+                                break;
+                            }
                         }
                     }
 

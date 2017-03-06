@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
-use Symfony\Component\Security\Core\Role\Role;
 
 class PreAuthenticatedTokenTest extends TestCase
 {
@@ -24,7 +23,7 @@ class PreAuthenticatedTokenTest extends TestCase
 
         $token = new PreAuthenticatedToken('foo', 'bar', 'key', ['ROLE_FOO']);
         $this->assertTrue($token->isAuthenticated());
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
+        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertEquals('key', $token->getProviderKey());
     }
 

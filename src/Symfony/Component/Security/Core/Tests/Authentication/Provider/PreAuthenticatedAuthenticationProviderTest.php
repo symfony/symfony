@@ -70,7 +70,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken', $token);
         $this->assertEquals('pass', $token->getCredentials());
         $this->assertEquals('key', $token->getProviderKey());
-        $this->assertEquals([], $token->getRoles());
+        $this->assertEquals([], $token->getRoleNames());
         $this->assertEquals(['foo' => 'bar'], $token->getAttributes(), '->authenticate() copies token attributes');
         $this->assertSame($user, $token->getUser());
     }

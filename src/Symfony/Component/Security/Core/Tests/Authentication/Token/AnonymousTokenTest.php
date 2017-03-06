@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Role\Role;
 
 class AnonymousTokenTest extends TestCase
 {
@@ -23,7 +22,7 @@ class AnonymousTokenTest extends TestCase
         $this->assertTrue($token->isAuthenticated());
 
         $token = new AnonymousToken('foo', 'bar', ['ROLE_FOO']);
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
+        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
     public function testGetKey()

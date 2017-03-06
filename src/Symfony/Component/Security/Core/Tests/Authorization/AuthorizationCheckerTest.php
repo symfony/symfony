@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 class AuthorizationCheckerTest extends TestCase
@@ -37,10 +38,10 @@ class AuthorizationCheckerTest extends TestCase
 
     public function testVoteAuthenticatesTokenIfNecessary()
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = new UsernamePasswordToken('username', 'password', 'provider');
         $this->tokenStorage->setToken($token);
 
-        $newToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $newToken = new UsernamePasswordToken('username', 'password', 'provider');
 
         $this->authenticationManager
             ->expects($this->once())
@@ -79,11 +80,7 @@ class AuthorizationCheckerTest extends TestCase
      */
     public function testIsGranted($decide)
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-        $token
-            ->expects($this->once())
-            ->method('isAuthenticated')
-            ->will($this->returnValue(true));
+        $token = new UsernamePasswordToken('username', 'password', 'provider', ['ROLE_USER']);
 
         $this->accessDecisionManager
             ->expects($this->once())

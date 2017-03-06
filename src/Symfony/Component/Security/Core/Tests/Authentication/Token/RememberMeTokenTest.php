@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeTokenTest extends TestCase
 {
@@ -24,7 +23,7 @@ class RememberMeTokenTest extends TestCase
 
         $this->assertEquals('fookey', $token->getProviderKey());
         $this->assertEquals('foo', $token->getSecret());
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
+        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertSame($user, $token->getUser());
         $this->assertTrue($token->isAuthenticated());
     }

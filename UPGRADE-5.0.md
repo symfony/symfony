@@ -226,6 +226,11 @@ Process
 Security
 --------
 
+ * The `Role` and `SwitchUserRole` classes have been removed.
+ * The `RoleHierarchyInterface` has been removed.
+ * The `getReachableRoles()` method of the `RoleHierarchy` class has been removed.
+ * The `getRoles()` method has been removed from the `TokenInterface`. It has been replaced by the new
+   `getRoleNames()` method.
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
  * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
  * The `ExpressionVoter::addExpressionLanguageProvider()` method has been removed.

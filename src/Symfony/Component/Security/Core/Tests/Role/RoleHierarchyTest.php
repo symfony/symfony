@@ -17,6 +17,9 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class RoleHierarchyTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testGetReachableRoles()
     {
         $role = new RoleHierarchy([
@@ -29,5 +32,19 @@ class RoleHierarchyTest extends TestCase
         $this->assertEquals([new Role('ROLE_ADMIN'), new Role('ROLE_USER')], $role->getReachableRoles([new Role('ROLE_ADMIN')]));
         $this->assertEquals([new Role('ROLE_FOO'), new Role('ROLE_ADMIN'), new Role('ROLE_USER')], $role->getReachableRoles([new Role('ROLE_FOO'), new Role('ROLE_ADMIN')]));
         $this->assertEquals([new Role('ROLE_SUPER_ADMIN'), new Role('ROLE_ADMIN'), new Role('ROLE_FOO'), new Role('ROLE_USER')], $role->getReachableRoles([new Role('ROLE_SUPER_ADMIN')]));
+    }
+
+    public function testGetReachableRoleNames()
+    {
+        $role = new RoleHierarchy(array(
+            'ROLE_ADMIN' => array('ROLE_USER'),
+            'ROLE_SUPER_ADMIN' => array('ROLE_ADMIN', 'ROLE_FOO'),
+        ));
+
+        $this->assertEquals(array('ROLE_USER'), $role->getReachableRoleNames(array('ROLE_USER')));
+        $this->assertEquals(array('ROLE_FOO'), $role->getReachableRoleNames(array('ROLE_FOO')));
+        $this->assertEquals(array('ROLE_ADMIN', 'ROLE_USER'), $role->getReachableRoleNames(array('ROLE_ADMIN')));
+        $this->assertEquals(array('ROLE_FOO', 'ROLE_ADMIN', 'ROLE_USER'), $role->getReachableRoleNames(array('ROLE_FOO', 'ROLE_ADMIN')));
+        $this->assertEquals(array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FOO', 'ROLE_USER'), $role->getReachableRoleNames(array('ROLE_SUPER_ADMIN')));
     }
 }

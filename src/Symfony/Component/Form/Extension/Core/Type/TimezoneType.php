@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType implements ChoiceLoaderInterface
@@ -33,7 +34,9 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'choice_loader' => $this,
+            'choice_loader' => function (Options $options) {
+                return $options['choices'] ? null : $this;
+            },
             'choice_translation_domain' => false,
         ));
     }

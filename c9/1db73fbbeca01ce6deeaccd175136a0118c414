@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T15:44:21Z
+
+@chs2 Can you change the target branch to 2.7 (and resolve the conflicts there)?
+
+---------------------------------------------------------------------------
+
+by chs2 at 2017-03-06T17:25:42Z
+
+Resolving the conflict will take a little time.
+I may have reached the limitations of my git(hub) knowledges.
+I'm even sure of the correct way to acccomplish the switch of target branch and the conflict resolving.
+Any tips ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T17:39:17Z
+
+The easiest is probably to close this PR and open a new one :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T18:15:48Z
+
+@chs2 I rebased your PR for you.

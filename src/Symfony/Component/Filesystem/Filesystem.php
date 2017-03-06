@@ -516,7 +516,10 @@ class Filesystem
             }
 
             $this->chmod($tmpFile, $mode);
+        } else {
+            @chmod($tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
         }
+
         $this->rename($tmpFile, $filename, true);
     }
 

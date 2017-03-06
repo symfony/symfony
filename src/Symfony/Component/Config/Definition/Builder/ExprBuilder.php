@@ -150,6 +150,19 @@ class ExprBuilder
     }
 
     /**
+     * Transforms variables of any type into an array.
+     *
+     * @return $this
+     */
+    public function castToArray()
+    {
+        $this->ifPart = function ($v) { return !is_array($v); };
+        $this->thenPart = function ($v) { return array($v); };
+
+        return $this;
+    }
+
+    /**
      * Sets the closure to run if the test pass.
      *
      * @param \Closure $closure

@@ -568,7 +568,10 @@ class Filesystem
             }
 
             $this->chmod($tmpFile, $mode);
+        } elseif (file_exists($filename)) {
+            @chmod($tmpFile, fileperms($filename));
         }
+
         $this->rename($tmpFile, $filename, true);
     }
 

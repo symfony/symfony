@@ -22,6 +22,12 @@ matrix:
           sudo: required
           dist: trusty
           group: edge
+          env: PHP7MODE="no"
+        - php: hhvm-3.15
+          sudo: required
+          dist: trusty
+          group: edge
+          env: PHP7MODE="yes"
         - php: 5.3
         - php: 5.4
         - php: 5.5
@@ -60,6 +66,10 @@ before_install:
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi
     - if [[ ! $skip ]]; then [ -d ~/.composer ] || mkdir ~/.composer; cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
+    # Option to allow HHVM's php 7 mode for one test
+    - if [[ ! $skip && $PHP7MODE == "yes" ]]; then echo hhvm.php7.all=1 >> /etc/hhvm/php.ini; fi
+    # Disable JIT compilation in hhvm, as the JIT is useless for short live scripts like tests.
+    - if [[ ! $skip && $TRAVIS_PHP_VERSION = hhvm* ]]; then echo 'hhvm.jit = 0' >> /etc/hhvm/php.ini; fi
 
 install:
     - if [[ ! $skip && $deps ]]; then cp composer.json composer.json.orig; fi

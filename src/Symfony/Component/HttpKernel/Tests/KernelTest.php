@@ -762,6 +762,14 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
+    public function testKernelRootDirNameStartingWithANumber()
+    {
+        $dir = __DIR__.'/Fixtures/123';
+        require_once $dir.'/Kernel123.php';
+        $kernel = new \Symfony\Component\HttpKernel\Tests\Fixtures\_123\Kernel123('dev', true);
+        $this->assertEquals('_123', $kernel->getName());
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      *

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T14:55:23Z
+
+see #21786 and #21828 :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T15:37:51Z
+
+@xabbuh This can be closed then, right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T15:42:52Z
+
+@fabpot We could discuss whether #21828 should have been merged into `3.2` as a bugfix (I don't think so, but others may disagree).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-03-06T15:43:44Z
+
+Yes, except that #21828 is merged as a feature. However, I consider it a bug fix and thus it has to be backported to 3.2. Imo, counting the `expectedDeprecation` *assertion* not as an assertion is a bug. PHPunit 6's default enabled risky test checker reveals the bug (but the bug is there in all PHPunit versions).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T15:50:08Z
+
+Fair enough, but note that you will probably check first that the test is neither skipped nor incomplete (see how #21828 was implemented).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-03-06T15:52:50Z
+
+Yeah, I think if it's decided to backport this to 3.2, the https://github.com/symfony/symfony/pull/21828 PR should simply be backported (and this PR should just be closed).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T15:54:26Z
+
+Except the trait does not exist in 3.2 IIRC, so this should be done here.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-03-06T16:09:21Z
+
+Ah, my bad. Updated the PR to match the code added in 3.3.

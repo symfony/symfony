@@ -485,6 +485,14 @@ class Inline
                 @trigger_error('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
             }
 
+            if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags)) {
+                $evaluatedKey = self::evaluateScalar($key, $flags, $references);
+
+                if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey)) {
+                    @trigger_error('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.', E_USER_DEPRECATED);
+                }
+            }
+
             if (':' !== $key && (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
                 @trigger_error('Using a colon that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}" is deprecated since version 3.2 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
             }

@@ -463,6 +463,36 @@ Workflow
 Yaml
 ----
 
+ * Removed support for implicitly parsing non-string mapping keys as strings. Mapping keys that are no strings will
+   result in a `ParseException`. Use the `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as strings.
+
+   Before:
+
+   ```php
+   $yaml = <<<YAML
+   null: null key
+   true: boolean true
+   1: integer key
+   2.0: float key
+   YAML;
+
+   Yaml::parse($yaml);
+   ```
+
+   After:
+
+   ```php
+
+   $yaml = <<<YAML
+   null: null key
+   true: boolean true
+   1: integer key
+   2.0: float key
+   YAML;
+
+   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   ```
+
  * Omitting the key of a mapping is not supported anymore and throws a `ParseException`.
 
  * Mappings with a colon (`:`) that is not followed by a whitespace are not

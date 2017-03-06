@@ -123,10 +123,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
             return;
         }
 
-        if (null === $domain) {
-            $domain = 'messages';
-        }
-
         $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
         if ($catalogue->defines($id, $domain)) {

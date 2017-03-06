@@ -130,10 +130,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             return;
         }
 
-        if (null === $domain) {
-            $domain = 'messages';
-        }
-
         $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
         $locale = $catalogue->getLocale();

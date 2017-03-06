@@ -186,6 +186,10 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
         if ($this->expectedDeprecations) {
+            if (!in_array($test->getStatus(), array(\PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED, \PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE), true)) {
+                $test->addToAssertionCount(count($this->expectedDeprecations));
+            }
+
             restore_error_handler();
 
             if (!in_array($test->getStatus(), array(\PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED, \PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE, \PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE, \PHPUnit_Runner_BaseTestRunner::STATUS_ERROR), true)) {

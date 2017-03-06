@@ -37,6 +37,9 @@ matrix:
         - php: 7.1
           env: deps=low
     fast_finish: true
+    allow_failures:
+        - php: hhvm-3.15
+          env: PHP7MODE="yes"
 
 cache:
     directories:
@@ -87,6 +90,7 @@ install:
     - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
     - if [[ ! $skip && $deps ]]; then export SYMFONY_DEPRECATIONS_HELPER=weak; fi
     - if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
+    - if [[ ! $skip ]]; then composer self-update; fi
     - if [[ ! $skip ]]; then composer update; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi

@@ -87,7 +87,7 @@ class ProjectServiceContainer extends Container
         return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('bar' => function () {
             return ${($_ = isset($this->services['bar_service']) ? $this->services['bar_service'] : $this->get('bar_service')) && false ?: '_'};
         }, 'baz' => function () {
-            return ${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->getBazServiceService()) && false ?: '_'};
+            $f = function (\stdClass $v) { return $v; }; return $f(${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->getBazServiceService()) && false ?: '_'});
         }));
     }
 

@@ -648,7 +648,6 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $suffix = PHP_VERSION_ID >= 70100 ? '71' : (PHP_VERSION_ID >= 70000 ? '70' : '55');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator_php'.$suffix.'.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator.php', $dumper->dump());
     }
 }

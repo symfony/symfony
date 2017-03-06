@@ -1687,23 +1687,19 @@ EOF;
 
     private function dumpServiceClosure(Reference $reference, $interpolate, $oneLine)
     {
-        $type = '';
-        if (PHP_VERSION_ID >= 70000 && $reference instanceof TypedReference) {
-            $type = $reference->getType();
-            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $reference->getInvalidBehavior()) {
-                $type = ': \\'.$type;
-            } elseif (PHP_VERSION_ID >= 70100) {
-                $type = ': ?\\'.$type;
-            } else {
-                $type = '';
-            }
+        $code = $this->dumpValue($reference, $interpolate);
+
+        if ($reference instanceof TypedReference) {
+            $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $reference->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior() ? ' = null' : '', $code);
+        } else {
+            $code = sprintf('return %s;', $code);
         }
 
         if ($oneLine) {
-            return sprintf('function ()%s { return %s; }', $type, $this->dumpValue($reference, $interpolate));
+            return sprintf('function () { %s }', $code);
         }
 
-        return sprintf("function ()%s {\n            return %s;\n        }", $type, $this->dumpValue($reference, $interpolate));
+        return sprintf("function () {\n            %s\n        }", $code);
     }
 
     /**

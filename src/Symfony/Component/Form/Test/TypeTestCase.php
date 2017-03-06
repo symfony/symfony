@@ -36,20 +36,6 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    protected function getTypeExtensions()
-    {
-        $typeExtensions = array();
-
-        if (interface_exists(ValidatorInterface::class)) {
-            $validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
-            $validator->expects($this->any())->method('validate')->will($this->returnValue(array()));
-
-            $typeExtensions[] = new FormTypeValidatorExtension($validator);
-        }
-
-        return $typeExtensions;
-    }
-
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));

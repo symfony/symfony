@@ -268,7 +268,7 @@ FrameworkBundle
    class instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass`
-   class has been removed. Use the 
+   class has been removed. Use the
    `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` class instead.
 
 HttpFoundation
@@ -320,6 +320,12 @@ HttpKernel
    `GetResponseForExceptionEvent::allowCustomResponseCode()` method instead,
    which will tell the Kernel to use the response code set on the event's
    response object.
+
+ * The `Kernel::getEnvParameters()` method has been removed.
+
+ * The `SYMFONY__` environment variables are no longer processed automatically
+   by Symfony. Use the `%env()%` syntax to get the value of any environment
+   variable from configuration files instead.
 
 Ldap
 ----

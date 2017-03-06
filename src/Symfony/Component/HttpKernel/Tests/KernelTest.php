@@ -743,6 +743,22 @@ EOF;
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation The support of special environment variables that start with SYMFONY__ (such as "SYMFONY__FOO__BAR") is deprecated as of 3.3 and will be removed in 4.0. Use the %env()% syntax instead to get the value of environment variables in configuration files.
+     */
+    public function testSymfonyEnvironmentVariables()
+    {
+        $_SERVER['SYMFONY__FOO__BAR'] = 'baz';
+
+        $kernel = $this->getKernel();
+        $method = new \ReflectionMethod($kernel, 'getEnvParameters');
+        $method->setAccessible(true);
+
+        $envParameters = $method->invoke($kernel);
+        $this->assertSame('baz', $envParameters['foo.bar']);
+    }
+
+    /**
      * Returns a mock for the BundleInterface.
      *
      * @return BundleInterface

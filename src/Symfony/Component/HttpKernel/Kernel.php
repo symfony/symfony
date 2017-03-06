@@ -579,6 +579,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, 'SYMFONY__')) {
+                @trigger_error(sprintf('The support of special environment variables that start with SYMFONY__ (such as "%s") is deprecated as of 3.3 and will be removed in 4.0. Use the %env()% syntax instead to get the value of environment variables in configuration files.', $key), E_USER_DEPRECATED);
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }

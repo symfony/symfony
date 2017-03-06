@@ -29,10 +29,28 @@ abstract class FormIntegrationTestCase extends TestCase
     {
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
+            ->addTypeExtensions($this->getTypedExtensions())
+            ->addTypes($this->getTypes())
+            ->addTypeGuessers($this->getTypeGuessers())
             ->getFormFactory();
     }
 
     protected function getExtensions()
+    {
+        return array();
+    }
+
+    protected function getTypedExtensions()
+    {
+        return array();
+    }
+
+    protected function getTypes()
+    {
+        return array();
+    }
+
+    protected function getTypeGuessers()
     {
         return array();
     }

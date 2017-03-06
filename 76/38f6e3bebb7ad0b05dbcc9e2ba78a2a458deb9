@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-03T22:15:49Z
+
+Hi @pierredup, thank you for proposing this.
+
+In fact there is already this [TypeTestCase](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Tests/Extension/Validator/Type/TypeTestCase.php) form the validator extension that can be extended, it does extend the [base TypeTestCase](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Test/TypeTestCase.php) with the change you suggest.
+
+I've opened https://github.com/symfony/symfony-docs/issues/7566 so we don't forget to document it, we may close here though.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-03-04T07:50:52Z
+
+@HeahDude I initially did try using that, but I got the error `Invalid argument supplied for foreach()` in Symfony/Component/Form/Extension/Validator/EventListener/ValidationListener.php:57.
+
+This is because the `validate` method is not mocked, which means when it is called it just returns `null` which breaks the listener. So to solve this I can add the mock to the validator TypeTestCase class, but I opted to rather update the base TypeTestCase since most people would probably use that class in their tests and not know about the other class. But I'm happy to make that change instead.
+
+This still leaves the issue that it's not easy to register your own type extensions. You can pass it as the second argument to the `PreloadedExtension` class, but that is not very intuitive (I'm not sure if most people even know about this).
+Having a method to register a type extension the same as the `getExtensions` method is a lot clearer and easier to use
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-03-06T07:37:30Z
+
+I created a separate PR (#21886) to address the validate method issue, which can go as a bug fix, and updated this PR as a new feature to include extra helper methods to register form extensions for unit testing for DX
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T07:52:52Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T16:17:07Z
+
+Can you add a note in the CHANGELOG?

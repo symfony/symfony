@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-21T20:04:24Z
+
+I made other attempts to find "the best" formatting. What do you prefer?
+
+![screenshot8](https://cloud.githubusercontent.com/assets/408368/23182568/4e68d7c6-f879-11e6-89e9-eb6fcc306f5e.png)
+
+A == :+1:
+B == :laughing:
+C == :tada:
+D == :heart:
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-22T10:28:51Z
+
+In your commit message :
+
+```diff
+- Basically, The formatter now use the VarDumper & use more significant…
++ Basically, the formatter now uses the VarDumper & uses more significant…
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-22T13:16:34Z
+
+Looks like the `C` is the favorite one ! :heart: it's mine too.
+
+This PR is now ready for the review ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-22T16:35:22Z
+
+Quick question: would it be possible to fallback to the old way when vardumper is not installed?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-22T16:52:33Z
+
+> Quick question: would it be possible to fallback to the old way when vardumper is not installed?
+
+It's not really easy (but not impossible) since the `ConsoleFormatter` does not extend the `LineFormatter` anymore. It just implements the interface.
+
+We can create two `ConsoleFormatter` implementation (the new and the old one). Then the `ConsoleHandler` can choose and the "best" one. (What about the naming ?)
+
+Another solution is to extends again the LineFormatter.
+
+What is the best option to you?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T14:36:23Z
+
+@lyrixx, I think we still need to support the case where `var-dumper` is not installed as we are trying to limit the required dependencies.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-06T16:23:54Z
+
+> @lyrixx, I think we still need to support the case where var-dumper is not installed as we are trying to limit the required dependencies.
+
+I pushed a new version: Now if the var-dumper component is not installed, the context and the extra are not dumped at all.
+
+I chose to do that in order to **keep the code as simple as possible**.
+
+I could also extends the NormalizeFormatter, but there is lot of code in the LineFormatter. So I don't think it worth it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T17:07:47Z
+
+Last thing, can you add a note in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-06T17:10:48Z
+
+> Last thing, can you add a note in the CHANGELOG?
+
+Done ;)

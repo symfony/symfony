@@ -1406,6 +1406,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame('bar', file_get_contents($filename));
     }
 
+    public function testDumpKeepsExistingPermissionsWhenOverwritingAnExistingFile()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo.txt';
+        file_put_contents($filename, 'FOO BAR');
+        chmod($filename, 0745);
+
+        $this->filesystem->dumpFile($filename, 'bar', null);
+
+        $this->assertFilePermissions(745, $filename);
+    }
+
     public function testCopyShouldKeepExecutionPermission()
     {
         $this->markAsSkippedIfChmodIsMissing();

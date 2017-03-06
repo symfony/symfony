@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
  * added `FormPass`
 
 3.2.0

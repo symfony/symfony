@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-27T15:16:16Z
+
+What about block mappings?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T14:02:26Z
+
+tests for block mappings added
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T18:36:34Z
+
+👍 (with a note added in the CHANGELOG)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-06T19:18:27Z
+
+Changelog and upgrade files updated, I also renamed `PARSE_KEYS_AS_STRING` to `PARSE_KEYS_AS_STRINGS` for consistency.

@@ -23,6 +23,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
         $this->validator->expects($this->once())->method('getMetadataFor')->will($this->returnValue($metadata));
+        $this->validator->expects($this->any())->method('validate')->will($this->returnValue(array()));
 
         parent::setUp();
     }

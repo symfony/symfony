@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by slaci at 2017-03-04T13:24:56Z
+
+hi
+
+With this patch this scenario will work out of the box. But to be honest I would say its just a quick hack, which is doable from the other way around (this patch is better than the other way).
+
+The main problem is that, if you have eg 3 providers and you need a user from the last, then every user will have 3 queries for every page load (say we are using fos user bundle, and just query from the db). Because the provider will need to load the user from the db (or api or from hell) first to check if its supported. Then throw the exception, and the next provider will do the same, stacking queries.
+
+So with this patch this feature will work, but won't be optimal cause this :(
+
+I liked the other approach more, where I could define a provider to use on refresh (I know that wont work, cause bc break, so just saying :P).
+
+Im sorry but I think the only way to solve it:
+* In the docs mention it is recommended to use only 1 userprovider per user classes. Just to remember, this whole thing is problem when people has more user providers for the same user class (type or something column in the same user table). If people use distinct user classes then everything works. OR
+* Store the used provider somewhere on login (well only session could work I think which is = token here), so no magic needed. The token interface could not be changed for obvious reasons, just a new interface could be introduced which would have the once removed getProvider method and tell people to use that if they want this scenario to work. But I guess that would be more like a new feature than bugfix, so you could not merge it into 2.7 (well just guessing).
+* EDIT: Or maybe use token attributes.. I don't know about those. Does not seem a clean solution, but the provider with a special key may be serialized there. Big hack, but possibility :)
+
+If these points are not possible, I support the merge of this patch. At least people will not have errors, just a bit degraded performance sometimes that they may not even notice or could live with that.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-04T13:58:36Z
+
+> In the docs mention it is recommended to use only 1 userprovider per user classes. Just to remember, this whole thing is problem when people has more user providers for the same user class (type or something column in the same user table). If people use distinct user classes then everything works.
+
+Would you like to open an issue or even better create a pull request to improve the docs?
+
+> * Store the used provider somewhere on login (well only session could work I think which is = token here), so no magic needed. The token interface could not be changed for obvious reasons, just a new interface could be introduced which would have the once removed getProvider method and tell people to use that if they want this scenario to work. But I guess that would be more like a new feature than bugfix, so you could not merge it into 2.7 (well just guessing).
+>
+> * EDIT: Or maybe use token attributes.. I don't know about those. Does not seem a clean solution, but the provider with a special key may be serialized there. Big hack, but possibility :)
+
+That would indeed be better solutions, but will need to be done on `master` as it would be a new feature IMO.

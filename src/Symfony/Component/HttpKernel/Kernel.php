@@ -269,6 +269,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         if (null === $this->name) {
             $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+            if (ctype_digit($this->name[0])) {
+                $this->name = '_'.$this->name;
+            }
         }
 
         return $this->name;

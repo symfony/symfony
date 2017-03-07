@@ -1121,6 +1121,31 @@ class ApplicationTest extends TestCase
         $this->assertEquals('some test value', $extraValue);
     }
 
+    public function testUpdateInputFromConsoleCommandEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getInput()->setOption('extra', 'overriden');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application
+            ->register('foo')
+            ->addOption('extra', null, InputOption::VALUE_REQUIRED)
+            ->setCode(function (InputInterface $input, OutputInterface $output) {
+                $output->write('foo.');
+            })
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--extra' => 'original'));
+
+        $this->assertEquals('overriden', $tester->getInput()->getOption('extra'));
+    }
+
     /**
      * @group legacy
      */

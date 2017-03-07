@@ -127,6 +127,34 @@ Finder
 
  * The `ExceptionInterface` has been deprecated and will be removed in 4.0.
 
+Form
+----
+
+ * Using the "choices" option in ``CountryType``, ``CurrencyType``, ``LanguageType``,
+   ``LocaleType``, and ``TimezoneType`` without overriding the ``choice_loader``
+   option has been deprecated and will be ignored in 4.0.
+   
+   Before:
+   ```php
+   $builder->add('custom_locales', LocaleType::class, array(
+       'choices' => $availableLocales,
+   ));
+   ```
+   
+   After:
+   ```php
+   $builder->add('custom_locales', LocaleType::class, array(
+       'choices' => $availableLocales,
+       'choice_loader' => null,
+   ));
+   // or
+   $builder->add('custom_locales', LocaleType::class, array(
+       'choice_loader' => new CallbackChoiceLoader(function () {
+           return $this->getAvailableLocales();
+       }),
+   ));
+   ```
+
 FrameworkBundle
 ---------------
 

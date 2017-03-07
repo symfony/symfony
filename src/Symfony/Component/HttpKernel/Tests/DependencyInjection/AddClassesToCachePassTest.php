@@ -24,6 +24,7 @@ class AddClassesToCachePassTest extends TestCase
         $r = new \ReflectionClass(AddClassesToCachePass::class);
         $pass = $r->newInstanceWithoutConstructor();
         $r = new \ReflectionMethod(AddClassesToCachePass::class, 'expandClasses');
+        $r->setAccessible(true);
         $expand = $r->getClosure($pass);
 
         $this->assertSame('Foo', $expand(array('Foo'), array())[0]);

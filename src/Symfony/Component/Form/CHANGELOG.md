@@ -9,11 +9,11 @@ CHANGELOG
  * added `Symfony\Component\Form\FormErrorIterator::findByCodes()`
  * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
  * added `FormPass`
+ * added `compare` option to `RepeatedType`
 
 3.2.0
 -----
 
- * added `compare` option to `RepeatedType`
  * added `CallbackChoiceLoader`
  * implemented `ChoiceLoaderInterface` in children of `ChoiceType`
 

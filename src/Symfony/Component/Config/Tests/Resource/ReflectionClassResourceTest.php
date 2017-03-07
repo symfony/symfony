@@ -88,7 +88,9 @@ EOPHP;
         if (null === $expectedSignature) {
             eval(sprintf($code, $class = 'Foo'.str_replace('.', '_', uniqid('', true))));
             $r = new \ReflectionClass(ReflectionClassResource::class);
-            $generateSignature = $r->getMethod('generateSignature')->getClosure($r->newInstanceWithoutConstructor());
+            $generateSignature = $r->getMethod('generateSignature');
+            $generateSignature->setAccessible(true);
+            $generateSignature = $generateSignature->getClosure($r->newInstanceWithoutConstructor());
             $expectedSignature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
         }
 

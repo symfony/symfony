@@ -506,17 +506,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function initializeContainer()
     {
         $class = $this->getContainerClass();
-        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
-        $fresh = true;
-        if (!$cache->isFresh()) {
-            $container = $this->buildContainer();
-            $container->compile();
-            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
-            $fresh = false;
+        if (!$fresh = class_exists($class, false)) {
+            $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
+
+            if (!$fresh = $cache->isFresh()) {
+                $container = $this->buildContainer();
+                $container->compile();
+                $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
+            }
+
+            require_once $cache->getPath();
         }
-
-        require_once $cache->getPath();
 
         $this->container = new $class();
         $this->container->set('kernel', $this);

@@ -13,6 +13,7 @@ CHANGELOG
 3.2.0
 -----
 
+ * added `compare` option to `RepeatedType`
  * added `CallbackChoiceLoader`
  * implemented `ChoiceLoaderInterface` in children of `ChoiceType`
 

@@ -108,10 +108,10 @@ class StaticPrefixCollection
      * Tries to combine a route with another route or group.
      *
      * @param StaticPrefixCollection|array $item
-     * @param $prefix
-     * @param $route
+     * @param string                       $prefix
+     * @param mixed                        $route
      *
-     * @return bool|StaticPrefixCollection
+     * @return null|StaticPrefixCollection
      */
     private function groupWithItem($item, $prefix, $route)
     {
@@ -119,7 +119,7 @@ class StaticPrefixCollection
         $commonPrefix = $this->detectCommonPrefix($prefix, $itemPrefix);
 
         if (!$commonPrefix) {
-            return false;
+            return;
         }
 
         $child = new self($commonPrefix);

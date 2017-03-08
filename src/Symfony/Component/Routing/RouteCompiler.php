@@ -223,7 +223,7 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         return array(
-            'staticPrefix' => static::determineStaticPrefix($route, $tokens),
+            'staticPrefix' => self::determineStaticPrefix($route, $tokens),
             'regex' => $regexp,
             'tokens' => array_reverse($tokens),
             'variables' => $variables,

@@ -1651,7 +1651,7 @@ EOF;
             }
             $signature = preg_replace('/^(&?)[^(]*/', '$1', InheritanceProxyHelper::getSignature($r, $call));
 
-            $return = method_exists($r, 'getReturnType') && 'void' !== (string) $r->getReturnType();
+            $return = !method_exists($r, 'getReturnType') || 'void' !== (string) $r->getReturnType();
 
             return sprintf("/** @closure-proxy %s::%s */ function %s {\n            %s%s->%s;\n        }", $class, $method, $signature, $return ? 'return ' : '', $this->dumpValue($reference), $call);
         } elseif ($value instanceof Variable) {

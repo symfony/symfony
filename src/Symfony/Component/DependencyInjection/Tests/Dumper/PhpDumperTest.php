@@ -597,6 +597,9 @@ class PhpDumperTest extends TestCase
         $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo', (string) array_pop($res));
     }
 
+    /**
+     * @requires PHP 7.0
+     */
     public function testClosureProxyWithVoidReturnType()
     {
         $container = include self::$fixturesPath.'/containers/container35.php';

@@ -25,7 +25,7 @@ class WebTestCase extends BaseWebTestCase
 
     protected static function deleteTmpDir($testCase)
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
+        if (defined('HHVM_VERSION_ID') || !file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
             return;
         }
 

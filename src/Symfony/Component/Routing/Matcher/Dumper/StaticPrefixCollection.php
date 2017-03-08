@@ -26,9 +26,9 @@ class StaticPrefixCollection
     private $prefix;
 
     /**
-     * @var array[]
+     * @var array[]|StaticPrefixCollection[]
      */
-    private $items = [];
+    private $items = array();
 
     /**
      * @var int
@@ -73,13 +73,15 @@ class StaticPrefixCollection
             // When a prefix is exactly the same as the base we move up the match start position.
             // This is needed because otherwise routes that come afterwards have higher precedence
             // than a possible regular expression, which goes against the input order sorting.
-            $this->items[] = [$prefix, $route];
+            $this->items[] = array($prefix, $route);
             $this->matchStart = count($this->items);
             return;
         }
 
         foreach ($this->items as $i => $item) {
-            if ($i < $this->matchStart) continue;
+            if ($i < $this->matchStart) {
+                continue;
+            }
 
             if ($item instanceof self && $item->accepts($prefix)) {
                 $item->addRoute($prefix, $route);
@@ -96,7 +98,7 @@ class StaticPrefixCollection
 
         // No optimised case was found, in this case we simple add the route for possible
         // grouping when new routes are added.
-        $this->items[] = [$prefix, $route];
+        $this->items[] = array($prefix, $route);
     }
 
     /**

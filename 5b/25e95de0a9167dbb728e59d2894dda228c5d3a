@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2017-03-07T16:46:49Z
+
+@nicolas-grekas I added a few checks here and there, but it always was in `PhpDumper`. the other ones (such as `ContainerBuilder`) do not really depend on the this method (Only `ContainerBuilder` seems to call this method, but with no implication on what it should return).
+
+I added some basic tests (for when trying to dump a value), but I'm not sure how to test some other cases (such as adding a new instance or dumping a value...), as it's a lot of privates...
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-03-07T17:12:09Z
+
+Changes made. So basically only where I triggered the error seemed to matter, as the rest was already checking the class existence (and thus could not fail the `getReflectionClass`. I modified the error message too.

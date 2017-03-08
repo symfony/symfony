@@ -241,9 +241,7 @@ class RouteCompiler implements RouteCompilerInterface
     private static function determineStaticPrefix(Route $route, array $tokens)
     {
         if ('text' !== $tokens[0][0]) {
-            return $route->hasDefault($tokens[0][3])
-                ? ''
-                : $tokens[0][1];
+            return $route->hasDefault($tokens[0][3]) ? '' : $tokens[0][1];
         }
 
         $prefix = $tokens[0][1];

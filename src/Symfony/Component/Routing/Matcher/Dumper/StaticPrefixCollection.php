@@ -191,7 +191,7 @@ class StaticPrefixCollection
 
                 // When a group contains only two items there's no reason to optimize because at minimum
                 // the amount of prefix check is 2. In this case inline the group.
-                if (count($item->items) <= 2) {
+                if ($item->shouldBeInlined()) {
                     array_splice($this->items, $index, 1, $item->items);
 
                     // Lower index to pass through the same index again after optimizing.
@@ -200,6 +200,24 @@ class StaticPrefixCollection
                 }
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    private function shouldBeInlined()
+    {
+        if (count($this->items) >= 3) {
+            return false;
+        }
+
+        foreach ($this->items as $item) {
+            if (is_array($item) && $item[0] === $this->prefix) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

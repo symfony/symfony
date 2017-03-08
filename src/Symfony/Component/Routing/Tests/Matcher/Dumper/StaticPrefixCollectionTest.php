@@ -44,13 +44,26 @@ EOF
             'Not nested - group too small' => array(
                 array(
                     array('/', 'root'),
-                    array('/prefix/segment/', 'prefix_segment'),
-                    array('/prefix/segment/', 'leading_segment'),
+                    array('/prefix/segment/aa', 'prefix_segment'),
+                    array('/prefix/segment/bb', 'leading_segment'),
                 ),
                 <<<EOF
 / root
-/prefix/segment/ prefix_segment
-/prefix/segment/ leading_segment
+/prefix/segment/aa prefix_segment
+/prefix/segment/bb leading_segment
+EOF
+            ),
+            'Nested - contains item at intersection' => array(
+                array(
+                    array('/', 'root'),
+                    array('/prefix/segment/', 'prefix_segment'),
+                    array('/prefix/segment/bb', 'leading_segment'),
+                ),
+                <<<EOF
+/ root
+/prefix/segment/
+-> /prefix/segment/ prefix_segment
+-> /prefix/segment/bb leading_segment
 EOF
             ),
             'Simple one level nesting' => array(

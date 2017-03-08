@@ -498,6 +498,30 @@ class FrameworkExtension extends Extension
                 $listener->addArgument(new Reference('logger'));
                 $container->setDefinition(sprintf('%s.listener.audit_trail', $workflowId), $listener);
             }
+
+            // Add Guard Listener
+            $guard = new Definition(Workflow\EventListener\GuardListener::class);
+            $configuration = array();
+            foreach ($workflow['transitions'] as $transitionName => $config) {
+                if (!isset($config['guard'])) {
+                    continue;
+                }
+                $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
+                $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
+                $configuration[$eventName] = $config['guard'];
+            }
+            if ($configuration) {
+                $guard->setArguments(array(
+                    $configuration,
+                    new Reference('workflow.security.expression_language'),
+                    new Reference('security.token_storage'),
+                    new Reference('security.authorization_checker'),
+                    new Reference('security.authentication.trust_resolver'),
+                    new Reference('security.role_hierarchy'),
+                ));
+
+                $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
+            }
         }
     }
 

@@ -27,5 +27,7 @@
             <argument type="service" id="workflow.registry" />
             <tag name="twig.extension" />
         </service>
+
+        <service id="workflow.security.expression_language" class="Symfony\Component\Workflow\EventListener\ExpressionLanguage" public="false" />
     </services>
 </container>

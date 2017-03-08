@@ -144,7 +144,7 @@ class StaticPrefixCollection
      */
     private function accepts($prefix)
     {
-        return '' === $this->prefix || strpos($prefix, $this->prefix, 0) === 0;
+        return '' === $this->prefix || strpos($prefix, $this->prefix) === 0;
     }
 
     /**

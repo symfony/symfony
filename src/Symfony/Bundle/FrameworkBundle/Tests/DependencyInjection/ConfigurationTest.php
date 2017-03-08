@@ -226,6 +226,7 @@ class ConfigurationTest extends TestCase
             'serializer' => array(
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
+                'mapping' => array('paths' => array()),
             ),
             'property_access' => array(
                 'magic_call' => false,

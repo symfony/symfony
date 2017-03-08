@@ -35,6 +35,8 @@ CHANGELOG
    `server:status` console commands have been moved to a dedicated bundle. 
    Require `symfony/web-server-bundle` in your composer.json and register 
    `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
+ * Added `framework.serializer.mapping` config option allowing to define custom 
+   serialization mapping files and directories
 
 3.2.0
 -----

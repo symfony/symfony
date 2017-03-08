@@ -223,11 +223,34 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         return array(
-            'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
+            'staticPrefix' => self::determineStaticPrefix($route, $tokens),
             'regex' => $regexp,
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );
+    }
+
+    /**
+     * Determines the longest static prefix possible for a route.
+     *
+     * @param Route $route
+     * @param array $tokens
+     *
+     * @return string The leading static part of a route's path
+     */
+    private static function determineStaticPrefix(Route $route, array $tokens)
+    {
+        if ('text' !== $tokens[0][0]) {
+            return ($route->hasDefault($tokens[0][3]) || '/' === $tokens[0][1]) ? '' : $tokens[0][1];
+        }
+
+        $prefix = $tokens[0][1];
+
+        if (isset($tokens[1][1]) && '/' !== $tokens[1][1] && false === $route->hasDefault($tokens[1][3])) {
+            $prefix .= $tokens[1][1];
+        }
+
+        return $prefix;
     }
 
     /**

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by keradus at 2017-03-07T21:09:13Z
+
+Technically, it's a non-internal class available eg on v3.2.4, removing it is BC breaker :/
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-08T02:55:28Z
+
+👍 Not used and not documented.

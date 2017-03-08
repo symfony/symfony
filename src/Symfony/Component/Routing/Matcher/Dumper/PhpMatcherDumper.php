@@ -400,7 +400,6 @@ EOF;
     private function groupRoutesByHostRegex(RouteCollection $routes)
     {
         $groups = new DumperCollection();
-
         $currentGroup = new DumperCollection();
         $currentGroup->setAttribute('host_regex', null);
         $groups->add($currentGroup);
@@ -416,30 +415,6 @@ EOF;
         }
 
         return $groups;
-    }
-
-    /**
-     * Organizes the routes into a prefix tree.
-     *
-     * Routes order is preserved such that traversing the tree will traverse the
-     * routes in the origin order.
-     *
-     * @param DumperCollection $collection A collection of routes
-     *
-     * @return DumperPrefixCollection
-     */
-    private function buildPrefixTree(DumperCollection $collection)
-    {
-        $tree = new DumperPrefixCollection();
-        $current = $tree;
-
-        foreach ($collection as $route) {
-            $current = $current->addPrefixRoute($route);
-        }
-
-        $tree->mergeSlashNodes();
-
-        return $tree;
     }
 
     private function getExpressionLanguage()

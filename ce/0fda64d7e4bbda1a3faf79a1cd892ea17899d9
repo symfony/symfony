@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-02-28T08:27:37Z
+
+@stof @lyrixx, what do you think of this? I've pushed a second commit to preserve the original order of the events.
+
+I would also note that the marking has lost its original places for very specific "leave" events, but at this stage it may be ok to only deal with the last part of the event name or should this be fixed too?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T14:21:48Z
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-03T07:19:08Z
+
+@HeahDude You said this is supposed to fix a bug. If you, can you add a test case that clarifies the behaviour you expected? As for now I tend to agree with @lyrixx that there is nothing to fix.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-05T23:33:23Z
+
+I've updated the PR with a first commit that adds failing tests, please look at it separately as it marks the ones actually failing without the following patches.
+
+Then I'll try to both clarify what I stated before and to answer @lyrixx's comment:
+
+>I really fail to see what is the real issue here: People relies on the event name, not the current marking.
+
+Ok, anyway the marking is available as part of the event object and its state should be consistent during the cycle of the workflow. Currently only the transition event is.
+
+Events are not all named and when multiple places are left or entered the information may be lost at some point.
+
+>More over it's a kind of BC.
+
+Every bug fix is a kind of BC break, more or less, since a thing that was happening doesn't anymore.
+
+>Finally, if you update this method you have to update others method to mimic this behaviour.
+
+I take that as a "yes" to what I said above:
+
+>I would also note that the marking has lost its original places for very specific "leave" events, but at this stage it may be ok to only deal with the last part of the event name or should this be fixed too?
+
+Hence the new third commit of this PR to fix the "leave" related events.
+
+I have no hard feeling about this, but while documenting it in the docs PR linked in the description, it felt just weird to explain it as is.
+
+Thanks for your reviews.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-05T23:34:58Z
+
+(Tests failure are unrelated).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-06T17:25:29Z
+
+Fixed, rebased and squashed!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-07T13:18:56Z
+
+I've just merged @lyrixx patch for tests coding style.
+
+This one should be ready now. Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-03-07T18:03:06Z
+
+Last comments addressed.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-08T09:43:29Z
+
+:+1:

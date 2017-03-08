@@ -35,17 +35,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
 
-        if (0 === strpos($pathinfo, '/rootprefix')) {
-            // static
-            if ('/rootprefix/test' === $pathinfo) {
-                return array('_route' => 'static');
-            }
+        // static
+        if ('/rootprefix/test' === $pathinfo) {
+            return array('_route' => 'static');
+        }
 
-            // dynamic
-            if (preg_match('#^/rootprefix/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array ());
-            }
-
+        // dynamic
+        if (0 === strpos($pathinfo, '/rootprefix/') && preg_match('#^/rootprefix/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
+            return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array ());
         }
 
         // with-condition

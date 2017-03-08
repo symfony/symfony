@@ -134,7 +134,6 @@ EOF;
     private function compileRoutes(RouteCollection $routes, $supportsRedirections)
     {
         $fetchedHost = false;
-
         $groups = $this->groupRoutesByHostRegex($routes);
         $code = '';
 
@@ -148,8 +147,8 @@ EOF;
                 $code .= sprintf("        if (preg_match(%s, \$host, \$hostMatches)) {\n", var_export($regex, true));
             }
 
-            $tree = $this->buildPrefixTree($collection);
-            $groupCode = $this->compilePrefixRoutes($tree, $supportsRedirections);
+            $tree = $this->buildStaticPrefixCollection($collection);
+            $groupCode = $this->compileStaticPrefixRoutes($tree, $supportsRedirections);
 
             if (null !== $regex) {
                 // apply extra indention at each line (except empty ones)
@@ -164,37 +163,51 @@ EOF;
         return $code;
     }
 
+    private function buildStaticPrefixCollection(DumperCollection $collection)
+    {
+        $prefixCollection = new StaticPrefixCollection();
+
+        foreach ($collection as $dumperRoute) {
+            $prefix = $dumperRoute->getRoute()->compile()->getStaticPrefix();
+            $prefixCollection->addRoute($prefix, $dumperRoute);
+        }
+
+        $prefixCollection->optimizeGroups();
+
+        return $prefixCollection;
+    }
+
     /**
-     * Generates PHP code recursively to match a tree of routes.
+     * Generates PHP code to match a tree of routes.
      *
-     * @param DumperPrefixCollection $collection           A DumperPrefixCollection instance
+     * @param StaticPrefixCollection $collection           A StaticPrefixCollection instance
      * @param bool                   $supportsRedirections Whether redirections are supported by the base class
-     * @param string                 $parentPrefix         Prefix of the parent collection
+     * @param bool                   $previousItemWasGroup Whether the previous item was a group.
      *
      * @return string PHP code
      */
-    private function compilePrefixRoutes(DumperPrefixCollection $collection, $supportsRedirections, $parentPrefix = '')
+    private function compileStaticPrefixRoutes(StaticPrefixCollection $collection, $supportsRedirections, $ifOrElseIf = 'if')
     {
         $code = '';
         $prefix = $collection->getPrefix();
-        $optimizable = 1 < strlen($prefix) && 1 < count($collection->all());
-        $optimizedPrefix = $parentPrefix;
 
-        if ($optimizable) {
-            $optimizedPrefix = $prefix;
-
-            $code .= sprintf("    if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
+        if (!empty($prefix) && '/' !== $prefix) {
+            $code .= sprintf("    %s (0 === strpos(\$pathinfo, %s)) {\n", $ifOrElseIf, var_export($prefix, true));
         }
 
-        foreach ($collection as $route) {
-            if ($route instanceof DumperCollection) {
-                $code .= $this->compilePrefixRoutes($route, $supportsRedirections, $optimizedPrefix);
+        $ifOrElseIf = 'if';
+
+        foreach ($collection->getItems() as $route) {
+            if ($route instanceof StaticPrefixCollection) {
+                $code .= $this->compileStaticPrefixRoutes($route, $supportsRedirections, $ifOrElseIf);
+                $ifOrElseIf = 'elseif';
             } else {
-                $code .= $this->compileRoute($route->getRoute(), $route->getName(), $supportsRedirections, $optimizedPrefix)."\n";
+                $code .= $this->compileRoute($route[1]->getRoute(), $route[1]->getName(), $supportsRedirections, $ifOrElseIf, $prefix)."\n";
+                $ifOrElseIf = 'if';
             }
         }
 
-        if ($optimizable) {
+        if (!empty($prefix) && '/' !== $prefix) {
             $code .= "    }\n\n";
             // apply extra indention at each line (except empty ones)
             $code = preg_replace('/^.{2,}$/m', '    $0', $code);
@@ -215,7 +228,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
+    private function compileRoute(Route $route, $name, $supportsRedirections, $ifOrElseIf, $parentPrefix = null)
     {
         $code = '';
         $compiledRoute = $route->compile();

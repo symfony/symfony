@@ -46,7 +46,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with a variable',
                 array('/foo/{bar}'),
-                '/foo', '#^/foo/(?P<bar>[^/]++)$#s', array('bar'), array(
+                '/foo/', '#^/foo/(?P<bar>[^/]++)$#s', array('bar'), array(
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 ),
@@ -64,7 +64,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with several variables',
                 array('/foo/{bar}/{foobar}'),
-                '/foo', '#^/foo/(?P<bar>[^/]++)/(?P<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
+                '/foo/', '#^/foo/(?P<bar>[^/]++)/(?P<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]++', 'foobar'),
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
@@ -127,7 +127,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
+                '/foo-', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
                     array('variable', '-', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 ),
@@ -146,7 +146,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
-                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
+                '/', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
                     array('variable', '.', '[^/]++', '_format'),
                     array('variable', '', '[^/\.]++', 'z'),
                     array('variable', '', '(y|Y)', 'y'),
@@ -158,7 +158,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
-                '/foo', '#^/foo/(?P<bar>[^/\.]++)\.(?P<_format>[^/]++)$#s', array('bar', '_format'), array(
+                '/foo/', '#^/foo/(?P<bar>[^/\.]++)\.(?P<_format>[^/]++)$#s', array('bar', '_format'), array(
                     array('variable', '.', '[^/]++', '_format'),
                     array('variable', '/', '[^/\.]++', 'bar'),
                     array('text', '/foo'),
@@ -233,7 +233,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with a UTF-8 separator',
                 array('/foo/{bar}§{_format}', array(), array(), array('compiler_class' => Utf8RouteCompiler::class)),
-                '/foo', '#^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$#su', array('bar', '_format'), array(
+                '/foo/', '#^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$#su', array('bar', '_format'), array(
                     array('variable', '§', '[^/]++', '_format', true),
                     array('variable', '/', '[^/§]++', 'bar', true),
                     array('text', '/foo'),
@@ -337,7 +337,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with host pattern and some variables',
                 array('/hello/{name}', array(), array(), array(), 'www.example.{tld}'),
-                '/hello', '#^/hello/(?P<name>[^/]++)$#s', array('tld', 'name'), array('name'), array(
+                '/hello/', '#^/hello/(?P<name>[^/]++)$#s', array('tld', 'name'), array('name'), array(
                     array('variable', '/', '[^/]++', 'name'),
                     array('text', '/hello'),
                 ),

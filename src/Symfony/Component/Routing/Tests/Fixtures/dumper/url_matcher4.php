@@ -69,30 +69,27 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             }
             not_post_and_head:
 
-            if (0 === strpos($pathinfo, '/put_and_post')) {
-                // put_and_post
-                if ('/put_and_post' === $pathinfo) {
-                    if (!in_array($requestMethod, array('PUT', 'POST'))) {
-                        $allow = array_merge($allow, array('PUT', 'POST'));
-                        goto not_put_and_post;
-                    }
-
-                    return array('_route' => 'put_and_post');
+            // put_and_post
+            if ('/put_and_post' === $pathinfo) {
+                if (!in_array($requestMethod, array('PUT', 'POST'))) {
+                    $allow = array_merge($allow, array('PUT', 'POST'));
+                    goto not_put_and_post;
                 }
-                not_put_and_post:
 
-                // put_and_get_and_head
-                if ('/put_and_post' === $pathinfo) {
-                    if (!in_array($canonicalMethod, array('PUT', 'GET'))) {
-                        $allow = array_merge($allow, array('PUT', 'GET'));
-                        goto not_put_and_get_and_head;
-                    }
-
-                    return array('_route' => 'put_and_get_and_head');
-                }
-                not_put_and_get_and_head:
-
+                return array('_route' => 'put_and_post');
             }
+            not_put_and_post:
+
+            // put_and_get_and_head
+            if ('/put_and_post' === $pathinfo) {
+                if (!in_array($canonicalMethod, array('PUT', 'GET'))) {
+                    $allow = array_merge($allow, array('PUT', 'GET'));
+                    goto not_put_and_get_and_head;
+                }
+
+                return array('_route' => 'put_and_get_and_head');
+            }
+            not_put_and_get_and_head:
 
         }
 

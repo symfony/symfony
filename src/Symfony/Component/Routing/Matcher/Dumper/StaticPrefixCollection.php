@@ -197,7 +197,6 @@ class StaticPrefixCollection
                     // Lower index to pass through the same index again after optimizing.
                     // The first item of the replacements might be a group needing optimization.
                     --$index;
-                    continue;
                 }
             }
         }

@@ -408,6 +408,23 @@ class PhpDumperTest extends TestCase
         yield array('Cannot dump definition for service "baz": factories and overridden getters are incompatible with each other.', 'getParam', 'baz');
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to configure service "Acme\FooNonExistant": class "Acme\FooNonExistant" not found.
+     */
+    public function testDumpOverriddenGetterOnNonExistantClassTriggersException()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('Acme\\FooNonExistant');
+        $definition->setOverriddenGetter('getFoo', array('foo'));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Overriden_Getters_On_Non_Existent_Definition'));
+    }
+
     public function testEnvParameter()
     {
         $container = new ContainerBuilder();

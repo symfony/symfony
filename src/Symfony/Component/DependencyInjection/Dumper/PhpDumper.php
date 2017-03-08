@@ -502,6 +502,11 @@ class PhpDumper extends Dumper
     private function addServiceOverriddenMethods($id, Definition $definition)
     {
         $class = $this->container->getReflectionClass($definition->getClass());
+
+        if (!$class) {
+            throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" not found.', $id, $definition->getClass()));
+        }
+
         if ($class->isFinal()) {
             throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" cannot be marked as final.', $id, $class->name));
         }

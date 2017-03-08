@@ -336,6 +336,10 @@ class PhpMatcherDumperTest extends TestCase
         $groupOptimisedCollection->add('a_fourth', new Route('/a/44'));
         $groupOptimisedCollection->add('a_fifth', new Route('/a/55'));
         $groupOptimisedCollection->add('a_sixth', new Route('/a/66'));
+        $groupOptimisedCollection->add('nested_wildcard', new Route('/nested/{param}'));
+        $groupOptimisedCollection->add('nested_a', new Route('/nested/group/a/'));
+        $groupOptimisedCollection->add('nested_b', new Route('/nested/group/b/'));
+        $groupOptimisedCollection->add('nested_c', new Route('/nested/group/c/'));
 
         return array(
            array($collection, 'url_matcher1.php', array()),

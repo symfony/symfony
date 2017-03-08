@@ -76,6 +76,32 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         }
 
+        elseif (0 === strpos($pathinfo, '/nested/')) {
+            // nested_wildcard
+            if (preg_match('#^/nested/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'nested_wildcard')), array ());
+            }
+
+            if (0 === strpos($pathinfo, '/nested/group/')) {
+                // nested_a
+                if ('/nested/group/a/' === $pathinfo) {
+                    return array('_route' => 'nested_a');
+                }
+
+                // nested_b
+                if ('/nested/group/b/' === $pathinfo) {
+                    return array('_route' => 'nested_b');
+                }
+
+                // nested_c
+                if ('/nested/group/c/' === $pathinfo) {
+                    return array('_route' => 'nested_c');
+                }
+
+            }
+
+        }
+
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }
 }

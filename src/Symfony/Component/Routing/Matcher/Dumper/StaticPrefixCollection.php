@@ -212,6 +212,9 @@ class StaticPrefixCollection
         }
 
         foreach ($this->items as $item) {
+            if ($item instanceof self) {
+                return true;
+            }
             if (is_array($item) && $item[0] === $this->prefix) {
                 return false;
             }

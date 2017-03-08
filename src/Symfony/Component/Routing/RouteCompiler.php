@@ -248,7 +248,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         $prefix = $tokens[0][1];
 
-        if (isset($tokens[1][1]) && ! $route->hasDefault($tokens[1][3])) {
+        if (isset($tokens[1][1]) && !$route->hasDefault($tokens[1][3])) {
             $prefix .= $tokens[1][1];
         }
 

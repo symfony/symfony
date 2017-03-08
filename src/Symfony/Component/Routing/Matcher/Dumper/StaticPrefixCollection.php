@@ -63,7 +63,7 @@ class StaticPrefixCollection
      * Adds a route to a group.
      *
      * @param string $prefix
-     * @param mixed $route
+     * @param mixed  $route
      */
     public function addRoute($prefix, $route)
     {
@@ -75,6 +75,7 @@ class StaticPrefixCollection
             // than a possible regular expression, which goes against the input order sorting.
             $this->items[] = array($prefix, $route);
             $this->matchStart = count($this->items);
+
             return;
         }
 
@@ -85,6 +86,7 @@ class StaticPrefixCollection
 
             if ($item instanceof self && $item->accepts($prefix)) {
                 $item->addRoute($prefix, $route);
+
                 return;
             }
 
@@ -92,6 +94,7 @@ class StaticPrefixCollection
 
             if ($group instanceof self) {
                 $this->items[$i] = $group;
+
                 return;
             }
         }
@@ -107,6 +110,7 @@ class StaticPrefixCollection
      * @param StaticPrefixCollection|array $item
      * @param $prefix
      * @param $route
+     *
      * @return bool|StaticPrefixCollection
      */
     private function groupWithItem($item, $prefix, $route)
@@ -118,10 +122,10 @@ class StaticPrefixCollection
             return false;
         }
 
-        $child = new StaticPrefixCollection($commonPrefix);
+        $child = new self($commonPrefix);
 
         if ($item instanceof self) {
-            $child->items = [$item];
+            $child->items = array($item);
         } else {
             $child->addRoute($item[0], $item[1]);
         }
@@ -157,7 +161,7 @@ class StaticPrefixCollection
         $commonLength = $baseLength;
         $end = min(strlen($prefix), strlen($anotherPrefix));
 
-        for ($i = $baseLength; $i <= $end; $i++) {
+        for ($i = $baseLength; $i <= $end; ++$i) {
             if (substr($prefix, 0, $i) !== substr($anotherPrefix, 0, $i)) {
                 break;
             }
@@ -203,11 +207,12 @@ class StaticPrefixCollection
      * Guards against adding incompatible prefixes in a group.
      *
      * @param string $prefix
+     *
      * @throws \LogicException When a prefix does not belong in a group.
      */
     private function guardAgainstAddingNotAcceptedRoutes($prefix)
     {
-        if ( ! $this->accepts($prefix)) {
+        if (!$this->accepts($prefix)) {
             $message = sprintf(
                 'Could not add route with prefix %s to collection with prefix %s',
                 $prefix,

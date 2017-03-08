@@ -410,13 +410,13 @@ class PhpDumperTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to configure service "Acme\FooNonExistant": class "Acme\FooNonExistant" not found.
+     * @expectedExceptionMessage Unable to configure service "Acme\FooNonExistent": class "Acme\FooNonExistent" not found.
      */
-    public function testDumpOverriddenGetterOnNonExistantClassTriggersException()
+    public function testDumpOverriddenGetterOnNonExistentClassTriggersException()
     {
         $container = new ContainerBuilder();
 
-        $definition = $container->register('Acme\\FooNonExistant');
+        $definition = $container->register('Acme\\FooNonExistent');
         $definition->setOverriddenGetter('getFoo', array('foo'));
 
         $container->compile();

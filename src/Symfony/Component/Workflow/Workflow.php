@@ -214,7 +214,7 @@ class Workflow
             return;
         }
 
-        $event = new GuardEvent($subject, $marking, $transition);
+        $event = new GuardEvent($subject, $marking, $transition, $this->name);
 
         $this->dispatcher->dispatch('workflow.guard', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.guard', $this->name), $event);
@@ -226,7 +226,7 @@ class Workflow
     private function leave($subject, Transition $transition, Marking $marking)
     {
         if (null !== $this->dispatcher) {
-            $event = new Event($subject, $marking, $transition);
+            $event = new Event($subject, $marking, $transition, $this->name);
 
             $this->dispatcher->dispatch('workflow.leave', $event);
             $this->dispatcher->dispatch(sprintf('workflow.%s.leave', $this->name), $event);
@@ -247,7 +247,7 @@ class Workflow
             return;
         }
 
-        $event = new Event($subject, $marking, $transition);
+        $event = new Event($subject, $marking, $transition, $this->name);
 
         $this->dispatcher->dispatch('workflow.transition', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.transition', $this->name), $event);
@@ -257,7 +257,7 @@ class Workflow
     private function enter($subject, Transition $transition, Marking $marking)
     {
         if (null !== $this->dispatcher) {
-            $event = new Event($subject, $marking, $transition);
+            $event = new Event($subject, $marking, $transition, $this->name);
 
             $this->dispatcher->dispatch('workflow.enter', $event);
             $this->dispatcher->dispatch(sprintf('workflow.%s.enter', $this->name), $event);
@@ -278,7 +278,7 @@ class Workflow
             return;
         }
 
-        $event = new Event($subject, $marking, $transition);
+        $event = new Event($subject, $marking, $transition, $this->name);
 
         $this->dispatcher->dispatch('workflow.entered', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.entered', $this->name), $event);

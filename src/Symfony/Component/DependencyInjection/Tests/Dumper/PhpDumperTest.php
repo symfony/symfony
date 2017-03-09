@@ -657,8 +657,10 @@ class PhpDumperTest extends TestCase
             ->addArgument(array(
                 'bar' => new ServiceClosureArgument(new Reference('bar_service')),
                 'baz' => new ServiceClosureArgument(new TypedReference('baz_service', 'stdClass')),
+                'nil' => $nil = new ServiceClosureArgument(new Reference('nil')),
             ))
         ;
+        $nil->setValues(array(null));
         $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
         $container->register('baz_service', 'stdClass')->setPublic(false);
         $container->compile();

@@ -49,6 +49,11 @@ class CachePoolsTest extends WebTestCase
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
+        } catch (InvalidArgumentException $e) {
+            if (0 !== strpos($e->getMessage(), 'Redis connection failed')) {
+                throw $e;
+            }
+            $this->markTestSkipped($e->getMessage());
         }
     }
 

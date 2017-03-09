@@ -88,6 +88,8 @@ class ProjectServiceContainer extends Container
             return ${($_ = isset($this->services['bar_service']) ? $this->services['bar_service'] : $this->get('bar_service')) && false ?: '_'};
         }, 'baz' => function () {
             $f = function (\stdClass $v) { return $v; }; return $f(${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->getBazServiceService()) && false ?: '_'});
+        }, 'nil' => function () {
+            return NULL;
         }));
     }
 

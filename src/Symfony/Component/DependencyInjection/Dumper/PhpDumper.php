@@ -1690,7 +1690,7 @@ EOF;
         return $this->export($value);
     }
 
-    private function dumpServiceClosure(Reference $reference, $interpolate, $oneLine)
+    private function dumpServiceClosure(Reference $reference = null, $interpolate, $oneLine)
     {
         $code = $this->dumpValue($reference, $interpolate);
 

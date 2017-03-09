@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -938,7 +939,7 @@ class FrameworkExtension extends Extension
 
         $files = array('xml' => array(), 'yml' => array());
         $this->getValidatorMappingFiles($container, $files);
-        $this->getValidatorMappingFilesFromConfig($config, $files);
+        $this->getValidatorMappingFilesFromConfig($container, $config, $files);
 
         if (!empty($files['xml'])) {
             $validatorBuilder->addMethodCall('addXmlMappings', array($files['xml']));
@@ -997,7 +998,7 @@ class FrameworkExtension extends Extension
                 $files['xml'][] = $file;
             }
 
-            if ($container->fileExists($dir = $dirname.'/Resources/config/validation')) {
+            if ($container->fileExists($dir = $dirname.'/Resources/config/validation', '/^$/')) {
                 $this->getValidatorMappingFilesFromDir($dir, $files);
             }
         }
@@ -1011,12 +1012,13 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function getValidatorMappingFilesFromConfig(array $config, array &$files)
+    private function getValidatorMappingFilesFromConfig(ContainerBuilder $container, array $config, array &$files)
     {
         foreach ($config['mapping']['paths'] as $path) {
             if (is_dir($path)) {
                 $this->getValidatorMappingFilesFromDir($path, $files);
-            } elseif (is_file($path)) {
+                $container->addResource(new DirectoryResource($path, '/^$/'));
+            } elseif ($container->fileExists($path, false)) {
                 if (preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
                     $extension = $matches[1];
                     $files['yaml' === $extension ? 'yml' : $extension][] = $path;

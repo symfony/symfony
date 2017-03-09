@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinitionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -23,11 +23,13 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class HttpBasicFactory implements SecurityFactoryInterface
 {
+    use ChildDefinitionTrait;
+
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setDefinition($provider, $this->createChildDefinition('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProvider))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
@@ -38,7 +40,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
 
         // listener
         $listenerId = 'security.authentication.listener.basic.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.basic'));
+        $listener = $container->setDefinition($listenerId, $this->createChildDefinition('security.authentication.listener.basic'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($entryPointId));
 
@@ -73,7 +75,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
 
         $entryPointId = 'security.authentication.basic_entry_point.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.basic_entry_point'))
+            ->setDefinition($entryPointId, $this->createChildDefinition('security.authentication.basic_entry_point'))
             ->addArgument($config['realm'])
         ;
 

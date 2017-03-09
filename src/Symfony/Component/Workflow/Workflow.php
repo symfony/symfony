@@ -225,19 +225,21 @@ class Workflow
 
     private function leave($subject, Transition $transition, Marking $marking)
     {
+        $places = $transition->getFroms();
+
         if (null !== $this->dispatcher) {
             $event = new Event($subject, $marking, $transition, $this->name);
 
             $this->dispatcher->dispatch('workflow.leave', $event);
             $this->dispatcher->dispatch(sprintf('workflow.%s.leave', $this->name), $event);
-        }
 
-        foreach ($transition->getFroms() as $place) {
-            $marking->unmark($place);
-
-            if (null !== $this->dispatcher) {
+            foreach ($places as $place) {
                 $this->dispatcher->dispatch(sprintf('workflow.%s.leave.%s', $this->name, $place), $event);
             }
+        }
+
+        foreach ($places as $place) {
+            $marking->unmark($place);
         }
     }
 
@@ -256,19 +258,21 @@ class Workflow
 
     private function enter($subject, Transition $transition, Marking $marking)
     {
+        $places = $transition->getTos();
+
         if (null !== $this->dispatcher) {
             $event = new Event($subject, $marking, $transition, $this->name);
 
             $this->dispatcher->dispatch('workflow.enter', $event);
             $this->dispatcher->dispatch(sprintf('workflow.%s.enter', $this->name), $event);
-        }
 
-        foreach ($transition->getTos() as $place) {
-            $marking->mark($place);
-
-            if (null !== $this->dispatcher) {
+            foreach ($places as $place) {
                 $this->dispatcher->dispatch(sprintf('workflow.%s.enter.%s', $this->name, $place), $event);
             }
+        }
+
+        foreach ($places as $place) {
+            $marking->mark($place);
         }
     }
 

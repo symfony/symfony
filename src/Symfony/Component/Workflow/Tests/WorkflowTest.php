@@ -5,6 +5,7 @@ namespace Symfony\Component\Workflow\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -254,6 +255,41 @@ class WorkflowTest extends TestCase
         $marking = $workflow->apply($subject, 't1');
 
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
+    public function testMarkingStateOnApplyWithEventDispatcher()
+    {
+        $definition = new Definition(range('a', 'f'), array(new Transition('t', range('a', 'c'), range('d', 'f'))));
+
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+
+        $dispatcher = new EventDispatcher();
+
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $dispatcher, 'test');
+
+        $assertInitialState = function (Event $event) {
+            $this->assertEquals(new Marking(array('a' => 1, 'b' => 1, 'c' => 1)), $event->getMarking());
+        };
+        $assertTransitionState = function (Event $event) {
+            $this->assertEquals(new Marking(array()), $event->getMarking());
+        };
+
+        $dispatcher->addListener('workflow.leave', $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave', $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave.a', $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave.b', $assertInitialState);
+        $dispatcher->addListener('workflow.test.leave.c', $assertInitialState);
+        $dispatcher->addListener('workflow.transition', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.transition', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.transition.t', $assertTransitionState);
+        $dispatcher->addListener('workflow.enter', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter.d', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter.e', $assertTransitionState);
+        $dispatcher->addListener('workflow.test.enter.f', $assertTransitionState);
+
+        $workflow->apply($subject, 't');
     }
 
     public function testGetEnabledTransitions()

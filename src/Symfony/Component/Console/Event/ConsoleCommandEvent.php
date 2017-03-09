@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Event;
 
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
+
 /**
  * Allows to do things before the command is executed, like skipping the command or changing the input.
  *
@@ -58,5 +61,109 @@ class ConsoleCommandEvent extends ConsoleEvent
     public function commandShouldRun()
     {
         return $this->commandShouldRun;
+    }
+}
+
+/**
+ * @internal
+ */
+final class InputDecorator implements InputInterface
+{
+    private $inner;
+    private $overriddenArguments = array();
+    private $overriddenOptions = array();
+
+    public function __construct(InputInterface $inner)
+    {
+        $this->inner = $inner;
+    }
+
+    public function setArgument($key, $value)
+    {
+        $this->overriddenArguments[$key] = $value;
+
+        return $this->inner->setArgument($key, $value);
+    }
+
+    public function setOption($key, $value)
+    {
+        $this->overriddenOptions[$key] = $value;
+
+        return $this->inner->setOption($key, $value);
+    }
+
+    public function getOverriddenArguments()
+    {
+        return $this->overriddenArguments;
+    }
+
+    public function getOverriddenOptions()
+    {
+        return $this->overriddenOptions;
+    }
+
+    public function getFirstArgument()
+    {
+        return $this->inner->getFirstArgument();
+    }
+
+    public function hasParameterOption($values)
+    {
+        return $this->inner->hasParameterOption($values);
+    }
+
+    public function getParameterOption($values, $default = false)
+    {
+        return $this->inner->getParameterOption($values, $default);
+    }
+
+    public function bind(InputDefinition $definition)
+    {
+        return $this->inner->bind($definition);
+    }
+
+    public function validate()
+    {
+        return $this->inner->validate();
+    }
+
+    public function getArguments()
+    {
+        return $this->inner->getArguments();
+    }
+
+    public function getArgument($name)
+    {
+        return $this->inner->getArgument($name);
+    }
+
+    public function hasArgument($name)
+    {
+        return $this->inner->hasArgument($name);
+    }
+
+    public function getOptions()
+    {
+        return $this->inner->getOptions();
+    }
+
+    public function getOption($name)
+    {
+        return $this->inner->getOption($name);
+    }
+
+    public function hasOption($name)
+    {
+        return $this->inner->hasOption($name);
+    }
+
+    public function isInteractive()
+    {
+        return $this->inner->isInteractive();
+    }
+
+    public function setInteractive($interactive)
+    {
+        return $this->inner->setInteractive($interactive);
     }
 }

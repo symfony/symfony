@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\DependencyInjection\Tests\Fixtures\Container35;
+namespace Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid;
 
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

@@ -609,7 +609,7 @@ class PhpDumperTest extends TestCase
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dump_proxy_with_void_return_type.php', $dumper->dump());
         $res = $container->getResources();
-        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container35\Foo', (string) array_pop($res));
+        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo', (string) array_pop($res));
     }
 
     /**

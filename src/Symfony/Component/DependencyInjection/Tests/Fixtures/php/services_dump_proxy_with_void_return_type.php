@@ -69,7 +69,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['bar'] = $instance = new \stdClass();
 
-        $instance->foo = array(0 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container35\Foo::withVoid */ function (): void {
+        $instance->foo = array(0 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo::withVoid */ function (): void {
             ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withVoid();
         });
 
@@ -82,10 +82,10 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Container35\Foo A Symfony\Component\DependencyInjection\Tests\Fixtures\Container35\Foo instance
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo A Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo instance
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Container35\Foo();
+        return $this->services['foo'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo();
     }
 }

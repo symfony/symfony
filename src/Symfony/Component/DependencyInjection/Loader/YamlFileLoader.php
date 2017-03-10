@@ -666,7 +666,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException('"!iterator" tag only accepts sequences.');
                 }
 
-                return new IteratorArgument(array_map(array($this, 'resolveServices'), $argument));
+                return new IteratorArgument($this->resolveServices($argument));
             }
             if ('service_locator' === $value->getTag()) {
                 if (!is_array($argument)) {
@@ -679,7 +679,7 @@ class YamlFileLoader extends FileLoader
                     }
                 }
 
-                return new ServiceLocatorArgument(array_map(array($this, 'resolveServices'), $argument));
+                return new ServiceLocatorArgument($this->resolveServices($argument));
             }
             if ('closure_proxy' === $value->getTag()) {
                 if (!is_array($argument) || array(0, 1) !== array_keys($argument) || !is_string($argument[0]) || !is_string($argument[1]) || 0 !== strpos($argument[0], '@') || 0 === strpos($argument[0], '@@')) {

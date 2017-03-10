@@ -27,7 +27,7 @@ class TwigTemplateListenerTest extends TestCase
 
         $event = $this->getEvent($template);
 
-        $twig = $this->getMockBuilder('Twig_Environment')->getMock();
+        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())
             ->method('render')
             ->willReturn('This is dummy content');
@@ -43,7 +43,7 @@ class TwigTemplateListenerTest extends TestCase
 
     public function testInvalidResponse()
     {
-        $twig = $this->getMockBuilder('Twig_Environment')->getMock();
+        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
 
         $template = $this->getMockBuilder(TemplatedResponseInterface::class)->getMock();
         $template->expects($this->once())

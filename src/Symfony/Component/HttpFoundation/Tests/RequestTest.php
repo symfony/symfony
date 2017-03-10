@@ -1264,6 +1264,12 @@ class RequestTest extends TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $this->assertEquals('/path%20test/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '?a=b';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/', $request->getPathInfo());
     }
 
     public function testGetPreferredLanguage()

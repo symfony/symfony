@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\EventListener\TemplateListener;
+use Symfony\Bundle\FrameworkBundle\EventListener\TwigTemplateListener;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponse;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponseInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -27,7 +27,7 @@ class TemplateListenerTest extends TestCase
 
         $event = $this->getEvent($template);
 
-        $listener = new TemplateListener($this->getMockBuilder(\Twig_Environment::class)->getMock());
+        $listener = new TwigTemplateListener($this->getMockBuilder(\Twig_Environment::class)->getMock());
         $listener->onView($event);
 
         $response = $event->getResponse();
@@ -50,7 +50,7 @@ class TemplateListenerTest extends TestCase
 
         $event = $this->getEvent($template);
 
-        $listener = new TemplateListener($twig);
+        $listener = new TwigTemplateListener($twig);
         $listener->onView($event);
     }
 

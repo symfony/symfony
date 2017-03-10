@@ -46,10 +46,5 @@
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
-
-        <service id="templating.listener" class="Symfony\Bundle\FrameworkBundle\EventListener\TemplateListener">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="twig" />
-        </service>
     </services>
 </container>

@@ -181,6 +181,10 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 
+        if ($container->hasDefinition('twig')) {
+            $loader->load('twig.xml');
+        }
+
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);

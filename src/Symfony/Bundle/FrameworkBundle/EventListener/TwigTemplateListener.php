@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @author Pierre du Plessis <pdples@gmail.com>
  */
-class TemplateListener implements EventSubscriberInterface
+class TwigTemplateListener implements EventSubscriberInterface
 {
     private $twig;
 

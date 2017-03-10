@@ -602,12 +602,12 @@ class PhpDumperTest extends TestCase
      */
     public function testClosureProxyWithVoidReturnType()
     {
-        $container = include self::$fixturesPath.'/containers/container35.php';
+        $container = include self::$fixturesPath.'/containers/container_dump_proxy_with_void_return_type.php';
 
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services35.php', $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dump_proxy_with_void_return_type.php', $dumper->dump());
         $res = $container->getResources();
         $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container35\Foo', (string) array_pop($res));
     }

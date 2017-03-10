@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-10T09:29:41Z
+
+please add `@return $this` annotations to instruct IDEs about that
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-10T09:38:44Z
+
+PHPDoc added. Thanks.

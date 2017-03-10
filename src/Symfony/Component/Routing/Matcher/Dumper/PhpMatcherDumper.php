@@ -182,7 +182,7 @@ EOF;
      *
      * @param StaticPrefixCollection $collection           A StaticPrefixCollection instance
      * @param bool                   $supportsRedirections Whether redirections are supported by the base class
-     * @param bool                   $previousItemWasGroup Whether the previous item was a group.
+     * @param string                 $ifOrElseIf           Either "if" or "elseif" to influence chaining.
      *
      * @return string PHP code
      */
@@ -202,7 +202,7 @@ EOF;
                 $code .= $this->compileStaticPrefixRoutes($route, $supportsRedirections, $ifOrElseIf);
                 $ifOrElseIf = 'elseif';
             } else {
-                $code .= $this->compileRoute($route[1]->getRoute(), $route[1]->getName(), $supportsRedirections, $ifOrElseIf, $prefix)."\n";
+                $code .= $this->compileRoute($route[1]->getRoute(), $route[1]->getName(), $supportsRedirections, $prefix)."\n";
                 $ifOrElseIf = 'if';
             }
         }
@@ -228,7 +228,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, $name, $supportsRedirections, $ifOrElseIf, $parentPrefix = null)
+    private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
         $code = '';
         $compiledRoute = $route->compile();

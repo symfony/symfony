@@ -35,17 +35,11 @@ class StaticPrefixCollection
      */
     private $matchStart = 0;
 
-    /**
-     * @param string $prefix
-     */
     public function __construct($prefix = '')
     {
         $this->prefix = $prefix;
     }
 
-    /**
-     * @return string
-     */
     public function getPrefix()
     {
         return $this->prefix;
@@ -202,9 +196,6 @@ class StaticPrefixCollection
         }
     }
 
-    /**
-     * @return bool
-     */
     private function shouldBeInlined()
     {
         if (count($this->items) >= 3) {

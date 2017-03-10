@@ -124,9 +124,10 @@ class Parser
                 if ($isRef) {
                     $this->refs[$isRef] = end($data);
                 }
-            } elseif (self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
-                && (false === strpos($values['key'], ' #')
-                    || in_array($values['key'][0], array('"', "'")))) {
+            } elseif (
+                self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
+                && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))
+            ) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence', $this->currentLineNb + 1, $this->currentLine);
                 }

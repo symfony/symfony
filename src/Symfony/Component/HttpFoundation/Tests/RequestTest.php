@@ -1286,6 +1286,12 @@ class RequestTest extends TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $this->assertEquals('/path%20test/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '?a=b';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/', $request->getPathInfo());
     }
 
     public function testGetParameterPrecedence()
@@ -2187,6 +2193,61 @@ class RequestTest extends TestCase
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_HOST, 'X_FORWARDED_HOST');
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_PORT, 'X_FORWARDED_PORT');
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_PROTO, 'X_FORWARDED_PROTO');
+    }
+
+    public function nonstandardRequestsData()
+    {
+        return array(
+            array('',  '', '/', 'http://host:8080/', ''),
+            array('/', '', '/', 'http://host:8080/', ''),
+
+            array('hello/app.php/x',  '', '/x', 'http://host:8080/hello/app.php/x', '/hello', '/hello/app.php'),
+            array('/hello/app.php/x', '', '/x', 'http://host:8080/hello/app.php/x', '/hello', '/hello/app.php'),
+
+            array('',      'a=b', '/', 'http://host:8080/?a=b'),
+            array('?a=b',  'a=b', '/', 'http://host:8080/?a=b'),
+            array('/?a=b', 'a=b', '/', 'http://host:8080/?a=b'),
+
+            array('x',      'a=b', '/x', 'http://host:8080/x?a=b'),
+            array('x?a=b',  'a=b', '/x', 'http://host:8080/x?a=b'),
+            array('/x?a=b', 'a=b', '/x', 'http://host:8080/x?a=b'),
+
+            array('hello/x',  '', '/x', 'http://host:8080/hello/x', '/hello'),
+            array('/hello/x', '', '/x', 'http://host:8080/hello/x', '/hello'),
+
+            array('hello/app.php/x',      'a=b', '/x', 'http://host:8080/hello/app.php/x?a=b', '/hello', '/hello/app.php'),
+            array('hello/app.php/x?a=b',  'a=b', '/x', 'http://host:8080/hello/app.php/x?a=b', '/hello', '/hello/app.php'),
+            array('/hello/app.php/x?a=b', 'a=b', '/x', 'http://host:8080/hello/app.php/x?a=b', '/hello', '/hello/app.php'),
+        );
+    }
+
+    /**
+     * @dataProvider nonstandardRequestsData
+     */
+    public function testNonstandardRequests($requestUri, $queryString, $expectedPathInfo, $expectedUri, $expectedBasePath = '', $expectedBaseUrl = null)
+    {
+        if (null === $expectedBaseUrl) {
+            $expectedBaseUrl = $expectedBasePath;
+        }
+
+        $server = array(
+            'HTTP_HOST' => 'host:8080',
+            'SERVER_PORT' => '8080',
+            'QUERY_STRING' => $queryString,
+            'PHP_SELF' => '/hello/app.php',
+            'SCRIPT_FILENAME' => '/some/path/app.php',
+            'REQUEST_URI' => $requestUri,
+        );
+
+        $request = new Request(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals($expectedPathInfo, $request->getPathInfo());
+        $this->assertEquals($expectedUri, $request->getUri());
+        $this->assertEquals($queryString, $request->getQueryString());
+        $this->assertEquals(8080, $request->getPort());
+        $this->assertEquals('host:8080', $request->getHttpHost());
+        $this->assertEquals($expectedBaseUrl, $request->getBaseUrl());
+        $this->assertEquals($expectedBasePath, $request->getBasePath());
     }
 }
 

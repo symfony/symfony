@@ -132,8 +132,10 @@ class Caster
 
     public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, $isNested)
     {
-        $stub->class .= '('.$a['__PHP_Incomplete_Class_Name'].')';
-        unset($a['__PHP_Incomplete_Class_Name']);
+        if (isset($a['__PHP_Incomplete_Class_Name'])) {
+            $stub->class .= '('.$a['__PHP_Incomplete_Class_Name'].')';
+            unset($a['__PHP_Incomplete_Class_Name']);
+        }
 
         return $a;
     }

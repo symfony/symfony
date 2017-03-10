@@ -67,11 +67,13 @@ class ExceptionCaster
 
         if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'])) {
             $b = (array) $a[$xPrefix.'previous'];
-            array_unshift($b[$xPrefix.'trace'], array(
-                'function' => 'new '.get_class($a[$xPrefix.'previous']),
-                'file' => $b[$prefix.'file'],
-                'line' => $b[$prefix.'line'],
-            ));
+            if (isset($a[$prefix.'file'], $a[$prefix.'line'])) {
+                array_unshift($b[$xPrefix.'trace'], array(
+                    'function' => 'new '.get_class($a[$xPrefix.'previous']),
+                    'file' => $b[$prefix.'file'],
+                    'line' => $b[$prefix.'line'],
+                ));
+            }
             $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], false, 0, -1 - count($a[$xPrefix.'trace']->value));
         }
 
@@ -234,11 +236,13 @@ class ExceptionCaster
         }
 
         if (!($filter & Caster::EXCLUDE_VERBOSE)) {
-            array_unshift($trace, array(
-                'function' => $xClass ? 'new '.$xClass : null,
-                'file' => $a[Caster::PREFIX_PROTECTED.'file'],
-                'line' => $a[Caster::PREFIX_PROTECTED.'line'],
-            ));
+            if (isset($a[Caster::PREFIX_PROTECTED.'file'], $a[Caster::PREFIX_PROTECTED.'line'])) {
+                array_unshift($trace, array(
+                    'function' => $xClass ? 'new '.$xClass : null,
+                    'file' => $a[Caster::PREFIX_PROTECTED.'file'],
+                    'line' => $a[Caster::PREFIX_PROTECTED.'line'],
+                ));
+            }
             $a[$xPrefix.'trace'] = new TraceStub($trace, self::$traceArgs);
         }
         if (empty($a[$xPrefix.'previous'])) {

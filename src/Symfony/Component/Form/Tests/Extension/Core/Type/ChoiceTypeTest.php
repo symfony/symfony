@@ -2319,7 +2319,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All choices submitted must be NULL or strings.', $form->getTransformationFailure()->getMessage());
+        $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
     }
 
     public function invalidNestedValueTestMatrix()

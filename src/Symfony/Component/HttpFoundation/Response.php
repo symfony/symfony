@@ -392,7 +392,7 @@ class Response
     }
 
       /**
-       * Allows to supress the call to fastcgi_finish_request() on send().
+       * Allows to suppress the call to fastcgi_finish_request() on send().
        *
        * @param bool $allow
        *

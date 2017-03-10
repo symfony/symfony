@@ -144,7 +144,7 @@ class HttpUtilsTest extends TestCase
         // Plus must not decoded to space
         $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo+bar'), '/foo+bar'));
         // Checking unicode
-        $this->assertTrue($utils->checkRequestPath($this->getRequest(urlencode('/вход')), '/вход'));
+        $this->assertTrue($utils->checkRequestPath($this->getRequest('/'.urlencode('вход')), '/вход'));
     }
 
     public function testCheckRequestPathWithUrlMatcherAndResourceNotFound()

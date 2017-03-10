@@ -509,6 +509,88 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_underscore.yml');
     }
+
+    public function testAnonymousServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('anonymous_services.yml');
+
+        $definition = $container->getDefinition('Foo');
+        $this->assertTrue($definition->isAutowired());
+
+        // Anonymous service in an argument
+        $args = $definition->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertInstanceOf(Reference::class, $args[0]);
+        $this->assertTrue($container->has((string) $args[0]));
+        $this->assertStringStartsWith('2', (string) $args[0]);
+
+        $anonymous = $container->getDefinition((string) $args[0]);
+        $this->assertEquals('Bar', $anonymous->getClass());
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertTrue($anonymous->isAutowired());
+
+        // Anonymous service in a callable
+        $factory = $definition->getFactory();
+        $this->assertInternalType('array', $factory);
+        $this->assertInstanceOf(Reference::class, $factory[0]);
+        $this->assertTrue($container->has((string) $factory[0]));
+        $this->assertStringStartsWith('1', (string) $factory[0]);
+        $this->assertEquals('constructFoo', $factory[1]);
+
+        $anonymous = $container->getDefinition((string) $factory[0]);
+        $this->assertEquals('Quz', $anonymous->getClass());
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertFalse($anonymous->isAutowired());
+    }
+
+    public function testAnonymousServicesInInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('anonymous_services_in_instanceof.yml');
+
+        $definition = $container->getDefinition('Dummy');
+
+        $instanceof = $definition->getInstanceofConditionals();
+        $this->assertCount(3, $instanceof);
+        $this->assertArrayHasKey('DummyInterface', $instanceof);
+
+        $args = $instanceof['DummyInterface']->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertInstanceOf(Reference::class, $args[0]);
+        $this->assertTrue($container->has((string) $args[0]));
+
+        $anonymous = $container->getDefinition((string) $args[0]);
+        $this->assertEquals('Anonymous', $anonymous->getClass());
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertEmpty($anonymous->getInstanceofConditionals());
+
+        $this->assertFalse($container->has('Bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Creating an alias using the tag "!service" is not allowed in "anonymous_services_alias.yml".
+     */
+    public function testAnonymousServicesWithAliases()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('anonymous_services_alias.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Using an anonymous service in a parameter is not allowed in "anonymous_services_in_parameters.yml".
+     */
+    public function testAnonymousServicesInParameters()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('anonymous_services_in_parameters.yml');
+    }
 }
 
 interface FooInterface

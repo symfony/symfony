@@ -31,8 +31,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 /**
  * YamlFileLoader loads YAML files service definitions.
  *
- * The YAML format does not support anonymous services (cf. the XML loader).
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlFileLoader extends FileLoader
@@ -107,6 +105,8 @@ class YamlFileLoader extends FileLoader
 
     private $yamlParser;
 
+    private $anonymousServicesCount;
+
     /**
      * {@inheritdoc}
      */
@@ -133,7 +133,7 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($content['parameters'] as $key => $value) {
-                $this->container->setParameter($key, $this->resolveServices($value));
+                $this->container->setParameter($key, $this->resolveServices($value, $resource, true));
             }
         }
 
@@ -141,6 +141,7 @@ class YamlFileLoader extends FileLoader
         $this->loadFromExtensions($content);
 
         // services
+        $this->anonymousServicesCount = 0;
         $this->setCurrentDir(dirname($path));
         try {
             $this->parseDefinitions($content, $resource);
@@ -416,11 +417,11 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['arguments'])) {
-            $definition->setArguments($this->resolveServices($service['arguments']));
+            $definition->setArguments($this->resolveServices($service['arguments'], $file));
         }
 
         if (isset($service['properties'])) {
-            $definition->setProperties($this->resolveServices($service['properties']));
+            $definition->setProperties($this->resolveServices($service['properties'], $file));
         }
 
         if (isset($service['configurator'])) {
@@ -428,7 +429,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['getters'])) {
-            $definition->setOverriddenGetters($this->resolveServices($service['getters']));
+            $definition->setOverriddenGetters($this->resolveServices($service['getters'], $file));
         }
 
         if (isset($service['calls'])) {
@@ -439,10 +440,10 @@ class YamlFileLoader extends FileLoader
             foreach ($service['calls'] as $call) {
                 if (isset($call['method'])) {
                     $method = $call['method'];
-                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file) : array();
                 } else {
                     $method = $call[0];
-                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                    $args = isset($call[1]) ? $this->resolveServices($call[1], $file) : array();
                 }
 
                 $definition->addMethodCall($method, $args);
@@ -553,7 +554,7 @@ class YamlFileLoader extends FileLoader
             if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
                 $parts = explode(':', $callable);
 
-                return array($this->resolveServices('@'.$parts[0]), $parts[1]);
+                return array($this->resolveServices('@'.$parts[0], $file), $parts[1]);
             }
 
             return $callable;
@@ -561,7 +562,7 @@ class YamlFileLoader extends FileLoader
 
         if (is_array($callable)) {
             if (isset($callable[0]) && isset($callable[1])) {
-                return array($this->resolveServices($callable[0]), $callable[1]);
+                return array($this->resolveServices($callable[0], $file), $callable[1]);
             }
 
             if ('factory' === $parameter && isset($callable[1]) && null === $callable[0]) {
@@ -653,11 +654,13 @@ class YamlFileLoader extends FileLoader
     /**
      * Resolves services.
      *
-     * @param mixed $value
+     * @param mixed  $value
+     * @param string $file
+     * @param bool   $isParameter
      *
      * @return array|string|Reference|ArgumentInterface
      */
-    private function resolveServices($value)
+    private function resolveServices($value, $file, $isParameter = false)
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
@@ -666,7 +669,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException('"!iterator" tag only accepts sequences.');
                 }
 
-                return new IteratorArgument($this->resolveServices($argument));
+                return new IteratorArgument($this->resolveServices($argument, $file, $isParameter));
             }
             if ('service_locator' === $value->getTag()) {
                 if (!is_array($argument)) {
@@ -679,7 +682,7 @@ class YamlFileLoader extends FileLoader
                     }
                 }
 
-                return new ServiceLocatorArgument($this->resolveServices($argument));
+                return new ServiceLocatorArgument($this->resolveServices($argument, $file, $isParameter));
             }
             if ('closure_proxy' === $value->getTag()) {
                 if (!is_array($argument) || array(0, 1) !== array_keys($argument) || !is_string($argument[0]) || !is_string($argument[1]) || 0 !== strpos($argument[0], '@') || 0 === strpos($argument[0], '@@')) {
@@ -696,12 +699,38 @@ class YamlFileLoader extends FileLoader
 
                 return new ClosureProxyArgument($argument[0], $argument[1], $invalidBehavior);
             }
+            if ('service' === $value->getTag()) {
+                if ($isParameter) {
+                    throw new InvalidArgumentException(sprintf('Using an anonymous service in a parameter is not allowed in "%s".', $file));
+                }
+
+                $isLoadingInstanceof = $this->isLoadingInstanceof;
+                $this->isLoadingInstanceof = false;
+                $instanceof = $this->instanceof;
+                $this->instanceof = array();
+
+                $id = sprintf('%d_%s', ++$this->anonymousServicesCount, hash('sha256', $file));
+                $this->parseDefinition($id, $argument, $file, array());
+
+                if (!$this->container->hasDefinition($id)) {
+                    throw new InvalidArgumentException(sprintf('Creating an alias using the tag "!service" is not allowed in "%s".', $file));
+                }
+
+                $this->container->getDefinition($id)->setPublic(false);
+
+                $this->isLoadingInstanceof = $isLoadingInstanceof;
+                $this->instanceof = $instanceof;
+
+                return new Reference($id);
+            }
 
             throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));
         }
 
         if (is_array($value)) {
-            $value = array_map(array($this, 'resolveServices'), $value);
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->resolveServices($v, $file, $isParameter);
+            }
         } elseif (is_string($value) && 0 === strpos($value, '@=')) {
             return new Expression(substr($value, 2));
         } elseif (is_string($value) && 0 === strpos($value, '@')) {

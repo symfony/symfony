@@ -598,7 +598,7 @@ class PhpDumperTest extends TestCase
     }
 
     /**
-     * @requires PHP 7.0
+     * @requires PHP 7.1
      */
     public function testClosureProxyWithVoidReturnType()
     {

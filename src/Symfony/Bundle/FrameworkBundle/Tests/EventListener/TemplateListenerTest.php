@@ -12,19 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\EventListener;
 
 use Symfony\Bundle\FrameworkBundle\EventListener\TemplateListener;
-use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponse;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponseInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Templating\Loader\Loader;
-use Symfony\Component\Templating\Storage\StringStorage;
-use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class TemplateListenerTest extends TestCase
 {
@@ -34,7 +27,7 @@ class TemplateListenerTest extends TestCase
 
         $event = $this->getEvent($template);
 
-        $listener = new TemplateListener($this->getPhpEngine());
+        $listener = new TemplateListener($this->getMockBuilder(\Twig_Environment::class)->getMock());
         $listener->onView($event);
 
         $response = $event->getResponse();
@@ -45,19 +38,19 @@ class TemplateListenerTest extends TestCase
 
     public function testInvalidResponse()
     {
-        $templating = $this->getPhpEngine();
+        $twig = $this->getMockBuilder(\Twig_Environment::class)->getMock();
 
         $template = $this->getMockBuilder(TemplatedResponseInterface::class)->getMock();
         $template->expects($this->once())
             ->method('getResponse')
-            ->with($templating)
+            ->with($twig)
             ->will($this->throwException(new \LogicException()));
 
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('LogicException');
 
         $event = $this->getEvent($template);
 
-        $listener = new TemplateListener($templating);
+        $listener = new TemplateListener($twig);
         $listener->onView($event);
     }
 
@@ -67,42 +60,5 @@ class TemplateListenerTest extends TestCase
         $mockKernel = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\Kernel', array('', ''));
 
         return new GetResponseForControllerResultEvent($mockKernel, $request, Kernel::MASTER_REQUEST, $template);
-    }
-
-    private function getPhpEngine()
-    {
-        $container = new Container();
-        $loader = new ProjectTemplateLoader();
-
-        $loader->templates['dummy_template.html.php'] = 'This is <?= $var ?> content';
-
-        $engine = new PhpEngine(new TemplateNameParser(), $container, $loader);
-
-        return $engine;
-    }
-}
-
-class ProjectTemplateLoader extends Loader
-{
-    public $templates = array();
-
-    public function setTemplate($name, $content)
-    {
-        $template = new TemplateReference($name, 'php');
-        $this->templates[$template->getLogicalName()] = $content;
-    }
-
-    public function load(TemplateReferenceInterface $template)
-    {
-        if (isset($this->templates[$template->getLogicalName()])) {
-            return new StringStorage($this->templates[$template->getLogicalName()]);
-        }
-
-        return false;
-    }
-
-    public function isFresh(TemplateReferenceInterface $template, $time)
-    {
-        return false;
     }
 }

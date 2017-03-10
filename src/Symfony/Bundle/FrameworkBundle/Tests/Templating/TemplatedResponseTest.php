@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponse;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,29 +19,29 @@ class TemplatedResponseTest extends TestCase
 {
     public function testResponse()
     {
-        $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
+        $templating = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
 
         $templating->expects($this->once())
-            ->method('renderResponse')
-            ->with('dummy_template.html.php', array('var' => 'dummy'))
+            ->method('render')
+            ->with('dummy_template.html.twig', array('var' => 'dummy'))
             ->will($this->returnValue(new Response()));
 
-        $templateResponse = new TemplatedResponse('dummy_template.html.php', array('var' => 'dummy'));
+        $templateResponse = new TemplatedResponse('dummy_template.html.twig', array('var' => 'dummy'));
 
         $this->assertInstanceOf(Response::class, $templateResponse->getResponse($templating));
     }
 
     public function testSameResponse()
     {
-        $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
+        $templating = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
 
         $response = new Response();
         $templating->expects($this->once())
-            ->method('renderResponse')
-            ->with('dummy_template.html.php', array('var' => 'dummy'))
+            ->method('render')
+            ->with('dummy_template.html.twig', array('var' => 'dummy'))
             ->will($this->returnValue($response));
 
-        $templateResponse = new TemplatedResponse('dummy_template.html.php', array('var' => 'dummy'), $response);
+        $templateResponse = new TemplatedResponse('dummy_template.html.twig', array('var' => 'dummy'), $response);
 
         $this->assertSame($response, $templateResponse->getResponse($templating));
     }

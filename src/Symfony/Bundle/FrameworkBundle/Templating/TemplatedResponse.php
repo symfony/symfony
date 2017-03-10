@@ -32,8 +32,10 @@ class TemplatedResponse implements TemplatedResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function getResponse(EngineInterface $templating)
+    public function getResponse(\Twig_Environment $twig)
     {
-        return $templating->renderResponse($this->template, $this->parameters, $this->response);
+        $this->response->setContent($twig->render($this->template, $this->parameters));
+
+        return $this->response;
     }
 }

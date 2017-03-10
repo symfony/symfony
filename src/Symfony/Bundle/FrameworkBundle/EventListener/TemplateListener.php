@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplatedResponseInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,11 +22,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class TemplateListener implements EventSubscriberInterface
 {
-    private $templating;
+    private $twig;
 
-    public function __construct(EngineInterface $templating)
+    public function __construct(\Twig_Environment $twig)
     {
-        $this->templating = $templating;
+        $this->twig = $twig;
     }
 
     public static function getSubscribedEvents()
@@ -45,7 +44,7 @@ class TemplateListener implements EventSubscriberInterface
             return;
         }
 
-        $response = $result->getResponse($this->templating);
+        $response = $result->getResponse($this->twig);
 
         if (!$response instanceof Response) {
             $msg = sprintf('The method %s::getResponse() must return a response (%s given).', get_class($result), is_object($response) ? get_class($response) : gettype($response));

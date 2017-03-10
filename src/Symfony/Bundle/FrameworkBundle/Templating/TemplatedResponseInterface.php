@@ -19,9 +19,9 @@ use Symfony\Component\HttpFoundation\Response;
 interface TemplatedResponseInterface
 {
     /**
-     * @param EngineInterface $templating
+     * @param \Twig_Environment $twig
      *
      * @return Response
      */
-    public function getResponse(EngineInterface $templating);
+    public function getResponse(\Twig_Environment $twig);
 }

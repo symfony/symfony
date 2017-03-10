@@ -8,8 +8,6 @@ CHANGELOG
  * Deprecated the special `SYMFONY__` environment variables
  * added the possibility to change the query string parameter used by `UriSigner`
  * deprecated `LazyLoadingFragmentHandler::addRendererService()`
- * added `SessionListener`
- * added `TestSessionListener`
 
 3.2.0
 -----

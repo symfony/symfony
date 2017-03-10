@@ -603,13 +603,19 @@ class ProgressBar
         };
         $line = preg_replace_callback($regex, $callback, $this->format);
 
-        $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
+        // gets string length for each sub line with multiline format
+        $linesLength = array_map(function ($subLine) {
+            return Helper::strlenWithoutDecoration($this->output->getFormatter(), rtrim($subLine, "\r"));
+        }, explode("\n", $line));
+
+        $linesWidth = max($linesLength);
+
         $terminalWidth = $this->terminal->getWidth();
-        if ($lineLength <= $terminalWidth) {
+        if ($linesWidth <= $terminalWidth) {
             return $line;
         }
 
-        $this->setBarWidth($this->barWidth - $lineLength + $terminalWidth);
+        $this->setBarWidth($this->barWidth - $linesWidth + $terminalWidth);
 
         return preg_replace_callback($regex, $callback, $this->format);
     }

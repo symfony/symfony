@@ -227,11 +227,7 @@ class StaticPrefixCollection
     private function guardAgainstAddingNotAcceptedRoutes($prefix)
     {
         if (!$this->accepts($prefix)) {
-            $message = sprintf(
-                'Could not add route with prefix %s to collection with prefix %s',
-                $prefix,
-                $this->prefix
-            );
+            $message = sprintf('Could not add route with prefix %s to collection with prefix %s', $prefix, $this->prefix);
 
             throw new \LogicException($message);
         }

@@ -114,7 +114,7 @@ class Response
     /**
      * @var bool
      */
-    private $allowEarlyFastCGIFinishRequest = TRUE;
+    private $allowEarlyFastCGIFinishRequest = true;
 
     /**
      * Status codes translation table.
@@ -391,13 +391,13 @@ class Response
         return $this;
     }
 
-    /**
-     * Allows to supress the call to fastcgi_finish_request() on send().
-     *
-     * @param bool $allow
-     *
-     * @return $this
-     */
+      /**
+       * Allows to supress the call to fastcgi_finish_request() on send().
+       *
+       * @param bool $allow
+       *
+       * @return $this
+       */
       public function allowEarlyFastcgiFinishRequest($allow)
       {
           $this->allowEarlyFastCGIFinishRequest = $allow;

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Kernel;
 
-class TemplateListenerTest extends TestCase
+class TwigTemplateListenerTest extends TestCase
 {
     public function testTemplateReference()
     {
@@ -27,7 +27,12 @@ class TemplateListenerTest extends TestCase
 
         $event = $this->getEvent($template);
 
-        $listener = new TwigTemplateListener($this->getMockBuilder(\Twig_Environment::class)->getMock());
+        $twig = $this->getMockBuilder('Twig_Environment')->getMock();
+        $twig->expects($this->once())
+            ->method('render')
+            ->willReturn('This is dummy content');
+
+        $listener = new TwigTemplateListener($twig);
         $listener->onView($event);
 
         $response = $event->getResponse();
@@ -38,7 +43,7 @@ class TemplateListenerTest extends TestCase
 
     public function testInvalidResponse()
     {
-        $twig = $this->getMockBuilder(\Twig_Environment::class)->getMock();
+        $twig = $this->getMockBuilder('Twig_Environment')->getMock();
 
         $template = $this->getMockBuilder(TemplatedResponseInterface::class)->getMock();
         $template->expects($this->once())

@@ -19,7 +19,7 @@ class TemplatedResponseTest extends TestCase
 {
     public function testResponse()
     {
-        $templating = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $templating = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
 
         $templating->expects($this->once())
             ->method('render')
@@ -33,7 +33,7 @@ class TemplatedResponseTest extends TestCase
 
     public function testSameResponse()
     {
-        $templating = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $templating = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
 
         $response = new Response();
         $templating->expects($this->once())

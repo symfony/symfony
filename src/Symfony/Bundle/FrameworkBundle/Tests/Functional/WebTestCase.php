@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Kernel;
 
 class WebTestCase extends BaseWebTestCase
 {
@@ -23,9 +22,19 @@ class WebTestCase extends BaseWebTestCase
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
-    protected function deleteTmpDir($testCase)
+    public static function setUpBeforeClass()
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
+        static::deleteTmpDir();
+    }
+
+    public static function tearDownAfterClass()
+    {
+        static::deleteTmpDir();
+    }
+
+    protected static function deleteTmpDir()
+    {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
             return;
         }
 
@@ -49,10 +58,16 @@ class WebTestCase extends BaseWebTestCase
         }
 
         return new $class(
+            static::getVarDir(),
             $options['test_case'],
             isset($options['root_config']) ? $options['root_config'] : 'config.yml',
-            isset($options['environment']) ? $options['environment'] : 'frameworkbundletest'.strtolower($options['test_case']),
+            isset($options['environment']) ? $options['environment'] : strtolower(static::getVarDir().$options['test_case']),
             isset($options['debug']) ? $options['debug'] : true
         );
+    }
+
+    protected static function getVarDir()
+    {
+        return substr(strrchr(get_called_class(), '\\'), 1);
     }
 }

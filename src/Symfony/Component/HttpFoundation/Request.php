@@ -1320,7 +1320,15 @@ class Request
             static::initializeFormats();
         }
 
-        return isset(static::$formats[$format]) ? static::$formats[$format][0] : null;
+        if (!isset(static::$formats[$format])) {
+            return null;
+        }
+
+        if (in_array($this->headers->get('Accept'), static::$formats[$format], true)) {
+            return $this->headers->get('Accept');
+        }
+
+        return static::$formats[$format][0];
     }
 
     /**

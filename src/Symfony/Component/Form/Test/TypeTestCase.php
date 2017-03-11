@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Test;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 abstract class TypeTestCase extends FormIntegrationTestCase
 {
@@ -39,13 +39,8 @@ abstract class TypeTestCase extends FormIntegrationTestCase
     {
         $extensions = array();
 
-        if (interface_exists('Symfony\Component\Validator\Validator\ValidatorInterface')) {
-            $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
-            $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
-            $validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
-            $validator->expects($this->any())->method('validate')->will($this->returnValue(array()));
-
-            $extensions[] = new ValidatorExtension($validator);
+        if (in_array(ValidatorExtensionTrait::class, class_uses($this))) {
+            $extensions[] = $this->getValidatorExtension();
         }
 
         return $extensions;

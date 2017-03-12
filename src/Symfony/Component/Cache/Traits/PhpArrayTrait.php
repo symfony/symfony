@@ -101,7 +101,7 @@ EOF;
         $tmpFile = uniqid($this->file, true);
 
         file_put_contents($tmpFile, $dump);
-        @chmod($tmpFile, 0666);
+        @chmod($tmpFile, 0666 & ~umask());
         unset($serialized, $unserialized, $value, $dump);
 
         @rename($tmpFile, $this->file);

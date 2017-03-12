@@ -167,8 +167,8 @@ class ChoiceType extends AbstractType
             }
 
             foreach ($data as $v) {
-                if (null !== $v && !is_string($v)) {
-                    throw new TransformationFailedException('All choices submitted must be NULL or strings.');
+                if (null !== $v && !is_string($v) && !is_int($v)) {
+                    throw new TransformationFailedException('All choices submitted must be NULL, strings or ints.');
                 }
             }
         }, 256);

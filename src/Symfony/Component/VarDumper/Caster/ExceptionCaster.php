@@ -65,15 +65,13 @@ class ExceptionCaster
         $prefix = Caster::PREFIX_PROTECTED;
         $xPrefix = "\0Exception\0";
 
-        if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'])) {
+        if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace']) && $a[$xPrefix.'previous'] instanceof \Exception) {
             $b = (array) $a[$xPrefix.'previous'];
-            if (isset($a[$prefix.'file'], $a[$prefix.'line'])) {
-                array_unshift($b[$xPrefix.'trace'], array(
-                    'function' => 'new '.get_class($a[$xPrefix.'previous']),
-                    'file' => $b[$prefix.'file'],
-                    'line' => $b[$prefix.'line'],
-                ));
-            }
+            array_unshift($b[$xPrefix.'trace'], array(
+                'function' => 'new '.get_class($a[$xPrefix.'previous']),
+                'file' => $b[$prefix.'file'],
+                'line' => $b[$prefix.'line'],
+            ));
             $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], false, 0, -1 - count($a[$xPrefix.'trace']->value));
         }
 

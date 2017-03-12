@@ -1698,6 +1698,19 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
+    public function testSubmitMultipleChoicesInts()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => true,
+            'choices' => array_flip($this->numericChoicesFlipped),
+            'choices_as_values' => true,
+        ));
+
+        $form->submit(array(1, 2));
+
+        $this->assertTrue($form->isSynchronized());
+    }
+
     public function testSingleSelectedObjectChoices()
     {
         $view = $this->factory->create(static::TESTED_TYPE, $this->objectChoices[3], array(
@@ -2315,7 +2328,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All choices submitted must be NULL or strings.', $form->getTransformationFailure()->getMessage());
+        $this->assertEquals('All choices submitted must be NULL, strings or ints.', $form->getTransformationFailure()->getMessage());
     }
 
     public function invalidNestedValueTestMatrix()

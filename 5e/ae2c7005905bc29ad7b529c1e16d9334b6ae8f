@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-11T19:28:52Z
+
+To me, it should be ok to change even when a protected property is involved: existing code won't break all of a sudden because of the less restrictive type hint. In any doubt, just to it in another PR to have this one merged earlier is this needs to be discussed.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-03-11T19:47:17Z
+
+Alright, will do it in separate PR.
+
+Also I didn't bother with deprecated classes like ContainerAwareEventDispatcher.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-03-12T09:24:25Z
+
+@GuilhemN Like this?

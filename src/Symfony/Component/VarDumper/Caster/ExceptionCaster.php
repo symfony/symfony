@@ -64,7 +64,7 @@ class ExceptionCaster
         $prefix = Caster::PREFIX_PROTECTED;
         $xPrefix = "\0Exception\0";
 
-        if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'][0])) {
+        if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'][0]) && $a[$xPrefix.'previous'] instanceof \Exception) {
             $b = (array) $a[$xPrefix.'previous'];
             $b[$xPrefix.'trace'][0] += array(
                 'file' => $b[$prefix.'file'],

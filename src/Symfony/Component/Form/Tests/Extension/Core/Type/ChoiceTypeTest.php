@@ -1372,7 +1372,6 @@ class ChoiceTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'choices' => array_flip($this->numericChoicesFlipped),
-            'choices_as_values' => true,
         ));
 
         $form->submit(array(1, 2));

@@ -61,6 +61,7 @@ class StaticPrefixCollection
      */
     public function addRoute($prefix, $route)
     {
+        $prefix = '/' === $prefix ? $prefix : rtrim($prefix, '/');
         $this->guardAgainstAddingNotAcceptedRoutes($prefix);
 
         if ($this->prefix === $prefix) {
@@ -166,7 +167,7 @@ class StaticPrefixCollection
         $commonPrefix = rtrim(substr($prefix, 0, $commonLength), '/');
 
         if (strlen($commonPrefix) > $baseLength) {
-            return substr($prefix, 0, $commonLength);
+            return $commonPrefix;
         }
 
         return false;

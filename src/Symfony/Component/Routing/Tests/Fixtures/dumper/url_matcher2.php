@@ -173,7 +173,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        elseif (0 === strpos($pathinfo, '/multi/')) {
+        elseif (0 === strpos($pathinfo, '/multi')) {
             // helloWorld
             if (0 === strpos($pathinfo, '/multi/hello') && preg_match('#^/multi/hello(?:/(?P<who>[^/]++))?$#s', $pathinfo, $matches)) {
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'helloWorld')), array (  'who' => 'World!',));

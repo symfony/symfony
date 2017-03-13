@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RequestContext;
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */
-class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
+class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher
 {
     /**
      * Constructor.
@@ -35,7 +35,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
 
-        if (0 === strpos($pathinfo, '/a/')) {
+        if (0 === strpos($pathinfo, '/a')) {
             // a_first
             if ('/a/11' === $pathinfo) {
                 return array('_route' => 'a_first');
@@ -58,19 +58,31 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return $this->mergeDefaults(array_replace($matches, array('_route' => 'a_wildcard')), array ());
         }
 
-        if (0 === strpos($pathinfo, '/a/')) {
+        if (0 === strpos($pathinfo, '/a')) {
             // a_fourth
-            if ('/a/44' === $pathinfo) {
+            if ('/a/44' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'a_fourth');
+                }
+
                 return array('_route' => 'a_fourth');
             }
 
             // a_fifth
-            if ('/a/55' === $pathinfo) {
+            if ('/a/55' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'a_fifth');
+                }
+
                 return array('_route' => 'a_fifth');
             }
 
             // a_sixth
-            if ('/a/66' === $pathinfo) {
+            if ('/a/66' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'a_sixth');
+                }
+
                 return array('_route' => 'a_sixth');
             }
 
@@ -81,20 +93,62 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return $this->mergeDefaults(array_replace($matches, array('_route' => 'nested_wildcard')), array ());
         }
 
-        if (0 === strpos($pathinfo, '/nested/group/')) {
+        if (0 === strpos($pathinfo, '/nested/group')) {
             // nested_a
-            if ('/nested/group/a/' === $pathinfo) {
+            if ('/nested/group/a' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'nested_a');
+                }
+
                 return array('_route' => 'nested_a');
             }
 
             // nested_b
-            if ('/nested/group/b/' === $pathinfo) {
+            if ('/nested/group/b' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'nested_b');
+                }
+
                 return array('_route' => 'nested_b');
             }
 
             // nested_c
-            if ('/nested/group/c/' === $pathinfo) {
+            if ('/nested/group/c' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'nested_c');
+                }
+
                 return array('_route' => 'nested_c');
+            }
+
+        }
+
+        elseif (0 === strpos($pathinfo, '/slashed/group')) {
+            // slashed_a
+            if ('/slashed/group' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'slashed_a');
+                }
+
+                return array('_route' => 'slashed_a');
+            }
+
+            // slashed_b
+            if ('/slashed/group/b' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'slashed_b');
+                }
+
+                return array('_route' => 'slashed_b');
+            }
+
+            // slashed_c
+            if ('/slashed/group/c' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'slashed_c');
+                }
+
+                return array('_route' => 'slashed_c');
             }
 
         }

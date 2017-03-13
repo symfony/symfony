@@ -163,7 +163,9 @@ class StaticPrefixCollection
             $commonLength = $i;
         }
 
-        if ($commonLength > $baseLength) {
+        $commonPrefix = trim(substr($prefix, 0, $commonLength), '/');
+
+        if (strlen($commonPrefix) > $baseLength) {
             return substr($prefix, 0, $commonLength);
         }
 

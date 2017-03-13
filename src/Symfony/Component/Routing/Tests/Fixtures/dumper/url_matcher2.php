@@ -306,14 +306,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             return array('_route' => 'route17');
         }
 
-        // a
-        if ('/a/a...' === $pathinfo) {
-            return array('_route' => 'a');
-        }
+        if (0 === strpos($pathinfo, '/a/')) {
+            // a
+            if ('/a/a...' === $pathinfo) {
+                return array('_route' => 'a');
+            }
 
-        if (0 === strpos($pathinfo, '/a/b')) {
             // b
-            if (preg_match('#^/a/b/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
+            if (0 === strpos($pathinfo, '/a/b') && preg_match('#^/a/b/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'b')), array ());
             }
 

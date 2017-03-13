@@ -109,8 +109,9 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
     /**
      * Loads the given template.
      *
-     * @param string|TemplateReferenceInterface|\Twig_Template $name A template name or an instance of
-     *                                                               TemplateReferenceInterface or \Twig_Template
+     * @param string|TemplateReferenceInterface|\Twig_Template|array $name A template name or an instance of
+     *                                                                     TemplateReferenceInterface or \Twig_Template or
+     *                                                                     an array of thoses.
      *
      * @return \Twig_Template A \Twig_Template instance
      *
@@ -123,7 +124,9 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
         }
 
         try {
-            return $this->environment->loadTemplate((string) $name);
+            return $this->environment->resolveTemplate(
+                is_array($name) ? $name : (string) $name
+            );
         } catch (\Twig_Error_Loader $e) {
             throw new \InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }

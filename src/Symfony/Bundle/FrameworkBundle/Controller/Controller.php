@@ -202,8 +202,8 @@ abstract class Controller implements ContainerAwareInterface
     /**
      * Returns a rendered view.
      *
-     * @param string $view       The view name
-     * @param array  $parameters An array of parameters to pass to the view
+     * @param string|array $view       The view name or an array of view names.
+     * @param array        $parameters An array of parameters to pass to the view
      *
      * @return string The rendered view
      */
@@ -223,9 +223,9 @@ abstract class Controller implements ContainerAwareInterface
     /**
      * Renders a view.
      *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A response instance
+     * @param string|array   $view       The view name or an array of view names.
+     * @param array          $parameters An array of parameters to pass to the view
+     * @param Response       $response   A response instance
      *
      * @return Response A Response instance
      */

@@ -33,8 +33,8 @@ interface EngineInterface
     /**
      * Renders a template.
      *
-     * @param string|TemplateReferenceInterface $name       A template name or a TemplateReferenceInterface instance
-     * @param array                             $parameters An array of parameters to pass to the template
+     * @param string|TemplateReferenceInterface|array $name       A template name or a TemplateReferenceInterface instance or an array of view names.
+     * @param array                                   $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
@@ -56,7 +56,7 @@ interface EngineInterface
     /**
      * Returns true if this class is able to render the given template.
      *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface|array $name A template name or a TemplateReferenceInterface instance or an array of thoses.
      *
      * @return bool true if this class supports the given template, false otherwise
      */

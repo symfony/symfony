@@ -52,6 +52,7 @@ class TwigEngineTest extends TestCase
     {
         $engine = $this->getTwig();
 
+        $this->assertSame('foo', $engine->render(array('foo', 'index')));
         $this->assertSame('foo', $engine->render('index'));
         $this->assertSame('foo', $engine->render(new TemplateReference('index')));
     }

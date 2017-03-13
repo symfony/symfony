@@ -34,6 +34,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
+use Symfony\Component\HttpKernel\Exception\MethodNotImplementedException;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -549,6 +550,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'namespace' => $bundle->getNamespace(),
             );
         }
+        try {
+            $hasLogDir = true;
+            $logDir = realpath($this->getLogDir()) ?: $this->getLogDir();
+        } catch (MethodNotImplementedException $e) {
+            $hasLogDir = false;
+        }
 
         return array_merge(
             array(
@@ -557,12 +564,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.debug' => $this->debug,
                 'kernel.name' => $this->name,
                 'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
-                'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
                 'kernel.bundles' => $bundles,
                 'kernel.bundles_metadata' => $bundlesMetadata,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
+            $hasLogDir ? array('kernel.logs_dir' => $logDir) : array(),
             $this->getEnvParameters()
         );
     }
@@ -595,7 +602,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function buildContainer()
     {
-        foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
+        $dirs = array('cache' => $this->getCacheDir());
+        try {
+            $dirs['logs'] = $this->getLogDir();
+        } catch (MethodNotImplementedException $e) {
+        }
+        foreach ($dirs as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
                     throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));

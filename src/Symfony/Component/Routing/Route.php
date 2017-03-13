@@ -475,7 +475,10 @@ class Route implements \Serializable
     public function addRequirements(array $requirements)
     {
         foreach ($requirements as $key => $regex) {
-            $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+            if (is_string($regex)) {
+                $regex = $this->sanitizeRequirement($key, $regex);
+            }
+            $this->requirements[$key] = $regex;
         }
         $this->compiled = null;
 
@@ -516,7 +519,10 @@ class Route implements \Serializable
      */
     public function setRequirement($key, $regex)
     {
-        $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+        if (is_string($regex)) {
+            $regex = $this->sanitizeRequirement($key, $regex);
+        }
+        $this->requirements[$key] = $regex;
         $this->compiled = null;
 
         return $this;
@@ -572,10 +578,6 @@ class Route implements \Serializable
 
     private function sanitizeRequirement($key, $regex)
     {
-        if (!is_string($regex)) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
-        }
-
         if ('' !== $regex && '^' === $regex[0]) {
             $regex = (string) substr($regex, 1); // returns false for a single character
         }

@@ -61,6 +61,13 @@ class PhpMatcherDumperTest extends TestCase
             array('def' => 'test'),
             array('bar' => 'baz|symfony')
         ));
+
+        // requirements which aren't strings.
+        $collection->add('foo_with_boolean_requirement', new Route(
+            '/foo/{bar}',
+            array('bar' => TRUE)
+        ));
+
         // method requirement
         $collection->add('bar', new Route(
             '/bar/{foo}',

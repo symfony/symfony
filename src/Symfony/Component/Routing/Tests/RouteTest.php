@@ -136,10 +136,29 @@ class RouteTest extends TestCase
     {
         return array(
            array(''),
-           array(array()),
            array('^$'),
            array('^'),
            array('$'),
+        );
+    }
+
+    /**
+     * @dataProvider getValidRequirements
+     */
+    public function testSetValid($req)
+    {
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', $req);
+        $this->assertEquals($req, $route->getRequirement('foo'));
+    }
+
+    public function getValidRequirements()
+    {
+        return array(
+            array(true),
+            array(false),
+            array(314),
+            array(array('key' => 'value')),
         );
     }
 

@@ -35,9 +35,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
 
-        // foo
-        if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo')), array (  'def' => 'test',));
+        if (0 === strpos($pathinfo, '/foo')) {
+            // foo
+            if (preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo')), array (  'def' => 'test',));
+            }
+
+            // foo_with_boolean_requirement
+            if (preg_match('#^/foo(?:/(?P<bar>[^/]++))?$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo_with_boolean_requirement')), array (  'bar' => true,));
+            }
+
         }
 
         if (0 === strpos($pathinfo, '/bar')) {

@@ -294,14 +294,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array('_route' => 'route17');
         }
 
-        if (0 === strpos($pathinfo, '/a/')) {
-            // a
-            if ('/a/a...' === $pathinfo) {
-                return array('_route' => 'a');
-            }
+        // a
+        if ('/a/a...' === $pathinfo) {
+            return array('_route' => 'a');
+        }
 
+        if (0 === strpos($pathinfo, '/a/b')) {
             // b
-            if (0 === strpos($pathinfo, '/a/b') && preg_match('#^/a/b/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
+            if (preg_match('#^/a/b/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'b')), array ());
             }
 

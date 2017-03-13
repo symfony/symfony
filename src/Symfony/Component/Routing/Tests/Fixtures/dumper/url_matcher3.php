@@ -35,7 +35,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
 
-        if (0 === strpos($pathinfo, '/rootprefix/')) {
+        if (0 === strpos($pathinfo, '/rootprefix')) {
             // static
             if ('/rootprefix/test' === $pathinfo) {
                 return array('_route' => 'static');

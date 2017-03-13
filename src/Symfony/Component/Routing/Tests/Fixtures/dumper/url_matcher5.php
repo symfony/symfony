@@ -77,7 +77,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // nested_wildcard
-        if (0 === strpos($pathinfo, '/nested/') && preg_match('#^/nested/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/nested') && preg_match('#^/nested/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
             return $this->mergeDefaults(array_replace($matches, array('_route' => 'nested_wildcard')), array ());
         }
 

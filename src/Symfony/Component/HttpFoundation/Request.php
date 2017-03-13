@@ -1774,7 +1774,7 @@ class Request
 
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
-        if($requestUri !== '' && $requestUri[0] !== '/') {
+        if ($requestUri !== '' && $requestUri[0] !== '/') {
             $requestUri = '/'.$requestUri;
         }
 

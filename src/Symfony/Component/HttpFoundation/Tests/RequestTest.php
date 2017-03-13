@@ -1999,7 +1999,8 @@ class RequestTest extends TestCase
         );
     }
 
-    public function nonstandardRequestsData() {
+    public function nonstandardRequestsData()
+    {
         return array(
             array('',  '', '/', 'http://host:8080/', ''),
             array('/', '', '/', 'http://host:8080/', ''),
@@ -2027,8 +2028,9 @@ class RequestTest extends TestCase
     /**
      * @dataProvider nonstandardRequestsData
      */
-    public function testNonstandardRequests($requestUri, $queryString, $expectedPathInfo, $expectedUri, $expectedBasePath = '', $expectedBaseUrl = null) {
-        if(is_null($expectedBaseUrl)) {
+    public function testNonstandardRequests($requestUri, $queryString, $expectedPathInfo, $expectedUri, $expectedBasePath = '', $expectedBaseUrl = null)
+    {
+        if (null === $expectedBaseUrl) {
             $expectedBaseUrl = $expectedBasePath;
         }
 

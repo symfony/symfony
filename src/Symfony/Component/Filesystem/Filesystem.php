@@ -37,7 +37,7 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $overwriteNewerFiles = false)
     {
-        if (stream_is_local($originFile) && !is_file($originFile)) {
+        if (stream_is_local((string) $originFile) && !is_file($originFile)) {
             throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
         }
 
@@ -71,7 +71,7 @@ class Filesystem
             // Like `cp`, preserve executable permission bits
             @chmod($targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
 
-            if (stream_is_local($originFile) && $bytesCopied !== ($bytesOrigin = filesize($originFile))) {
+            if (stream_is_local((string) $originFile) && $bytesCopied !== ($bytesOrigin = filesize($originFile))) {
                 throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
             }
         }

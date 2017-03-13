@@ -31,6 +31,11 @@ class FilesystemTestCase extends TestCase
     protected $workspace = null;
 
     /**
+     * @var array
+     */
+    protected $workspacesToRemove = array();
+
+    /**
      * @var null|bool Flag for hard links on Windows
      */
     private static $linkOnWindows = null;
@@ -73,9 +78,7 @@ class FilesystemTestCase extends TestCase
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
-        mkdir($this->workspace, 0777, true);
-        $this->workspace = realpath($this->workspace);
+        $this->workspace = $this->createWorkspace();
     }
 
     protected function tearDown()
@@ -87,8 +90,20 @@ class FilesystemTestCase extends TestCase
             $this->longPathNamesWindows = array();
         }
 
-        $this->filesystem->remove($this->workspace);
+        $this->filesystem->remove($this->workspacesToRemove);
         umask($this->umask);
+    }
+
+    /**
+     * @return string
+     */
+    protected function createWorkspace()
+    {
+        $workspace = sys_get_temp_dir().DIRECTORY_SEPARATOR.microtime(true).'.'.mt_rand();
+        mkdir($workspace, 0777, true);
+        $this->workspacesToRemove[] = $workspace;
+
+        return realpath($workspace);
     }
 
     /**

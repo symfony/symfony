@@ -90,17 +90,13 @@ class DeprecationErrorHandler
             'remainingCount' => 0,
             'legacyCount' => 0,
             'otherCount' => 0,
+            'remaining vendorCount' => 0,
             'unsilenced' => array(),
             'remaining' => array(),
             'legacy' => array(),
             'other' => array(),
+            'remaining vendor' => array(),
         );
-        if (self::MODE_WEAK_VENDORS === $mode) {
-            $deprecations += array(
-                'remaining vendorCount' => 0,
-                'remaining vendor' => array(),
-            );
-        }
         $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $getMode, $UtilPrefix, $inVendors) {
             $mode = $getMode();
             if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode) {

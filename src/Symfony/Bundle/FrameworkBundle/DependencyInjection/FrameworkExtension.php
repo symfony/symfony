@@ -1152,6 +1152,9 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
             // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class);
+            if (isset($config['datetime_format'])) {
+                $definition->addArgument($config['datetime_format']);
+            }
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -910));
         }

@@ -134,6 +134,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        getters:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getOverriddenGetters()), 0));
         }
 
+        if ($definition->getOverridenTails()) {
+            $code .= sprintf("        tails:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getOverridenTails()), 0));
+        }
+
         if ($definition->getMethodCalls()) {
             $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }

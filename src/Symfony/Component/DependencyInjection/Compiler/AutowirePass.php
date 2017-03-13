@@ -36,6 +36,11 @@ class AutowirePass extends AbstractRecursivePass
      */
     const MODE_OPTIONAL = 2;
 
+    /**
+     * @internal
+     */
+    const MODE_TAIL = 3;
+
     private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
@@ -147,6 +152,12 @@ class AutowirePass extends AbstractRecursivePass
                 $value->setOverriddenGetters($overriddenGetters);
             }
 
+            $overridenTails = $this->autowireTails($reflectionClass, $value->getOverridenTails());
+
+            if ($overridenTails !== $value->getOverridenTails()) {
+                $value->setOverridenTails($overridenTails);
+            }
+
             return parent::processValue($value, $isRoot);
         } finally {
             $this->currentDefinition = $parentDefinition;
@@ -255,7 +266,12 @@ class AutowirePass extends AbstractRecursivePass
     private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments, $mode)
     {
         $didAutowire = false; // Whether any arguments have been autowired or not
-        foreach ($reflectionMethod->getParameters() as $index => $parameter) {
+
+        $parameters = $reflectionMethod->getParameters();
+        if (self::MODE_TAIL === $mode) {
+            $parameters = array_reverse($parameters, true);
+        }
+        foreach ($parameters as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
             }
@@ -273,6 +289,9 @@ class AutowirePass extends AbstractRecursivePass
                 if (!$parameter->isOptional()) {
                     if (self::MODE_REQUIRED === $mode) {
                         throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s::%s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $reflectionMethod->class, $reflectionMethod->name));
+                    }
+                    if (self::MODE_TAIL === $mode) {
+                        break;
                     }
 
                     return array();
@@ -301,6 +320,8 @@ class AutowirePass extends AbstractRecursivePass
                 }
 
                 throw new RuntimeException($message);
+            } elseif (self::MODE_TAIL === $mode) {
+                break;
             } else {
                 return array();
             }
@@ -368,6 +389,34 @@ class AutowirePass extends AbstractRecursivePass
         if ($autoRegister && $class = $this->container->getReflectionClass($typeName, true)) {
             return $this->createAutowiredDefinition($class);
         }
+    }
+
+    /**
+     * Autowires method tails.
+     *
+     * @return array
+     */
+    private function autowireTails(\ReflectionClass $reflectionClass, array $overridenTails)
+    {
+        foreach ($overridenTails as $lcMethod => $defaultValues) {
+            if (!$reflectionClass->hasMethod($lcMethod)) {
+                continue;
+            }
+            $reflectionMethod = $reflectionClass->getMethod($lcMethod);
+
+            if ($reflectionMethod->isConstructor()
+                || !$reflectionMethod->getNumberOfParameters()
+                || $reflectionMethod->isFinal()
+            ) {
+                continue;
+            }
+
+            if ($defaultValues = $this->autowireMethod($reflectionMethod, $defaultValues, self::MODE_TAIL)) {
+                $overridenTails[$lcMethod] = $defaultValues;
+            }
+        }
+
+        return $overridenTails;
     }
 
     /**

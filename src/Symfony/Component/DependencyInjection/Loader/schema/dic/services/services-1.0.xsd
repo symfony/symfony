@@ -118,6 +118,7 @@
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="getter" type="getter" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="tail" type="tail" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="autowiring-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
@@ -223,6 +224,13 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
+  </xsd:complexType>
+
+  <xsd:complexType name="tail" mixed="true">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="argument" type="argument" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">

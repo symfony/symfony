@@ -364,6 +364,20 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertSame('ParentClass', $def->getClass());
     }
 
+    public function testTails()
+    {
+        $container = new ContainerBuilder();
+        $container->register('parent', 'foo')->setOverridenTail('foo', array('moo', 'b'));
+        $container->setDefinition('child', new ChildDefinition('parent'))
+            ->setOverridenTail('foo', array('index_0' => 'a'))
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertEquals(array('foo' => array('a', 'b')), $def->getOverridenTails());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

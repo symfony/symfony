@@ -533,7 +533,7 @@ class PhpDumper extends Dumper
             $constructor = sprintf("\n    public function __construct(\$container%1\$s)\n    {\n        \$this->container%1\$s = \$container%1\$s;\n    }\n", $this->salt);
         }
 
-        return $constructor.$this->addServiceOverriddenGetters($id, $definition, $class);
+        return $constructor.$this->addServiceOverriddenGetters($id, $definition, $class).$this->addServiceOverridenTails($id, $definition, $class);
     }
 
     private function addServiceOverriddenGetters($id, Definition $definition, \ReflectionClass $class)
@@ -574,6 +574,57 @@ class PhpDumper extends Dumper
         }
 
         return $getters;
+    }
+
+    private function addServiceOverridenTails($id, Definition $definition, \ReflectionClass $class)
+    {
+        $tails = '';
+
+        foreach ($definition->getOverridenTails() as $name => $defaultArgs) {
+            $r = InheritanceProxyHelper::getReflector($class, $name, $id);
+            if (!$defaultArgs = InheritanceProxyHelper::getTailArgs($r, $defaultArgs, $id)) {
+                continue;
+            }
+
+            $tail = array();
+            $tail[] = sprintf('%s function %s', $r->isProtected() ? 'protected' : 'public', InheritanceProxyHelper::getSignature($r, $call, $defaultArgs));
+            $tail[] = '{';
+            $tail[] = '    switch (func_num_args()) {';
+
+            if ($numReqArgs = key($defaultArgs)) {
+                for ($i = 0; $i < $numReqArgs; ++$i) {
+                    $tail[] = "        case $i:";
+                }
+            }
+
+            foreach ($defaultArgs as $i => list($param, $value)) {
+                if (null === $value && !$param->allowsNull()) {
+                    throw new RuntimeException(sprintf('Unable to configure service "%s": argument %d ($%s) of method "%s::%s()" must be non-null.', $id, $i, $param->name, $class->name, $r->name));
+                }
+                if (false === strpos($dumpedValue = $this->dumpValue($value), '$this')) {
+                    $tail[] = "        case $i: \${$param->name} = {$dumpedValue};";
+                } else {
+                    $s = $this->salt;
+                    $tail[] = "        case $i:";
+                    $tail[] = "            if (null === \$p{$s} = &\$this->tails{$s}[__FUNCTION__][{$i}]) {";
+                    $tail[] = "                \$p{$s} = \Closure::bind(function () { return {$dumpedValue}; }, \$this->container{$s}, \$this->container{$s});";
+                    $tail[] = '            }';
+                    $tail[] = "            \${$param->name} = \$p{$s}();";
+                }
+            }
+
+            $tail[] = '    }';
+            $tail[] = '';
+            $tail[] = "    return parent::{$call};";
+            $tail[] = '}';
+            $tail[] = '';
+
+            foreach ($tail as $code) {
+                $tails .= $code ? "\n    ".$code : "\n";
+            }
+        }
+
+        return $tails;
     }
 
     private function addServiceProperties($id, Definition $definition, $variableName = 'instance')
@@ -824,6 +875,9 @@ EOF;
             if ($definition->getOverriddenGetters()) {
                 throw new RuntimeException(sprintf('Cannot dump definition for service "%s": factories and overridden getters are incompatible with each other.', $id));
             }
+            if ($definition->getOverridenTails()) {
+                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": factories and overridden tails are incompatible with each other.', $id));
+            }
             $callable = $definition->getFactory();
             if (is_array($callable)) {
                 if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $callable[1])) {
@@ -859,13 +913,20 @@ EOF;
             if ($definition->getOverriddenGetters()) {
                 throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names and overridden getters are incompatible with each other.', $id));
             }
+            if ($definition->getOverridenTails()) {
+                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names and overridden tails are incompatible with each other.', $id));
+            }
 
             return sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
         }
         $class = $this->dumpLiteralClass($class);
 
-        if ($definition->getOverriddenGetters()) {
-            $inheritanceProxy = "    private \$container{$this->salt};\n    private \$getters{$this->salt};\n";
+        if ($definition->getOverriddenGetters() || $definition->getOverridenTails()) {
+            $inheritanceProxy = implode('', array(
+                "    private \$container{$this->salt};\n",
+                $definition->getOverriddenGetters() ? "    private \$getters{$this->salt};\n" : '',
+                $definition->getOverridenTails() ? "    private \$tails{$this->salt};\n" : '',
+            ));
             $inheritanceProxy = sprintf("%s implements \\%s\n{\n%s%s}\n", $class, InheritanceProxyInterface::class, $inheritanceProxy, $this->addServiceOverriddenMethods($id, $definition));
             $class = 'SymfonyProxy_'.md5($inheritanceProxy);
             $this->inheritanceProxies[$class] = $inheritanceProxy;
@@ -1442,6 +1503,7 @@ EOF;
                 $this->getDefinitionsFromArguments($definition->getArguments()),
                 $this->getDefinitionsFromArguments($definition->getMethodCalls()),
                 $this->getDefinitionsFromArguments($definition->getOverriddenGetters()),
+                $this->getDefinitionsFromArguments($definition->getOverridenTails()),
                 $this->getDefinitionsFromArguments($definition->getProperties()),
                 $this->getDefinitionsFromArguments(array($definition->getConfigurator())),
                 $this->getDefinitionsFromArguments(array($definition->getFactory()))
@@ -1589,6 +1651,9 @@ EOF;
             }
             if ($value->getOverriddenGetters()) {
                 throw new RuntimeException('Cannot dump definitions which have overridden getters.');
+            }
+            if ($value->getOverridenTails()) {
+                throw new RuntimeException('Cannot dump definitions which have overridden tails.');
             }
             if (null !== $value->getConfigurator()) {
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');

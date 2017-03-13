@@ -1047,6 +1047,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if ($definition->getOverriddenGetters()) {
                 throw new RuntimeException(sprintf('Cannot create service "%s": factories and overridden getters are incompatible with each other.', $id));
             }
+            if ($definition->getOverridenTails()) {
+                throw new RuntimeException(sprintf('Cannot create service "%s": factories and overridden tails are incompatible with each other.', $id));
+            }
             if (is_array($factory)) {
                 $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
             } elseif (!is_string($factory)) {
@@ -1068,12 +1071,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
                 @trigger_error(sprintf('The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name), E_USER_DEPRECATED);
             }
-            if ($definition->getOverriddenGetters()) {
+            if ($definition->getOverriddenGetters() || $definition->getOverridenTails()) {
                 static $salt;
                 if (null === $salt) {
                     $salt = str_replace('.', '', uniqid('', true));
                 }
-                $service = sprintf('%s implements \\%s { private $container%4$s; private $getters%4$s; %s }', $r->name, InheritanceProxyInterface::class, $this->generateOverriddenMethods($id, $definition, $r, $salt), $salt);
+                $service = sprintf('%s implements \\%s { private $container%4$s; private $getters%4$s; private $tails%4$s; %s }', $r->name, InheritanceProxyInterface::class, $this->generateOverriddenMethods($id, $definition, $r, $salt), $salt);
                 if (!class_exists($proxyClass = 'SymfonyProxy_'.md5($service), false)) {
                     eval(sprintf('class %s extends %s', $proxyClass, $service));
                 }
@@ -1083,7 +1086,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     $constructor = null;
                 }
                 $service = $constructor ? $r->newInstanceWithoutConstructor() : $r->newInstanceArgs($arguments);
-                call_user_func(\Closure::bind(function ($c, $g, $s) { $this->{'container'.$s} = $c; $this->{'getters'.$s} = $g; }, $service, $service), $this, $definition->getOverriddenGetters(), $salt);
+                call_user_func(\Closure::bind(function ($c, $g, $p, $s) { $this->{'container'.$s} = $c; $this->{'getters'.$s} = $g; $this->{'tails'.$s} = $p; }, $service, $service), $this, $definition->getOverriddenGetters(), $definition->getOverridenTails(), $salt);
                 if ($constructor) {
                     $constructor->invokeArgs($service, $arguments);
                 }
@@ -1368,7 +1371,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" cannot be marked as final.', $id, $class->name));
         }
 
-        return $this->generateOverriddenGetters($id, $definition, $class, $salt);
+        return $this->generateOverriddenGetters($id, $definition, $class, $salt).$this->generateOverridenTails($id, $definition, $class, $salt);
     }
 
     private function generateOverriddenGetters($id, Definition $definition, \ReflectionClass $class, $salt)
@@ -1398,6 +1401,43 @@ EOF;
         }
 
         return $getters;
+    }
+
+    private function generateOverridenTails($id, Definition $definition, \ReflectionClass $class, $salt)
+    {
+        $tails = '';
+
+        foreach ($definition->getOverridenTails() as $name => $defaultArgs) {
+            $r = InheritanceProxyHelper::getReflector($class, $name, $id);
+            if (!$defaultArgs = InheritanceProxyHelper::getTailArgs($r, $defaultArgs, $id)) {
+                continue;
+            }
+
+            $tail = array();
+            $tail[] = sprintf("\n%s function %s\n{", $r->isProtected() ? 'protected' : 'public', InheritanceProxyHelper::getSignature($r, $call, $defaultArgs));
+            $tail[] = "\$c{$salt} = \$this->container{$salt};";
+            $tail[] = "\$b{$salt} = \$c{$salt}->getParameterBag();";
+            $tail[] = "\$v{$salt} = \$this->tails{$salt}['{$name}'];";
+            $tail[] = 'switch (func_num_args()) {';
+
+            if ($numReqArgs = key($defaultArgs)) {
+                for ($i = 0; $i < $numReqArgs; ++$i) {
+                    $tail[] = "case $i:";
+                }
+            }
+
+            foreach ($defaultArgs as $i => list($param, $value)) {
+                if (null === $value && !$param->allowsNull()) {
+                    throw new RuntimeException(sprintf('Unable to configure service "%s": argument %d ($%s) of method "%s::%s()" must be non-null.', $id, $i, $param->name, $class->name, $r->name));
+                }
+                $tail[] = "case $i: \${$param->name} = \$c{$salt}->resolveServices(\$b{$salt}->unescapeValue(\$b{$salt}->resolveValue(\$v{$salt}[{$i}])));";
+            }
+
+            $tail[] = sprintf("}\nreturn parent::%s;\n}", $call);
+            $tails .= implode("\n", $tail);
+        }
+
+        return $tails;
     }
 
     /**

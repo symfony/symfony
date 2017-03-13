@@ -321,6 +321,34 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services24.php', $dumper->dump());
     }
 
+    public function testDumpOverridenTails()
+    {
+        $container = include self::$fixturesPath.'/containers/container_tails.php';
+        $container->compile();
+        $container->getDefinition('foo')
+            ->setOverridenTail('method0', array(new Reference('bar', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)));
+        $dumper = new PhpDumper($container);
+
+        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Tail_Methods'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_tails.php', $dump);
+
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Test_Tail_Methods();
+
+        $foo = $container->get('foo');
+
+        $this->assertSame(array(null), $foo->method0());
+        $this->assertSame(array(123), $foo->method1());
+
+        $baz = $container->get('baz');
+        $r = new \ReflectionMethod($baz, 'method1');
+        $r->setAccessible(true);
+
+        $this->assertTrue($r->isProtected());
+        $this->assertSame(array(456, $foo), $r->invoke($baz, 456));
+    }
+
     public function testDumpOverridenGetters()
     {
         $container = include self::$fixturesPath.'/containers/container29.php';

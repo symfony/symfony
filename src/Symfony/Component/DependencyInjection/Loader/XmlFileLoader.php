@@ -294,6 +294,10 @@ class XmlFileLoader extends FileLoader
             }
         }
 
+        foreach ($this->getChildren($service, 'tail') as $call) {
+            $definition->setOverridenTail($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument', false, (bool) $parent));
+        }
+
         foreach ($this->getChildren($service, 'call') as $call) {
             $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument'));
         }

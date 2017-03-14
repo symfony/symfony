@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by jlamur at 2017-02-05T02:43:45Z
+
+@fabpot You authored the original commit (2d34e78aafa0e170845a23d0e163b3a15569fa8e) that introduced dropping from POST to GET on 302 and 303 codes only. Could you please confirm that the behaviour was overlooked for the 301 code (as suggested [here](https://github.com/symfony/symfony/issues/20924#issuecomment-267258875)) and that it was not a deliberate choice, or at least if this PR is a good idea?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T12:48:31Z
+
+I don't remember the reasons why 301 was not included back then. 👍 for changing this in master. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-02-17T00:25:30Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-17T11:17:34Z
+
+:+1: but this should be documented in the upgrade files
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T14:46:52Z
+
+@jlamur Can you take the comments into accounts? Moving the new tests to a new method and adding a note in the CHANGELOG/UPGRADE files?
+
+---------------------------------------------------------------------------
+
+by jlamur at 2017-03-01T15:35:39Z
+
+@fabpot I didn't had enough time to do it, but it will be done this weekend.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-06T18:34:02Z
+
+@jlamur If you don't have time, I'm sure someone can take over and finish it.
+
+---------------------------------------------------------------------------
+
+by jlamur at 2017-03-07T13:11:12Z
+
+@fabpot Please let me know if I did something wrong while updating UPGRADE/CHANGELOG files.

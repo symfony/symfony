@@ -560,7 +560,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
-            $this->getEnvParameters()
+            $this->getEnvParameters(false)
         );
     }
 
@@ -570,9 +570,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Only the parameters starting with "SYMFONY__" are considered.
      *
      * @return array An array of parameters
+     *
+     * @deprecated since version 3.3, to be removed in 4.0
      */
     protected function getEnvParameters()
     {
+        if (0 === func_num_args() || func_get_arg(0)) {
+            @trigger_error(sprintf('The %s() method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, 'SYMFONY__')) {

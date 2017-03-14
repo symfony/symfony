@@ -100,6 +100,10 @@ class ParameterBag implements ParameterBagInterface
             throw new ParameterNotFoundException($name, null, null, null, $alternatives, $nonNestedAlternative);
         }
 
+        if (isset($_SERVER[$sfEnvVar = 'SYMFONY__'.strtoupper(str_replace('.', '__', $name))])) {
+            @trigger_error(sprintf('Defining parameters using special environment variables that start with "SYMFONY__" (such as "%s") is deprecated as of 3.3 and won\'t be supported in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', $sfEnvVar), E_USER_DEPRECATED);
+        }
+
         return $this->parameters[$name];
     }
 

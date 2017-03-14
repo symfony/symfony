@@ -735,6 +735,22 @@ EOF;
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Kernel::getEnvParameters() method is deprecated as of 3.3 and will be removed in 4.0. Use the %s syntax to get the value of any environment variable from configuration files instead.
+     */
+    public function testGetEnvParameters()
+    {
+        $_SERVER['SYMFONY__FOO__BAR'] = 'baz';
+
+        $kernel = $this->getKernel();
+        $method = new \ReflectionMethod($kernel, 'getEnvParameters');
+        $method->setAccessible(true);
+
+        $envParameters = $method->invoke($kernel);
+        $this->assertSame('baz', $envParameters['foo.bar']);
+    }
+
+    /**
      * Returns a mock for the BundleInterface.
      *
      * @return BundleInterface

@@ -226,6 +226,16 @@ class ParameterBagTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation Defining parameters using special environment variables that start with "SYMFONY__" (such as "SYMFONY__FOO__BAR") is deprecated as of 3.3 and won't be supported in 4.0. Use the %s syntax to get the value of any environment variable from configuration files instead.
+     */
+    public function testGetSymfonyEnvParameter()
+    {
+        $_SERVER['SYMFONY__FOO__BAR'] = 'foobar';
+        $this->assertSame('foobar', (new ParameterBag(array('foo.bar' => 'foobar')))->get('foo.bar'));
+    }
+
+    /**
      * @dataProvider stringsWithSpacesProvider
      */
     public function testResolveStringWithSpacesReturnsString($expected, $test, $description)

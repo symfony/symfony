@@ -10,5 +10,5 @@ services:
         arguments:
             - !service
                 class: Bar
-                autowire: true
+                autowire: false
         factory: [ !service { class: Quz }, 'constructFoo' ]

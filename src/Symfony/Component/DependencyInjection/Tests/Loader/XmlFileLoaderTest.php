@@ -13,8 +13,8 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -229,6 +229,56 @@ class XmlFileLoaderTest extends TestCase
         $fooArgs = $services['foo']->getArguments();
         $barArgs = $services['bar']->getArguments();
         $this->assertSame($fooArgs[0], $barArgs[0]);
+    }
+
+    public function testDefaultsInAnonymousServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('anonymous_services.xml');
+
+        $this->assertTrue($container->has('Bar'));
+        $definition = $container->getDefinition('Bar');
+
+        $args = $definition->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertInstanceof(Reference::class, $args[0]);
+        $this->assertTrue($container->has((string) $args[0]));
+        $this->assertStringStartsWith('1', (string) $args[0]);
+
+        $anonymous = $container->getDefinition((string) $args[0]);
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertTrue($anonymous->isAutowired());
+        $this->assertCount(1, $anonymous->getInstanceofConditionals());
+
+        $instanceof = $definition->getInstanceofConditionals();
+        $this->assertCount(1, $instanceof);
+        $this->assertArrayHasKey('BarInterface', $instanceof);
+
+        $interface = $instanceof['BarInterface'];
+        $this->assertFalse($interface->isAutowired());
+
+        $args = $interface->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertInstanceof(Reference::class, $args[0]);
+        $this->assertTrue($container->has((string) $args[0]));
+        $this->assertStringStartsWith('1_i', (string) $args[0]);
+
+        $anonymous = $container->getDefinition((string) $args[0]);
+        $this->assertEquals('Anonymous', $anonymous->getClass());
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertTrue($anonymous->isAutowired());
+        $this->assertEmpty($anonymous->getInstanceofConditionals());
+
+        $factory = $interface->getFactory();
+        $this->assertInternalType('array', $factory);
+        $this->assertInstanceOf(Reference::class, $factory[0]);
+        $this->assertTrue($container->has((string) $factory[0]));
+        $this->assertEquals('createBar', $factory[1]);
+
+        $factoryService = $container->getDefinition((string) $factory[0]);
+        $this->assertTrue($factoryService->isAutowired());
+        $this->assertEmpty($factoryService->getInstanceofConditionals());
     }
 
     public function testLoadServices()
@@ -539,23 +589,28 @@ class XmlFileLoaderTest extends TestCase
         $foo = $container->getDefinition('foo');
 
         $fooFactory = $foo->getFactory();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactory[0]);
-        $this->assertSame('FooFactory', $fooFactory[0]->getClass());
+        $this->assertInstanceOf(Reference::class, $fooFactory[0]);
+        $this->assertTrue($container->has((string) $fooFactory[0]));
+        $fooFactoryDefinition = $container->getDefinition((string) $fooFactory[0]);
+        $this->assertSame('FooFactory', $fooFactoryDefinition->getClass());
         $this->assertSame('createFoo', $fooFactory[1]);
 
-        $fooFactoryFactory = $fooFactory[0]->getFactory();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactoryFactory[0]);
-        $this->assertSame('Foobar', $fooFactoryFactory[0]->getClass());
+        $fooFactoryFactory = $fooFactoryDefinition->getFactory();
+        $this->assertInstanceOf(Reference::class, $fooFactoryFactory[0]);
+        $this->assertTrue($container->has((string) $fooFactoryFactory[0]));
+        $this->assertSame('Foobar', $container->getDefinition((string) $fooFactoryFactory[0])->getClass());
         $this->assertSame('createFooFactory', $fooFactoryFactory[1]);
 
         $fooConfigurator = $foo->getConfigurator();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooConfigurator[0]);
-        $this->assertSame('Bar', $fooConfigurator[0]->getClass());
+        $this->assertInstanceOf(Reference::class, $fooConfigurator[0]);
+        $this->assertTrue($container->has((string) $fooConfigurator[0]));
+        $fooConfiguratorDefinition = $container->getDefinition((string) $fooConfigurator[0]);
+        $this->assertSame('Bar', $fooConfiguratorDefinition->getClass());
         $this->assertSame('configureFoo', $fooConfigurator[1]);
 
-        $barConfigurator = $fooConfigurator[0]->getConfigurator();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $barConfigurator[0]);
-        $this->assertSame('Baz', $barConfigurator[0]->getClass());
+        $barConfigurator = $fooConfiguratorDefinition->getConfigurator();
+        $this->assertInstanceOf(Reference::class, $barConfigurator[0]);
+        $this->assertSame('Baz', $container->getDefinition((string) $barConfigurator[0])->getClass());
         $this->assertSame('configureBar', $barConfigurator[1]);
     }
 

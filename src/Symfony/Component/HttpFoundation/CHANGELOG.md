@@ -8,6 +8,7 @@ CHANGELOG
    disabling `Range` and `Content-Length` handling, switching to chunked encoding instead
  * added the `Cookie::fromString()` method that allows to create a cookie from a
    raw header string
+ * added `MimeTypeByExtensionGuesser`, that guesses a mime type by a file extension.
 
 3.1.0
 -----

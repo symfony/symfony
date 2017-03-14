@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * added anonymous services support in YAML configuration files using the `!service` tag.
  * [EXPERIMENTAL] added "TypedReference" and "ServiceClosureArgument" for creating service-locator services
  * [EXPERIMENTAL] added "instanceof" section for local interface-defined configs
  * added "service-locator" argument for lazy loading a set of identified values and services

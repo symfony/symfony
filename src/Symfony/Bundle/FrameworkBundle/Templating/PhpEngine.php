@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

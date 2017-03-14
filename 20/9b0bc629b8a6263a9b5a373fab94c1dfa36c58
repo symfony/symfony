@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-14T08:17:47Z
+
+> Defaults and instanceof conditionals aren't applied on anonymous services, as in xml too.
+
+Thinking a bit more about this, my opinion on it is that it's a bug that should be fixed in XmlFileLoader also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-14T21:14:04Z
+
+good to merge as is to me, my previous comments are for another PR

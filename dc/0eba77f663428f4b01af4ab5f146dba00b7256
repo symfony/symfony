@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-05T12:02:51Z
+
+@lepiaf thanks for contributing a fix for this super old issue report.
+
+To give some context:
+
+1) Symfony uses `Timezone` sometimes and `TimeZone` others.
+2) PHP uses "TimeZone" in its classes: http://php.net/manual/en/class.intltimezone.php
+3) In UK English, "timezone" doesn't exist (it's "time zone") but in US English, it's more common to use "timezone", so the camelized version should be "Timezone".
+
+Symfony always favors US English, so this change looks correct to me!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-03-14T10:26:55Z
+
+👍

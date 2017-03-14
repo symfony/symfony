@@ -40,20 +40,6 @@ class SetAclCommandTest extends WebTestCase
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
 
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->deleteTmpDir('Acl');
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->deleteTmpDir('Acl');
-    }
-
     public function testSetAclUser()
     {
         $objectId = 1;

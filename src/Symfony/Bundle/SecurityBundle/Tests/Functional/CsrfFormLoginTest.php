@@ -108,14 +108,4 @@ class CsrfFormLoginTest extends WebTestCase
             array('routes_as_path.yml'),
         );
     }
-
-    public static function setUpBeforeClass()
-    {
-        parent::deleteTmpDir('CsrfFormLogin');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        parent::deleteTmpDir('CsrfFormLogin');
-    }
 }

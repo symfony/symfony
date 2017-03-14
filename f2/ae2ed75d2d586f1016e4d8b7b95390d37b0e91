@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-03-13T11:59:10Z
+
+@nicolas-grekas it would imply doing the following change :
+
+```patch
+-$getMode = function () use ($mode) {
++$getMode = function () {
+      static $memoizedMode = false;
+
+      if (false !== $memoizedMode) {
+          return $memoizedMode;
+      }
+-     if (false === $mode) {
+-         $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
+-     }
++     $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
+      if (DeprecationErrorHandler::MODE_WEAK !== $mode && DeprecationErrorHandler::MODE_WEAK_VENDORS !== $mode && (!isset($mode[0]) || '/' !== $mode[0])) {
+          $mode = preg_match('/^[1-9][0-9]*$/', $mode) ? (int) $mode : 0;
+      }
+
+      return $memoizedMode = $mode;
+ };
+```
+
+Not sure if dropping support for that kind of usage would be acceptable, so I think I see your point now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-13T12:06:41Z
+
+The env var is not and should become the only way to configure the bridge.
+This means there is nothing else to change to me :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-03-13T12:08:08Z
+
+Failed to parse your sentence :confused:
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-03-13T12:16:14Z
+
+>should the $mode argument be removed to avoided
+
+Not sure, I think it's fair to use if it has a valid value and try to get the env variable only if is `false`. So IMO nothing to change on that side.
+
+>When registering the error handler, simple-phpunit might be used
+
+Actually the bug occurs with `phpunit` as well. Not just `simple-phpunit` (I didn't use it when reported the bug).
+
+IMO this piece of could should work seamlessly with both PhpUnit and SimplePhpUnit. Two ways to avoid the issue you had [doing this kind of error]:
+
+- Have a proper review: the person in charge of it knows the potential risks and ought to try locally the changes if not obvious...
+- Have proper integration tests, but they are not trivial and may not be worth it. The first point may be enough
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-03-13T12:16:45Z
+
+@nicolas-grekas Oh you meant "and should not"? If yes I understand and agree.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-03-13T12:43:32Z
+
+@theofidry I did not reproduce the bug with phpunit though… did you? When you call phpunit, the bootstrap script is just `vendor/autoload.php`. When you use simple-phpunit… there are two bootstrap scripts?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-03-13T13:37:48Z
+
+@greg0ire I did in https://github.com/theofidry/phpunitbridge-demo1. Tbh I didn't even try with `simple-phpunit`... The bootstrap file is `app/autoload.php` (specified in `phpunit.xml.dist`).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-13T20:05:46Z
+
+Isn't this a bugfix and should then be merged into lower branches too?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-03-13T20:20:01Z
+
+It's a bugfix, but the feature is not released yet
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-13T20:23:27Z
+
+Sorry, missed that this change was introduced in #21539.
+
+👍
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-03-13T20:44:05Z
+
+No problem, thanks for caring!

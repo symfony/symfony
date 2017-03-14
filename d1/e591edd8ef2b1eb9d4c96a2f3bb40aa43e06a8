@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-08T19:07:18Z
+
+third option: do as the SecurityListener in FrameworkExtraBundle: allow expressions, but not by using the ExpressionVoter itself, allowing you to expose ``is_granted`` to call the full-featured access decision logic (for instance using ``is_granted('EDIT', subject)`` to vote on the subject rather than just on ``null``)
+
+Pros:
+- very flexible
+- easy for simple checks (if you also expose the functions available inside the ExpressionVoter language, as done in `@Security`).
+- we can expose additional variables in the expression if needed, as we control it (the workflow name, the transition name, etc... depending on what actually makes sense)
+- we can add more workflow-specific functions (a way to check whether another place is also marked, not sure whether it makes sense ?)
+
+I see several cons in your option 2:
+- not allowing to vote on an object (the one being marked is a candidate here), or enforcing it depending on the implementation (both ways can have issues, as we need to be able to do both of them)
+- not flexible at all when wanting to implement more complex checks, as expressions are not available (not sure why you listed this as a Pro. It is not one IMO). And custom voters don't help much here if there is no access to the subject.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-08T19:14:09Z
+
+@stof Thanks. That's very cool. I did not think to do that ;) I will do that !
+
+Just to clarify your point about 2/: I said it's more flexible because in the end you write pure PHP. That's why it is the most flexible solution. Thus you have access to the object in the voter (because the listener pass it to the AuthChecker)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-08T19:19:04Z
+
+@lyrixx but forcing to pass it is not always the most flexible. I have voters which explicitly vote on ``null`` and abstain when being asked to vote on an object (because a most specific voter is responsible for it). The RoleVoter accepts anything (it ignores the subject entirely) so it does not hurt to pass it in this case, but it is less flexible.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-08T19:55:21Z
+
+I pushed the new version ;) Ready for review.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-08T20:51:29Z
+
+More of a semantic, but why 'guard' instead of 'authorization'?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-08T20:56:06Z
+
+@iltar usually people use `guard` for this kind of things. More over the event is named `guard`.
+
+refs:
+
+* https://refactoring.com/catalog/replaceNestedConditionalWithGuardClauses.html
+* https://en.wikipedia.org/wiki/Guard_(computer_science)
+
+Thus, here you can block a transition not only with the security but with, for example, the subject itself. So authorization seems too "security related" to me.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-08T20:57:25Z
+
+The expression seems to be used for authorization, hence I was wondering. Guard sounds fine in this case though.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-08T20:59:34Z
+
+I updated the PR description to add another example where we don't use the security. I guess it's better now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-09T10:41:46Z
+
+In routing, this is called "condition", maybe better and more consistent?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-09T10:43:56Z
+
+In that case, it will not be consistent with the workflow. to me, `guard` is better.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-10T09:31:23Z
+
+Fabbot is red, and deps=low line also
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-10T13:32:45Z
+
+@nicolas-grekas Rebase + Fixed tests. Now it's green.
+
+@stof Is it what you had in mind ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-14T10:20:12Z
+
+:+1:

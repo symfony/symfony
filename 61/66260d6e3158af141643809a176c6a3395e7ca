@@ -1,0 +1,148 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-28T17:06:01Z
+
+:+1: Thanks you for this awesome feature! `--filter <expresion language>` :astonished: !!
+
+<del>Just a minor fix in your description to try this PR correctly, because [`server_log` handler is configured into `config_dev.yml`](https://github.com/lyrixx/symfony-standard/blob/server-log/app/config/config_dev.yml#L21) we need to run `curl http://0:8000/app_dev.php/` to see the output ;)</del>
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-28T18:08:40Z
+
+@yceruto By default, `bin/console` use the `dev` env. So the server is in `dev` env by default. That's why I did not add `/app_dev.php`, because it should not be necessary.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-28T18:58:53Z
+
+>@yceruto By default, bin/console use the dev env. So the server is in dev env by default. That's why I did not add /app_dev.php, because it should not be necessary.
+
+Right, but when you run `curl http://127.0.0.1:8000/` we are in prod env right? the handler is not there and the `server:log` doesn't shows nothing.
+
+I missing something :/ ? at least doesn't works for me :( without /app_dev.php/
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-28T19:14:59Z
+
+> Right, but when you run curl http://127.0.0.1:8000/ we are in prod env right?
+
+Nevermind, I forgot my env var in prod by default, sorry for the noise. This works as it is!
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-12-29T08:44:50Z
+
+Very nice feature!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-29T13:15:35Z
+
+> You missed a bunch of short-array syntax instances. ;-) Thanks for this feature, though!
+
+Yes, I know ;) I'm just waiting for @symfony/deciders feedbacks before fixing this kind of details.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-06T09:49:56Z
+
+@fabpot Should I move this command to the new server bundle?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-10T22:32:09Z
+
+@lyrixx Indeed, it should be moved to the new web server bundle.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-12T16:29:43Z
+
+I moved the command to the WebServerBundle.
+
+This PR is no "Ready To Review"
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-15T08:17:52Z
+
+The `ServerLogCommand` on one side and the `VarDumperFormatter` and `ServerLogHandler` on the other side are not wired. Is that intended? Wouldn't it be better to split this in two PRs then?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-18T10:02:25Z
+
+@xabbuh You are right, they are not wired. You might want to see my fork to see how it is wired.
+IMHO, it's should not be split in 2 PRs because all theses classes work together.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-18T13:59:28Z
+
+@lyrixx Why did you close here?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-18T14:33:29Z
+
+Oups ... I don't know. Sorry for the noise.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-03T10:23:09Z
+
+@fabpot It looks like you are not totally convinced by this PR. I could add "experimental" (cf http://symfony.com/blog/experimental-features) if you want.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-15T20:06:23Z
+
+I like this :) Here are some suggestions:
+https://github.com/symfony/symfony/compare/master...nicolas-grekas:server-log
+
+This patch fixes a 1s pause per log line I experienced when no log server was listening.
+It uses persistent and asynchronous connections to make things faster.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-16T09:27:45Z
+
+> This patch fixes a 1s pause per log line I experienced when no log server was listening.
+
+I'm unable to reproduce it. Do you have a reproducer ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-16T18:01:20Z
+
+@nicolas-grekas I cherry-picked your commit and added a new one.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-05T20:44:26Z
+
+@lyrixx any news?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-06T16:26:28Z
+
+@fabpot I want to merge #21705 first, then I will rebase this one.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-07T11:26:24Z
+
+Hello;
+
+Here we go. I think this PR is ready for a last review.
+
+I pushed everything to my fork for those who want to test it: https://github.com/lyrixx/symfony-standard/tree/server-log
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-14T10:19:09Z
+
+:+1:

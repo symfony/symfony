@@ -1,6 +1,12 @@
 UPGRADE FROM 3.2 to 3.3
 =======================
 
+BrowserKit
+----------
+
+ * The request method is dropped from POST to GET when the response
+   status code is 301.
+
 ClassLoader
 -----------
 

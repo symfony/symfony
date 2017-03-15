@@ -60,7 +60,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
                 '<html><head></head><body>Empty WDT</body></html>',
                 '<html><head></head><body>Empty WDT</body></html>',
                 new WebDebugToolbarListener($this->getTwigMock('')),
-            )
+            ),
         );
     }
 

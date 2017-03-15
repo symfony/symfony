@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-02T18:11:15Z
+
+@stof I moved the argument to the `addGlobalIgnoredName` call, which is a public method on a non-final class, thus can't really change in the future (BC concerns). I'd prefer not adding yet-another-class-to-load for this, unless it's a strong requirement to you.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-02T18:37:53Z
+
+👍 Does the job
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-03-03T09:12:43Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-09T03:03:17Z
+
+The clean way would be to use a configurator, which means adding one additional class. Would it be better? Do we just merge it like this? In any case, I like the idea of removing the need for an `autoload.php` file, that would also help with cleaning the code of Flex.
+
+I'm inclined to just merge this PR as is, but some @symfony/deciders might think going the clean way would be preferable. What's your thoughts?

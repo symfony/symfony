@@ -1281,6 +1281,10 @@ class FrameworkExtension extends Extension
         if (isset($config['name_converter']) && $config['name_converter']) {
             $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
         }
+
+        if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
+            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
+        }
     }
 
     /**

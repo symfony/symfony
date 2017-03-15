@@ -177,6 +177,29 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertEquals(array(new Author('s_first', 's_last')), $form->getData());
     }
 
+    public function testResizedDownIfSubmittedWithCompoundEmptyDataDeleteEmptyAndNoDataClass()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'entry_type' => 'Symfony\Component\Form\Tests\Fixtures\AuthorType',
+            // If the field is not required, no new Author will be created if the
+            // form is completely empty
+            'entry_options' => array('data_class' => null),
+            'allow_add' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array(array('firstName' => 'first', 'lastName' => 'last')));
+        $form->submit(array(
+            array('firstName' => 's_first', 'lastName' => 's_last'),
+            array('firstName' => '', 'lastName' => ''),
+        ));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals(array('s_first', 's_last'), $form[0]->getData());
+        $this->assertEquals(array(array('s_first', 's_last')), $form->getData());
+    }
+
     public function testNotResizedIfSubmittedWithExtraData()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(

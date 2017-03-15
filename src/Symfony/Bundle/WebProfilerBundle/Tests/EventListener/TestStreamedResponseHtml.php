@@ -24,18 +24,9 @@ class TestStreamedResponseHtml extends StreamedResponse implements HtmlResponseI
      */
     public function sendContent()
     {
-        ob_start();
         parent::sendContent();
-        $content = ob_get_contents();
-        ob_end_clean();
-
-        $pos = strripos($content, '</body>');
-
-        if (false !== $pos) {
-            $extraHtml = "\n".$this->extraHtml."\n";
-            $content = substr($content, 0, $pos).$extraHtml.substr($content, $pos);
+        if ('' !== $this->extraHtml) {
+            echo "\n".$this->extraHtml;
         }
-
-        echo $content;
     }
 }

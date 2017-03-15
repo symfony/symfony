@@ -22,11 +22,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider getInjectToolbarTests
+     * @dataProvider getHtmlResponseTests
      */
-    public function testInjectToolbarToHtmlResponseInterface($content, $expected)
+    public function testInjectToolbarToHtmlResponseInterface($content, $expected, WebDebugToolbarListener $listener)
     {
-        $listener = new WebDebugToolbarListener($this->getTwigMock());
         $m = new \ReflectionMethod($listener, 'injectToolbar');
         $m->setAccessible(true);
 
@@ -40,6 +39,29 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $content = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($expected, $content);
+    }
+
+    public function getHtmlResponseTests()
+    {
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+
+        return array(
+            array(
+                '<html><head></head><body></body></html>',
+                "<html><head></head><body></body></html>\nWDT",
+                $listener,
+            ),
+            array(
+                '<html><head></head><body>Hello</body></html>',
+                "<html><head></head><body>Hello</body></html>\nWDT",
+                $listener,
+            ),
+            array(
+                '<html><head></head><body>Empty WDT</body></html>',
+                '<html><head></head><body>Empty WDT</body></html>',
+                new WebDebugToolbarListener($this->getTwigMock('')),
+            )
+        );
     }
 
     /**

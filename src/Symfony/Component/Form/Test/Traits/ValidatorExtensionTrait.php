@@ -33,7 +33,7 @@ trait ValidatorExtensionTrait
         $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
         $metadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
         $this->validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
-        $this->validator->expects($this->any())->method('validate')->will($this->returnValue([]));
+        $this->validator->expects($this->any())->method('validate')->will($this->returnValue(array()));
 
         return new ValidatorExtension($this->validator);
     }

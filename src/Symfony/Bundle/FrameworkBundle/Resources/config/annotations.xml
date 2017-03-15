@@ -5,7 +5,19 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader" public="false" />
+        <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader" public="false">
+            <call method="addGlobalIgnoredName">
+                <argument>required</argument>
+                <argument type="service">
+                    <!-- dummy arg to register class_exists as annotation loader only when required -->
+                    <service class="Doctrine\Common\Annotations\AnnotationRegistry">
+                        <call method="registerLoader">
+                            <argument>class_exists</argument>
+                        </call>
+                    </service>
+                </argument>
+            </call>
+        </service>
         <service id="Doctrine\Common\Annotations\Reader" alias="annotations.reader" public="false" />
 
         <service id="annotations.cached_reader" class="Doctrine\Common\Annotations\CachedReader" public="false">

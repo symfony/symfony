@@ -185,6 +185,7 @@ class CollectionTypeTest extends BaseTypeTest
             // form is completely empty
             'entry_options' => array('data_class' => null),
             'allow_add' => true,
+            'allow_delete' => true,
             'delete_empty' => true,
         ));
 

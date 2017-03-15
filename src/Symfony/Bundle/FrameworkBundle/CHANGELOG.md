@@ -35,6 +35,8 @@ CHANGELOG
    `server:status` console commands have been moved to a dedicated bundle. 
    Require `symfony/web-server-bundle` in your composer.json and register 
    `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
+ * Added `$defaultLocale` as 3rd argument of `Translator::__construct()`
+   making `Translator` works with any PSR-11 container
 
 3.2.0
 -----

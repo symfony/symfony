@@ -6,14 +6,14 @@
 
     <services>
         <service id="translator.default" class="Symfony\Bundle\FrameworkBundle\Translation\Translator">
-            <argument type="service" id="service_container" />
+            <argument /> <!-- translation loaders locator -->
             <argument type="service" id="translator.selector" />
-            <argument type="collection" /> <!-- translation loaders -->
+            <argument>%kernel.default_locale%</argument>
+            <argument type="collection" /> <!-- translation loaders ids -->
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
-            <argument type="collection" /> <!-- translation resources -->
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>

@@ -274,6 +274,9 @@ FrameworkBundle
    class has been removed. Use the
    `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\Translator` constructor now takes the
+   default locale as mandatory 3rd argument.
+
 HttpFoundation
 ---------------
 

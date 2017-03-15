@@ -12,11 +12,14 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
+    use ValidatorExtensionTrait;
+
     public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder(

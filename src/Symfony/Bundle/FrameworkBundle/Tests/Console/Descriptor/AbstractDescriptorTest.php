@@ -192,7 +192,7 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->getDescriptor()->describe($output, $describedObject, $options);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
+            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), JSON_PRETTY_PRINT));
         } else {
             $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
         }

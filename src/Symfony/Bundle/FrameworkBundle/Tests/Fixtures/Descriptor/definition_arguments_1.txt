@@ -18,6 +18,5 @@
                    Array (3 element(s))                       
                    Iterator (2 element(s))                    
                    ClosureProxy(Service(definition1)::get())  
-                   ServiceLocator (2 service(s))              
  ---------------- ------------------------------------------- 
 

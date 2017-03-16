@@ -7,7 +7,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Symfony_DI_PhpDumper_Test_Overriden_Getters.

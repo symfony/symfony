@@ -15,8 +15,6 @@ namespace Symfony\Component\DependencyInjection;
  * Represents a PHP type-hinted service reference.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in version 3.3
  */
 class TypedReference extends Reference
 {

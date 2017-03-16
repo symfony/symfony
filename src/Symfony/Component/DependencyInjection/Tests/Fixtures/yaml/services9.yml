@@ -121,9 +121,6 @@ services:
         arguments: [!closure_proxy ['@closure_proxy', getBaz]]
     alias_for_foo: '@foo'
     alias_for_alias: '@foo'
-    service_locator:
-        class: Bar
-        arguments: [!service_locator { bar: '@bar', invalid: '@?invalid', container: '@service_container' }]
     Psr\Container\ContainerInterface:
         alias: service_container
         public: false

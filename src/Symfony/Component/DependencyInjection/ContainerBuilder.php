@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -1146,18 +1145,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = function () use ($reference) {
                 return $this->resolveServices($reference);
             };
-        } elseif ($value instanceof ServiceLocatorArgument) {
-            $parameterBag = $this->getParameterBag();
-            $services = array();
-            foreach ($value->getValues() as $k => $v) {
-                if ($v && $v->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE && !$this->has((string) $v)) {
-                    continue;
-                }
-                $services[$k] = function () use ($v, $parameterBag) {
-                    return $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($v)));
-                };
-            }
-            $value = new ServiceLocator($services);
         } elseif ($value instanceof IteratorArgument) {
             $parameterBag = $this->getParameterBag();
             $value = new RewindableGenerator(function () use ($value, $parameterBag) {

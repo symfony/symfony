@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -907,7 +906,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 $bagClass
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /*{$this->docStar}
  * $class.
@@ -1548,15 +1546,16 @@ EOF;
 
             return sprintf('array(%s)', implode(', ', $code));
         } elseif ($value instanceof ServiceClosureArgument) {
-            return $this->dumpServiceClosure($value->getValues()[0], $interpolate, false);
-        } elseif ($value instanceof ServiceLocatorArgument) {
-            $code = "\n";
-            foreach ($value->getValues() as $k => $v) {
-                $code .= sprintf("            %s => %s,\n", $this->dumpValue($k, $interpolate), $this->dumpServiceClosure($v, $interpolate, true));
-            }
-            $code .= '        ';
+            $value = $value->getValues()[0];
+            $code = $this->dumpValue($value, $interpolate);
 
-            return sprintf('new ServiceLocator(array(%s))', $code);
+            if ($value instanceof TypedReference) {
+                $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
+            } else {
+                $code = sprintf('return %s;', $code);
+            }
+
+            return sprintf("function () {\n            %s\n        }", $code);
         } elseif ($value instanceof IteratorArgument) {
             $countCode = array();
             $countCode[] = 'function () {';
@@ -1690,23 +1689,6 @@ EOF;
         }
 
         return $this->export($value);
-    }
-
-    private function dumpServiceClosure(Reference $reference = null, $interpolate, $oneLine)
-    {
-        $code = $this->dumpValue($reference, $interpolate);
-
-        if ($reference instanceof TypedReference) {
-            $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $reference->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior() ? ' = null' : '', $code);
-        } else {
-            $code = sprintf('return %s;', $code);
-        }
-
-        if ($oneLine) {
-            return sprintf('function () { %s }', $code);
-        }
-
-        return sprintf("function () {\n            %s\n        }", $code);
     }
 
     /**

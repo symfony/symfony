@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
@@ -469,24 +468,6 @@ class ContainerBuilderTest extends TestCase
 
         // The second argument should have been ignored.
         $this->assertEquals(1, $i);
-    }
-
-    public function testCreateServiceWithServiceLocatorArgument()
-    {
-        $builder = new ContainerBuilder();
-        $builder->register('bar', 'stdClass');
-        $builder
-            ->register('lazy_context', 'LazyContext')
-            ->setArguments(array(new ServiceLocatorArgument(array('bar' => new Reference('bar'), 'invalid' => new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
-        ;
-
-        $lazyContext = $builder->get('lazy_context');
-        $locator = $lazyContext->lazyValues;
-
-        $this->assertInstanceOf(ServiceLocator::class, $locator);
-        $this->assertInstanceOf('stdClass', $locator->get('bar'));
-        $this->assertFalse($locator->has('invalid'));
-        $this->assertSame($locator->get('bar'), $locator('bar'), '->get() should be used when invoking ServiceLocator');
     }
 
     /**

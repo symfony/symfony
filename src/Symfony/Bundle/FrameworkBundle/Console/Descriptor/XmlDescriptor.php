@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -435,12 +434,6 @@ class XmlDescriptor extends Descriptor
                 $argumentXML->setAttribute('id', (string) $argument);
             } elseif ($argument instanceof IteratorArgument) {
                 $argumentXML->setAttribute('type', 'iterator');
-
-                foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
-                    $argumentXML->appendChild($childArgumentXML);
-                }
-            } elseif ($argument instanceof ServiceLocatorArgument) {
-                $argumentXML->setAttribute('type', 'service-locator');
 
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);

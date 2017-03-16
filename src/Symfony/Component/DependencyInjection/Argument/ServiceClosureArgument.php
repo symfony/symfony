@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * Represents a service wrapped in a memoizing closure.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in version 3.3
  */
 class ServiceClosureArgument implements ArgumentInterface
 {

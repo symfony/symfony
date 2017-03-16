@@ -14,10 +14,11 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractType;
 
 /**
@@ -49,10 +50,10 @@ class FormPassTest extends TestCase
         $extDefinition = $container->getDefinition('form.extension');
 
         $this->assertEquals(
-            new ServiceLocatorArgument(array(
-                __CLASS__.'_Type1' => new Reference('my.type1'),
-                __CLASS__.'_Type2' => new Reference('my.type2'),
-            )),
+            (new Definition(ServiceLocator::class, array(array(
+                __CLASS__.'_Type1' => new ServiceClosureArgument(new Reference('my.type1')),
+                __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
+            ))))->addTag('container.service_locator'),
             $extDefinition->getArgument(0)
         );
     }
@@ -196,7 +197,7 @@ class FormPassTest extends TestCase
     {
         $definition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $definition->setArguments(array(
-            new ServiceLocatorArgument(array()),
+            array(),
             array(),
             new IteratorArgument(array()),
         ));

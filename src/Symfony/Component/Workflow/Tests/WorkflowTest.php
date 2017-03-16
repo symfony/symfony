@@ -104,6 +104,23 @@ class WorkflowTest extends TestCase
 
         $this->assertTrue($workflow->can($subject, 't1'));
         $this->assertFalse($workflow->can($subject, 't2'));
+
+        $subject->marking = array('b' => 1);
+
+        $this->assertFalse($workflow->can($subject, 't1'));
+        // In a workflow net, all "from" places should contain a token to enable
+        // the transition.
+        $this->assertFalse($workflow->can($subject, 't2'));
+
+        $subject->marking = array('b' => 1, 'c' => 1);
+
+        $this->assertFalse($workflow->can($subject, 't1'));
+        $this->assertTrue($workflow->can($subject, 't2'));
+
+        $subject->marking = array('f' => 1);
+
+        $this->assertFalse($workflow->can($subject, 't5'));
+        $this->assertTrue($workflow->can($subject, 't6'));
     }
 
     public function testCanWithGuard()

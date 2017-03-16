@@ -313,8 +313,9 @@ class WorkflowTest extends TestCase
 
         $subject->marking = array('c' => 1, 'e' => 1);
         $transitions = $workflow->getEnabledTransitions($subject);
-        $this->assertCount(1, $transitions);
-        $this->assertSame('t5', $transitions[0]->getName());
+        $this->assertCount(2, $transitions);
+        $this->assertSame('t2', $transitions[0]->getName());
+        $this->assertSame('t5', $transitions[1]->getName());
     }
 
     public function testGetEnabledTransitionsWithSameNameTransition()

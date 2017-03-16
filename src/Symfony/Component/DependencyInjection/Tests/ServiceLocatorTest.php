@@ -40,15 +40,20 @@ class ServiceLocatorTest extends TestCase
         $this->assertSame('baz', $locator->get('bar'));
     }
 
-    public function testGetDoesNotExecuteTheSameCallableTwice()
+    public function testGetDoesNotMemoize()
     {
         $i = 0;
-        $locator = new ServiceLocator(array('foo' => function () use (&$i) { $i++; return 'bar'; }));
+        $locator = new ServiceLocator(array(
+            'foo' => function () use (&$i) {
+                ++$i;
+
+                return 'bar';
+            },
+        ));
 
         $this->assertSame('bar', $locator->get('foo'));
         $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame('bar', $locator->get('foo'));
-        $this->assertSame(1, $i);
+        $this->assertSame(2, $i);
     }
 
     /**

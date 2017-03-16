@@ -187,8 +187,8 @@ class Workflow
     }
 
     /**
-     * Check if this marking has at least one place in the froms transition
-     * Check also if the transition is guarded for this marking
+     * Check if this marking has at least one place in the froms transition.
+     * Check also if the transition is guarded for this marking.
      *
      * @param object     $subject
      * @param Marking    $marking

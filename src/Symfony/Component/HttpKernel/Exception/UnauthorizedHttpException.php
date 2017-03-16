@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * UnauthorizedHttpException.
  *
@@ -30,6 +32,6 @@ class UnauthorizedHttpException extends HttpException
     {
         $headers = array('WWW-Authenticate' => $challenge);
 
-        parent::__construct(401, $message, $previous, $headers, $code);
+        parent::__construct(Response::HTTP_UNAUTHORIZED, $message, $previous, $headers, $code);
     }
 }

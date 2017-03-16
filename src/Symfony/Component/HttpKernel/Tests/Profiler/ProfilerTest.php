@@ -27,14 +27,14 @@ class ProfilerTest extends TestCase
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
-        $response = new Response('', 204);
+        $response = new Response('', Response::HTTP_NO_CONTENT);
         $collector = new RequestDataCollector();
 
         $profiler = new Profiler($this->storage);
         $profiler->add($collector);
         $profile = $profiler->collect($request, $response);
 
-        $this->assertSame(204, $profile->getStatusCode());
+        $this->assertSame(Response::HTTP_NO_CONTENT, $profile->getStatusCode());
         $this->assertSame('GET', $profile->getMethod());
         $this->assertSame('bar', $profiler->get('request')->getRequestQuery()->all()['foo']->getValue());
     }

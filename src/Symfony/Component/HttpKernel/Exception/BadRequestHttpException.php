@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * BadRequestHttpException.
  *
@@ -27,6 +29,6 @@ class BadRequestHttpException extends HttpException
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(400, $message, $previous, array(), $code);
+        parent::__construct(Response::HTTP_BAD_REQUEST, $message, $previous, array(), $code);
     }
 }

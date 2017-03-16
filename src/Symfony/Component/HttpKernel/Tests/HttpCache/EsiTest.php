@@ -200,7 +200,7 @@ class EsiTest extends TestCase
     {
         $esi = new Esi();
         $response = new Response('foo');
-        $response->setStatusCode(404);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $cache = $this->getCache(Request::create('/'), $response);
         $esi->handle($cache, '/', '/alt', false);
     }
@@ -209,7 +209,7 @@ class EsiTest extends TestCase
     {
         $esi = new Esi();
         $response = new Response('foo');
-        $response->setStatusCode(404);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $cache = $this->getCache(Request::create('/'), $response);
         $this->assertEquals('', $esi->handle($cache, '/', '/alt', true));
     }
@@ -218,7 +218,7 @@ class EsiTest extends TestCase
     {
         $esi = new Esi();
         $response1 = new Response('foo');
-        $response1->setStatusCode(404);
+        $response1->setStatusCode(Response::HTTP_NOT_FOUND);
         $response2 = new Response('bar');
         $cache = $this->getCache(Request::create('/'), array($response1, $response2));
         $this->assertEquals('bar', $esi->handle($cache, '/', '/alt', false));

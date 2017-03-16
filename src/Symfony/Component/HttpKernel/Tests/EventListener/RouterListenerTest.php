@@ -175,7 +175,7 @@ class RouterListenerTest extends TestCase
         $dispatcher->addSubscriber(new ValidateRequestListener());
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
         $dispatcher->addSubscriber(new ExceptionListener(function () {
-            return new Response('Exception handled', 400);
+            return new Response('Exception handled', Response::HTTP_BAD_REQUEST);
         }));
 
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
@@ -183,6 +183,6 @@ class RouterListenerTest extends TestCase
         $request = Request::create('http://localhost/');
         $request->headers->set('host', '###');
         $response = $kernel->handle($request);
-        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
 }

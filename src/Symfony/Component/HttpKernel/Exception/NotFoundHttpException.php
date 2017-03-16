@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * NotFoundHttpException.
  *
@@ -27,6 +29,6 @@ class NotFoundHttpException extends HttpException
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(404, $message, $previous, array(), $code);
+        parent::__construct(Response::HTTP_NOT_FOUND, $message, $previous, array(), $code);
     }
 }

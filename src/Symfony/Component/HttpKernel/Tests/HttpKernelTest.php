@@ -60,7 +60,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException('foo'); });
         $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
 
-        $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $this->assertEquals('foo', $response->getContent());
     }
 
@@ -87,13 +87,13 @@ class HttpKernelTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
-            $event->setResponse(new RedirectResponse('/login', 301));
+            $event->setResponse(new RedirectResponse('/login', Response::HTTP_MOVED_PERMANENTLY));
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new AccessDeniedHttpException(); });
         $response = $kernel->handle(new Request());
 
-        $this->assertEquals('301', $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
         $this->assertEquals('/login', $response->headers->get('Location'));
     }
 
@@ -107,7 +107,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new MethodNotAllowedHttpException(array('POST')); });
         $response = $kernel->handle(new Request());
 
-        $this->assertEquals('405', $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $response->getStatusCode());
         $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
@@ -132,10 +132,10 @@ class HttpKernelTest extends TestCase
     public function getStatusCodes()
     {
         return array(
-            array(200, 404),
-            array(404, 200),
-            array(301, 200),
-            array(500, 200),
+            array(Response::HTTP_OK, Response::HTTP_NOT_FOUND),
+            array(Response::HTTP_NOT_FOUND, Response::HTTP_OK),
+            array(Response::HTTP_MOVED_PERMANENTLY, Response::HTTP_OK),
+            array(Response::HTTP_INTERNAL_SERVER_ERROR, Response::HTTP_OK),
         );
     }
 
@@ -159,9 +159,9 @@ class HttpKernelTest extends TestCase
     public function getSpecificStatusCodes()
     {
         return array(
-            array(200),
-            array(302),
-            array(403),
+            array(Response::HTTP_OK),
+            array(Response::HTTP_FOUND),
+            array(Response::HTTP_FORBIDDEN),
         );
     }
 
@@ -296,7 +296,7 @@ class HttpKernelTest extends TestCase
 
         $kernel = $this->getHttpKernel($dispatcher, function ($content) { return new Response($content); }, null, array('foo'));
 
-        $this->assertResponseEquals(new Response('foo', 200, array('X-Id' => 'bar')), $kernel->handle(new Request()));
+        $this->assertResponseEquals(new Response('foo', Response::HTTP_OK, array('X-Id' => 'bar')), $kernel->handle(new Request()));
     }
 
     public function testTerminate()

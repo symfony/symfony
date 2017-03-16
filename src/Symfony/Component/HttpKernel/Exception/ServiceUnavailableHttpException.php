@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * ServiceUnavailableHttpException.
  *
@@ -33,6 +35,6 @@ class ServiceUnavailableHttpException extends HttpException
             $headers = array('Retry-After' => $retryAfter);
         }
 
-        parent::__construct(503, $message, $previous, $headers, $code);
+        parent::__construct(Response::HTTP_INTERNAL_SERVER_ERROR, $message, $previous, $headers, $code);
     }
 }

@@ -50,6 +50,7 @@
         "symfony/translation": "~3.2",
         "symfony/templating": "~2.8|~3.0",
         "symfony/validator": "~3.2",
+        "symfony/workflow": "~3.2",
         "symfony/yaml": "~3.2",
         "symfony/property-info": "~3.1",
         "doctrine/annotations": "~1.0",

@@ -397,6 +397,10 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        if (!class_exists(Workflow\Workflow::class)) {
+            throw new LogicException('Workflow support cannot be enabled as the Workflow component is not installed.');
+        }
+
         $loader->load('workflow.xml');
 
         $registryDefinition = $container->getDefinition('workflow.registry');

@@ -595,7 +595,10 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
+        $this->assertEquals(0, $this->response->getAge());
         $this->assertEquals('Hello World', $this->response->getContent());
+
+        sleep(2);
 
         $this->setNextResponse(304, array('Cache-Control' => 's-maxage=0'));
 
@@ -604,6 +607,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertTraceContains('stale');
         $this->assertTraceContains('valid');
+        $this->assertEquals(0, $this->response->getAge());
         $this->assertEquals('Hello World', $this->response->getContent());
     }
 

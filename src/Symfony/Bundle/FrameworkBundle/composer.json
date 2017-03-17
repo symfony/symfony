@@ -67,7 +67,8 @@
         "symfony/property-info": "<3.3",
         "symfony/serializer": "<3.3",
         "symfony/translations": "<3.2",
-        "symfony/validator": "<3.3"
+        "symfony/validator": "<3.3",
+        "symfony/workflow": "<3.3"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

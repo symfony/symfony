@@ -54,11 +54,17 @@ class DefinitionBuilder
         $this->initialPlace = null;
     }
 
+    /**
+     * @param string $place
+     */
     public function setInitialPlace($place)
     {
         $this->initialPlace = $place;
     }
 
+    /**
+     * @param string $place
+     */
     public function addPlace($place)
     {
         if (!preg_match('{^[\w\d_-]+$}', $place)) {
@@ -72,6 +78,9 @@ class DefinitionBuilder
         $this->places[$place] = $place;
     }
 
+    /**
+     * @param string[] $places
+     */
     public function addPlaces(array $places)
     {
         foreach ($places as $place) {

@@ -549,49 +549,39 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // try to acquire a lock to call the backend
         $lock = $this->store->lock($request);
 
+        if (true === $lock) {
+            // we have the lock, call the backend
+            return false;
+        }
+
         // there is already another process calling the backend
-        if (true !== $lock) {
-            // check if we can serve the stale entry
-            if (null === $age = $entry->headers->getCacheControlDirective('stale-while-revalidate')) {
-                $age = $this->options['stale_while_revalidate'];
-            }
 
-            if (abs($entry->getTtl()) < $age) {
-                $this->record($request, 'stale-while-revalidate');
-
-                // server the stale response while there is a revalidation
-                return true;
-            }
-
-            // wait for the lock to be released
-            $wait = 0;
-            while ($this->store->isLocked($request) && $wait < 5000000) {
-                usleep(50000);
-                $wait += 50000;
-            }
-
-            if ($wait < 5000000) {
-                // replace the current entry with the fresh one
-                $new = $this->lookup($request);
-                $entry->headers = $new->headers;
-                $entry->setContent($new->getContent());
-                $entry->setStatusCode($new->getStatusCode());
-                $entry->setProtocolVersion($new->getProtocolVersion());
-                foreach ($new->headers->getCookies() as $cookie) {
-                    $entry->headers->setCookie($cookie);
-                }
-            } else {
-                // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
-                $entry->setStatusCode(503);
-                $entry->setContent('503 Service Unavailable');
-                $entry->headers->set('Retry-After', 10);
-            }
+        // May we serve a stale response?
+        if ($this->mayServeStaleWhileRevalidate($entry)) {
+            $this->record($request, 'stale-while-revalidate');
 
             return true;
         }
 
-        // we have the lock, call the backend
-        return false;
+        // wait for the lock to be released
+        if ($this->waitForLock($request)) {
+            // replace the current entry with the fresh one
+            $new = $this->lookup($request);
+            $entry->headers = $new->headers;
+            $entry->setContent($new->getContent());
+            $entry->setStatusCode($new->getStatusCode());
+            $entry->setProtocolVersion($new->getProtocolVersion());
+            foreach ($new->headers->getCookies() as $cookie) {
+                $entry->headers->setCookie($cookie);
+            }
+        } else {
+            // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
+            $entry->setStatusCode(503);
+            $entry->setContent('503 Service Unavailable');
+            $entry->headers->set('Retry-After', 10);
+        }
+
+        return true;
     }
 
     /**
@@ -709,5 +699,42 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $path .= '?'.$qs;
         }
         $this->traces[$request->getMethod().' '.$path][] = $event;
+    }
+
+    /**
+     * Checks whether the given (cached) response may be served as "stale" when a revalidation
+     * is currently in progress.
+     *
+     * @param Response $entry
+     *
+     * @return bool True when the stale response may be served, false otherwise.
+     */
+    private function mayServeStaleWhileRevalidate(Response $entry)
+    {
+        $timeout = $entry->headers->getCacheControlDirective('stale-while-revalidate');
+
+        if ($timeout === null) {
+            $timeout = $this->options['stale_while_revalidate'];
+        }
+
+        return abs($entry->getTtl()) < $timeout;
+    }
+
+    /**
+     * Waits for the store to release a locked entry.
+     *
+     * @param Request $request The request to wait for
+     *
+     * @return bool True if the lock was released before the internal timeout was hit; false if the wait timeout was exceeded.
+     */
+    private function waitForLock(Request $request)
+    {
+        $wait = 0;
+        while ($this->store->isLocked($request) && $wait < 5000000) {
+            usleep(50000);
+            $wait += 50000;
+        }
+
+        return $wait < 5000000;
     }
 }

@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Workflow;
 use Symfony\Component\Console\Application;
 
@@ -96,21 +97,26 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->annotationsConfigEnabled = $this->isConfigEnabled($container, $config['annotations']);
+        $isTemplatingPHPEngineEnabled = $this->isConfigEnabled($container, $config['templating']) && in_array('php', $config['templating']['engines']);
 
         // A translator must always be registered (as support is included by
         // default in the Form and Validator component). If disabled, an identity
         // translator will be used and everything will still work as expected.
-        if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
+        if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation']) || $isTemplatingPHPEngineEnabled) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['translator'])) {
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
             }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['form'])) {
                 throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
             }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['validation'])) {
                 throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
+            }
+
+            if (!class_exists(Translator::class) && $isTemplatingPHPEngineEnabled) {
+                throw new LogicException('Templating with PHP engine support cannot be enabled as the Translation component is not installed.');
             }
 
             $loader->load('identity_translator.xml');

@@ -530,7 +530,7 @@ class Response
             return false;
         }
 
-        return $this->isValidateable() || $this->isFresh();
+        return $this->isValidateable() || $this->isExpirable();
     }
 
     /**
@@ -545,6 +545,19 @@ class Response
     public function isFresh()
     {
         return $this->getTtl() > 0;
+    }
+
+    /**
+     * Returns true if the response includes headers that indicate time-based
+     * content expiration.
+     *
+     * @return bool true if the response expires when it reaches a particular age, false otherwise.
+     */
+    public function isExpirable()
+    {
+        return $this->headers->hasCacheControlDirective('s-maxage')
+            || $this->headers->hasCacheControlDirective('max-age')
+            || $this->headers->has('expires');
     }
 
     /**

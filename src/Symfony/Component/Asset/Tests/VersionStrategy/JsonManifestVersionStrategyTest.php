@@ -52,7 +52,7 @@ class JsonManifestVersionStrategyTest extends TestCase
      */
     public function testManifestFileWithBadJSONThrowsException()
     {
-        $strategy = $this->createStrategy('manifest-invalid.json.invalid');
+        $strategy = $this->createStrategy('manifest-invalid-json');
         $strategy->getVersion('main.js');
     }
 

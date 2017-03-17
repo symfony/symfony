@@ -136,6 +136,17 @@ class TranslatorTest extends TestCase
         $this->assertSame('en', $translator->getLocale());
     }
 
+    /**
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The Translator does not support the following options: 'foo'
+     */
+    public function testInvalidOptions()
+    {
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+
+        (new Translator($container, new MessageSelector(), array(), array('foo' => 'bar')));
+    }
+
     protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);

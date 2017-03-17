@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by chapterjason at 2017-03-16T17:43:51Z
+
+It does what I expect and I dont see anything missing.
+
+Mentioning in the docs that `priority` and `lazy` are also available would be a good idea. Also to referring to the default event docs because it works in the same way?

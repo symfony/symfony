@@ -26,16 +26,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class AutowirePass extends AbstractRecursivePass
 {
-    /**
-     * @internal
-     */
-    const MODE_REQUIRED = 1;
-
-    /**
-     * @internal
-     */
-    const MODE_OPTIONAL = 2;
-
     private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
@@ -170,13 +160,6 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $reflectionMethod) {
-            if ($reflectionMethod->isStatic()) {
-                continue;
-            }
-            if ($reflectionMethod->isAbstract() && !$reflectionMethod->getNumberOfParameters()) {
-                $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
-                continue;
-            }
             $r = $reflectionMethod;
 
             while (true) {
@@ -225,7 +208,7 @@ class AutowirePass extends AbstractRecursivePass
                 }
             }
 
-            $arguments = $this->autowireMethod($reflectionMethod, $arguments, self::MODE_REQUIRED);
+            $arguments = $this->autowireMethod($reflectionMethod, $arguments);
 
             if ($arguments !== $call[1]) {
                 $methodCalls[$i][1] = $arguments;
@@ -233,9 +216,13 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         foreach ($autowiredMethods as $lcMethod => $reflectionMethod) {
-            if ($reflectionMethod->isPublic() && $arguments = $this->autowireMethod($reflectionMethod, array(), self::MODE_OPTIONAL)) {
-                $methodCalls[] = array($reflectionMethod->name, $arguments);
+            if (!$reflectionMethod->getNumberOfParameters()) {
+                continue; // skip getters
             }
+            if (!$reflectionMethod->isPublic()) {
+                throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s::%s() must be public.', $this->currentId, $reflectionClass->name, $reflectionMethod->name));
+            }
+            $methodCalls[] = array($reflectionMethod->name, $this->autowireMethod($reflectionMethod, array()));
         }
 
         return $methodCalls;
@@ -246,20 +233,24 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @param \ReflectionMethod $reflectionMethod
      * @param array             $arguments
-     * @param int               $mode
      *
      * @return array The autowired arguments
      *
      * @throws RuntimeException
      */
-    private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments, $mode)
+    private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments)
     {
-        $didAutowire = false; // Whether any arguments have been autowired or not
+        $isConstructor = $reflectionMethod->isConstructor();
+
+        if (!$isConstructor && !$arguments && !$reflectionMethod->getNumberOfRequiredParameters()) {
+            throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s::%s() has only optional arguments, thus must be wired explicitly.', $this->currentId, $reflectionMethod->class, $reflectionMethod->name));
+        }
+
         foreach ($reflectionMethod->getParameters() as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
             }
-            if (self::MODE_OPTIONAL === $mode && $parameter->isOptional() && !array_key_exists($index, $arguments)) {
+            if (!$isConstructor && $parameter->isOptional() && !array_key_exists($index, $arguments)) {
                 break;
             }
             if (method_exists($parameter, 'isVariadic') && $parameter->isVariadic()) {
@@ -271,11 +262,7 @@ class AutowirePass extends AbstractRecursivePass
             if (!$typeName) {
                 // no default value? Then fail
                 if (!$parameter->isOptional()) {
-                    if (self::MODE_REQUIRED === $mode) {
-                        throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s::%s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $reflectionMethod->class, $reflectionMethod->name));
-                    }
-
-                    return array();
+                    throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s::%s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $reflectionMethod->class, $reflectionMethod->name));
                 }
 
                 if (!array_key_exists($index, $arguments)) {
@@ -287,13 +274,12 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             if ($value = $this->getAutowiredReference($typeName)) {
-                $didAutowire = true;
                 $this->usedTypes[$typeName] = $this->currentId;
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $value = $parameter->getDefaultValue();
             } elseif ($parameter->allowsNull()) {
                 $value = null;
-            } elseif (self::MODE_REQUIRED === $mode) {
+            } else {
                 if ($classOrInterface = class_exists($typeName, false) ? 'class' : (interface_exists($typeName, false) ? 'interface' : null)) {
                     $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeName, $this->currentId, $classOrInterface);
                 } else {
@@ -301,15 +287,9 @@ class AutowirePass extends AbstractRecursivePass
                 }
 
                 throw new RuntimeException($message);
-            } else {
-                return array();
             }
 
             $arguments[$index] = $value;
-        }
-
-        if (self::MODE_REQUIRED !== $mode && !$didAutowire) {
-            return array();
         }
 
         // it's possible index 1 was set, then index 0, then 2, etc
@@ -330,15 +310,23 @@ class AutowirePass extends AbstractRecursivePass
     private function autowireOverridenGetters(array $overridenGetters, array $autowiredMethods)
     {
         foreach ($autowiredMethods as $lcMethod => $reflectionMethod) {
-            if (isset($overridenGetters[$lcMethod])
-                || !method_exists($reflectionMethod, 'getReturnType')
-                || 0 !== $reflectionMethod->getNumberOfParameters()
-                || $reflectionMethod->isFinal()
-                || $reflectionMethod->returnsReference()
-                || !($typeName = InheritanceProxyHelper::getTypeHint($reflectionMethod, null, true))
-                || !($typeRef = $this->getAutowiredReference($typeName))
-            ) {
+            if (isset($overridenGetters[$lcMethod]) || $reflectionMethod->getNumberOfParameters() || $reflectionMethod->isConstructor()) {
                 continue;
+            }
+            if (!$typeName = InheritanceProxyHelper::getTypeHint($reflectionMethod, null, true)) {
+                $typeName = InheritanceProxyHelper::getTypeHint($reflectionMethod);
+
+                throw new RuntimeException(sprintf('Cannot autowire service "%s": getter %s::%s() must%s be given a return value explicitly.', $this->currentId, $reflectionMethod->class, $reflectionMethod->name, $typeName ? '' : ' have a return-type hint or'));
+            }
+
+            if (!$typeRef = $this->getAutowiredReference($typeName)) {
+                if ($classOrInterface = class_exists($typeName, false) ? 'class' : (interface_exists($typeName, false) ? 'interface' : null)) {
+                    $message = sprintf('Unable to autowire return type "%s" for service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeName, $this->currentId, $classOrInterface);
+                } else {
+                    $message = sprintf('Cannot autowire return type of getter %s::%s() for service "%s": Class %s does not exist.', $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $typeName);
+                }
+
+                throw new RuntimeException($message);
             }
 
             $overridenGetters[$lcMethod] = $typeRef;

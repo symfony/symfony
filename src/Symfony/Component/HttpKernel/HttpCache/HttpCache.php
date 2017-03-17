@@ -196,11 +196,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             }
         }
 
-        $path = $request->getPathInfo();
-        if ($qs = $request->getQueryString()) {
-            $path .= '?'.$qs;
-        }
-        $this->traces[$request->getMethod().' '.$path] = array();
+        $this->traces[$this->getTraceKey($request)] = array();
 
         if (!$request->isMethodSafe(false)) {
             $response = $this->invalidate($request, $catch);
@@ -704,10 +700,22 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     private function record(Request $request, $event)
     {
+        $this->traces[$this->getTraceKey($request)][] = $event;
+    }
+
+    /**
+     * Calculates the key we use in the "trace" array for this request.
+     *
+     * @param Request $request
+     * @return string
+     */
+    private function getTraceKey(Request $request)
+    {
         $path = $request->getPathInfo();
         if ($qs = $request->getQueryString()) {
             $path .= '?'.$qs;
         }
-        $this->traces[$request->getMethod().' '.$path][] = $event;
+
+        return $request->getMethod().' '.$path;
     }
 }

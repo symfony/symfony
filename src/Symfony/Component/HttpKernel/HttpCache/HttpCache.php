@@ -419,9 +419,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Forwards the Request to the backend and determines whether the response should be stored.
-     *
-     * This methods is triggered when the cache missed or a reload is required.
+     * Unconditionally fetches a fresh response from the backend and
+     * stores it in the cache if is cacheable.
      *
      * @param Request $request A Request instance
      * @param bool    $catch   whether to process exceptions

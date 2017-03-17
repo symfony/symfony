@@ -70,35 +70,35 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
         $data = json_decode($request->getContent());
 
-        if (!$data instanceof \stdClass) {
-            throw new BadCredentialsException('Invalid JSON.');
-        }
-
         try {
-            $username = $this->propertyAccessor->getValue($data, $this->options['username_path']);
-        } catch (AccessException $e) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['username_path']));
-        }
+            if (!$data instanceof \stdClass) {
+                throw new BadCredentialsException('Invalid JSON.');
+            }
 
-        try {
-            $password = $this->propertyAccessor->getValue($data, $this->options['password_path']);
-        } catch (AccessException $e) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['password_path']));
-        }
+            try {
+                $username = $this->propertyAccessor->getValue($data, $this->options['username_path']);
+            } catch (AccessException $e) {
+                throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['username_path']));
+            }
 
-        if (!is_string($username)) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
-        }
+            try {
+                $password = $this->propertyAccessor->getValue($data, $this->options['password_path']);
+            } catch (AccessException $e) {
+                throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['password_path']));
+            }
 
-        if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
-            throw new BadCredentialsException('Invalid username.');
-        }
+            if (!is_string($username)) {
+                throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
+            }
 
-        if (!is_string($password)) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
-        }
+            if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+                throw new BadCredentialsException('Invalid username.');
+            }
 
-        try {
+            if (!is_string($password)) {
+                throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
+            }
+
             $token = new UsernamePasswordToken($username, $password, $this->providerKey);
 
             $authenticatedToken = $this->authenticationManager->authenticate($token);

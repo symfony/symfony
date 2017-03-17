@@ -86,9 +86,6 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertEquals('ok', $event->getResponse()->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAttemptAuthenticationNoUsername()
     {
         $this->createListener();
@@ -96,11 +93,9 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
+        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAttemptAuthenticationNoPassword()
     {
         $this->createListener();
@@ -108,11 +103,9 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
+        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAttemptAuthenticationUsernameNotAString()
     {
         $this->createListener();
@@ -120,11 +113,9 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
+        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAttemptAuthenticationPasswordNotAString()
     {
         $this->createListener();
@@ -132,11 +123,9 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
+        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testAttemptAuthenticationUsernameTooLong()
     {
         $this->createListener();
@@ -145,5 +134,6 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
+        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 }

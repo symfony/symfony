@@ -570,7 +570,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version_strategy']) && $v['version_strategy'] == 'json_manifest' && !isset($v['manifest_path']);
+                            return isset($v['version_strategy']) && $v['version_strategy'] === 'json_manifest' && !isset($v['manifest_path']);
                         })
                         ->thenInvalid('You must configure the "manifest_path" key in order to use the "json_manifest" "version_strategy".')
                     ->end()
@@ -608,7 +608,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version_strategy']) && $v['version_strategy'] == 'json_manifest' && !isset($v['manifest_path']);
+                                        return isset($v['version_strategy']) && $v['version_strategy'] === 'json_manifest' && !isset($v['manifest_path']);
                                     })
                                     ->thenInvalid('You must configure the "manifest_path" key in order to use the "json_manifest" "version_strategy".')
                                 ->end()

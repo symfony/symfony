@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Asset\VersionStrategy;
 
-use Symfony\Component\Asset\Exception\MissingAssetManifestException;
-
 /**
  * Reads the versioned path of an asset from a JSON manifest file.
  *
@@ -41,6 +39,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
      * versioned file.
      *
      * @param string $path
+     *
      * @return string
      */
     public function getVersion($path)

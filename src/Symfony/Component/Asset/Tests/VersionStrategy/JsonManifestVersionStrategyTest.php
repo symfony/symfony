@@ -54,7 +54,6 @@ class JsonManifestVersionStrategyTest extends TestCase
     {
         $strategy = $this->createStrategy('manifest-invalid.json');
         $strategy->getVersion('main.js');
-
     }
 
     private function createStrategy($manifestFilename)

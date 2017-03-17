@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 class ServiceLocator implements PsrContainerInterface
 {
     private $factories;
-    private $values = array();
 
     /**
      * @param callable[] $factories
@@ -53,13 +52,12 @@ class ServiceLocator implements PsrContainerInterface
             throw new ServiceCircularReferenceException($id, array($id, $id));
         }
 
-        if (false !== $factory) {
-            $this->factories[$id] = true;
-            $this->values[$id] = $factory();
-            $this->factories[$id] = false;
+        $this->factories[$id] = true;
+        try {
+            return $factory();
+        } finally {
+            $this->factories[$id] = $factory;
         }
-
-        return $this->values[$id];
     }
 
     public function __invoke($id)

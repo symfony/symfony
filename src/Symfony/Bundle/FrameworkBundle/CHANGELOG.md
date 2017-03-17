@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * A new version_strategy called json_manifest was added that reads a JSON manifest
+   to load the correct, versioned paths of assets.
  * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
  * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Deprecated the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter

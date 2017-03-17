@@ -17,3 +17,6 @@ framework:
             bar_version_strategy:
                 base_urls: ["https://bar_version_strategy.example.com"]
                 version_strategy: assets.custom_version_strategy
+            json_manifest_strategy:
+                version_strategy: json_manifest
+                manifest_path: '/path/to/manifest.json'

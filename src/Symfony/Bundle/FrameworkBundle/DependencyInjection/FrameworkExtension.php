@@ -808,7 +808,11 @@ class FrameworkExtension extends Extension
         $defaultVersion = null;
 
         if ($config['version_strategy']) {
-            $defaultVersion = new Reference($config['version_strategy']);
+            if ($config['version_strategy'] == 'json_manifest') {
+                $defaultVersion = $this->createJsonManifestVersion($container, $config['manifest_path'], '_default');
+            } else {
+                $defaultVersion = new Reference($config['version_strategy']);
+            }
         } else {
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
         }
@@ -819,7 +823,11 @@ class FrameworkExtension extends Extension
         $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
-                $version = new Reference($package['version_strategy']);
+                if ($package['version_strategy'] == 'json_manifest') {
+                    $version = $this->createJsonManifestVersion($container, $package['manifest_path'], $name);
+                } else {
+                    $version = new Reference($package['version_strategy']);
+                }
             } elseif (!array_key_exists('version', $package)) {
                 $version = $defaultVersion;
             } else {
@@ -866,6 +874,17 @@ class FrameworkExtension extends Extension
         $def
             ->replaceArgument(0, $version)
             ->replaceArgument(1, $format)
+        ;
+        $container->setDefinition('assets._version_'.$name, $def);
+
+        return new Reference('assets._version_'.$name);
+    }
+
+    private function createJsonManifestVersion(ContainerBuilder $container, $manifestPath, $name)
+    {
+        $def = new ChildDefinition('assets.json_manifest_version_strategy');
+        $def
+            ->replaceArgument(0, $manifestPath)
         ;
         $container->setDefinition('assets._version_'.$name, $def);
 

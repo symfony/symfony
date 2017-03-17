@@ -586,6 +586,27 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World', $this->response->getContent());
     }
 
+    public function testCachesResponseWithSMaxAge0ButRevalidatesIt()
+    {
+        $this->setNextResponse(200, array('Cache-Control' => 's-maxage=0'), 'Hello World');
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertTraceContains('miss');
+        $this->assertTraceContains('store');
+        $this->assertEquals('Hello World', $this->response->getContent());
+
+        $this->setNextResponse(304, array('Cache-Control' => 's-maxage=0'));
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertTraceContains('stale');
+        $this->assertTraceContains('valid');
+        $this->assertEquals('Hello World', $this->response->getContent());
+    }
+
     public function testAssignsDefaultTtlWhenResponseHasNoFreshnessInformation()
     {
         $this->setNextResponse();

@@ -61,7 +61,7 @@
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
-        "symfony/translations": "<3.2"
+        "symfony/translation": "<3.2"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

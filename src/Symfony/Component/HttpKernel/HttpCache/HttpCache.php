@@ -202,6 +202,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect') || !$request->isMethodCacheable()) {
             $response = $this->pass($request, $catch);
+        } elseif ($this->options['allow_reload'] && $request->isNoCache()) {
+            /*
+                If allow_reload is configured and the client requests "Cache-Control: no-cache",
+                reload the cache by fetching a fresh response and caching it (if possible).
+            */
+            $this->record($request, 'reload');
+            $response = $this->fetch($request, $catch);
         } else {
             $response = $this->lookup($request, $catch);
         }
@@ -315,13 +322,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function lookup(Request $request, $catch = false)
     {
-        // if allow_reload and no-cache Cache-Control, allow a cache reload
-        if ($this->options['allow_reload'] && $request->isNoCache()) {
-            $this->record($request, 'reload');
-
-            return $this->fetch($request, $catch);
-        }
-
         try {
             $entry = $this->store->lookup($request);
         } catch (\Exception $e) {

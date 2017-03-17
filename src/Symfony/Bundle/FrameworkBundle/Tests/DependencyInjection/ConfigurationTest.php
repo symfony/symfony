@@ -120,6 +120,7 @@ class ConfigurationTest extends TestCase
             'base_path' => '',
             'base_urls' => array(),
             'packages' => array(),
+            'manifest_path' => null,
         );
 
         $this->assertEquals($defaultConfig, $config['assets']);
@@ -274,6 +275,7 @@ class ConfigurationTest extends TestCase
                 'base_path' => '',
                 'base_urls' => array(),
                 'packages' => array(),
+                'manifest_path' => null,
             ),
             'cache' => array(
                 'pools' => array(),

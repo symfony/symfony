@@ -559,6 +559,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // May we serve a stale response?
         if ($this->mayServeStaleWhileRevalidate($entry)) {
             $this->record($request, 'stale-while-revalidate');
+
             return true;
         }
 

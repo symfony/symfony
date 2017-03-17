@@ -712,9 +712,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Calculates the key we use in the "trace" array for this request.
+     * Calculates the key we use in the "trace" array for a given request.
      *
      * @param Request $request
+     *
      * @return string
      */
     private function getTraceKey(Request $request)

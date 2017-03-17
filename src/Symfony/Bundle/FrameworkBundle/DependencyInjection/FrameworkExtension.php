@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
@@ -508,6 +509,11 @@ class FrameworkExtension extends Extension
                 if (!isset($config['guard'])) {
                     continue;
                 }
+
+                if (!class_exists(ExpressionLanguage::class)) {
+                    throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed.');
+                }
+
                 $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
                 $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
                 $configuration[$eventName] = $config['guard'];

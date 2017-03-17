@@ -453,6 +453,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Forwards the Request to the backend and returns the Response.
      *
+     * All backend requests (cache passes, fetches, cache validations)
+     * run through this method.
+     *
      * @param Request  $request A Request instance
      * @param bool     $catch   Whether to catch exceptions or not
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)

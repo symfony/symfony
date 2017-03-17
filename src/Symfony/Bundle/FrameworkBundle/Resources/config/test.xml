@@ -22,8 +22,13 @@
 
         <service id="test.session.listener" class="Symfony\Component\HttpKernel\EventListener\TestSessionListener">
             <tag name="kernel.event_subscriber" />
-            <argument type="service-locator">
-                <argument key="session" type="service" id="session" on-invalid="null" />
+            <argument type="service">
+                <service class="Symfony\Component\DependencyInjection\ServiceLocator">
+                    <tag name="container.service_locator" />
+                    <argument type="collection">
+                        <argument key="session" type="service" id="session" on-invalid="ignore" />
+                    </argument>
+                </service>
             </argument>
         </service>
     </services>

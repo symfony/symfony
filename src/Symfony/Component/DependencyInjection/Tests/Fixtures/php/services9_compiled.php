@@ -7,7 +7,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * ProjectServiceContainer.
@@ -55,7 +54,6 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
-            'service_locator' => 'getServiceLocatorService',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -396,22 +394,6 @@ class ProjectServiceContainer extends Container
     protected function getServiceFromStaticMethodService()
     {
         return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
-    }
-
-    /**
-     * Gets the 'service_locator' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar A Bar instance
-     */
-    protected function getServiceLocatorService()
-    {
-        return $this->services['service_locator'] = new \Bar(new ServiceLocator(array(
-            'bar' => function () { return ${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->get('bar')) && false ?: '_'}; },
-            'container' => function () { return $this; },
-        )));
     }
 
     /**

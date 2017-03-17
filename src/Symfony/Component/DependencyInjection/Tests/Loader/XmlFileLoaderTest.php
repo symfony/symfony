@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -276,16 +275,6 @@ class XmlFileLoaderTest extends TestCase
         $lazyDefinition = $container->getDefinition('lazy_context');
 
         $this->assertEquals(array(new IteratorArgument(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))), $lazyDefinition->getArguments(), '->load() parses lazy arguments');
-    }
-
-    public function testParsesServiceLocatorArgument()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services_locator_argument.xml');
-
-        $this->assertEquals(array(new ServiceLocatorArgument(array('foo_baz' => new Reference('foo.baz'), 'container' => new Reference('service_container')))), $container->getDefinition('lazy_context')->getArguments(), '->load() parses service-locator arguments');
-        $this->assertEquals(array(new ServiceLocatorArgument(array('foo_baz' => new Reference('foo.baz'), 'invalid' => new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))), $container->getDefinition('lazy_context_ignore_invalid_ref')->getArguments(), '->load() parses service-locator arguments');
     }
 
     public function testParsesTags()

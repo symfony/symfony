@@ -12,8 +12,10 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
@@ -63,7 +65,7 @@ class FragmentRendererPassTest extends TestCase
         $renderer
             ->expects($this->once())
             ->method('replaceArgument')
-            ->with(0, $this->equalTo(new ServiceLocatorArgument(array('foo' => new Reference('my_content_renderer')))));
+            ->with(0, $this->equalTo((new Definition(ServiceLocator::class, array(array('foo' => new ServiceClosureArgument(new Reference('my_content_renderer'))))))->addTag('container.service_locator')));
 
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $definition->expects($this->atLeastOnce())

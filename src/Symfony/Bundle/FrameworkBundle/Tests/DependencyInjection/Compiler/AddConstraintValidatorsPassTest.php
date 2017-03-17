@@ -13,9 +13,11 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class AddConstraintValidatorsPassTest extends TestCase
 {
@@ -23,7 +25,7 @@ class AddConstraintValidatorsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $validatorFactory = $container->register('validator.validator_factory')
-            ->setArguments(array(new ServiceLocatorArgument(array())));
+            ->addArgument(array());
 
         $container->register('my_constraint_validator_service1', Validator1::class)
             ->addTag('validator.constraint_validator', array('alias' => 'my_constraint_validator_alias1'));
@@ -36,11 +38,11 @@ class AddConstraintValidatorsPassTest extends TestCase
         $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
         $addConstraintValidatorsPass->process($container);
 
-        $this->assertEquals(new ServiceLocatorArgument(array(
-            Validator1::class => new Reference('my_constraint_validator_service1'),
-            'my_constraint_validator_alias1' => new Reference('my_constraint_validator_service1'),
-            Validator2::class => new Reference('my_constraint_validator_service2'),
-        )), $validatorFactory->getArgument(0));
+        $this->assertEquals((new Definition(ServiceLocator::class, array(array(
+            Validator1::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
+            'my_constraint_validator_alias1' => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
+            Validator2::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service2')),
+        ))))->addTag('container.service_locator'), $validatorFactory->getArgument(0));
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition()

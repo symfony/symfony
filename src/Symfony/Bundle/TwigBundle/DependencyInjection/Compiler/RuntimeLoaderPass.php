@@ -11,10 +11,12 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Registers Twig runtime services.
@@ -36,9 +38,9 @@ class RuntimeLoaderPass implements CompilerPassInterface
                 continue;
             }
 
-            $mapping[$def->getClass()] = new Reference($id);
+            $mapping[$def->getClass()] = new ServiceClosureArgument(new Reference($id));
         }
 
-        $definition->replaceArgument(0, new ServiceLocatorArgument($mapping));
+        $definition->replaceArgument(0, (new Definition(ServiceLocator::class, array($mapping)))->addTag('container.service_locator'));
     }
 }

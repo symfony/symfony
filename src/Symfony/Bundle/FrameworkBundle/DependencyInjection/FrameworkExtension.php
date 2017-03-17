@@ -96,6 +96,7 @@ class FrameworkExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->annotationsConfigEnabled = $this->isConfigEnabled($container, $config['annotations']);
+        $this->translationConfigEnabled = $this->isConfigEnabled($container, $config['translator']);
 
         // A translator must always be registered (as support is included by
         // default in the Form and Validator component). If disabled, an identity
@@ -776,6 +777,10 @@ class FrameworkExtension extends Extension
             } else {
                 $container->removeDefinition('templating.helper.assets');
             }
+
+            if (!$this->translationConfigEnabled) {
+                $container->removeDefinition('templating.helper.translator');
+            }
         }
     }
 
@@ -870,8 +875,6 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('translation.xml');
-
-        $this->translationConfigEnabled = true;
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');

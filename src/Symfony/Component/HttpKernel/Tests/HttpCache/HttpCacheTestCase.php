@@ -27,7 +27,7 @@ class HttpCacheTestCase extends TestCase
     protected $cacheConfig;
     protected $request;
 
-    /** @var  Response */
+    /** @var Response */
     protected $response;
     protected $responses;
     protected $catch;

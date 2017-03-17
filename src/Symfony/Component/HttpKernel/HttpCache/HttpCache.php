@@ -215,8 +215,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $this->restoreResponseBody($request, $response);
 
-        $response->setDate(\DateTime::createFromFormat('U', time(), new \DateTimeZone('UTC')));
-
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
@@ -502,6 +500,17 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             }
         }
 
+        /*
+            RFC 7231 Sect. 7.1.1.2 says that a server that does not have a reasonably accurate
+            clock MUST NOT send a "Date" header, although it MUST send one in most other cases
+            except for 1xx or 5xx responses where it MAY do so.
+
+            Anyway, a client that received a message without a "Date" header MUST add it.
+        */
+        if (!$response->headers->has('Date')) {
+            $response->setDate(\DateTime::createFromFormat('U', time()));
+        }
+
         $this->processResponseBody($request, $response);
 
         if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
@@ -602,9 +611,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function store(Request $request, Response $response)
     {
-        if (!$response->headers->has('Date')) {
-            $response->setDate(\DateTime::createFromFormat('U', time()));
-        }
         try {
             $this->store->write($request, $response);
 

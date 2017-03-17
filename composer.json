@@ -81,7 +81,7 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "cache/integration-tests": "^0.15.0",
+        "cache/integration-tests": "dev-master",
         "doctrine/cache": "~1.6",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",

@@ -47,7 +47,7 @@
         "symfony/security-core": "~3.2",
         "symfony/security-csrf": "~2.8|~3.0",
         "symfony/serializer": "~3.3",
-        "symfony/translation": "~2.8|~3.0",
+        "symfony/translation": "~3.2",
         "symfony/templating": "~2.8|~3.0",
         "symfony/validator": "~3.3",
         "symfony/yaml": "~3.2",
@@ -63,9 +63,10 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/asset": "<3.3",
         "symfony/console": "<3.3",
-        "symfony/serializer": "<3.3",
         "symfony/form": "<3.3",
         "symfony/property-info": "<3.3",
+        "symfony/serializer": "<3.3",
+        "symfony/translations": "<3.2",
         "symfony/validator": "<3.3"
     },
     "suggest": {

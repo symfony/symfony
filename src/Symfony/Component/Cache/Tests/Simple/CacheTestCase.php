@@ -13,18 +13,6 @@ namespace Symfony\Component\Cache\Tests\Simple;
 
 use Cache\IntegrationTests\SimpleCacheTest;
 
-if (!class_exists('PHPUnit_Framework_TestCase')) {
-    abstract class CacheTestCase
-    {
-        public static function setUpBeforeClass()
-        {
-            self::markTestSkipped('cache/integration-tests is not yet compatible with namespaced phpunit versions.');
-        }
-    }
-
-    return;
-}
-
 abstract class CacheTestCase extends SimpleCacheTest
 {
     public function testDefaultLifeTime()

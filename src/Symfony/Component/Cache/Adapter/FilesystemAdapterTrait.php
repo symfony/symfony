@@ -47,7 +47,6 @@ trait FilesystemAdapterTrait
         }
 
         $this->directory = $dir;
-        $this->tmp = $this->directory.uniqid('', true);
     }
 
     /**
@@ -81,19 +80,21 @@ trait FilesystemAdapterTrait
 
     private function write($file, $data, $expiresAt = null)
     {
-        if (false === @file_put_contents($this->tmp, $data)) {
-            return false;
-        }
-        if (null !== $expiresAt) {
-            @touch($this->tmp, $expiresAt);
-        }
+        set_error_handler(__CLASS__.'::throwError');
+        try {
+            if (null === $this->tmp) {
+                $this->tmp = $this->directory.uniqid('', true);
+            }
+            file_put_contents($this->tmp, $data);
 
-        if (@rename($this->tmp, $file)) {
-            return true;
-        }
-        @unlink($this->tmp);
+            if (null !== $expiresAt) {
+                touch($this->tmp, $expiresAt);
+            }
 
-        return false;
+            return rename($this->tmp, $file);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     private function getFile($id, $mkdir = false)
@@ -106,5 +107,21 @@ trait FilesystemAdapterTrait
         }
 
         return $dir.substr($hash, 2, 20);
+    }
+
+    /**
+     * @internal
+     */
+    public static function throwError($type, $message, $file, $line)
+    {
+        throw new \ErrorException($message, 0, $type, $file, $line);
+    }
+
+    public function __destruct()
+    {
+        parent::__destruct();
+        if (null !== $this->tmp && file_exists($this->tmp)) {
+            unlink($this->tmp);
+        }
     }
 }

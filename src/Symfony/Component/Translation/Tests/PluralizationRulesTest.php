@@ -65,7 +65,6 @@ class PluralizationRulesTest extends TestCase
             array('2', array('nl', 'fr', 'en', 'de', 'de_GE', 'hy', 'hy_AM')),
             array('3', array('be', 'bs', 'cs', 'hr')),
             array('4', array('cy', 'mt', 'sl')),
-            array('5', array()),
             array('6', array('ar')),
         );
     }
@@ -86,7 +85,6 @@ class PluralizationRulesTest extends TestCase
             array('3', array('cbs')),
             array('4', array('gd', 'kw')),
             array('5', array('ga')),
-            array('6', array()),
         );
     }
 

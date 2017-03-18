@@ -94,5 +94,7 @@ class GroupSequenceTest extends TestCase
 
         // should not fail
         unset($sequence[2]);
+
+        $this->assertCount(2, $sequence);
     }
 }

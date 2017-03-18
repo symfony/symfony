@@ -83,6 +83,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
                 // strip away <root> and </root>
                 substr($dom->saveHTML(), 6, -8)
             ));
+        } else {
+            $this->addToAssertionCount(1);
         }
     }
 

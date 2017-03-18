@@ -72,6 +72,8 @@ class CheckDefinitionValidityPassTest extends TestCase
         $container->register('d', 'class')->setSynthetic(true);
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testValidTags()
@@ -83,6 +85,8 @@ class CheckDefinitionValidityPassTest extends TestCase
         $container->register('d', 'class')->addTag('foo', array('bar' => 1.1));
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     /**

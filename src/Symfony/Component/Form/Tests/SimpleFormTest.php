@@ -918,12 +918,11 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmittingWrongDataIsIgnored()
     {
-        $test = $this;
+        $called = 0;
 
         $child = $this->getBuilder('child', $this->dispatcher);
-        $child->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($test) {
-            // child form doesn't receive the wrong data that is submitted on parent
-            $test->assertNull($event->getData());
+        $child->addEventListener(FormEvents::PRE_SUBMIT, function () use (&$called) {
+            ++$called;
         });
 
         $parent = $this->getBuilder('parent', new EventDispatcher())
@@ -933,6 +932,8 @@ class SimpleFormTest extends AbstractFormTest
             ->getForm();
 
         $parent->submit('not-an-array');
+
+        $this->assertSame(0, $called, 'PRE_SUBMIT event listeners are not called for wrong data');
     }
 
     public function testHandleRequestForwardsToRequestHandler()
@@ -1036,15 +1037,17 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmitIsNeverFiredIfInheritData()
     {
-        $test = $this;
+        $called = 0;
         $form = $this->getBuilder()
-            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($test) {
-                $test->fail('The SUBMIT event should not be fired');
+            ->addEventListener(FormEvents::SUBMIT, function () use (&$called) {
+                ++$called;
             })
             ->setInheritData(true)
             ->getForm();
 
         $form->submit('foo');
+
+        $this->assertSame(0, $called, 'The SUBMIT event is not fired when data are inherited from the parent form');
     }
 
     public function testInitializeSetsDefaultData()

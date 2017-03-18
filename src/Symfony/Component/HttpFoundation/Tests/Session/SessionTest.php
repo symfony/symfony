@@ -177,6 +177,8 @@ class SessionTest extends TestCase
     {
         $this->session->start();
         $this->session->save();
+
+        $this->assertFalse($this->session->isStarted());
     }
 
     public function testGetId()

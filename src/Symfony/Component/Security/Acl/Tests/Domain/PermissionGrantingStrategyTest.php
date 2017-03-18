@@ -17,7 +17,6 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
-use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 class PermissionGrantingStrategyTest extends TestCase
 {
@@ -152,11 +151,13 @@ class PermissionGrantingStrategyTest extends TestCase
         $acl->insertObjectAce($sid, $aceMask, 0, true, $maskStrategy);
 
         if (false === $result) {
-            try {
-                $strategy->isGranted($acl, array($requiredMask), array($sid));
-                $this->fail('The ACE is not supposed to match.');
-            } catch (NoAceFoundException $e) {
+            if (method_exists($this, 'expectException')) {
+                $this->expectException('Symfony\Component\Security\Acl\Exception\NoAceFoundException');
+            } else {
+                $this->setExpectedException('Symfony\Component\Security\Acl\Exception\NoAceFoundException');
             }
+
+            $strategy->isGranted($acl, array($requiredMask), array($sid));
         } else {
             $this->assertTrue($strategy->isGranted($acl, array($requiredMask), array($sid)));
         }

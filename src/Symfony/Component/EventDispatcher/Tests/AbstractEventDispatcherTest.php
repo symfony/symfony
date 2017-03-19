@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventPropagationTrackerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class AbstractEventDispatcherTest extends TestCase
@@ -31,10 +32,13 @@ abstract class AbstractEventDispatcherTest extends TestCase
 
     private $listener;
 
+    private $anonymousListener;
+
     protected function setUp()
     {
         $this->dispatcher = $this->createEventDispatcher();
         $this->listener = new TestEventListener();
+        $this->anonymousListener = new TestAnonymousEventListener($this->dispatcher);
     }
 
     protected function tearDown()
@@ -135,6 +139,38 @@ abstract class AbstractEventDispatcherTest extends TestCase
         $event = new Event();
         $return = $this->dispatcher->dispatch(self::preFoo, $event);
         $this->assertSame($event, $return);
+    }
+
+    public function testDispatchAnonymousEvent()
+    {
+        $this->dispatcher->addListener(PreFoo::class, array($this->anonymousListener, 'preFoo'));
+        $this->dispatcher->addListener(PostFoo::class, array($this->anonymousListener, 'postFoo'));
+        $this->dispatcher->dispatchAnonymousEvent(new PreFoo());
+        $this->assertTrue($this->anonymousListener->preFooInvoked);
+        $this->assertFalse($this->anonymousListener->postFooInvoked);
+    }
+
+    public function nonObjectProvider()
+    {
+        return array(
+            array(array(1, 2, 3, 4)),
+            array('foo'),
+            array(9),
+            array(3.14),
+            array(true),
+            array(fopen(__FILE__, 'r')),
+        );
+    }
+
+    /**
+     * @dataProvider nonObjectProvider
+     * @expectedException \InvalidArgumentException
+     *
+     * @param mixed $nonObject
+     */
+    public function testDispatchNonObjectAnonymousEvent($nonObject)
+    {
+        $this->dispatcher->dispatchAnonymousEvent($nonObject);
     }
 
     public function testDispatchForClosure()
@@ -370,5 +406,45 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
             array('preFoo1'),
             array('preFoo2', 10),
         ));
+    }
+}
+
+class PreFoo
+{
+}
+
+class PostFoo
+{
+}
+
+class TestAnonymousEventListener
+{
+    public $preFooInvoked = false;
+    public $postFooInvoked = false;
+    public $fooInvoked = false;
+    private $eventPropagationTracker;
+
+    public function __construct(EventPropagationTrackerInterface $eventPropagationTracker)
+    {
+        $this->eventPropagationTracker = $eventPropagationTracker;
+    }
+
+    /* Listener methods */
+
+    public function preFoo($e)
+    {
+        $this->preFooInvoked = true;
+    }
+
+    public function postFoo($e)
+    {
+        $this->postFooInvoked = true;
+
+        $this->eventPropagationTracker->stopPropagation($e);
+    }
+
+    public function foo($e)
+    {
+        $this->fooInvoked = true;
     }
 }

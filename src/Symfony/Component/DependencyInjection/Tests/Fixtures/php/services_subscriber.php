@@ -91,7 +91,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * This service is autowired.
+     * This service is autowired by types.
      *
      * @return \TestServiceSubscriber A TestServiceSubscriber instance
      */
@@ -118,7 +118,7 @@ class ProjectServiceContainer extends Container
      * If you want to be able to request this service from the container directly,
      * make it public, otherwise you might end up with broken code.
      *
-     * This service is autowired.
+     * This service is autowired by types.
      *
      * @return \stdClass A stdClass instance
      */

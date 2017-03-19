@@ -199,7 +199,7 @@ class XmlDumper extends Dumper
         }
 
         if ($definition->isAutowired()) {
-            $service->setAttribute('autowire', 'true');
+            $service->setAttribute('autowire', Definition::AUTOWIRE_BY_TYPE === $definition->getAutowired() ? 'by-type' : 'by-id');
         }
 
         foreach ($definition->getAutowiringTypes(false) as $autowiringTypeValue) {

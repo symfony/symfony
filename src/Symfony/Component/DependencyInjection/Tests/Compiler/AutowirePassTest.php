@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
@@ -751,6 +752,53 @@ class AutowirePassTest extends TestCase
         $container->register('i', I::class);
         $container->register('j', J::class)
             ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    public function testById()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(A::class, A::class);
+        $container->register(DInterface::class, F::class);
+        $container->register('d', D::class)
+            ->setAutowired(Definition::AUTOWIRE_BY_ID);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(array('service_container', A::class, DInterface::class, 'd'), array_keys($container->getDefinitions()));
+        $this->assertEquals(array(new Reference(A::class), new Reference(DInterface::class)), $container->getDefinition('d')->getArguments());
+    }
+
+    public function testByIdDoesNotAutoregister()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('f', F::class);
+        $container->register('e', E::class)
+            ->setAutowired(Definition::AUTOWIRE_BY_ID);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(array('service_container', 'f', 'e'), array_keys($container->getDefinitions()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot autowire service "j": argument $i of method Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct() references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. This type-hint could be aliased to the existing "i" service; or be updated to "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface".
+     */
+    public function testByIdAlternative()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setAlias(IInterface::class, 'i');
+        $container->register('i', I::class);
+        $container->register('j', J::class)
+            ->setAutowired(Definition::AUTOWIRE_BY_ID);
 
         $pass = new AutowirePass();
         $pass->process($container);

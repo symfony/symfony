@@ -132,7 +132,7 @@ class Parser
                 throw new ParseException('A YAML file cannot contain tabs as indentation.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
 
-            $isRef = $mergeNode = false;
+            $isRef = false;
             if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
                 if ($context && 'mapping' == $context) {
                     throw new ParseException('You cannot define a sequence item when in a mapping', $this->getRealCurrentLineNb() + 1, $this->currentLine);
@@ -198,66 +198,18 @@ class Parser
                     $key = (string) $key;
                 }
 
-                if ('<<' === $key) {
-                    $mergeNode = true;
-                    $allowOverwrite = true;
-                    if (isset($values['value']) && 0 === strpos($values['value'], '*')) {
-                        $refName = substr($values['value'], 1);
-                        if (!array_key_exists($refName, $this->refs)) {
-                            throw new ParseException(sprintf('Reference "%s" does not exist.', $refName), $this->getRealCurrentLineNb() + 1, $this->currentLine);
-                        }
-
-                        $refValue = $this->refs[$refName];
-
-                        if (!is_array($refValue)) {
-                            throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
-                        }
-
-                        $data += $refValue; // array union
-                    } else {
-                        if (isset($values['value']) && $values['value'] !== '') {
-                            $value = $values['value'];
-                        } else {
-                            $value = $this->getNextEmbedBlock();
-                        }
-                        $parsed = $this->parseBlock($this->getRealCurrentLineNb() + 1, $value, $flags);
-
-                        if (!is_array($parsed)) {
-                            throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
-                        }
-
-                        if (isset($parsed[0])) {
-                            // If the value associated with the merge key is a sequence, then this sequence is expected to contain mapping nodes
-                            // and each of these nodes is merged in turn according to its order in the sequence. Keys in mapping nodes earlier
-                            // in the sequence override keys specified in later mapping nodes.
-                            foreach ($parsed as $parsedItem) {
-                                if (!is_array($parsedItem)) {
-                                    throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, $parsedItem);
-                                }
-
-                                $data += $parsedItem; // array union
-                            }
-                        } else {
-                            // If the value associated with the key is a single mapping node, each of its key/value pairs is inserted into the
-                            // current mapping, unless the key already exists in it.
-                            $data += $parsed; // array union
-                        }
-                    }
-                } elseif (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
+                if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
                 }
 
                 $subTag = null;
-                if ($mergeNode) {
-                    // Merge keys
-                } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#') || (null !== $subTag = $this->getLineTag(ltrim($values['value'], ' '), $flags))) {
+                if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#') || (null !== $subTag = $this->getLineTag(ltrim($values['value'], ' '), $flags))) {
                     // hash
                     // if next line is less indented or equal, then it means that the current value is null
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         // Spec: Keys MUST be unique; first one wins.
-                        // But overwriting is allowed when a merge node is used in current block.
-                        if ($allowOverwrite || !isset($data[$key])) {
+                        if (!isset($data[$key])) {
                             if (null !== $subTag) {
                                 $data[$key] = new TaggedValue($subTag, '');
                             } else {
@@ -271,12 +223,17 @@ class Parser
                         $realCurrentLineNbKey = $this->getRealCurrentLineNb();
                         $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
                         // Spec: Keys MUST be unique; first one wins.
-                        // But overwriting is allowed when a merge node is used in current block.
-                        if ($allowOverwrite || !isset($data[$key])) {
+                        if (!isset($data[$key])) {
                             if (null !== $subTag) {
                                 $data[$key] = new TaggedValue($subTag, $value);
                             } else {
                                 $data[$key] = $value;
+                            }
+                        } elseif ('<<' === $key) {
+                            if (isset($data['<<'][0])) {
+                                $data['<<'][] = $value;
+                            } else {
+                                $data['<<'] = array($data['<<'], $value);
                             }
                         } else {
                             @trigger_error(sprintf('Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key, $realCurrentLineNbKey + 1), E_USER_DEPRECATED);
@@ -285,9 +242,14 @@ class Parser
                 } else {
                     $value = $this->parseValue($values['value'], $flags, $context);
                     // Spec: Keys MUST be unique; first one wins.
-                    // But overwriting is allowed when a merge node is used in current block.
-                    if ($allowOverwrite || !isset($data[$key])) {
+                    if (!isset($data[$key])) {
                         $data[$key] = $value;
+                    } elseif ('<<' === $key) {
+                        if (isset($data['<<'][0])) {
+                            $data['<<'][] = $value;
+                        } else {
+                            $data['<<'] = array($data['<<'], $value);
+                        }
                     } else {
                         @trigger_error(sprintf('Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                     }
@@ -386,6 +348,47 @@ class Parser
 
         if (isset($mbEncoding)) {
             mb_internal_encoding($mbEncoding);
+        }
+
+        if (array_key_exists('<<', $data)) {
+            $merged = $data['<<'];
+
+            if (!is_array($merged)) {
+                throw new ParseException('YAML merge keys used with a scalar value instead of an array.');
+            }
+
+            // If the value associated with the merge key is a sequence, then this sequence is expected to contain mapping nodes
+            // and each of these nodes is merged in turn according to its order in the sequence. Keys in mapping nodes earlier
+            // in the sequence override keys specified in later mapping nodes.
+            if (isset($merged[0])) {
+                foreach ($merged as $mergedMapping) {
+                    if (!is_array($mergedMapping)) {
+                        throw new ParseException('Merge items must be arrays.');
+                    }
+                }
+
+                $merged = array_reduce($merged, function (array $a, array $b) {
+                    return $a + $b;
+                }, array());
+            }
+
+            // If the value associated with the key is a single mapping node, each of its key/value pairs is inserted into the
+            // current mapping, unless the key already exists in it.
+            $tmp = $data;
+            $data = array();
+            foreach ($tmp as $key => $value) {
+                if ('<<' !== $key) {
+                    $data[$key] = $value;
+
+                    continue;
+                }
+
+                foreach ($merged as $mergedKey => $mergedValue) {
+                    if (!array_key_exists($mergedKey, $data)) {
+                        $data[$mergedKey] = $mergedValue;
+                    }
+                }
+            }
         }
 
         if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && !is_object($data) && 'mapping' === $context) {

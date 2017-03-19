@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-17T12:44:20Z
+
+For reference, here are the original decisions we made about how to try to autowire setter methods, but not fail as often / consistently when compared with constructor autowiring - items 2, 3 and 4 in my comment: https://github.com/symfony/symfony/pull/17608#issuecomment-180837991
+
+I think this PR is wonderful! The `@required` completely removes the need for us to try to make this decision for the user.
+
+@nicolas-grekas the only thing I noticed when trying this was that if I had `@required` above a method with *zero* arguments, that method wasn't called. With this philosophy, it now *feels* like this method should also be called. However, if I have a method with a single optional argument that cannot be autowired, it *feels* like that one should *not* be called (which is how it works now). But those are kind of the same situation (i.e. should we call a method when we have nothing to pass to it), so I'm not totally sure :).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-17T14:23:24Z
+
+@weaverryan As `@required` is added by the user, he knows what he wants. So to me, the methods marked with `@required` must always be called, regardless of their arguments.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-17T14:34:08Z
+
+Nicolas and I were talking off-GitHub, and we agree - we should always call methods with `@required`, unless they cannot be called due to non-autowireable args (then we should throw an exception).
+
+What I forgot was that a method with *no* arguments is *getter*-injected. In other words, it's incorrect for me to assume that I could add `@required` above a method with no args (e.g. `configure()`) and expect it to be called. This is a little magic - that we're deciding between setter and getter injection based on the presence/absence of at least one arg -, but it seems like it needs to be done that way (and Nicolas and I discussed how we should perhaps throw an exception if there is an `@required` method with no args, but also not return type - so at least the user will get a clear error).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-17T14:52:58Z
+
+I think throwing an exception when there is a `@required` annotation without arguments is a good idea indeed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-17T23:34:35Z
+
+Exceptions added, all code related to skipping logic removed.
+I also reverted #21602: abstract getter don't need to be autowired anymore, we'd better encourage using the annotation instead.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-18T14:11:43Z
+
+minor comment, 👍

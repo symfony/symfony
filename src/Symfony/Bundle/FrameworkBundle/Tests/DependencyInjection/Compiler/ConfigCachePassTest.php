@@ -22,7 +22,7 @@ class ConfigCachePassTest extends TestCase
         $services = array(
             'checker_2' => array(0 => array('priority' => 100)),
             'checker_1' => array(0 => array('priority' => 200)),
-            'checker_3' => array(),
+            'checker_3' => array(0 => array()),
         );
 
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
@@ -50,7 +50,6 @@ class ConfigCachePassTest extends TestCase
 
     public function testThatCheckersCanBeMissing()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
 
         $container->expects($this->atLeastOnce())

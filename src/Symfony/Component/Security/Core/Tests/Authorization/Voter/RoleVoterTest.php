@@ -18,13 +18,6 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class RoleVoterTest extends TestCase
 {
-    public function testSupportsClass()
-    {
-        $voter = new RoleVoter();
-
-        $this->assertTrue($voter->supportsClass('Foo'));
-    }
-
     /**
      * @dataProvider getVoteTests
      */

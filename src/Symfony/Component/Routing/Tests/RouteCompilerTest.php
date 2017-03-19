@@ -164,6 +164,82 @@ class RouteCompilerTest extends TestCase
                     array('text', '/foo'),
                 ),
             ),
+
+            array(
+                'Static non UTF-8 route',
+                array("/fo\xE9"),
+                "/fo\xE9", "#^/fo\xE9$#s", array(), array(
+                    array('text', "/fo\xE9"),
+                ),
+            ),
+
+            array(
+                'Route with an explicit UTF-8 requirement',
+                array('/{bar}', array('bar' => null), array('bar' => '.'), array('utf8' => true)),
+                '', '#^/(?P<bar>.)?$#su', array('bar'), array(
+                    array('variable', '/', '.', 'bar', true),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideCompileImplicitUtf8Data
+     * @expectedDeprecation Using UTF-8 route %s without setting the "utf8" option is deprecated %s.
+     */
+    public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
+    {
+        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $route = $r->newInstanceArgs($arguments);
+
+        $compiled = $route->compile();
+        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
+        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+    }
+
+    public function provideCompileImplicitUtf8Data()
+    {
+        return array(
+            array(
+                'Static UTF-8 route',
+                array('/foé'),
+                '/foé', '#^/foé$#su', array(), array(
+                    array('text', '/foé'),
+                ),
+                'patterns',
+            ),
+
+            array(
+                'Route with an implicit UTF-8 requirement',
+                array('/{bar}', array('bar' => null), array('bar' => 'é')),
+                '', '#^/(?P<bar>é)?$#su', array('bar'), array(
+                    array('variable', '/', 'é', 'bar', true),
+                ),
+                'requirements',
+            ),
+
+            array(
+                'Route with a UTF-8 class requirement',
+                array('/{bar}', array('bar' => null), array('bar' => '\pM')),
+                '', '#^/(?P<bar>\pM)?$#su', array('bar'), array(
+                    array('variable', '/', '\pM', 'bar', true),
+                ),
+                'requirements',
+            ),
+
+            array(
+                'Route with a UTF-8 separator',
+                array('/foo/{bar}§{_format}', array(), array(), array('compiler_class' => Utf8RouteCompiler::class)),
+                '/foo', '#^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$#su', array('bar', '_format'), array(
+                    array('variable', '§', '[^/]++', '_format', true),
+                    array('variable', '/', '[^/§]++', 'bar', true),
+                    array('text', '/foo'),
+                ),
+                'patterns',
+            ),
         );
     }
 
@@ -173,6 +249,36 @@ class RouteCompilerTest extends TestCase
     public function testRouteWithSameVariableTwice()
     {
         $route = new Route('/{name}/{name}');
+
+        $compiled = $route->compile();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRouteCharsetMismatch()
+    {
+        $route = new Route("/\xE9/{bar}", array(), array('bar' => '.'), array('utf8' => true));
+
+        $compiled = $route->compile();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRequirementCharsetMismatch()
+    {
+        $route = new Route('/foo/{bar}', array(), array('bar' => "\xE9"), array('utf8' => true));
+
+        $compiled = $route->compile();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRouteWithFragmentAsPathParameter()
+    {
+        $route = new Route('/{_fragment}');
 
         $compiled = $route->compile();
     }
@@ -275,4 +381,9 @@ class RouteCompilerTest extends TestCase
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
         $route->compile();
     }
+}
+
+class Utf8RouteCompiler extends RouteCompiler
+{
+    const SEPARATORS = '/§';
 }

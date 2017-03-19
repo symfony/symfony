@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
@@ -23,6 +24,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SerializerPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('serializer')) {
@@ -31,42 +34,17 @@ class SerializerPass implements CompilerPassInterface
 
         // Looks for all the services tagged "serializer.normalizer" and adds them to the Serializer service
         $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
+
+        if (empty($normalizers)) {
+            throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the Serializer service');
+        }
         $container->getDefinition('serializer')->replaceArgument(0, $normalizers);
 
         // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
         $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
+        if (empty($encoders)) {
+            throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the Serializer service');
+        }
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
-    }
-
-    /**
-     * Finds all services with the given tag name and order them by their priority.
-     *
-     * @param string           $tagName
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     *
-     * @throws \RuntimeException
-     */
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
-    {
-        $services = $container->findTaggedServiceIds($tagName);
-
-        if (empty($services)) {
-            throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));
-        }
-
-        $sortedServices = array();
-        foreach ($services as $serviceId => $tags) {
-            foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
-            }
-        }
-
-        krsort($sortedServices);
-
-        // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
     }
 }

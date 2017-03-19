@@ -45,7 +45,7 @@ class FormLoginLdapFactory extends FormLoginFactory
 
         $node
             ->children()
-                ->scalarNode('service')->end()
+                ->scalarNode('service')->defaultValue('ldap')->end()
                 ->scalarNode('dn_string')->defaultValue('{username}')->end()
             ->end()
         ;

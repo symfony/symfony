@@ -20,5 +20,6 @@ class DescriptorApplication2 extends Application
         parent::__construct('My Symfony application', 'v1.0');
         $this->add(new DescriptorCommand1());
         $this->add(new DescriptorCommand2());
+        $this->add(new DescriptorCommand3());
     }
 }

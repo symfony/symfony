@@ -154,4 +154,9 @@ class BinaryNode extends Node
                 return preg_match($right, $left);
         }
     }
+
+    public function toArray()
+    {
+        return array('(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')');
+    }
 }

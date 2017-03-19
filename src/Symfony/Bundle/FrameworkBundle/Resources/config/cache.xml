@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="cache.app" parent="cache.adapter.filesystem">
+            <tag name="cache.pool" clearer="cache.app_clearer" />
+        </service>
+
+        <service id="cache.system" parent="cache.adapter.system">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="cache.validator" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="cache.serializer" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="cache.annotations" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
+            <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
+            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <argument /> <!-- version -->
+            <argument>%kernel.cache_dir%/pools</argument>
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
+            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <argument /> <!-- version -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
+        <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
+            <tag name="cache.pool" provider="cache.default_doctrine_provider" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- Doctrine provider service -->
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
+        <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
+            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <argument>%kernel.cache_dir%/pools</argument>
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
+        <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
+            <tag name="cache.pool" provider="cache.default_psr6_provider" clearer="cache.default_clearer" />
+            <argument /> <!-- PSR-6 provider service -->
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+        </service>
+
+        <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true">
+            <tag name="cache.pool" provider="cache.default_redis_provider" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument /> <!-- Redis connection service -->
+            <argument /> <!-- namespace -->
+            <argument>0</argument> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
+        <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
+            <tag name="kernel.cache_clearer" />
+        </service>
+
+        <service id="cache.app_clearer" alias="cache.default_clearer" />
+
+    </services>
+</container>

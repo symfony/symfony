@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * deprecated `Tests\Constraints\AbstractContraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
+
+3.1.0
+-----
+
+ * deprecated `DateTimeValidator::PATTERN` constant
+ * added a `format` option to the `DateTime` constraint
+
 2.8.0
 -----
 

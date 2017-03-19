@@ -12,19 +12,34 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CurrencyType extends AbstractType
+class CurrencyType extends AbstractType implements ChoiceLoaderInterface
 {
+    /**
+     * Currency loaded choice list.
+     *
+     * The choices are lazy loaded and generated from the Intl component.
+     *
+     * {@link \Symfony\Component\Intl\Intl::getCurrencyBundle()}.
+     *
+     * @var ArrayChoiceList
+     */
+    private $choiceList;
+
     /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'choices' => array_flip(Intl::getCurrencyBundle()->getCurrencyNames()),
-            'choices_as_values' => true,
+            'choice_loader' => function (Options $options) {
+                return $options['choices'] ? null : $this;
+            },
             'choice_translation_domain' => false,
         ));
     }
@@ -40,16 +55,58 @@ class CurrencyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
-        return $this->getBlockPrefix();
+        return 'currency';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function loadChoiceList($value = null)
     {
-        return 'currency';
+        if (null !== $this->choiceList) {
+            return $this->choiceList;
+        }
+
+        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getCurrencyBundle()->getCurrencyNames()), $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadChoicesForValues(array $values, $value = null)
+    {
+        // Optimize
+        $values = array_filter($values);
+        if (empty($values)) {
+            return array();
+        }
+
+        // If no callable is set, values are the same as choices
+        if (null === $value) {
+            return $values;
+        }
+
+        return $this->loadChoiceList($value)->getChoicesForValues($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadValuesForChoices(array $choices, $value = null)
+    {
+        // Optimize
+        $choices = array_filter($choices);
+        if (empty($choices)) {
+            return array();
+        }
+
+        // If no callable is set, choices are the same as values
+        if (null === $value) {
+            return $choices;
+        }
+
+        return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 }

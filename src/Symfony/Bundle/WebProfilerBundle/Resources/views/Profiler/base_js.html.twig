@@ -1,4 +1,4 @@
-<script>/*<![CDATA[*/
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
     {# Caution: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}
@@ -124,6 +124,23 @@
                             methodCell.textContent = request.method;
                             row.appendChild(methodCell);
 
+                            var typeCell = document.createElement('td');
+                            typeCell.textContent = request.type;
+                            row.appendChild(typeCell);
+
+                            var statusCodeCell = document.createElement('td');
+                            var statusCode = document.createElement('span');
+                            if (request.statusCode < 300) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status');
+                            } else if (request.statusCode < 400) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+                            } else {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+                            }
+                            statusCode.textContent = request.statusCode || '-';
+                            statusCodeCell.appendChild(statusCode);
+                            row.appendChild(statusCodeCell);
+
                             var pathCell = document.createElement('td');
                             pathCell.className = 'sf-ajax-request-url';
                             if ('GET' === request.method) {
@@ -222,6 +239,57 @@
         }
 
         {% if excluded_ajax_paths is defined %}
+            if (window.fetch && window.fetch.polyfill === undefined) {
+                var oldFetch = window.fetch;
+                window.fetch = function () {
+                    var promise = oldFetch.apply(this, arguments);
+                    var url = arguments[0];
+                    var params = arguments[1];
+                    var paramType = Object.prototype.toString.call(arguments[0]);
+                    if (paramType === '[object Request]') {
+                        url = arguments[0].url;
+                        params = {
+                            method: arguments[0].method,
+                            credentials: arguments[0].credentials,
+                            headers: arguments[0].headers,
+                            mode: arguments[0].mode,
+                            redirect: arguments[0].redirect
+                        };
+                    }
+                    if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                        var method = 'GET';
+                        if (params && params.method !== undefined) {
+                            method = params.method;
+                        }
+
+                        var stackElement = {
+                            loading: true,
+                            error: false,
+                            url: url,
+                            method: method,
+                            type: 'fetch',
+                            start: new Date()
+                        };
+
+                        requestStack.push(stackElement);
+                        promise.then(function (r) {
+                            stackElement.duration = new Date() - stackElement.start;
+                            stackElement.loading = false;
+                            stackElement.error = r.status < 200 || r.status >= 400;
+                            stackElement.statusCode = r.status;
+                            stackElement.profile = r.headers.get('x-debug-token');
+                            stackElement.profilerUrl = r.headers.get('x-debug-token-link');
+                            Sfjs.renderAjaxRequests();
+                        }, function (e){
+                            stackElement.loading = false;
+                            stackElement.error = true;
+                        });
+                        Sfjs.renderAjaxRequests();
+                    }
+
+                    return promise;
+                };
+            }
             if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
                 var proxied = XMLHttpRequest.prototype.open;
 
@@ -245,6 +313,7 @@
                             error: false,
                             url: url,
                             method: method,
+                            type: 'xhr',
                             start: new Date()
                         };
 
@@ -255,7 +324,7 @@
                                 stackElement.duration = new Date() - stackElement.start;
                                 stackElement.loading = false;
                                 stackElement.error = self.status < 200 || self.status >= 400;
-
+                                stackElement.statusCode = self.status;
                                 extractHeaders(self, stackElement);
 
                                 Sfjs.renderAjaxRequests();

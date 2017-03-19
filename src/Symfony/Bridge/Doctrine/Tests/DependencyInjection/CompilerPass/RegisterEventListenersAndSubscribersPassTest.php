@@ -160,8 +160,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
     private function getServiceOrder(ContainerBuilder $container, $method)
     {
         $order = array();
-        foreach ($container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls() as $call) {
-            list($name, $arguments) = $call;
+        foreach ($container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls() as list($name, $arguments)) {
             if ($method !== $name) {
                 continue;
             }

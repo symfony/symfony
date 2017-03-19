@@ -30,6 +30,9 @@ class FileDumperTest extends TestCase
         $this->assertFileExists($tempDir.'/messages.en.concrete');
     }
 
+    /**
+     * @group legacy
+     */
     public function testDumpBackupsFileIfExisting()
     {
         $tempDir = sys_get_temp_dir();

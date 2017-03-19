@@ -55,7 +55,7 @@ class XmlDumper extends Dumper
         $xml = $this->document->saveXML();
         $this->document = null;
 
-        return $xml;
+        return $this->container->resolveEnvPlaceholders($xml);
     }
 
     /**
@@ -117,29 +117,14 @@ class XmlDumper extends Dumper
 
             $service->setAttribute('class', $class);
         }
-        if ($definition->getFactoryMethod(false)) {
-            $service->setAttribute('factory-method', $definition->getFactoryMethod(false));
-        }
-        if ($definition->getFactoryClass(false)) {
-            $service->setAttribute('factory-class', $definition->getFactoryClass(false));
-        }
-        if ($definition->getFactoryService(false)) {
-            $service->setAttribute('factory-service', $definition->getFactoryService(false));
-        }
         if (!$definition->isShared()) {
             $service->setAttribute('shared', 'false');
-        }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
-            $service->setAttribute('scope', $scope);
         }
         if (!$definition->isPublic()) {
             $service->setAttribute('public', 'false');
         }
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
-        }
-        if ($definition->isSynchronized(false)) {
-            $service->setAttribute('synchronized', 'true');
         }
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
@@ -306,9 +291,6 @@ class XmlDumper extends Dumper
                     $element->setAttribute('on-invalid', 'null');
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
-                }
-                if (!$value->isStrict(false)) {
-                    $element->setAttribute('strict', 'false');
                 }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');

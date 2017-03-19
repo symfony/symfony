@@ -30,6 +30,7 @@ class Image extends File
     const SQUARE_NOT_ALLOWED_ERROR = '5d41425b-facb-47f7-a55a-de9fbe45cb46';
     const LANDSCAPE_NOT_ALLOWED_ERROR = '6f895685-7cf2-4d65-b3da-9029c5581d88';
     const PORTRAIT_NOT_ALLOWED_ERROR = '65608156-77da-4c79-a88c-02ef6d18c782';
+    const CORRUPTED_IMAGE_ERROR = '5d4163f3-648f-4e39-87fd-cc5ea7aad2d1';
 
     // Include the mapping from the base class
 
@@ -49,6 +50,7 @@ class Image extends File
         self::SQUARE_NOT_ALLOWED_ERROR => 'SQUARE_NOT_ALLOWED_ERROR',
         self::LANDSCAPE_NOT_ALLOWED_ERROR => 'LANDSCAPE_NOT_ALLOWED_ERROR',
         self::PORTRAIT_NOT_ALLOWED_ERROR => 'PORTRAIT_NOT_ALLOWED_ERROR',
+        self::CORRUPTED_IMAGE_ERROR => 'CORRUPTED_IMAGE_ERROR',
     );
 
     public $mimeTypes = 'image/*';
@@ -61,6 +63,7 @@ class Image extends File
     public $allowSquare = true;
     public $allowLandscape = true;
     public $allowPortrait = true;
+    public $detectCorrupted = false;
 
     // The constant for a wrong MIME type is taken from the parent class.
     public $mimeTypesMessage = 'This file is not a valid image.';
@@ -74,4 +77,5 @@ class Image extends File
     public $allowSquareMessage = 'The image is square ({{ width }}x{{ height }}px). Square images are not allowed.';
     public $allowLandscapeMessage = 'The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.';
     public $allowPortraitMessage = 'The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.';
+    public $corruptedMessage = 'The image file is corrupted.';
 }

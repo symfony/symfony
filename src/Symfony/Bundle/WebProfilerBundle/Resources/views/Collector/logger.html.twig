@@ -3,12 +3,11 @@
 {% import _self as helper %}
 
 {% block toolbar %}
-    {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
+    {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
         {% set icon %}
-            {% set status_color = collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' %}
-            {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+            {% set status_color = collector.counterrors ? 'red' : 'yellow' %}
             {{ include('@WebProfiler/Icon/logger.svg') }}
-            <span class="sf-toolbar-value">{{ error_count }}</span>
+            <span class="sf-toolbar-value">{{ collector.counterrors ?: (collector.countdeprecations + collector.countwarnings) }}</span>
         {% endset %}
 
         {% set text %}
@@ -18,13 +17,13 @@
             </div>
 
             <div class="sf-toolbar-info-piece">
-                <b>Deprecated Calls</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countdeprecations ? 'yellow' }}">{{ collector.countdeprecations|default(0) }}</span>
+                <b>Warnings</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countwarnings ? 'yellow' }}">{{ collector.countwarnings|default(0) }}</span>
             </div>
 
             <div class="sf-toolbar-info-piece">
-                <b>Silenced Errors</b>
-                <span class="sf-toolbar-status">{{ collector.countscreams|default(0) }}</span>
+                <b>Deprecations</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countdeprecations ? 'yellow' }}">{{ collector.countdeprecations|default(0) }}</span>
             </div>
         {% endset %}
 
@@ -33,12 +32,12 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countdeprecations ? 'warning' }} {{ collector.logs is empty ? 'disabled' }}">
+    <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countdeprecations or collector.countwarnings ? 'warning' }} {{ collector.logs is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
         <strong>Logs</strong>
-        {% if collector.counterrors or collector.countdeprecations %}
+        {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
             <span class="count">
-                <span>{{ collector.counterrors ?: collector.countdeprecations }}</span>
+                <span>{{ collector.counterrors ?: (collector.countdeprecations + collector.countwarnings) }}</span>
             </span>
         {% endif %}
     </span>
@@ -55,9 +54,9 @@
         {# sort collected logs in groups #}
         {% set deprecation_logs, debug_logs, info_and_error_logs, silenced_logs = [], [], [], [] %}
         {% for log in collector.logs %}
-            {% if log.context.level is defined and log.context.type is defined and log.context.type in [constant('E_DEPRECATED'), constant('E_USER_DEPRECATED')] %}
+            {% if log.scream is defined and not log.scream %}
                 {% set deprecation_logs = deprecation_logs|merge([log]) %}
-            {% elseif log.context.scream is defined and log.context.scream == true  %}
+            {% elseif log.scream is defined and log.scream %}
                 {% set silenced_logs = silenced_logs|merge([log]) %}
             {% elseif log.priorityName == 'DEBUG' %}
                 {% set debug_logs = debug_logs|merge([log]) %}
@@ -68,7 +67,7 @@
 
         <div class="sf-tabs">
             <div class="tab">
-                <h3 class="tab-title">Info. &amp; Errors <span class="badge">{{ info_and_error_logs|length }}</span></h3>
+                <h3 class="tab-title">Info. &amp; Errors <span class="badge status-{{ collector.counterrors ? 'error' : collector.countwarnings ? 'warning' }}">{{ collector.counterrors ?: info_and_error_logs|length }}</span></h3>
 
                 <div class="tab-content">
                     {% if info_and_error_logs is empty %}
@@ -76,7 +75,7 @@
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(info_and_error_logs, true) }}
+                        {{ helper.render_table(info_and_error_logs, 'info', true) }}
                     {% endif %}
                 </div>
             </div>
@@ -84,7 +83,7 @@
             <div class="tab">
                 {# 'deprecation_logs|length' is not used because deprecations are
                 now grouped and the group count doesn't match the message count #}
-                <h3 class="tab-title">Deprecations <span class="badge">{{ collector.countdeprecations|default(0) }}</span></h3>
+                <h3 class="tab-title">Deprecations <span class="badge status-{{ collector.countdeprecations ? 'warning' }}">{{ collector.countdeprecations|default(0) }}</span></h3>
 
                 <div class="tab-content">
                     {% if deprecation_logs is empty %}
@@ -92,7 +91,7 @@
                             <p>There are no log messages about deprecated features.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(deprecation_logs, false, true) }}
+                        {{ helper.render_table(deprecation_logs, 'deprecation', false, true) }}
                     {% endif %}
                 </div>
             </div>
@@ -106,13 +105,13 @@
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(debug_logs) }}
+                        {{ helper.render_table(debug_logs, 'debug') }}
                     {% endif %}
                 </div>
             </div>
 
             <div class="tab">
-                <h3 class="tab-title">Silenced Errors <span class="badge">{{ collector.countscreams|default(0) }}</span></h3>
+                <h3 class="tab-title">Silenced PHP Notices<span class="badge">{{ collector.countscreams|default(0) }}</span></h3>
 
                 <div class="tab-content">
                     {% if silenced_logs is empty %}
@@ -120,7 +119,7 @@
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(silenced_logs) }}
+                        {{ helper.render_table(silenced_logs, 'silenced') }}
                     {% endif %}
                 </div>
             </div>
@@ -129,7 +128,7 @@
     {% endif %}
 {% endblock %}
 
-{% macro render_table(logs, show_level = false, is_deprecation = false) %}
+{% macro render_table(logs, category = '', show_level = false, is_deprecation = false) %}
     {% import _self as helper %}
     {% set channel_is_defined = (logs|first).channel is defined %}
 
@@ -138,7 +137,7 @@
             <tr>
                 <th>{{ show_level ? 'Level' : 'Time' }}</th>
                 {% if channel_is_defined %}<th>Channel</th>{% endif %}
-                <th>Message</th>
+                <th class="full-width">Message</th>
             </tr>
         </thead>
 
@@ -146,77 +145,59 @@
             {% for log in logs %}
                 {% set css_class = is_deprecation ? ''
                     : log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error'
-                    : log.priorityName in ['NOTICE', 'WARNING'] ? 'status-warning'
+                    : log.priorityName == 'WARNING' ? 'status-warning'
                 %}
                 <tr class="{{ css_class }}">
-                    <td class="font-normal text-small">
+                    <td class="font-normal text-small" nowrap>
                         {% if show_level %}
-                            <span class="colored text-bold nowrap">{{ log.priorityName }}</span>
+                            <span class="colored text-bold">{{ log.priorityName }}</span>
                         {% endif %}
-                        <span class="text-muted nowrap newline">{{ log.timestamp|date('H:i:s') }}</span>
+                        <span class="text-muted newline">{{ log.timestamp|date('H:i:s') }}</span>
                     </td>
 
                     {% if channel_is_defined %}
-                        <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
+                        <td class="font-normal text-small text-bold" nowrap>
+                            {{ log.channel }}
+                            {% if log.errorCount is defined and log.errorCount > 1 %}
+                                <span class="text-muted">({{ log.errorCount }} times)</span>
+                            {% endif %}
+                        </td>
+
                     {% endif %}
 
-                    <td class="font-normal">{{ helper.render_log_message(loop.index, log, is_deprecation) }}</td>
+                    <td class="font-normal">{{ helper.render_log_message(category, loop.index, log, is_deprecation) }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% endmacro %}
 
-{% macro render_log_message(log_index, log, is_deprecation = false) %}
-    {{ log.message }}
-
+{% macro render_log_message(category, log_index, log, is_deprecation = false) %}
     {% if is_deprecation %}
-        {% set stack = log.context.stack|default([]) %}
-        {% set id = 'sf-call-stack-' ~ log_index %}
+        {{ log.message }}
 
-        {% if log.context.errorCount is defined %}
-            <span class="text-small text-bold">({{ log.context.errorCount }} times)</span>
-        {% endif %}
+        {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
 
-        {% if stack %}
-            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
-        {% endif %}
+        <span class="metadata">
+             <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
 
-        {% for index, call in stack if index > 1 %}
-            {% if index == 2 %}
-                <ul class="sf-call-stack hidden" id="{{ id }}">
-            {% endif %}
+            <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.context.seek('exception').seek('\0Exception\0trace'), maxDepth=2) }}
+            </div>
+        </span>
+    {% elseif log.context is defined and log.context is not empty %}
+        {{ profiler_dump_log(log.message, log.context) }}
 
-            {% if call.class is defined %}
-                {% set from = call.class|abbr_class ~ '::' ~ call.function|abbr_method() %}
-            {% elseif call.function is defined %}
-                {% set from = call.function|abbr_method %}
-            {% elseif call.file is defined %}
-                {% set from = call.file %}
-            {% else %}
-                {% set from = '-' %}
-            {% endif %}
+        {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
 
-            {% set file_name = (call.file is defined and call.line is defined) ? call.file|replace({'\\': '/'})|split('/')|last %}
+        <span class="metadata">
+             <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
 
-            <li>
-                {{ from|raw }}
-                {% if file_name %}
-                    <span class="text-small">(called from {{ call.file|format_file(call.line, file_name)|raw }})</span>
-                {% endif %}
-            </li>
-
-            {% if index == stack|length - 1 %}
-                </ul>
-            {% endif %}
-        {% endfor %}
+             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.context, maxDepth=1) }}
+            </div>
+        </span>
     {% else %}
-        {% if log.context is defined and log.context is not empty %}
-            <span class="metadata">
-                <strong>Context</strong>: {{ log.context|json_encode(64 b-or 256)|replace({
-                    '{"' : '{ "', '"}' : '" }', '":{' : '": {', '":"' : '": "', '","' : '", "'
-                }) }}
-            </span>
-        {% endif %}
+        {{ log.message }}
     {% endif %}
 {% endmacro %}

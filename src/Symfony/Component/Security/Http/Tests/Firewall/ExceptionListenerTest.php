@@ -66,6 +66,20 @@ class ExceptionListenerTest extends TestCase
         );
     }
 
+    public function testExceptionWhenEntryPointReturnsBadValue()
+    {
+        $event = $this->createEvent(new AuthenticationException());
+
+        $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
+        $entryPoint->expects($this->once())->method('start')->will($this->returnValue('NOT A RESPONSE'));
+
+        $listener = $this->createExceptionListener(null, null, null, $entryPoint);
+        $listener->onKernelException($event);
+        // the exception has been replaced by our LogicException
+        $this->assertInstanceOf('LogicException', $event->getException());
+        $this->assertStringEndsWith('start() method must return a Response object (string returned)', $event->getException()->getMessage());
+    }
+
     /**
      * @dataProvider getAccessDeniedExceptionProvider
      */

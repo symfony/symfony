@@ -59,22 +59,6 @@ class HttpDigestFactory implements SecurityFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $node
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['key']); })
-                ->then(function ($v) {
-                    if (isset($v['secret'])) {
-                        throw new \LogicException('Cannot set both key and secret options for http_digest, use only secret instead.');
-                    }
-
-                    @trigger_error('http_digest.key is deprecated since version 2.8 and will be removed in 3.0. Use http_digest.secret instead.', E_USER_DEPRECATED);
-
-                    $v['secret'] = $v['key'];
-
-                    unset($v['key']);
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->scalarNode('provider')->end()
                 ->scalarNode('realm')->defaultValue('Secured Area')->end()

@@ -171,12 +171,7 @@ class JsonDescriptor extends Descriptor
     private function writeData(array $data, array $options)
     {
         $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
-
-        if (defined('JSON_PRETTY_PRINT')) {
-            $flags |= JSON_PRETTY_PRINT;
-        }
-
-        $this->write(json_encode($data, $flags)."\n");
+        $this->write(json_encode($data, $flags | JSON_PRETTY_PRINT)."\n");
     }
 
     /**
@@ -186,9 +181,6 @@ class JsonDescriptor extends Descriptor
      */
     protected function getRouteData(Route $route)
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         return array(
             'path' => $route->getPath(),
             'pathRegex' => $route->compile()->getRegex(),
@@ -198,7 +190,7 @@ class JsonDescriptor extends Descriptor
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
             'class' => get_class($route),
             'defaults' => $route->getDefaults(),
-            'requirements' => $requirements ?: 'NO CUSTOM',
+            'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
             'options' => $route->getOptions(),
         );
     }
@@ -213,12 +205,10 @@ class JsonDescriptor extends Descriptor
     {
         $data = array(
             'class' => (string) $definition->getClass(),
-            'scope' => $definition->getScope(false),
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
             'shared' => $definition->isShared(),
-            'synchronized' => $definition->isSynchronized(false),
             'abstract' => $definition->isAbstract(),
             'autowire' => $definition->isAutowired(),
             'autowiring_types' => array(),
@@ -227,18 +217,6 @@ class JsonDescriptor extends Descriptor
 
         foreach ($definition->getAutowiringTypes() as $autowiringType) {
             $data['autowiring_types'][] = $autowiringType;
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $data['factory_class'] = $definition->getFactoryClass(false);
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $data['factory_service'] = $definition->getFactoryService(false);
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $data['factory_method'] = $definition->getFactoryMethod(false);
         }
 
         if ($factory = $definition->getFactory()) {
@@ -253,6 +231,14 @@ class JsonDescriptor extends Descriptor
                 $data['factory_method'] = $factory[1];
             } else {
                 $data['factory_function'] = $factory;
+            }
+        }
+
+        $calls = $definition->getMethodCalls();
+        if (count($calls) > 0) {
+            $data['calls'] = array();
+            foreach ($calls as $callData) {
+                $data['calls'][] = $callData[0];
             }
         }
 

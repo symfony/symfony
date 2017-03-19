@@ -20,6 +20,16 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Yaml
 {
+    const DUMP_OBJECT = 1;
+    const PARSE_EXCEPTION_ON_INVALID_TYPE = 2;
+    const PARSE_OBJECT = 4;
+    const PARSE_OBJECT_FOR_MAP = 8;
+    const DUMP_EXCEPTION_ON_INVALID_TYPE = 16;
+    const PARSE_DATETIME = 32;
+    const DUMP_OBJECT_AS_MAP = 64;
+    const DUMP_MULTI_LINE_LITERAL_BLOCK = 128;
+    const PARSE_CONSTANT = 256;
+
     /**
      * Parses YAML into a PHP value.
      *
@@ -29,47 +39,44 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
-     * As this method accepts both plain strings and file names as an input,
-     * you must validate the input before calling this method. Passing a file
-     * as an input is a deprecated feature and will be removed in 3.0.
-     *
-     * Note: the ability to pass file names to the Yaml::parse method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
-     *
-     * @param string $input                  Path to a YAML file or a string containing YAML
-     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param bool   $objectSupport          True if object support is enabled, false otherwise
-     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
+     * @param string $input A string containing YAML
+     * @param int    $flags A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @return mixed The YAML converted to a PHP value
      *
      * @throws ParseException If the YAML is not valid
      */
-    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
+    public static function parse($input, $flags = 0)
     {
-        // if input is a file, process it
-        $file = '';
-        if (strpos($input, "\n") === false && is_file($input)) {
-            @trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
+        if (is_bool($flags)) {
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
 
-            if (false === is_readable($input)) {
-                throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
+            if ($flags) {
+                $flags = self::PARSE_EXCEPTION_ON_INVALID_TYPE;
+            } else {
+                $flags = 0;
             }
+        }
 
-            $file = $input;
-            $input = file_get_contents($file);
+        if (func_num_args() >= 3) {
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
+
+            if (func_get_arg(2)) {
+                $flags |= self::PARSE_OBJECT;
+            }
+        }
+
+        if (func_num_args() >= 4) {
+            @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
+
+            if (func_get_arg(3)) {
+                $flags |= self::PARSE_OBJECT_FOR_MAP;
+            }
         }
 
         $yaml = new Parser();
 
-        try {
-            return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport, $objectForMap);
-        } catch (ParseException $e) {
-            if ($file) {
-                $e->setParsedFile($file);
-            }
-
-            throw $e;
-        }
+        return $yaml->parse($input, $flags);
     }
 
     /**
@@ -78,23 +85,35 @@ class Yaml
      * The dump method, when supplied with an array, will do its best
      * to convert the array into friendly YAML.
      *
-     * @param mixed $input                  The PHP value
-     * @param int   $inline                 The level where you switch to inline YAML
-     * @param int   $indent                 The amount of spaces to use for indentation of nested nodes
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param mixed $input  The PHP value
+     * @param int   $inline The level where you switch to inline YAML
+     * @param int   $indent The amount of spaces to use for indentation of nested nodes
+     * @param int   $flags  A bit field of DUMP_* constants to customize the dumped YAML string
      *
      * @return string A YAML string representing the original PHP value
      */
-    public static function dump($input, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($input, $inline = 2, $indent = 4, $flags = 0)
     {
-        if ($indent < 1) {
-            throw new \InvalidArgumentException('The indentation must be greater than zero.');
+        if (is_bool($flags)) {
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+
+            if ($flags) {
+                $flags = self::DUMP_EXCEPTION_ON_INVALID_TYPE;
+            } else {
+                $flags = 0;
+            }
         }
 
-        $yaml = new Dumper();
-        $yaml->setIndentation($indent);
+        if (func_num_args() >= 5) {
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
 
-        return $yaml->dump($input, $inline, 0, $exceptionOnInvalidType, $objectSupport);
+            if (func_get_arg(4)) {
+                $flags |= self::DUMP_OBJECT;
+            }
+        }
+
+        $yaml = new Dumper($indent);
+
+        return $yaml->dump($input, $inline, 0, $flags);
     }
 }

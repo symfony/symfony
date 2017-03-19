@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
-
 /**
  * Converts between objects with getter and setter methods and arrays.
  *
@@ -36,99 +32,16 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class GetSetMethodNormalizer extends AbstractNormalizer
+class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @throws LogicException
-     * @throws CircularReferenceException
-     */
-    public function normalize($object, $format = null, array $context = array())
-    {
-        if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object);
-        }
-
-        $reflectionObject = new \ReflectionObject($object);
-        $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
-
-        $attributes = array();
-        foreach ($reflectionMethods as $method) {
-            if ($this->isGetMethod($method)) {
-                $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
-                if (in_array($attributeName, $this->ignoredAttributes)) {
-                    continue;
-                }
-
-                if (false !== $allowedAttributes && !in_array($attributeName, $allowedAttributes)) {
-                    continue;
-                }
-
-                $attributeValue = $method->invoke($object);
-                if (isset($this->callbacks[$attributeName])) {
-                    $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
-                }
-                if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                    if (!$this->serializer instanceof NormalizerInterface) {
-                        throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
-                    }
-
-                    $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
-                }
-
-                if ($this->nameConverter) {
-                    $attributeName = $this->nameConverter->normalize($attributeName);
-                }
-
-                $attributes[$attributeName] = $attributeValue;
-            }
-        }
-
-        return $attributes;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws RuntimeException
-     */
-    public function denormalize($data, $class, $format = null, array $context = array())
-    {
-        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
-        $normalizedData = $this->prepareForDenormalization($data);
-
-        $reflectionClass = new \ReflectionClass($class);
-        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
-
-        $classMethods = get_class_methods($object);
-        foreach ($normalizedData as $attribute => $value) {
-            if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
-            }
-
-            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
-
-            if ($allowed && !$ignored) {
-                $setter = 'set'.ucfirst($attribute);
-
-                if (in_array($setter, $classMethods) && !$reflectionClass->getMethod($setter)->isStatic()) {
-                    $object->$setter($value);
-                }
-            }
-        }
-
-        return $object;
-    }
+    private static $setterAccessibleCache = array();
 
     /**
      * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
+        return parent::supportsNormalization($data, $format) && $this->supports(get_class($data));
     }
 
     /**
@@ -136,7 +49,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return class_exists($type) && $this->supports($type);
+        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
 
     /**
@@ -178,5 +91,64 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                 0 === $method->getNumberOfRequiredParameters()
             )
         ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function extractAttributes($object, $format = null, array $context = array())
+    {
+        $reflectionObject = new \ReflectionObject($object);
+        $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
+
+        $attributes = array();
+        foreach ($reflectionMethods as $method) {
+            if (!$this->isGetMethod($method)) {
+                continue;
+            }
+
+            $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+
+            if ($this->isAllowedAttribute($object, $attributeName)) {
+                $attributes[] = $attributeName;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
+    {
+        $ucfirsted = ucfirst($attribute);
+
+        $getter = 'get'.$ucfirsted;
+        if (is_callable(array($object, $getter))) {
+            return $object->$getter();
+        }
+
+        $isser = 'is'.$ucfirsted;
+        if (is_callable(array($object, $isser))) {
+            return $object->$isser();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    {
+        $setter = 'set'.ucfirst($attribute);
+        $key = get_class($object).':'.$setter;
+
+        if (!isset(self::$setterAccessibleCache[$key])) {
+            self::$setterAccessibleCache[$key] = is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();
+        }
+
+        if (self::$setterAccessibleCache[$key]) {
+            $object->$setter($value);
+        }
     }
 }

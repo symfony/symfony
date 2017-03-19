@@ -22,7 +22,7 @@ class AddCacheWarmerPassTest extends TestCase
         $services = array(
             'my_cache_warmer_service1' => array(0 => array('priority' => 100)),
             'my_cache_warmer_service2' => array(0 => array('priority' => 200)),
-            'my_cache_warmer_service3' => array(),
+            'my_cache_warmer_service3' => array(0 => array()),
         );
 
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();

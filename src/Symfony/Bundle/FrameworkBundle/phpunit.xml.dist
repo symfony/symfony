@@ -8,6 +8,7 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <env name="REDIS_HOST" value="localhost" />
     </php>
 
     <testsuites>

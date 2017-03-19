@@ -18,6 +18,21 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AddSecurityVotersPassTest extends TestCase
 {
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     */
+    public function testNoVoters()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('security.access.decision_manager', 'Symfony\Component\Security\Core\Authorization\AccessDecisionManager')
+            ->addArgument(array())
+        ;
+
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
+    }
+
     public function testThatSecurityVotersAreProcessedInPriorityOrder()
     {
         $container = new ContainerBuilder();
@@ -45,15 +60,9 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
 
         $calls = $container->getDefinition('security.access.decision_manager')->getMethodCalls();
-
-        $this->assertEquals(
-            array(
-                new Reference('highest_prio_service'),
-                new Reference('lowest_prio_service'),
-                new Reference('no_prio_service'),
-                new Reference('zero_prio_service'),
-            ),
-            $calls[0][1][0]
-        );
+        $refs = $calls[0][1][0];
+        $this->assertEquals(new Reference('highest_prio_service'), $refs[0]);
+        $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
+        $this->assertCount(4, $refs);
     }
 }

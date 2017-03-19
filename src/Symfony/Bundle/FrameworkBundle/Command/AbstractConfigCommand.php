@@ -27,6 +27,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
     protected function listBundles($output)
     {
+        $title = 'Available registered bundles with their extension alias if available';
         $headers = array('Bundle name', 'Extension alias');
         $rows = array();
 
@@ -41,9 +42,10 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
 
         if ($output instanceof StyleInterface) {
+            $output->title($title);
             $output->table($headers, $rows);
         } else {
-            $output->writeln('Available registered bundles with their extension alias if available:');
+            $output->writeln($title);
             $table = new Table($output);
             $table->setHeaders($headers)->setRows($rows)->render();
         }
@@ -52,6 +54,8 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     protected function findExtension($name)
     {
         $bundles = $this->initializeBundles();
+        $minScore = INF;
+
         foreach ($bundles as $bundle) {
             if ($name === $bundle->getName()) {
                 if (!$bundle->getContainerExtension()) {
@@ -61,16 +65,37 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
                 return $bundle->getContainerExtension();
             }
 
+            $distance = levenshtein($name, $bundle->getName());
+
+            if ($distance < $minScore) {
+                $guess = $bundle->getName();
+                $minScore = $distance;
+            }
+
             $extension = $bundle->getContainerExtension();
-            if ($extension && $name === $extension->getAlias()) {
-                return $extension;
+
+            if ($extension) {
+                if ($name === $extension->getAlias()) {
+                    return $extension;
+                }
+
+                $distance = levenshtein($name, $extension->getAlias());
+
+                if ($distance < $minScore) {
+                    $guess = $extension->getAlias();
+                    $minScore = $distance;
+                }
             }
         }
 
         if ('Bundle' !== substr($name, -6)) {
-            $message = sprintf('No extensions with configuration available for "%s"', $name);
+            $message = sprintf('No extensions with configuration available for "%s".', $name);
         } else {
-            $message = sprintf('No extension with alias "%s" is enabled', $name);
+            $message = sprintf('No extension with alias "%s" is enabled.', $name);
+        }
+
+        if (isset($guess) && $minScore < 3) {
+            $message .= sprintf("\n\nDid you mean \"%s\"?", $guess);
         }
 
         throw new \LogicException($message);

@@ -93,6 +93,7 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
+
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
@@ -101,22 +102,66 @@ class ConfigurationTest extends TestCase
         ));
     }
 
+    public function testAssetsCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+
+        $defaultConfig = array(
+            'enabled' => true,
+            'version_strategy' => null,
+            'version' => null,
+            'version_format' => '%%s?%%s',
+            'base_path' => '',
+            'base_urls' => array(),
+            'packages' => array(),
+        );
+
+        $this->assertEquals($defaultConfig, $config['assets']);
+    }
+
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.
-     * @group legacy
+     * @expectedExceptionMessage You cannot use both "version_strategy" and "version" at the same time under "assets".
      */
-    public function testLegacyInvalidValueAssets()
+    public function testInvalidVersionStrategy()
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
-                'templating' => array(
-                    'engines' => null,
-                    'assets_base_urls' => '//example.com',
+                'assets' => array(
+                    'base_urls' => '//example.com',
+                    'version' => 1,
+                    'version_strategy' => 'foo',
                 ),
-                'assets' => null,
+            ),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage  You cannot use both "version_strategy" and "version" at the same time under "assets" packages.
+     */
+    public function testInvalidPackageVersionStrategy()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, array(
+            array(
+                'assets' => array(
+                    'base_urls' => '//example.com',
+                    'version' => 1,
+                    'packages' => array(
+                        'foo' => array(
+                            'base_urls' => '//example.com',
+                            'version' => 1,
+                            'version_strategy' => 'foo',
+                        ),
+                    ),
+                ),
             ),
         ));
     }
@@ -128,16 +173,15 @@ class ConfigurationTest extends TestCase
             'trusted_proxies' => array(),
             'ide' => null,
             'default_locale' => 'en',
+            'csrf_protection' => array(
+                'enabled' => false,
+            ),
             'form' => array(
                 'enabled' => false,
                 'csrf_protection' => array(
                     'enabled' => null, // defaults to csrf_protection.enabled
-                    'field_name' => null,
+                    'field_name' => '_token',
                 ),
-            ),
-            'csrf_protection' => array(
-                'enabled' => false,
-                'field_name' => '_token',
             ),
             'esi' => array('enabled' => false),
             'ssi' => array('enabled' => false),
@@ -150,10 +194,11 @@ class ConfigurationTest extends TestCase
                 'only_exceptions' => false,
                 'only_master_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
-                'username' => '',
-                'password' => '',
-                'lifetime' => 86400,
                 'collect' => true,
+                'matcher' => array(
+                    'enabled' => false,
+                    'ips' => array(),
+                ),
             ),
             'translator' => array(
                 'enabled' => false,
@@ -169,9 +214,10 @@ class ConfigurationTest extends TestCase
                 'strict_email' => false,
             ),
             'annotations' => array(
-                'cache' => 'file',
+                'cache' => 'php_array',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug' => true,
+                'enabled' => true,
             ),
             'serializer' => array(
                 'enabled' => false,
@@ -184,12 +230,54 @@ class ConfigurationTest extends TestCase
             'property_info' => array(
                 'enabled' => false,
             ),
+            'router' => array(
+                'enabled' => false,
+                'http_port' => 80,
+                'https_port' => 443,
+                'strict_requirements' => true,
+            ),
+            'session' => array(
+                'enabled' => false,
+                'storage_id' => 'session.storage.native',
+                'handler_id' => 'session.handler.native_file',
+                'cookie_httponly' => true,
+                'gc_probability' => 1,
+                'save_path' => '%kernel.cache_dir%/sessions',
+                'metadata_update_threshold' => '0',
+            ),
+            'request' => array(
+                'enabled' => false,
+                'formats' => array(),
+            ),
+            'templating' => array(
+                'enabled' => false,
+                'hinclude_default_template' => null,
+                'form' => array(
+                    'resources' => array('FrameworkBundle:Form'),
+                ),
+                'engines' => array(),
+                'loaders' => array(),
+            ),
             'assets' => array(
+                'enabled' => false,
+                'version_strategy' => null,
                 'version' => null,
                 'version_format' => '%%s?%%s',
                 'base_path' => '',
                 'base_urls' => array(),
                 'packages' => array(),
+            ),
+            'cache' => array(
+                'pools' => array(),
+                'app' => 'cache.adapter.filesystem',
+                'system' => 'cache.adapter.system',
+                'directory' => '%kernel.cache_dir%/pools',
+                'default_redis_provider' => 'redis://localhost',
+            ),
+            'workflows' => array(),
+            'php_errors' => array(
+                'log' => true,
+                'throw' => true,
             ),
         );
     }

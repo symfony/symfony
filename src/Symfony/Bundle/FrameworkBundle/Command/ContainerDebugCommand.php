@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\FileLocator;
 
 /**
@@ -40,9 +41,6 @@ class ContainerDebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('debug:container')
-            ->setAliases(array(
-                'container:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
@@ -95,15 +93,15 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $io->caution('The use of "container:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:container" instead.');
-        }
-
         $this->validateInput($input);
         $object = $this->getContainerBuilder();
 
         if ($input->getOption('parameters')) {
-            $object = $object->getParameterBag();
+            $parameters = array();
+            foreach ($object->getParameterBag()->all() as $k => $v) {
+                $parameters[$k] = $object->resolveEnvPlaceholders($v);
+            }
+            $object = new ParameterBag($parameters);
             $options = array();
         } elseif ($parameter = $input->getOption('parameter')) {
             $options = array('parameter' => $parameter);
@@ -124,8 +122,14 @@ EOF
         $options['output'] = $io;
         $helper->describe($output, $object, $options);
 
-        if (!$input->getArgument('name') && $input->isInteractive()) {
-            $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
+        if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && $input->isInteractive()) {
+            if ($input->getOption('tags')) {
+                $io->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
+            } elseif ($input->getOption('parameters')) {
+                $io->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
+            } else {
+                $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
+            }
         }
     }
 
@@ -195,7 +199,9 @@ EOF
             throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
-        return $io->choice('Select one of the following services to display its information', $matchingServices);
+        $default = 1 === count($matchingServices) ? $matchingServices[0] : null;
+
+        return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)

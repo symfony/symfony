@@ -24,7 +24,6 @@ class ConfigDataCollectorTest extends TestCase
     {
         $kernel = new KernelForTest('test', true);
         $c = new ConfigDataCollector();
-        $c->setCacheVersionInfo(false);
         $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
 

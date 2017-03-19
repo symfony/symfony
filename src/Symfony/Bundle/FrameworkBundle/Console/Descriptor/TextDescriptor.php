@@ -78,9 +78,6 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         $tableHeaders = array('Property', 'Value');
         $tableRows = array(
             array('Route Name', isset($options['name']) ? $options['name'] : ''),
@@ -90,7 +87,7 @@ class TextDescriptor extends Descriptor
             array('Host Regex', ('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')),
             array('Scheme', ($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')),
             array('Method', ($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')),
-            array('Requirements', ($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM')),
+            array('Requirements', ($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')),
             array('Class', get_class($route)),
             array('Defaults', $this->formatRouterConfig($route->getDefaults())),
             array('Options', $this->formatRouterConfig($route->getOptions())),
@@ -276,11 +273,19 @@ class TextDescriptor extends Descriptor
         }
         $tableRows[] = array('Tags', $tagInformation);
 
-        $tableRows[] = array('Scope', $definition->getScope(false));
+        $calls = $definition->getMethodCalls();
+        if (count($calls) > 0) {
+            $callInformation = array();
+            foreach ($calls as $call) {
+                $callInformation[] = $call[0];
+            }
+            $tableRows[] = array('Calls', implode(', ', $callInformation));
+        }
+
         $tableRows[] = array('Public', $definition->isPublic() ? 'yes' : 'no');
         $tableRows[] = array('Synthetic', $definition->isSynthetic() ? 'yes' : 'no');
         $tableRows[] = array('Lazy', $definition->isLazy() ? 'yes' : 'no');
-        $tableRows[] = array('Synchronized', $definition->isSynchronized(false) ? 'yes' : 'no');
+        $tableRows[] = array('Shared', $definition->isShared() ? 'yes' : 'no');
         $tableRows[] = array('Abstract', $definition->isAbstract() ? 'yes' : 'no');
         $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
 
@@ -289,18 +294,6 @@ class TextDescriptor extends Descriptor
 
         if ($definition->getFile()) {
             $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $tableRows[] = array('Factory Class', $definition->getFactoryClass(false));
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $tableRows[] = array('Factory Service', $definition->getFactoryService(false));
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $tableRows[] = array('Factory Method', $definition->getFactoryMethod(false));
         }
 
         if ($factory = $definition->getFactory()) {

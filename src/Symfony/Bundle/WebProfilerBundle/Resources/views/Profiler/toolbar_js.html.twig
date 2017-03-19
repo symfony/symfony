@@ -1,6 +1,6 @@
-<div id="sfwdt{{ token }}" class="sf-toolbar" style="display: none"></div>
+<div id="sfwdt{{ token }}" class="sf-toolbar sf-display-none"></div>
 {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
-<script>/*<![CDATA[*/
+<script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
     (function () {
         {% if 'top' == position %}
             var sfwdt = document.getElementById('sfwdt{{ token }}');
@@ -14,6 +14,14 @@
             'sfwdt{{ token }}',
             '{{ path("_wdt", { "token": token }) }}',
             function(xhr, el) {
+
+                /* Evaluate embedded scripts inside the toolbar */
+                var i, scripts = [].slice.call(el.querySelectorAll('script'));
+
+                for (i = 0; i < scripts.length; ++i) {
+                    eval(scripts[i].firstChild.nodeValue);
+                }
+
                 el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
 
                 if (el.style.display == 'none') {
@@ -33,8 +41,8 @@
                 Sfjs.renderAjaxRequests();
 
                 /* Handle toolbar-info position */
-                var toolbarBlocks = document.querySelectorAll('.sf-toolbar-block');
-                for (var i = 0; i < toolbarBlocks.length; i += 1) {
+                var toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
+                for (i = 0; i < toolbarBlocks.length; ++i) {
                     toolbarBlocks[i].onmouseover = function () {
                         var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
                         var pageWidth = document.body.clientWidth;
@@ -58,13 +66,38 @@
                         }
                     };
                 }
+                Sfjs.addEventListener(document.getElementById('sfToolbarHideButton-{{ token }}'), 'click', function (event) {
+                    event.preventDefault();
+
+                    var p = this.parentNode;
+                    p.style.display = 'none';
+                    (p.previousElementSibling || p.previousSibling).style.display = 'none';
+                    document.getElementById('sfMiniToolbar-{{ token }}').style.display = 'block';
+                    Sfjs.setPreference('toolbar/displayState', 'none');
+                });
+                Sfjs.addEventListener(document.getElementById('sfToolbarMiniToggler-{{ token }}'), 'click', function (event) {
+                    event.preventDefault();
+
+                    var elem = this.parentNode;
+                    if (elem.style.display == 'none') {
+                        document.getElementById('sfToolbarMainContent-{{ token }}').style.display = 'none';
+                        document.getElementById('sfToolbarClearer-{{ token }}').style.display = 'none';
+                        elem.style.display = 'block';
+                    } else {
+                        document.getElementById('sfToolbarMainContent-{{ token }}').style.display = 'block';
+                        document.getElementById('sfToolbarClearer-{{ token }}').style.display = 'block';
+                        elem.style.display = 'none'
+                    }
+
+                    Sfjs.setPreference('toolbar/displayState', 'block');
+                })
             },
             function(xhr) {
                 if (xhr.status !== 0) {
                     confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
                 }
             },
-            {'maxTries': 5}
+            { maxTries: 5 }
         );
     })();
 /*]]>*/</script>

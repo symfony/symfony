@@ -45,7 +45,7 @@ class LoggingTranslatorPassTest extends TestCase
 
         $definition->expects($this->once())
             ->method('getClass')
-            ->will($this->returnValue('%translator.class%'));
+            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Translation\Translator'));
 
         $parameterBag->expects($this->once())
             ->method('resolveValue')

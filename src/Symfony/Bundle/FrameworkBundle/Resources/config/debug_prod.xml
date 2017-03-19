@@ -5,23 +5,26 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.debug_handlers_listener.class">Symfony\Component\HttpKernel\EventListener\DebugHandlersListener</parameter>
-        <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
-        <parameter key="debug.error_handler.throw_at">0</parameter>
+        <parameter key="debug.error_handler.throw_at">-1</parameter>
     </parameters>
 
     <services>
-        <service id="debug.debug_handlers_listener" class="%debug.debug_handlers_listener.class%">
+        <service id="debug.debug_handlers_listener" class="Symfony\Component\HttpKernel\EventListener\DebugHandlersListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="php" />
             <argument>null</argument><!-- Exception handler -->
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>null</argument><!-- Log levels map for enabled error levels -->
-            <argument>null</argument>
+            <argument>-1</argument><!-- Log levels map for enabled error levels -->
+            <argument>%debug.error_handler.throw_at%</argument>
             <argument>true</argument>
-            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
+            <argument type="service" id="debug.file_link_formatter"></argument>
+            <argument>true</argument>
         </service>
 
-        <service id="debug.stopwatch" class="%debug.stopwatch.class%" />
+        <service id="debug.stopwatch" class="Symfony\Component\Stopwatch\Stopwatch" />
+
+        <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" public="false">
+            <argument>%debug.file_link_format%</argument>
+        </service>
     </services>
 </container>

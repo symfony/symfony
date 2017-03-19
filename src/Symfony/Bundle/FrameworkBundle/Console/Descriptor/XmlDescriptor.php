@@ -196,11 +196,11 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $requirements = $route->getRequirements();
+        $originRequirements = $requirements = $route->getRequirements();
         unset($requirements['_scheme'], $requirements['_method']);
         if ($requirements) {
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
-            foreach ($requirements as $attribute => $pattern) {
+            foreach ($originRequirements as $attribute => $pattern) {
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
                 $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));
@@ -331,18 +331,6 @@ class XmlDescriptor extends Descriptor
 
         $serviceXML->setAttribute('class', $definition->getClass());
 
-        if ($definition->getFactoryClass(false)) {
-            $serviceXML->setAttribute('factory-class', $definition->getFactoryClass(false));
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $serviceXML->setAttribute('factory-service', $definition->getFactoryService(false));
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod(false));
-        }
-
         if ($factory = $definition->getFactory()) {
             $serviceXML->appendChild($factoryXML = $dom->createElement('factory'));
 
@@ -360,15 +348,22 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $serviceXML->setAttribute('scope', $definition->getScope(false));
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
         $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
-        $serviceXML->setAttribute('synchronized', $definition->isSynchronized(false) ? 'true' : 'false');
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
+
+        $calls = $definition->getMethodCalls();
+        if (count($calls) > 0) {
+            $serviceXML->appendChild($callsXML = $dom->createElement('calls'));
+            foreach ($calls as $callData) {
+                $callsXML->appendChild($callXML = $dom->createElement('call'));
+                $callXML->setAttribute('method', $callData[0]);
+            }
+        }
 
         if (!$omitTags) {
             if ($tags = $definition->getTags()) {

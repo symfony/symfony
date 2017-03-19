@@ -2,11 +2,11 @@
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Tests\Style\SymfonyStyleWithForcedLineLength;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 //Ensure has single blank line after any text and a title
 return function (InputInterface $input, OutputInterface $output) {
-    $output = new SymfonyStyleWithForcedLineLength($input, $output);
+    $output = new SymfonyStyle($input, $output);
 
     $output->write('Lorem ipsum dolor sit amet');
     $output->title('First title');

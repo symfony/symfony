@@ -23,8 +23,7 @@ class YamlReferenceDumperTest extends TestCase
 
         $dumper = new YamlReferenceDumper();
 
-        $this->assertContains($this->getConfigurationAsString(), $dumper->dump($configuration));
-        $this->markTestIncomplete('The Yaml Dumper currently does not support prototyped arrays');
+        $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
     private function getConfigurationAsString()
@@ -57,10 +56,31 @@ acme_root:
         # multi-line info text
         # which should be indented
         child3:               ~ # Example: example setting
+    scalar_prototyped:    []
     parameters:
 
         # Prototype: Parameter name
         name:                 ~
+    connections:
+
+        # Prototype
+        -
+            user:                 ~
+            pass:                 ~
+    cms_pages:
+
+        # Prototype
+        page:
+
+            # Prototype
+            locale:
+                title:                ~ # Required
+                path:                 ~ # Required
+    pipou:
+
+        # Prototype
+        name:                 []
+
 EOL;
     }
 }

@@ -97,6 +97,77 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testRegress()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start();
+        $bar->advance();
+        $bar->advance();
+        $bar->advance(-1);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    1 [->--------------------------]').
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    1 [->--------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegressWithStep()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start();
+        $bar->advance(4);
+        $bar->advance(4);
+        $bar->advance(-2);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    4 [---->-----------------------]').
+            $this->generateOutput('    8 [-------->-------------------]').
+            $this->generateOutput('    6 [------>---------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegressMultipleTimes()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start();
+        $bar->advance(3);
+        $bar->advance(3);
+        $bar->advance(-1);
+        $bar->advance(-2);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    3 [--->------------------------]').
+            $this->generateOutput('    6 [------>---------------------]').
+            $this->generateOutput('    5 [----->----------------------]').
+            $this->generateOutput('    3 [--->------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegressBelowMin()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar->setProgress(1);
+        $bar->advance(-1);
+        $bar->advance(-1);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '  1/10 [==>-------------------------]  10%'.
+            $this->generateOutput('  0/10 [>---------------------------]   0%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testFormat()
     {
         $expected =
@@ -279,18 +350,6 @@ class ProgressBarTest extends TestCase
         $bar = new ProgressBar($this->getOutputStream());
         $bar->setProgress(15);
         $this->assertNotNull($bar->getStartTime());
-    }
-
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage You can't regress the progress bar
-     */
-    public function testRegressProgress()
-    {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
-        $bar->start();
-        $bar->setProgress(15);
-        $bar->setProgress(10);
     }
 
     public function testRedrawFrequency()
@@ -516,6 +575,24 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testWithSmallScreen()
+    {
+        $output = $this->getOutputStream();
+
+        $bar = new ProgressBar($output);
+        putenv('COLUMNS=12');
+        $bar->start();
+        $bar->advance();
+        putenv('COLUMNS=120');
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---]'.
+            $this->generateOutput('    1 [->--]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testAddingPlaceholderFormatter()
     {
         ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', function (ProgressBar $bar) {
@@ -559,6 +636,8 @@ class ProgressBarTest extends TestCase
 
     public function testAnsiColorsAndEmojis()
     {
+        putenv('COLUMNS=156');
+
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);
         ProgressBar::setPlaceholderFormatterDefinition('memory', function (ProgressBar $bar) {
             static $i = 0;
@@ -574,22 +653,37 @@ class ProgressBarTest extends TestCase
 
         $bar->setMessage('Starting the demo... fingers crossed', 'title');
         $bar->start();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
+            '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
+            " \xf0\x9f\x8f\x81  < 1 sec                        \033[44;37m 0 B \033[0m",
+            stream_get_contents($output->getStream())
+        );
+        ftruncate($output->getStream(), 0);
+        rewind($output->getStream());
+
         $bar->setMessage('Looks good to me...', 'title');
         $bar->advance(4);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(
+                " \033[44;37m Looks good to me...                   \033[0m\n".
+                '  4/15 '.str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
+                " \xf0\x9f\x8f\x81  < 1 sec                     \033[41;37m 97 KiB \033[0m"
+            ),
+            stream_get_contents($output->getStream())
+        );
+        ftruncate($output->getStream(), 0);
+        rewind($output->getStream());
+
         $bar->setMessage('Thanks, bye', 'title');
         $bar->finish();
 
         rewind($output->getStream());
         $this->assertEquals(
-                " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
-                '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
-                " \xf0\x9f\x8f\x81  < 1 sec                        \033[44;37m 0 B \033[0m"
-            .
-            $this->generateOutput(
-                " \033[44;37m Looks good to me...                   \033[0m\n".
-                '  4/15 '.str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
-                " \xf0\x9f\x8f\x81  < 1 sec                     \033[41;37m 97 KiB \033[0m"
-            ).
             $this->generateOutput(
                 " \033[44;37m Thanks, bye                           \033[0m\n".
                 ' 15/15 '.str_repeat($done, 28)." 100%\n".
@@ -597,6 +691,7 @@ class ProgressBarTest extends TestCase
             ),
             stream_get_contents($output->getStream())
         );
+        putenv('COLUMNS=120');
     }
 
     public function testSetFormat()

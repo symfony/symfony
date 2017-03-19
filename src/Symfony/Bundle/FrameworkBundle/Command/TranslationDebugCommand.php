@@ -43,9 +43,6 @@ class TranslationDebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('debug:translation')
-            ->setAliases(array(
-                'translation:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
@@ -92,12 +89,21 @@ EOF
     /**
      * {@inheritdoc}
      */
+    public function isEnabled()
+    {
+        if (!class_exists('Symfony\Component\Translation\Translator')) {
+            return false;
+        }
+
+        return parent::isEnabled();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $io->caution('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
-        }
 
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');

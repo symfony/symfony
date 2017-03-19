@@ -78,7 +78,7 @@ class GuardAuthenticationListener implements ListenerInterface
 
             if ($event->hasResponse()) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('The "%s" authenticator set the response. Any later authenticator will not be called', get_class($guardAuthenticator)));
+                    $this->logger->debug('The "{authenticator}" authenticator set the response. Any later authenticator will not be called', array('authenticator' => get_class($guardAuthenticator)));
                 }
 
                 break;

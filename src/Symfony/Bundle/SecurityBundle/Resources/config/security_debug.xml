@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="debug.security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager" decorates="security.access.decision_manager" public="false">
+            <argument type="service" id="debug.security.access.decision_manager.inner" />
+        </service>
+    </services>
+</container>

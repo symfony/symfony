@@ -31,17 +31,6 @@ class ReflectionCaster
         'isVariadic' => 'isVariadic',
     );
 
-    /**
-     * @deprecated since Symfony 2.7, to be removed in 3.0.
-     */
-    public static function castReflector(\Reflector $c, array $a, Stub $stub, $isNested)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
-        $a[Caster::PREFIX_VIRTUAL.'reflection'] = $c->__toString();
-
-        return $a;
-    }
-
     public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -64,7 +53,7 @@ class ReflectionCaster
         }
 
         if ($f = $c->getFileName()) {
-            $a[$prefix.'file'] = $f;
+            $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());
             $a[$prefix.'line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
 
@@ -185,7 +174,10 @@ class ReflectionCaster
         if (isset($a[$prefix.'returnType'])) {
             $v = $a[$prefix.'returnType'];
             $v = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
-            $a[$prefix.'returnType'] = $a[$prefix.'returnType']->allowsNull() ? '?'.$v : $v;
+            $a[$prefix.'returnType'] = new ClassStub($a[$prefix.'returnType']->allowsNull() ? '?'.$v : $v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
+        }
+        if (isset($a[$prefix.'class'])) {
+            $a[$prefix.'class'] = new ClassStub($a[$prefix.'class']);
         }
         if (isset($a[$prefix.'this'])) {
             $a[$prefix.'this'] = new CutStub($a[$prefix.'this']);
@@ -251,7 +243,11 @@ class ReflectionCaster
         } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $c, $v)) {
             $a[$prefix.'typeHint'] = $v[1];
         }
-        if (!isset($a[$prefix.'typeHint'])) {
+
+        if (isset($a[$prefix.'typeHint'])) {
+            $v = $a[$prefix.'typeHint'];
+            $a[$prefix.'typeHint'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
+        } else {
             unset($a[$prefix.'allowsNull']);
         }
 
@@ -314,7 +310,7 @@ class ReflectionCaster
         $x = isset($a[Caster::PREFIX_VIRTUAL.'extra']) ? $a[Caster::PREFIX_VIRTUAL.'extra']->value : array();
 
         if (method_exists($c, 'getFileName') && $m = $c->getFileName()) {
-            $x['file'] = $m;
+            $x['file'] = new LinkStub($m, $c->getStartLine());
             $x['line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
 

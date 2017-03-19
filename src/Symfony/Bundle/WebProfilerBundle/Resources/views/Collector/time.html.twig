@@ -130,7 +130,7 @@
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h4>
-                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>
+                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').identifier }}</a>
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 

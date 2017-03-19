@@ -3,7 +3,7 @@
         {
             "name": "help",
             "usage": [
-                "help [--xml] [--format FORMAT] [--raw] [--] [<command_name>]"
+                "help [--format FORMAT] [--raw] [--] [<command_name>]"
             ],
             "description": "Displays help for a command",
             "help": "The <info>help<\/info> command displays help for a given command:\n\n  <info>php app\/console help list<\/info>\n\nYou can also output the help in other formats by using the <comment>--format<\/comment> option:\n\n  <info>php app\/console help --format=xml list<\/info>\n\nTo display the list of available commands, please use the <info>list<\/info> command.",
@@ -18,15 +18,6 @@
                     }
                 },
                 "options": {
-                    "xml": {
-                        "name": "--xml",
-                        "shortcut": "",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "To output help as XML",
-                        "default": false
-                    },
                     "format": {
                         "name": "--format",
                         "shortcut": "",
@@ -114,7 +105,7 @@
         {
             "name": "list",
             "usage": [
-                "list [--xml] [--raw] [--format FORMAT] [--] [<namespace>]"
+                "list [--raw] [--format FORMAT] [--] [<namespace>]"
             ],
             "description": "Lists commands",
             "help": "The <info>list<\/info> command lists all commands:\n\n  <info>php app\/console list<\/info>\n\nYou can also display the commands for a specific namespace:\n\n  <info>php app\/console list test<\/info>\n\nYou can also output the information in other formats by using the <comment>--format<\/comment> option:\n\n  <info>php app\/console list --format=xml<\/info>\n\nIt's also possible to get raw list of commands (useful for embedding command runner):\n\n  <info>php app\/console list --raw<\/info>",
@@ -129,15 +120,6 @@
                     }
                 },
                 "options": {
-                    "xml": {
-                        "name": "--xml",
-                        "shortcut": "",
-                        "accept_value": false,
-                        "is_value_required": false,
-                        "is_multiple": false,
-                        "description": "To output list as XML",
-                        "default": false
-                    },
                     "raw": {
                         "name": "--raw",
                         "shortcut": "",

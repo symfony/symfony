@@ -14,28 +14,77 @@ namespace Symfony\Component\ExpressionLanguage\Tests;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends TestCase
 {
     public function testCachedParse()
     {
-        $cacheMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
+        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
+        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
         $cacheMock
             ->expects($this->exactly(2))
-            ->method('fetch')
-            ->with('1 + 1//')
+            ->method('getItem')
+            ->with('1%20%2B%201%2F%2F')
+            ->willReturn($cacheItemMock)
+        ;
+
+        $cacheItemMock
+            ->expects($this->exactly(2))
+            ->method('get')
             ->will($this->returnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
             }))
         ;
+
+        $cacheItemMock
+            ->expects($this->exactly(1))
+            ->method('set')
+            ->with($this->isInstanceOf(ParsedExpression::class))
+            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+                $savedParsedExpression = $parsedExpression;
+            }))
+        ;
+
         $cacheMock
             ->expects($this->exactly(1))
             ->method('save')
-            ->with('1 + 1//', $this->isInstanceOf('Symfony\Component\ExpressionLanguage\ParsedExpression'))
+            ->with($cacheItemMock)
+        ;
+
+        $parsedExpression = $expressionLanguage->parse('1 + 1', array());
+        $this->assertSame($savedParsedExpression, $parsedExpression);
+
+        $parsedExpression = $expressionLanguage->parse('1 + 1', array());
+        $this->assertSame($savedParsedExpression, $parsedExpression);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCachedParseWithDeprecatedParserCacheInterface()
+    {
+        $cacheMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
+
+        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
+        $savedParsedExpression = null;
+        $expressionLanguage = new ExpressionLanguage($cacheMock);
+
+        $cacheMock
+            ->expects($this->exactly(1))
+            ->method('fetch')
+            ->with('1%20%2B%201%2F%2F')
+            ->willReturn($savedParsedExpression)
+        ;
+
+        $cacheMock
+            ->expects($this->exactly(1))
+            ->method('save')
+            ->with('1%20%2B%201%2F%2F', $this->isInstanceOf(ParsedExpression::class))
             ->will($this->returnCallback(function ($key, $expression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $expression;
             }))
@@ -43,9 +92,16 @@ class ExpressionLanguageTest extends TestCase
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', array());
         $this->assertSame($savedParsedExpression, $parsedExpression);
+    }
 
-        $parsedExpression = $expressionLanguage->parse('1 + 1', array());
-        $this->assertSame($savedParsedExpression, $parsedExpression);
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Cache argument has to implement Psr\Cache\CacheItemPoolInterface.
+     */
+    public function testWrongCacheImplementation()
+    {
+        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemSpoolInterface')->getMock();
+        $expressionLanguage = new ExpressionLanguage($cacheMock);
     }
 
     public function testConstantFunction()
@@ -118,22 +174,39 @@ class ExpressionLanguageTest extends TestCase
 
     public function testCachingWithDifferentNamesOrder()
     {
-        $cacheMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
+        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
+        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $expressionLanguage = new ExpressionLanguage($cacheMock);
         $savedParsedExpressions = array();
+
         $cacheMock
             ->expects($this->exactly(2))
-            ->method('fetch')
-            ->will($this->returnCallback(function ($key) use (&$savedParsedExpressions) {
-                return isset($savedParsedExpressions[$key]) ? $savedParsedExpressions[$key] : null;
+            ->method('getItem')
+            ->with('a%20%2B%20b%2F%2Fa%7CB%3Ab')
+            ->willReturn($cacheItemMock)
+        ;
+
+        $cacheItemMock
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->will($this->returnCallback(function () use (&$savedParsedExpression) {
+                return $savedParsedExpression;
             }))
         ;
+
+        $cacheItemMock
+            ->expects($this->exactly(1))
+            ->method('set')
+            ->with($this->isInstanceOf(ParsedExpression::class))
+            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+                $savedParsedExpression = $parsedExpression;
+            }))
+        ;
+
         $cacheMock
             ->expects($this->exactly(1))
             ->method('save')
-            ->will($this->returnCallback(function ($key, $expression) use (&$savedParsedExpressions) {
-                $savedParsedExpressions[$key] = $expression;
-            }))
+            ->with($cacheItemMock)
         ;
 
         $expression = 'a + b';

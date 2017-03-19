@@ -75,38 +75,7 @@
 
             <tr>
                 <td class="text-right">{{ listener.priority|default('-') }}</td>
-                <td class="font-normal">
-                    {% if listener.type == 'Closure' %}
-
-                        Closure
-                        <span class="text-muted text-small">(there is no class or file information)</span>
-
-                    {% elseif listener.type == 'Function' %}
-
-                        {% set link = listener.file|file_link(listener.line) %}
-                        {% if link %}
-                            <a href="{{ link }}">{{ listener.function }}()</a>
-                            <span class="text-muted text-small">({{ listener.file }})</span>
-                        {% else %}
-                            {{ listener.function }}()
-                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
-                        {% endif %}
-
-                    {% elseif listener.type == "Method" %}
-
-                        {% set link = listener.file|file_link(listener.line) %}
-                        {% set class_namespace = listener.class|split('\\', -1)|join('\\') %}
-
-                        {% if link %}
-                            <a href="{{ link }}"><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()</a>
-                            <span class="text-muted text-small">({{ listener.class }})</span>
-                        {% else %}
-                            <span>{{ class_namespace }}\</span><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()
-                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
-                        {% endif %}
-
-                    {% endif %}
-                </td>
+                <td class="font-normal">{{ profiler_dump(listener.data) }}</td>
             </tr>
 
             {% if loop.last %}

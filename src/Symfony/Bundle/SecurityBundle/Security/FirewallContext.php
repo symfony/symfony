@@ -23,11 +23,18 @@ class FirewallContext
 {
     private $listeners;
     private $exceptionListener;
+    private $config;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
+    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
+        $this->config = $config;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     public function getContext()

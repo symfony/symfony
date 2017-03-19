@@ -166,4 +166,15 @@ class CookieTest extends TestCase
         $cookie = new Cookie('foo', 'bar', 0, '/', '');
         $this->assertEquals('foo=bar; path=/; httponly', (string) $cookie);
     }
+
+    public function testRawCookie()
+    {
+        $cookie = new Cookie('foo', 'b a r', 0, '/', null, false, false);
+        $this->assertFalse($cookie->isRaw());
+        $this->assertEquals('foo=b+a+r; path=/', (string) $cookie);
+
+        $cookie = new Cookie('foo', 'b+a+r', 0, '/', null, false, false, true);
+        $this->assertTrue($cookie->isRaw());
+        $this->assertEquals('foo=b+a+r; path=/', (string) $cookie);
+    }
 }

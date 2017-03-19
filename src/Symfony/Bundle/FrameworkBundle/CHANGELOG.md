@@ -1,6 +1,34 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Removed `doctrine/annotations` from the list of required dependencies in `composer.json`
+ * Removed `symfony/security-core` and `symfony/security-csrf` from the list of required dependencies in `composer.json`
+ * Removed `symfony/templating` from the list of required dependencies in `composer.json`
+ * Removed `symfony/translation` from the list of required dependencies in `composer.json`
+ * Removed `symfony/asset` from the list of required dependencies in `composer.json`
+ * The `Resources/public/images/*` files have been removed.
+ * The `Resources/public/css/*.css` files have been removed (they are now inlined in TwigBundle).
+ * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension` 
+
+3.1.0
+-----
+
+ * Added `Controller::json` to simplify creating JSON responses when using the Serializer component
+ * Deprecated absolute template paths support in the template name parser
+ * Deprecated using core form types without dependencies as services
+ * Added `Symfony\Component\HttpHernel\DataCollector\RequestDataCollector::onKernelResponse()`
+ * Added `Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector`
+ * Deprecated service `serializer.mapping.cache.apc` (use `serializer.mapping.cache.doctrine.apc` instead)
+
+3.0.0
+-----
+
+ * removed `validator.api` parameter
+ * removed `alias` option of the `form.type` tag
+
 2.8.0
 -----
 

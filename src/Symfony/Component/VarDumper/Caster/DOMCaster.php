@@ -107,7 +107,7 @@ class DOMCaster
             'namespaceURI' => $dom->namespaceURI,
             'prefix' => $dom->prefix,
             'localName' => $dom->localName,
-            'baseURI' => $dom->baseURI,
+            'baseURI' => $dom->baseURI ? new LinkStub($dom->baseURI) : $dom->baseURI,
             'textContent' => new CutStub($dom->textContent),
         );
 
@@ -144,7 +144,7 @@ class DOMCaster
             'version' => $dom->version,
             'xmlVersion' => $dom->xmlVersion,
             'strictErrorChecking' => $dom->strictErrorChecking,
-            'documentURI' => $dom->documentURI,
+            'documentURI' => $dom->documentURI ? new LinkStub($dom->documentURI) : $dom->documentURI,
             'config' => $dom->config,
             'formatOutput' => $dom->formatOutput,
             'validateOnParse' => $dom->validateOnParse,
@@ -237,7 +237,7 @@ class DOMCaster
             'columnNumber' => $dom->columnNumber,
             'offset' => $dom->offset,
             'relatedNode' => $dom->relatedNode,
-            'uri' => $dom->uri,
+            'uri' => $dom->uri ? new LinkStub($dom->uri, $dom->lineNumber) : $dom->uri,
         );
 
         return $a;

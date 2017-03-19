@@ -1,0 +1,47 @@
+{
+    "name": "symfony/cache",
+    "type": "library",
+    "description": "Symfony implementation of PSR-6",
+    "keywords": ["caching", "psr6"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "provide": {
+        "psr/cache-implementation": "1.0"
+    },
+    "require": {
+        "php": ">=5.5.9",
+        "psr/cache": "~1.0",
+        "psr/log": "~1.0"
+    },
+    "require-dev": {
+        "cache/integration-tests": "dev-master",
+        "doctrine/cache": "~1.6",
+        "doctrine/dbal": "~2.4",
+        "predis/predis": "~1.0"
+    },
+    "suggest": {
+        "symfony/polyfill-apcu": "For using ApcuAdapter on HHVM"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Cache\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.2-dev"
+        }
+    }
+}

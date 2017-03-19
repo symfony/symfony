@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Registers event listeners and subscribers to the available doctrine connections.
@@ -77,7 +79,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 uasort($subscribers, $sortFunc);
                 foreach ($subscribers as $id => $instance) {
                     if ($container->getDefinition($id)->isAbstract()) {
-                        throw new \InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event subscriber.', $id));
+                        throw new InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event subscriber.', $id));
                     }
 
                     $em->addMethodCall('addEventSubscriber', array(new Reference($id)));
@@ -93,7 +95,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 uasort($listeners, $sortFunc);
                 foreach ($listeners as $id => $instance) {
                     if ($container->getDefinition($id)->isAbstract()) {
-                        throw new \InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event listener.', $id));
+                        throw new InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event listener.', $id));
                     }
 
                     $em->addMethodCall('addEventListener', array(
@@ -116,7 +118,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             foreach ($instances as $instance) {
                 if ($isListener) {
                     if (!isset($instance['event'])) {
-                        throw new \InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
+                        throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
                     }
                     $instance['event'] = array($instance['event']);
 
@@ -128,7 +130,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 $cons = isset($instance['connection']) ? array($instance['connection']) : $allCons;
                 foreach ($cons as $con) {
                     if (!isset($grouped[$con])) {
-                        throw new \RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
+                        throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
                     }
 
                     if ($isListener && isset($grouped[$con][$id])) {

@@ -12,7 +12,6 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -104,72 +103,6 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $dispatcher->dispatch('onEvent', $event);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @group legacy
-     */
-    public function testTriggerAListenerServiceOutOfScope()
-    {
-        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
-
-        $scope = new Scope('scope');
-        $container = new Container();
-        $container->addScope($scope);
-        $container->enterScope('scope');
-
-        $container->set('service.listener', $service, 'scope');
-
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
-
-        $container->leaveScope('scope');
-        $dispatcher->dispatch('onEvent');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testReEnteringAScope()
-    {
-        $event = new Event();
-
-        $service1 = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
-
-        $service1
-            ->expects($this->exactly(2))
-            ->method('onEvent')
-            ->with($event)
-        ;
-
-        $scope = new Scope('scope');
-        $container = new Container();
-        $container->addScope($scope);
-        $container->enterScope('scope');
-
-        $container->set('service.listener', $service1, 'scope');
-
-        $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
-        $dispatcher->dispatch('onEvent', $event);
-
-        $service2 = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
-
-        $service2
-            ->expects($this->once())
-            ->method('onEvent')
-            ->with($event)
-        ;
-
-        $container->enterScope('scope');
-        $container->set('service.listener', $service2, 'scope');
-
-        $dispatcher->dispatch('onEvent', $event);
-
-        $container->leaveScope('scope');
-
-        $dispatcher->dispatch('onEvent');
-    }
-
     public function testHasListenersOnLazyLoad()
     {
         $event = new Event();
@@ -181,9 +114,6 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
-
-        $event->setDispatcher($dispatcher);
-        $event->setName('onEvent');
 
         $service
             ->expects($this->once())

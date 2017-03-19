@@ -1,0 +1,6 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    annotations:
+        cache: none

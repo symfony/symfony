@@ -2,59 +2,99 @@
 
 {% block toolbar %}
     {% set request_handler %}
-        {% if collector.controller.class is defined %}
-            {% set link = collector.controller.file|file_link(collector.controller.line) %}
-            {% if link %}<a href="{{ link }}" title="{{ collector.controller.file }}">{% else %}<span>{% endif %}
-
-                {{ collector.controller.class|abbr_class|striptags }}
-
-                {%- if collector.controller.method -%}
-                    &nbsp;::&nbsp;{{ collector.controller.method }}
-                {%- endif -%}
-
-            {% if link %}</a>{% else %}</span>{% endif %}
-        {% else %}
-            <span>{{ collector.controller }}</span>
-        {% endif %}
+        {% import _self as helper %}
+        {{ helper.set_handler(collector.controller) }}
     {% endset %}
+
+    {% if collector.redirect %}
+        {% set redirect_handler %}
+            {% import _self as helper %}
+            {{ helper.set_handler(collector.redirect.controller, collector.redirect.route, 'GET' != collector.redirect.method ? collector.redirect.method) }}
+        {% endset %}
+    {% endif %}
+
+    {% if collector.forward|default(false) %}
+        {% set forward_handler %}
+            {% import _self as helper %}
+            {{ helper.set_handler(collector.forward.controller) }}
+        {% endset %}
+    {% endif %}
 
     {% set request_status_code_color = (collector.statuscode >= 400) ? 'red' : (collector.statuscode >= 300) ? 'yellow' : 'green' %}
 
     {% set icon %}
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
-            <span class="sf-toolbar-label">@</span>
+            {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
+            {% if collector.forward|default(false) %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+            <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}
     {% endset %}
 
     {% set text %}
-        <div class="sf-toolbar-info-piece">
-            <b>HTTP status</b>
-            <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
-        </div>
-
-        <div class="sf-toolbar-info-piece">
-            <b>Controller</b>
-            <span>{{ request_handler }}</span>
-        </div>
-
-        {% if collector.controller.class is defined %}
+        <div class="sf-toolbar-info-group">
             <div class="sf-toolbar-info-piece">
-                <b>Controller class</b>
-                <span>{{ collector.controller.class }}</span>
+                <b>HTTP status</b>
+                <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
+            </div>
+
+            {% if 'GET' != collector.method -%}
+                <div class="sf-toolbar-info-piece">
+                    <b>Method</b>
+                    <span>{{ collector.method }}</span>
+                </div>
+            {%- endif %}
+
+            <div class="sf-toolbar-info-piece">
+                <b>Controller</b>
+                <span>{{ request_handler }}</span>
+            </div>
+
+            {% if collector.controller.class is defined -%}
+                <div class="sf-toolbar-info-piece">
+                    <b>Controller class</b>
+                    <span>{{ collector.controller.class }}</span>
+                </div>
+            {%- endif %}
+
+            <div class="sf-toolbar-info-piece">
+                <b>Route name</b>
+                <span>{{ collector.route|default('NONE') }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Has session</b>
+                <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
+            </div>
+        </div>
+
+        {% if redirect_handler is defined -%}
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <b>
+                        <span class="sf-toolbar-redirection-status sf-toolbar-status-yellow">{{ collector.redirect.status_code }}</span>
+                        Redirect from
+                    </b>
+                    <span>
+                        {{ redirect_handler }}
+                        (<a href="{{ path('_profiler', { token: collector.redirect.token }) }}">{{ collector.redirect.token }}</a>)
+                    </span>
+                </div>
             </div>
         {% endif %}
 
-        <div class="sf-toolbar-info-piece">
-            <b>Route name</b>
-            <span>{{ collector.route|default('NONE') }}</span>
-        </div>
-
-        <div class="sf-toolbar-info-piece">
-            <b>Has session</b>
-            <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
-        </div>
+        {% if forward_handler is defined %}
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <b>Forwarded to</b>
+                    <span>
+                        {{ forward_handler }}
+                        (<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
+                    </span>
+                </div>
+            </div>
+        {% endif %}
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
@@ -80,7 +120,7 @@
                         <p>No GET parameters</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestquery }, with_context = false) }}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestquery, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
                 <h3>POST Parameters</h3>
@@ -90,7 +130,7 @@
                         <p>No POST parameters</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest }, with_context = false) }}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
                 <h3>Request Attributes</h3>
@@ -114,7 +154,7 @@
                 {% endif %}
 
                 <h3>Request Headers</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders, labels: ['Header', 'Value'] }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders, labels: ['Header', 'Value'], maxDepth: 1 }, with_context = false) }}
 
                 <h3>Request Content</h3>
 
@@ -143,7 +183,7 @@
             <div class="tab-content">
                 <h3>Response Headers</h3>
 
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'] }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'], maxDepth: 1 }, with_context = false) }}
             </div>
         </div>
 
@@ -212,7 +252,7 @@
                 {% for child in profile.children %}
                     <h3>
                         <a href="{{ path('_profiler', { token: child.token }) }}">
-                            {{- child.getcollector('request').requestattributes.get('_controller') -}}
+                            {{- child.getcollector('request').identifier -}}
                         </a>
                         <small>(token = {{ child.token }})</small>
                     </h3>
@@ -224,3 +264,22 @@
         {% endif %}
     </div>
 {% endblock %}
+
+{% macro set_handler(controller, route, method) %}
+    {% if controller.class is defined -%}
+        {%- if method|default(false) %}<span class="sf-toolbar-status sf-toolbar-redirection-method">{{ method }}</span>{% endif -%}
+        {%- set link = controller.file|file_link(controller.line) %}
+        {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% else %}<span>{% endif %}
+
+            {%- if route|default(false) -%}
+                @{{ route }}
+            {%- else -%}
+                {{- controller.class|abbr_class|striptags -}}
+                {{- controller.method ? ' :: ' ~ controller.method -}}
+            {%- endif -%}
+
+        {%- if link %}</a>{% else %}</span>{% endif %}
+    {%- else -%}
+        <span>{{ route|default(controller) }}</span>
+    {%- endif %}
+{% endmacro %}

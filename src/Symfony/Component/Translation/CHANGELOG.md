@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Added support for escaping `|` in plural translations with double pipe.
+
+3.1.0
+-----
+
+ * Deprecated the backup feature of the file dumper classes.
+
+3.0.0
+-----
+
+ * removed `FileDumper::format()` method.
+ * Changed the visibility of the locale property in `Translator` from protected to private.
+
 2.8.0
 -----
 

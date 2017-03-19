@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -96,11 +97,24 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      */
     private function resolveDefinition(ContainerBuilder $container, DefinitionDecorator $definition)
     {
-        if (!$container->hasDefinition($parent = $definition->getParent())) {
-            throw new RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $this->currentId));
+        try {
+            return $this->doResolveDefinition($container, $definition);
+        } catch (ExceptionInterface $e) {
+            $r = new \ReflectionProperty($e, 'message');
+            $r->setAccessible(true);
+            $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
+
+            throw $e;
+        }
+    }
+
+    private function doResolveDefinition(ContainerBuilder $container, DefinitionDecorator $definition)
+    {
+        if (!$container->has($parent = $definition->getParent())) {
+            throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
         }
 
-        $parentDef = $container->getDefinition($parent);
+        $parentDef = $container->findDefinition($parent);
         if ($parentDef instanceof DefinitionDecorator) {
             $id = $this->currentId;
             $this->currentId = $parent;
@@ -113,21 +127,12 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def = new Definition();
 
         // merge in parent definition
-        // purposely ignored attributes: scope, abstract, tags
+        // purposely ignored attributes: abstract, tags
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
         $def->setAutowiringTypes($parentDef->getAutowiringTypes());
-        if ($parentDef->getFactoryClass(false)) {
-            $def->setFactoryClass($parentDef->getFactoryClass(false));
-        }
-        if ($parentDef->getFactoryMethod(false)) {
-            $def->setFactoryMethod($parentDef->getFactoryMethod(false));
-        }
-        if ($parentDef->getFactoryService(false)) {
-            $def->setFactoryService($parentDef->getFactoryService(false));
-        }
         if ($parentDef->isDeprecated()) {
             $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
@@ -142,15 +147,6 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $changes = $definition->getChanges();
         if (isset($changes['class'])) {
             $def->setClass($definition->getClass());
-        }
-        if (isset($changes['factory_class'])) {
-            $def->setFactoryClass($definition->getFactoryClass(false));
-        }
-        if (isset($changes['factory_method'])) {
-            $def->setFactoryMethod($definition->getFactoryMethod(false));
-        }
-        if (isset($changes['factory_service'])) {
-            $def->setFactoryService($definition->getFactoryService(false));
         }
         if (isset($changes['factory'])) {
             $def->setFactory($definition->getFactory());
@@ -214,7 +210,6 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
-        $def->setScope($definition->getScope(false), false);
         $def->setShared($definition->isShared());
         $def->setTags($definition->getTags());
 

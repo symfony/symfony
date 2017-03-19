@@ -79,6 +79,15 @@ $container
     ->setConfigurator(array(new Reference('configurator_service'), 'configureStdClass'))
 ;
 $container
+    ->register('configurator_service_simple', 'ConfClass')
+    ->addArgument('bar')
+    ->setPublic(false)
+;
+$container
+    ->register('configured_service_simple', 'stdClass')
+    ->setConfigurator(array(new Reference('configurator_service_simple'), 'configureStdClass'))
+;
+$container
     ->register('decorated', 'stdClass')
 ;
 $container
@@ -110,6 +119,15 @@ $container
 $container
     ->register('service_from_static_method', 'Bar\FooClass')
     ->setFactory(array('Bar\FooClass', 'getInstance'))
+;
+$container
+    ->register('factory_simple', 'SimpleFactoryClass')
+    ->addArgument('foo')
+    ->setPublic(false)
+;
+$container
+    ->register('factory_service_simple', 'Bar')
+    ->setFactory(array(new Reference('factory_simple'), 'getInstance'))
 ;
 
 return $container;

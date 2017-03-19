@@ -21,12 +21,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Eases the testing of console commands.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Robin Chalas <robin.chalas@gmail.com>
  */
 class CommandTester
 {
     private $command;
     private $input;
     private $output;
+    private $inputs = array();
     private $statusCode;
 
     /**
@@ -65,6 +67,10 @@ class CommandTester
         }
 
         $this->input = new ArrayInput($input);
+        if ($this->inputs) {
+            $this->input->setStream(self::createStream($this->inputs));
+        }
+
         if (isset($options['interactive'])) {
             $this->input->setInteractive($options['interactive']);
         }
@@ -128,5 +134,30 @@ class CommandTester
     public function getStatusCode()
     {
         return $this->statusCode;
+    }
+
+    /**
+     * Sets the user inputs.
+     *
+     * @param array An array of strings representing each input
+     *              passed to the command input stream.
+     *
+     * @return CommandTester
+     */
+    public function setInputs(array $inputs)
+    {
+        $this->inputs = $inputs;
+
+        return $this;
+    }
+
+    private static function createStream(array $inputs)
+    {
+        $stream = fopen('php://memory', 'r+', false);
+
+        fwrite($stream, implode(PHP_EOL, $inputs));
+        rewind($stream);
+
+        return $stream;
     }
 }

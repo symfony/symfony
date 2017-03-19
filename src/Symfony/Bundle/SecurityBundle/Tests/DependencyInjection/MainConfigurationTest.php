@@ -92,54 +92,6 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyCsrfAliases()
-    {
-        $config = array(
-            'firewalls' => array(
-                'stub' => array(
-                    'logout' => array(
-                        'csrf_provider' => 'a_token_generator',
-                        'intention' => 'a_token_id',
-                    ),
-                ),
-            ),
-        );
-        $config = array_merge(static::$minimalConfig, $config);
-
-        $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processedConfig = $processor->processConfiguration($configuration, array($config));
-        $this->assertTrue(isset($processedConfig['firewalls']['stub']['logout']['csrf_token_generator']));
-        $this->assertEquals('a_token_generator', $processedConfig['firewalls']['stub']['logout']['csrf_token_generator']);
-        $this->assertTrue(isset($processedConfig['firewalls']['stub']['logout']['csrf_token_id']));
-        $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testCsrfOriginalAndAliasValueCausesException()
-    {
-        $config = array(
-            'firewalls' => array(
-                'stub' => array(
-                    'logout' => array(
-                        'csrf_token_id' => 'a_token_id',
-                        'intention' => 'old_name',
-                    ),
-                ),
-            ),
-        );
-        $config = array_merge(static::$minimalConfig, $config);
-
-        $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processor->processConfiguration($configuration, array($config));
-    }
-
     public function testDefaultUserCheckers()
     {
         $processor = new Processor();

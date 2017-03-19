@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * Adds tagged data_collector services to profiler service.
@@ -38,7 +39,7 @@ class ProfilerPass implements CompilerPassInterface
 
             if (isset($attributes[0]['template'])) {
                 if (!isset($attributes[0]['id'])) {
-                    throw new \InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template', $id));
+                    throw new InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template', $id));
                 }
                 $template = array($attributes[0]['id'], $attributes[0]['template']);
             }

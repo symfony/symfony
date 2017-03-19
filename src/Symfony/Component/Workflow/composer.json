@@ -1,0 +1,39 @@
+{
+    "name": "symfony/workflow",
+    "type": "library",
+    "description": "Symfony Workflow Component",
+    "keywords": ["workflow", "petrinet", "place", "transition"],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Grégoire Pineau",
+            "email": "lyrixx@lyrixx.info"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/property-access": "~2.3|~3.0"
+    },
+    "require-dev": {
+        "psr/log": "~1.0",
+        "symfony/event-dispatcher": "~2.1|~3.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Workflow\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.2-dev"
+        }
+    }
+}

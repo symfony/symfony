@@ -11,6 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Doctrine\Common\Annotations\Reader;
+use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -23,6 +28,14 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Workflow;
 
 /**
  * FrameworkExtension.
@@ -30,12 +43,14 @@ use Symfony\Component\Config\FileLocator;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class FrameworkExtension extends Extension
 {
     private $formConfigEnabled = false;
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
+    private $annotationsConfigEnabled = false;
 
     /**
      * @var string|null
@@ -58,16 +73,27 @@ class FrameworkExtension extends Extension
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
 
-        // A translator must always be registered (as support is included by
-        // default in the Form component). If disabled, an identity translator
-        // will be used and everything will still work as expected.
-        $loader->load('translation.xml');
-
         // Property access is used by both the Form and the Validator component
         $loader->load('property_access.xml');
 
+        // Load Cache configuration first as it is used by other components
+        $loader->load('cache.xml');
+
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
+
+        $this->annotationsConfigEnabled = $this->isConfigEnabled($container, $config['annotations']);
+
+        // A translator must always be registered (as support is included by
+        // default in the Form component). If disabled, an identity translator
+        // will be used and everything will still work as expected.
+        if (class_exists('Symfony\Component\Translation\Translator') || $this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists('Symfony\Component\Translation\Translator')) {
+                throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
+            }
+
+            $loader->load('translation.xml');
+        }
 
         if (isset($config['secret'])) {
             $container->setParameter('kernel.secret', $config['secret']);
@@ -78,20 +104,34 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
+        if (!$container->hasParameter('debug.file_link_format')) {
+            if (!$container->hasParameter('templating.helper.code.file_link_format')) {
+                $links = array(
+                    'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+                    'macvim' => 'mvim://open?url=file://%%f&line=%%l',
+                    'emacs' => 'emacs://open?url=file://%%f&line=%%l',
+                    'sublime' => 'subl://open?url=file://%%f&line=%%l',
+                    'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
+                );
+                $ide = $config['ide'];
+
+                $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+            }
+            $container->setParameter('debug.file_link_format', '%templating.helper.code.file_link_format%');
+        }
+
         if (!empty($config['test'])) {
             $loader->load('test.xml');
         }
 
-        if (isset($config['session'])) {
+        if ($this->isConfigEnabled($container, $config['session'])) {
             $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
-        if (isset($config['request'])) {
+        if ($this->isConfigEnabled($container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
-
-        $loader->load('security.xml');
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
@@ -101,20 +141,24 @@ class FrameworkExtension extends Extension
             if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
-
-            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-                $config['csrf_protection']['enabled'] = true;
-            }
         }
 
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
-        if (isset($config['assets'])) {
+        if ($this->isConfigEnabled($container, $config['assets'])) {
+            if (!class_exists('Symfony\Component\Asset\Package')) {
+                throw new LogicException('Asset support cannot be enabled as the Asset component is not installed.');
+            }
+
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
         }
 
-        if (isset($config['templating'])) {
-            $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
+        if ($this->isConfigEnabled($container, $config['templating'])) {
+            if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
+                throw new LogicException('Templating support cannot be enabled as the Templating component is not installed.');
+            }
+
+            $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
@@ -123,70 +167,70 @@ class FrameworkExtension extends Extension
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        $this->registerCacheConfiguration($config['cache'], $container);
+        $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
+        $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
 
-        if (isset($config['router'])) {
+        if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
 
-        if (isset($config['serializer'])) {
+        if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
-        if (isset($config['property_info'])) {
+        if ($this->isConfigEnabled($container, $config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
-        $loader->load('debug_prod.xml');
-        $definition = $container->findDefinition('debug.debug_handlers_listener');
+        $this->addAnnotatedClassesToCompile(array(
+            '**Bundle\\Controller\\',
+            '**Bundle\\Entity\\',
 
-        if ($container->hasParameter('templating.helper.code.file_link_format')) {
-            $definition->replaceArgument(5, '%templating.helper.code.file_link_format%');
-        }
-
-        if ($container->getParameter('kernel.debug')) {
-            $definition->replaceArgument(2, -1 & ~(E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR));
-
-            $loader->load('debug.xml');
-
-            $definition = $container->findDefinition('http_kernel');
-            $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
-
-            // replace the regular event_dispatcher service with the debug one
-            $definition = $container->findDefinition('event_dispatcher');
-            $definition->setPublic(false);
-            $container->setDefinition('debug.event_dispatcher.parent', $definition);
-            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
-        } else {
-            $definition->replaceArgument(1, null);
-        }
+            // Added explicitly so that we don't rely on the class map being dumped to make it work
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+        ));
 
         $this->addClassesToCompile(array(
+            'Symfony\\Component\\Config\\ConfigCache',
             'Symfony\\Component\\Config\\FileLocator',
 
             'Symfony\\Component\\Debug\\ErrorHandler',
+
+            'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',
+            'Symfony\\Component\\DependencyInjection\\Container',
 
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
 
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
+            'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
+            'Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver',
+            'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadata',
+            'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadataFactory',
             'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
             'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
             'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
+            'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\KernelEvents',
             'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
 
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
+
             // Cannot be included because annotations will parse the big compiled class file
             // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+
+            // cannot be included as commands are discovered based on the path to this class via Reflection
+            // 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
         ));
     }
 
@@ -218,12 +262,7 @@ class FrameworkExtension extends Extension
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-
-            if (null !== $config['form']['csrf_protection']['field_name']) {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
-            } else {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
-            }
+            $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -312,28 +351,14 @@ class FrameworkExtension extends Extension
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
         // Choose storage class based on the DSN
-        $supported = array(
-            'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql' => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file' => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
-            'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
-            'memcache' => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
-            'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
-            'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
-        );
         list($class) = explode(':', $config['dsn'], 2);
-        if (!isset($supported[$class])) {
+        if ('file' !== $class) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
-        $container->setParameter('profiler.storage.username', $config['username']);
-        $container->setParameter('profiler.storage.password', $config['password']);
-        $container->setParameter('profiler.storage.lifetime', $config['lifetime']);
 
-        $container->getDefinition('profiler.storage')->setClass($supported[$class]);
-
-        if (isset($config['matcher'])) {
+        if ($this->isConfigEnabled($container, $config['matcher'])) {
             if (isset($config['matcher']['service'])) {
                 $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
             } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
@@ -356,6 +381,126 @@ class FrameworkExtension extends Extension
 
         if (!$config['collect']) {
             $container->getDefinition('profiler')->addMethodCall('disable', array());
+        }
+    }
+
+    /**
+     * Loads the workflow configuration.
+     *
+     * @param array            $workflows A workflow configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerWorkflowConfiguration(array $workflows, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$workflows) {
+            return;
+        }
+
+        $loader->load('workflow.xml');
+
+        $registryDefinition = $container->getDefinition('workflow.registry');
+
+        foreach ($workflows as $name => $workflow) {
+            $type = $workflow['type'];
+
+            $transitions = array();
+            foreach ($workflow['transitions'] as $transition) {
+                if ($type === 'workflow') {
+                    $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                } elseif ($type === 'state_machine') {
+                    foreach ($transition['from'] as $from) {
+                        foreach ($transition['to'] as $to) {
+                            $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                        }
+                    }
+                }
+            }
+
+            // Create a Definition
+            $definitionDefinition = new Definition(Workflow\Definition::class);
+            $definitionDefinition->setPublic(false);
+            $definitionDefinition->addArgument($workflow['places']);
+            $definitionDefinition->addArgument($transitions);
+            $definitionDefinition->addTag('workflow.definition', array(
+                'name' => $name,
+                'type' => $type,
+                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
+            ));
+            if (isset($workflow['initial_place'])) {
+                $definitionDefinition->addArgument($workflow['initial_place']);
+            }
+
+            // Create MarkingStore
+            if (isset($workflow['marking_store']['type'])) {
+                $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.'.$workflow['marking_store']['type']);
+                foreach ($workflow['marking_store']['arguments'] as $argument) {
+                    $markingStoreDefinition->addArgument($argument);
+                }
+            } elseif (isset($workflow['marking_store']['service'])) {
+                $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
+            }
+
+            // Create Workflow
+            $workflowDefinition = new DefinitionDecorator(sprintf('%s.abstract', $type));
+            $workflowDefinition->replaceArgument(0, $definitionDefinition);
+            if (isset($markingStoreDefinition)) {
+                $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
+            }
+            $workflowDefinition->replaceArgument(3, $name);
+
+            // Store to container
+            $workflowId = sprintf('%s.%s', $type, $name);
+            $container->setDefinition($workflowId, $workflowDefinition);
+            $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
+
+            // Add workflow to Registry
+            foreach ($workflow['supports'] as $supportedClass) {
+                $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $supportedClass));
+            }
+        }
+    }
+
+    /**
+     * Loads the debug configuration.
+     *
+     * @param array            $config    A php errors configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerDebugConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('debug_prod.xml');
+
+        $debug = $container->getParameter('kernel.debug');
+
+        if ($debug) {
+            $loader->load('debug.xml');
+
+            // replace the regular event_dispatcher service with the debug one
+            $definition = $container->findDefinition('event_dispatcher');
+            $definition->setPublic(false);
+            $container->setDefinition('debug.event_dispatcher.parent', $definition);
+            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
+        }
+
+        $definition = $container->findDefinition('debug.debug_handlers_listener');
+
+        if (!$config['log']) {
+            $definition->replaceArgument(1, null);
+        }
+
+        if (!$config['throw']) {
+            $container->setParameter('debug.error_handler.throw_at', 0);
+        }
+
+        $definition->replaceArgument(4, $debug);
+        $definition->replaceArgument(6, $debug);
+
+        if ($debug && class_exists(DebugProcessor::class)) {
+            $definition = new Definition(DebugProcessor::class);
+            $definition->setPublic(false);
+            $container->setDefinition('debug.log_processor', $definition);
         }
     }
 
@@ -473,24 +618,12 @@ class FrameworkExtension extends Extension
      * Loads the templating configuration.
      *
      * @param array            $config    A templating configuration array
-     * @param string           $ide
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
-
-        if (!$container->hasParameter('templating.helper.code.file_link_format')) {
-            $links = array(
-                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-                'sublime' => 'subl://open?url=file://%%f&line=%%l',
-            );
-
-            $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
-        }
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
@@ -570,12 +703,12 @@ class FrameworkExtension extends Extension
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
             ));
-        }
 
-        if ($container->hasDefinition('assets.packages')) {
-            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
-        } else {
-            $container->removeDefinition('templating.helper.assets');
+            if ($container->has('assets.packages')) {
+                $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
+            } else {
+                $container->removeDefinition('templating.helper.assets');
+            }
         }
     }
 
@@ -590,14 +723,22 @@ class FrameworkExtension extends Extension
     {
         $loader->load('assets.xml');
 
-        $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
+        $defaultVersion = null;
+
+        if ($config['version_strategy']) {
+            $defaultVersion = new Reference($config['version_strategy']);
+        } else {
+            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
+        }
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
         $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
-            if (!array_key_exists('version', $package)) {
+            if (null !== $package['version_strategy']) {
+                $version = new Reference($package['version_strategy']);
+            } elseif (!array_key_exists('version', $package)) {
                 $version = $defaultVersion;
             } else {
                 $format = $package['version_format'] ?: $config['version_format'];
@@ -660,6 +801,11 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
+
+        if (!class_exists('Symfony\Component\Translation\Translator')) {
+            throw new LogicException('Translation support cannot be enabled as the Translator component is not installed.');
+        }
+
         $this->translationConfigEnabled = true;
 
         // Use the "real" translator instead of the identity default
@@ -777,6 +923,10 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
+            }
+
             $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
         }
 
@@ -786,20 +936,18 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (isset($config['cache'])) {
+        if (isset($config['cache']) && $config['cache']) {
+            @trigger_error('The "framework.validation.cache" option is deprecated since Symfony 3.2 and will be removed in 4.0. Configure the "cache.validator" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
+
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.$this->getKernelRootHash($container)
             );
 
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
+        } elseif (!$container->getParameter('kernel.debug')) {
+            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.symfony')));
         }
-
-        // You can use this parameter to check the API version in your own
-        // bundle extension classes
-        // This is set to 2.5-bc for compatibility with Symfony 2.5 and 2.6.
-        // @deprecated since version 2.7, to be removed in 3.0
-        $container->setParameter('validator.api', '2.5-bc');
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)
@@ -841,11 +989,33 @@ class FrameworkExtension extends Extension
 
     private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, $loader)
     {
+        if (!$this->annotationsConfigEnabled) {
+            return;
+        }
+
+        if (!class_exists('Doctrine\Common\Annotations\Annotation')) {
+            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
+        }
+
         $loader->load('annotations.xml');
 
         if ('none' !== $config['cache']) {
-            if ('file' === $config['cache']) {
+            $cacheService = $config['cache'];
+
+            if ('php_array' === $config['cache']) {
+                $cacheService = 'annotations.cache';
+
+                // Enable warmer only if PHP array is used for cache
+                $definition = $container->findDefinition('annotations.cache_warmer');
+                $definition->addTag('kernel.cache_warmer');
+
+                $this->addClassesToCompile(array(
+                    'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
+                    'Symfony\Component\Cache\DoctrineProvider',
+                ));
+            } elseif ('file' === $config['cache']) {
                 $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+
                 if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
                     throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
                 }
@@ -855,20 +1025,18 @@ class FrameworkExtension extends Extension
                     ->replaceArgument(0, $cacheDir)
                 ;
 
-                // The annotations.file_cache_reader service is deprecated
-                $container
-                    ->getDefinition('annotations.file_cache_reader')
-                    ->replaceArgument(1, $cacheDir)
-                    ->replaceArgument(2, $config['debug'])
-                ;
+                $cacheService = 'annotations.filesystem_cache';
             }
 
             $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.filesystem_cache'))
                 ->replaceArgument(2, $config['debug'])
+                ->addTag('annotations.cached_reader', array('provider' => $cacheService))
+                ->addAutowiringType(Reader::class)
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
+        } else {
+            $container->removeDefinition('annotations.cached_reader');
         }
     }
 
@@ -896,6 +1064,10 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
+            throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed.');
+        }
+
         if (!$this->sessionConfigEnabled) {
             throw new \LogicException('CSRF protection needs sessions to be enabled.');
         }
@@ -913,8 +1085,37 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$config['enabled']) {
-            return;
+        if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
+            // Run after serializer.normalizer.object
+            $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.normalizer', array('priority' => -920));
+        }
+
+        if (class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
+            // Run before serializer.normalizer.object
+            $definition = $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.normalizer', array('priority' => -910));
+        }
+
+        if (class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
+            // Run before serializer.normalizer.object
+            $definition = $container->register('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.normalizer', array('priority' => -900));
+        }
+
+        if (class_exists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+            $definition = $container->register('serializer.encoder.yaml', YamlEncoder::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.encoder');
+        }
+
+        if (class_exists(CsvEncoder::class)) {
+            $definition = $container->register('serializer.encoder.csv', CsvEncoder::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.encoder');
         }
 
         $loader->load('serializer.xml');
@@ -922,6 +1123,10 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
+            }
+
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
                  array(new Reference('annotation_reader'))
@@ -969,8 +1174,11 @@ class FrameworkExtension extends Extension
         }
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
+        $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
         if (isset($config['cache']) && $config['cache']) {
+            @trigger_error('The "framework.serializer.cache" option is deprecated since Symfony 3.1 and will be removed in 4.0. Configure the "cache.serializer" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
+
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
                 'serializer_'.$this->getKernelRootHash($container)
@@ -979,6 +1187,18 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
+        } elseif (!$container->getParameter('kernel.debug') && class_exists(CacheClassMetadataFactory::class)) {
+            $cacheMetadataFactory = new Definition(
+                CacheClassMetadataFactory::class,
+                array(
+                    new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
+                    new Reference('serializer.mapping.cache.symfony'),
+                )
+            );
+            $cacheMetadataFactory->setPublic(false);
+            $cacheMetadataFactory->setDecoratedService('serializer.mapping.class_metadata_factory');
+
+            $container->setDefinition('serializer.mapping.cache_class_metadata_factory', $cacheMetadataFactory);
         }
 
         if (isset($config['name_converter']) && $config['name_converter']) {
@@ -995,17 +1215,65 @@ class FrameworkExtension extends Extension
      */
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$config['enabled']) {
-            return;
-        }
-
         $loader->load('property_info.xml');
 
-        if (class_exists('phpDocumentor\Reflection\ClassReflector')) {
+        if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }
+    }
+
+    private function registerCacheConfiguration(array $config, ContainerBuilder $container)
+    {
+        $version = substr(str_replace('/', '-', base64_encode(hash('sha256', uniqid(mt_rand(), true), true))), 0, 22);
+        $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
+        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
+        $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
+
+        if (isset($config['prefix_seed'])) {
+            $container->setParameter('cache.prefix.seed', $config['prefix_seed']);
+        }
+        foreach (array('doctrine', 'psr6', 'redis') as $name) {
+            if (isset($config[$name = 'default_'.$name.'_provider'])) {
+                $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
+            }
+        }
+        foreach (array('app', 'system') as $name) {
+            $config['pools']['cache.'.$name] = array(
+                'adapter' => $config[$name],
+                'public' => true,
+            );
+        }
+        foreach ($config['pools'] as $name => $pool) {
+            $definition = new DefinitionDecorator($pool['adapter']);
+            $definition->setPublic($pool['public']);
+            unset($pool['adapter'], $pool['public']);
+
+            $definition->addTag('cache.pool', $pool);
+            $container->setDefinition($name, $definition);
+        }
+
+        if (method_exists(PropertyAccessor::class, 'createCache')) {
+            $propertyAccessDefinition = $container->register('cache.property_access', AdapterInterface::class);
+            $propertyAccessDefinition->setPublic(false);
+
+            if (!$container->getParameter('kernel.debug')) {
+                $propertyAccessDefinition->setFactory(array(PropertyAccessor::class, 'createCache'));
+                $propertyAccessDefinition->setArguments(array(null, null, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+                $propertyAccessDefinition->addTag('cache.pool', array('clearer' => 'cache.default_clearer'));
+                $propertyAccessDefinition->addTag('monolog.logger', array('channel' => 'cache'));
+            } else {
+                $propertyAccessDefinition->setClass(ArrayAdapter::class);
+                $propertyAccessDefinition->setArguments(array(0, false));
+            }
+        }
+
+        $this->addClassesToCompile(array(
+            'Symfony\Component\Cache\Adapter\ApcuAdapter',
+            'Symfony\Component\Cache\Adapter\FilesystemAdapter',
+            'Symfony\Component\Cache\CacheItem',
+        ));
     }
 
     /**

@@ -13,6 +13,8 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
+use Symfony\Component\ClassLoader\Tests\Fixtures\DeclaredClass;
+use Symfony\Component\ClassLoader\Tests\Fixtures\WarmedClass;
 
 require_once __DIR__.'/Fixtures/ClassesWithParents/GInterface.php';
 require_once __DIR__.'/Fixtures/ClassesWithParents/CInterface.php';
@@ -21,9 +23,6 @@ require_once __DIR__.'/Fixtures/ClassesWithParents/A.php';
 
 class ClassCollectionLoaderTest extends TestCase
 {
-    /**
-     * @requires PHP 5.4
-     */
     public function testTraitDependencies()
     {
         require_once __DIR__.'/Fixtures/deps/traits.php';
@@ -95,7 +94,6 @@ class ClassCollectionLoaderTest extends TestCase
 
     /**
      * @dataProvider getDifferentOrdersForTraits
-     * @requires PHP 5.4
      */
     public function testClassWithTraitsReordering(array $classes)
     {
@@ -139,9 +137,6 @@ class ClassCollectionLoaderTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testFixClassWithTraitsOrdering()
     {
         require_once __DIR__.'/Fixtures/ClassesWithParents/CTrait.php';
@@ -285,5 +280,37 @@ EOF
         );
 
         unlink($file);
+    }
+
+    public function testInline()
+    {
+        $this->assertTrue(class_exists(WarmedClass::class, true));
+
+        @unlink($cache = sys_get_temp_dir().'/inline.php');
+
+        $classes = array(WarmedClass::class);
+        $excluded = array(DeclaredClass::class);
+
+        ClassCollectionLoader::inline($classes, $cache, $excluded);
+
+        $this->assertSame(<<<'EOTXT'
+<?php 
+namespace Symfony\Component\ClassLoader\Tests\Fixtures
+{
+interface WarmedInterface
+{
+}
+}
+namespace Symfony\Component\ClassLoader\Tests\Fixtures
+{
+class WarmedClass extends DeclaredClass implements WarmedInterface
+{
+}
+}
+EOTXT
+            , file_get_contents($cache)
+        );
+
+        unlink($cache);
     }
 }

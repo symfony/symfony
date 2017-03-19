@@ -16,22 +16,33 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/polyfill-php55": "~1.0"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "^2.0.5|~3.0.0",
-        "symfony/config": "~2.2|~3.0.0",
-        "symfony/property-access": "~2.3|~3.0.0",
+        "symfony/yaml": "~3.1",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/cache": "~3.1",
+        "symfony/property-info": "~3.1",
         "doctrine/annotations": "~1.0",
-        "doctrine/cache": "~1.0"
+        "doctrine/cache": "~1.0",
+        "phpdocumentor/reflection-docblock": "~3.0"
+    },
+    "conflict": {
+        "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4",
+        "symfony/property-info": "<3.1",
+        "symfony/yaml": "<3.1"
     },
     "suggest": {
-        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
-        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+        "psr/cache-implementation": "For using the metadata cache.",
+        "symfony/property-info": "To deserialize relations.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
-        "symfony/property-access": "For using the ObjectNormalizer."
+        "symfony/property-access": "For using the ObjectNormalizer.",
+        "symfony/http-foundation": "To use the DataUriNormalizer.",
+        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" },
@@ -42,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.2-dev"
         }
     }
 }

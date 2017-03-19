@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
@@ -67,4 +68,33 @@ class BundleTest extends TestCase
         $bundle->setContainer($container);
         $bundle->registerCommands($application);
     }
+
+    public function testBundleNameIsGuessedFromClass()
+    {
+        $bundle = new GuessedNameBundle();
+
+        $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
+        $this->assertSame('GuessedNameBundle', $bundle->getName());
+    }
+
+    public function testBundleNameCanBeExplicitlyProvided()
+    {
+        $bundle = new NamedBundle();
+
+        $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
+        $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
+        $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
+    }
+}
+
+class NamedBundle extends Bundle
+{
+    public function __construct()
+    {
+        $this->name = 'ExplicitlyNamedBundle';
+    }
+}
+
+class GuessedNameBundle extends Bundle
+{
 }

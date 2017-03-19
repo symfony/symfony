@@ -1,0 +1,212 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+// Please update when phpunit needs to be reinstalled with fresh deps:
+// Cache-Id-Version: 2016-10-20 14:00 UTC
+
+error_reporting(-1);
+
+// PHPUnit 4.8 does not support PHP 7, while 5.1 requires PHP 5.6+
+$PHPUNIT_VERSION = PHP_VERSION_ID >= 50600 ? getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.4' : '4.8';
+$oldPwd = getcwd();
+$PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: (__DIR__.'/.phpunit');
+$PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
+$PHP = escapeshellarg($PHP);
+if ('phpdbg' === PHP_SAPI) {
+    $PHP .= ' -qrr';
+}
+
+$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
+    ? $PHP.' '.escapeshellarg($COMPOSER)
+    : 'composer';
+
+if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".getenv('SYMFONY_PHPUNIT_REMOVE') !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
+    // Build a standalone phpunit without symfony/yaml nor prophecy by default
+
+    @mkdir($PHPUNIT_DIR);
+    chdir($PHPUNIT_DIR);
+    if (file_exists("phpunit-$PHPUNIT_VERSION")) {
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
+    }
+    if (extension_loaded('openssl') && ini_get('allow_url_fopen') && !isset($_SERVER['http_proxy']) && !isset($_SERVER['https_proxy'])) {
+        stream_copy_to_stream(fopen("https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip", 'rb'), fopen("$PHPUNIT_VERSION.zip", 'wb'));
+    } else {
+        @unlink("$PHPUNIT_VERSION.zip");
+        passthru("wget https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");
+    }
+    if (!class_exists('ZipArchive')) {
+        throw new \Exception('simple-phpunit requires the "zip" PHP extension to be installed and enabled in order to uncompress the downloaded PHPUnit packages.');
+    }
+    $zip = new ZipArchive();
+    $zip->open("$PHPUNIT_VERSION.zip");
+    $zip->extractTo(getcwd());
+    $zip->close();
+    chdir("phpunit-$PHPUNIT_VERSION");
+    passthru("$COMPOSER remove --no-update ".(getenv('SYMFONY_PHPUNIT_REMOVE') ?: 'phpspec/prophecy symfony/yaml'));
+    if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
+        passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
+    }
+    passthru("$COMPOSER require --no-update symfony/phpunit-bridge \">=3.2@dev\"");
+    $prevRoot = getenv('COMPOSER_ROOT_VERSION');
+    putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION");
+    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
+    putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
+    if ($exit) {
+        exit($exit);
+    }
+    file_put_contents('phpunit', <<<'EOPHP'
+<?php
+
+define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
+require PHPUNIT_COMPOSER_INSTALL;
+Symfony\Bridge\PhpUnit\TextUI\Command::main();
+
+EOPHP
+    );
+    chdir('..');
+    file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__)."\n".getenv('SYMFONY_PHPUNIT_REMOVE'));
+    chdir($oldPwd);
+
+}
+
+$components = array();
+$cmd = array_map('escapeshellarg', $argv);
+$exit = 0;
+
+if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file_exists('src/Symfony')) {
+    $argv[1] = 'src/Symfony';
+}
+if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.dist')) {
+    // Find Symfony components in plain php for Windows portability
+
+    $finder = new RecursiveDirectoryIterator($argv[1], FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
+    $finder = new RecursiveIteratorIterator($finder);
+    $finder->setMaxDepth(getenv('SYMFONY_PHPUNIT_MAX_DEPTH') ?: 3);
+
+    foreach ($finder as $file => $fileInfo) {
+        if ('phpunit.xml.dist' === $file) {
+            $components[] = dirname($fileInfo->getPathname());
+        }
+    }
+    if ($components) {
+        array_shift($cmd);
+    }
+}
+
+$cmd[0] = sprintf('%s %s --colors=always', $PHP, escapeshellarg("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit"));
+$cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
+
+if ('\\' === DIRECTORY_SEPARATOR) {
+    $cmd = 'cmd /v:on /d /c "('.$cmd.')%2$s"';
+} else {
+    $cmd .= '%2$s';
+}
+
+if ($components) {
+    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
+    $runningProcs = array();
+
+    foreach ($components as $component) {
+        // Run phpunit tests in parallel
+
+        if ($skippedTests) {
+            putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
+        }
+
+        $c = escapeshellarg($component);
+
+        if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), array(), $pipes)) {
+            $runningProcs[$component] = $proc;
+        } else {
+            $exit = 1;
+            echo "\033[41mKO\033[0m $component\n\n";
+        }
+    }
+
+    // Fixes for colors support on appveyor
+    // See https://github.com/appveyor/ci/issues/373
+    $colorFixes = array(
+        array("S\033[0m\033[0m\033[36m\033[1mS", "E\033[0m\033[0m\033[31m\033[1mE", "I\033[0m\033[0m\033[33m\033[1mI", "F\033[0m\033[0m\033[41m\033[37mF"),
+        array("SS", "EE", "II", "FF"),
+    );
+    $colorFixes[0] = array_merge($colorFixes[0], $colorFixes[0]);
+    $colorFixes[1] = array_merge($colorFixes[1], $colorFixes[1]);
+
+    while ($runningProcs) {
+        usleep(300000);
+        $terminatedProcs = array();
+        foreach ($runningProcs as $component => $proc) {
+            $procStatus = proc_get_status($proc);
+            if (!$procStatus['running']) {
+                $terminatedProcs[$component] = $procStatus['exitcode'];
+                unset($runningProcs[$component]);
+                proc_close($proc);
+            }
+        }
+
+        foreach ($terminatedProcs as $component => $procStatus) {
+            foreach (array('out', 'err') as $file) {
+                $file = "$component/phpunit.std$file";
+
+                if ('\\' === DIRECTORY_SEPARATOR) {
+                    $h = fopen($file, 'rb');
+                    while (false !== $line = fgets($h)) {
+                        echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
+                            '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
+                            "$1m\033[$2$3$4$4",
+                            $line
+                        ));
+                    }
+                    fclose($h);
+                } else {
+                    readfile($file);
+                }
+                unlink($file);
+            }
+
+            // Fail on any individual component failures but ignore some error codes on Windows when APCu is enabled:
+            // STATUS_STACK_BUFFER_OVERRUN (-1073740791/0xC0000409)
+            // STATUS_ACCESS_VIOLATION (-1073741819/0xC0000005)
+            // STATUS_HEAP_CORRUPTION (-1073740940/0xC0000374)
+            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !ini_get('apc.enable_cli') || !in_array($procStatus, array(-1073740791, -1073741819, -1073740940)))) {
+                $exit = $procStatus;
+                echo "\033[41mKO\033[0m $component\n\n";
+            } else {
+                echo "\033[32mOK\033[0m $component\n\n";
+            }
+        }
+    }
+} elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
+    // Run regular phpunit in a subprocess
+
+    $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
+    if ($proc = proc_open(sprintf($cmd, '', ' 2> '.escapeshellarg($errFile)), array(1 => array('pipe', 'w')), $pipes)) {
+        stream_copy_to_stream($pipes[1], STDOUT);
+        fclose($pipes[1]);
+        $exit = proc_close($proc);
+
+        readfile($errFile);
+        unlink($errFile);
+    }
+
+    if (!file_exists($component = array_pop($argv))) {
+        $component = basename($oldPwd);
+    }
+
+    if ($exit) {
+        echo "\033[41mKO\033[0m $component\n\n";
+    } else {
+        echo "\033[32mOK\033[0m $component\n\n";
+    }
+}
+
+exit($exit);

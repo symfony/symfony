@@ -183,8 +183,7 @@
 
                         <div id="parameters-{{ loop.index }}" class="hidden">
                             {% for parameters in message.parameters %}
-                                {{ profiler_dump(parameters) }}
-                                {% if not loop.last %}<br />{% endif %}
+                                {{ profiler_dump(parameters, maxDepth=1) }}
                             {% endfor %}
                         </div>
                     {% endif %}

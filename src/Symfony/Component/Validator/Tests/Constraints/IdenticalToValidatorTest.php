@@ -13,18 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\IdenticalToValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new IdenticalToValidator();
@@ -69,10 +63,8 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array(null, 1),
         );
 
-        if (PHP_VERSION_ID >= 50500) {
-            $immutableDate = new \DateTimeImmutable('2000-01-01');
-            $comparisons[] = array($immutableDate, $immutableDate);
-        }
+        $immutableDate = new \DateTimeImmutable('2000-01-01');
+        $comparisons[] = array($immutableDate, $immutableDate);
 
         return $comparisons;
     }

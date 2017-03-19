@@ -17,18 +17,6 @@ class CollectionTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CollectionType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('collection', array(
-            'entry_type' => TextTypeTest::TESTED_TYPE,
-        ));
-
-        $this->assertSame('collection', $form->getConfig()->getType()->getName());
-    }
-
     public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -275,22 +263,6 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyEntryOptions()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
-            'type' => NumberTypeTest::TESTED_TYPE,
-            'options' => array('attr' => array('maxlength' => '10')),
-        ));
-
-        $resolvedOptions = $form->getConfig()->getOptions();
-
-        $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\NumberType', $resolvedOptions['entry_type']);
-        $this->assertEquals(array('attr' => array('maxlength' => '10'), 'block_name' => 'entry'), $resolvedOptions['entry_options']);
-    }
-
     public function testPrototypeDefaultLabel()
     {
         $form = $this->factory->create(static::TESTED_TYPE, array(), array(
@@ -317,24 +289,6 @@ class CollectionTypeTest extends BaseTypeTest
         ));
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
-        $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyPrototypeData()
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
-            'allow_add' => true,
-            'prototype' => true,
-            'type' => TextTypeTest::TESTED_TYPE,
-            'options' => array(
-                'data' => 'bar',
-                'label' => false,
-            ),
-        ));
-        $this->assertSame('bar', $form->createView()->vars['prototype']->vars['value']);
         $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
     }
 

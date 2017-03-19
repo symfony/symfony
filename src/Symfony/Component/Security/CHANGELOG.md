@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * added `$attributes` and `$subject` with getters/setters to `Symfony\Component\Security\Core\Exception\AccessDeniedException`
+
+3.0.0
+-----
+
+ * removed all deprecated code
+
 2.8.0
 -----
 

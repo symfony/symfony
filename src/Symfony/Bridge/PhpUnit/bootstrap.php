@@ -24,4 +24,6 @@ if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && cl
     AnnotationRegistry::registerLoader('class_exists');
 }
 
-DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));
+if ('disabled' !== getenv('SYMFONY_DEPRECATIONS_HELPER')) {
+    DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));
+}

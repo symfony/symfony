@@ -187,7 +187,8 @@ HttpKernel
    which will tell the Kernel to use the response code set on the event's
    response object.
 
- * The `getEnvParameters()` method has been deprecated and will be removed in 4.0.
+ * The `Kernel::getEnvParameters()` method has been deprecated and will be
+   removed in 4.0.
 
  * The `SYMFONY__` environment variables have been deprecated and they will be
    no longer processed automatically by Symfony in 4.0. Use the `%env()%` syntax

@@ -321,7 +321,7 @@ HttpKernel
    which will tell the Kernel to use the response code set on the event's
    response object.
 
- * The `getEnvParameters()` method has been removed.
+ * The `Kernel::getEnvParameters()` method has been removed.
 
  * The `SYMFONY__` environment variables are no longer processed automatically
    by Symfony. Use the `%env()%` syntax to get the value of any environment

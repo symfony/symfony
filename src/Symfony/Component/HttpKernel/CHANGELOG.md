@@ -4,7 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
- * Deprecated `getEnvParameters`
+ * Deprecated `Kernel::getEnvParameters()`
  * Deprecated the special `SYMFONY__` environment variables
  * added the possibility to change the query string parameter used by `UriSigner`
  * deprecated `LazyLoadingFragmentHandler::addRendererService()`

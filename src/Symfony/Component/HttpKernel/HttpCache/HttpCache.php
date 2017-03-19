@@ -472,6 +472,14 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $request->headers->set('X-Forwarded-For', $request->server->get('REMOTE_ADDR'));
         }
 
+        // modify the Forwarded header if needed
+        $forwarded = $request->headers->get('Forwarded');
+        if ($forwarded) {
+            $request->headers->set('Forwarded', preg_replace('/for=([0-9a-zA-Z.,\\s]*)/', '$0, '.$request->server->get('REMOTE_ADDR'), $forwarded));
+        } else {
+            $request->headers->set('Forwarded', 'for='.$request->server->get('REMOTE_ADDR'));
+        }
+
         // fix the client IP address by setting it to 127.0.0.1 as HttpCache
         // is always called from the same process as the backend.
         $request->server->set('REMOTE_ADDR', '127.0.0.1');

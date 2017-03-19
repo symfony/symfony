@@ -463,8 +463,12 @@ Workflow
 Yaml
 ----
 
- * Removed support for implicitly parsing non-string mapping keys as strings. Mapping keys that are no strings will
-   result in a `ParseException`. Use the `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as strings.
+ * Starting an unquoted string with a question mark followed by a space
+   throws a `ParseException`.
+
+ * Removed support for implicitly parsing non-string mapping keys as strings.
+   Mapping keys that are no strings will result in a `ParseException`. Use the
+   `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as strings.
 
    Before:
 

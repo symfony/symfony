@@ -1640,6 +1640,52 @@ YAML
         $this->parser->parse('!!foo');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+     */
+    public function testComplexMappingThrowsParseException()
+    {
+        $yaml = <<<YAML
+? "1"
+:
+  name: végétalien
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+     */
+    public function testComplexMappingNestedInMappingThrowsParseException()
+    {
+        $yaml = <<<YAML
+diet:
+  ? "1"
+  :
+    name: végétalien
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+     */
+    public function testComplexMappingNestedInSequenceThrowsParseException()
+    {
+        $yaml = <<<YAML
+- ? "1"
+  :
+    name: végétalien
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
     private function loadTestsFromFixtureFiles($testsFile)
     {
         $parser = new Parser();

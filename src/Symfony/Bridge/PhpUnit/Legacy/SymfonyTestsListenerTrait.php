@@ -39,6 +39,7 @@ class SymfonyTestsListenerTrait
     private $previousErrorHandler;
     private $testsWithWarnings;
     private $reportUselessTests;
+    private $error;
 
     /**
      * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive or dns-sensitive)
@@ -207,10 +208,10 @@ class SymfonyTestsListenerTrait
             }
             if (isset($annotations['method']['expectedDeprecation'])) {
                 if (!in_array('legacy', $groups, true)) {
-                    $test->getTestResultObject()->addError($test, new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.'), 0);
-                } else {
-                    $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
+                    $this->error = new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.');
                 }
+
+                $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
 
                 $this->expectedDeprecations = $annotations['method']['expectedDeprecation'];
                 $this->previousErrorHandler = set_error_handler(array($this, 'handleError'));
@@ -245,6 +246,17 @@ class SymfonyTestsListenerTrait
             $this->reportUselessTests = null;
         }
 
+        $errored = false;
+
+        if (null !== $this->error) {
+            if ($BaseTestRunner::STATUS_PASSED === $test->getStatus()) {
+                $test->getTestResultObject()->addError($test, $this->error, 0);
+                $errored = true;
+            }
+
+            $this->error = null;
+        }
+
         if ($this->expectedDeprecations) {
             if (!in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE), true)) {
                 $test->addToAssertionCount(count($this->expectedDeprecations));
@@ -252,7 +264,7 @@ class SymfonyTestsListenerTrait
 
             restore_error_handler();
 
-            if (!in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE, $BaseTestRunner::STATUS_FAILURE, $BaseTestRunner::STATUS_ERROR), true)) {
+            if (!$errored && !in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE, $BaseTestRunner::STATUS_FAILURE, $BaseTestRunner::STATUS_ERROR), true)) {
                 try {
                     $prefix = "@expectedDeprecation:\n";
                     $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $this->expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", $this->gatheredDeprecations)."\n");

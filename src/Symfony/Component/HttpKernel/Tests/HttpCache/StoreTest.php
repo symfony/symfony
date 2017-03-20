@@ -236,6 +236,33 @@ class StoreTest extends TestCase
         $this->assertFalse($this->store->isLocked($req));
     }
 
+    public function testPurgeHttps()
+    {
+        $request = Request::create('https://example.com/foo');
+        $this->store->write($request, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($request));
+
+        $this->assertTrue($this->store->purge('https://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($request));
+    }
+
+    public function testPurgeHttpAndHttps()
+    {
+        $requestHttp = Request::create('https://example.com/foo');
+        $this->store->write($requestHttp, new Response('foo'));
+
+        $requestHttps = Request::create('http://example.com/foo');
+        $this->store->write($requestHttps, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttps));
+
+        $this->assertTrue($this->store->purge('http://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertEmpty($this->getStoreMetadata($requestHttps));
+    }
+
     protected function storeSimpleEntry($path = null, $headers = array())
     {
         if (null === $path) {

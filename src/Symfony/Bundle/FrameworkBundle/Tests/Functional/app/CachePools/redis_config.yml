@@ -1,6 +1,9 @@
 imports:
     - { resource: ../config/default.yml }
 
+parameters:
+    env(REDIS_HOST): 'localhost'
+
 framework:
     cache:
         app: cache.adapter.redis

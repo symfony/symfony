@@ -632,7 +632,7 @@ EOF;
         }
 
         if ($definition->isAutowired()) {
-            $doc = <<<EOF
+            $doc .= <<<EOF
 
      *
      * This service is autowired.

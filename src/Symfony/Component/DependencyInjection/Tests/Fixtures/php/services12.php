@@ -16,20 +16,18 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private $parameters;
-    private $targetDirs = array();
+    private static $parameters = array(
+            'foo' => ('wiz'.__DIR__.'/..'),
+            'bar' => __DIR__,
+            'baz' => (__DIR__.'/PhpDumperTest.php'),
+            'buz' => __DIR__.'/../..',
+        );
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
-        }
-        $this->parameters = $this->getDefaultParameters();
-
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
@@ -68,7 +66,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
+        return $this->services['test'] = new \stdClass(('wiz'.__DIR__.'/..'), array(('wiz'.__DIR__.'/..') => (__DIR__.'/../..'.'/')));
     }
 
     /**
@@ -78,11 +76,11 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
+        if (!(isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
-        return $this->parameters[$name];
+        return self::$parameters[$name];
     }
 
     /**
@@ -92,7 +90,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
+        return isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters);
     }
 
     /**
@@ -109,24 +107,9 @@ class ProjectServiceContainer extends Container
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag($this->parameters);
+            $this->parameterBag = new FrozenParameterBag(self::$parameters);
         }
 
         return $this->parameterBag;
-    }
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'foo' => ('wiz'.$this->targetDirs[1]),
-            'bar' => __DIR__,
-            'baz' => (__DIR__.'/PhpDumperTest.php'),
-            'buz' => $this->targetDirs[2],
-        );
     }
 }

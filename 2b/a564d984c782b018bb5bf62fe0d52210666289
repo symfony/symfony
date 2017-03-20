@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by jordscream at 2017-03-15T17:08:06Z
+
+My first PR, try to start contributing ^^
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-15T17:52:57Z
+
+Looks like one test needs a fix though :)
+
+---------------------------------------------------------------------------
+
+by jordscream at 2017-03-15T18:08:07Z
+
+@javiereguiluz @xabbuh @nicolas-grekas , thanks for your welcome. ^^
+
+Tests passes by simply change the existing wording.(as requested in the PR)
+
+Anyway, When I look the previous test. Something strange, the code [here](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/DependencyInjection/Loader/YamlFileLoader.php#L332) is never tested and it should be according the previous unit test (Not my fault, I just change the wording ;-)).
+
+What do you think ?
+
+This PR can come to be more interesting :-P (I will investigate)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-16T09:07:15Z
+
+@jordscream That's actually a good catch. I think we could split the `testLoadFile()` method into three single test methods and then get rid of the `try`/`catch` parts and use the `@expectedException` and `@expectedExceptionMessage` annotations instead.
+
+---------------------------------------------------------------------------
+
+by jordscream at 2017-03-16T09:34:42Z
+
+@xabbuh , thanks for your feed back
+According to me there is a **misunderstanding** and **mistake** concerning the developpement of the method testLoadFile
+
+In the branch 2.7:
+- we invoke the method loadFile but in line 45 (-> load() comments is written. The same for the others tests.
+
+First question. testLoadFile has to test loadFile method or load method ? :-)
+
+- This tests in branch 2.7 pass. It 's normal cause each test failed to a "non valid file" (returns by file_exist) and changed by myself in this PR. Each test fails cause the loadFile invokation (line 40) expect to have the absolute path, not only the filename. (see the call of the method loadFile in the method load, we call locator object before to call the loadFile function)
+
+In fact, sice the beginning, in the unit tests of symfony, we **never test a NON valid yaml file** ^^ ! Test has to be tested :-P
+
+What do you think ? Which way I have to take according to you ? testing load method or loadFile method ?
+
+Thanks for all
+
+---------------------------------------------------------------------------
+
+by jordscream at 2017-03-16T09:52:55Z
+
+it's a **minimal point** but I see @fabpot in the commit of this test. Maybe he as an opinion about this ;-)
+
+---------------------------------------------------------------------------
+
+by jordscream at 2017-03-17T13:15:20Z
+
+@xabbuh or @javiereguiluz , I pushed new unit test as you suggest
+- testLoadUnExistFile with phpunit annotation to check the unexistence of a file
+- testLoadNotValidYAMLFile with phpunit annotation to check if it is a valid YAML
+- valid1.yml and valid2.yml, I put the check in the provideInvalidFiles dataProvider.
+
+Tell me if it is okay for you ;-)
+
+---------------------------------------------------------------------------
+
+by jordscream at 2017-03-20T13:19:27Z
+
+@xabbuh WDYT ? can we merge ? ^^

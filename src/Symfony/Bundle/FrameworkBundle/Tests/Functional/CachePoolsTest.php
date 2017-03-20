@@ -19,12 +19,12 @@ class CachePoolsTest extends WebTestCase
 {
     protected function setUp()
     {
-        $_SERVER['SYMFONY__REDIS_HOST'] = getenv('REDIS_HOST');
+        $_SERVER['REDIS_HOST'] = getenv('REDIS_HOST');
     }
 
     protected function tearDown()
     {
-        unset($_SERVER['SYMFONY__REDIS_HOST']);
+        unset($_SERVER['REDIS_HOST']);
     }
 
     public function testCachePools()

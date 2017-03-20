@@ -1641,6 +1641,52 @@ YAML
         $this->parser->parse('!!foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp /^Complex mappings are not supported/
+     */
+    public function testComplexMappingThrowsParseException()
+    {
+        $yaml = <<<YAML
+? "1"
+:
+  name: végétalien
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp /^Complex mappings are not supported/
+     */
+    public function testComplexMappingNestedInMappingThrowsParseException()
+    {
+        $yaml = <<<YAML
+diet:
+  ? "1"
+  :
+    name: végétalien
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp /^Complex mappings are not supported/
+     */
+    public function testComplexMappingNestedInSequenceThrowsParseException()
+    {
+        $yaml = <<<YAML
+- ? "1"
+  :
+    name: végétalien
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
     private function loadTestsFromFixtureFiles($testsFile)
     {
         $parser = new Parser();

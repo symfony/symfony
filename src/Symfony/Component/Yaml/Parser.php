@@ -710,10 +710,7 @@ class Parser
             return false;
         }
 
-        $ret = false;
-        if ($this->getCurrentLineIndentation() > $currentIndentation) {
-            $ret = true;
-        }
+        $ret = $this->getCurrentLineIndentation() > $currentIndentation;
 
         $this->moveToPreviousLine();
 
@@ -814,14 +811,7 @@ class Parser
             return false;
         }
 
-        $ret = false;
-        if (
-            $this->getCurrentLineIndentation() == $currentIndentation
-            &&
-            $this->isStringUnIndentedCollectionItem()
-        ) {
-            $ret = true;
-        }
+        $ret = $this->getCurrentLineIndentation() === $currentIndentation && $this->isStringUnIndentedCollectionItem();
 
         $this->moveToPreviousLine();
 
@@ -863,8 +853,7 @@ class Parser
      */
     public static function preg_match($pattern, $subject, &$matches = null, $flags = 0, $offset = 0)
     {
-        $ret = preg_match($pattern, $subject, $matches, $flags, $offset);
-        if ($ret === false) {
+        if (false === $ret = preg_match($pattern, $subject, $matches, $flags, $offset)) {
             switch (preg_last_error()) {
                 case PREG_INTERNAL_ERROR:
                     $error = 'Internal PCRE error.';

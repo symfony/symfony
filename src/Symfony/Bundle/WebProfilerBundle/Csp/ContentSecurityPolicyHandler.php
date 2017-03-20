@@ -108,6 +108,7 @@ class ContentSecurityPolicyHandler
     {
         $response->headers->remove('X-Content-Security-Policy');
         $response->headers->remove('Content-Security-Policy');
+        $response->headers->remove('Content-Security-Policy-Report-Only');
     }
 
     /**
@@ -255,6 +256,10 @@ class ContentSecurityPolicyHandler
 
         if ($response->headers->has('Content-Security-Policy')) {
             $headers['Content-Security-Policy'] = $this->parseDirectives($response->headers->get('Content-Security-Policy'));
+        }
+
+        if ($response->headers->has('Content-Security-Policy-Report-Only')) {
+            $headers['Content-Security-Policy-Report-Only'] = $this->parseDirectives($response->headers->get('Content-Security-Policy-Report-Only'));
         }
 
         if ($response->headers->has('X-Content-Security-Policy')) {

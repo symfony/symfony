@@ -513,15 +513,34 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $class = $this->getContainerClass();
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = true;
+        $unversionedClass = $class;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();
+            $class = $this->getNextClassVersion($class);
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
+        } else {
+            $class = $this->getLatestClassVersion($class);
         }
 
-        require_once $cache->getPath();
+        if(!class_exists($class)) {
+            require $cache->getPath();
+        }
+
+        if(!class_exists($class)) {
+            //the cache file loaded has a different classVersion than we expected, so we need to find the loaded class.
+            foreach (array_reverse(get_declared_classes()) as $declaredClass) {
+                if (rtrim($declaredClass, '0123456789') === $unversionedClass) {
+                    class_alias($declaredClass, $class);
+                    break;
+                }
+            }
+            if (!class_exists($class)) {
+                throw new \RuntimeException(sprintf("Failed to load the %s container from cache\n", $class));
+            }
+        }
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
@@ -529,6 +548,34 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
+    }
+
+    /**
+     * Returns the first version of the given class name that doesn't yet exist.
+     *
+     * eg. 'MyClass' is the first version, 'MyClass1' the second, 'MyClass2' the second, etc.
+     *
+     * @param string $class
+     * @return string
+     */
+    protected function getNextClassVersion($class)
+    {
+        for ($classVer = 0; class_exists($class . ($classVer ?: '')); $classVer++);
+
+        return $class . ($classVer ?: '');
+    }
+
+    /**
+     * Returns the last version of the given class name that does exist
+     *
+     * @param string $class
+     * @return string
+     */
+    protected function getLatestClassVersion($class)
+    {
+        for ($classVer = 0; class_exists($class . ($classVer ?: '')); $classVer++);
+
+        return $class . ($classVer > 1 ? $classVer - 1 : '');
     }
 
     /**

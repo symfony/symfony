@@ -299,9 +299,8 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      * The name of the getter is assumed to be the name of the property with an
      * uppercased first letter and either the prefix "get" or "is".
      *
-     * @param string      $property   The name of the property
-     * @param Constraint  $constraint The constraint
-     * @param string|null $method     The method that is called to retrieve the value being validated (null for auto-detection)
+     * @param string     $property   The name of the property
+     * @param Constraint $constraint The constraint
      *
      * @return $this
      */

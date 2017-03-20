@@ -59,6 +59,8 @@ class DefinitionBuilder
     }
 
     /**
+     * @param string $place
+     *
      * @return $this
      */
     public function setInitialPlace($place)
@@ -69,6 +71,8 @@ class DefinitionBuilder
     }
 
     /**
+     * @param string $place
+     *
      * @return $this
      */
     public function addPlace($place)
@@ -87,6 +91,8 @@ class DefinitionBuilder
     }
 
     /**
+     * @param string[] $places
+     *
      * @return $this
      */
     public function addPlaces(array $places)

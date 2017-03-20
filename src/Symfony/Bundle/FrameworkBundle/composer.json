@@ -50,6 +50,7 @@
         "symfony/translation": "~3.2",
         "symfony/templating": "~2.8|~3.0",
         "symfony/validator": "~3.3",
+        "symfony/workflow": "~3.3",
         "symfony/yaml": "~3.2",
         "symfony/property-info": "~3.3",
         "doctrine/annotations": "~1.0",
@@ -66,7 +67,7 @@
         "symfony/form": "<3.3",
         "symfony/property-info": "<3.3",
         "symfony/serializer": "<3.3",
-        "symfony/translations": "<3.2",
+        "symfony/translation": "<3.2",
         "symfony/validator": "<3.3",
         "symfony/workflow": "<3.3"
     },

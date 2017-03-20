@@ -325,8 +325,8 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        $http = preg_replace('#^https#', 'http', $url);
-        $https = preg_replace('#^http#', 'https', $url);
+        $http = preg_replace('#^https:#', 'http:', $url);
+        $https = preg_replace('#^http:#', 'https:', $url);
 
         return $this->doPurge($http) || $this->doPurge($https);
     }

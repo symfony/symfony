@@ -144,6 +144,10 @@ class Parser
                     $values['value'] = $matches['value'];
                 }
 
+                if (isset($values['value'][1]) && '?' === $values['value'][0] && ' ' === $values['value'][1]) {
+                    @trigger_error('Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', E_USER_DEPRECATED);
+                }
+
                 // array
                 if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags);
@@ -302,6 +306,10 @@ class Parser
                 // multiple documents are not supported
                 if ('---' === $this->currentLine) {
                     throw new ParseException('Multiple documents are not supported.', $this->currentLineNb + 1, $this->currentLine);
+                }
+
+                if (isset($this->currentLine[1]) && '?' === $this->currentLine[0] && ' ' === $this->currentLine[1]) {
+                    @trigger_error('Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', E_USER_DEPRECATED);
                 }
 
                 // 1-liner optionally followed by newline(s)

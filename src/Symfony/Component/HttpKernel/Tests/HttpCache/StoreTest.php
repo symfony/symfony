@@ -247,6 +247,22 @@ class StoreTest extends TestCase
         $this->assertEmpty($this->getStoreMetadata($request));
     }
 
+    public function testPurgeHttpAndHttps()
+    {
+        $requestHttp = Request::create('https://example.com/foo');
+        $this->store->write($requestHttp, new Response('foo'));
+
+        $requestHttps = Request::create('http://example.com/foo');
+        $this->store->write($requestHttps, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttps));
+
+        $this->assertTrue($this->store->purge('http://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertEmpty($this->getStoreMetadata($requestHttps));
+    }
+
     protected function storeSimpleEntry($path = null, $headers = array())
     {
         if (null === $path) {

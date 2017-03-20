@@ -51,7 +51,7 @@ class YamlFileLoaderTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessageRegExp /The file ".+" does not contain valid YAML./
      */
-    public function testLoadNotValidYAMLFile()
+    public function testLoadInvalidYamlFile()
     {
         $path = self::$fixturesPath.'/ini';
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator($path));

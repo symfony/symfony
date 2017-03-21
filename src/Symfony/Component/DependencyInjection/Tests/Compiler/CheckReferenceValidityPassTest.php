@@ -30,6 +30,8 @@ class CheckReferenceValidityPassTest extends TestCase
         $container->register('b')->setScope('prototype');
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -43,6 +45,8 @@ class CheckReferenceValidityPassTest extends TestCase
         $container->register('b')->setScope('prototype');
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -58,6 +62,8 @@ class CheckReferenceValidityPassTest extends TestCase
         $container->register('b')->setScope('b');
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -96,6 +102,8 @@ class CheckReferenceValidityPassTest extends TestCase
         $container->register('b');
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

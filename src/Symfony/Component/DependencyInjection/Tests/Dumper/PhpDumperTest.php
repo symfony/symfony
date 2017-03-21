@@ -305,6 +305,8 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
         $dumper->dump();
+
+        $this->addToAssertionCount(1);
     }
 
     public function testCircularReferenceAllowanceForInlinedDefinitionsForLazyServices()
@@ -342,5 +344,7 @@ class PhpDumperTest extends TestCase
 
         $dumper->setProxyDumper(new DummyProxyDumper());
         $dumper->dump();
+
+        $this->addToAssertionCount(1);
     }
 }

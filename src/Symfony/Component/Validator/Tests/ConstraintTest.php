@@ -115,7 +115,9 @@ class ConstraintTest extends TestCase
 
     public function testRequiredOptionsPassed()
     {
-        new ConstraintC(array('option1' => 'default'));
+        $constraint = new ConstraintC(array('option1' => 'default'));
+
+        $this->assertSame('default', $constraint->option1);
     }
 
     public function testGroupsAreConvertedToArray()
@@ -140,7 +142,9 @@ class ConstraintTest extends TestCase
 
     public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray()
     {
-        new ConstraintB(array());
+        $constraint = new ConstraintB(array());
+
+        $this->assertSame(array(Constraint::PROPERTY_CONSTRAINT, Constraint::CLASS_CONSTRAINT), $constraint->getTargets());
     }
 
     public function testGetTargetsCanBeString()

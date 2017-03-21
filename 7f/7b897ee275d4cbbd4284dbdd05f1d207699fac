@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-21T17:28:47Z
+
+I agree about encouraging interfaces rather than implementations (especially for the translator and dispatcher, as we have decorator implementations)

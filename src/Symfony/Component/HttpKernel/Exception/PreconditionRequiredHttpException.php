@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * PreconditionRequiredHttpException.
  *
@@ -29,6 +31,6 @@ class PreconditionRequiredHttpException extends HttpException
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(428, $message, $previous, array(), $code);
+        parent::__construct(Response::HTTP_PRECONDITION_REQUIRED, $message, $previous, array(), $code);
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * LengthRequiredHttpException.
  *
@@ -27,6 +29,6 @@ class LengthRequiredHttpException extends HttpException
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(411, $message, $previous, array(), $code);
+        parent::__construct(Response::HTTP_LENGTH_REQUIRED, $message, $previous, array(), $code);
     }
 }

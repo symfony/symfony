@@ -61,7 +61,7 @@ class FragmentHandlerTest extends TestCase
      */
     public function testDeliverWithUnsuccessfulResponse()
     {
-        $handler = $this->getHandler($this->returnValue(new Response('foo', 404)));
+        $handler = $this->getHandler($this->returnValue(new Response('foo', Response::HTTP_NOT_FOUND)));
 
         $handler->render('/', 'foo');
     }

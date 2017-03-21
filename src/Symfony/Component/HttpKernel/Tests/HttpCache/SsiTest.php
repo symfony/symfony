@@ -167,7 +167,7 @@ class SsiTest extends TestCase
     {
         $ssi = new Ssi();
         $response = new Response('foo');
-        $response->setStatusCode(404);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $cache = $this->getCache(Request::create('/'), $response);
         $ssi->handle($cache, '/', '/alt', false);
     }
@@ -176,7 +176,7 @@ class SsiTest extends TestCase
     {
         $ssi = new Ssi();
         $response = new Response('foo');
-        $response->setStatusCode(404);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $cache = $this->getCache(Request::create('/'), $response);
         $this->assertEquals('', $ssi->handle($cache, '/', '/alt', true));
     }
@@ -185,7 +185,7 @@ class SsiTest extends TestCase
     {
         $ssi = new Ssi();
         $response1 = new Response('foo');
-        $response1->setStatusCode(404);
+        $response1->setStatusCode(Response::HTTP_NOT_FOUND);
         $response2 = new Response('bar');
         $cache = $this->getCache(Request::create('/'), array($response1, $response2));
         $this->assertEquals('bar', $ssi->handle($cache, '/', '/alt', false));

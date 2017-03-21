@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * UnprocessableEntityHttpException.
  *
@@ -27,6 +29,6 @@ class UnprocessableEntityHttpException extends HttpException
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(422, $message, $previous, array(), $code);
+        parent::__construct(Response::HTTP_UNPROCESSABLE_ENTITY, $message, $previous, array(), $code);
     }
 }

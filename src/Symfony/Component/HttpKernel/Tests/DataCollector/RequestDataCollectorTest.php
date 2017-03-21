@@ -56,7 +56,7 @@ class RequestDataCollectorTest extends TestCase
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getResponseHeaders());
         $this->assertSame('OK', $c->getStatusText());
-        $this->assertSame(200, $c->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $c->getStatusCode());
         $this->assertSame('application/json', $c->getContentType());
     }
 
@@ -233,7 +233,7 @@ class RequestDataCollectorTest extends TestCase
     protected function createResponse()
     {
         $response = new Response();
-        $response->setStatusCode(200);
+        $response->setStatusCode(Response::HTTP_OK);
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('X-Foo-Bar', null);
         $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true));

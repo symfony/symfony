@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
@@ -131,11 +132,11 @@ class FileProfilerStorageTest extends TestCase
     public function testRetrieveByStatusCode()
     {
         $profile200 = new Profile('statuscode200');
-        $profile200->setStatusCode(200);
+        $profile200->setStatusCode(Response::HTTP_OK);
         $this->storage->write($profile200);
 
         $profile404 = new Profile('statuscode404');
-        $profile404->setStatusCode(404);
+        $profile404->setStatusCode(Response::HTTP_NOT_FOUND);
         $this->storage->write($profile404);
 
         $this->assertCount(1, $this->storage->find(null, null, 10, null, null, null, '200'), '->find() retrieve a record by Status code 200');
@@ -284,17 +285,17 @@ class FileProfilerStorageTest extends TestCase
     public function testStatusCode()
     {
         $profile = new Profile('token1');
-        $profile->setStatusCode(200);
+        $profile->setStatusCode(Response::HTTP_OK);
         $this->storage->write($profile);
 
         $profile = new Profile('token2');
-        $profile->setStatusCode(404);
+        $profile->setStatusCode(Response::HTTP_NOT_FOUND);
         $this->storage->write($profile);
 
         $tokens = $this->storage->find('', '', 10, '');
         $this->assertCount(2, $tokens);
-        $this->assertContains($tokens[0]['status_code'], array(200, 404));
-        $this->assertContains($tokens[1]['status_code'], array(200, 404));
+        $this->assertContains($tokens[0]['status_code'], array(Response::HTTP_OK, Response::HTTP_NOT_FOUND));
+        $this->assertContains($tokens[1]['status_code'], array(Response::HTTP_OK, Response::HTTP_NOT_FOUND));
     }
 
     public function testMultiRowIndexFile()

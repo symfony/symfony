@@ -3,6 +3,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HttpExceptionTest extends TestCase
@@ -32,7 +33,7 @@ class HttpExceptionTest extends TestCase
      */
     public function testHeadersConstructor($headers)
     {
-        $exception = new HttpException(200, null, null, $headers);
+        $exception = new HttpException(Response::HTTP_OK, null, null, $headers);
         $this->assertSame($headers, $exception->getHeaders());
     }
 
@@ -48,6 +49,6 @@ class HttpExceptionTest extends TestCase
 
     protected function createException()
     {
-        return new HttpException(200);
+        return new HttpException(Response::HTTP_OK);
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * ConflictHttpException.
  *
@@ -27,6 +29,6 @@ class ConflictHttpException extends HttpException
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {
-        parent::__construct(409, $message, $previous, array(), $code);
+        parent::__construct(Response::HTTP_CONFLICT, $message, $previous, array(), $code);
     }
 }

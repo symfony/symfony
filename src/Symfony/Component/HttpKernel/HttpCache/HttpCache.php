@@ -372,7 +372,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $response = $this->forward($subRequest, $catch, $entry);
 
-        if (304 == $response->getStatusCode()) {
+        if (Response::HTTP_NOT_MODIFIED == $response->getStatusCode()) {
             $this->record($request, 'valid');
 
             // return the response and not the cache entry if the response is valid but not cached
@@ -471,8 +471,15 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
         // FIXME: we probably need to also catch exceptions if raw === true
 
+        $errorStatuses = array(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_BAD_GATEWAY,
+            Response::HTTP_SERVICE_UNAVAILABLE,
+            Response::HTTP_GATEWAY_TIMEOUT,
+        );
+
         // we don't implement the stale-if-error on Requests, which is nonetheless part of the RFC
-        if (null !== $entry && in_array($response->getStatusCode(), array(500, 502, 503, 504))) {
+        if (null !== $entry && in_array($response->getStatusCode(), $errorStatuses)) {
             if (null === $age = $entry->headers->getCacheControlDirective('stale-if-error')) {
                 $age = $this->options['stale_if_error'];
             }
@@ -562,7 +569,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 }
             } else {
                 // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
-                $entry->setStatusCode(503);
+                $entry->setStatusCode(Response::HTTP_SERVICE_UNAVAILABLE);
                 $entry->setContent('503 Service Unavailable');
                 $entry->headers->set('Retry-After', 10);
             }
@@ -613,7 +620,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ($request->isMethod('HEAD') || 304 === $response->getStatusCode()) {
+        if ($request->isMethod('HEAD') || Response::HTTP_NOT_MODIFIED === $response->getStatusCode()) {
             $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');

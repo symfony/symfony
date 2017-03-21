@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * TooManyRequestsHttpException.
  *
@@ -35,6 +37,6 @@ class TooManyRequestsHttpException extends HttpException
             $headers = array('Retry-After' => $retryAfter);
         }
 
-        parent::__construct(429, $message, $previous, $headers, $code);
+        parent::__construct(Response::HTTP_TOO_MANY_REQUESTS, $message, $previous, $headers, $code);
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
@@ -79,7 +80,7 @@ class HttpCacheTestCase extends TestCase
 
     public function assertResponseOk()
     {
-        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $this->response->getStatusCode());
     }
 
     public function assertTraceContains($trace)
@@ -141,7 +142,7 @@ class HttpCacheTestCase extends TestCase
     }
 
     // A basic response with 200 status code and a tiny body.
-    public function setNextResponse($statusCode = 200, array $headers = array(), $body = 'Hello World', \Closure $customizer = null)
+    public function setNextResponse($statusCode = Response::HTTP_OK, array $headers = array(), $body = 'Hello World', \Closure $customizer = null)
     {
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);
     }

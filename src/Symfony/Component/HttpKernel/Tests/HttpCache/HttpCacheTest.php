@@ -871,10 +871,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
         sleep(15); // expire the cache
 
-        $that = $this;
-
-        $this->setNextResponse(304, array(), '', function (Request $request, Response $response) use ($time, $that) {
-            $that->assertEquals($time->format(DATE_RFC2822), $request->headers->get('IF_MODIFIED_SINCE'));
+        $this->setNextResponse(304, array(), '', function (Request $request, Response $response) use ($time) {
+            $this->assertEquals($time->format(DATE_RFC2822), $request->headers->get('IF_MODIFIED_SINCE'));
         });
 
         $this->request('GET', '/');

@@ -57,11 +57,10 @@ class CacheClearCommandTest extends TestCase
         // simply check that cache is warmed up
         $this->assertGreaterThanOrEqual(1, count($metaFiles));
         $configCacheFactory = new ConfigCacheFactory(true);
-        $that = $this;
 
         foreach ($metaFiles as $file) {
-            $configCacheFactory->cache(substr($file, 0, -5), function () use ($that, $file) {
-                $that->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
+            $configCacheFactory->cache(substr($file, 0, -5), function () use ($file) {
+                $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
             });
         }
 

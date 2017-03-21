@@ -153,7 +153,7 @@ FrameworkBundle
    have been deprecated and will be removed in 4.0.
 
  * Extending `ConstraintValidatorFactory` is deprecated and won't be supported in 4.0.
- 
+
  * Class parameters related to routing have been deprecated and will be removed in 4.0.
      * router.options.generator_class
      * router.options.generator_base_class
@@ -168,8 +168,8 @@ FrameworkBundle
    has been deprecated and will be removed in 4.0. Use the `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass`
    class instead.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass` 
-   class has been deprecated and will be removed in 4.0. Use the 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass`
+   class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` class instead.
 
  * The `server:run`, `server:start`, `server:stop` and 
@@ -191,6 +191,13 @@ HttpKernel
    `GetResponseForExceptionEvent::allowCustomResponseCode()` method instead,
    which will tell the Kernel to use the response code set on the event's
    response object.
+
+ * The `Kernel::getEnvParameters()` method has been deprecated and will be
+   removed in 4.0.
+
+ * The `SYMFONY__` environment variables have been deprecated and they will be
+   no longer processed automatically by Symfony in 4.0. Use the `%env()%` syntax
+   to get the value of any environment variable from configuration files instead.
 
 Process
 -------

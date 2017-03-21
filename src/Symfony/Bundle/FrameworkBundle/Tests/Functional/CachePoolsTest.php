@@ -17,16 +17,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class CachePoolsTest extends WebTestCase
 {
-    protected function setUp()
-    {
-        $_SERVER['SYMFONY__REDIS_HOST'] = getenv('REDIS_HOST');
-    }
-
-    protected function tearDown()
-    {
-        unset($_SERVER['SYMFONY__REDIS_HOST']);
-    }
-
     public function testCachePools()
     {
         $this->doTestCachePools(array(), FilesystemAdapter::class);

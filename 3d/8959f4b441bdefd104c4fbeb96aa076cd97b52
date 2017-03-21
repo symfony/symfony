@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-21T10:10:43Z
+
+Yeah, ``normal`` was used by the profiler itself in the old design: https://github.com/symfony/symfony/commit/56b6d537d6f803e3b497292c14f16fdfd1514126

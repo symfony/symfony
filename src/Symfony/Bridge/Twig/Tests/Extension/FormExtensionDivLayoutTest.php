@@ -105,7 +105,11 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         $renderer = $this->extension->renderer;
         $renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
-        $renderer->searchAndRenderBlock($view, 'row');
+
+        $this->assertMatchesXpath(
+            $renderer->searchAndRenderBlock($view, 'row'),
+            '/div/label[text()="child"]'
+        );
     }
 
     public function isSelectedChoiceProvider()
@@ -211,36 +215,36 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function testRange()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 
     public function testRangeWithMinMaxValues()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 
     public function testLabelWithoutTranslationOnButton()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 
     public function testSingleChoiceWithPlaceholderWithoutTranslation()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 
     public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 
     public function testButtonlabelWithoutTranslation()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 
     public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
     {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
+        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 }

@@ -87,7 +87,9 @@ class PropertyPathTest extends TestCase
 
     public function testZeroIsValidPropertyPath()
     {
-        new PropertyPath('0');
+        $propertyPath = new PropertyPath('0');
+
+        $this->assertSame('0', (string) $propertyPath);
     }
 
     public function testGetParentWithDot()

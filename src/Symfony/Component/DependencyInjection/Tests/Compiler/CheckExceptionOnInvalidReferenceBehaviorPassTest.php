@@ -28,6 +28,10 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
             ->addArgument(new Reference('b'))
         ;
         $container->register('b', '\stdClass');
+
+        $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     /**

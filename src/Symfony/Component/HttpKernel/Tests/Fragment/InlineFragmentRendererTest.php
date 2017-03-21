@@ -22,6 +22,18 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class InlineFragmentRendererTest extends TestCase
 {
+    private $originalTrustedHeaderName;
+
+    protected function setUp()
+    {
+        $this->originalTrustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);
+    }
+
+    protected function tearDown()
+    {
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, $this->originalTrustedHeaderName);
+    }
+
     public function testRender()
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
@@ -47,7 +59,7 @@ class InlineFragmentRendererTest extends TestCase
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($subRequest));
 
-        $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'));
+        $this->assertSame('foo', $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'))->getContent());
     }
 
     public function testRenderWithObjectsAsAttributesPassedAsObjectsInTheController()
@@ -70,14 +82,10 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testRenderWithTrustedHeaderDisabled()
     {
-        $trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);
-
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, '');
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest(Request::create('/')));
-        $strategy->render('/', Request::create('/'));
-
-        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, $trustedHeaderName);
+        $this->assertSame('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     /**
@@ -120,22 +128,6 @@ class InlineFragmentRendererTest extends TestCase
             ->expects($this->any())
             ->method('handle')
             ->will($returnValue)
-        ;
-
-        return $kernel;
-    }
-
-    /**
-     * Creates a Kernel expecting a request equals to $request
-     * Allows delta in comparison in case REQUEST_TIME changed by 1 second.
-     */
-    private function getKernelExpectingRequest(Request $request)
-    {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $kernel
-            ->expects($this->any())
-            ->method('handle')
-            ->with($this->equalTo($request, 1))
         ;
 
         return $kernel;
@@ -210,6 +202,22 @@ class InlineFragmentRendererTest extends TestCase
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
         $request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_IF_MODIFIED_SINCE' => 'Fri, 01 Jan 2016 00:00:00 GMT', 'HTTP_IF_NONE_MATCH' => '*'));
         $strategy->render('/', $request);
+    }
+
+    /**
+     * Creates a Kernel expecting a request equals to $request
+     * Allows delta in comparison in case REQUEST_TIME changed by 1 second.
+     */
+    private function getKernelExpectingRequest(Request $request, $strict = false)
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->equalTo($request, 1))
+            ->willReturn(new Response('foo'));
+
+        return $kernel;
     }
 }
 

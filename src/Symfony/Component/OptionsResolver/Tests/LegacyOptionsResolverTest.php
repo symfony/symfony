@@ -89,9 +89,9 @@ class LegacyOptionsResolverTest extends TestCase
             'force' => 'boolean',
         ));
 
-        $this->resolver->resolve(array(
+        $this->assertSame(array('force' => true), $this->resolver->resolve(array(
             'force' => true,
-        ));
+        )));
     }
 
     public function testResolveLazyDependencyOnOptional()

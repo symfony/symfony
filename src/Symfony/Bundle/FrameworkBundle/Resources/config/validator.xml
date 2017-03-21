@@ -13,6 +13,7 @@
         <service id="validator" class="Symfony\Component\Validator\Validator\ValidatorInterface">
             <factory service="validator.builder" method="getValidator" />
         </service>
+        <service id="Symfony\Component\Validator\Validator\ValidatorInterface" alias="validator" public="false" />
 
         <service id="validator.builder" class="Symfony\Component\Validator\ValidatorBuilderInterface">
             <factory class="Symfony\Component\Validator\Validation" method="createValidatorBuilder" />

@@ -10,6 +10,7 @@
             <argument type="service" id="assets.empty_package" /> <!-- default package -->
             <argument type="collection" /> <!-- named packages -->
         </service>
+        <service id="Symfony\Component\Asset\Packages" alias="assets.packages" public="false" />
 
         <service id="assets.empty_package" class="Symfony\Component\Asset\Package" public="false">
             <argument type="service" id="assets.empty_version_strategy" />

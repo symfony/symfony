@@ -35,6 +35,7 @@
         </service>
 
         <service id="security.acl.provider" alias="security.acl.dbal.provider" />
+        <service id="Symfony\Component\Security\Acl\Model\AclProviderInterface" alias="security.acl.provider" public="false" />
 
         <service id="security.acl.cache.doctrine" class="Symfony\Component\Security\Acl\Domain\DoctrineAclCache" public="false">
             <argument type="service" id="security.acl.cache.doctrine.cache_impl" />

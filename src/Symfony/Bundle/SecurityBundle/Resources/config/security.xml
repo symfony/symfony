@@ -17,8 +17,10 @@
             <argument type="service" id="security.access.decision_manager" />
             <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
+        <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" />
 
         <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
+        <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" public="false" />
 
         <service id="security.user_value_resolver" class="Symfony\Bundle\SecurityBundle\SecurityUserValueResolver" public="false">
             <argument type="service" id="security.token_storage" />
@@ -48,12 +50,14 @@
         </service>
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic" />
+        <service id="Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface" alias="security.encoder_factory" public="false" />
 
         <service id="security.user_password_encoder.generic" class="Symfony\Component\Security\Core\Encoder\UserPasswordEncoder" public="false">
             <argument type="service" id="security.encoder_factory"></argument>
         </service>
 
-        <service id="security.password_encoder" alias="security.user_password_encoder.generic"></service>
+        <service id="security.password_encoder" alias="security.user_password_encoder.generic" />
+        <service id="Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface" alias="security.password_encoder" />
 
         <service id="security.user_checker" class="Symfony\Component\Security\Core\User\UserChecker" public="false" />
 
@@ -103,6 +107,7 @@
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>
+        <service id="Symfony\Component\Security\Http\Firewall" alias="security.firewall" public="false" />
 
         <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
             <argument /> <!-- Firewall context locator -->

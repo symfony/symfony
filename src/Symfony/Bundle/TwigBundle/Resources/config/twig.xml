@@ -17,6 +17,7 @@
             </call>
             <configurator service="twig.configurator.environment" method="configure" />
         </service>
+        <service id="Twig_Environment" alias="twig" public="false" />
 
         <service id="twig.app_variable" class="Symfony\Bridge\Twig\AppVariable" public="false">
             <call method="setEnvironment"><argument>%kernel.environment%</argument></call>

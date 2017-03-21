@@ -82,7 +82,6 @@ class XmlDumperTest extends TestCase
     </service>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
-    <service id="Symfony\Component\DependencyInjection\Container" alias="service_container" public="false"/>
   </services>
 </container>
 ', $dumper->dump());
@@ -102,7 +101,6 @@ class XmlDumperTest extends TestCase
     </service>
     <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\Container\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", $dumper->dump());
@@ -129,7 +127,6 @@ class XmlDumperTest extends TestCase
     <service id=\"foo\" class=\"FooClass\Foo\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
     <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\Container\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container15.php'),
@@ -140,7 +137,6 @@ class XmlDumperTest extends TestCase
     <service id=\"foo\" class=\"FooClass\Foo\" decorates=\"bar\"/>
     <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
-    <service id=\"Symfony\Component\DependencyInjection\Container\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
 ", include $fixturesPath.'/containers/container16.php'),

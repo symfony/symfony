@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -58,7 +57,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(ContainerInterface::class, $definition->getClass());
         $this->assertTrue($builder->hasAlias(PsrContainerInterface::class));
         $this->assertTrue($builder->hasAlias(ContainerInterface::class));
-        $this->assertTrue($builder->hasAlias(Container::class));
     }
 
     public function testDefinitions()
@@ -229,7 +227,6 @@ class ContainerBuilderTest extends TestCase
                 'bar',
                 'Psr\Container\ContainerInterface',
                 'Symfony\Component\DependencyInjection\ContainerInterface',
-                'Symfony\Component\DependencyInjection\Container',
             ),
             $builder->getServiceIds(),
             '->getServiceIds() returns all defined service ids'
@@ -281,7 +278,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->set('foobar', 'stdClass');
         $builder->set('moo', 'stdClass');
-        $this->assertCount(3, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
+        $this->assertCount(2, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
     }
 
     public function testSetAliases()

@@ -9,7 +9,6 @@
             <argument type="service" id="service_container" />
         </service>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" public="false" />
-        <service id="Symfony\Component\EventDispatcher\EventDispatcher" alias="event_dispatcher" public="false" />
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel">
             <argument type="service" id="event_dispatcher" />
@@ -17,8 +16,10 @@
             <argument type="service" id="request_stack" />
             <argument type="service" id="argument_resolver" />
         </service>
+        <service id="Symfony\Component\HttpKernel\HttpKernelInterface" alias="http_kernel" public="false" />
 
         <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />
+        <service id="Symfony\Component\HttpFoundation\RequestStack" alias="request_stack" public="false" />
 
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate">
             <argument type="collection" />
@@ -41,8 +42,10 @@
         </service>
 
         <service id="kernel" synthetic="true" />
+        <service id="Symfony\Component\HttpKernel\KernelInterface" alias="kernel" public="false" />
 
         <service id="filesystem" class="Symfony\Component\Filesystem\Filesystem" />
+        <service id="Symfony\Component\Filesystem\Filesystem" alias="filesystem" public="false" />
 
         <service id="file_locator" class="Symfony\Component\HttpKernel\Config\FileLocator">
             <argument type="service" id="kernel" />
@@ -51,6 +54,7 @@
                 <argument>%kernel.root_dir%</argument>
             </argument>
         </service>
+        <service id="Symfony\Component\HttpKernel\Config\FileLocator" alias="file_locator" public="false" />
 
         <service id="uri_signer" class="Symfony\Component\HttpKernel\UriSigner">
             <argument>%kernel.secret%</argument>

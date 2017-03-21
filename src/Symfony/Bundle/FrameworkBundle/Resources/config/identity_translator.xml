@@ -7,6 +7,7 @@
         <service id="translator" class="Symfony\Component\Translation\IdentityTranslator">
             <argument type="service" id="translator.selector" />
         </service>
+        <service id="Symfony\Component\Translation\TranslatorInterface" alias="translator" public="false" />
 
         <service id="translator.selector" class="Symfony\Component\Translation\MessageSelector" public="false" />
     </services>

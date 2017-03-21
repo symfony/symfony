@@ -15,6 +15,3 @@ services:
     Symfony\Component\DependencyInjection\ContainerInterface:
         alias: service_container
         public: false
-    Symfony\Component\DependencyInjection\Container:
-        alias: service_container
-        public: false

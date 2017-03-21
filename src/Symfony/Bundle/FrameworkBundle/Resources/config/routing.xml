@@ -80,6 +80,9 @@
         </service>
 
         <service id="router" alias="router.default" />
+        <service id="Symfony\Component\Routing\RouterInterface" alias="router" public="false" />
+        <service id="Symfony\Component\Routing\Generator\UrlGeneratorInterface" alias="router" public="false" />
+        <service id="Symfony\Component\Routing\Matcher\UrlMatcherInterface" alias="router" public="false" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext" public="false">
             <argument>%router.request_context.base_url%</argument>
@@ -89,6 +92,7 @@
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
         </service>
+        <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" public="false" />
 
         <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer" public="false">
             <tag name="kernel.cache_warmer" />

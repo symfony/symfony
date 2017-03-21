@@ -14,6 +14,11 @@
             <argument type="collection" />
             <argument type="collection" />
         </service>
+        <service id="Symfony\Component\Serializer\SerializerInterface" alias="serializer" public="false" />
+        <service id="Symfony\Component\Serializer\NormalizerInterface" alias="serializer" public="false" />
+        <service id="Symfony\Component\Serializer\DenormalizerInterface" alias="serializer" public="false" />
+        <service id="Symfony\Component\Serializer\EncoderInterface" alias="serializer" public="false" />
+        <service id="Symfony\Component\Serializer\DecoderInterface" alias="serializer" public="false" />
 
         <service id="serializer.property_accessor" alias="property_accessor" public="false" />
 
@@ -27,6 +32,7 @@
             <!-- Run after all custom normalizers -->
             <tag name="serializer.normalizer" priority="-1000" />
         </service>
+        <service id="Symfony\Component\Serializer\Normalizer\ObjectNormalizer" alias="serializer.normalizer.object" public="false" />
 
         <service id="serializer.denormalizer.array" class="Symfony\Component\Serializer\Normalizer\ArrayDenormalizer" public="false">
             <!-- Run before the object normalizer -->

@@ -4,6 +4,5 @@
         <service class="Symfony\Component\DependencyInjection\ContainerInterface" id="service_container" synthetic="true"/>
         <service alias="service_container" id="Psr\Container\ContainerInterface" public="false"/>
         <service alias="service_container" id="Symfony\Component\DependencyInjection\ContainerInterface" public="false"/>
-        <service alias="service_container" id="Symfony\Component\DependencyInjection\Container" public="false"/>
     </services>
 </container>

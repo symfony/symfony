@@ -6,14 +6,17 @@
 
     <services>
         <service id="security.csrf.token_generator" class="Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator" public="false" />
+        <service id="Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface" alias="security.csrf.token_generator" public="false" />
 
         <service id="security.csrf.token_storage" class="Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage" public="false">
             <argument type="service" id="session" />
         </service>
+        <service id="Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface" alias="security.csrf.token_storage" public="false" />
 
         <service id="security.csrf.token_manager" class="Symfony\Component\Security\Csrf\CsrfTokenManager">
             <argument type="service" id="security.csrf.token_generator" />
             <argument type="service" id="security.csrf.token_storage" />
         </service>
+        <service id="Symfony\Component\Security\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" public="false" />
     </services>
 </container>

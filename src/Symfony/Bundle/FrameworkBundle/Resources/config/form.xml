@@ -7,6 +7,7 @@
     <services>
         <!-- ResolvedFormTypeFactory -->
         <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" />
+        <service id="Symfony\Component\Form\ResolvedFormTypeFactoryInterface" alias="form.resolved_type_factory" public="false" />
 
         <!-- FormRegistry -->
         <service id="form.registry" class="Symfony\Component\Form\FormRegistry">
@@ -21,12 +22,14 @@
             </argument>
             <argument type="service" id="form.resolved_type_factory" />
         </service>
+        <service id="Symfony\Component\Form\FormRegistryInterface" alias="form.registry" public="false" />
 
         <!-- FormFactory -->
         <service id="form.factory" class="Symfony\Component\Form\FormFactory">
             <argument type="service" id="form.registry" />
             <argument type="service" id="form.resolved_type_factory" />
         </service>
+        <service id="Symfony\Component\Form\FormFactoryInterface" alias="form.factory" public="false" />
 
         <!-- DependencyInjectionExtension -->
         <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension" public="false">

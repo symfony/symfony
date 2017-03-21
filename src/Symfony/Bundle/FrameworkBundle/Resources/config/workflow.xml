@@ -22,6 +22,7 @@
         <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
 
         <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />
+        <service id="Symfony\Component\Workflow\Registry" alias="workflow.registry" public="false" />
 
         <service id="workflow.twig_extension" class="Symfony\Bridge\Twig\Extension\WorkflowExtension">
             <argument type="service" id="workflow.registry" />

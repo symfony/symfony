@@ -11,6 +11,7 @@
             <argument type="collection" />
             <argument type="collection" />
         </service>
+        <service id="Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface" alias="property_info" public="false" />
 
         <!-- Extractor -->
         <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor" public="false">

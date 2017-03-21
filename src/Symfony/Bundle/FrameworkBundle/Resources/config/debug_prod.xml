@@ -26,5 +26,6 @@
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" public="false">
             <argument>%debug.file_link_format%</argument>
         </service>
+        <service id="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" alias="debug.file_link_formatter" public="false" />
     </services>
 </container>

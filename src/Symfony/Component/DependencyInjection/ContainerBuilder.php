@@ -126,7 +126,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true));
         $this->setAlias(PsrContainerInterface::class, new Alias('service_container', false));
         $this->setAlias(ContainerInterface::class, new Alias('service_container', false));
-        $this->setAlias(Container::class, new Alias('service_container', false));
     }
 
     /**

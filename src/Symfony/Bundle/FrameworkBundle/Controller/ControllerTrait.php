@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -76,12 +77,9 @@ trait ControllerTrait
     }
 
     /**
-     * An instance of the Session implementation (and not the interface) is returned because getFlashBag is not part of
-     * the interface.
-     *
      * @required
      */
-    protected function getSession(): Session
+    protected function getSession(): SessionInterface
     {
     }
 
@@ -235,7 +233,11 @@ trait ControllerTrait
      */
     protected function addFlash(string $type, string $message)
     {
-        $this->getSession()->getFlashBag()->add($type, $message);
+        $session = $this->getSession();
+        if (!$session instanceof Session) {
+            throw new \LogicException(sprintf('You can not use the addFlash method: "%s" is not an instance of "%s".', get_class($session), Session::class));
+        }
+        $session->getFlashBag()->add($type, $message);
     }
 
     /**
@@ -245,8 +247,6 @@ trait ControllerTrait
      * @param mixed $object     The object
      *
      * @return bool
-     *
-     * @throws \LogicException
      */
     protected function isGranted($attributes, $object = null): bool
     {
@@ -395,8 +395,6 @@ trait ControllerTrait
      * Get a user from the Security Token Storage.
      *
      * @return mixed
-     *
-     * @throws \LogicException If SecurityBundle is not available
      *
      * @see TokenInterface::getUser()
      */

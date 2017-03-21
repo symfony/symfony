@@ -397,6 +397,40 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/bar');
     }
 
+    public function testWithExcludedHost()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '!example.com'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.net'));
+        $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testWithExcludedHostSameHost()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '!example.com'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.com'));
+        $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo'));
+
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testWithExcludedHostSubdomains()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '!subdomain.example.com'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'subdomain.example.com'));
+        $this->assertEquals(array('foo' => 'bar', '_route' => 'foo'), $matcher->match('/foo/bar'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */

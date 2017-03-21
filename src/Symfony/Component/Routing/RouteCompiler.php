@@ -50,6 +50,7 @@ class RouteCompiler implements RouteCompilerInterface
         $variables = array();
         $hostRegex = null;
         $hostTokens = array();
+        $hostExcluded = false;
 
         if ('' !== $host = $route->getHost()) {
             $result = self::compilePattern($route, $host, true);
@@ -59,6 +60,8 @@ class RouteCompiler implements RouteCompilerInterface
 
             $hostTokens = $result['tokens'];
             $hostRegex = $result['regex'];
+
+            $hostExcluded = $result['hostExcluded'];
         }
 
         $path = $route->getPath();
@@ -88,7 +91,8 @@ class RouteCompiler implements RouteCompilerInterface
             $hostRegex,
             $hostTokens,
             $hostVariables,
-            array_unique($variables)
+            array_unique($variables),
+            $hostExcluded
         );
     }
 
@@ -108,6 +112,17 @@ class RouteCompiler implements RouteCompilerInterface
         }
         if (!$useUtf8 && $needsUtf8) {
             throw new \LogicException(sprintf('Cannot mix UTF-8 requirements with non-UTF-8 pattern "%s".', $pattern));
+        }
+
+        /*
+         * Checks if the host is excluded from route.
+         */
+        if (true === $isHost) {
+            $hostExcluded = false;
+            if ('!' === $pattern[0]) {
+                $hostExcluded = true;
+                $pattern = substr($pattern, 1);
+            }
         }
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
@@ -222,12 +237,18 @@ class RouteCompiler implements RouteCompilerInterface
             }
         }
 
-        return array(
+        $returnArray = array(
             'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
             'regex' => $regexp,
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );
+
+        if (true === $isHost) {
+            $returnArray['hostExcluded'] = $hostExcluded;
+        }
+
+        return $returnArray;
     }
 
     /**

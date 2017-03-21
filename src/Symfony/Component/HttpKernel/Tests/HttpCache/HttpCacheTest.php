@@ -813,7 +813,7 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $time = \DateTime::createFromFormat('U', time());
 
-        $this->setNextResponse(200, [], 'Hello World', function (Request $request, Response $response) use ($time) {
+        $this->setNextResponse(200, array(), 'Hello World', function (Request $request, Response $response) use ($time) {
             $response->setSharedMaxAge(10);
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });
@@ -831,7 +831,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         sleep(15); // expire the cache
 
-        $this->setNextResponse(304, [], '', function (Request $request, Response $response) use ($time) {
+        $this->setNextResponse(304, array(), '', function (Request $request, Response $response) use ($time) {
             $this->assertEquals($time->format(DATE_RFC2822), $request->headers->get('IF_MODIFIED_SINCE'));
         });
 

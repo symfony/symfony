@@ -121,6 +121,8 @@ final class Dotenv
             return $this->values;
         } finally {
             $this->values = array();
+            $this->data = null;
+            $this->path = null;
         }
     }
 

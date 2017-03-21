@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-06T18:17:14Z
+
+I surely miss something but https://github.com/symfony/symfony/pull/20100#issuecomment-275523325:
+
+>  shouldn't the Kernel::getEnvParameters() method be deprecated?
+
+Or do we plan to trigger this deprecation forever?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-03-06T18:27:18Z
+
+Vastly prefer the implementation described in https://github.com/symfony/symfony/pull/20100#issuecomment-275523325. I was going to comment on this earlier, but couldn't find that comment by @chalasr.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-12T17:31:58Z
+
+@chalasr about your comment, I don't agree on reporting the deprecation when using the env var instead of when setting it (if you set it, it's because you have defined it ... so you should get the deprecation).
+
+About the other proposal ... I don't know what to say ... but others think it's much better, so if you can implement it, I guess we can close this PR in favor of your PR. Thanks!
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-03-12T20:37:45Z
+
+The reason I believe we shouldn't get *any* deprecations until an environment variable is *actually used* is because otherwise, we are restricting the use of *external* environment variables without knowing that they are intended for consumption by Symfony itself. People may well be using environment variables beginning with `SYMFONY__` for their own container port mapping or other functionality related to setting up their Symfony environment, but external to the Symfony runtime itself.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-14T13:37:00Z
+
+@javiereguiluz My point is mainly what @robfrawley said in the previous comment, but also that deprecating `SYMFONY__` prefixed env vars does not make sense to me in term of upgrade.
+Defining these prefixed env vars will not stop to work, only using them as parameters will.
+The symfony-specific behavior is only to consider these vars differently, I think the deprecation should reflect this and that this behavior should really die in 4.0 (i.e. `Kernel::getEnvParameters()` be removed).
+I'll propose the alternative PR.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-14T14:04:05Z
+
+@chalasr yes, I agree that both of you are right and your solution is better than mine :) Thanks for providing the alternative PR. I'll close this one then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-14T15:48:18Z
+
+In think this implem here is right, but misses the deprecation of `Kernel::getEnvParameters`
+The false positive that has been identified makes no harm at all: it's mainly theoretical, and it's not like it's going to break anything (4.0 won't throw - it'll just ignore and not warn anymore).
+
+The alternative proposed in #21997 looks worse to me because it breaks SRP.
+
+Until someone finds another solution freed from any of the identified drawbacks, I'm :+1: here (I won't be the one working on this as the identified drawback of this PR doesn't look that realistic to me.)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-14T15:59:39Z
+
+For the record, I still think that comments from Rob and Robin are right ... but I'll update this PR in case we don't find a viable alternative solution.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-14T16:00:53Z
+
+Reopening, this looks like the correct approach to me:
+
+> Defining these prefixed env vars will not stop to work, only using them as parameters will.
+
+`SYMFONY__` is not a common prefix. I'd better consider that we can claim triggering a deprecation notice here. In terms of DX, it's also way more important to me to warn users that if they expect a `SYMFONY__` env var to be taken into account, then that won't happen in 4.0, even in the case they don't actually use it as params.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-14T16:07:26Z
+
+> even in the case they don't actually use it as params.
+
+If not used as a parameter then there is no reason to expect the env var to be taken into account. I don't understand how this is a better approach regarding DX, but let's move on.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-14T16:11:21Z
+
+@chalasr since these env vars are used as *default values*, they can very well be defined by the env just in case - but actually not being used because the param is defined / not used by the current app.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-14T16:37:35Z
+
+missing entries in CHANGELOG / UPGRADE files
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-14T19:21:46Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-20T14:58:37Z
+
+Tests are broken.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-21T09:52:14Z
+
+The last failing tests seem unrelated, so this is now ready!  A big "thank you" to @chalasr for his great help fixing all the failing tests.

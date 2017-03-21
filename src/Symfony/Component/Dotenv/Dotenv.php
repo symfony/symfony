@@ -61,7 +61,7 @@ final class Dotenv
      *
      * Note that existing environment variables are never overridden.
      *
-     * @param array An array of env variables
+     * @param array $values An array of env variables
      */
     public function populate($values)
     {

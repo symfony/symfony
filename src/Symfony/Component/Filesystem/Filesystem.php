@@ -362,6 +362,31 @@ class Filesystem
         $startPathArr = explode('/', trim($startPath, '/'));
         $endPathArr = explode('/', trim($endPath, '/'));
 
+        $normalizePathArray = function ($pathSegments) {
+            do {
+                $normalized = false;
+
+                for ($i = 0; $i < count($pathSegments); ++$i) {
+                    if ('..' === $pathSegments[$i]) {
+                        unset($pathSegments[$i]);
+
+                        if (isset($pathSegments[$i - 1])) {
+                            unset($pathSegments[$i - 1]);
+                        }
+
+                        $pathSegments = array_values($pathSegments);
+                        $normalized = true;
+                        break;
+                    }
+                }
+            } while ($normalized);
+
+            return $pathSegments;
+        };
+
+        $startPathArr = $normalizePathArray($startPathArr);
+        $endPathArr = $normalizePathArray($endPathArr);
+
         // Find for which directory the common path stops
         $index = 0;
         while (isset($startPathArr[$index]) && isset($endPathArr[$index]) && $startPathArr[$index] === $endPathArr[$index]) {

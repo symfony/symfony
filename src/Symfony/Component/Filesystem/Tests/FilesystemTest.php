@@ -842,10 +842,16 @@ class FilesystemTest extends FilesystemTestCase
             array('/a/aab/bb/', '/b/aab', '../../a/aab/bb/'),
             array('/aab/bb', '/aa', '../aab/bb/'),
             array('/aab', '/aa', '../aab/'),
+            array('/aa/bb/cc', '/aa/dd/..', 'bb/cc/'),
+            array('/aa/../bb/cc', '/aa/dd/..', '../bb/cc/'),
+            array('/aa/bb/../../cc', '/aa/../dd/..', 'cc/'),
+            array('../aa/bb/cc', '/aa/dd/..', 'bb/cc/'),
+            array('../../aa/../bb/cc', '/aa/dd/..', '../bb/cc/'),
         );
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             $paths[] = array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/');
+            $paths[] = array('C:\web\js\app.js', 'C:\web\css\..\\', 'js/app.js');
         }
 
         return $paths;

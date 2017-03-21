@@ -829,7 +829,7 @@ EOF;
         $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
         $namespaceLine = $namespace ? "namespace $namespace;\n" : '';
 
-        // We inject the parameters as a static propery so opcache can optimize it for speed and memory
+        // Inject the parameters as a static property so OPcache can optimize it for speed and memory
         if ($this->container->getParameterBag()->all()) {
             $parametersArray = $this->exportParameters($this->container->getParameterBag()->all());
             $parameters = "\n    private static \$parameters = $parametersArray;";

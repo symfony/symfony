@@ -36,8 +36,24 @@ class GetterOverriding
     }
 
     /** @required */
+    public function getUnknown(): NotExist
+    {
+        // should not be called
+    }
+
+    /** @required */
     public function getExplicitlyDefined(): B
     {
         // should be called but not autowired
+    }
+
+    final public function getFinal(): A
+    {
+        // should not be called
+    }
+
+    public function &getReference(): A
+    {
+        // should not be called
     }
 }

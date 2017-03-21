@@ -177,7 +177,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". No services were found matching this interface and it cannot be auto-registered.
+     * @expectedExceptionMessage Cannot autowire argument $collision of method Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct() for service "a": No services were found matching the "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" interface and it cannot be auto-registered.
      */
     public function testTypeNotGuessableNoServicesFound()
     {
@@ -295,7 +295,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct() for service "a": Class Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass does not exist.
+     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct() for service "a": Class or interface "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" does not exist.
      */
     public function testClassNotFoundThrowsException()
     {
@@ -310,7 +310,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct() for service "a": Class Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass does not exist.
+     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct() for service "a": Class or interface "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" does not exist.
      */
     public function testParentClassNotFoundThrowsException()
     {
@@ -716,13 +716,26 @@ class AutowirePassTest extends TestCase
     public function provideNotWireableCalls()
     {
         return array(
-            array('setNotAutowireable', 'Cannot autowire argument $n of method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable() for service "foo": Class Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass does not exist.'),
+            array('setNotAutowireable', 'Cannot autowire argument $n of method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable() for service "foo": Class or interface "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" does not exist.'),
             array('setBar', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setBar() has only optional arguments, thus must be wired explicitly.'),
             array('setOptionalNotAutowireable', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setOptionalNotAutowireable() has only optional arguments, thus must be wired explicitly.'),
             array('setOptionalNoTypeHint', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setOptionalNoTypeHint() has only optional arguments, thus must be wired explicitly.'),
             array('setOptionalArgNoAutowireable', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setOptionalArgNoAutowireable() has only optional arguments, thus must be wired explicitly.'),
             array(null, 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod() must be public.'),
         );
+    }
+
+    public function testAutoregisterRestoresStateOnFailure()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('e', E::class)
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(array('service_container', 'e'), array_keys($container->getDefinitions()));
     }
 }
 
@@ -782,6 +795,20 @@ class G
 class H
 {
     public function __construct(B $b, DInterface $d)
+    {
+    }
+}
+
+class D
+{
+    public function __construct(A $a, DInterface $d)
+    {
+    }
+}
+
+class E
+{
+    public function __construct(D $d = null)
     {
     }
 }

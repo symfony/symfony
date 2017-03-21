@@ -30,6 +30,10 @@ CHANGELOG
  * Deprecated `ControllerArgumentValueResolverPass`. Use
    `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
  * Deprecated `RoutingResolverPass`, use `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` instead
+ * [BC BREAK] The `server:run`, `server:start`, `server:stop` and 
+   `server:status` console commands have been moved to a dedicated bundle. 
+   Require `symfony/web-server-bundle` in your composer.json and register 
+   `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
 
 3.2.0
 -----

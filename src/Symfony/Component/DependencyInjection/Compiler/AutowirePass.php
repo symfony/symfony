@@ -20,9 +20,10 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
- * Guesses constructor arguments of services definitions and try to instantiate services if necessary.
+ * Inspects existing service definitions and wires the autowired ones using the type hints of their classes.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class AutowirePass extends AbstractRecursivePass
 {
@@ -95,6 +96,8 @@ class AutowirePass extends AbstractRecursivePass
         if ($value instanceof TypedReference && $this->currentDefinition->isAutowired() && !$this->container->has((string) $value)) {
             if ($ref = $this->getAutowiredReference($value->getType(), $value->canBeAutoregistered())) {
                 $value = new TypedReference((string) $ref, $value->getType(), $value->getInvalidBehavior(), $value->canBeAutoregistered());
+            } else {
+                $this->container->log($this, $this->createTypeNotFoundMessage($value->getType(), 'typed reference'));
             }
         }
         if (!$value instanceof Definition) {
@@ -275,18 +278,17 @@ class AutowirePass extends AbstractRecursivePass
 
             if ($value = $this->getAutowiredReference($type)) {
                 $this->usedTypes[$type] = $this->currentId;
-            } elseif ($parameter->isDefaultValueAvailable()) {
-                $value = $parameter->getDefaultValue();
-            } elseif ($parameter->allowsNull()) {
-                $value = null;
             } else {
-                if ($classOrInterface = class_exists($type, false) ? 'class' : (interface_exists($type, false) ? 'interface' : null)) {
-                    $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $type, $this->currentId, $classOrInterface);
-                } else {
-                    $message = sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": Class %s does not exist.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $type);
-                }
+                $failureMessage = $this->createTypeNotFoundMessage($type, 'argument $'.$parameter->name.' of method '.$reflectionMethod->class.'::'.$reflectionMethod->name.'()');
 
-                throw new RuntimeException($message);
+                if ($parameter->isDefaultValueAvailable()) {
+                    $value = $parameter->getDefaultValue();
+                } elseif ($parameter->allowsNull()) {
+                    $value = null;
+                } else {
+                    throw new RuntimeException($failureMessage);
+                }
+                $this->container->log($this, $failureMessage);
             }
 
             $arguments[$index] = $value;
@@ -320,6 +322,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             if (!$typeRef = $this->getAutowiredReference($type)) {
+                $this->container->log($this, $this->createTypeNotFoundMessage($type, 'return value of method '.$reflectionMethod->class.'::'.$reflectionMethod->name.'()'));
                 continue;
             }
 
@@ -344,6 +347,8 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if (isset($this->types[$type])) {
+            $this->container->log($this, sprintf('Service "%s" matches type "%s" and has been autowired into service "%s".', $this->types[$type], $type, $this->currentId));
+
             return new Reference($this->types[$type]);
         }
 
@@ -449,22 +454,51 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if (!$typeHint->isInstantiable()) {
+            $this->container->log($this, sprintf('Type "%s" is not instantiable thus cannot be auto-registered for service "%s".', $typeHint->name, $this->currentId));
+
             return;
         }
 
+        $ambiguousServiceTypes = $this->ambiguousServiceTypes;
+        $currentDefinition = $this->currentDefinition;
+        $definitions = $this->container->getDefinitions();
         $currentId = $this->currentId;
         $this->currentId = $argumentId = sprintf('autowired.%s', $typeHint->name);
-
-        $argumentDefinition = $this->container->register($argumentId, $typeHint->name);
+        $this->currentDefinition = $argumentDefinition = new Definition($typeHint->name);
         $argumentDefinition->setPublic(false);
         $argumentDefinition->setAutowired(true);
 
         $this->populateAvailableType($argumentId, $argumentDefinition);
 
-        $this->processValue($argumentDefinition, true);
-        $this->currentId = $currentId;
+        try {
+            $this->processValue($argumentDefinition, true);
+            $this->container->setDefinition($argumentId, $argumentDefinition);
+        } catch (RuntimeException $e) {
+            // revert any changes done to our internal state
+            unset($this->types[$typeHint->name]);
+            $this->ambiguousServiceTypes = $ambiguousServiceTypes;
+            $this->container->setDefinitions($definitions);
+            $this->container->log($this, $e->getMessage());
+
+            return;
+        } finally {
+            $this->currentId = $currentId;
+            $this->currentDefinition = $currentDefinition;
+        }
+
+        $this->container->log($this, sprintf('Type "%s" has been auto-registered for service "%s".', $typeHint->name, $this->currentId));
 
         return new Reference($argumentId);
+    }
+
+    private function createTypeNotFoundMessage($type, $label)
+    {
+        if (!$classOrInterface = class_exists($type, false) ? 'class' : (interface_exists($type, false) ? 'interface' : null)) {
+            return sprintf('Cannot autowire %s for service "%s": Class or interface "%s" does not exist.', $label, $this->currentId, $type);
+        }
+        $message = sprintf('No services were found matching the "%s" %s and it cannot be auto-registered', $type, $classOrInterface);
+
+        return sprintf('Cannot autowire %s for service "%s": %s.', $label, $this->currentId, $message);
     }
 
     /**

@@ -757,6 +757,8 @@ EOF;
 
         $envParameters = $method->invoke($kernel);
         $this->assertSame('baz', $envParameters['foo.bar']);
+
+        unset($_SERVER['SYMFONY__FOO__BAR']);
     }
 
     /**

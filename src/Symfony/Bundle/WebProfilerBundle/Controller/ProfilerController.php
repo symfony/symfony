@@ -47,7 +47,7 @@ class ProfilerController
      * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      * @param string                $baseDir         The project root directory
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'bottom', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;

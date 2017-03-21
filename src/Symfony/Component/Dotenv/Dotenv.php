@@ -233,11 +233,6 @@ final class Dotenv
         return $value;
     }
 
-    private function skipWhitespace()
-    {
-        $this->cursor += strspn($this->data, " \t", $this->cursor);
-    }
-
     private function skipEmptyLines()
     {
         if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, null, $this->cursor)) {

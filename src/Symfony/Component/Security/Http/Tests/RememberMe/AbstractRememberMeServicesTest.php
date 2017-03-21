@@ -251,6 +251,7 @@ class AbstractRememberMeServicesTest extends TestCase
             array('1'),
             array('on'),
             array('yes'),
+            array(true),
         );
     }
 

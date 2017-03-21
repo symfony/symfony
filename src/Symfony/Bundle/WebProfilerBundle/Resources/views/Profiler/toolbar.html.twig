@@ -1,15 +1,10 @@
 <!-- START of Symfony Web Debug Toolbar -->
-{% if 'normal' != position %}
-    <div id="sfMiniToolbar-{{ token }}" class="sf-minitoolbar" data-no-turbolink>
-        <a href="#" title="Show Symfony toolbar" tabindex="-1" id="sfToolbarMiniToggler-{{ token }}" accesskey="D">
-            {{ include('@WebProfiler/Icon/symfony.svg') }}
-        </a>
-    </div>
-    <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
-        {{ include('@WebProfiler/Profiler/toolbar.css.twig', { 'position': position, 'floatable': true }) }}
-    </style>
-    <div id="sfToolbarClearer-{{ token }}" class="sf-toolbar-clearer"></div>
-{% endif %}
+<div id="sfMiniToolbar-{{ token }}" class="sf-minitoolbar" data-no-turbolink>
+    <a href="#" title="Show Symfony toolbar" tabindex="-1" id="sfToolbarMiniToggler-{{ token }}" accesskey="D">
+        {{ include('@WebProfiler/Icon/symfony.svg') }}
+    </a>
+</div>
+<div id="sfToolbarClearer-{{ token }}" class="sf-toolbar-clearer"></div>
 
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
@@ -28,10 +23,8 @@
         {% endif %}
     {% endfor %}
 
-    {% if 'normal' != position %}
-        <a class="hide-button" id="sfToolbarHideButton-{{ token }}" title="Close Toolbar" tabindex="-1" accesskey="D">
-            {{ include('@WebProfiler/Icon/close.svg') }}
-        </a>
-    {% endif %}
+    <a class="hide-button" id="sfToolbarHideButton-{{ token }}" title="Close Toolbar" tabindex="-1" accesskey="D">
+        {{ include('@WebProfiler/Icon/close.svg') }}
+    </a>
 </div>
 <!-- END of Symfony Web Debug Toolbar -->

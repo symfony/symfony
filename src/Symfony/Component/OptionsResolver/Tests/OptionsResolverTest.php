@@ -1102,7 +1102,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver->resolve();
     }
 
-    public function testCatchedExceptionFromNormalizerDoesNotCrashOptionResolver()
+    public function testCaughtExceptionFromNormalizerDoesNotCrashOptionResolver()
     {
         $throw = true;
 
@@ -1116,7 +1116,7 @@ class OptionsResolverTest extends TestCase
             }
         });
 
-        $this->resolver->setNormalizer('thrower', function (Options $options) use (&$throw) {
+        $this->resolver->setNormalizer('thrower', function () use (&$throw) {
             if ($throw) {
                 $throw = false;
                 throw new \UnexpectedValueException('throwing');
@@ -1125,10 +1125,10 @@ class OptionsResolverTest extends TestCase
             return true;
         });
 
-        $this->resolver->resolve();
+        $this->assertSame(array('catcher' => false, 'thrower' => true), $this->resolver->resolve());
     }
 
-    public function testCatchedExceptionFromLazyDoesNotCrashOptionResolver()
+    public function testCaughtExceptionFromLazyDoesNotCrashOptionResolver()
     {
         $throw = true;
 
@@ -1149,7 +1149,7 @@ class OptionsResolverTest extends TestCase
             return true;
         });
 
-        $this->resolver->resolve();
+        $this->assertSame(array('catcher' => false, 'thrower' => true), $this->resolver->resolve());
     }
 
     public function testInvokeEachNormalizerOnlyOnce()

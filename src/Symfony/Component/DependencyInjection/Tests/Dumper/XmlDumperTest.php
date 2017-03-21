@@ -157,6 +157,8 @@ class XmlDumperTest extends TestCase
         $container->compile();
         $dumper = new XmlDumper($container);
         $dumper->dump();
+
+        $this->addToAssertionCount(1);
     }
 
     public function provideCompiledContainerData()

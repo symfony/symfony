@@ -17,7 +17,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -457,23 +456,12 @@ XML;
         $this->encoder->decode('<?xml version="1.0"?><invalid><xml>', 'xml');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
     public function testPreventsComplexExternalEntities()
     {
-        $oldCwd = getcwd();
-        chdir(__DIR__);
-
-        try {
-            $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE scan[<!ENTITY test SYSTEM "php://filter/read=convert.base64-encode/resource=XmlEncoderTest.php">]><scan>&test;</scan>', 'xml');
-            chdir($oldCwd);
-
-            $this->fail('No exception was thrown.');
-        } catch (\Exception $e) {
-            chdir($oldCwd);
-
-            if (!$e instanceof UnexpectedValueException) {
-                $this->fail('Expected UnexpectedValueException');
-            }
-        }
+        $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE scan[<!ENTITY test SYSTEM "php://filter/read=convert.base64-encode/resource=XmlEncoderTest.php">]><scan>&test;</scan>', 'xml');
     }
 
     public function testDecodeEmptyXml()

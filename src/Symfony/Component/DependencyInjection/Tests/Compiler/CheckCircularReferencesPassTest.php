@@ -115,6 +115,8 @@ class CheckCircularReferencesPassTest extends TestCase
         $container->register('b')->addMethodCall('setA', array(new Reference('a')));
 
         $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testProcessIgnoresLazyServices()

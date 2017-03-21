@@ -25,6 +25,8 @@ class TranslationFilesTest extends TestCase
         } else {
             \PHPUnit\Util\XML::loadfile($filePath, false, false, true);
         }
+
+        $this->addToAssertionCount(1);
     }
 
     public function provideTranslationFiles()

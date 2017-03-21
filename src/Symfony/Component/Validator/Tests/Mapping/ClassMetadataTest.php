@@ -245,19 +245,23 @@ class ClassMetadataTest extends TestCase
     public function testGroupSequencesWorkIfContainingDefaultGroup()
     {
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup()));
+
+        $this->assertInstanceOf('Symfony\Component\Validator\Constraints\GroupSequence', $this->metadata->getGroupSequence());
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
     public function testGroupSequencesFailIfNotContainingDefaultGroup()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\GroupDefinitionException');
-
         $this->metadata->setGroupSequence(array('Foo', 'Bar'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
     public function testGroupSequencesFailIfContainingDefault()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\GroupDefinitionException');
-
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
 

@@ -174,14 +174,20 @@ class TraceableEventDispatcherTest extends TestCase
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $loop = 1;
+        $dispatchedEvents = 0;
         $dispatcher->addListener('foo', $listener1 = function () use ($dispatcher, &$loop) {
             ++$loop;
             if (2 == $loop) {
                 $dispatcher->dispatch('foo');
             }
         });
+        $dispatcher->addListener('foo', function () use (&$dispatchedEvents) {
+            ++$dispatchedEvents;
+        });
 
         $dispatcher->dispatch('foo');
+
+        $this->assertSame(2, $dispatchedEvents);
     }
 
     public function testDispatchReusedEventNested()

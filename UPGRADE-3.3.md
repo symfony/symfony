@@ -172,6 +172,11 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the 
    `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` class instead.
 
+ * The `server:run`, `server:start`, `server:stop` and 
+   `server:status` console commands have been moved to a dedicated bundle. 
+   Require `symfony/web-server-bundle` in your composer.json and register 
+   `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
+
 HttpKernel
 -----------
 

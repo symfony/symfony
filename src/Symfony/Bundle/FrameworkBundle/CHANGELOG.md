@@ -37,6 +37,8 @@ CHANGELOG
    `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
  * Added `$defaultLocale` as 3rd argument of `Translator::__construct()`
    making `Translator` works with any PSR-11 container
+ * Added `framework.serializer.mapping` config option allowing to define custom 
+   serialization mapping files and directories
 
 3.2.0
 -----

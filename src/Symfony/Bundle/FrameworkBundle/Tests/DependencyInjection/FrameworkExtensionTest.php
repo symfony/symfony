@@ -28,10 +28,12 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
@@ -798,6 +800,28 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $cache = $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1);
         $this->assertEquals(new Reference('foo'), $cache);
+    }
+
+    public function testSerializerMapping()
+    {
+        $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle', 'parent' => null))));
+        $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
+        $expectedLoaders = array(
+            new Definition(AnnotationLoader::class, array(new Reference('annotation_reader'))),
+            new Definition(XmlFileLoader::class, array($configDir.'/serialization.xml')),
+            new Definition(YamlFileLoader::class, array($configDir.'/serialization.yml')),
+            new Definition(XmlFileLoader::class, array($configDir.'/serializer_mapping/files/foo.xml')),
+            new Definition(YamlFileLoader::class, array($configDir.'/serializer_mapping/files/foo.yml')),
+            new Definition(YamlFileLoader::class, array($configDir.'/serializer_mapping/serialization.yml')),
+            new Definition(YamlFileLoader::class, array($configDir.'/serializer_mapping/serialization.yaml')),
+        );
+
+        foreach ($expectedLoaders as $definition) {
+            $definition->setPublic(false);
+        }
+
+        $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+        $this->assertEquals(sort($expectedLoaders), sort($loaders));
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

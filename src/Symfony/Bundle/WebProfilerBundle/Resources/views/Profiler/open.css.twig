@@ -43,14 +43,23 @@ body {
     word-break: break-all;
 }
 
-a.doc {
+a.doc,
+a.close {
     color: #FFF;
     text-decoration: none;
-    margin: auto;
-    margin-right: 10px;
+    margin: auto 10px auto 0;
 }
 
-a.doc:hover {
+a.close {
+    display: none;
+}
+
+a.doc {
+    margin-left: auto;
+}
+
+a.doc:hover,
+a.close:hover {
     text-decoration: underline;
 }
 

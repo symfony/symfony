@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T14:28:40Z
+
+Updated according to latest feedback in #19728
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-15T09:00:10Z
+
+Now that the tag-interop repo is ready, I think we can merge this one as experimental.
+Status: needs review

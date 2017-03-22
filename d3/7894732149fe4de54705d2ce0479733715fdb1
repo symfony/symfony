@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-26T15:11:28Z
+
+Considering assets are static, the recommendation is to put them in the web-dir: http://symfony.com/doc/current/best_practices/web-assets.html
+
+Edit; As this is a new feature, it should be aimed at the master
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T12:47:04Z
+
+@noahheck can you please rebase on master + change base branch on github?

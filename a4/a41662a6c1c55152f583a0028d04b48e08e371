@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-16T09:05:24Z
+
+@nicolas-grekas comments addressed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-16T23:49:40Z
+
+`$defaultLocale` argument replaced by an option.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-17T12:36:04Z
+
+Not sure about the change: the option is not optional (it's required ;) ), which means the 4th arg is now mandatory also, but the signature tells the contrary. WDYT @fabpot ? Was that what you had in mind?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-17T14:27:09Z
+
+My point was just that we already have an `$options` array with 3 different keys and that adding a 4th one for the locale seemed natural to me and allowed to keep BC.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-17T15:28:34Z
+
+Given it would be the only mandatory option and we would have to provide an equivalent BC layer in both cases, I changed it back to an argument.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-18T09:47:00Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-22T16:18:31Z
+
+Tests green, ready.

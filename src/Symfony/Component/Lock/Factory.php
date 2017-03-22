@@ -37,7 +37,7 @@ class Factory implements LoggerAwareInterface
      * Creates a lock for the given resource.
      *
      * @param string $resource The resource to lock
-     * @param float  $ttl      maximum expected lock duration
+     * @param float  $ttl      Maximum expected lock duration in seconds
      *
      * @return Lock
      */
@@ -47,5 +47,18 @@ class Factory implements LoggerAwareInterface
         $lock->setLogger($this->logger);
 
         return $lock;
+    }
+
+    /**
+     * Create a scoped lock for the given resource.
+     *
+     * @param string $resource The resource to lock
+     * @param float  $ttl      Maximum expected lock duration in seconds
+     *
+     * @return ScopedLock
+     */
+    public function createScopedLock($resource, $ttl = 300.0)
+    {
+        return new ScopedLock($this->createLock($resource, $ttl));
     }
 }

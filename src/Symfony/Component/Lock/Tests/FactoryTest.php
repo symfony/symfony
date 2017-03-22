@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\ScopedLock;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -32,5 +33,17 @@ class FactoryTest extends TestCase
         $lock = $factory->createLock('foo');
 
         $this->assertInstanceOf(LockInterface::class, $lock);
+    }
+
+    public function testCreateScopedLock()
+    {
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $factory = new Factory($store);
+        $factory->setLogger($logger);
+
+        $lock = $factory->createScopedLock('foo');
+
+        $this->assertInstanceOf(ScopedLock::class, $lock);
     }
 }

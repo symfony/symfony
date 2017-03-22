@@ -1,0 +1,449 @@
+---------------------------------------------------------------------------
+
+by assertchris at 2017-03-08T10:57:56Z
+
+At the risk of sounding like a stick in the mud, adding ~470 LOC seems like a big change sans benchmarks to show the performance improvement and to show that performance doesn't suffer with few routes.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T10:59:53Z
+
+@assertchris It's actually not adding that. Those are extra compiled cases, so there are more test fixtures.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T11:01:06Z
+
+@assertchris in addition to that, the fast majority of that code is used at compile time, not at runtime. There are also optimisation which benefit small groups.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-08T11:02:17Z
+
+Still, @assertchris is right about one thing: we want to see the numbers when you claim it improves performance.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T11:06:24Z
+
+@stof it has the same behaviour in smaller cases, so I don't know what you want to see. Also, in those cases neither before or after would show up in blackfire, it's literally double digit nanosecond wall time we're talking about.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T11:08:25Z
+
+@arnaud-lb since you did the initial work on the prefix optimisation I thought I'd ping you.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-08T11:18:46Z
+
+Well, I never said that the numbers you are showing us should be on the smaller case. You talk about a 60x performance improvement. I want a proof.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T11:20:36Z
+
+@stof ok, how do you want the proof and what is the baseline?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-08T11:29:40Z
+
+@frankdejonge the comparison should be between the master branch and your optimized version. See https://github.com/symfony/symfony/pull/5734#issuecomment-9665207 about the way @arnaud-lb did it when applying the initial optimization.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T12:03:09Z
+
+@stof I'll create the benchmark and post it with the results here.
+
+---------------------------------------------------------------------------
+
+by Stelian at 2017-03-08T13:03:21Z
+
+@stof I believe you meant "Thank you for your contribution, this would be a great addition to the framework. Could we maybe have some benchmarks on less routes / more user-land samples before we make a decision?" but for some reason your auto correct went quite poorly.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2017-03-08T13:16:44Z
+
+Seems great @frankdejonge, impressive improvements ! If I understand correctly, you pushed the optimizations farther by allowing the routes to be re-ordered (while taking into account that some routes must still be matched before others - those with parameters at least), and striping inefficient / too small groupings ?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T13:18:03Z
+
+@arnaud-lb that's exactly correct!
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-08T13:20:40Z
+
+> Because of the altered grouping behaviour I've not modified the PrefixCollection but I've created a new StaticPrefixCollection and updated the PhpMatcherDumper to use that instead.
+
+DumperPrefixCollection is an internal class. So if the new logic does not use it anymore, the class should be removed (or the same class should be reused differently). No need to keep dead internal code around.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T13:27:11Z
+
+While the benchmarks are running I'll provide some more context. Part of the reason for this optimisation is because we use a locale prefix in our bundles. More specifically it's because we also use BeSimpleRouting bundle which adds multiple routes based on locale per route definition. This causes the prefixed routes to not be grouped, missing the opportunity of benefitting from the prefix grouping currently in place. The problem is also not only specific to the BeSimpleRouting bundle, every bundle which provides this will benefit from this more intelligent grouping. Also, in most cases this dumping strategy outputs less code to do the same work. Because of the advanced grouping, we can also be smarter about excluding multiple paths. Like, if a group is followed by another group, the second group can never be matched if the first group did. Simply by chaining the groups in if/elseif statements additional exclusions are possible.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T13:34:19Z
+
+Also, believe it or not, this is not even the most we can push out of the routing bundle just by sorting and grouping routes. There's still the possibility of taking into account segments after parameters to intelligently group routes. For instance, if you have a the paths (in order) `/prefixed/path/here/`, `/prefixed/{param}/segment/` and `/prefixed/path/other/` the first and last COULD still be logically grouped because path 3 could never match pattern 2.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T14:47:18Z
+
+@stof https://gist.github.com/frankdejonge/0ab1b9d386f7393e151538f0486ddd18
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T14:49:42Z
+
+After profiling it seems that big as well as smaller groups benefit from this optimisation. As an added benefit the cost of routing is more stable (less difference between lower and upper bounds), which is especially beneficial for determining scaling needs.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T14:53:25Z
+
+@stof the old code and tree builder has been deleted.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T15:03:38Z
+
+@stof I've gone through your comments and corrected them.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-08T15:04:56Z
+
+The findings from the profiling:
+
+# In the given small route set
+
+| group | avg | max |
+| ----- | --- | --- |
+| master | 0.81 | 1.56 |
+| pr     | 0.59 | 0.92 |
+| +/- | 1.37x | 1.64x |
+
+# On a real life project with ~800 routes
+
+| group | avg | max |
+| ----- | --- | --- |
+| master | 4.73 | 10.26 |
+| pr     | 1.07 | 2.42 |
+| +/- | 4.42x | 4.26x |
+
+This comparison is done against master which already includes the previous optimisation which brought routing times down from 7ms to 2,5ms.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-10T19:19:00Z
+
+👍 (minor comments only)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-10T22:20:11Z
+
+@fabpot I've corrected the things you've commented on.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-03-13T00:18:49Z
+
+@frankdejonge under which conditions do you reorder routes? Only static ones without parameters?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T10:35:11Z
+
+@Tobion it will reorder routes if it doesn't logically change matching order, all based on the static prefix. For example if there are two logical groups with common prefixes, say `/a/` and `/b/`, and both of them have 2 routes `/a/1/`, `/b/1/`, `/a/2/`, `/b/2/`. In this collection we know that if the prefix `/a/` matches the prefix `/b/` wil never match. So in that case we can group them /a/[/a/1/,/a/2/],/b/[/b/1/,/b/2/]. The only exception is then there's an item within the collection which has an item within the group that groups higher up in the tree. For instance if there a collection of `/a/1/`, `/b/1/`, `/{param}/`, `/a/2/`, `/b/2/` the groups can't be merged because `/{param}/` needs to be before the routes defined after it. This is because we want to respect the order of declaration. We know why this happens because routes are recursively grouped by longest possible static prefix. Prefix intersections can be detected when their static prefix matches the groups static prefix. In those cases we guide the grouping to only try to groups with routes after the intersection, this is done by holding onto the index of the intersections internally. During the grouping process we simple skip all the items that come before the first intersection.
+
+In essence it's really simple, but it requires some thought to see 1) how it plays out in a larger case and 2) why it is beneficial and 3) you need to really think about which types of exclusions are possible logically.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-13T11:53:23Z
+
+@frankdejonge I was curious about the changes and tried it on my biggest professional project with around 460 (without debug routes its ~ 250 for production) routes.
+
+Its still running on Symfony 2.8 so I had to update `symfony/routing` to `3.2.6`. With that version my test suite works fine.
+
+I then ported your changes within `PhpMatcherDumper` and `RouteCompiler` plus I added the new class `StaticPrefixCollection`.  That should be enough, right?
+
+After clearing the cache I ran my test suite again but now it fails with a 404 on some routes. So it seems something is not working anymore as it did before :yum:
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-13T12:05:25Z
+
+Ok so here a quick example that fails:
+
+```
+No route found for "GET /guest/newsletter"
+```
+
+dumped matcher line with your changes:
+
+```php
+elseif (0 === strpos($pathinfo, '/guest/newsletter/')) {
+    // ca_guest_newsletter_index
+    if ('/guest/newsletter' === $trimmedPathinfo) {
+```
+
+dumped matcher line for `3.2.6`:
+
+```php
+if (0 === strpos($pathinfo, '/guest/newsletter')) {
+    // ca_guest_newsletter_index
+    if (rtrim($pathinfo, '/') === '/guest/newsletter') {
+```
+
+So before it handled fine without a trailing `/` but now its expecting it in some cases?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T12:45:39Z
+
+@dmaicher could you try again? I've updated the RouteCompiler to take trailing slash handling into account.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-13T14:58:13Z
+
+@frankdejonge for me the dumped matcher is still the same here and it keeps failing:
+
+```php
+elseif (0 === strpos($pathinfo, '/guest/newsletter/')) {
+    // ca_guest_newsletter_index
+    if ('/guest/newsletter' === $trimmedPathinfo) {
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T15:22:27Z
+
+@dmaicher could you share a route definition collection with which I can simulate this?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T15:24:31Z
+
+I think I know which case this is...
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T15:36:06Z
+
+@dmaicher should be good now.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-13T15:41:21Z
+
+Still the same problem :cry: I can try to put together a minimal route definition set tomorrow morning to reproduce the problem.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T16:15:58Z
+
+@dmaicher I've recreated the issue, working on the solution.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T16:26:05Z
+
+@dmaicher could you try again?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-13T16:41:45Z
+
+@frankdejonge that case is fine now but I still have some more test fails :cry:
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-13T16:42:21Z
+
+@dmaicher what kind of failures?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-14T08:50:46Z
+
+Here is one more failing example:
+
+```
+No route found for "GET /statistics/semantic"
+```
+
+Dumped matcher for your version:
+
+```php
+        elseif (0 === strpos($pathinfo, '/statistics/semantic')) {
+            // ca_statistics_semantic
+            if ('/statistics/semantic/' === $pathinfo) {
+                if (!in_array($canonicalMethod, array('GET', 'POST'))) {
+                    $allow = array_merge($allow, array('GET', 'POST'));
+                    goto not_ca_statistics_semantic;
+                }
+
+                return array(...)
+```
+
+Dumped matcher for `3.2.6`:
+
+```php
+        if (0 === strpos($pathinfo, '/statistics/semantic')) {
+            // ca_statistics_semantic
+            if (rtrim($pathinfo, '/') === '/statistics/semantic') {
+                if (!in_array($this->context->getMethod(), array('GET', 'POST', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'POST', 'HEAD'));
+                    goto not_ca_statistics_semantic;
+                }
+
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'ca_statistics_semantic');
+                }
+
+                return array (...)
+```
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-14T12:03:34Z
+
+This could be the effect of other changes, looks like your dumper doesn't allow a trailing slack to be absent, which is caused by having a non redirecting matcher. I'll look into this some more, try and reproduce it and come back. I'm AFK now, but might be good to look into the strict matching setting on your end too.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-14T12:04:08Z
+
+@dmaicher ^
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-15T07:43:23Z
+
+@dmaicher I would have expected a piece of code like this:
+
+```php
+            // a_fifth
+            if ('/a/55' === $trimmedPathinfo) {
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'a_fifth');
+                }
+
+                return array('_route' => 'a_fifth');
+            }
+```
+
+Which is generated for a route if it has redirect support. But I see in the code that those redirects only happen if the matcher supports redirects, but the method should have no methods (thus matching all methods) or contains the HEAD method. This code wasn't changed in this PR. Perhaps @fabpot could shed some light on this? I saw he was the last one to touch that bit of logic.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-15T08:28:40Z
+
+Maybe my test fails are related to other changes on `master` for the routing that are not in `3.2` yet? I cannot test `master` unfortunately as its not compatible with Symfony `2.8` (missing `Psr\Container\ContainerInterface` etc) :yum:
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-15T08:50:44Z
+
+Ok @frankdejonge I think its related to something else indeed. I just took `PhpMatcherDumper` and `RouteCompiler` from `master` and have the same fails.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-15T10:00:22Z
+
+@dmaicher cool, thanks for trying out this PR in a real project btw! Very valuable!
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-15T10:47:47Z
+
+I also did a quick benchmark for your PR on my project using this script:
+
+https://gist.github.com/dmaicher/5e85c23145e84a4400354224da85bd08
+
+I did 5 runs for each version.
+
+`3.2.6` routing component:
+
+```
+matched: 218
+not found: 19
+method not allowed: 2
+
+1m6.975s
+1m1.886s
+1m3.858s
+1m2.247s
+1m2.309s
+```
+
+your PR changes:
+
+```
+matched: 218
+not found: 19
+method not allowed: 2
+
+1m2.529s
+1m1.204s
+0m59.481s
+1m0.846s
+1m1.294s
+```
+
+I don't see a clear performance advantage here but it might be because the optimization is not effective for my route collection.
+
+@frankdejonge do you see something wrong with the benchmark script? Maybe some other people could try it on real projects? :blush:
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-15T11:12:08Z
+
+@dmaicher it really depends on the project. Also, the times of the script is not the cleanest indicator of wether there are speed improvements. Did you look at the benchmark script I posted above?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-15T11:18:32Z
+
+@dmaicher Also, it could be that your routes grouped nicely with the current optimisation methods, but not all of them do. In the case of the application I was working in the algorithm didn't match at all.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-15T11:24:15Z
+
+@frankdejonge yes I also believe your new optimizations simply don't apply for my application :wink: This particular app has 4 different hosts and a lot of routes are filtered/matched by host first.
+
+I checked your benchmark script but my script was simply easier to run on an existing app without extracting route definitions first.
+
+The good news is that your solution is for sure not slower than `3.2.6` in my case :smile:
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-03-15T11:25:36Z
+
+@dmaicher nope, on average they are faster in your results too, so that's good.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-22T19:17:44Z
+
+@dmaicher all good on your side, no remaining failing edge cases?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-03-22T19:39:09Z
+
+@nicolas-grekas yes the remaining test fails were not related to the changes in this PR (Running a Symfony 2.8 app and updated `symfony/routing` to `3.2.6` to try the changes of this PR which resulted in some other weird test fails). So from my side all good :+1:

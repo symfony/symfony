@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-24T07:23:16Z
+
+@fabpot is the deprecation notice really needed though? I mean it can be a info/warning log message on behavior change as well right? And perhaps dont log anything in non-quiet mode, but display it to the user instead. Meaning we could deprecate `--no-warmup` right away..
+
+Point is; half the internet does `bin/console c:c` by now, and im not sure getting a deprecation _by default_, makes really sense :thinking: (opposed to informing about `cache:warmup` / changing behavior).
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-24T08:57:03Z
+
+This looks like a good idea to me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-24T09:03:20Z
+
+@stof you think @ro0NL is a good idea? or just the fact that we deprecate the warmup process in cache:clear?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-24T09:08:31Z
+
+I was talking about the deprecation of the warmup part. But @ro0NL is right about deprecations by default though
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-24T11:03:38Z
+
+I know for sure i wouldnt care about the deprecation; it would work rather confusing instead, ie;
+
+ _I must/should run cache:warmup now to upgrade properly?_
+
+While we're actually trying to separate things, and let users decide. Hence, it should be informational imo.
+
+> Meaning we could deprecate --no-warmup right away..
+
+Not sure though, as removing it is not the right upgrade path till 4.0.. tough one :)
+
+edit: yep.. we should definitely deprecate `--no-warmup` _after_ the default behavior has changed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-24T12:42:05Z
+
+Now im not even sure we should log/display anything opposed to adding a changelog note?
+
+Doing it in code kinda implies "people dont read changelogs" ;-)
+
+We could _just_ drop it, right?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-21T22:13:21Z
+
+Just dropping the flag won't work as it would break people using it currently. I don't see any other better way.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T00:00:24Z
+
+I'm going to merge it as is. We will have 2 months to tweak the message if needed.

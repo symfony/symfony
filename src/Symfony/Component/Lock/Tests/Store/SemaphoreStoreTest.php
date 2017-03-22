@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
- * @require
+ * @requires extension sysvsem
  */
 class SemaphoreStoreTest extends AbstractStoreTest
 {

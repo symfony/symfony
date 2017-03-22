@@ -95,13 +95,15 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             throw new UnexpectedValueException($error->message);
         }
 
+        $rootNode = null;
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
                 throw new UnexpectedValueException('Document types are not allowed.');
             }
+            if (!$rootNode && $child->nodeType !== XML_PI_NODE) {
+                $rootNode = $child;
+            }
         }
-
-        $rootNode = $dom->firstChild;
 
         // todo: throw an exception if the root node name is not correctly configured (bc)
 
@@ -332,6 +334,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $value = array();
 
         foreach ($node->childNodes as $subnode) {
+            if ($subnode->nodeType === XML_PI_NODE) {
+                continue;
+            }
+
             $val = $this->parseXml($subnode);
 
             if ('item' === $subnode->nodeName && isset($val['@key'])) {

@@ -392,6 +392,44 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeXMLWithProcessInstruction()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="/xsl/xmlverbatimwrapper.xsl"?>
+    <?display table-view?>
+    <?sort alpha-ascending?>
+    <response>
+        <foo>foo</foo>
+        <?textinfo whitespace is allowed ?>
+        <bar>a</bar>
+        <bar>b</bar>
+        <baz>
+            <key>val</key>
+            <key2>val</key2>
+            <item key="A B">bar</item>
+            <item>
+                <title>title1</title>
+            </item>
+            <?item ignore-title ?>
+            <item>
+                <title>title2</title>
+            </item>
+            <Barry>
+                <FooBar id="1">
+                    <Baz>Ed</Baz>
+                </FooBar>
+            </Barry>
+        </baz>
+        <qux>1</qux>
+    </response>
+    <?instruction <value> ?>
+XML;
+        $obj = $this->getObject();
+
+        $this->assertEquals(get_object_vars($obj), $this->encoder->decode($source, 'xml'));
+    }
+
     public function testDecodeIgnoreWhiteSpace()
     {
         $source = <<<'XML'

@@ -76,6 +76,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $statusCode = $response->getStatusCode();
 
+        $responseCookies = array();
+        foreach ($response->headers->getCookies() as $cookie) {
+            $responseCookies[$cookie->getName()] = $cookie;
+        }
+
         $this->data = array(
             'method' => $request->getMethod(),
             'format' => $request->getRequestFormat(),
@@ -91,6 +96,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'request_attributes' => $attributes,
             'route' => $route,
             'response_headers' => $response->headers->all(),
+            'response_cookies' => $responseCookies,
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
             'flashes' => $flashes,
@@ -188,6 +194,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getResponseHeaders()
     {
         return new ParameterBag($this->data['response_headers']->getValue());
+    }
+
+    public function getResponseCookies()
+    {
+        return new ParameterBag($this->data['response_cookies']->getValue());
     }
 
     public function getSessionMetadata()

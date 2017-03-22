@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -25,8 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class RequestDataCollectorTest extends TestCase
 {
@@ -36,7 +35,6 @@ class RequestDataCollectorTest extends TestCase
 
         $c->collect($request = $this->createRequest(), $this->createResponse());
 
-        $cloner = new VarCloner();
         $attributes = $c->getRequestAttributes();
 
         $this->assertSame('request', $c->getName());
@@ -46,6 +44,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $attributes);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestRequest());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
+        $this->assertInstanceOf(ParameterBag::class, $c->getResponseCookies());
         $this->assertSame('html', $c->getFormat());
         $this->assertEquals('foobar', $c->getRoute());
         $this->assertEquals(array('name' => 'foo'), $c->getRouteParams());

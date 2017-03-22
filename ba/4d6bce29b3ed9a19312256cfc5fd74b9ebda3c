@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-25T18:29:26Z
+
+@wouterj Are you able to address the comments here?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-25T23:35:50Z
+
+Updated this PR:
+
+ * A new `ConsoleErrorEvent` was introduced, replacing `ConsoleExceptionEvent`. This now adds full PHP 7 support (`\Throwable` instead of `\Exception`) and makes it a lot easier to trigger deprecation notices.
+ * Instead of passing `null` to `setException()`, `markErrorAsHandled()` and `isErrorHandled()` were introduced.
+ * Tests were updated to use the new event and a new legacy test was added for the old behaviour.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-25T23:37:18Z
+
+*Fabbot.io failures should be ignored, this is a bug in the CS fixer config*
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-26T10:17:10Z
+
+Thanks for the quick review. PR is now updated (also added related UPGRADE and CHANGELOG notes).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-02-01T08:55:05Z
+
+Updated the PR. Should be ready to merge now (finally).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-03-16T20:28:57Z
+
+So, what's the decision here:
+
+ 1. Keep current proposal, using `$event->markErrorAsHandled()` to indicate console shouldn't output the error
+ 1. Change to `$event->setException(null)` again
+
+I'm getting a bit tired of rebasing my PRs each month, so I would like to have some quick decision making on this. Happy to close as well.

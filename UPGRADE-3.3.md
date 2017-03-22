@@ -186,6 +186,14 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\Translation\Translator` constructor now takes the
    default locale as 3rd argument. Not passing it will trigger an error in 4.0.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass`
+   class has been deprecated and will be removed in 4.0.
+   Use the `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass`
+   class has been deprecated and will be removed in 4.0.
+   Use the `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` class instead.
+
 HttpFoundation
 --------------
 

@@ -11,25 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass as BaseAddValidatorsInitializerPass;
 
-class AddValidatorInitializersPass implements CompilerPassInterface
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', AddValidatorInitializersPass::class, BaseAddValidatorsInitializerPass::class), E_USER_DEPRECATED);
+
+/**
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseAddValidatorInitializersPass} instead
+ */
+class AddValidatorInitializersPass extends BaseAddValidatorsInitializerPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('validator.builder')) {
-            return;
-        }
-
-        $validatorBuilder = $container->getDefinition('validator.builder');
-
-        $initializers = array();
-        foreach ($container->findTaggedServiceIds('validator.initializer') as $id => $attributes) {
-            $initializers[] = new Reference($id);
-        }
-
-        $validatorBuilder->addMethodCall('addObjectInitializers', array($initializers));
-    }
 }

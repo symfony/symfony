@@ -11,36 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass as BaseAddConstraintValidatorsPass;
 
-class AddConstraintValidatorsPass implements CompilerPassInterface
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', AddConstraintValidatorsPass::class, BaseAddConstraintValidatorsPass::class), E_USER_DEPRECATED);
+
+/**
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseAddConstraintValidatorsPass} instead
+ */
+class AddConstraintValidatorsPass extends BaseAddConstraintValidatorsPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('validator.validator_factory')) {
-            return;
-        }
-
-        $validators = array();
-        foreach ($container->findTaggedServiceIds('validator.constraint_validator') as $id => $attributes) {
-            $definition = $container->getDefinition($id);
-
-            if ($definition->isAbstract()) {
-                continue;
-            }
-
-            if (isset($attributes[0]['alias'])) {
-                $validators[$attributes[0]['alias']] = new ServiceClosureArgument(new Reference($id));
-            }
-
-            $validators[$definition->getClass()] = new ServiceClosureArgument(new Reference($id));
-        }
-
-        $container->getDefinition('validator.validator_factory')->replaceArgument(0, (new Definition(ServiceLocator::class, array($validators)))->addTag('container.service_locator'));
-    }
 }

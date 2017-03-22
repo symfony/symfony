@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by keradus at 2016-10-30T09:58:29Z
+
+Something wrong happen with PR title
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-06T12:58:44Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-27T10:15:04Z
+
+@fabpot any chance to get this on the 3.2 train? It allows the `label[title]` attribute to be translated.. (being my field help text.. :cry: )
+
+To clarify this is consistent with `option[title]` for the choice widget. see https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig#L82
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-27T10:25:53Z
+
+There will be 3.2.1 after 3.2.0 :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-27T10:29:21Z
+
+That is true :+1: the RC release triggered me that maybe this was forgotten / overlooked at :angel:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-15T13:57:55Z
+
+We work around it till 3.3 then :) the 2 bugs are real though.. but i should separate them for 2.7 i just realized. :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T12:58:29Z
+
+Updated. I qualify it a feature, not a bug.

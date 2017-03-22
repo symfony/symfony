@@ -341,7 +341,7 @@ class Parser
                         try {
                             $parsedLine = Inline::parse($line, $flags, $this->refs);
 
-                            if (!is_string($value)) {
+                            if (!is_string($parsedLine)) {
                                 $parseError = true;
                                 break;
                             }

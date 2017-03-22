@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-10T14:20:38Z
+
+PR scope now focused on adding the second argument only. Ready.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-11T09:13:57Z
+
+~~I'm working on adding a new `kernel.trusted_header_set` config option in fwb, and deprecate not setting it when `kernel.trusted_proxies` is set.~~
+I'm also wondering if we shouldn't plan for renaming all the `Request::HEADER_CLIENT_*` to `Request::HEADER_X_FORWARDED_*` to make them less critic.
+Please advise @symfony/deciders, I'd appreciate some feedback on this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-18T17:14:25Z
+
+Status: needs review
+
+PR ready, with more deprecations, namely:
+- `Request::CLIENT_*`
+- `Request::get/setTrustedHeaderName()`
+- `framework.trusted_proxies` config and `kernel.trusted_proxies` param
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T19:54:18Z
+
+👍

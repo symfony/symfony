@@ -686,6 +686,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('cache')->end()
                         ->scalarNode('name_converter')->end()
+                        ->scalarNode('circular_reference_handler')->end()
                     ->end()
                 ->end()
             ->end()

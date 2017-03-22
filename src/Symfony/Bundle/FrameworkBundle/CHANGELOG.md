@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
  * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Deprecated the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
  * Changed default configuration for

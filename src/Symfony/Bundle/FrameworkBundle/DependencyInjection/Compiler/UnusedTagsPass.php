@@ -25,6 +25,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'console.command',
         'container.service_locator',
         'container.service_subscriber',
+        'controller.service_arguments',
         'config_cache.resource_checker',
         'data_collector',
         'form.type',

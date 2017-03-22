@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-22T10:16:50Z
+
+Talking with others, it looks like this approach has a drawback: it does not play well with composition.
+Say you have a class that uses trait1 and trait2, then the deps declaration can't be provided by each trait because of method name collision. Instead, the class itself must do it.
+That's an issue getter does not have. use trait1 and trait2 which declares their deps via eg abstract getters, and composition is at its best.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-05T21:23:21Z
+
+PR rebased and ready
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-06T15:18:38Z
+
+Just added a few more test cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-10T14:29:15Z
+
+CHANGELOG entry added, PR ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-11T09:16:42Z
+
+Second commit added, to implement the new interface where applicable in the code base.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-11T09:22:05Z
+
+As you can see, this allows having type-hinted service locators also, on top of explicit deps.
+Can only help write more robust code and help IDEs provide auto-completion.

@@ -139,7 +139,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function testRefererHasToBeDifferentThatLoginUrl()
+    public function testRefererHasToBeDifferentThanLoginUrl()
     {
         $options = array('use_referer' => true);
 
@@ -150,6 +150,26 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->httpUtils->expects($this->once())
             ->method('generateUri')->with($this->request, '/login')
             ->will($this->returnValue('/login'));
+
+        $response = $this->expectRedirectResponse('/');
+
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testRefererWithoutParametersHasToBeDifferentThanLoginUrl()
+    {
+        $options = array('use_referer' => true);
+
+        $this->request->headers->expects($this->any())
+            ->method('get')->with('Referer')
+            ->will($this->returnValue('/subfolder/login?t=1&p=2'));
+
+        $this->httpUtils->expects($this->once())
+            ->method('generateUri')->with($this->request, '/login')
+            ->will($this->returnValue('/subfolder/login'));
 
         $response = $this->expectRedirectResponse('/');
 

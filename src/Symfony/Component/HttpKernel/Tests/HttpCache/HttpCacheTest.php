@@ -1276,6 +1276,55 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertHttpKernelIsNotCalled();
         $this->assertSame('get', $this->response->getContent());
     }
+
+    public function testChangesHeadToGetRequestForBackendFetch()
+    {
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=60'), 'foo', function (Request $request) {
+            $this->assertSame('GET', $request->getMethod());
+        });
+        $this->request('HEAD', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertSame('', $this->response->getContent());
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame('foo', $this->response->getContent());
+    }
+
+    public function testDoesNotChangeHeadToGetRequestForBackendFetchIfOptionSet()
+    {
+        $this->cacheConfig['head_method_passthrough'] = true;
+
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=60'), '', function (Request $request) {
+            $this->assertSame('HEAD', $request->getMethod());
+        });
+        $this->request('HEAD', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertSame('', $this->response->getContent());
+        $this->assertNull($this->response->headers->get(HttpCache::HEADER_ORIGINAL_METHOD));
+
+        $this->request('HEAD', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame('', $this->response->getContent());
+        $this->assertNull($this->response->headers->get(HttpCache::HEADER_ORIGINAL_METHOD));
+
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=60', 'X-GET' => 'bar'), 'foo', function (Request $request) {
+            $this->assertSame('GET', $request->getMethod());
+        });
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertSame('foo', $this->response->getContent());
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame('foo', $this->response->getContent());
+
+        $this->request('HEAD', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame('', $this->response->getContent());
+        $this->assertSame('bar', $this->response->headers->get('X-GET'));
+    }
 }
 
 class TestKernel implements HttpKernelInterface

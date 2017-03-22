@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2017-03-16T13:30:11Z
+
+Awesome. Thank you for your contribution. Your code will definitely improve Symfony code base by fixing potential security error and many projects will benefit of that.
+
+I made some tests. This (non-valid) URL isn't validated (which is great) `http://example.com/exploit.html?hel lo`, I think we should add it to the test suite.
+
+-----------------
+
+I also tested this other URL that is considered as valid but is not: `http://example.com/exploit.html?tçest` this is a problem with many non-ascii chars. Do you plan to fix it? Or your fix (that actually fix some things) will remain as it? _It may be kept as it as there is no security issue in that case, even [browsers will interpret it](http://codepen.io/anon/pen/OpOLgV) as standard URL_.
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-03-16T13:47:53Z
+
+@Nek- , thanks for your review! I just extended test cases with your example (`http://example.com/exploit.html?hel lo`). As for non-ascii chars I'm not sure. But previously they were treated as valid: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Tests/Constraints/UrlValidatorTest.php#L104
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-03-16T13:49:58Z
+
+@e-moe it's valid as DNS but not as query string (where is must be url-encoded). But well, it's fine to me, I'm just noticing it.
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-03-16T13:54:53Z
+
+oh, I see your point. If needed it can be fixed. Let's wait for other reviews and then we will be able to make a decision
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-03-17T18:05:08Z
+
+@nicolas-grekas , I just fixed code based on your comments.
+
+should I create new PR for 2.7 branch?
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-03-17T18:07:02Z
+
+as for BC break - new constraint is more strict comparing to old version. but new one is closer to RFC
+
+should it be considered as a BC break?
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-03-18T16:09:03Z
+
+It's not a BC break! It's a fix.

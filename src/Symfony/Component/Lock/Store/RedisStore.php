@@ -130,8 +130,11 @@ class RedisStore implements StoreInterface
             return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge(array($resource), $args), 1);
         }
 
-        // Have to be a \Predis\Client
-        return call_user_func_array(array($this->redis, 'eval'), array_merge(array($script, 1, $resource), $args));
+        if ($this->redis instanceof \Predis\Client) {
+            return call_user_func_array(array($this->redis, 'eval'), array_merge(array($script, 1, $resource), $args));
+        }
+
+        throw new InvalidArgumentException(sprintf('%s() expects been initialized with a Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($this->redis) ? get_class($this->redis) : gettype($this->redis)));
     }
 
     /**

@@ -1,0 +1,202 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-19T13:05:50Z
+
+In some ways it was actually compiling (resolving the parameters), as this is also done in a compiler pass. So we can also just go with `compile()` + `isCompiled()` on both sides. And deprecate the concept of freezing, which breaks;
+
+>  Still allowing to compile a already frozen container builder.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-19T13:26:16Z
+
+-1 for renaming compile to freeze. This method is not only about freezing. It is about performing all the compilation steps of the container building (everything done in compiler passes for instance).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-19T13:57:54Z
+
+@stof different approach. WDYT?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-19T16:01:26Z
+
+I don't understand the problem you are trying to fix here. Can you elaborate? Deprecating something should be taken lightly, so we need to have a very good reason to rename something.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-19T16:14:18Z
+
+It's confusing to mix&match `freeze/is-frozen` and `compile/is-compiled`. `isFrozen` is currently enabled due compilation (ie. we practically have `compile/is-frozen`). Imo, the parameter bag is frozen; the container compiled.
+
+This exposes a minor code smell in `ContainerBuilder` where it's additionally tracking state (`ContainerBuilder::$compiled`) where this is actually the same as checking if it's frozen (ie. compiled). I guess the difference was unclear back then, and you get "better be safe then sorry" changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-22T15:16:20Z
+
+I tend to be sympathetic to deprecating the "frozen" vocabulary on containers. It's been looking strange to me also and the difference is unclear with the "compile" concept. `isCompiled` looks better.
+That may enhance DX, that would be the argument supporting this change.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-22T16:59:10Z
+
+Updated the `PhpDumper` as well.. it makes sense, but can be unpredictable when you have
+`new Container<Builder>(new FrozenParameterBag())`
+
+What do we expect when dumping this uncompiled (ie. we dont call `$container->compile()`)? Currently the behavior is the same when doning `new Container<Builder>(new ParamaterBag())`
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-22T17:19:48Z
+
+@ro0NL : As we do not rely anymore on the `$this->parameterBag instanceof FrozenParameterBag`, I'd say it doesn't matter anymore... But...you'll probably have to check if the parameterBag is frozen in the `ContainerBuilder::merge()` method before trying to add parameters.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-23T08:11:14Z
+
+@ogizanagi merging is only allowed before compiling. If you passed a `FrozenParameterBag` at that point i tend to let it crash (from the paramereter bag side that is).
+
+Not sure what's best for DX here.. crashing or ignoring silently...
+
+@nicolas-grekas any thoughts?
+
+Other then that.. this is ready.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-23T08:14:45Z
+
+Oh and btw... just to be sure; the YAML+XML dumper really depend on a frozen bag right? Due escaping.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-23T13:41:47Z
+
+Rebase needed to take #19704 into account.
+
+---------------------------------------------------------------------------
+
+by allflame at 2016-08-24T08:53:21Z
+
+@ro0NL as far as i can see isCompiled will return false for dumped container whether or not container was compiled beforehand
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T09:06:23Z
+
+I really don't know if this has a chance to be accepted by the core team, but let's say yes, I think we should go one step further and try deprecating dumping non-compiled containers.
+WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-24T15:20:52Z
+
+@allflame `isCompiled` depends on `compile()`. The PHP dumper doesnt compile your container, it''s more or less designed to cover both cases, ie.
+- dump a compiled container(builder)
+- compile a dumped container(builder)
+
+---------------------------------------------------------------------------
+
+by allflame at 2016-08-24T16:36:47Z
+
+@ro0NL I'm aware of that fact. Let me explain using your own statements:
+Since `PhpDumper` has nothing to do with the compiled status, it shouldn't change it, right?
+What I'm trying to say is that if you take your code, compile the container, you will get `isCompiled` resolving to true (correct), but if you dump it to the file and then create the container from the dumped file, you will get `isCompiled` resolving to false (incorrect), which is "strange" since you were dumping compiled container.
+@nicolas-grekas tbh I'm not using the whole Symfony ecosystem so I cant think of implication this change can have (potential BC issues), but what I'm pretty sure of is that if you don't compile your container the "original" and "dumped" version won't necessarily be the same.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-24T17:11:19Z
+
+@allflame sorry, you're right #19704 applies to `isCompiled` as well, i should fix that :+1:
+
+About BC, i truly consider this a design flaw and ~~think~~hope the impact is minimal.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-16T17:35:20Z
+
+@allflame i added the stub for `isCompiled`. Also rebased on master...
+
+> I really don't know if this has a chance to be accepted by the core team, but let's say yes, I think we should go one step further and try deprecating dumping non-compiled containers.
+> WDYT?
+
+Personally i find this out of scope for this PR. @fabpot WDYT by now?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-20T19:23:19Z
+
+Rebased. Still all good :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T19:33:12Z
+
+I just realized i made a mistake with the latest deprecation: https://github.com/symfony/symfony/commit/ed5b1d89685c5b808aaf1f119064554b84eccaa0#diff-f7b23d463cba27ac5e4cb677f2be7623R76
+
+Im talking _uncompiled container_ here, looking at the class it _should_ have been _not-frozen container_. I really dont mind this tiny semantic. Then again, if we dont do the PR it might be worth updating that instead... sorry :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-02T18:34:03Z
+
+:+1: with suggested changes
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-03T16:07:06Z
+
+Updated, rebased & waiting for travis.
+
+Cant wait for 4.0 guys :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-11T13:11:13Z
+
+@ro0NL Looks like tests fail.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-11T13:19:46Z
+
+Hm.. looks fixture related, maybe something added in the meanwhile. Ill have a look tonight.
+
+Note to self;
+- Symfony\Component\DependencyInjection\Tests\ContainerTest::testIsFrozen
+- Symfony\Component\DependencyInjection\Tests\Dumper\PhpDumperTest::testClosureProxy
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-14T14:05:14Z
+
+ping @ro0NL
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-02-14T14:54:57Z
+
+Yes..  ill check it tonight. Focussed on #19668 first.. but that's more or less dealt with now.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-02-14T19:36:04Z
+
+All good @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T17:29:33Z
+
+LGMT @ro0NL Can you rebase one last time? Thanks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-22T18:59:03Z
+
+@fabpot all good.

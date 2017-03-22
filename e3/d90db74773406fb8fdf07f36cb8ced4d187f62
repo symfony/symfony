@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-17T15:04:31Z
+
+Not sure I understand the actual this is trying to fix. Can you explain this a bit more?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-03-17T15:58:58Z
+
+@xabbuh I'll try 😄
+
+Every `Response` needs a `Date:` header. #14906 asked to postpone the initialization to as late as possible which was done in #14912. It now happens in `getDate()` or `sendHeaders()` only.
+
+As the date is needed for age calculations, it is implicitly initialized when you call `getAge()`, `getTtl()` or `isFresh()`.
+
+My first point is that this is ugly API-wise because these getters/issers now change the `Response` state in a subtle way. Also it feels weird that a Response does not "get old" unless you once call one of the above methods. After that, `getTtl()` will decrement every second and `isFresh()` will eventually expire.
+
+Second, `HttpCache` relies on the age calculation functions. But because the lazy initialization happens in `getDate()` or `sendHeaders()` and `HttpCache` may happen to call *neither one*, chances are the date remains uninitialized – this was reported in #19390.
+
+[More precisely, when the Reponse has an ETag set, `Response::isCacheable` returns true because of `isValidateable()`, without touching the date through `isFresh()`.]
+
+#19390 fixed this by adding an extra safeguard in `HttpCache::store()`, but I think that's just a workaround for the underlying cause.
+
+We *could* remove the additional initializations in `getDate()` or `sendHeaders()` but then we'd need to make sure otherwise that the header remains present *even* if you remove it (I have an idea how to do so).
+
+Does that make it clearer?

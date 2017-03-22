@@ -22,10 +22,8 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
  *
  * @author Wouter J <waldio.webdesign@gmail.com>
  */
-class XmlReferenceDumper
+class XmlReferenceDumper extends ReferenceDumper
 {
-    private $reference;
-
     public function dump(ConfigurationInterface $configuration, $namespace = null)
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
@@ -147,6 +145,11 @@ class XmlReferenceDumper
 
                     if ($example = $child->getExample()) {
                         $comments[] = 'Example: '.$example;
+                    }
+
+                    // doc
+                    if ($this->withDoc && $doc = $child->getDoc()) {
+                        $comments[] = 'Doc: '.$doc;
                     }
 
                     if ($child->isRequired()) {

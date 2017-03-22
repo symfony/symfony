@@ -208,6 +208,26 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Sets an documentation URL.
+     *
+     * @param string $doc The documentation URL
+     */
+    public function setDoc($doc)
+    {
+        $this->setAttribute('doc', $doc);
+    }
+
+    /**
+     * Retrieves the documentation URL configuration for this node.
+     *
+     * @return string The documentation URL
+     */
+    public function getDoc()
+    {
+        return $this->getAttribute('doc');
+    }
+
+    /**
      * Merges two values together.
      *
      * @param mixed $leftSide

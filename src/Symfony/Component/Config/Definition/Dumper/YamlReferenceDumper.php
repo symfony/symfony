@@ -24,11 +24,9 @@ use Symfony\Component\Yaml\Inline;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class YamlReferenceDumper
+class YamlReferenceDumper extends ReferenceDumper
 {
-    private $reference;
-
-    public function dump(ConfigurationInterface $configuration)
+    public function dump(ConfigurationInterface $configuration, $namespace = null)
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
     }
@@ -126,6 +124,11 @@ class YamlReferenceDumper
         // example
         if ($example && !is_array($example)) {
             $comments[] = 'Example: '.$example;
+        }
+
+        // doc
+        if ($this->withDoc && $doc = $node->getDoc()) {
+            $comments[] = 'Doc: '.$doc;
         }
 
         $default = (string) $default != '' ? ' '.$default : '';

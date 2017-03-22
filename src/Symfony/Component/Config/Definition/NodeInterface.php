@@ -59,6 +59,13 @@ interface NodeInterface
     public function getDefaultValue();
 
     /**
+     * Returns the documentation URL of the node.
+     *
+     * @return string The documentation URL
+     */
+    public function getDoc();
+
+    /**
      * Normalizes the supplied value.
      *
      * @param mixed $value The value to normalize

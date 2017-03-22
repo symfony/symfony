@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2017-03-10T23:56:08Z
+
+See https://github.com/symfony/symfony/issues/21967#issuecomment-285817431
+
+---------------------------------------------------------------------------
+
+by syzygymsu at 2017-03-11T02:20:35Z
+
+Well, #21967 could be questionable. But here are more arguments:
+
+- `prepareBaseUrl()` already performs exactly the same operation and it works for requests starting with '?':
+```php
+        $truncatedRequestUri = $requestUri;
+        if (false !== $pos = strpos($requestUri, '?')) {
+            $truncatedRequestUri = substr($requestUri, 0, $pos);
+        }
+```
+- `preparePathInfo()` can work with empty path returning '/'. Why it should work differently for empty path + query?
+- String containing '?' does not look like a valid pathinfo anyway.
+- Whole class becomes inconsistent because query is duplicated in pathinfo and qs:
+```php
+echo Request::createFromGlobals()->getUri(); // prints: http://localhost?a=b?a=b
+```
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-03-11T09:20:26Z
+
+Give than web servers treat such requests as valid ones I'm :+1: (once my comment is addressed).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-13T10:39:53Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-03-13T17:19:56Z
+
+What about other invalid request uris like `ab` without a leading slash? This is currently not adding the leading slash which can result in bugs further down. So that should be changed as well if we start to accept invalid requests.

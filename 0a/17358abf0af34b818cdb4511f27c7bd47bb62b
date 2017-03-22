@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-08T15:14:20Z
+
+As we are listing alternatives in a lot of different places in the framework, wouldn't it make sense to change the sort for all of them?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T13:42:47Z
+
+Have you had time to have a look at the other exceptions using alternatives to see if sorting them would also make sense?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-17T09:57:16Z
+
+I thought of this yesterday, and it's more or less related; wouldn't it be nice to filter the command list if a command is not found?
+
+Ie. `bin/console` vs. `bin/console keyword` render the same output, but the latter only shows matching commands and some little info like _"Showing 1 of 3 commands matching 'keyword'"_.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-09T23:58:13Z
+
+@javiereguiluz Any news?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T16:07:32Z
+
+@javiereguiluz Still interested in finishing this PR?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-01T16:11:43Z
+
+Yes ... but I don't know where to look for more places where this feature could be implemented. Anyone can give me a clue? Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T16:16:31Z
+
+I think looking for `levenshtein` in the code base would give you all the places where we need to make the same change.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-06T09:19:23Z
+
+I've committed some changes:
+
+* For the list of commands, I think that sorting best matches alphabetically is the most natural thing...
+* ... but for the other levenshtein candidates (service ids, param names, etc.) I propose to sort them from best to worst (i.e. from lowest to highest levenshtein distance)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-14T19:56:39Z
+
+Tests fail on deps=low, we should find a way to fix that.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-19T12:22:41Z
+
+I can't see which is the error that makes test fail for "deps = low". Can anyone help me? Thanks!
+
+---
+
+Some context --> The original test was:
+
+```
+Did you mean one of these: "bar", "baz"?
+```
+
+But after this PR, that fails on most Symfony versions, so I changed it to:
+
+```
+Did you mean one of these: "baz", "bar"?
+```
+
+and now test pass ... except when using "deps = low", which fails because the expected output is again:
+
+```
+Did you mean one of these: "bar", "baz"?
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-19T13:02:14Z
+
+@javiereguiluz my guess is that the DependencyInjection needs a higher console version for that as it seems like it's the DependencyInjection component that fails. I could be wrong though, but that's my hunch after seeing the failure.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-22T20:32:05Z
+
+After thinking about this, what if we do the following:
+
+1) Remove the last 3 commits
+2) Keep only the original feature that sorts commands alphabetically
+
+Reason:
+
+We already show very good alternatives because we limit the levenhstein cost to < 3, so every alternative displayed is almost as good as the other ones. The proposed changes wouldn't make the results much better.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T20:33:18Z
+
+Make sense 👍

@@ -2,6 +2,7 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 function sc_configure($instance)
 {
@@ -105,5 +106,22 @@ class LazyContext
     public function __construct($lazyValues)
     {
         $this->lazyValues = $lazyValues;
+    }
+}
+
+class TestServiceSubscriber implements ServiceSubscriberInterface
+{
+    public function __construct($container)
+    {
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array(
+            __CLASS__,
+            '?stdClass',
+            'bar' => 'stdClass',
+            'baz' => '?stdClass',
+        );
     }
 }

@@ -28,7 +28,8 @@
 
         <service id="twig.cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="service_container" />
+            <tag name="container.service_subscriber" id="twig" />
+            <argument type="service" id="container" />
             <argument type="service" id="templating.finder" on-invalid="ignore" />
             <argument type="collection" /> <!-- Twig paths -->
         </service>

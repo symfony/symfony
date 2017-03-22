@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * added "ServiceSubscriberInterface" - to allow for per-class explicit service-locator definitions
  * added "container.service_locator" tag for defining service-locator services
  * added anonymous services support in YAML configuration files using the `!service` tag.
  * added "TypedReference" and "ServiceClosureArgument" for creating service-locator services

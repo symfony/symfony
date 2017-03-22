@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,7 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Router extends BaseRouter implements WarmableInterface
+class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
     private $container;
     private $collectedParameters = array();
@@ -172,5 +174,15 @@ class Router extends BaseRouter implements WarmableInterface
         }, $value);
 
         return str_replace('%%', '%', $escapedValue);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'routing.loader' => LoaderInterface::class,
+        );
     }
 }

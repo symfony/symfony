@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Sets the session in the request.
@@ -20,7 +22,7 @@ use Psr\Container\ContainerInterface;
  *
  * @final since version 3.3
  */
-class TestSessionListener extends AbstractTestSessionListener
+class TestSessionListener extends AbstractTestSessionListener implements ServiceSubscriberInterface
 {
     private $container;
 
@@ -36,5 +38,15 @@ class TestSessionListener extends AbstractTestSessionListener
         }
 
         return $this->container->get('session');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'session' => '?'.SessionInterface::class,
+        );
     }
 }

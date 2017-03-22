@@ -8,6 +8,8 @@ CHANGELOG
 * added `AddConsoleCommandPass` (originally in FrameworkBundle)
 * [BC BREAK] `Input::getOption()` no longer returns the default value for options
   with value optional explicitly passed empty
+* added console.error event to catch exceptions thrown by other listeners
+* deprecated console.exception event in favor of console.error
 
 3.2.0
 ------

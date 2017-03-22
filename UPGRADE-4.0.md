@@ -58,6 +58,9 @@ Console
    $commandTester->execute();
    ```
 
+ * The `console.exception` event and the related `ConsoleExceptionEvent` class have
+   been removed in favor of the `console.error` event and the `ConsoleErrorEvent` class.
+
 Debug
 -----
 

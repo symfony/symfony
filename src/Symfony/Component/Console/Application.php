@@ -33,6 +33,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -118,16 +119,40 @@ class Application
         $this->configureIO($input, $output);
 
         try {
+            $e = null;
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
+            $exception = $e;
+        } catch (\Throwable $e) {
+            $exception = new FatalThrowableError($e);
+        }
+
+        if (null !== $e && null !== $this->dispatcher) {
+            $event = new ConsoleErrorEvent($this->runningCommand, $input, $output, $e, $e->getCode());
+            $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+
+            $e = $event->getError();
+
+            if ($event->isErrorHandled()) {
+                $e = null;
+                $exitCode = 0;
+            } else {
+                $exitCode = $e->getCode();
+            }
+
+            $event = new ConsoleTerminateEvent($this->runningCommand, $input, $output, $exitCode);
+            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        }
+
+        if (null !== $e) {
             if (!$this->catchExceptions) {
                 throw $e;
             }
 
             if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($e, $output->getErrorOutput());
+                $this->renderException($exception, $output->getErrorOutput());
             } else {
-                $this->renderException($e, $output);
+                $this->renderException($exception, $output);
             }
 
             $exitCode = $e->getCode();
@@ -863,16 +888,16 @@ class Application
             } catch (\Throwable $x) {
                 $e = new FatalThrowableError($x);
             }
+
             if (null !== $e) {
-                $event = new ConsoleExceptionEvent($command, $input, $output, $e, $e->getCode());
+                $event = new ConsoleExceptionEvent($command, $input, $output, $e, $e->getCode(), false);
                 $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
 
                 if ($e !== $event->getException()) {
+                    @trigger_error('The "console.exception" event is deprecated since version 3.3 and will be removed in 4.0. Use the "console.error" event instead.', E_USER_DEPRECATED);
+
                     $x = $e = $event->getException();
                 }
-
-                $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
-                $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
 
                 throw $x;
             }

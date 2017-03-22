@@ -29,7 +29,7 @@ class ConsoleTerminateEvent extends ConsoleEvent
      */
     private $exitCode;
 
-    public function __construct(Command $command, InputInterface $input, OutputInterface $output, $exitCode)
+    public function __construct(Command $command = null, InputInterface $input, OutputInterface $output, $exitCode)
     {
         parent::__construct($command, $input, $output);
 

@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -31,15 +31,15 @@ class ExceptionListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onConsoleException(ConsoleExceptionEvent $event)
+    public function onConsoleError(ConsoleErrorEvent $event)
     {
         if (null === $this->logger) {
             return;
         }
 
-        $exception = $event->getException();
+        $error = $event->getError();
 
-        $this->logger->error('Exception thrown while running command "{command}". Message: "{message}"', array('exception' => $exception, 'command' => $this->getInputString($event), 'message' => $exception->getMessage()));
+        $this->logger->error('Error thrown while running command "{command}". Message: "{message}"', array('error' => $error, 'command' => $this->getInputString($event), 'message' => $error->getMessage()));
     }
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
@@ -60,7 +60,7 @@ class ExceptionListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            ConsoleEvents::EXCEPTION => array('onConsoleException', -128),
+            ConsoleEvents::ERROR => array('onConsoleError', -128),
             ConsoleEvents::TERMINATE => array('onConsoleTerminate', -128),
         );
     }

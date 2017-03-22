@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Lock\Tests\Quorum;
+namespace Symfony\Component\Lock\Tests\Strategy;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Lock\Quorum\UnanimousStrategy;
+use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -20,11 +20,11 @@ use Symfony\Component\Lock\Quorum\UnanimousStrategy;
 class UnanimousStrategyTest extends TestCase
 {
     /** @var UnanimousStrategy */
-    private $quorum;
+    private $strategy;
 
     public function setup()
     {
-        $this->quorum = new UnanimousStrategy();
+        $this->strategy = new UnanimousStrategy();
     }
 
     public function provideMetResults()
@@ -76,7 +76,7 @@ class UnanimousStrategyTest extends TestCase
      */
     public function testMet($success, $failure, $total, $isMet)
     {
-        $this->assertSame($isMet, $this->quorum->isMet($success, $total));
+        $this->assertSame($isMet, $this->strategy->isMet($success, $total));
     }
 
     /**
@@ -84,6 +84,6 @@ class UnanimousStrategyTest extends TestCase
      */
     public function canBeMet($success, $failure, $total, $isMet)
     {
-        $this->assertSame($isMet, $this->quorum->canBeMet($failure, $total));
+        $this->assertSame($isMet, $this->strategy->canBeMet($failure, $total));
     }
 }

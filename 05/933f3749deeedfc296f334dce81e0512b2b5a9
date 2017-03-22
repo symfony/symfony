@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2017-03-17T11:15:47Z
+
+Thanks for your contribution. 😄
+
+Is it possible to add a test case that exposes this issue?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-03-17T11:24:46Z
+
+I will add that once I have found/understood it.
+
+For now, this PR is intended as a refactoring that helps (at least me) to better follow execution paths through the `HttpCache`.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-03-17T13:54:01Z
+
+#19390 added a check in the `HttpCache::store()` method to make sure we have a `Date` header. As all requests go through `forward()`, to me this seems to be the better place.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-03-17T16:18:08Z
+
+@Nek- the test in #22043 comes close

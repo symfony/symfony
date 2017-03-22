@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-12T08:25:44Z
+
+Looks good to me 👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-12T10:43:46Z
+
+Not sure on this one.. but shouldn't we consider trailing slash normalization since the router, AFAIK, has some issues with it (#18702)
+
+---------------------------------------------------------------------------
+
+by cdesign at 2016-06-12T12:55:41Z
+
+Minor issue, but there is a type in the test name: ('That' --> 'Than')
+
+`public function testRefererWithoutParametersHasToBeDifferentThatLoginUrl()`
+
+should be:
+
+`public function testRefererWithoutParametersHasToBeDifferentThanLoginUrl()`
+
+---------------------------------------------------------------------------
+
+by mrzard at 2016-06-12T13:29:01Z
+
+@cdesign Thanks! Fixed. Fixed the original test name too.
+
+@sstok thanks for taking the time to look at this.
+
+@ro0NL Not very sure how to apply that detection as it is kind of "quirk" of the Router, any pointers? I'd be happy to actually code them.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-15T19:49:43Z
+
+@mrzard i think it's a problem we cant fix.. as we cant determine the `login_path` route supports both variants yes or no. Currently how i understand it, it only is supported for imported routes.
+
+I foresee some nasty side effects, but im not sure as i havent tested it, i.e. it needs to be reproduced first to properly document what no to do :-)

@@ -127,7 +127,7 @@ class RouteCompilerTest extends TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
+                '/foo-', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
                     array('variable', '-', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 ),

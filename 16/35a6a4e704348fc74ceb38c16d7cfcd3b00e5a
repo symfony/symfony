@@ -1,0 +1,493 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-14T18:02:45Z
+
+What about doing it in `LogoutUrlGenerator` directly?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T18:03:42Z
+
+@chalasr : I'd like to. But the `FirewallConfig` is available in the `SecurityBundle` only (whereas as the `LogoutUrlGenerator` is in the `Security` component). :/
+
+(we can provide an implementation in the `SecurityBundle`, but is worth it ?)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T18:09:05Z
+
+Note that providing an implementation in the `SecurityBundle` will automatically allow the [`Symfony\Bridge\Twig\Extension\LogoutUrlExtension`](https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Extension/LogoutUrlExtension.php) and [`Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper`](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/Templating/Helper/LogoutUrlHelper.php) to benefit from this. WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T18:55:11Z
+
+Let's get feedbacks about an implementation in the `SecurityBundle` thanks to afdc33b.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-14T19:44:43Z
+
+Imho it is worth it 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-14T21:04:02Z
+
+Shouldnt we technically still check `Token::getProviderKey()` first, if `$key` is null?
+
+What about `setDefaultProviderKey` on the component side? And set it using the `FirewallConfig`?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T21:10:49Z
+
+> What about setDefaultProviderKey on the component side? And set it using the FirewallConfig?
+
+That would made the `Security` component's `LogourUrlGenerator` stateful (you'll have to set it with  `setDefaultProviderKey` for every request, and it'll not be a default at all, just the value retrieved from the firewall config for current request).
+
+> Shouldnt we technically still check Token::getProviderKey() first, if $key is null?
+
+Why? 😕
+`Token::getProviderKey()` does return the firewall name. Using the firewall config is simply the safest way to get it but cannot replace `Token::getProviderKey()` in the component because it's only available in the bundle.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-14T21:11:04Z
+
+> Shouldnt we technically still check Token::getProviderKey() first, if $key is null?
+
+Since the parent methods are called, the token storage [will be used](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Http/Logout/LogoutUrlGenerator.php#L89-L99) if `$key` is null, right?
+
+About the `setProviderKey`, Imho it's good to have the bundle as an extension of the component, rather than changing the component.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-14T21:16:56Z
+
+Yeah.. but in case of null we pass `extractKeyFromFirewallConfig()`. Ie. `FirewallConfig::getName` is preferred over `Token::getProviderKey()`. Im not sure that's correct.
+
+Opposed to
+
+``` php
+try {
+   return parent::getLogoutPath($key);
+} catch (\InvalidArgumentException $e) {
+   if (null === $key && null !== $defaultKey = $this->extractKeyFromFirewallConfig()) {
+      return parent::getLogoutPath($defaultKey);
+   }
+   throw $e;
+}
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T21:20:55Z
+
+> FirewallConfig::getName is preferred over Token::getProviderKey(). Im not sure that's correct.
+
+Why? `FirewallConfig::getName`  is strictly equivalent to `Token::getProviderKey().` Unless you get a token without the current firewall name as provider key (which mean it has failed to implement `getProviderKey` or there is an issue in the application/security listener). Or am I missing something?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-14T21:27:37Z
+
+Again not sure :) just imagining one could actually be authenticated against a different firewall (ie. identified by its current token) other then the current firewall (ie. identified by request?)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T21:28:54Z
+
+Correction: `FirewallConfig::getName` and `Token::getProviderKey()` are not strictly equivalent in case two firewalls share the same context. The firewall which has created the token will be set in the token provider key.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T21:36:29Z
+
+Then I'm not confident about this PR anymore.
+With the current code, the logout listener might have been defined on only one firewall of many sharing the same context. Thus, the current firewall may not allow to generate the logout url.
+
+Even by changing the code by:
+
+``` php
+try {
+   return parent::getLogoutPath($key);
+} catch (\InvalidArgumentException $e) {
+   if (null === $key && null !== $defaultKey = $this->extractKeyFromFirewallConfig()) {
+      return parent::getLogoutPath($defaultKey);
+   }
+   throw $e;
+}
+```
+
+as you've suggested @ro0NL. The issue is that it's probably wrong to suggest to logout using the wrong logout url, even in last resort. 😕 (and you may still not find the logout listener)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-14T21:56:47Z
+
+You should return a key only if `in_array('logout', $firewallConfig->getListeners(), true)` :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T22:10:18Z
+
+> You should return a key only if in_array('logout', $firewallConfig->getListeners(), true) :)
+
+The original [LogoutUrlGenerator](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Http/Logout/LogoutUrlGenerator.php#L101-L103) will already throw an exception if the logout listener does not exists for this firewall.
+
+That's not what I meant by:
+
+> you may still not find the logout listener
+
+I meant you may still be behind a firewall on which is not defined the `logout` listener, so anyyway you won't get the link in the profiler.
+
+Anyway, I think I'm closing this one, because it brings more issues than it solves. It's not even an issue I encountered, but I thought it could be a good usage of the new `FirewallConfig` (apparently it was not 😄 ). Let's implements `getProviderKey` in your security tokens guys. :)
+
+Thank you for your time. :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-15T17:57:05Z
+
+@ogizanagi im really considering this a DX improvement.. and we were almost there, right?
+
+What's wrong with the exception in case you're passing the key from firewall config and it has no listeners? In user-land if someone calls this, and there is absolutely no available url it already crashes anyway.
+
+The only difference would be (in case of null) we get
+
+```
+No LogoutListener found for firewall key "<key-from-firewall-config>".
+```
+
+Instead of
+
+```
+Unable to find the current firewall LogoutListener, please provide the provider key manually.
+```
+
+If we add a `protected getDefaultProviderKey()` to the base logout url generator we can avoid the try/catch approach.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-15T21:42:59Z
+
+> I'm really considering this a DX improvement.. and we were almost there, right?
+> What's wrong with the exception in case you're passing the key from firewall config and it has no listeners?
+
+Nothing wrong with the exception. What would appear to be "wrong" to me is to generate the logout url with the wrong firewall and logout listener (not the one which generated the token). I mean...it's not fundamentally wrong: AFAIK, given two firewalls sharing a same context, with only one defining the logout listener, the logout url is actually available for both firewalls and will invalidate the token, doesn't matter which firewall created it.
+
+But is this PR really worth it, considering it won't give you 100% chances to get the logout url (as the logout listener might be on another firewall than the current one)? (you don't have 100% chances currently neither of course, but the implementation is sufficient to me)
+
+I'm reopening this in order to get more feedbacks about it, but I don't expect much actually 😕
+
+> If we add a protected getDefaultProviderKey() to the base logout url generator we can avoid the try/catch approach.
+
+Still not convinced about this because it'll make the `LogoutUrlGenerator` state tied to the request (the `Translator` for instance is also tied to the request, though. So a request listener setting the current firewall key in the original `LogoutUrlGenerator` could be considered actually).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-15T21:57:36Z
+
+> is this PR really worth it, considering it won't give you 100% chances to get the logout url
+
+Sure, but still more chances than if kept as is so, for what it costs, I would still say yes.
+
+Since the token's provider key would be the better alternative if provided (right?), shouldn't it be indeed checked at first?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-15T22:14:35Z
+
+> Since the token's provider key would be the better alternative if provided (right?), shouldn't it be indeed checked at first?
+
+It won't give more chances, but is still more accurate yes. I agree with that and @ro0NL's suggestion about checking it first, and then fallback to the current firewall key if no logout listener is found.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T18:05:52Z
+
+The only problem i see is we generate a URL that wont actually log you out.
+
+> considering it won't give you 100% chances to get the logout url (as the logout listener might be on another firewall than the current one)
+
+So the data in `FirewallConfig` is semi-incorrect then? When 2 firewalls share the same context...
+- Firewall A defines the logout listener (available in firewall config for A)
+- Firewall B actually tries to generate the URL (not available in config for B although practically the config from A affects B during request).
+
+This could be solved at populating the config; it should consider contexts then.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-16T18:22:04Z
+
+> This could be solved at populating the config; it should consider contexts then.
+
+The `FirewallConfig::getListeners()` method only returns the keys of the listeners explicitly configured on the firewall but not the ones available from the shared context. AFAIK it would not be easy to implement (at least not without making the SecurityExtension even more ugly), but indeed a nice improvement.
+
+edit: There is no problem on the FirewallConfig side and using the current firewall name to generate the logout url, in fact :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T18:25:22Z
+
+And somehow needed for this PR to be viable :) Otherwise. i think i have to agree with @ogizanagi; if it's not error prone we shouldnt do it.
+
+There should be some logic already regarding context-aware lookups..i mean practically it already works. Maybe you can reuse that when creating the config?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-16T18:30:42Z
+
+Well, let me up to tomorrow for looking at it if you don't before :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T18:31:51Z
+
+Ill review it :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-16T20:12:40Z
+
+The data of `FirewallConfig` are perfectly fine. I don't think we should tweak it in order to add listeners from shared contexts (anyway it won't help for this PR at all and listeners are actually tied to the firewall itself, not the context. The context simply allows to share the token between firewalls).
+Instead, I've thought about adding a `UrlLogoutGenerator::registerContextListener` in order to reference any logout listener from a set of firewalls sharing the same context (but we can only choose one arbitrary if there are many).
+Then, the `LogoutUrlGenerator` will:
+- try the token firewall from `Token::getProviderKey` if available
+- fallback to the current firewall from the `FirewallConfig`
+- fallback to the registered logout listener from the context (extracted from `FirewallConfig::getContext`)
+
+This will cover the thing at 100% I guess, but I still don't know if it worth the "complexity" added.
+
+> The only problem i see is we generate a URL that wont actually log you out.
+
+Any logout listener will properly logout you anyway AFAIK (or I failed testing it)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T20:26:14Z
+
+I would add anything necessary to `FirewallConfig`, exactly for reducing complexity.
+- ~~fallback to the registered logout listener from the context (extracted from FirewallConfig::getContext)~~
+- fallback to `FirewallConfig::getContextConfig()->getName()`
+- fallback to `FirewallConfig::getContextConfig()->getContextConfig()->getName()`
+- etc.
+
+This would be ideal right? Yet gives a naming issue..
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-16T20:29:07Z
+
+@ro0NL I think the context key won't help here. Most of the times, the context key is custom when set explicitly (it doesn't correspond to the firewall name as opposed to the default value).
+
+Anyway the FirewallConfig already give you the `context` key, see `FirewallConfig::getContext()`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-16T20:30:10Z
+
+> fallback to `FirewallConfig::getContextConfig()->getName()`
+
+I don't follow you 😕
+
+What will be in the context config apart from the context key (i.e currently `FirewallConfig::getContext()`) ?
+Taking the risk to repeat myself (and maybe being wrong twice?):
+
+> listeners are actually tied to the firewall itself, not the context. The context simply allows to share the token between firewalls
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T20:34:32Z
+
+If the context key is shared, is basicly references another firewall (having the same context key). I think `FirewallConfig` should track those firewall configs. But it can indeed be many; for the logout url we can just pick one.
+
+> Yet gives a naming issue..
+
+Does `getFirewallConfigsResolvedFromContextKey() : FirewallConfig[]` clarify?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-16T20:47:36Z
+
+Hmm...The `FirewallConfig` should be kept simple and avoid building a cyclic object graph. It could simply store the name of firewalls sharing a same context and getting them using `FirewallConfig::getSiblingFirewallNames()`, `FirewallConfig::getContextFirewallNames()` or whatever.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-16T20:47:48Z
+
+> But it can indeed be many; for the logout url we can just pick one.
+
+Looks like another topic that definitely won't help here, right? :)
+Given sharing a context between two firewalls makes that only the session token and the request matcher will be really shared, I'm not sure copying/merging the listeners of the two firewalls would really make sense, even if they can be safely used in practice.
+
+The real issue here is that we are not able to generate the url if the logout listener has been defined on a different firewall than the one used, even if they share the same context so the url would be usable by all of them. Without looking deeper, fixing this for being able to generate the url from the context key looks hard
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-16T20:56:59Z
+
+But indeed, being able to try the name of all the firewalls sharing the same context would solve the problem. I will look at it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T21:09:28Z
+
+I cant think of any other real use cases yet :)), but it could be cool to have a manager object something.
+
+```
+FirewallManager::get($name) : FirewallConfig
+FirewallManager::getCurrent() : FirewallConfig
+FirewallManager::all() : FirewallConfig[]
+FirewallManager::inContext($context) : FirewallManager
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-19T10:20:48Z
+
+Status: needs work
+
+:)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-19T20:36:40Z
+
+I've updated the PR by adding a new commit as a POC for using firewall contexts and a listener setting the current firewall name + context per request (no more `FirewallConfig` usage, so no more `LogoutUrlGenerator` implementation in the bundle).
+
+When not providing the firewall key:
+1. Try to find the key from the token (unless it's an anonymous token)
+2. If found, try to get the listener from the key. If the listener is found, stop there.
+3. Try from the injected firewall key. If the listener is found, stop there.
+4. Try from the injected firewall context. If the listener is found, stop there.
+
+The behavior remains unchanged when providing explicitly the firewall key. No fallback.
+
+<details>
+<summary>
+
+This can be tested with the following changes in the demo app and by commenting/decommenting the logout listener on the admin firewall.</summary>
+
+``` diff
+diff --git a/app/Resources/views/base.html.twig b/app/Resources/views/base.html.twig
+index c20f749..2e0c5a8 100644
+--- a/app/Resources/views/base.html.twig
++++ b/app/Resources/views/base.html.twig
+@@ -61,7 +61,7 @@
+
+                                 {% if app.user %}
+                                     <li>
+-                                        <a href="{{ path('security_logout') }}">
++                                        <a href="{{ logout_url() }}">
+                                             <i class="fa fa-sign-out" aria-hidden="true"></i> {{ 'menu.logout'|trans }}
+                                         </a>
+                                     </li>
+diff --git a/app/config/security.yml b/app/config/security.yml
+index cc31cfb..cfda7ee 100644
+--- a/app/config/security.yml
++++ b/app/config/security.yml
+@@ -13,33 +13,27 @@ security:
+
+     # http://symfony.com/doc/current/book/security.html#firewalls-authentication
+     firewalls:
+-        secured_area:
+-            # this firewall applies to all URLs
+-            pattern: ^/
+-
+-            # but the firewall does not require login on every page
+-            # denying access is done in access_control or in your controllers
++        admin:
++            pattern: ^/(%app_locales%)/admin
+             anonymous: true
+-
+-            # This allows the user to login by submitting a username and password
+-            # Reference: http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+             form_login:
+-                # The route name that the login form submits to
+                 check_path: security_login
+-                # The name of the route where the login form lives
+-                # When the user tries to access a protected page, they are redirected here
+                 login_path: security_login
+-                # Secure the login form against CSRF
+-                # Reference: http://symfony.com/doc/current/cookbook/security/csrf_in_login_form.html
+                 csrf_token_generator: security.csrf.token_manager
+-
+             logout:
+-                # The route name the user can go to in order to logout
++                path: security_logout_admin
++                target: security_login
++            context: foo
++        secured_area:
++            pattern: ^/
++            anonymous: true
++            logout:
+                 path: security_logout
+-                # The name of the route to redirect to after logging out
+                 target: homepage
++            context: foo
+
+     access_control:
+         # this is a catch-all for the admin area
+         # additional security lives in the controllers
++        - { path: '^/(%app_locales%)/admin/login', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+         - { path: '^/(%app_locales%)/admin', roles: ROLE_ADMIN }
+diff --git a/src/AppBundle/Controller/SecurityController.php b/src/AppBundle/Controller/SecurityController.php
+index fa99392..3b79931 100644
+--- a/src/AppBundle/Controller/SecurityController.php
++++ b/src/AppBundle/Controller/SecurityController.php
+@@ -24,7 +24,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+ class SecurityController extends Controller
+ {
+     /**
+-     * @Route("/login", name="security_login")
++     * @Route("/admin/login", name="security_login")
+      */
+     public function loginAction()
+     {
+@@ -45,6 +45,7 @@ class SecurityController extends Controller
+      * and handle the logout automatically. See logout in app/config/security.yml
+      *
+      * @Route("/logout", name="security_logout")
++     * @Route("/admin_logout", name="security_logout_admin")
+      */
+     public function logoutAction()
+     {
+```
+
+</details>
+
+Status: Needs Review
+
+If you still think it makes sense, let me know what could possibly be improved and what should be reconsidered regarding our previous suggested solutions.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-20T15:07:59Z
+
+@ro0NL : I think https://github.com/symfony/symfony/pull/20516/commits/b29b00448f08be9f472e988b73c9daaa186b9907?w=1 should cover your expectations for your last review (However it's hard to follow small comments for such changes while ensuring it does not change any behavior (tests will of course be required if we want to merge this). Could you provide a full diff next time instead?).
+
+Anyway, thank you for your review. ;)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-20T15:11:11Z
+
+Ship it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T15:53:22Z
+
+@ogizanagi  What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-03-01T18:34:31Z
+
+@fabpot: Squashed, rebased on master and tested back on the symfony demo using the patch mentioned in https://github.com/symfony/symfony/pull/20516#issuecomment-261738061. Tests are green on my side. ~~Waiting for Travis.~~ Failures unrelated.
+
+No more changes planned on my side. It actually enhances the situation for cases mentioned in the PR description and should always find and use the proper logout listener across contexts (as soon as there is one of course).
+
+So I think it's ready for the final review and validating the strategy used. :)

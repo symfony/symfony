@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Lock;
+namespace Symfony\Component\Lock\Strategy;
 
 /**
- * QuorumInterface defines an interface to indicate when a quorum is met and can be met.
+ * StrategyInterface defines an interface to indicate when a quorum is met and can be met.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-interface QuorumInterface
+interface StrategyInterface
 {
     /**
      * Returns whether or not the quorum is met.

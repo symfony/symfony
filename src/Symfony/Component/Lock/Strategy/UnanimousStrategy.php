@@ -9,23 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Lock\Quorum;
-
-use Symfony\Component\Lock\QuorumInterface;
+namespace Symfony\Component\Lock\Strategy;
 
 /**
- * ConsensusStrategy is a QuorumInterface implementation where strictly more than 50% items should be successful.
+ * UnanimousStrategy is a StrategyInterface implementation where 100% of elements should be successful.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class ConsensusStrategy implements QuorumInterface
+class UnanimousStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
     public function isMet($numberOfSuccess, $numberOfItems)
     {
-        return $numberOfSuccess > ($numberOfItems / 2);
+        return $numberOfSuccess === $numberOfItems;
     }
 
     /**
@@ -33,6 +31,6 @@ class ConsensusStrategy implements QuorumInterface
      */
     public function canBeMet($numberOfFailure, $numberOfItems)
     {
-        return $numberOfFailure < ($numberOfItems / 2);
+        return $numberOfFailure === 0;
     }
 }

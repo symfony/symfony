@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Lock\Tests\Quorum;
+namespace Symfony\Component\Lock\Tests\Strategy;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Lock\Quorum\ConsensusStrategy;
+use Symfony\Component\Lock\Strategy\ConsensusStrategy;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -20,11 +20,11 @@ use Symfony\Component\Lock\Quorum\ConsensusStrategy;
 class ConsensusStrategyTest extends TestCase
 {
     /** @var ConsensusStrategy */
-    private $quorum;
+    private $strategy;
 
     public function setup()
     {
-        $this->quorum = new ConsensusStrategy();
+        $this->strategy = new ConsensusStrategy();
     }
 
     public function provideMetResults()
@@ -76,7 +76,7 @@ class ConsensusStrategyTest extends TestCase
      */
     public function testMet($success, $failure, $total, $isMet)
     {
-        $this->assertSame($isMet, $this->quorum->isMet($success, $total));
+        $this->assertSame($isMet, $this->strategy->isMet($success, $total));
     }
 
     /**
@@ -84,6 +84,6 @@ class ConsensusStrategyTest extends TestCase
      */
     public function canBeMet($success, $failure, $total, $isMet)
     {
-        $this->assertSame($isMet, $this->quorum->canBeMet($failure, $total));
+        $this->assertSame($isMet, $this->strategy->canBeMet($failure, $total));
     }
 }

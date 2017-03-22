@@ -13,8 +13,8 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Quorum\UnanimousStrategy;
-use Symfony\Component\Lock\QuorumInterface;
+use Symfony\Component\Lock\Strategy\UnanimousStrategy;
+use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\Store\CombinedStore;
 use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\StoreInterface;
@@ -50,7 +50,7 @@ class CombinedStoreTest extends AbstractStoreTest
     }
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $quorum;
+    private $strategy;
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $store1;
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -60,11 +60,11 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function setup()
     {
-        $this->quorum = $this->getMockBuilder(QuorumInterface::class)->getMock();
+        $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
         $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
         $this->store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
 
-        $this->store = new CombinedStore(array($this->store1, $this->store2), $this->quorum);
+        $this->store = new CombinedStore(array($this->store1, $this->store2), $this->strategy);
     }
 
     /**
@@ -85,11 +85,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->with($key)
             ->willThrowException(new LockConflictedException());
 
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
@@ -119,11 +119,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->expects($this->once())
             ->method('delete');
 
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
@@ -135,7 +135,7 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testSaveAbortWhenQuorumCantBeMet()
+    public function testSaveAbortWhenStrategyCantBeMet()
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -148,11 +148,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->expects($this->never())
             ->method('save');
 
-        $this->quorum
+        $this->strategy
             ->expects($this->once())
             ->method('canBeMet')
             ->willReturn(false);
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
@@ -183,11 +183,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->with($key, $ttl)
             ->willThrowException(new LockConflictedException());
 
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
@@ -218,11 +218,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->expects($this->once())
             ->method('delete');
 
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
@@ -234,7 +234,7 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testputOffExpirationAbortWhenQuorumCantBeMet()
+    public function testputOffExpirationAbortWhenStrategyCantBeMet()
     {
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
@@ -248,11 +248,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->expects($this->never())
             ->method('putOffExpiration');
 
-        $this->quorum
+        $this->strategy
             ->expects($this->once())
             ->method('canBeMet')
             ->willReturn(false);
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
@@ -269,16 +269,16 @@ class CombinedStoreTest extends AbstractStoreTest
         $store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
         $store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
 
-        $store = new CombinedStore(array($store1, $store2), $this->quorum);
+        $store = new CombinedStore(array($store1, $store2), $this->strategy);
 
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
 
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->quorum
+        $this->strategy
             ->expects($this->once())
             ->method('isMet')
             ->with(2, 2)
@@ -300,11 +300,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->expects($this->never())
             ->method('exists');
 
-        $this->quorum
+        $this->strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->quorum
+        $this->strategy
             ->expects($this->once())
             ->method('isMet')
             ->willReturn(true);
@@ -312,7 +312,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->assertTrue($this->store->exists($key));
     }
 
-    public function testExistsAbortWhenQuorumCantBeMet()
+    public function testExistsAbortWhenStrategyCantBeMet()
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -325,11 +325,11 @@ class CombinedStoreTest extends AbstractStoreTest
             ->expects($this->never())
             ->method('exists');
 
-        $this->quorum
+        $this->strategy
             ->expects($this->once())
             ->method('canBeMet')
             ->willReturn(false);
-        $this->quorum
+        $this->strategy
             ->expects($this->once())
             ->method('isMet')
             ->willReturn(false);

@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\QuorumInterface;
+use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -32,16 +32,16 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
 
     /** @var StoreInterface[] */
     private $stores;
-    /** @var QuorumInterface */
-    private $quorum;
+    /** @var StrategyInterface */
+    private $strategy;
 
     /**
-     * @param StoreInterface[] $stores The list of synchronized stores
-     * @param QuorumInterface  $quorum
+     * @param StoreInterface[]  $stores   The list of synchronized stores
+     * @param StrategyInterface $strategy
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $stores, QuorumInterface $quorum)
+    public function __construct(array $stores, StrategyInterface $strategy)
     {
         foreach ($stores as $store) {
             if (!$store instanceof StoreInterface) {
@@ -50,7 +50,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
         }
 
         $this->stores = $stores;
-        $this->quorum = $quorum;
+        $this->strategy = $strategy;
         $this->logger = new NullLogger();
     }
 
@@ -72,12 +72,12 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
                 ++$failureCount;
             }
 
-            if (!$this->quorum->canBeMet($failureCount, $storesCount)) {
+            if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
                 break;
             }
         }
 
-        if ($this->quorum->isMet($successCount, $storesCount)) {
+        if ($this->strategy->isMet($successCount, $storesCount)) {
             return;
         }
 
@@ -112,12 +112,12 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
                 ++$failureCount;
             }
 
-            if (!$this->quorum->canBeMet($failureCount, $storesCount)) {
+            if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
                 break;
             }
         }
 
-        if ($this->quorum->isMet($successCount, $storesCount)) {
+        if ($this->strategy->isMet($successCount, $storesCount)) {
             return;
         }
 
@@ -161,10 +161,10 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
                 ++$failureCount;
             }
 
-            if ($this->quorum->isMet($successCount, $storesCount)) {
+            if ($this->strategy->isMet($successCount, $storesCount)) {
                 return true;
             }
-            if (!$this->quorum->canBeMet($failureCount, $storesCount)) {
+            if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
                 return false;
             }
         }

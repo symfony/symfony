@@ -34,7 +34,7 @@ trait BlockingStoreTestTrait
     public function testBlockingLocks()
     {
         // Amount a microsecond used to order async actions
-        $clockDelay = 30000;
+        $clockDelay = 50000;
 
         if (PHP_VERSION_ID < 50600 || defined('HHVM_VERSION_ID')) {
             $this->markTestSkipped('The PHP engine does not keep resource in child forks');
@@ -57,7 +57,7 @@ trait BlockingStoreTestTrait
                     $this->assertSame(0, pcntl_wexitstatus($status2));
                     $this->assertSame(3, pcntl_wexitstatus($status3));
                 } else {
-                    usleep(2 * $clockDelay);
+                    usleep(1 * $clockDelay);
 
                     try {
                         // This call should failed given the lock should already by acquired by the child #1

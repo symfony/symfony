@@ -1,0 +1,167 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-29T12:30:07Z
+
+When I worked on the Filesystem/LockHandler we (fab, niko, me) decided to not implement a  "lock component" because it was always very specific to each use case: one vs multiple server. lock in redis with a ttl, Redlock, etc.
+
+May be it's time to reconsider this and to introduce in symfony a new lock component.
+
+Anyway, about the end user API:
+
+I saw you arguments about `aquire` vs `lock`  and for what is worth is prefer `lock` and `release`.
+
+More over, I would prefer a system based on `false/true` than on exception.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2016-12-29T12:56:37Z
+
+Since you said the component is already full of Lock names, what about call the component `Mutex`?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-29T14:39:57Z
+
+Regarding the naming of the methods, I've been checking the practices of other languages:
+
+Python:
+
+```py
+lock = Lock()
+lock.acquire()       # waits if lock is already held
+lock.acquire(False)  # doesn't wait if lock is already held
+lock.release()
+if lock.locked()
+```
+
+Ruby:
+
+```ruby
+lock = Mutex.new
+lock.lock           # waits if lock is already held
+lock.try_lock       # doesn't wait if lock is already held
+lock.unlock
+if lock.locked?
+```
+
+PHP pthreads extension
+
+```php
+$lock = Mutex::create();
+Mutex::lock($lock);     // waits if lock is already held
+Mutex::trylock($lock);  // doesn't wait if lock is already held
+Mutex::unlock($lock);
+// no method to check if the lock is locked
+```
+
+Java:
+
+```java
+Lock lock = ...;
+lock.lock();        // waits if lock is already held
+lock.tryLock();     // doesn't wait if lock is already held
+lock.unlock();
+// no method to check if the lock is locked
+```
+
+It looks like the most common choice is: `lock`, `tryLock` and `unlock`
+
+---------------------------------------------------------------------------
+
+by jderusse at 2016-12-29T20:43:19Z
+
+- Moved the createLock factory in the StoreInterface
+  Create an AbstractClass to avoid dupplication of code (Could be a trait too, WDYT)
+- Remove the TokenGenerator
+
+API choices:
+
+IMO lock and unlock fit well when the subject is the resource. ie. `$resource->lock()` or `$handler->lock($resource)`;
+In this PR the subject is not the resource, but the Lock itself, in this case, I think the python naming is meaningful `$lock->acquire/release`.
+
+I like the split in lock/tryLock, I think I'll apply this change unless someone prefer the $blocking flag?
+
+About the return true/false vs \Exception. Personally, I see it like "lock me the resource right now" instead of "can you please lock the resource". If the lock is not acquired, it means sometinhg goes wrong, that's why I excpect an exception.
+But that's just my taste/opinion
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-01-01T19:14:34Z
+
+Pushed a new commit to remove the 2 interfaces `BlockingStoreInterface` and `ExpirableStoreInterface` and merge the methods into `StoreInterface`.
+
+At first it was a god thing to split it 3 interfaces to separate responsibilities, but I realize that it was a pain to decorate the stores because we both need to implement every interfaces and are not sure that the decorated store will implement every interfaces. In this case, the decorator don't know what to do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-10T22:51:28Z
+
+@jderusse you need to also add the new component in the `replace` key of the root `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2017-01-11T12:49:12Z
+
+I think a little explanation about clock drift (which is introduced) could be a plus, a link in code comment, or in the docs to automatically answer about the "why" when people look at the code could be useful:)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-01-11T20:37:52Z
+
+@ProPheT777 You're absolutely right, but this PR don't yet introduce a clock drift imlplementation.
+
+I'll do it in a next PR or in a other PR
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T13:43:42Z
+
+@jderusse Any news on this PR?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-02-16T20:11:48Z
+
+This PR looks good to me, (unless I missed a point: tell me what, I'll work on it)
+I just a push a new commit to fix the remaining issues in CI. (Failling tests are not related to this PR)
+
+In case you've missed it, the documentation is available [here](https://github.com/symfony/symfony-docs/pull/7364)
+And I start working the integration in the FrameworkBundle. see https://github.com/jderusse/symfony/pull/1 .
+I'm waiting this PR to be merged to open a officiall PR in the symfony/symfony repo
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-02-17T07:06:46Z
+
+I switch the Flag `deprecation` from `yes` to `no` given the deprecation of the `LockHandler` is not in this PR.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-17T08:35:00Z
+
+Just asking: would it make sense to change the name of the Quorum classes in CombinedStore to match the same naming as the Security component?
+
+`MajorityQuorum` -> `ConsensusStrategy`
+`UnanimousQuorum` -> `UnanimousStrategy`
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-02-17T11:20:20Z
+
+@javiereguiluz I don't choose similar name to avoid confusion with the AccessDecisionManager.
+
+I'm neither not totaly again the idea, if some people think it's better for Symfony to keep consistent, I'll do the change.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-17T15:46:11Z
+
+I think @javiereguiluz's idea is good, consistent names are important.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-02-28T09:01:55Z
+
+Thank you @HeahDude, comments takes into account.
+
+Failure test is not related to this PR.

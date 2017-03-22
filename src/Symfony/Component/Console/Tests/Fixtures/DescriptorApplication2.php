@@ -21,5 +21,6 @@ class DescriptorApplication2 extends Application
         $this->add(new DescriptorCommand1());
         $this->add(new DescriptorCommand2());
         $this->add(new DescriptorCommand3());
+        $this->add(new DescriptorCommand4());
     }
 }

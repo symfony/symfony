@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-21T15:14:05Z
+
+This targets 3.3, adding support for serialization mapping files outside of bundles.
+ping @dunglas

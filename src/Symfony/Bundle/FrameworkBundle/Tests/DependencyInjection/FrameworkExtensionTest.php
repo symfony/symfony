@@ -119,13 +119,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
     }
 
-    public function testProxies()
-    {
-        $container = $this->createContainerFromFile('full');
-
-        $this->assertEquals(array('127.0.0.1', '10.0.0.1'), $container->getParameter('kernel.trusted_proxies'));
-    }
-
     public function testHttpMethodOverride()
     {
         $container = $this->createContainerFromFile('full');

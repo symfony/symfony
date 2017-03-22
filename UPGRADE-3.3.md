@@ -126,6 +126,9 @@ FrameworkBundle
  * The `cache:clear` command should always be called with the `--no-warmup` option.
    Warmup should be done via the `cache:warmup` command.
 
+ * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been deprecated and will be removed in 4.0. Use the Request::setTrustedProxies() method in your front controller instead.
+
+
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass` class has been
@@ -175,13 +178,23 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` class instead.
 
- * The `server:run`, `server:start`, `server:stop` and 
-   `server:status` console commands have been moved to a dedicated bundle. 
-   Require `symfony/web-server-bundle` in your composer.json and register 
+ * The `server:run`, `server:start`, `server:stop` and
+   `server:status` console commands have been moved to a dedicated bundle.
+   Require `symfony/web-server-bundle` in your composer.json and register
    `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
 
  * The `Symfony\Bundle\FrameworkBundle\Translation\Translator` constructor now takes the
    default locale as 3rd argument. Not passing it will trigger an error in 4.0.
+
+HttpFoundation
+--------------
+
+ * The `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument - not setting it is deprecated.
+   Set it to `Request::HEADER_FORWARDED` if your reverse-proxy uses the RFC7239 `Forwarded` header,
+   or to `Request::HEADER_X_FORWARDED_ALL` if it is using `X-Forwarded-*` headers instead.
+
+ * The `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods are deprecated,
+   use the RFC7239 `Forwarded` header, or the `X-Forwarded-*` headers instead.
 
 HttpKernel
 -----------

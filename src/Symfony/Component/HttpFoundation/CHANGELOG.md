@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * added `$trustedHeaderSet` argument to `Request::setTrustedProxies()` - deprecate not setting it,
+ * deprecated the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods,
  * added `File\Stream`, to be passed to `BinaryFileResponse` when the size of the served file is unknown,
    disabling `Range` and `Content-Length` handling, switching to chunked encoding instead
  * added the `Cookie::fromString()` method that allows to create a cookie from a

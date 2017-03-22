@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-19T13:19:58Z
+
+Shouldn't the header bag part (the bug fix) be in a separated PR targeting older branches ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-19T13:27:42Z
+
+And of course this is one of those files that is different in all branches (`bag.html.twig`), making it hard to merge this approach upstream (as we would need to modify `headerbag.html.twig` as well)...
+
+Ie. the bug is fixed by a new feature :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-22T14:47:02Z
+
+Displaying multiple HTTP headers should be fixed in #20595.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-22T15:14:35Z
+
+Do you think the cookie panel is viable? I tend to like it (cookies shown as data objects that is).
+
+I can update the PR to only include that.. so multiple header fixes goes with #20595 ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-22T11:05:16Z
+
+@javiereguiluz now all the cookie hassle is fixed.. WDYT? (bug label can be removed)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T15:55:06Z
+
+@javiereguiluz Can you review this PR? Is it ok for you?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T20:08:22Z
+
+@ro0NL Can this one be merged?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-22T20:18:25Z
+
+@fabpot  for me yes :) rebased and updated. Waiting for travis.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T20:34:52Z
+
+@ro0NL Apparently, that breaks the tests.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-22T20:41:14Z
+
+Yeah im looking at it. Problem is asserting collected response cookies, due the var cloning thingy. It now happens at root level (https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php#L145) making it nearly impossible to mock.
+
+For now i added only an additional _instance of_ assertion, basically what we do for other public methods.

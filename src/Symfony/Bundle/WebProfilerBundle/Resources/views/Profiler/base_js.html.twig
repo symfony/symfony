@@ -88,16 +88,15 @@
         var successStreak = 4;
         var pendingRequests = 0;
         var renderAjaxRequests = function() {
-            var requestCounter = document.querySelector('.sf-toolbar-ajax-requests');
+            var requestCounter = document.querySelector('.sf-toolbar-ajax-request-counter');
             if (!requestCounter) {
                 return;
             }
             requestCounter.textContent = requestStack.length;
-            requestCounter.className = 'sf-toolbar-ajax-requests sf-toolbar-value';
 
             var infoSpan = document.querySelector(".sf-toolbar-ajax-info");
             if (infoSpan) {
-                infoSpan.textContent = requestStack.length + ' AJAX request' + (requestStack.length > 1 ? 's' : '');
+                infoSpan.textContent = requestStack.length + ' AJAX request' + (requestStack.length !== 1 ? 's' : '');
             }
 
             var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
@@ -138,7 +137,7 @@
 
             var statusCodeCell = document.createElement('td');
             var statusCode = document.createElement('span');
-            statusCode.textContent = '-';
+            statusCode.textContent = 'n/a';
             statusCodeCell.appendChild(statusCode);
             row.appendChild(statusCodeCell);
 
@@ -157,7 +156,7 @@
 
             var durationCell = document.createElement('td');
             durationCell.className = 'sf-ajax-request-duration';
-            durationCell.textContent = '-';
+            durationCell.textContent = 'n/a';
             row.appendChild(durationCell);
 
             var profilerCell = document.createElement('td');
@@ -199,6 +198,8 @@
                     statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
                 }
                 statusCodeElem.textContent = request.statusCode;
+            } else {
+                statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
             }
 
             if (request.duration) {
@@ -271,6 +272,7 @@
                             finishAjaxRequest(idx);
                         }, function (e){
                             stackElement.error = true;
+                            finishAjaxRequest(idx);
                         });
                         startAjaxRequest(idx);
                     }
@@ -498,7 +500,6 @@
     Sfjs.addEventListener(window, 'load', function() {
         Sfjs.createTabs();
         Sfjs.createToggles();
-        Sfjs.renderAjaxRequests();
     });
 
 /*]]>*/</script>

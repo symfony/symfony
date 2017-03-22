@@ -40,7 +40,6 @@ class Command
     private $ignoreValidationErrors = false;
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
-    private $inputBound = false;
     private $code;
     private $synopsis = array();
     private $usages = array();
@@ -217,13 +216,11 @@ class Command
         $this->mergeApplicationDefinition();
 
         // bind the input against the command specific arguments/options
-        if (!$this->inputBound) {
-            try {
-                $input->bind($this->definition);
-            } catch (ExceptionInterface $e) {
-                if (!$this->ignoreValidationErrors) {
-                    throw $e;
-                }
+        try {
+            $input->bind($this->definition);
+        } catch (ExceptionInterface $e) {
+            if (!$this->ignoreValidationErrors) {
+                throw $e;
             }
         }
 
@@ -650,14 +647,6 @@ class Command
         }
 
         return $this->helperSet->get($name);
-    }
-
-    /**
-     * @internal
-     */
-    public function setInputBound($inputBound)
-    {
-        $this->inputBound = $inputBound;
     }
 
     /**

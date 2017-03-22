@@ -1730,6 +1730,17 @@ INI;
 
         return $tests;
     }
+
+    public function testCanParseVeryLongValue()
+    {
+        $longStringWithSpaces = str_repeat('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ', 20000);
+        $trickyVal = array('x' => $longStringWithSpaces);
+
+        $yamlString = Yaml::dump($trickyVal);
+        $arrayFromYaml = $this->parser->parse($yamlString);
+
+        $this->assertEquals($trickyVal, $arrayFromYaml);
+    }
 }
 
 class B

@@ -175,7 +175,7 @@ class Parser
                     $this->refs[$isRef] = end($data);
                 }
             } elseif (
-                self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|(?:![^\s]+\s+)?[^ \'"\[\{!].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)
+                self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|(?:![^\s]++\s++)?[^ \'"\[\{!].*?) *\:(\s++(?P<value>.+))?$#u', $this->currentLine, $values)
                 && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))
             ) {
                 if ($context && 'sequence' == $context) {
@@ -209,7 +209,7 @@ class Parser
                     $mergeNode = true;
                     $allowOverwrite = true;
                     if (isset($values['value']) && 0 === strpos($values['value'], '*')) {
-                        $refName = substr($values['value'], 1);
+                        $refName = substr(rtrim($values['value']), 1);
                         if (!array_key_exists($refName, $this->refs)) {
                             throw new ParseException(sprintf('Reference "%s" does not exist.', $refName), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                         }
@@ -250,7 +250,7 @@ class Parser
                             $data += $parsed; // array union
                         }
                     }
-                } elseif (isset($values['value']) && self::preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
+                } elseif (isset($values['value']) && self::preg_match('#^&(?P<ref>[^ ]++) *+(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
                 }
@@ -258,7 +258,7 @@ class Parser
                 $subTag = null;
                 if ($mergeNode) {
                     // Merge keys
-                } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#') || (null !== $subTag = $this->getLineTag(ltrim($values['value'], ' '), $flags))) {
+                } elseif (!isset($values['value']) || '' === $values['value'] || 0 === strpos($values['value'], '#') || (null !== $subTag = $this->getLineTag($values['value'], $flags))) {
                     // hash
                     // if next line is less indented or equal, then it means that the current value is null
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
@@ -290,7 +290,7 @@ class Parser
                         }
                     }
                 } else {
-                    $value = $this->parseValue($values['value'], $flags, $context);
+                    $value = $this->parseValue(rtrim($values['value']), $flags, $context);
                     // Spec: Keys MUST be unique; first one wins.
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {

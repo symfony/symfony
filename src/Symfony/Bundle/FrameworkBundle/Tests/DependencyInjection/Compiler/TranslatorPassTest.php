@@ -12,8 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class TranslatorPassTest extends TestCase
 {
@@ -39,7 +41,15 @@ class TranslatorPassTest extends TestCase
             ->will($this->returnValue(array('xliff' => array(array('alias' => 'xliff', 'legacy-alias' => 'xlf')))));
         $container->expects($this->once())
             ->method('findDefinition')
-            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock()));
+            ->will($this->returnValue($translator = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock()));
+        $translator->expects($this->at(0))
+            ->method('replaceArgument')
+            ->with(0, $this->equalTo((new Definition(ServiceLocator::class, array(array('xliff' => new Reference('xliff')))))->addTag('container.service_locator')))
+            ->willReturn($translator);
+        $translator->expects($this->at(1))
+            ->method('replaceArgument')
+            ->with(3, array('xliff' => array('xliff', 'xlf')))
+            ->willReturn($translator);
         $pass = new TranslatorPass();
         $pass->process($container);
     }

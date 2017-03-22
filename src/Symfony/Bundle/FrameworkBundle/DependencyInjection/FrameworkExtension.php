@@ -954,11 +954,11 @@ class FrameworkExtension extends Extension
             }
 
             $options = array_merge(
-                $translator->getArgument(3),
+                $translator->getArgument(4),
                 array('resource_files' => $files)
             );
 
-            $translator->replaceArgument(3, $options);
+            $translator->replaceArgument(4, $options);
         }
     }
 

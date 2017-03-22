@@ -180,6 +180,9 @@ FrameworkBundle
    Require `symfony/web-server-bundle` in your composer.json and register 
    `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\Translator` constructor now takes the
+   default locale as 3rd argument. Not passing it will trigger an error in 4.0.
+
 HttpKernel
 -----------
 

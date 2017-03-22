@@ -968,7 +968,7 @@ class Request
     {
         if ($this->isFromTrustedProxy()) {
             if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
-                return $port;
+                return (int) $port;
             }
 
             if (self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && 'https' === $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO], 'http')) {
@@ -1217,9 +1217,9 @@ class Request
     public function getHost()
     {
         if ($this->isFromTrustedProxy() && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
-            $elements = explode(',', $host);
+            $elements = explode(',', $host, 2);
 
-            $host = $elements[count($elements) - 1];
+            $host = $elements[0];
         } elseif (!$host = $this->headers->get('HOST')) {
             if (!$host = $this->server->get('SERVER_NAME')) {
                 $host = $this->server->get('SERVER_ADDR', '');

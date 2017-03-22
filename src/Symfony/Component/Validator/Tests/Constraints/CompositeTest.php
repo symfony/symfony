@@ -128,6 +128,17 @@ class CompositeTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
+    public function testFailIfNoConstraintObject()
+    {
+        new ConcreteComposite(array(
+            new NotNull(array('groups' => 'Default')),
+            new \ArrayObject(),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
     public function testValidCantBeNested()
     {
         new ConcreteComposite(array(

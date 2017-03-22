@@ -117,9 +117,9 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Disables use of stty.
+     * Prevents usage of stty.
      */
-    public function disableStty()
+    public static function disableStty()
     {
         self::$stty = false;
     }

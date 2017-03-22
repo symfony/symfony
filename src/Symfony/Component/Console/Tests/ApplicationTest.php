@@ -477,6 +477,36 @@ class ApplicationTest extends TestCase
         }
     }
 
+    public function testFindAlternativesOutput()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $application->add(new \Foo3Command());
+
+        $expectedAlternatives = array(
+            'afoobar',
+            'afoobar1',
+            'afoobar2',
+            'foo1:bar',
+            'foo3:bar',
+            'foo:bar',
+            'foo:bar1',
+        );
+
+        try {
+            $application->find('foo');
+            $this->fail('->find() throws a CommandNotFoundException if command is not defined');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command is not defined');
+            $this->assertSame($expectedAlternatives, $e->getAlternatives());
+
+            $this->assertRegExp('/Command "foo" is not defined\..*Did you mean one of these\?.*/Ums', $e->getMessage());
+        }
+    }
+
     public function testFindNamespaceDoesNotFailOnDeepSimilarNamespaces()
     {
         $application = $this->getMockBuilder('Symfony\Component\Console\Application')->setMethods(array('getNamespaces'))->getMock();

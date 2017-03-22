@@ -1142,6 +1142,57 @@ class ApplicationTest extends TestCase
         $this->assertEquals('overriden', $tester->getInput()->getOption('extra'));
     }
 
+    public function testAddArgumentFromConsoleCommandEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getCommand()->addArgument('extra', InputArgument::REQUIRED);
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application
+            ->register('foo')
+            ->addOption('extra', null, InputOption::VALUE_REQUIRED)
+            ->setCode(function (InputInterface $input, OutputInterface $output) {
+                $output->write('foo.');
+            })
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', 'extra' => 'foo'));
+
+        $this->assertEquals('foo', $tester->getInput()->getArgument('extra'));
+    }
+
+    public function testAddAndSetArgumentFromConsoleCommandEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getCommand()->addArgument('extra', InputArgument::REQUIRED);
+            $event->getInput()->setArgument('extra', 'overridden');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application
+            ->register('foo')
+            ->addOption('extra', null, InputOption::VALUE_REQUIRED)
+            ->setCode(function (InputInterface $input, OutputInterface $output) {
+                $output->write('foo.');
+            })
+        ;
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+
+        $this->assertSame('overridden', $tester->getInput()->getArgument('extra'));
+    }
+
     public function testTerminalDimensions()
     {
         $application = new Application();

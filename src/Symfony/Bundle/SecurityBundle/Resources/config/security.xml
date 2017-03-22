@@ -102,10 +102,11 @@
 
 
         <!-- Firewall related services -->
-        <service id="security.firewall" class="Symfony\Component\Security\Http\Firewall">
+        <service id="security.firewall" class="Symfony\Bundle\SecurityBundle\EventListener\FirewallListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="security.logout_url_generator" />
         </service>
         <service id="Symfony\Component\Security\Http\Firewall" alias="security.firewall" public="false" />
 

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-17T16:43:26Z
+
+Can you add a unit test to avoid regressions? Thanks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-17T19:10:15Z
+
+@fabpot maybe 72374eb should target 2.7 to ease future upstream merges/diffs...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-17T19:18:22Z
+
+Indeed, merging it in 2.7 would greatly help
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-17T19:21:33Z
+
+Would a PR do? Can you also please have a look at #19776 and decide what to do? I'd prefer this PR as a whole (all fixes can target master).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-05T03:08:38Z
+
+Can you rebase on current master?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-05T17:48:36Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T17:34:24Z
+
+@ro0NL Sorry about that but can you rebase one last time? When done, ping me so that I can merge ASAP to avoid any problems. Thanks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-22T18:39:07Z
+
+@fabpot done. Replayed the before/after scenarios once more, and still all good. Waiting for travis though :)
+
+edit: green :)

@@ -1,0 +1,322 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-27T10:35:31Z
+
+~I'm personally against this suggestion, especially now that autowiring the constructor is a lot easier: https://github.com/symfony/symfony/pull/21164#issuecomment-270857003~
+
+@nicolas-grekas made some excellent points regarding DX. I will not use it myself, but it's beneficial when it comes to lazy loading, which can fully replace the container usage, which I highly encourage!
+
+> If you ask me:
+> - **Constructor** stateless dependencies, e.g. services, things that are the same no matter what action is called.
+> - **Action** stateful dependencies, e.g. entities, parameters or other objects that can have different states each time it gets called.
+>
+>The session can be different each time it's called, therefore it shouldn't be a constructor dependency. However, when using the `Request::getSession()`, you don't have access to `getFlashBag()`, which is `Session` specific.
+
+I think that adding the ability to "inject" services into the action arguments, will add a layer of magic that makes it more complex in combination with autowiring.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-06T15:42:21Z
+
+Now with explicit wiring:
+`<tag name="routing.controller" action="fooAction" argument="logger" id="logger"/>`
+repeat the tag for several args/actions.
+
+And with tests.
+PR is thus ready.
+Status: needs review
+
+@iltar: except when there is only one action (e.g. `__invoke` style - but this is not the general case), constructor injection is not an option for controllers, because this kind of injection misses a core property that is required here: laziness.
+
+That's why people inject the container instead in fact (and/or extend the base controller really).
+We all know that injecting the container is an anti-pattern - the bad kind of service locators.
+
+By injecting services into actions, we get laziness, and we ask people for writing a type hint instead of calling `$this->get('foo')`. This makes dependencies explicit - thus helps the reader, and the IDE (auto-completion without the clever phpstorm plugin for Symfony). DX wise, it's a good trade - an enjoyable one to me.
+
+The alternatives we have that provide laziness are getter injection - and [service subscribers](https://github.com/symfony/symfony/pull/21708). But these won't provide the same DX here (getter injection is nice when shipped via a trait, see #18193).
+
+All in all, this will provide a seamless DX to me, without making people write "bad" code anymore.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-06T17:32:55Z
+
+Will this make it possible to do something like `<tag name="routing.controller">` and have it registered as service? This would replace the annotation for me:
+```php
+/**
+ * @Route(service="...")
+ */
+class FooController {}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-06T18:22:13Z
+
+@iltar so, this is good to you now? cool :)
+About your question, this won't help (#21282 could). Maybe `ContainerControllerResolver` could do a by-fqcn lookup in the container? Dunno if that'd be a good idea thought. I'll let you give it a try if you want :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-06T18:23:07Z
+
+@nicolas-grekas I'm not against it and your argument makes sense!
+
+---------------------------------------------------------------------------
+
+by simensen at 2017-03-07T00:05:14Z
+
+I need to look at the actual implementation in more detail, but what is described here sounds pretty close to what I was hoping for in this implementation.
+
+I also like this bit:
+
+```
+<tag name="routing.controller" action="fooAction" argument="logger" id="my_logger"/>
+```
+
+What would I want to do if I wanted to have all actions mapped automatically and also map a specific service? Would it work like this?
+
+```
+<tag name="routing.controller" action="*Action"/>
+<tag name="routing.controller" action="fooAction" argument="logger" id="my_logger"/>
+```
+
+... or even:
+
+```
+<tag name="routing.controller" action="fooAction"/>
+<tag name="routing.controller" action="fooAction" argument="logger" id="my_logger"/>
+```
+
+How would `__invoke` be handled? Would it be possible to assume `__invoke` if `action` is not specified? For example, if you had a simple controller that only had `__invoke`, you could do this?
+
+```
+<tag name="routing.controller"/>
+```
+
+All-in-all, I think I like this approach. I know you had some technical reasons why it might not be the best way to go. Were there any things you've done in this PR that you wish you could have done differently?
+
+Tentative :+1: from me for now. :) Super excited about this direction!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-07T08:14:22Z
+
+@simensen:
+
+> Would it work like this?
+```
+<tag name="routing.controller" action="*Action"/>
+<tag name="routing.controller" action="fooAction" argument="logger" id="my_logger"/>
+```
+Yes! You'd just need one more thing to have the DX you envision: enable autowiring on the definitions that have these tags. The "routing.controller" does not enable autowiring automatically (that'd be coupling), but it plays well with autowired definitions (that's composition).
+
+```
+<tag name="routing.controller" action="fooAction"/>
+<tag name="routing.controller" action="fooAction" argument="logger" id="my_logger"/>
+```
+That one would be redundant, only the second tag is needed.
+
+> Would it be possible to assume `__invoke` if `action` is not specified?
+
+As you know, I wondered the same. Thinking about this, it doesn't make much sense for `__invoke`-style controllers to use the "routing.controller" tag: they could very well use classical constructor injection. That'd be what I'd recommend in fact.
+As such, the "action" attribute is required. An exception is thrown if it's missing.
+
+> you had some technical reasons why it might not be the best way to go.
+
+They vanished now that we have #21770, which serves as the infrastructure that this PR leverages.
+
+I'm really happy with the PR as is :)
+
+---------------------------------------------------------------------------
+
+by simensen at 2017-03-07T14:38:31Z
+
+@nicolas-grekas:
+
+> I'm really happy with the PR as is :)
+
+That makes *me* happy. :)
+
+I'm a bit lost on this:
+
+> enable autowiring on the definitions that have these tags
+
+Does this mean that if autowiring is defined for the controller in question then autowiring is used but if not then it isn't?
+
+> ... it doesn't make much sense for __invoke-style controllers to use the "routing.controller" tag: they could very well use classical constructor injection. That'd be what I'd recommend in fact.
+
+What about closures? Or is that something we don't need to worry about supporting in core? For example, Silex-style closures:
+
+```
+$app->get('/', function (Request $request, PostRepository $postRepository) {
+    // ...
+});
+```
+
+This might be well out of scope so I'm not going to worry about this too much. Mostly just curious if this would somehow be covered?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-07T14:41:41Z
+
+> if autowiring is defined for the controller in question then autowiring is used but if not then it isn't?
+
+yep
+
+> What about closures?
+
+All of this is bound to Symfony's DIC (almost all the logic is in a compiler pass), so Silex would need its own wiring system.
+
+---------------------------------------------------------------------------
+
+by simensen at 2017-03-07T14:43:29Z
+
+> All of this is bound to Symfony's DIC (almost all the logic is in a compiler pass), so Silex would need its own wiring system.
+
+Got it. Makes sense.
+
+---
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-08T19:32:23Z
+
+I just found two edges to polish:
+- magic php methods (all those starting with double underscore) are now skipped by wildcard actions
+- the service value resolver is unregistered if there is no controllers using the tag at all
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-08T22:36:02Z
+
+Question to reviewers: should the pass be moved to HTTP kernel? The tag be renamed ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-09T01:34:58Z
+
+Hi guys!
+
+This is really interesting! I think the approach of putting the arguments for each controller into its own ServiceLocator service is super clever and powerful!
+
+I think this PR may contain the best possible way to implement this feature. But, it still may not be good enough, because it's error prone. I mean, it's too easy for the user to make an error. And that error will be have a clear message.
+
+For example,, if you do everything correct, but configure your route to *not* use the service syntax (e.g. you use `AppBundle:Foo:bar`, or you use `@Route`, without explicitly specifying the service id above the controller). Or, you do everything right, use `action: *Action`, but then accidentally forget to suffix your method with `Action` (e.g. because you're using `@Route`... where this is easy to do and perfectly legal). In these cases, instead of the user getting a clear, compile-time error, they'll get a strange run-time error - i.e. `controller requires that you provide a value for the $logger argument...` - but no indication as to *why* this is not working. It might even be working for one controller, but not for another.
+
+Backing up, in a perfect world, this argument resolver would work for *all* controllers, regardless of how they are registered or used. This is how all the other argument resolvers work. The big problem is that the type-hint => service resolution (i.e. autowiring) is only done during container compile time. But controllers are only ever known at runtime. Sure, we could even read the routing configuration at compile time to try to get a list of all of the controllers, but even that falls short: it wouldn't catch controllers used in sub-requests (e.g. `render(controller())` in Twig or forwarding).
+
+tl;dr The implementation of *how* we determine the service arguments for a controller method, store them and look them up is not the problem - it's pretty brilliant actually. The problem is that there is no decent way to know all of the controllers in the system at compile time. And unless we can figure that out, I don't think this feature works.
+
+Thoughts & ideas?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-09T07:38:44Z
+
+@weaverryan all metadata required is known, so regarding error messages, it would need some extra inspection when throwing the exception to determine a more developer friendly error.
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Controller/ArgumentResolver.php#L50-L79
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-09T17:39:44Z
+
+PR updated. Everything now moved to `HttpKernel`, tag renamed to `controller.service_arguments`.
+
+When the tag is set, all public methods are now considered for generating a service-locator based argument-resolver.
+This means the "action" attribute is now optional. If provided, it doesn't accept wildcards anymore. It must now be accompanied by the "argument" and "id" attributes. Eg same as before:
+`<tag name="controller.service_arguments" action="fooAction" argument="logger" id="my_logger"/>`
+
+All public methods are considered for generating a service-locator: in fact, methods that are listed to be called at instantiation time (ie the one returned by `Definition::getMethodCalls()`) are excluded of course.
+
+So, we now have two passes:
+- the first looks like a restricted version of the previous one (no wildcard support, all methods considered as service-locator generator candidates) - it generates the service locators;
+- the second one runs just before removing passes, and removes any emptied service-locators (because of "ignore-on-invalid" processing), and any service-locators bound to call-at-instantiation methods.
+
+There is a possibility that this may generate some unused service-locators, bound to public methods that are not used as actions. Yet, that should be rare and that'll be just dead code with no practical downside, especially compared to the huge +-side of not having to configure anything.
+
+> if you do everything correct, but configure your route to not use the service syntax
+
+this PR provides nothing new on this topic: today also, if you add a bogus argument to an action (eg a bad type hint for a doctrine entity with the proper argument resolver configured), then the controller fails when it is called without earlier notice. There is no chance to make anything better here, at least that's not what this PR is about - entities or services or whatever.
+
+> use action: *Action, but then accidentally forget to suffix your method with Action
+
+valid concern, fixed! see description above.
+
+> in a perfect world, this argument resolver would work for all controllers
+
+not in *my* perfect world! I certainly do not want to have services come in when I did not ask for!
+Doing so would mean relying on some global mechanism that knows better than me *which* services should be injected. One may think that, well, just do `$container->get(MyTypeHint::class)`, or `$autowirer->getTheServiceThatMatches(LoggerInterface::class)`. If so, please realize that this is applying a convention that you can't escape from. Symfony has always provided the opposite, via flexible OOP architectures that you can use however you want/need (no hard-coded conventions - and no runtime introspection).
+
+> The problem is that there is no decent way to know all of the controllers in the system at compile time.
+
+As stated, that's certainly not a problem to me, quite the contrary.
+Keeping things simple means *not* doing that kind of global things.
+Instead, Symfony has always chosen the "be explicit" path.
+No exception here.
+
+> when the user makes a mistake, we must tell them exactly what went wrong - no wtf moments
+
+I really like that approach, thanks for pushing it to us.
+So, on this topic, the code has many checks/exceptions thrown in each possible bad situations.
+In situations where things cannot be decided as legitimate or mistake, I added log messages so that the user can inspect what's going on by looking at them.
+
+@weaverryan, I think I addressed all your concerns :)
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-03-10T12:38:05Z
+
+Instead of that. Why not promote one Action per class. Then everything works with constructor autowiring which is already in core
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-10T18:50:17Z
+
+"service" attribute renamed to "id" for consistency with existing practice.
+@mvrhov classical actions are still first class citizens.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-12T03:33:35Z
+
+Awesome! So this new approach is very interesting - it removes several of the issues I was having earlier!
+
+Before we dive further into the details, the implementation makes me realize something: from a *purely* technical perspective, this feature could work *without* the controllers being services. If I told you that I wanted service auto-completion on my `AppBundle\Controller\SecurityController` actions, then you could create a service locator for all of those arguments. After all, the `RegisterControllerArgumentLocatorsPass` does not actually rely on the controller being a service... other than this is the way you opt into this feature. But (again, from a purely technical perspective... just stay with me), it would be equally possible to allow the user to opt into this feature without needing to register the controller as a service. For example:
+
+```yml
+framework:
+    controllers_service_arguments:
+        AppBundle\Controller: true
+        # .. and you could probably have config to control specific args...
+```
+
+I'm not proposing this is a superior syntax! It just strikes me as a bit unnatural that we're requiring the controllers to be services... when we don't really need that! In fact, one of my original comments was this:
+
+> if you do everything correct, but configure your route to not use the service syntax, then the feature doesn't work.
+
+You said you didn't do anything to address this... but you did! Thanks to this line in `RegisterControllerArgumentLocatorsPass`:
+
+```php
+if ($id === $class) {
+    $controllers[$id.'::'.$r->name] = new Reference($argsId);
+}
+```
+
+It is now possible to register a controller as a service via the PSR-4 loader, but then refer to it using the non-service syntax. Yes: as long as your register the controller as a service with the correct tag, you are then allowed to use it NOT as a service, but enjoy the service argument injection. I can imagine this conversation:
+
+> Person 1) I can't get Symfony to auto-inject my LoggerInterface argument to my controller
+> Person 2) Just register the controllers as services, and it'll work
+
+But in reality, Person 1 is still not actually using their controller as a service. This whole situation is what made me realize that the requirement that the controllers be services is unnatural... simply because the feature itself doesn't require it! Even if everyone was creating all controllers as services, I still think the implementation shouldn't rely on this unrelated thing.
+
+So:
+
+1) I 100% agree that you should be able to opt into / opt out of this feature (and somehow control edge case services - i.e. the `action`, `id`, `argument` options in your implementation)
+
+2) But, since the implementation doesn't rely on controllers being services, I think the opt-in should be done in a different, but similar way - i.e. by pointing at what classes you want this for. Then, the controller names in the service locator would be keyed almost exactly like now: using the `className::methodName` syntax (`arguments.AppBundle\Controller\SecurityController::loginAction`) and also any service ids that match the class name (e.g. `arguments.AppBundle\Controller\SecurityController:loginAction` or `security_controller:loginAction` if I created a custom service id).
+
+What are your thoughts about this? And thanks :)

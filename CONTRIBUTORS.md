@@ -841,7 +841,7 @@ Symfony is the result of the work of many people who made the code better
  - Robin Lehrmann (robinlehrmann)
  - Troy McCabe
  - Ville Mattila
- - ilyes kooli
+ - ilyes kooli (skafandri)
  - Boris Vujicic (boris.vujicic)
  - Max Beutel
  - Antanas Arvasevicius
@@ -1521,7 +1521,6 @@ Symfony is the result of the work of many people who made the code better
  - tirnanog06
  - phc
  - Дмитрий Пацура
- - ilyes kooli
  - Matthias Althaus
  - Michaël VEROUX
  - Julia

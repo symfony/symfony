@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * added `Symfony\Component\Form\FormErrorIterator::findByCodes()`
  * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
  * added `FormPass`
 

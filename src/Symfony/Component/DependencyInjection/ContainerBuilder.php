@@ -416,13 +416,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return $this
      *
-     * @throws BadMethodCallException When this ContainerBuilder is frozen
-     * @throws \LogicException        if the container is frozen
+     * @throws BadMethodCallException When this ContainerBuilder is compiled
+     * @throws \LogicException        if the extension is not registered
      */
     public function loadFromExtension($extension, array $values = array())
     {
-        if ($this->isFrozen()) {
-            throw new BadMethodCallException('Cannot load from an extension on a frozen container.');
+        if ($this->isCompiled()) {
+            throw new BadMethodCallException('Cannot load from an extension on a compiled container.');
         }
 
         $namespace = $this->getExtension($extension)->getAlias();
@@ -493,13 +493,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      *
-     * @throws BadMethodCallException When this ContainerBuilder is frozen
+     * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function set($id, $service)
     {
         $id = $this->normalizeId($id);
 
-        if ($this->isFrozen() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
+        if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
             // setting a synthetic service on a frozen container is alright
             throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a frozen container is not allowed.', $id));
         }
@@ -601,12 +601,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param ContainerBuilder $container The ContainerBuilder instance to merge
      *
-     * @throws BadMethodCallException When this ContainerBuilder is frozen
+     * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function merge(ContainerBuilder $container)
     {
-        if ($this->isFrozen()) {
-            throw new BadMethodCallException('Cannot merge on a frozen container.');
+        if ($this->isCompiled()) {
+            throw new BadMethodCallException('Cannot merge on a compiled container.');
         }
 
         $this->addDefinitions($container->getDefinitions());
@@ -922,12 +922,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition the service definition
      *
-     * @throws BadMethodCallException When this ContainerBuilder is frozen
+     * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function setDefinition($id, Definition $definition)
     {
-        if ($this->isFrozen()) {
-            throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
+        if ($this->isCompiled()) {
+            throw new BadMethodCallException('Adding definition to a compiled container is not allowed');
         }
 
         $id = $this->normalizeId($id);

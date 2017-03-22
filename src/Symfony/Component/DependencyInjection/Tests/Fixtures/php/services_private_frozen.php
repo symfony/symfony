@@ -48,7 +48,15 @@ class ProjectServiceContainer extends Container
      */
     public function compile()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isCompiled()
+    {
+        return true;
     }
 
     /**
@@ -56,6 +64,8 @@ class ProjectServiceContainer extends Container
      */
     public function isFrozen()
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+
         return true;
     }
 

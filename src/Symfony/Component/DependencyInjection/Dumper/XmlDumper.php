@@ -73,7 +73,7 @@ class XmlDumper extends Dumper
             return;
         }
 
-        if ($this->container->isFrozen()) {
+        if ($this->container->isCompiled()) {
             $data = $this->escape($data);
         }
 

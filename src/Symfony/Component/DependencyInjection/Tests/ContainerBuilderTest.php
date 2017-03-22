@@ -848,7 +848,7 @@ class ContainerBuilderTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testThrowsExceptionWhenSetServiceOnAFrozenContainer()
+    public function testThrowsExceptionWhenSetServiceOnACompiledContainer()
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -857,7 +857,7 @@ class ContainerBuilderTest extends TestCase
         $container->set('a', new \stdClass());
     }
 
-    public function testThrowsExceptionWhenAddServiceOnAFrozenContainer()
+    public function testThrowsExceptionWhenAddServiceOnACompiledContainer()
     {
         $container = new ContainerBuilder();
         $container->compile();
@@ -865,7 +865,7 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame($foo, $container->get('a'));
     }
 
-    public function testNoExceptionWhenSetSyntheticServiceOnAFrozenContainer()
+    public function testNoExceptionWhenSetSyntheticServiceOnACompiledContainer()
     {
         $container = new ContainerBuilder();
         $def = new Definition('stdClass');
@@ -879,7 +879,7 @@ class ContainerBuilderTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
+    public function testThrowsExceptionWhenSetDefinitionOnACompiledContainer()
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);

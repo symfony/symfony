@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-21T09:13:59Z
+
+A quick question: when there are no Ajax requests, the entire Ajax panel is hidden. Do you really see it when you have 0 requests?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-21T09:15:33Z
+
+Yes on hover.. and it's ugly ;-)
+
+edit: not sure if that's actually intended though?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-21T09:18:15Z
+
+@ro0NL that's a Symfony bug. There's no Ajax panel when there are no Ajax requests:
+
+![no-ajax-requests](https://cloud.githubusercontent.com/assets/73419/21383575/be346cbc-c766-11e6-9ece-744616c34763.gif)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-21T09:19:11Z
+
+Hmz interesting. I also noticed `span.sf-toolbar-ajax-requests` implicitly inherits styling from `table.sf-toolbar-ajax-requests` (hence the class rename) which feels buggy.
+
+edit: @javiereguiluz it's a regression i guess; i cannot rebase this PR onto 3.2 in any way. Feel free to add a commit and re-fix it :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-12-21T13:37:15Z
+
+Hmm maybe we need a new tag for this "improvement"?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-21T15:34:59Z
+
+Updated. Havent tracked back where this got broken, so im not sure how it was done before.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-22T10:28:29Z
+
+It seems to behave the same as latest 3.2 now, only difference i spotted 3.2 handles failures a bit different;
+
+![image](https://cloud.githubusercontent.com/assets/1047696/21422757/8c302dae-c839-11e6-8e87-4b167d10baeb.png)
+
+There's no red block in 3.3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T14:02:22Z
+
+@javiereguiluz What do we do with this one? Is it a bug that should be fixed in 3.2 as well? Do we have a regression in current master (or even several as noted in the latest @ro0NL's comment)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T15:31:06Z
+
+@javiereguiluz Can you have a look at this one?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-01T15:40:43Z
+
+@fabpot  @javiereguiluz regression is caused by #20197 (see https://github.com/symfony/symfony/pull/20197/files#diff-de00cc2fe56e59a48a4d26e7a0dccca3L133) (for the red block at least)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-04T10:18:20Z
+
+Investigated it a bit further..
+
+The display:none not being applied initially behaves really weird; after a few refreshes it works.
+
+```js
+var requestCounter = document.querySelector('.sf-toolbar-ajax-requests');
+if (!requestCounter) {
+   return;
+}
+```
+
+seems to false-positive sometimes. This is related to the window.load event concurring with the xhr load event.
+
+The second issue with the red status block not working is because the JS promise gets rejected due CORS policy (same as in 3.2), however we dont reach `finishAjaxRequest` in that case (for 404 responses etc. it works as expected).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-04T11:11:04Z
+
+@fabpot @javiereguiluz  we're all good :+1:
+
+Part of the regression was caused by a missing else case, which actually happened before (https://github.com/symfony/symfony/pull/20197/files#diff-de00cc2fe56e59a48a4d26e7a0dccca3L137)

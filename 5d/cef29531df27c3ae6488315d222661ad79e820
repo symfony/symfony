@@ -1,0 +1,291 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T15:58:17Z
+
+Could additionally also display the cache and log dirs here.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-07-03T18:33:10Z
+
+Nice one!
+To be consistent with other commands, I would change the name to `debug:kernel` ;)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T19:32:18Z
+
+`debug:kernel` is just fine i guess. Btw fabbot.io is wrong?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-07-03T19:33:32Z
+
+See the fabbot.io patch.
+http://fabbot.io/report/symfony/symfony/19278/76811f35f3e69377ef8298546259bc15b0791b60
+You inversed the type and var name in the `@param` phpdoc section.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T19:35:07Z
+
+Nah it's the inline `@var`... afaik this is the way to typehint inline variables.. =/
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T19:46:33Z
+
+What if you try `/** @var $foo Bar */`?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T19:50:58Z
+
+Last thing i could think of is adding some PHP / caching / platform info.. but other then that.. i like it :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-03T21:58:54Z
+
+Nice improvement! Can you add tests for this new command?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-04T05:30:41Z
+
+Before reviewing the code, I'm wondering which problems it solves? What's the added value? Symfony already has quite a few built-in commands, so adding a new one should be considered carefully, it should add some value. Here, why and when would I use this command?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-04T06:36:41Z
+
+I would mainly use this command to have a "CLI WDT" for applications that do not have pages that are able display the WDT; APIs and Command Line related (e.g. cron).
+
+Additionally, options could be passed along to only display a certain setting. This way you can easily collect a lot of info of multiple applications at once. This is great when trying to streamline applications. As my company has at least 15 applications running at all times, it would make finding inconsistencies between kernels easier. It would also help detect which bundles we use in which environment and easily compare without having to check different source files.
+
+Just my 2 cents of why I'd like to have this feature.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-04T07:17:02Z
+
+For me; i want to leave the CLI as little as possible. Not want to dive into code / visit websites to get some (version) specifications. Also consider a environment where colleagues have their own workingcopy, docker container etc. I want to debug/review/troubleshoot their setup in a blink of an eye.
+
+Besides that, it's definitely nice to have, which always counts for value imo.
+
+edit: @iltar even the WDT doesnt expose all information like EOL, EOM etc. ;-) Ie. i would also like to see this info from there (different story ;-)).
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2016-07-05T11:49:17Z
+
+@ro0NL I don't realy see the value of this command _in the framework_. How about make a Bundle to share this command ? If you have a lot of Symfony websites to manage, could be nice to return theses useful informations into a dashboard :)
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-05T16:17:17Z
+
+A whole bundle for 1 command is a bit much :) but i'm really not a package maintainer or so. If it's not accepted, and you like, it's here to take :+1:
+
+Anyway, why it _should_ be accepted :) These are framework specs, numbers, etc., hence the framework should also expose them, preferably from the CLI (imo). But yes, also from the WDT as some specs may differ (however that's not what this PR is about).
+
+Basicly it's about, is the info useful enough yes/no. I would say yes, (for me) especially when entering someone else's application (work, opensource "editions", my environment, docker environments, etc.) to get a quick scan of whats going on. I.e. big :+1: for me if i can do this in whatever symfony (full-stack) application.
+
+We could argue this needs a dedicated command vs. `bin/console -V --verbose`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-06T15:15:44Z
+
+Maybe we should explicitly split symfony specs from kernel specs (although code-wise it's all kernel related, stuff like `Kernel::VERSION` is basicly about symfony).
+
+![image](https://cloud.githubusercontent.com/assets/1047696/16623178/31a237e0-439d-11e6-930b-3729919a6439.png)
+
+ping @stof
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-06T15:59:39Z
+
+The bundle list looks really chaotic, have you tried what it would look like if you'd introduce a 3rd column for it?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-06T16:51:03Z
+
+Not sure =/
+
+![image](https://cloud.githubusercontent.com/assets/1047696/16626664/3c89bc16-43aa-11e6-9bf4-297a8b1de3a1.png)
+
+We could also do `bin/console debug:kernel --with-bundles` showing all bundles + info, making the table really long :)
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-06T17:09:39Z
+
+I would be 👍 for the option, it's a bit that won't render well on small screens
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-06T20:32:08Z
+
+![image](https://cloud.githubusercontent.com/assets/1047696/16633255/b201f378-43c8-11e6-8375-2ab682f58577.png)
+could work
+
+We can also leave the path out, and keep it a simple list. Perhaps later someone can enhance it with detailed bundle information.
+
+---------------------------------------------------------------------------
+
+by sh4ka at 2016-07-19T09:09:36Z
+
+Excellent command. What do you think about adding a third horizontal separator for the directories? You have 'Symfony', 'Kernel', what about 'Directories'?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-20T10:21:35Z
+
+Not sure.. the directories are kernel metadata. The 2 lines separating directories and bundles was just my own creativity :angel: to create some form of grouping (of kernel metadata).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-06T07:50:05Z
+
+Final thoughts; Goal of this PR is to bring (more) parts of the WDT to the console.
+
+Why?
+- Prefer console when possible ([ref1](https://github.com/symfony/symfony/pull/19278#issuecomment-230215707), [ref2](https://github.com/symfony/symfony/pull/19278#issuecomment-230221612))
+- Specific values could actually differ from web (ie. php.ini related)
+
+How?
+- Add useful commands in the `debug:` namespace (imo. this represents WDT for console), ie. we have a lot already :+1:
+- Basically this brings the _WDT Configuration_ panel to the console..
+  - Ie. what about naming it `debug:system` or `debug:application`?
+  - Relates to #20126 in terms of having the same info in the WDT
+  - Define the same set of groups for the console command as well as the WDT panel, meaning on both sides we consistently have;
+
+```
+Symfony / Framework
+- Version / Version ID
+- EOM / EOL
+
+Kernel / Application
+- Type / Name / Env / Debug
+- Paths / Bundles
+
+PHP / System
+- Version
+- Caching / Acceleration / Xdebug
+- Charset / TImezone / Locale
+```
+
+Worth it?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-06T09:41:32Z
+
+One thing I often notice people having trouble with, is that Apache and CLI use a different php.ini, perhaps that could be listed in both the WDT and CLI?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-06T09:43:42Z
+
+You mean to reference the path to php.ini somewhere?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-06T09:16:10Z
+
+@iltar I agree. I'm going to create a PR soon for the WDT to see if others agree. Thanks!
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-06T09:22:15Z
+
+@ro0NL exactly! I see questions coming by on IRC regarding stuff that works on the CLI but not the web and vica versa and most of the time helping with those issues, is explaining that PHP has different php.ini files and where/how to find them.
+
+edit: the replies are in a borked up sequence
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T10:27:19Z
+
+Updated to
+
+![image](https://cloud.githubusercontent.com/assets/1047696/20244926/17d45200-a994-11e6-98ae-f9ec735f9d63.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-13T15:23:04Z
+
+Reading the output of the command, it looks like it's more about the config than debug, right?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T15:37:13Z
+
+More or less..., i guess its main purpose is to debug while it's actually showing config. What do you propose?
+
+I just had this wild idea of a global _about_ command.. `bin/console about` that is.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-13T15:41:19Z
+
+Indeed, I like the `about` command better. What others think?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-13T15:57:15Z
+
+I like `about` a lot!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T16:05:25Z
+
+Done. Love it.
+
+Current command description is `Displays information about the current installation`. Is this ok?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T16:37:44Z
+
+Also playing around with adding some git info (reading straight from `.git/HEAD`). WDYT?
+
+![image](https://cloud.githubusercontent.com/assets/1047696/20247248/c564708e-a9c7-11e6-8f30-60ec36e0f81d.png)
+
+![image](https://cloud.githubusercontent.com/assets/1047696/20247250/d1b8b8f4-a9c7-11e6-81e7-947c6f2b76a8.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-13T16:50:33Z
+
+@ro0NL I don't have an opinion about your last proposal ... but I recommend you to not add any other feature to the command. Otherwise we won't be able to stabilize it on time for Symfony 3.2.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T16:55:59Z
+
+Agree. I wouldnt mind though if this becomes a longer table list in the future (i like specs :)), but we should consider each entry carefully.
+
+Last but not least, im considering to remove the bundle paths. Not sure how useful those actually are :confused: it would cleanup the output a lot :)
+
+It could be even a comma separated value perhaps, in case of many bundles.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-13T17:04:42Z
+
+I would suggest to add "Base directory" without Git info, but renamed to "Root directory" which looks more like the "App directory".
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T17:15:32Z
+
+Root is relative to the kernel group, ie. it reflects `getRootDir`. Not sure we should mix&match.. but agree this could be confusing.
+
+Also reconsidered adding the base directory, you probably know where your project lives already.

@@ -1687,6 +1687,21 @@ YAML;
         $this->parser->parse($yaml);
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Unable to parse at line 1 (near "[parameters]").
+     */
+    public function testParsingIniThrowsException()
+    {
+        $ini = <<<INI
+[parameters]
+  foo = bar
+  bar = %foo%
+INI;
+
+        $this->parser->parse($ini);
+    }
+
     private function loadTestsFromFixtureFiles($testsFile)
     {
         $parser = new Parser();

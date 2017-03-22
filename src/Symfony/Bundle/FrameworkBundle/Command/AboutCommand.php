@@ -47,10 +47,6 @@ class AboutCommand extends ContainerAwareCommand
         /** @var $kernel KernelInterface */
         $kernel = $this->getContainer()->get('kernel');
         $baseDir = realpath($kernel->getRootDir().DIRECTORY_SEPARATOR.'..');
-        $bundles = array_map(function ($bundle) use ($baseDir) {
-            return $bundle->getName();
-        }, $kernel->getBundles());
-        sort($bundles);
 
         $io->table(array(), array(
             array('<info>Symfony</>'),

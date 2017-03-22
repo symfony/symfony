@@ -883,9 +883,8 @@ class FrameworkExtension extends Extension
     private function createJsonManifestVersion(ContainerBuilder $container, $manifestPath, $name)
     {
         $def = new ChildDefinition('assets.json_manifest_version_strategy');
-        $def
-            ->replaceArgument(0, $manifestPath)
-        ;
+        $def->replaceArgument(0, $manifestPath);
+        $def->setPublic(false);
         $container->setDefinition('assets._version_'.$name, $def);
 
         return new Reference('assets._version_'.$name);

@@ -28,6 +28,9 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
 
     private $manifestData;
 
+    /**
+     * @param string $manifestPath Absolute path to the manifest file.
+     */
     public function __construct($manifestPath)
     {
         $this->manifestPath = $manifestPath;
@@ -51,7 +54,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     {
         $manifestPath = $this->getManifestPath($path);
 
-        return $manifestPath ? $manifestPath : $path;
+        return $manifestPath ?: $path;
     }
 
     private function getManifestPath($path)
@@ -62,7 +65,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
             }
 
             $this->manifestData = json_decode(file_get_contents($this->manifestPath), true);
-            if (0 < $errorCode = json_last_error()) {
+            if (0 < json_last_error()) {
                 throw new \RuntimeException(sprintf('Error parsing JSON from asset manifest file "%s" - %s', $this->manifestPath, json_last_error_msg()));
             }
         }

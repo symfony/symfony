@@ -70,7 +70,7 @@ class ConsoleLoggerTest extends TestCase
         $logger = new ConsoleLogger($out, $addVerbosityLevelMap);
         $logger->log($logLevel, 'foo bar');
         $logs = $out->fetch();
-        $this->assertEquals($isOutput ? "[$logLevel] foo bar\n" : '', $logs);
+        $this->assertEquals($isOutput ? "[$logLevel] foo bar".PHP_EOL : '', $logs);
     }
 
     public function provideOutputMappingParams()

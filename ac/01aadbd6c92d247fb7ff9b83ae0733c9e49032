@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-01T12:25:57Z
+
+Any test case?
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2017-03-01T12:27:15Z
+
+still no, in 20min
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-01T13:08:50Z
+
+@antanas-arvasevicius Can you confirm that this change is not necessary if #21811 gets merged?
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2017-03-01T13:54:28Z
+
+added test cases for this.
+Revertion is not needed, as this bug is due inconsistent getUserProviderId() usage, sometimes it was called like: getUserProviderId(strtolower($name)); sometimes like getUserProviderId($name);
+
+I think it's better to accept this PR as this will prevent that kind of bugs in the future.
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2017-03-01T15:22:15Z
+
+test errors on 5.5 7.1  https://travis-ci.org/symfony/symfony/jobs/206617501#L2417
+Error: Class 'Doctrine\ORM\Version' not found
+?
+How to this fix? Or better remove test case completely?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T15:10:52Z
+
+@antanas-arvasevicius Indeed, just removing the `orm` part of the configuration should be enough.

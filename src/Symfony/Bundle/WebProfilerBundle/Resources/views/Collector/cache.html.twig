@@ -22,7 +22,7 @@
         </div>
         <div class="sf-toolbar-info-piece">
             <b>Cache hits</b>
-            <span>{{ collector.totals.hits }}/{{ collector.totals.reads }} ({{ collector.totals['hits/reads'] }})</span>
+            <span>{{ collector.totals.hits }}/{{ collector.totals.reads }}{% if collector.totals.hit_read_ratio is not null %} ({{ collector.totals.hit_read_ratio }}%){% endif %}</span>
         </div>
         <div class="sf-toolbar-info-piece">
             <b>Cache writes</b>
@@ -54,20 +54,13 @@
             <span class="label">Total calls</span>
         </div>
         <div class="metric">
-            <span class="value">{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+            <span class="value">{{ '%0.2f'|format(collector.totals.time * 1000) }} <span class="unit">ms</span></span>
             <span class="label">Total time</span>
         </div>
+        <div class="metric-divider"></div>
         <div class="metric">
             <span class="value">{{ collector.totals.reads }}</span>
             <span class="label">Total reads</span>
-        </div>
-        <div class="metric">
-            <span class="value">{{ collector.totals.hits }}</span>
-            <span class="label">Total hits</span>
-        </div>
-        <div class="metric">
-            <span class="value">{{ collector.totals.misses }}</span>
-            <span class="label">Total misses</span>
         </div>
         <div class="metric">
             <span class="value">{{ collector.totals.writes }}</span>
@@ -77,70 +70,96 @@
             <span class="value">{{ collector.totals.deletes }}</span>
             <span class="label">Total deletes</span>
         </div>
+        <div class="metric-divider"></div>
         <div class="metric">
-            <span class="value">{{ collector.totals['hits/reads'] }}</span>
+            <span class="value">{{ collector.totals.hits }}</span>
+            <span class="label">Total hits</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.misses }}</span>
+            <span class="label">Total misses</span>
+        </div>
+        <div class="metric">
+            <span class="value">
+                {% if collector.totals.hit_read_ratio is null %}
+                    n/a
+                {% else %}
+                    {{ collector.totals.hit_read_ratio }} <span class="unit">%</span>
+                {% endif %}
+            </span>
             <span class="label">Hits/reads</span>
         </div>
     </div>
 
-    {% for name, calls in collector.calls %}
-        <h3>Statistics for '{{ name }}'</h3>
-        <div class="metrics">
-            {% for key, value in collector.statistics[name] %}
-                <div class="metric">
-                    <span class="value">
-                        {% if key == 'time' %}
-                            {{ '%0.2f'|format(1000*value.value) }} ms
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </span>
-                    <span class="label">{{ key|capitalize }}</span>
-                </div>
-            {% endfor %}
-        </div>
-        <h4>Calls for '{{ name }}'</h4>
+    <h2>Pools</h2>
+    <div class="sf-tabs">
+        {% for name, calls in collector.calls %}
+            <div class="tab {{ calls|length == 0 ? 'disabled' }}">
+                <h3 class="tab-title">{{ name }} <span class="badge">{{ collector.statistics[name].calls }}</span></h3>
 
-        {% if not collector.totals.calls %}
-            <p>
-                <em>No calls.</em>
-            </p>
-        {% else %}
-            <table>
-                <thead>
-                <tr>
-                    <th style="width: 5rem;">Key</th>
-                    <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for i, call in calls %}
-                    <tr>
-                        <th style="padding-top:2rem">#{{ i }}</th>
-                        <th style="padding-top:2rem">Pool::{{ call.name }}</th>
-                    </tr>
-                    <tr>
-                        <th>Argument</th>
-                        <td>{{ profiler_dump(call.argument, maxDepth=2) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Results</th>
-                        <td>
-                            {% if call.result != false %}
-                                {{ profiler_dump(call.result, maxDepth=1) }}
+                <div class="tab-content">
+                    <h3>Statistics</h3>
+                    <div class="metrics">
+                        {% for key, value in collector.statistics[name] %}
+                            <div class="metric">
+                                <span class="value">
+                                    {% if key == 'time' %}
+                                        {{ '%0.2f'|format(1000 * value.value) }} <span class="unit">ms</span>
+                                    {% elseif key == 'hit_read_ratio' %}
+                                        {% if value.value is null %}
+                                            n/a
+                                        {% else %}
+                                            {{ value }} <span class="unit">%</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </span>
+                                <span class="label">{{ key == 'hit_read_ratio' ? 'Hits/reads' : key|capitalize }}</span>
+                            </div>
+                            {% if key == 'time' or key == 'deletes' %}
+                                <div class="metric-divider"></div>
                             {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Time</th>
-                        <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
-                    </tr>
+                        {% endfor %}
+                    </div>
 
-                {% endfor %}
-                </tbody>
-
-            </table>
-        {% endif %}
-    {% endfor %}
+                    <h4>Calls</h4>
+                    {% if calls|length == 0 %}
+                        <div class="empty">
+                            <p>No calls</p>
+                        </div>
+                    {% else %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th class="key">Key</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for call in calls %}
+                                {% set separatorStyle = not loop.first ? ' style="border-top-width: medium;"' : '' %}
+                                <tr>
+                                    <td class="font-normal text-small text-muted nowrap" rowspan="3"{{ separatorStyle|raw }}>{{ loop.index }}</td>
+                                    <th{{ separatorStyle|raw }}>{{ call.name }}</th>
+                                    <td{{ separatorStyle|raw }}>{{ profiler_dump(call.value.argument, maxDepth=2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Result</th>
+                                    <td>{{ profiler_dump(call.value.result, maxDepth=1) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Time</th>
+                                    <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}

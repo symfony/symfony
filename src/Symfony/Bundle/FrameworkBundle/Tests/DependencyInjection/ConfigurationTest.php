@@ -133,11 +133,12 @@ class ConfigurationTest extends TestCase
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(
-            InvalidConfigurationException::class
-        );
-        $this->{method_exists($this, $_ = 'expectExceptionMessage') ? $_ : 'setExpectedExceptionMessage'}(
+            InvalidConfigurationException::class,
             $expectedMessage
         );
+        if (method_exists($this, 'expectExceptionMessage')) {
+            $this->expectExceptionMessage($expectedMessage);
+        }
 
         $processor = new Processor();
         $configuration = new Configuration(true);

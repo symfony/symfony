@@ -605,8 +605,8 @@ class ProgressBar
 
         // gets string length for each sub line with multiline format
         $linesLength = array_map(function ($subLine) {
-            return Helper::strlenWithoutDecoration($this->output->getFormatter(), rtrim($subLine, "\r"));
-        }, explode("\n", $line));
+            return Helper::strlenWithoutDecoration($this->output->getFormatter(), "\r");
+        }, explode(PHP_EOL, $line));
 
         $linesWidth = max($linesLength);
 

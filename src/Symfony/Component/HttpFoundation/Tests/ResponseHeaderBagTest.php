@@ -20,48 +20,24 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class ResponseHeaderBagTest extends TestCase
 {
-    /**
-     * @dataProvider provideAllPreserveCase
-     */
-    public function testAllPreserveCase($headers, $expected)
+    public function testAllPreserveCase()
     {
-        $bag = new ResponseHeaderBag($headers);
-
-        $this->assertEquals($expected, $bag->allPreserveCase(), '->allPreserveCase() gets all input keys in original case');
-    }
-
-    public function provideAllPreserveCase()
-    {
-        return array(
-            array(
-                array('fOo' => 'BAR'),
-                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache, private')),
-            ),
-            array(
-                array('ETag' => 'xyzzy'),
-                array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate')),
-            ),
-            array(
-                array('Content-MD5' => 'Q2hlY2sgSW50ZWdyaXR5IQ=='),
-                array('Content-MD5' => array('Q2hlY2sgSW50ZWdyaXR5IQ=='), 'Cache-Control' => array('no-cache, private')),
-            ),
-            array(
-                array('P3P' => 'CP="CAO PSA OUR"'),
-                array('P3P' => array('CP="CAO PSA OUR"'), 'Cache-Control' => array('no-cache, private')),
-            ),
-            array(
-                array('WWW-Authenticate' => 'Basic realm="WallyWorld"'),
-                array('WWW-Authenticate' => array('Basic realm="WallyWorld"'), 'Cache-Control' => array('no-cache, private')),
-            ),
-            array(
-                array('X-UA-Compatible' => 'IE=edge,chrome=1'),
-                array('X-UA-Compatible' => array('IE=edge,chrome=1'), 'Cache-Control' => array('no-cache, private')),
-            ),
-            array(
-                array('X-XSS-Protection' => '1; mode=block'),
-                array('X-XSS-Protection' => array('1; mode=block'), 'Cache-Control' => array('no-cache, private')),
-            ),
+        $headers = array(
+            'fOo' => 'BAR',
+            'ETag' => 'xyzzy',
+            'Content-MD5' => 'Q2hlY2sgSW50ZWdyaXR5IQ==',
+            'P3P' => 'CP="CAO PSA OUR"',
+            'WWW-Authenticate' => 'Basic realm="WallyWorld"',
+            'X-UA-Compatible' => 'IE=edge,chrome=1',
+            'X-XSS-Protection' => '1; mode=block',
         );
+
+        $bag = new ResponseHeaderBag($headers);
+        $allPreservedCase = $bag->allPreserveCase();
+
+        foreach (array_keys($headers) as $headerName) {
+            $this->assertArrayHasKey($headerName, $allPreservedCase, '->allPreserveCase() gets all input keys in original case');
+        }
     }
 
     public function testCacheControlHeader()
@@ -330,6 +306,43 @@ class ResponseHeaderBagTest extends TestCase
             array('attachment', '\foo.html'),
             array('attachment', 'föö.html'),
         );
+    }
+
+    public function testDateHeaderAddedOnCreation()
+    {
+        $now = time();
+
+        $bag = new ResponseHeaderBag();
+        $this->assertTrue($bag->has('Date'));
+
+        $this->assertEquals($now, $bag->getDate('Date')->getTimestamp());
+    }
+
+    public function testDateHeaderCanBeSetOnCreation()
+    {
+        $someDate = 'Thu, 23 Mar 2017 09:15:12 GMT';
+        $bag = new ResponseHeaderBag(array('Date' => $someDate));
+
+        $this->assertEquals($someDate, $bag->get('Date'));
+    }
+
+    public function testDateHeaderWillBeRecreatedWhenRemoved()
+    {
+        $someDate = 'Thu, 23 Mar 2017 09:15:12 GMT';
+        $bag = new ResponseHeaderBag(array('Date' => $someDate));
+        $bag->remove('Date');
+
+        // a (new) Date header is still present
+        $this->assertTrue($bag->has('Date'));
+        $this->assertNotEquals($someDate, $bag->get('Date'));
+    }
+
+    public function testDateHeaderWillBeRecreatedWhenHeadersAreReplaced()
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->replace(array());
+
+        $this->assertTrue($bag->has('Date'));
     }
 
     private function assertSetCookieHeader($expected, ResponseHeaderBag $actual)

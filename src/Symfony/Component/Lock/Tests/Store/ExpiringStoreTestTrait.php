@@ -20,7 +20,7 @@ use Symfony\Component\Lock\StoreInterface;
 trait ExpiringStoreTestTrait
 {
     /**
-     * Amount a microsecond used to order async actions
+     * Amount a microsecond used to order async actions.
      *
      * @return int
      */
@@ -72,7 +72,7 @@ trait ExpiringStoreTestTrait
         $store->putOffExpiration($key, 1.0 * $clockDelay / 1000000);
         $this->assertTrue($store->exists($key));
 
-        usleep(1.5 * $clockDelay);
+        usleep(2.1 * $clockDelay);
         $this->assertFalse($store->exists($key));
     }
 }

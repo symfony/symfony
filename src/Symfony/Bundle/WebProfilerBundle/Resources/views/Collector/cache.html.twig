@@ -22,7 +22,7 @@
         </div>
         <div class="sf-toolbar-info-piece">
             <b>Cache hits</b>
-            <span>{{ collector.totals.hits }}/{{ collector.totals.reads }} ({{ collector.totals['hits/reads'] }})</span>
+            <span>{{ collector.totals.hits }}/{{ collector.totals.reads }}{% if collector.totals.hit_read_ratio is not null %} ({{ collector.totals.hit_read_ratio }}%){% endif %}</span>
         </div>
         <div class="sf-toolbar-info-piece">
             <b>Cache writes</b>
@@ -54,20 +54,13 @@
             <span class="label">Total calls</span>
         </div>
         <div class="metric">
-            <span class="value">{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+            <span class="value">{{ '%0.2f'|format(collector.totals.time * 1000) }} <span class="unit">ms</span></span>
             <span class="label">Total time</span>
         </div>
+        <div class="metric-divider"></div>
         <div class="metric">
             <span class="value">{{ collector.totals.reads }}</span>
             <span class="label">Total reads</span>
-        </div>
-        <div class="metric">
-            <span class="value">{{ collector.totals.hits }}</span>
-            <span class="label">Total hits</span>
-        </div>
-        <div class="metric">
-            <span class="value">{{ collector.totals.misses }}</span>
-            <span class="label">Total misses</span>
         </div>
         <div class="metric">
             <span class="value">{{ collector.totals.writes }}</span>
@@ -77,8 +70,23 @@
             <span class="value">{{ collector.totals.deletes }}</span>
             <span class="label">Total deletes</span>
         </div>
+        <div class="metric-divider"></div>
         <div class="metric">
-            <span class="value">{{ collector.totals['hits/reads'] }}</span>
+            <span class="value">{{ collector.totals.hits }}</span>
+            <span class="label">Total hits</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.misses }}</span>
+            <span class="label">Total misses</span>
+        </div>
+        <div class="metric">
+            <span class="value">
+                {% if collector.totals.hit_read_ratio is null %}
+                    n/a
+                {% else %}
+                    {{ collector.totals.hit_read_ratio }} <span class="unit">%</span>
+                {% endif %}
+            </span>
             <span class="label">Hits/reads</span>
         </div>
     </div>
@@ -95,13 +103,22 @@
                             <div class="metric">
                                 <span class="value">
                                     {% if key == 'time' %}
-                                        {{ '%0.2f'|format(1000*value.value) }} ms
+                                        {{ '%0.2f'|format(1000*value.value) }} <span class="unit">ms</span>
+                                    {% elseif key == 'hit_read_ratio' %}
+                                        {% if value.value is null %}
+                                            n/a
+                                        {% else %}
+                                            {{ value }} <span class="unit">%</span>
+                                        {% endif %}
                                     {% else %}
                                         {{ value }}
                                     {% endif %}
                                 </span>
-                                <span class="label">{{ key|capitalize }}</span>
+                                <span class="label">{{ key == 'hit_read_ratio' ? 'Hits/reads' : key|capitalize }}</span>
                             </div>
+                            {% if key == 'time' or key == 'deletes' %}
+                                <div class="metric-divider"></div>
+                            {% endif %}
                         {% endfor %}
                     </div>
 

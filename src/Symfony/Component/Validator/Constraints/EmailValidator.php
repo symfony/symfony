@@ -141,7 +141,7 @@ class EmailValidator extends ConstraintValidator
         if ('' === $host) {
             return false;
         }
-
+        
         return checkdnsrr($host, 'MX');
     }
 
@@ -157,7 +157,7 @@ class EmailValidator extends ConstraintValidator
         if ('' === $host) {
             return false;
         }
-        
+
         return $this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA'));
     }
 }

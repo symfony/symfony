@@ -143,14 +143,12 @@
                                 </tr>
                                 <tr>
                                     <th>Argument</th>
-                                    <td>{{ profiler_dump(call.argument, maxDepth=2) }}</td>
+                                    <td>{{ profiler_dump(call.value.argument, maxDepth=2) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Results</th>
                                     <td>
-                                        {% if call.result != false %}
-                                            {{ profiler_dump(call.result, maxDepth=1) }}
-                                        {% endif %}
+                                        {{ profiler_dump(call.value.result, maxDepth=1) }}
                                     </td>
                                 </tr>
                                 <tr>

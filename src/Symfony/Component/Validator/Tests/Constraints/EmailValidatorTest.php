@@ -159,4 +159,10 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
 
         $this->assertNoViolation();
     }
+
+    public function testEmptyHostReturnsFalse()
+    {
+        $this->assertFalse($this->validator->checkMX(''));
+        $this->assertFalse($this->validator->checkHost(''));
+    }
 }

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by e-moe at 2017-03-23T09:30:02Z
+
+@javiereguiluz , sorry for stealing items from your todo list :)
+
+I do agree with length of `message.translation` and will update this PR. As for `message.domain` - currently it has additional styles like bold and small. I have doubts about visual appearance of this item with one more style applied
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-23T09:44:59Z
+
+Here is the before/after if we add `nowrap` to domain and id but not the message:
+
+![before](https://cloud.githubusercontent.com/assets/73419/24241380/f1c09dee-0fb4-11e7-83bd-61ed75110323.png)
+
+![after](https://cloud.githubusercontent.com/assets/73419/24241601/a48315f6-0fb5-11e7-95c3-3882b6777078.png)
+
+---
+
+It looks better now, right? so maybe we should add the `nowrap` to the translation domain after all.
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-03-23T09:48:34Z
+
+oh, sorry. got your point. thanks for you review! PR is updated

@@ -10,7 +10,6 @@ doctrine:
     orm:
         entity_managers:
             default:
-
                 auto_mapping: true
 
 security:

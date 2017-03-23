@@ -242,6 +242,11 @@ class Response
                 @trigger_error(sprintf('Extending %s::%s() in %s is deprecated since version 3.2 and won\'t be supported anymore in 4.0 as it will be final.', __CLASS__, $method, $class), E_USER_DEPRECATED);
             }
         }
+
+        /* RFC2616 - 14.18 says all Responses need to have a Date */
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
+        }
     }
 
     /**
@@ -370,6 +375,7 @@ class Response
             return $this;
         }
 
+        /* RFC2616 - 14.18 says all Responses need to have a Date */
         if (!$this->headers->has('Date')) {
             $this->setDate(\DateTime::createFromFormat('U', time()));
         }
@@ -657,6 +663,11 @@ class Response
      */
     public function getDate()
     {
+        /*
+            RFC2616 - 14.18 says all Responses need to have a Date.
+            Make sure we provide one even if it the header
+            has been removed in the meantime.
+         */
         if (!$this->headers->has('Date')) {
             $this->setDate(\DateTime::createFromFormat('U', time()));
         }

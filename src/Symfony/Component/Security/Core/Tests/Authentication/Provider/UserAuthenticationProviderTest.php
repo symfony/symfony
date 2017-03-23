@@ -221,7 +221,7 @@ class UserAuthenticationProviderTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
         $this->assertContains(new Role('ROLE_FOO'), $authToken->getRoles(), '', false, false);
-        $this->assertContains($switchUserRole, $authToken->getRoles());
+        $this->assertContains($switchUserRole, $authToken->getRoles(), '', false, false);
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(array('foo' => 'bar'), $authToken->getAttributes(), '->authenticate() copies token attributes');
     }

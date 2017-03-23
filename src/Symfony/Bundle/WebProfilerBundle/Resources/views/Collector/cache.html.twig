@@ -83,64 +83,71 @@
         </div>
     </div>
 
-    {% for name, calls in collector.calls %}
-        <h3>Statistics for '{{ name }}'</h3>
-        <div class="metrics">
-            {% for key, value in collector.statistics[name] %}
-                <div class="metric">
-                    <span class="value">
-                        {% if key == 'time' %}
-                            {{ '%0.2f'|format(1000*value.value) }} ms
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </span>
-                    <span class="label">{{ key|capitalize }}</span>
+    <div class="sf-tabs">
+        {% for name, calls in collector.calls %}
+            <div class="tab {{ calls|length == 0 ? 'disabled' }}">
+                <h3 class="tab-title">{{ name }} <span class="badge">{{ collector.statistics[name].calls }}</span></h3>
+
+                <div class="tab-content">
+                    <h3>Statistics</h3>
+                    <div class="metrics">
+                        {% for key, value in collector.statistics[name] %}
+                            <div class="metric">
+                                <span class="value">
+                                    {% if key == 'time' %}
+                                        {{ '%0.2f'|format(1000*value.value) }} ms
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </span>
+                                <span class="label">{{ key|capitalize }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <h4>Calls</h4>
+                    {% if calls|length == 0 %}
+                        <div class="empty">
+                            <p>No calls</p>
+                        </div>
+                    {% else %}
+                        <table>
+                            <thead>
+                            <tr>
+                                <th style="width: 5rem;">Key</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i, call in calls %}
+                                <tr>
+                                    <th style="padding-top:2rem">#{{ i }}</th>
+                                    <th style="padding-top:2rem">Pool::{{ call.name }}</th>
+                                </tr>
+                                <tr>
+                                    <th>Argument</th>
+                                    <td>{{ profiler_dump(call.argument, maxDepth=2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Results</th>
+                                    <td>
+                                        {% if call.result != false %}
+                                            {{ profiler_dump(call.result, maxDepth=1) }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Time</th>
+                                    <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                </tr>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
                 </div>
-            {% endfor %}
-        </div>
-
-        <h4>Calls for '{{ name }}'</h4>
-        {% if calls|length == 0 %}
-            <div class="empty">
-                <p>No calls</p>
             </div>
-        {% else %}
-            <table>
-                <thead>
-                <tr>
-                    <th style="width: 5rem;">Key</th>
-                    <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for i, call in calls %}
-                    <tr>
-                        <th style="padding-top:2rem">#{{ i }}</th>
-                        <th style="padding-top:2rem">Pool::{{ call.name }}</th>
-                    </tr>
-                    <tr>
-                        <th>Argument</th>
-                        <td>{{ profiler_dump(call.argument, maxDepth=2) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Results</th>
-                        <td>
-                            {% if call.result != false %}
-                                {{ profiler_dump(call.result, maxDepth=1) }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Time</th>
-                        <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
-                    </tr>
-
-                {% endfor %}
-                </tbody>
-
-            </table>
-        {% endif %}
-    {% endfor %}
+        {% endfor %}
+    </div>
 
 {% endblock %}

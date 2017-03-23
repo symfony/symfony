@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-01T17:11:06Z
+
+Having a simpler API is a good idea.
+
+But I'm really not a fan of the magic API, which returns a nested array when you give 0 arguments or >2, but a flat array when you pass 1 argument. This is too magic.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-01T17:19:05Z
+
+btw, to get some types only, an array would be better than a variadic function IMO. Twig does not have the spread operator, and does not have a ``call_user_func_array`` equivalent to allow building arguments dynamically
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-02T21:49:25Z
+
+I've replaced the variadic arguments by an array:
+
+| Code | Result
+| --- | ---
+| `app.flashes` | nested array with all flashes
+| `app.flashes('notice')` | simple array with flashes of that type
+| `app.flashes(['notice'])` | nested array with type => messages
+| `app.flashes(['notice', 'warning'])` | nested array with types => messages
+
+@stof I take your comment into consideration, but in this case, instead of "magic API" I think it's "smart/flexible API". It's similar to when Symfony lets you pass a string to a config option that needs an array and does the string -> array conversion automatically.
+
+I think that returning a nested array when you ask for the flash messages of a single type is cumbersome:
+
+```twig
+{# you would need to use this... #}
+{% for message in app.flashes('notice')['notice'] %}
+    <div class="alert alert-notice">
+        {{ message }}
+    </div>
+{% endfor %}
+
+{# ... or this ... #}
+{% for type, messages in app.flashes('notice') %}
+    {% for message in messages %}
+        <div class="alert alert-notice">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+{# ... instead of this: #}
+{% for message in app.flashes('notice') %}
+    <div class="alert alert-notice">
+        {{ message }}
+    </div>
+{% endfor %}
+```
+
+But I'm open to other comments and opinions about this. Let's work together to make a great API that doesn't feel magic! Thanks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-03T19:10:36Z
+
+Not sure about the mixed api.. i could live with it i guess. In twig context it's probably less an issue, and once you know it you're good to go :)
+
+Some other  thoughts
+- `getFlashes($type = null)` either all types nested, or a single type flat
+- `getFlashes(array $types = null)` for nested / `getFlashesFor(array $types = null)` for flat
+- `{{ message.type ~ message.value }}` flat with a nested message structure
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-04T14:11:03Z
+
+Hopefully I have the code right this time. The idea is:
+
+* If you pass a string, you get a simple array with just those messages
+* If you pass an array, you get an array of messages
+* Otherwise, you get all messages ... except when the session hasn't started, where you get an empty array
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T15:03:31Z
+
+👍

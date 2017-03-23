@@ -91,6 +91,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             array('example@'),
             array('example@localhost'),
             array('foo@example.com bar'),
+            array('foo@bar.fr@'),
         );
     }
 

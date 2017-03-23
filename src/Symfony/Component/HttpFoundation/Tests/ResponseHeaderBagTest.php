@@ -332,6 +332,43 @@ class ResponseHeaderBagTest extends TestCase
         );
     }
 
+    public function testDateHeaderAddedOnCreation()
+    {
+        $now = time();
+
+        $bag = new ResponseHeaderBag();
+        $this->assertTrue($bag->has('Date'));
+
+        $this->assertEquals($now, $bag->getDate('Date')->getTimestamp());
+    }
+
+    public function testDateHeaderCanBeSetOnCreation()
+    {
+        $someDate = 'Thu, 23 Mar 2017 09:15:12 GMT';
+        $bag = new ResponseHeaderBag(array('Date' => $someDate));
+
+        $this->assertEquals($someDate, $bag->get('Date'));
+    }
+
+    public function testDateHeaderWillBeRecreatedWhenRemoved()
+    {
+        $someDate = 'Thu, 23 Mar 2017 09:15:12 GMT';
+        $bag = new ResponseHeaderBag(array('Date' => $someDate));
+        $bag->remove('Date');
+
+        // a (new) Date header is still present
+        $this->assertTrue($bag->has('Date'));
+        $this->assertNotEquals($someDate, $bag->get('Date'));
+    }
+
+    public function testDateHeaderWillBeRecreatedWhenHeadersAreReplaced()
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->replace(array());
+
+        $this->assertTrue($bag->has('Date'));
+    }
+
     private function assertSetCookieHeader($expected, ResponseHeaderBag $actual)
     {
         $this->assertRegExp('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));

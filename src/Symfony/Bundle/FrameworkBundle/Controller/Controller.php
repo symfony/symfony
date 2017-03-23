@@ -20,8 +20,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
@@ -186,16 +186,12 @@ abstract class Controller implements ContainerAwareInterface
      * @param mixed  $object     The object
      * @param string $message    The message passed to the exception
      *
-     * @throws AccessDeniedException
+     * @throws AccessDeniedHttpException
      */
     protected function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
     {
         if (!$this->isGranted($attributes, $object)) {
-            $exception = $this->createAccessDeniedException($message);
-            $exception->setAttributes($attributes);
-            $exception->setSubject($object);
-
-            throw $exception;
+            throw $this->createAccessDeniedException($message);
         }
     }
 
@@ -302,7 +298,7 @@ abstract class Controller implements ContainerAwareInterface
     }
 
     /**
-     * Returns an AccessDeniedException.
+     * Returns an AccessDeniedHttpException.
      *
      * This will result in a 403 response code. Usage example:
      *
@@ -311,11 +307,11 @@ abstract class Controller implements ContainerAwareInterface
      * @param string          $message  A message
      * @param \Exception|null $previous The previous exception
      *
-     * @return AccessDeniedException
+     * @return AccessDeniedHttpException
      */
     protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
-        return new AccessDeniedException($message, $previous);
+        return new AccessDeniedHttpException($message, $previous);
     }
 
     /**

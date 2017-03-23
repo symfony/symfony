@@ -128,6 +128,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://symfony.com#'),
             array('http://symfony.com#fragment'),
             array('http://symfony.com/#fragment'),
+            array('http://symfony.com/#one_more%20test'),
         );
     }
 
@@ -168,6 +169,9 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://:password@@symfony.com'),
             array('http://username:passwordsymfony.com'),
             array('http://usern@me:password@symfony.com'),
+            array('http://example.com/exploit.html?<script>alert(1);</script>'),
+            array('http://example.com/exploit.html?hel lo'),
+            array('http://example.com/exploit.html?not_a%hex'),
         );
     }
 

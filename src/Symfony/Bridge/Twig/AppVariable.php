@@ -166,7 +166,7 @@ class AppVariable
             return array();
         }
 
-        if (null !== $type || array() === $types) {
+        if (null === $types || array() === $types) {
             return $session->getFlashBag()->all();
         }
 

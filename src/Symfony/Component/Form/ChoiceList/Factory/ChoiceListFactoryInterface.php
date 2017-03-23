@@ -90,8 +90,9 @@ interface ChoiceListFactoryInterface
      *                                              group names
      * @param null|array|callable $attr             The callable generating the
      *                                              HTML attributes
+     * @param null|array|callable $groupByOrder     The group by order
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null);
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $groupByOrder = null);
 }

@@ -1669,6 +1669,37 @@ class ChoiceTypeTest extends BaseTypeTest
         ), $view->vars['preferred_choices']);
     }
 
+    public function testPassHierarchicalChoicesToViewWithGroupOrder()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices' => $this->choices,
+            'preferred_choices' => array('b', 'd'),
+            'group_by' => function ($val, $key, $index) {
+                return (strlen($key) > 4) ? 'LongName' : 'ShortName';
+            },
+            'group_by_order' => array('ShortName', 'LongName', 'TestNotMatched'),
+        ))
+            ->createView();
+
+        $this->assertEquals(array(
+            'ShortName' => new ChoiceGroupView('ShortName', array(
+                2 => new ChoiceView('c', 'c', 'Kris'),
+            )),
+            'LongName' => new ChoiceGroupView('LongName', array(
+                0 => new ChoiceView('a', 'a', 'Bernhard'),
+                4 => new ChoiceView('e', 'e', 'Roman'),
+            )),
+        ), $view->vars['choices']);
+        $this->assertEquals(array(
+            'LongName' => new ChoiceGroupView('LongName', array(
+                1 => new ChoiceView('b', 'b', 'Fabien'),
+            )),
+            'ShortName' => new ChoiceGroupView('ShortName', array(
+                3 => new ChoiceView('d', 'd', 'Jon'),
+            )),
+        ), $view->vars['preferred_choices']);
+    }
+
     public function testPassChoiceDataToView()
     {
         $obj1 = (object) array('value' => 'a', 'label' => 'A');

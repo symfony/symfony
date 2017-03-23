@@ -332,6 +332,7 @@ class ChoiceType extends AbstractType
             'choice_attr' => null,
             'preferred_choices' => array(),
             'group_by' => null,
+            'group_by_order' => null,
             'empty_data' => $emptyData,
             'placeholder' => $placeholderDefault,
             'error_bubbling' => false,
@@ -356,6 +357,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_attr', array('null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('preferred_choices', array('array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('group_by', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
+        $resolver->setAllowedTypes('group_by_order', array('null', 'array', '\Traversable'));
     }
 
     /**
@@ -444,7 +446,8 @@ class ChoiceType extends AbstractType
             $options['choice_label'],
             $options['choice_name'],
             $options['group_by'],
-            $options['choice_attr']
+            $options['choice_attr'],
+            $options['group_by_order']
         );
     }
 }

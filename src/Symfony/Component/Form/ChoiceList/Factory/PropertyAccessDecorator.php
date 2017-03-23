@@ -148,10 +148,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      * @param null|callable|string|PropertyPath       $index            The callable or path generating the view indices
      * @param null|callable|string|PropertyPath       $groupBy          The callable or path generating the group names
      * @param null|array|callable|string|PropertyPath $attr             The callable or path generating the HTML attributes
+     * @param null|array|callable|string|PropertyPath $groupByOrder     The groupBy order
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $groupByOrder = null)
     {
         $accessor = $this->propertyAccessor;
 
@@ -224,6 +225,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr, $groupByOrder);
     }
 }

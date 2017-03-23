@@ -45,7 +45,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $groupByOrder = null)
     {
         $preferredViews = array();
         $otherViews = array();
@@ -80,6 +80,12 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $preferredViews,
                     $otherViews
                 );
+            }
+
+            if ($groupByOrder && is_array($groupByOrder)) {
+                uksort($otherViews, function ($key1, $key2) use ($groupByOrder) {
+                    return array_search($key1, $groupByOrder) > array_search($key2, $groupByOrder);
+                });
             }
         } else {
             // Otherwise use the original structure of the choices

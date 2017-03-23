@@ -33,7 +33,14 @@ class FlattenException
     private $file;
     private $line;
 
-    public static function create(\Exception $exception, $statusCode = null, array $headers = array())
+    /**
+     * @param \Exception|\Throwable $exception  Exception or Error instance
+     * @param int                   $statusCode HTTP status code
+     * @param array                 $headers    HTTP headers
+     *
+     * @return FlattenException
+     */
+    public static function create($exception, $statusCode = null, array $headers = array())
     {
         $e = new static();
         $e->setMessage($exception->getMessage());

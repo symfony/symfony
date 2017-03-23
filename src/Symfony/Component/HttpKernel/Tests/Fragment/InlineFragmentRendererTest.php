@@ -118,12 +118,42 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
+    /**
+     * @expectedException \Error
+     */
+    public function testRenderErrorNoIgnoreErrors()
+    {
+        if (!class_exists('Error', false)) {
+            $this->markTestSkipped('PHP 7 Error required');
+        }
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher->expects($this->never())->method('dispatch');
+
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \Error('error'))), $dispatcher);
+
+        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
+    }
+
     public function testRenderExceptionIgnoreErrors()
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher->expects($this->once())->method('dispatch')->with(KernelEvents::EXCEPTION);
 
         $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))), $dispatcher);
+
+        $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
+    }
+    public function testRenderErrorIgnoreErrors()
+    {
+        if (!class_exists('Error', false)) {
+            $this->markTestSkipped('PHP 7 Error required');
+        }
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher->expects($this->once())->method('dispatch')->with(KernelEvents::EXCEPTION);
+
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \Error('foo'))), $dispatcher);
 
         $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
     }

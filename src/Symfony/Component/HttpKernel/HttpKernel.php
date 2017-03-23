@@ -67,17 +67,21 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
-            if ($e instanceof RequestExceptionInterface) {
-                $e = new BadRequestHttpException($e->getMessage(), $e);
-            }
-            if (false === $catch) {
-                $this->finishRequest($request, $type);
 
-                throw $e;
-            }
+        } catch (\Throwable $e) {
 
-            return $this->handleException($e, $request, $type);
         }
+
+        if ($e instanceof RequestExceptionInterface) {
+            $e = new BadRequestHttpException($e->getMessage(), $e);
+        }
+        if (false === $catch) {
+            $this->finishRequest($request, $type);
+
+            throw $e;
+        }
+
+        return $this->handleException($e, $request, $type);
     }
 
     /**
@@ -216,15 +220,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Handles an exception by trying to convert it to a Response.
      *
-     * @param \Exception $e       An \Exception instance
-     * @param Request    $request A Request instance
-     * @param int        $type    The type of the request
+     * @param \Exception|\Throwable $e       An \Exception instance
+     * @param Request               $request A Request instance
+     * @param int                   $type    The type of the request
      *
      * @return Response A Response instance
      *
      * @throws \Exception
      */
-    private function handleException(\Exception $e, $request, $type)
+    private function handleException($e, $request, $type)
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);

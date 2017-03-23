@@ -30,9 +30,9 @@ use Symfony\Component\HttpFoundation\Request;
 class GetResponseForExceptionEvent extends GetResponseEvent
 {
     /**
-     * The exception object.
+     * The exception or error object.
      *
-     * @var \Exception
+     * @var \Exception|\Throwable
      */
     private $exception;
 
@@ -41,7 +41,14 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      */
     private $allowCustomResponseCode = false;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, \Exception $e)
+    /**
+     * GetResponseForExceptionEvent constructor.
+     * @param HttpKernelInterface   $kernel
+     * @param Request               $request
+     * @param int                   $requestType
+     * @param \Exception|\Throwable $e
+     */
+    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, $e)
     {
         parent::__construct($kernel, $request, $requestType);
 
@@ -51,7 +58,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
     /**
      * Returns the thrown exception.
      *
-     * @return \Exception The thrown exception
+     * @return \Exception|\Throwable The thrown exception or error
      */
     public function getException()
     {
@@ -63,9 +70,9 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      *
      * This exception will be thrown if no response is set in the event.
      *
-     * @param \Exception $exception The thrown exception
+     * @param \Exception|\Throwable $exception The thrown exception
      */
-    public function setException(\Exception $exception)
+    public function setException($exception)
     {
         $this->exception = $exception;
     }

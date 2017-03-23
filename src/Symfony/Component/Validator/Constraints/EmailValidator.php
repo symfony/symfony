@@ -118,7 +118,7 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        return ('' !== $host) && checkdnsrr($host, 'MX');
+        return '' !== $host && checkdnsrr($host, 'MX');
     }
 
     /**
@@ -130,6 +130,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkHost($host)
     {
-        return ('' !== $host) && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
+        return '' !== $host && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
     }
 }

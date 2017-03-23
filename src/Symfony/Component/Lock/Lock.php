@@ -34,9 +34,9 @@ final class Lock implements LockInterface, LoggerAwareInterface
     private $ttl;
 
     /**
-     * @param Key            $key
-     * @param StoreInterface $store
-     * @param float|null     $ttl
+     * @param Key            $key   Resource to lock
+     * @param StoreInterface $store Store used to handle lock persistence
+     * @param float|null     $ttl   Maximum expected lock duration in seconds
      */
     public function __construct(Key $key, StoreInterface $store, $ttl = null)
     {
@@ -45,6 +45,20 @@ final class Lock implements LockInterface, LoggerAwareInterface
         $this->ttl = $ttl;
 
         $this->logger = new NullLogger();
+    }
+
+    /**
+     * Automatically release the underlying lock when the object is destructed.
+     */
+    public function __destruct()
+    {
+        try {
+            if ($this->isAcquired()) {
+                $this->release();
+            }
+        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+        }
     }
 
     /**

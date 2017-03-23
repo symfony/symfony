@@ -37,7 +37,7 @@ class Factory implements LoggerAwareInterface
      * Creates a lock for the given resource.
      *
      * @param string $resource The resource to lock
-     * @param float  $ttl      maximum expected lock duration
+     * @param float  $ttl      Maximum expected lock duration in seconds
      *
      * @return Lock
      */

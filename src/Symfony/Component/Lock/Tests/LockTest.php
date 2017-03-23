@@ -103,7 +103,7 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects($this->atLeast(1))
             ->method('exists')
             ->with($key)
             ->willReturn(true);
@@ -123,12 +123,29 @@ class LockTest extends TestCase
             ->with($key);
 
         $store
-            ->expects($this->once())
+            ->expects($this->atLeast(1))
             ->method('exists')
             ->with($key)
             ->willReturn(false);
 
         $lock->release();
+    }
+
+    public function testReleaseOnDestruction()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $lock = new Lock($key, $store, 10);
+
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(array(true, false))
+        ;
+        $store
+            ->expects($this->once())
+            ->method('delete')
+        ;
+        unset($lock);
     }
 
     /**
@@ -141,12 +158,12 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects($this->atLeast(1))
             ->method('delete')
             ->with($key);
 
         $store
-            ->expects($this->once())
+            ->expects($this->atLeast(1))
             ->method('exists')
             ->with($key)
             ->willReturn(true);

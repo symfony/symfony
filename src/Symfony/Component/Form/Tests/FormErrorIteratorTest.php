@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Validator\ConstraintViolation;
 
-class FormErrorIteratorTest extends \PHPUnit_Framework_TestCase
+class FormErrorIteratorTest extends TestCase
 {
     /**
      * @dataProvider findByCodesProvider
@@ -32,7 +33,7 @@ class FormErrorIteratorTest extends \PHPUnit_Framework_TestCase
             'form',
             null,
             new EventDispatcher(),
-            $this->getMock('Symfony\Component\Form\FormFactoryInterface'),
+            $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock(),
             array()
         );
 

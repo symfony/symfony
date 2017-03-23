@@ -1051,6 +1051,10 @@ class ApplicationTest extends TestCase
         $this->assertEquals(0, $tester->getStatusCode());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "console.exception" event is deprecated since version 3.3 and will be removed in 4.0. Use the "console.error" event instead.
+     */
     public function testLegacyExceptionListenersAreStillTriggered()
     {
         $dispatcher = $this->getDispatcher();

@@ -25,8 +25,7 @@ $container->loadFromExtension('framework', array(
                 'version_strategy' => 'assets.custom_version_strategy',
             ),
             'json_manifest_strategy' => array(
-                'version_strategy' => 'json_manifest',
-                'manifest_path' => '/path/to/manifest.json',
+                'json_manifest_path' => '/path/to/manifest.json',
             ),
         ),
     ),

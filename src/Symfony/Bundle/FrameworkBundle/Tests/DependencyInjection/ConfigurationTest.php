@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
@@ -120,55 +121,62 @@ class ConfigurationTest extends TestCase
             'base_path' => '',
             'base_urls' => array(),
             'packages' => array(),
-            'manifest_path' => null,
+            'json_manifest_path' => null,
         );
 
         $this->assertEquals($defaultConfig, $config['assets']);
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage You cannot use both "version_strategy" and "version" at the same time under "assets".
+     * @dataProvider provideInvalidAssetConfigurationTests
      */
-    public function testInvalidVersionStrategy()
+    public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
         $processor = new Processor();
-        $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(
-            array(
-                'assets' => array(
-                    'base_urls' => '//example.com',
-                    'version' => 1,
-                    'version_strategy' => 'foo',
+            $configuration = new Configuration(true);
+            $processor->processConfiguration($configuration, array(
+                array(
+                    'assets' => $assetConfig
                 ),
-            ),
-        ));
+            ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage  You cannot use both "version_strategy" and "version" at the same time under "assets" packages.
-     */
-    public function testInvalidPackageVersionStrategy()
+    public function provideInvalidAssetConfigurationTests()
     {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $processor->processConfiguration($configuration, array(
-            array(
-                'assets' => array(
-                    'base_urls' => '//example.com',
-                    'version' => 1,
-                    'packages' => array(
-                        'foo' => array(
-                            'base_urls' => '//example.com',
-                            'version' => 1,
-                            'version_strategy' => 'foo',
-                        ),
-                    ),
+        // helper to turn config into embedded package config
+        $createPackageConfig = function(array $packageConfig) {
+            return array(
+                'base_urls' => '//example.com',
+                'version' => 1,
+                'packages' => array(
+                    'foo' => $packageConfig,
                 ),
-            ),
-        ));
+            );
+        };
+
+        $config = array(
+            'version' => 1,
+            'version_strategy' => 'foo',
+        );
+        yield array($config, 'You cannot use both "version_strategy" and "version" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "version" at the same time under "assets" packages.');
+
+        $config = array(
+            'json_manifest_path' => '/foo.json',
+            'version_strategy' => 'foo',
+        );
+        yield array($config, 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.');
+
+        $config = array(
+            'json_manifest_path' => '/foo.json',
+            'version' => '1',
+        );
+        yield array($config, 'You cannot use both "version" and "json_manifest_path" at the same time under "assets".');
+        yield array($createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.');
     }
 
     protected static function getBundleDefaultConfig()
@@ -275,7 +283,7 @@ class ConfigurationTest extends TestCase
                 'base_path' => '',
                 'base_urls' => array(),
                 'packages' => array(),
-                'manifest_path' => null,
+                'json_manifest_path' => null,
             ),
             'cache' => array(
                 'pools' => array(),

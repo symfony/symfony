@@ -808,13 +808,9 @@ class FrameworkExtension extends Extension
         $defaultVersion = null;
 
         if ($config['version_strategy']) {
-            if ($config['version_strategy'] == 'json_manifest') {
-                $defaultVersion = $this->createJsonManifestVersion($container, $config['manifest_path'], '_default');
-            } else {
-                $defaultVersion = new Reference($config['version_strategy']);
-            }
+            $defaultVersion = new Reference($config['version_strategy']);
         } else {
-            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
+            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default');
         }
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
@@ -823,16 +819,15 @@ class FrameworkExtension extends Extension
         $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
-                if ($package['version_strategy'] == 'json_manifest') {
-                    $version = $this->createJsonManifestVersion($container, $package['manifest_path'], $name);
-                } else {
-                    $version = new Reference($package['version_strategy']);
-                }
-            } elseif (!array_key_exists('version', $package)) {
+                $version = new Reference($package['version_strategy']);
+            } elseif (!array_key_exists('version', $package) && null === $package['json_manifest_path']) {
+                // if neither version nor json_manifest_path are specified, use the default
                 $version = $defaultVersion;
             } else {
+                // let format fallback to main version_format
                 $format = $package['version_format'] ?: $config['version_format'];
-                $version = $this->createVersion($container, $package['version'], $format, $name);
+                $version = isset($package['version']) ? $package['version'] : null;
+                $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
             }
 
             $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
@@ -864,30 +859,30 @@ class FrameworkExtension extends Extension
         return $package;
     }
 
-    private function createVersion(ContainerBuilder $container, $version, $format, $name)
+    private function createVersion(ContainerBuilder $container, $version, $format, $jsonManifestPath, $name)
     {
-        if (null === $version) {
-            return new Reference('assets.empty_version_strategy');
+        // Configuration prevents $version and $jsonManifestPath from being set
+        if (null !== $version) {
+            $def = new ChildDefinition('assets.static_version_strategy');
+            $def
+                ->replaceArgument(0, $version)
+                ->replaceArgument(1, $format)
+            ;
+            $container->setDefinition('assets._version_'.$name, $def);
+
+            return new Reference('assets._version_'.$name);
         }
 
-        $def = new ChildDefinition('assets.static_version_strategy');
-        $def
-            ->replaceArgument(0, $version)
-            ->replaceArgument(1, $format)
-        ;
-        $container->setDefinition('assets._version_'.$name, $def);
+        if (null !== $jsonManifestPath) {
+            $def = new ChildDefinition('assets.json_manifest_version_strategy');
+            $def->replaceArgument(0, $jsonManifestPath);
+            $def->setPublic(false);
+            $container->setDefinition('assets._version_'.$name, $def);
 
-        return new Reference('assets._version_'.$name);
-    }
+            return new Reference('assets._version_'.$name);
+        }
 
-    private function createJsonManifestVersion(ContainerBuilder $container, $manifestPath, $name)
-    {
-        $def = new ChildDefinition('assets.json_manifest_version_strategy');
-        $def->replaceArgument(0, $manifestPath);
-        $def->setPublic(false);
-        $container->setDefinition('assets._version_'.$name, $def);
-
-        return new Reference('assets._version_'.$name);
+        return new Reference('assets.empty_version_strategy');
     }
 
     /**

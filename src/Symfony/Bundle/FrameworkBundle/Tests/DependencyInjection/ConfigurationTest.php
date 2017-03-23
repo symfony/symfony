@@ -136,10 +136,10 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage($expectedMessage);
 
         $processor = new Processor();
-            $configuration = new Configuration(true);
-            $processor->processConfiguration($configuration, array(
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
                 array(
-                    'assets' => $assetConfig
+                    'assets' => $assetConfig,
                 ),
             ));
     }
@@ -147,7 +147,7 @@ class ConfigurationTest extends TestCase
     public function provideInvalidAssetConfigurationTests()
     {
         // helper to turn config into embedded package config
-        $createPackageConfig = function(array $packageConfig) {
+        $createPackageConfig = function (array $packageConfig) {
             return array(
                 'base_urls' => '//example.com',
                 'version' => 1,

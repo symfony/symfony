@@ -26,7 +26,6 @@ class ConsoleExceptionEvent extends ConsoleEvent
 {
     private $exception;
     private $exitCode;
-    private $handled = false;
 
     public function __construct(Command $command, InputInterface $input, OutputInterface $output, \Exception $exception, $exitCode, $deprecation = true)
     {

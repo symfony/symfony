@@ -20,16 +20,15 @@ namespace Symfony\Component\Asset\VersionStrategy;
  *         "css/styles.css": "css/styles.555abc.css"
  *     }
  *
- * You could then as for the version of "main.js" or "css/styles.css".
+ * You could then ask for the version of "main.js" or "css/styles.css".
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
     private $manifestPath;
-
     private $manifestData;
 
     /**
-     * @param string $manifestPath Absolute path to the manifest file.
+     * @param string $manifestPath Absolute path to the manifest file
      */
     public function __construct($manifestPath)
     {
@@ -40,10 +39,6 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
      * With a manifest, we don't really know or care about what
      * the version is. Instead, this returns the path to the
      * versioned file.
-     *
-     * @param string $path
-     *
-     * @return string
      */
     public function getVersion($path)
     {

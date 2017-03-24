@@ -59,11 +59,48 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         $classes = $this->findClasses($namespace, $resource);
+
+        $unusedArguments = array();
+        foreach ($prototype->getArguments() as $key => $argument) {
+            if ('' === $key || '$' !== $key[0]) {
+                continue;
+            }
+
+            $unusedArguments[$key] = true;
+        }
+
         // prepare for deep cloning
         $prototype = serialize($prototype);
 
-        foreach ($classes as $class) {
-            $this->setDefinition($class, unserialize($prototype));
+        foreach ($classes as $class => $reflectionClass) {
+            $parameters = array();
+            if ($reflectionClass->hasMethod('__construct')) {
+                foreach ($reflectionClass->getMethod('__construct')->getParameters() as $parameter) {
+                    $parameters['$'.$parameter->name] = true;
+                }
+            }
+
+            $definition = unserialize($prototype);
+
+            $arguments = array();
+            foreach ($definition->getArguments() as $key => $argument) {
+                if ('' !== $key && '$' === $key[0]) {
+                    if (!isset($parameters[$key])) {
+                        continue;
+                    }
+
+                    unset($unusedArguments[$key]);
+                }
+
+                $arguments[$key] = $argument;
+            }
+            $definition->setArguments($arguments);
+
+            $this->setDefinition($class, $definition);
+        }
+
+        if ($unusedArguments) {
+            throw new InvalidArgumentException(sprintf('Unused named arguments in a prototype: "%s".', implode('", "', array_keys($unusedArguments))));
         }
     }
 
@@ -104,7 +141,7 @@ abstract class FileLoader extends BaseFileLoader
                 continue;
             }
             if (!$r->isInterface() && !$r->isTrait()) {
-                $classes[] = $class;
+                $classes[$class] = $r;
             }
         }
 

@@ -24,7 +24,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -448,6 +447,33 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(array(null, 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
         $this->assertEquals(array(null, 'ABCD'), $container->getDefinition('another_one')->getArguments());
         $this->assertEquals(array(array('setApiKey', array('123'))), $container->getDefinition('another_one')->getMethodCalls());
+    }
+
+    public function testNamedArgumentsInPrototypes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('prototype_named_args.yml');
+
+        $fooDefinition = $container->getDefinition('Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo');
+        $this->assertEquals(array('$bar' => 'foo'), $fooDefinition->getArguments());
+
+        $this->assertEmpty($container->getDefinition('Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar')->getArguments());
+
+        $container->compile();
+
+        $this->assertEquals(array('foo'), $fooDefinition->getArguments());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unused named arguments in a prototype: "$invalid", "$invalid2".
+     */
+    public function testUnusedNamedArgumentsInPrototypes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('prototype_unused_named_args.yml');
     }
 
     public function testInstanceof()

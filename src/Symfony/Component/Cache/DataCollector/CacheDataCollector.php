@@ -103,10 +103,10 @@ class CacheDataCollector extends DataCollector
                 'calls' => 0,
                 'time' => 0,
                 'reads' => 0,
-                'hits' => 0,
-                'misses' => 0,
                 'writes' => 0,
                 'deletes' => 0,
+                'hits' => 0,
+                'misses' => 0,
             );
             /** @var TraceableAdapterEvent $call */
             foreach ($calls as $call) {
@@ -138,9 +138,9 @@ class CacheDataCollector extends DataCollector
                 }
             }
             if ($statistics[$name]['reads']) {
-                $statistics[$name]['hits/reads'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2).'%';
+                $statistics[$name]['hit_read_ratio'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2);
             } else {
-                $statistics[$name]['hits/reads'] = 'N/A';
+                $statistics[$name]['hit_read_ratio'] = null;
             }
         }
 
@@ -157,10 +157,10 @@ class CacheDataCollector extends DataCollector
             'calls' => 0,
             'time' => 0,
             'reads' => 0,
-            'hits' => 0,
-            'misses' => 0,
             'writes' => 0,
             'deletes' => 0,
+            'hits' => 0,
+            'misses' => 0,
         );
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
@@ -168,9 +168,9 @@ class CacheDataCollector extends DataCollector
             }
         }
         if ($totals['reads']) {
-            $totals['hits/reads'] = round(100 * $totals['hits'] / $totals['reads'], 2).'%';
+            $totals['hit_read_ratio'] = round(100 * $totals['hits'] / $totals['reads'], 2);
         } else {
-            $totals['hits/reads'] = 'N/A';
+            $totals['hit_read_ratio'] = null;
         }
 
         return $totals;

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-23T21:19:17Z
+
+Improved the metric handling, moving things to the view layer. Totally worth it :) (screenshot updated).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-24T19:51:34Z
+
+Did some overall improvements to the table structure.. i kinda like it. The whole thing looks really calm now and we save a lot on spacing overall.
+
+Screenshots updated.
+
+Should be reviewed with [`?w=1`](https://github.com/symfony/symfony/pull/22129/files?w=1)

@@ -1106,7 +1106,7 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The definition for "DateTime" has no class.
+     * @expectedExceptionMessage The definition for "DateTime" has no class attribute, and appears to reference a class or interface in the global namespace.
      */
     public function testNoClassFromGlobalNamespaceClassId()
     {

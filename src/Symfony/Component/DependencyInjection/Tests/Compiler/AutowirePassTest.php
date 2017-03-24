@@ -125,7 +125,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (c1, c2, c3).
+     * @expectedExceptionMessage Cannot autowire service "a": multiple candidate services exist for interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface". This type-hint could be aliased to one of these existing services: "c1", "c2", "c3".
      */
     public function testTypeCollision()
     {
@@ -143,7 +143,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "a". Multiple services exist for this class (a1, a2).
+     * @expectedExceptionMessage Cannot autowire service "a": multiple candidate services exist for class "Symfony\Component\DependencyInjection\Tests\Compiler\Foo". This type-hint could be aliased to one of these existing services: "a1", "a2".
      */
     public function testTypeNotGuessable()
     {
@@ -160,7 +160,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\A" for the service "a". Multiple services exist for this class (a1, a2).
+     * @expectedExceptionMessage Cannot autowire service "a": multiple candidate services exist for class "Symfony\Component\DependencyInjection\Tests\Compiler\A". This type-hint could be aliased to one of these existing services: "a1", "a2".
      */
     public function testTypeNotGuessableWithSubclass()
     {
@@ -177,7 +177,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument $collision of method Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct() for service "a": No services were found matching the "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" interface and it cannot be auto-registered.
+     * @expectedExceptionMessage Cannot autowire service "a": no services were found matching the "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" interface and it cannot be auto-registered for argument $collision of method Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct().
      */
     public function testTypeNotGuessableNoServicesFound()
     {
@@ -295,7 +295,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct() for service "a": Class or interface "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" does not exist.
+     * @expectedExceptionMessage Cannot autowire service "a": argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct() has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class does not exist.
      */
     public function testClassNotFoundThrowsException()
     {
@@ -310,7 +310,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct() for service "a": Class or interface "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" does not exist.
+     * @expectedExceptionMessage Cannot autowire service "a": argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct() has type "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" but this class does not exist.
      */
     public function testParentClassNotFoundThrowsException()
     {
@@ -563,7 +563,7 @@ class AutowirePassTest extends TestCase
     /**
      * @requires PHP 7.1
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "getter_overriding". Multiple services exist for this class (a1, a2).
+     * @expectedExceptionMessage Cannot autowire service "getter_overriding": multiple candidate services exist for class "Symfony\Component\DependencyInjection\Tests\Compiler\Foo". This type-hint could be aliased to one of these existing services: "a1", "a2".
      */
     public function testGetterOverridingWithAmbiguousServices()
     {
@@ -631,7 +631,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "setter_injection_collision". Multiple services exist for this interface (c1, c2).
+     * @expectedExceptionMessage Cannot autowire service "setter_injection_collision": multiple candidate services exist for interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface". This type-hint could be aliased to one of these existing services: "c1", "c2".
      */
     public function testSetterInjectionCollisionThrowsException()
     {
@@ -666,7 +666,7 @@ class AutowirePassTest extends TestCase
      * @dataProvider provideAutodiscoveredAutowiringOrder
      *
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB).
+     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for service "a". Multiple services exist for this interface: autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB.
      */
     public function testAutodiscoveredAutowiringOrder($class)
     {
@@ -716,7 +716,7 @@ class AutowirePassTest extends TestCase
     public function provideNotWireableCalls()
     {
         return array(
-            array('setNotAutowireable', 'Cannot autowire argument $n of method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable() for service "foo": Class or interface "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" does not exist.'),
+            array('setNotAutowireable', 'Cannot autowire service "foo": argument $n of method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable() has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class does not exist.'),
             array('setBar', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setBar() has only optional arguments, thus must be wired explicitly.'),
             array('setOptionalNotAutowireable', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setOptionalNotAutowireable() has only optional arguments, thus must be wired explicitly.'),
             array('setOptionalNoTypeHint', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setOptionalNoTypeHint() has only optional arguments, thus must be wired explicitly.'),
@@ -736,6 +736,24 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
 
         $this->assertSame(array('service_container', 'e'), array_keys($container->getDefinitions()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot autowire service "j": multiple candidate services exist for class "Symfony\Component\DependencyInjection\Tests\Compiler\I". This type-hint could be aliased to one of these existing services: "f", "i"; or be updated to "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface".
+     */
+    public function testAlternatives()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setAlias(IInterface::class, 'i');
+        $container->register('f', F::class);
+        $container->register('i', I::class);
+        $container->register('j', J::class)
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
     }
 }
 
@@ -809,6 +827,13 @@ class D
 class E
 {
     public function __construct(D $d = null)
+    {
+    }
+}
+
+class J
+{
+    public function __construct(I $i)
     {
     }
 }

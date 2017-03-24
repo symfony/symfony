@@ -38,6 +38,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener implements ListenerInterface
 {
+    const PARAMETER_EXIT = '_exit';
+
     private $tokenStorage;
     private $provider;
     private $userChecker;
@@ -80,7 +82,7 @@ class SwitchUserListener implements ListenerInterface
             return;
         }
 
-        if ('_exit' === $request->get($this->usernameParameter)) {
+        if (self::PARAMETER_EXIT === $request->get($this->usernameParameter)) {
             $this->tokenStorage->setToken($this->attemptExitUser($request));
         } else {
             try {
@@ -93,7 +95,7 @@ class SwitchUserListener implements ListenerInterface
         $request->query->remove($this->usernameParameter);
         $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
 
-        $response = new RedirectResponse($request->getUri(), 302);
+        $response = new RedirectResponse($request->getUri(), RedirectResponse::HTTP_FOUND);
 
         $event->setResponse($response);
     }

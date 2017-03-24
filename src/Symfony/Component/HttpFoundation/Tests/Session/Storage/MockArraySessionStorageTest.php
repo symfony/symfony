@@ -112,6 +112,15 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertTrue($this->storage->isStarted());
     }
 
+    public function testClearWithNoBagsStartsSession()
+    {
+        $storage = new MockArraySessionStorage();
+
+        $storage->clear();
+
+        $this->assertTrue($storage->isStarted());
+    }
+
     /**
      * @expectedException \RuntimeException
      */

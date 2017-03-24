@@ -99,12 +99,12 @@
                 </div>
             {% endfor %}
         </div>
-        <h4>Calls for '{{ name }}'</h4>
 
-        {% if not collector.totals.calls %}
-            <p>
-                <em>No calls.</em>
-            </p>
+        <h4>Calls for '{{ name }}'</h4>
+        {% if calls|length == 0 %}
+            <div class="empty">
+                <p>No calls</p>
+            </div>
         {% else %}
             <table>
                 <thead>

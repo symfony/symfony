@@ -157,7 +157,7 @@ class CacheDataCollector extends DataCollector
             'calls' => 0,
             'time' => 0,
             'reads' => 0,
-            'writes' =>  0,
+            'writes' => 0,
             'deletes' => 0,
             'hits' => 0,
             'misses' => 0,

@@ -230,7 +230,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getCheckTypes()
+    public function provideCheckTypes()
     {
         return array(
             array('checkMX', Email::MX_CHECK_FAILED_ERROR),

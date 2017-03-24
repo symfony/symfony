@@ -146,6 +146,43 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testUnknownFunctionHandling()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $expressionLanguage->register('*',
+            function($name, array $names, array $args) {
+                $name = (in_array($name, $names)) ? "\$$name" : $name ;
+                return sprintf('%s(%s)', $name, implode(', ', $args));
+            },
+            function($name, array $values, array $args) {
+                if (array_key_exists($name, $values)) {
+                    return call_user_func_array($values[$name], $args);
+                }
+                return call_user_func_array($name, $args);
+            }
+        );
+
+        // global function
+
+        $expected = 'sha1("foo")';
+        $this->assertEquals($expected, $expressionLanguage->compile('sha1("foo")'));
+
+        $expected = '0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33';
+        $this->assertEquals($expected, $expressionLanguage->evaluate('sha1("foo")'));
+
+        // local function
+
+        $expected = '$f($x)';
+        $this->assertEquals($expected, $expressionLanguage->compile('f(x)', array('x', 'f')));
+
+        $f = function($x) { return $x * $x; };
+        $g = function($x) { return $x + 1; };
+
+        $expected = 65;
+        $this->assertEquals($expected, $expressionLanguage->evaluate('g(f(x))', array('x' => 8, 'f' => $f, 'g' => $g)));
+    }
+
     public function shortCircuitProviderEvaluate()
     {
         $object = $this->getMockBuilder('stdClass')->setMethods(array('foo'))->getMock();

@@ -194,11 +194,11 @@ class Parser
 
                     default:
                         if ('(' === $this->stream->current->value) {
-                            if (false === isset($this->functions[$token->value])) {
+                            if (false === isset($this->functions[$token->value]) &&  false === isset($this->functions['*'])) {
                                 throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor);
                             }
 
-                            $node = new Node\FunctionNode($token->value, $this->parseArguments());
+                            $node = new Node\FunctionNode($token->value, $this->parseArguments(), $this->names);
                         } else {
                             if (!in_array($token->value, $this->names, true)) {
                                 throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);

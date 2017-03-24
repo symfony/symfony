@@ -508,9 +508,14 @@ class AutowirePass extends AbstractRecursivePass
         if (!$classOrInterface = class_exists($type, false) ? 'class' : (interface_exists($type, false) ? 'interface' : null)) {
             return sprintf('Cannot autowire service "%s": %s has type "%s" but this class does not exist.', $this->currentId, $label, $type);
         }
-        $message = sprintf('no services were found matching the "%s" %s and it cannot be auto-registered for %s.', $type, $classOrInterface, $label);
 
-        return sprintf('Cannot autowire service "%s": %s', $this->currentId, $message);
+        $message = sprintf('Cannot autowire service "%s": no services were found matching the "%s" %s and it cannot be auto-registered for %s.', $this->currentId, $type, $classOrInterface, $label);
+
+        if ($classOrInterface === 'interface') {
+            $message .= sprintf(' Make sure that a service implementing "%s" interface is registered in the container before registering service "%s".', $type, $this->currentId);
+        }
+
+        return $message;
     }
 
     private function createTypeAlternatives($type)

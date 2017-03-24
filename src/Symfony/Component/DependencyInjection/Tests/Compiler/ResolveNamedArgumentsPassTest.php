@@ -92,6 +92,34 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using key "0" after the key "1" for defining arguments of method "__construct" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy" is deprecated since Symfony 3.3. They will be automatically reordered in 4.0.
+     */
+    public function testArgumentsWithManualIndexes()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments(array(1 => '123', 0 => new Reference('foo')));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+    }
+
+    public function testCase()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments(array('$apiKey' => '123', 0 => new Reference('foo')));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+
+        $this->assertEquals(array(1 => '123', 2 => new Reference('foo')), $definition->getArguments());
+    }
 }
 
 class NoConstructor

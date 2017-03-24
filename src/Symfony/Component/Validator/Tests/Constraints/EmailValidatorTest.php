@@ -239,7 +239,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider getCheckTypes
+     * @dataProvider provideCheckTypes
      */
     public function testEmptyHostIsNotValid($checkType, $violation)
     {

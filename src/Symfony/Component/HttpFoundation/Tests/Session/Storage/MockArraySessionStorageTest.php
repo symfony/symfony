@@ -97,6 +97,30 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertNotEquals('', $this->storage->getId());
     }
 
+    public function testClearClearsBags()
+    {
+        $this->storage->clear();
+
+        $this->assertSame(array(), $this->storage->getBag('attributes')->all());
+        $this->assertSame(array(), $this->storage->getBag('flashes')->peekAll());
+    }
+
+    public function testClearStartsSession()
+    {
+        $this->storage->clear();
+
+        $this->assertTrue($this->storage->isStarted());
+    }
+
+    public function testClearWithNoBagsStartsSession()
+    {
+        $storage = new MockArraySessionStorage();
+
+        $storage->clear();
+
+        $this->assertTrue($storage->isStarted());
+    }
+
     /**
      * @expectedException \RuntimeException
      */

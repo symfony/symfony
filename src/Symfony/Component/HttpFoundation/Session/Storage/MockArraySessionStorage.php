@@ -60,7 +60,7 @@ class MockArraySessionStorage implements SessionStorageInterface
     /**
      * @var array
      */
-    protected $bags;
+    protected $bags = array();
 
     /**
      * Constructor.

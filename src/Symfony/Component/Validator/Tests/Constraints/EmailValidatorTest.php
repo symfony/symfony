@@ -229,4 +229,32 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    public function getCheckTypes()
+    {
+        return array(
+            array('checkMX', Email::MX_CHECK_FAILED_ERROR),
+            array('checkHost', Email::HOST_CHECK_FAILED_ERROR),
+        );
+    }
+
+    /**
+     * @dataProvider getCheckTypes
+     */
+    public function testEmptyHostIsNotValid($checkType, $violation)
+    {
+        $this->validator->validate(
+            'foo@bar.fr@',
+            new Email(array(
+                'message' => 'myMessage',
+                $checkType => true,
+            ))
+        );
+
+        $this
+            ->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"foo@bar.fr@"')
+            ->setCode($violation)
+            ->assertRaised();
+    }
 }

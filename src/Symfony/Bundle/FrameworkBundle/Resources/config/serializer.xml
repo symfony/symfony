@@ -31,6 +31,11 @@
         <service id="Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface" alias="serializer.mapping.class_discriminator_resolver" />
 
         <!-- Normalizer -->
+        <service id="serializer.normalizer.constraint_violation_list" class="Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-915" />
+        </service>
+
         <service id="serializer.normalizer.dateinterval" class="Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer">
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-915" />

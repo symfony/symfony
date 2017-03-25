@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2017-03-20T08:15:30Z
+
+Looks to replace https://github.com/irozgar/gulp-rev-versions-bundle.
+
+A useful feature would be to compile the manifest into a static array, to avoid reading it at runtime (in production).
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-21T10:04:41Z
+
+This changes the meaning of the ``version_strategy`` configuration, as this is not a service id anymore in some cases.
+IMO, the usage of the json manifest strategy should be detected based only on `manifest_path` being configured and no custom strategy being provided, similar to the way the static version strategy is configured
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-03-23T07:44:36Z
+
+Awesome feature that I've seen implemented in many projects, this JSON format is so simple that it is always the one that is used.
+Is it possible to have many manifests ? I remember having JS, CSS and images assets in different manifests files. But also mobile and desktop assets in different manifests.
+
+Is the solution to define an asset package for each manifest file ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-23T07:57:51Z
+
+@GromNaN is having multiple manifest still common? I only know the Webpack solution and they create just 1 `manifest.json` for all assets(images, CSS, JS).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-23T11:19:11Z
+
+PR Updated!
+
+1) I like Stof's [suggestion](https://github.com/symfony/symfony/pull/22046#issuecomment-288030843) about keeping `version_strategy` always as an `id`. I updated the config usage in the PR description
+
+2)  @thewilkybarkid I don't know if compiling a static array from the JSON is a good idea or not. It might be unexpected that simply updating the file wouldn't cause Symfony to pick up the changes. I'm not sure if the decoding overhead is significant enough to care - decoding a 30 line manifest takes `.00011` seconds (`.11` milliseconds), though it is a filesystem hit!
+
+3) @GromNaN That's interesting, I want to make sure we've at least thought through this scenario (though ultimately, the strategy doesn't need to work for *everyone*. In general, can you think of a solution *other* than multiple packages? Even if we made this feature much bigger and supported multiple manifest files, in Twig, you still would need to specify which one you need, and the only config you can pass to `asset()` is the `$packageName`. Or, the strategy would need to somehow be smart enough to *know* which manifest file to use for each package, which now sounds like you would/should have a custom version strategy.
+
+This is ready to be reviewed again! Thanks!
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-03-23T13:25:01Z
+
+@javiereguiluz @weaverryan My actual use case is the following:
+Having a website on www.example.com with an mirror mobile site m.example.com
+Routing and controllers are the same for both domains, but depending on the domain the view listener render a different template (thanks to Twig namespaces).
+Both websites are very different in terms of design, that why the frontend developers chose to have 2 separate builds, generating 2 separate JSON manifests. The "mobile" templates use "mobile" assets while the "desktop" templates use "desktop" assets.
+
+---
+
+Regarding the usage of a PHP file to cache the content of the JSON into a PHP array, from my experience on high traffic websites there is no performance issue at reading the same JSON file on each request: the OS caches the file content in memory and native JSON parsing is very fast.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-23T13:36:21Z
+
+@GromNaN Hmm, in that case, it would be most convenient for the listener to be able to change the manifest file. If you created a default package and a `mobile` package, then in the listener, if you're on mobile, you could make the `mobile` package the default:
+
+```php
+// in the listener... if mobile
+// using the container for clarity
+$packages = $this->container->get('assets.packages');
+$packages->setDefaultPackage($packages->getPackage('mobile'));
+```
+
+And then your templates wouldn't need to specify a package everywhere. Of course, since they're using different templates, they could just specify the `mobile` package when using `asset()` instead of the above code.
+
+I think this is actually a pretty decent solution. In other words, I think this PR solves the 99%, and makes the 1% reasonably easy.
+
+Thanks for the reply :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T16:24:50Z
+
+@weaverryan For the invalid JSON file, just add it to `.php_cs.dist`
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-03-23T16:49:17Z
+
+The manifest could be a remote file accessible over HTTP ; that appends when assets and the app are deployed on distinct servers asynchronously. In that case, it is necessary to use an HTTP client (other that file_get_contents) and a cache layer.
+This feature can be added once this PR is merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T16:58:37Z
+
+@GromNaN I would say that we don't want to support that use case.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T18:25:29Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-23T18:27:12Z
+
+@GromNaN I thought about that use-case, it's also relevant with webpack-dev-server, but ultimately, I didn't want it, at least for now: the user should make sure there's a physical JSON file - it could be part of their deploy process (or, they can of course add their own strategy!)
+
+Tweaks made! But fabbot and I are still fighting - is the JSON check done through `PhpCsFixer`? Or did I just not get the config right in `.php_cs.dist`?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-23T18:30:57Z
+
+@fabpot if my silly invalid JSON file is going to be a problem with fabbot, let me know - I could re-work things - i.e. save a tmp invalid JSON file in the test and use that (so no committed invalid JSON file).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T18:31:43Z
+
+@weaverryan Don't worry about that. I will see why it's not taken into account by fabbot. Keep the code as is.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-24T01:06:16Z
+
+Minor comments addressed!

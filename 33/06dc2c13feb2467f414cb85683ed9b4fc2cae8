@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-25T15:06:30Z
+
+My comment is not directed specifically to @nicolas-grekas but to all the people that are trying to push ideas like these ones:
+
+* *This provides almost the same experience, but makes the container private.*
+* *I think we should deprecate the base Controller class.*
+* *Encourage not using the container in controllers directly anymore.*
+
+Are you telling me that putting this line of code in my controllers will turn my application into something horrible and unmaintainable?
+
+```php
+$this->get('app.user_manager')->save($user);
+```
+
+I believe that's a great line of code. I love that Symfony controllers provide me a simple access to the container services so I can make my controllers ultra-thin and then I can leverage services in other parts of the application.
+
+Please, don't complicate such a critical feature of the framework. Thanks!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-25T15:12:48Z
+
+I like this! And the fact that we'll get a lot of great stuff, but no longer need `getter` injection is awesome 👍
+
+Btw, we should not deprecate `Controller`. It's just too soon - we need to see how this stuff works in the wild.
+
+@javiereguiluz I think your comment is really important! If this new paradigm is going to work (and we can't rush it), then the user-land code needs to stay as simple as it was before. The "new way" recommendation would look like this:
+
+```php
+public function editAction(UserManager $userManager)
+{
+    // ...
+    $userManager->save($user);
+}
+```
+
+(thanks to #21771). And as long as we don't deprecate the old `Controller` class too soon, I think we're good (and we can continue to make sure the DX on the new stuff is as good, and hopefully better).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-25T15:20:49Z
+
+In my opinion, there would be some important DX differences:
+
+**Before**:
+
+1. Create a `UserManager` class
+2. Define a `app.user_manager` service for that class
+3. Whenever you want to get the user manager, get/inject `app.user_manager` service
+
+**After**:
+
+1. Create a `UserManager` class
+2. Define a `app.user_manager` service for that class
+3. If you want to inject the user manager in a service, inject `app.user_manager` service
+4. If you want to get the user manager in the controller:
+  4.1 Open the services configuration, look up the `app.user_manager` service and look at its associated class (`UserManager`)
+  4.2 Import the UserManager class in the controller
+  4.3 Type-hint the controller action with that class (that variable will "magically" contain the service, not the class instance)
+  4.4 If more than one service use that class, the above won't work and you need to do other things.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-25T15:21:53Z
+
+100% agree with @weaverryan
+@javiereguiluz please don't hijack the PR ;)
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-03-25T15:55:37Z
+
+Using the Controller class to easily load services using the container is great for newcomers and RAD, for those who prefer more explicit loading (while still being lazy) can use this way or #21771 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-25T17:38:25Z
+
+@weaverryan the method is internal so we don't care. And it's better than implementing any interface, which would mean adding public behavior, which should remain private.

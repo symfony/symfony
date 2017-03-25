@@ -11,49 +11,26 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use PHPUnit\Framework\TestCase as PHPUnitTestCase;
-use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Controller\UseControllerTraitController;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-/**
- * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @requires PHP 7
- */
-class ControllerTraitTest extends PHPUnitTestCase
+abstract class ControllerTraitTest extends TestCase
 {
-    public function testGenerateUrl()
-    {
-        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
-        $router->expects($this->once())->method('generate')->willReturn('/foo');
-
-        $controller = new UseControllerTraitController();
-        $controller->setRouter($router);
-
-        $this->assertEquals('/foo', $controller->generateUrl('foo'));
-    }
+    abstract protected function createController();
 
     public function testForward()
     {
@@ -64,91 +41,96 @@ class ControllerTraitTest extends PHPUnitTestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $httpKernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
         }));
 
-        $controller = new UseControllerTraitController();
-        $controller->setRequestStack($requestStack);
-        $controller->setHttpKernel($httpKernel);
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+        $container->set('http_kernel', $kernel);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $response = $controller->forward('a_controller');
         $this->assertEquals('xml--fr', $response->getContent());
     }
 
-    public function testRedirect()
-    {
-        $controller = new UseControllerTraitController();
-
-        $response = $controller->redirect('http://example.com', 301);
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('http://example.com', $response->getTargetUrl());
-        $this->assertSame(301, $response->getStatusCode());
-    }
-
-    public function testRedirectToRoute()
-    {
-        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
-        $router->expects($this->once())->method('generate')->willReturn('/foo');
-
-        $controller = new UseControllerTraitController();
-        $controller->setRouter($router);
-
-        $response = $controller->redirectToRoute('foo');
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('/foo', $response->getTargetUrl());
-        $this->assertSame(302, $response->getStatusCode());
-    }
-
     public function testGetUser()
     {
         $user = new User('user', 'pass');
+        $token = new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'));
 
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'))));
-
-        $controller = new UseControllerTraitController();
-        $controller->setTokenStorage($tokenStorage);
+        $controller = $this->createController();
+        $controller->setContainer($this->getContainerWithTokenStorage($token));
 
         $this->assertSame($controller->getUser(), $user);
     }
 
     public function testGetUserAnonymousUserConvertedToNull()
     {
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(new AnonymousToken('default', 'anon.')));
+        $token = new AnonymousToken('default', 'anon.');
 
-        $controller = new UseControllerTraitController();
-        $controller->setTokenStorage($tokenStorage);
+        $controller = $this->createController();
+        $controller->setContainer($this->getContainerWithTokenStorage($token));
 
         $this->assertNull($controller->getUser());
     }
 
     public function testGetUserWithEmptyTokenStorage()
     {
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null));
-
-        $controller = new UseControllerTraitController();
-        $controller->setTokenStorage($tokenStorage);
+        $controller = $this->createController();
+        $controller->setContainer($this->getContainerWithTokenStorage(null));
 
         $this->assertNull($controller->getUser());
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The SecurityBundle is not registered in your application.
+     */
+    public function testGetUserWithEmptyContainer()
+    {
+        $controller = $this->createController();
+        $controller->setContainer(new Container());
+
+        $controller->getUser();
+    }
+
+    /**
+     * @param $token
+     *
+     * @return Container
+     */
+    private function getContainerWithTokenStorage($token = null)
+    {
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage')->getMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $container = new Container();
+        $container->set('security.token_storage', $tokenStorage);
+
+        return $container;
+    }
+
+    public function testJson()
+    {
+        $controller = $this->createController();
+        $controller->setContainer(new Container());
+
+        $response = $controller->json(array());
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals('[]', $response->getContent());
+    }
+
     public function testJsonWithSerializer()
     {
+        $container = new Container();
+
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer
             ->expects($this->once())
@@ -156,8 +138,10 @@ class ControllerTraitTest extends PHPUnitTestCase
             ->with(array(), 'json', array('json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS))
             ->will($this->returnValue('[]'));
 
-        $controller = new UseControllerTraitController();
-        $controller->setSerializer($serializer);
+        $container->set('serializer', $serializer);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $response = $controller->json(array());
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -166,6 +150,8 @@ class ControllerTraitTest extends PHPUnitTestCase
 
     public function testJsonWithSerializerContextOverride()
     {
+        $container = new Container();
+
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer
             ->expects($this->once())
@@ -173,8 +159,10 @@ class ControllerTraitTest extends PHPUnitTestCase
             ->with(array(), 'json', array('json_encode_options' => 0, 'other' => 'context'))
             ->will($this->returnValue('[]'));
 
-        $controller = new UseControllerTraitController();
-        $controller->setSerializer($serializer);
+        $container->set('serializer', $serializer);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $response = $controller->json(array(), 200, array(), array('json_encode_options' => 0, 'other' => 'context'));
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -183,28 +171,129 @@ class ControllerTraitTest extends PHPUnitTestCase
         $this->assertEquals('{}', $response->getContent());
     }
 
-    public function testAddFlash()
+    public function testFile()
     {
-        $flashBag = new FlashBag();
+        $container = new Container();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $container->set('http_kernel', $kernel);
 
-        $session = $this->getMockBuilder(Session::class)->getMock();
-        $session->method('getFlashBag')->willReturn($flashBag);
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
-        $controller = new UseControllerTraitController();
-        $controller->setSession($session);
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file(new File(__FILE__));
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        if ($response->headers->get('content-type')) {
+            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+        }
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
+    }
 
-        $controller->addFlash('foo', 'bar');
+    public function testFileAsInline()
+    {
+        $controller = $this->createController();
 
-        $this->assertSame(array('bar'), $flashBag->get('foo'));
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        if ($response->headers->get('content-type')) {
+            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+        }
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
+    }
+
+    public function testFileWithOwnFileName()
+    {
+        $controller = $this->createController();
+
+        /* @var BinaryFileResponse $response */
+        $fileName = 'test.php';
+        $response = $controller->file(new File(__FILE__), $fileName);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        if ($response->headers->get('content-type')) {
+            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+        }
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+    }
+
+    public function testFileWithOwnFileNameAsInline()
+    {
+        $controller = $this->createController();
+
+        /* @var BinaryFileResponse $response */
+        $fileName = 'test.php';
+        $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        if ($response->headers->get('content-type')) {
+            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+        }
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+    }
+
+    public function testFileFromPath()
+    {
+        $controller = $this->createController();
+
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file(__FILE__);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        if ($response->headers->get('content-type')) {
+            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+        }
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
+    }
+
+    public function testFileFromPathWithCustomizedFileName()
+    {
+        $controller = $this->createController();
+
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file(__FILE__, 'test.php');
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        if ($response->headers->get('content-type')) {
+            $this->assertSame('text/x-php', $response->headers->get('content-type'));
+        }
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains('test.php', $response->headers->get('content-disposition'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
+     */
+    public function testFileWhichDoesNotExist()
+    {
+        $controller = $this->createController();
+
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file('some-file.txt', 'test.php');
     }
 
     public function testIsGranted()
     {
-        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(true);
 
-        $controller = new UseControllerTraitController();
-        $controller->setAuthorizationChecker($authorizationChecker);
+        $container = new Container();
+        $container->set('security.authorization_checker', $authorizationChecker);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $this->assertTrue($controller->isGranted('foo'));
     }
@@ -212,107 +301,327 @@ class ControllerTraitTest extends PHPUnitTestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testDenyAccessUnlessGranted()
+    public function testdenyAccessUnlessGranted()
     {
-        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 
-        $controller = new UseControllerTraitController();
-        $controller->setAuthorizationChecker($authorizationChecker);
+        $container = new Container();
+        $container->set('security.authorization_checker', $authorizationChecker);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $controller->denyAccessUnlessGranted('foo');
     }
 
-    public function testRenderView()
+    public function testRenderViewTwig()
     {
-        $twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
-        $controller = new UseControllerTraitController();
-        $controller->setTwig($twig);
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $this->assertEquals('bar', $controller->renderView('foo'));
     }
 
     public function testRenderTwig()
     {
-        $twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
-        $controller = new UseControllerTraitController();
-        $controller->setTwig($twig);
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
     public function testStreamTwig()
     {
-        $twig = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
 
-        $controller = new UseControllerTraitController();
-        $controller->setTwig($twig);
+        $container = new Container();
+        $container->set('twig', $twig);
 
-        $this->assertInstanceOf(StreamedResponse::class, $controller->stream('foo'));
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
     }
 
-    public function testCreateNotFoundException()
+    public function testRedirectToRoute()
     {
-        $controller = new UseControllerTraitController();
+        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
+        $router->expects($this->once())->method('generate')->willReturn('/foo');
 
-        $this->assertInstanceOf(NotFoundHttpException::class, $controller->createNotFoundException());
+        $container = new Container();
+        $container->set('router', $router);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        $response = $controller->redirectToRoute('foo');
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+        $this->assertSame('/foo', $response->getTargetUrl());
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public function testAddFlash()
+    {
+        $flashBag = new FlashBag();
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->getMock();
+        $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
+
+        $container = new Container();
+        $container->set('session', $session);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+        $controller->addFlash('foo', 'bar');
+
+        $this->assertSame(array('bar'), $flashBag->get('foo'));
     }
 
     public function testCreateAccessDeniedException()
     {
-        $controller = new UseControllerTraitController();
+        $controller = $this->createController();
 
-        $this->assertInstanceOf(AccessDeniedException::class, $controller->createAccessDeniedException());
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Exception\AccessDeniedException', $controller->createAccessDeniedException());
+    }
+
+    public function testIsCsrfTokenValid()
+    {
+        $tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
+        $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
+
+        $container = new Container();
+        $container->set('security.csrf.token_manager', $tokenManager);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
+    }
+
+    public function testGenerateUrl()
+    {
+        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
+        $router->expects($this->once())->method('generate')->willReturn('/foo');
+
+        $container = new Container();
+        $container->set('router', $router);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertEquals('/foo', $controller->generateUrl('foo'));
+    }
+
+    public function testRedirect()
+    {
+        $controller = $this->createController();
+        $response = $controller->redirect('http://dunglas.fr', 301);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+        $this->assertSame('http://dunglas.fr', $response->getTargetUrl());
+        $this->assertSame(301, $response->getStatusCode());
+    }
+
+    public function testRenderViewTemplating()
+    {
+        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
+        $templating->expects($this->once())->method('render')->willReturn('bar');
+
+        $container = new Container();
+        $container->set('templating', $templating);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertEquals('bar', $controller->renderView('foo'));
+    }
+
+    public function testRenderTemplating()
+    {
+        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
+        $templating->expects($this->once())->method('renderResponse')->willReturn(new Response('bar'));
+
+        $container = new Container();
+        $container->set('templating', $templating);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertEquals('bar', $controller->render('foo')->getContent());
+    }
+
+    public function testStreamTemplating()
+    {
+        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
+
+        $container = new Container();
+        $container->set('templating', $templating);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
+    }
+
+    public function testCreateNotFoundException()
+    {
+        $controller = $this->createController();
+
+        $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\NotFoundHttpException', $controller->createNotFoundException());
     }
 
     public function testCreateForm()
     {
-        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
 
-        $formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
+        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $formFactory->expects($this->once())->method('create')->willReturn($form);
 
-        $controller = new UseControllerTraitController();
-        $controller->setFormFactory($formFactory);
+        $container = new Container();
+        $container->set('form.factory', $formFactory);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $this->assertEquals($form, $controller->createForm('foo'));
     }
 
     public function testCreateFormBuilder()
     {
-        $formBuilder = $this->getMockBuilder(FormBuilderInterface::class)->getMock();
+        $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilderInterface')->getMock();
 
-        $formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
+        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $formFactory->expects($this->once())->method('createBuilder')->willReturn($formBuilder);
 
-        $controller = new UseControllerTraitController();
-        $controller->setFormFactory($formFactory);
+        $container = new Container();
+        $container->set('form.factory', $formFactory);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
 
-        $controller = new UseControllerTraitController();
-        $controller->setDoctrine($doctrine);
+        $container = new Container();
+        $container->set('doctrine', $doctrine);
 
-        $this->assertSame($doctrine, $controller->getDoctrine());
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertEquals($doctrine, $controller->getDoctrine());
+    }
+}
+
+trait TestControllerTrait
+{
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    public function testIsCsrfTokenValid()
+    public function redirect($url, $status = 302)
     {
-        $csrfTokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
-        $csrfTokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
+        return parent::redirect($url, $status);
+    }
 
-        $controller = new UseControllerTraitController();
-        $controller->setCsrfTokenManager($csrfTokenManager);
+    public function forward($controller, array $path = array(), array $query = array())
+    {
+        return parent::forward($controller, $path, $query);
+    }
 
-        $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
+    public function getUser()
+    {
+        return parent::getUser();
+    }
+
+    public function json($data, $status = 200, $headers = array(), $context = array())
+    {
+        return parent::json($data, $status, $headers, $context);
+    }
+
+    public function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
+    {
+        return parent::file($file, $fileName, $disposition);
+    }
+
+    public function isGranted($attributes, $object = null)
+    {
+        return parent::isGranted($attributes, $object);
+    }
+
+    public function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
+    {
+        parent::denyAccessUnlessGranted($attributes, $object, $message);
+    }
+
+    public function redirectToRoute($route, array $parameters = array(), $status = 302)
+    {
+        return parent::redirectToRoute($route, $parameters, $status);
+    }
+
+    public function addFlash($type, $message)
+    {
+        parent::addFlash($type, $message);
+    }
+
+    public function isCsrfTokenValid($id, $token)
+    {
+        return parent::isCsrfTokenValid($id, $token);
+    }
+
+    public function renderView($view, array $parameters = array())
+    {
+        return parent::renderView($view, $parameters);
+    }
+
+    public function render($view, array $parameters = array(), Response $response = null)
+    {
+        return parent::render($view, $parameters, $response);
+    }
+
+    public function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    {
+        return parent::stream($view, $parameters, $response);
+    }
+
+    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    {
+        return parent::createNotFoundException($message, $previous);
+    }
+
+    public function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
+    {
+        return parent::createAccessDeniedException($message, $previous);
+    }
+
+    public function createForm($type, $data = null, array $options = array())
+    {
+        return parent::createForm($type, $data, $options);
+    }
+
+    public function createFormBuilder($data = null, array $options = array())
+    {
+        return parent::createFormBuilder($data, $options);
+    }
+
+    public function getDoctrine()
+    {
+        return parent::getDoctrine();
     }
 }

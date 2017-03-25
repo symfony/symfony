@@ -11,120 +11,31 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * Common features needed in controllers.
  *
- * The recommended way of injecting dependencies is through getter injection.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in version 3.3
+ * @internal
  */
 trait ControllerTrait
 {
-    /**
-     * @required
-     */
-    protected function getRouter(): RouterInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getRequestStack(): RequestStack
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getHttpKernel(): HttpKernelInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getSerializer(): SerializerInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getSession(): SessionInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getTwig(): \Twig_Environment
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getDoctrine(): ManagerRegistry
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getFormFactory(): FormFactoryInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getTokenStorage(): TokenStorageInterface
-    {
-    }
-
-    /**
-     * @required
-     */
-    protected function getCsrfTokenManager(): CsrfTokenManagerInterface
-    {
-    }
-
     /**
      * Generates a URL from the given parameters.
      *
@@ -136,9 +47,9 @@ trait ControllerTrait
      *
      * @see UrlGeneratorInterface
      */
-    protected function generateUrl(string $route, array $parameters = array(), int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
+    protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->getRouter()->generate($route, $parameters, $referenceType);
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
     /**
@@ -150,14 +61,14 @@ trait ControllerTrait
      *
      * @return Response A Response instance
      */
-    protected function forward(string $controller, array $path = array(), array $query = array()): Response
+    protected function forward($controller, array $path = array(), array $query = array())
     {
-        $request = $this->getRequestStack()->getCurrentRequest();
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         $path['_forwarded'] = $request->attributes;
         $path['_controller'] = $controller;
         $subRequest = $request->duplicate($query, null, $path);
 
-        return $this->getHttpKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**
@@ -168,7 +79,7 @@ trait ControllerTrait
      *
      * @return RedirectResponse
      */
-    protected function redirect(string $url, int $status = 302): RedirectResponse
+    protected function redirect($url, $status = 302)
     {
         return new RedirectResponse($url, $status);
     }
@@ -182,28 +93,32 @@ trait ControllerTrait
      *
      * @return RedirectResponse
      */
-    protected function redirectToRoute(string $route, array $parameters = array(), int $status = 302): RedirectResponse
+    protected function redirectToRoute($route, array $parameters = array(), $status = 302)
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }
 
     /**
-     * Returns a JsonResponse that uses the serializer component.
+     * Returns a JsonResponse that uses the serializer component if enabled, or json_encode.
      *
      * @param mixed $data    The response data
      * @param int   $status  The status code to use for the Response
      * @param array $headers Array of extra headers to add
-     * @param array $context Context to pass to serializer
+     * @param array $context Context to pass to serializer when using serializer component
      *
      * @return JsonResponse
      */
-    protected function json($data, int $status = 200, array $headers = array(), array $context = array()): JsonResponse
+    protected function json($data, $status = 200, $headers = array(), $context = array())
     {
-        $json = $this->getSerializer()->serialize($data, 'json', array_merge(array(
-            'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-        ), $context));
+        if ($this->container->has('serializer')) {
+            $json = $this->container->get('serializer')->serialize($data, 'json', array_merge(array(
+                'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
+            ), $context));
 
-        return new JsonResponse($json, $status, $headers, true);
+            return new JsonResponse($json, $status, $headers, true);
+        }
+
+        return new JsonResponse($data, $status, $headers);
     }
 
     /**
@@ -215,7 +130,7 @@ trait ControllerTrait
      *
      * @return BinaryFileResponse
      */
-    protected function file($file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
+    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
         $response = new BinaryFileResponse($file);
         $response->setContentDisposition($disposition, $fileName === null ? $response->getFile()->getFilename() : $fileName);
@@ -231,13 +146,13 @@ trait ControllerTrait
      *
      * @throws \LogicException
      */
-    protected function addFlash(string $type, string $message)
+    protected function addFlash($type, $message)
     {
-        $session = $this->getSession();
-        if (!$session instanceof Session) {
-            throw new \LogicException(sprintf('You can not use the addFlash method: "%s" is not an instance of "%s".', get_class($session), Session::class));
+        if (!$this->container->has('session')) {
+            throw new \LogicException('You can not use the addFlash method if sessions are disabled.');
         }
-        $session->getFlashBag()->add($type, $message);
+
+        $this->container->get('session')->getFlashBag()->add($type, $message);
     }
 
     /**
@@ -247,10 +162,16 @@ trait ControllerTrait
      * @param mixed $object     The object
      *
      * @return bool
+     *
+     * @throws \LogicException
      */
-    protected function isGranted($attributes, $object = null): bool
+    protected function isGranted($attributes, $object = null)
     {
-        return $this->getAuthorizationChecker()->isGranted($attributes, $object);
+        if (!$this->container->has('security.authorization_checker')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application.');
+        }
+
+        return $this->container->get('security.authorization_checker')->isGranted($attributes, $object);
     }
 
     /**
@@ -263,12 +184,13 @@ trait ControllerTrait
      *
      * @throws AccessDeniedException
      */
-    protected function denyAccessUnlessGranted($attributes, $object = null, string $message = 'Access Denied.')
+    protected function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
     {
         if (!$this->isGranted($attributes, $object)) {
             $exception = $this->createAccessDeniedException($message);
             $exception->setAttributes($attributes);
             $exception->setSubject($object);
+
             throw $exception;
         }
     }
@@ -281,9 +203,17 @@ trait ControllerTrait
      *
      * @return string The rendered view
      */
-    protected function renderView(string $view, array $parameters = array()): string
+    protected function renderView($view, array $parameters = array())
     {
-        return $this->getTwig()->render($view, $parameters);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->render($view, $parameters);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        return $this->container->get('twig')->render($view, $parameters);
     }
 
     /**
@@ -295,13 +225,23 @@ trait ControllerTrait
      *
      * @return Response A Response instance
      */
-    protected function render(string $view, array $parameters = array(), Response $response = null): Response
+    protected function render($view, array $parameters = array(), Response $response = null)
     {
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
         if (null === $response) {
             $response = new Response();
         }
 
-        return $response->setContent($this->getTwig()->render($view, $parameters));
+        $response->setContent($this->container->get('twig')->render($view, $parameters));
+
+        return $response;
     }
 
     /**
@@ -313,13 +253,23 @@ trait ControllerTrait
      *
      * @return StreamedResponse A StreamedResponse instance
      */
-    protected function stream(string $view, array $parameters = array(), StreamedResponse $response = null): StreamedResponse
+    protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
-        $twig = $this->getTwig();
+        if ($this->container->has('templating')) {
+            $templating = $this->container->get('templating');
 
-        $callback = function () use ($twig, $view, $parameters) {
-            $twig->display($view, $parameters);
-        };
+            $callback = function () use ($templating, $view, $parameters) {
+                $templating->stream($view, $parameters);
+            };
+        } elseif ($this->container->has('twig')) {
+            $twig = $this->container->get('twig');
+
+            $callback = function () use ($twig, $view, $parameters) {
+                $twig->display($view, $parameters);
+            };
+        } else {
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available.');
+        }
 
         if (null === $response) {
             return new StreamedResponse($callback);
@@ -342,7 +292,7 @@ trait ControllerTrait
      *
      * @return NotFoundHttpException
      */
-    protected function createNotFoundException(string $message = 'Not Found', \Exception $previous = null): NotFoundHttpException
+    protected function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -359,7 +309,7 @@ trait ControllerTrait
      *
      * @return AccessDeniedException
      */
-    protected function createAccessDeniedException(string $message = 'Access Denied.', \Exception $previous = null): AccessDeniedException
+    protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -371,11 +321,11 @@ trait ControllerTrait
      * @param mixed  $data    The initial data for the form
      * @param array  $options Options for the form
      *
-     * @return FormInterface
+     * @return Form
      */
-    protected function createForm(string $type, $data = null, array $options = array()): FormInterface
+    protected function createForm($type, $data = null, array $options = array())
     {
-        return $this->getFormFactory()->create($type, $data, $options);
+        return $this->container->get('form.factory')->create($type, $data, $options);
     }
 
     /**
@@ -384,11 +334,27 @@ trait ControllerTrait
      * @param mixed $data    The initial data for the form
      * @param array $options Options for the form
      *
-     * @return FormBuilderInterface
+     * @return FormBuilder
      */
-    protected function createFormBuilder($data = null, array $options = array()): FormBuilderInterface
+    protected function createFormBuilder($data = null, array $options = array())
     {
-        return $this->getFormFactory()->createBuilder(FormType::class, $data, $options);
+        return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
+    }
+
+    /**
+     * Shortcut to return the Doctrine Registry service.
+     *
+     * @return Registry
+     *
+     * @throws \LogicException If DoctrineBundle is not available
+     */
+    protected function getDoctrine()
+    {
+        if (!$this->container->has('doctrine')) {
+            throw new \LogicException('The DoctrineBundle is not registered in your application.');
+        }
+
+        return $this->container->get('doctrine');
     }
 
     /**
@@ -396,11 +362,17 @@ trait ControllerTrait
      *
      * @return mixed
      *
+     * @throws \LogicException If SecurityBundle is not available
+     *
      * @see TokenInterface::getUser()
      */
     protected function getUser()
     {
-        if (null === $token = $this->getTokenStorage()->getToken()) {
+        if (!$this->container->has('security.token_storage')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application.');
+        }
+
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return;
         }
 
@@ -420,8 +392,12 @@ trait ControllerTrait
      *
      * @return bool
      */
-    protected function isCsrfTokenValid(string $id, string $token): bool
+    protected function isCsrfTokenValid($id, $token)
     {
-        return $this->getCsrfTokenManager()->isTokenValid(new CsrfToken($id, $token));
+        if (!$this->container->has('security.csrf.token_manager')) {
+            throw new \LogicException('CSRF protection is not enabled in your application.');
+        }
+
+        return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
 }

@@ -62,6 +62,9 @@ class ControllerResolver extends ContainerControllerResolver
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }
+        if ($controller instanceof AbstractController && null !== $previousContainer = $controller->setContainer($this->container)) {
+            $controller->setContainer($previousContainer);
+        }
 
         return $controller;
     }

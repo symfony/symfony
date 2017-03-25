@@ -6,6 +6,8 @@ CHANGELOG
 
  * Added a new new version strategy option called json_manifest_path
    that allows you to use the `JsonManifestVersionStrategy`.
+ * Added `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`. It provides the same helpers than the `Controller` class,
+   but does not allow accessing the dependency injection container, in order to encourage explicit dependency declarations.
  * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
  * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Deprecated the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
@@ -26,12 +28,6 @@ CHANGELOG
    Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
  * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
  * Deprecated extending `ConstraintValidatorFactory`
- * Added `Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait` (requires PHP 7). Unlike the `Symfony\Bundle\FrameworkBundle\Controller\Controller`
-   class, this trait does not have access to the dependency injection container. Its dependencies are explicitly and lazily
-   injected using getter injection.
-   `render()`, `renderView()` and `stream()` methods can only use Twig (using the Templating component is not supported).
-   The `json()` method requires the Serializer component (use `Symfony\Component\HttpFoundation\JsonResponse` directly if
-   you do not want to use the Serializer).
  * Deprecated `ControllerArgumentValueResolverPass`. Use
    `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
  * Deprecated `RoutingResolverPass`, use `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` instead

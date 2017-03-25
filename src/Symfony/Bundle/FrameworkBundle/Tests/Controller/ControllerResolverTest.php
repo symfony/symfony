@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +66,44 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller[0]);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
+    }
+
+    public function testAbstractControllerGetsContainerWhenNotSet()
+    {
+        class_exists(AbstractControllerTest::class);
+
+        $controller = new TestAbstractController(false);
+
+        $container = new Container();
+        $container->set(TestAbstractController::class, $controller);
+
+        $resolver = $this->createControllerResolver(null, $container);
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
+
+        $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
+        $this->assertSame($container, $controller->setContainer($container));
+    }
+
+    public function testAbstractControllerGetsNoContainerWhenSet()
+    {
+        class_exists(AbstractControllerTest::class);
+
+        $controller = new TestAbstractController(false);
+        $controllerContainer = new Container();
+        $controller->setContainer($controllerContainer);
+
+        $container = new Container();
+        $container->set(TestAbstractController::class, $controller);
+
+        $resolver = $this->createControllerResolver(null, $container);
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
+
+        $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
+        $this->assertSame($controllerContainer, $controller->setContainer($container));
     }
 
     protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null)

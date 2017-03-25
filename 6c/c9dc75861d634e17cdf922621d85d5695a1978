@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2017-03-20T01:04:37Z
+
+cool, will try it during the week/weekend!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-20T08:08:26Z
+
+Could you please show a before/after comparison of what the user has to do to use this feature? Or some small but complete code example? Otherwise it's hard to follow :(  Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-20T22:56:47Z
+
+I played with this PR on symfony-demo, I really like the taste it provides :)
+I found some enhancements for exception messages: these now provide suggestions when the corresponding type is not found as an id.
+
+A typical example is this one, displayed while building an incompletely defined container:
+```
+  [Symfony\Component\DependencyInjection\Exception\RuntimeException]
+  Cannot autowire argument $manager of method AppBundle\Form\Type\TagsInputTy
+  pe::__construct() for service "AppBundle\Form\Type\TagsInputType": Service
+  "Doctrine\Common\Persistence\ObjectManager" does not exist and it cannot be
+   auto-registered. This type could be aliased to the existing "doctrine.orm.
+  default_entity_manager" service.
+```
+
+The resolution is easy, just add the following to services.yml:
+```yaml
+    Doctrine\Common\Persistence\ObjectManager:
+        '@doctrine.orm.default_entity_manager'
+```
+
+Of course, this alias should be provided by default by DoctrineBundle. By doing so, we would fix "by-id" autowiring immediatly, but we would also prevent any ambiguous "by-type" autowiring - by stating that "doctrine.orm.default_entity_manager" is the service to use by default when the "Doctrine\Common\Persistence\ObjectManager" type is wired.
+
+A possible working resulting services.yml file for symfony-demo could be the following:
+```yaml
+services:
+    _defaults:
+        public: false
+        autowire: by_id
+
+    _instanceof:
+        Symfony\Component\EventDispatcher\EventSubscriberInterface:
+            tags: [ kernel.event_subscriber ]
+
+        Symfony\Component\Form\AbstractType:
+            tags: [ form.type ]
+
+        Twig_Extension:
+            tags: [ twig.extension ]
+
+    AppBundle\:
+        resource: ../../src/AppBundle/{EventListener,Form/Type}
+
+    AppBundle\Controller\:
+        resource: ../../src/AppBundle/Controller
+        public: true
+
+    AppBundle\Twig\AppExtension:
+        arguments: { $locales: '%app_locales%' }
+
+    AppBundle\EventListener\CommentNotificationListener:
+        arguments: { $sender: '%app.notifications.email_sender%' }
+
+    AppBundle\EventListener\RedirectToPreferredLocaleListener:
+        arguments:
+            $locales: '%app_locales%'
+            $defaultLocale: '%locale%'
+
+    AppBundle\Security\PostVoter:
+        tags: [ security.voter ]
+
+    Twig_Extensions_Extension_Intl:
+        class: Twig_Extensions_Extension_Intl
+
+# The following aliases are required for now when using by-id autowiring,
+# until these types are aliased in each core bundle, which they should be.
+# This kind of explicit aliasing is the only difference between by-id and
+# by-type autowiring in this file.
+
+    Doctrine\ORM\EntityManager:
+        '@doctrine.orm.default_entity_manager'
+
+    Doctrine\Common\Persistence\ObjectManager:
+        '@doctrine.orm.default_entity_manager'
+
+    Swift_Mailer:
+        '@swiftmailer.mailer.default'
+
+    Symfony\Component\Routing\Generator\UrlGeneratorInterface:
+        '@router.default'
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-21T09:10:44Z
+
+for the url generator, please add the alias as this has to be done in FrameworkBundle
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-21T15:28:34Z
+
+First commit now split as separate PR, adding logging to AutowirePass, see #22095.
+This made me realize that by-id autoregistration has a high chance of creating a duplicate service when an alias is missing. Better encourage writing explicit aliases.
+PR updated accordingly. Still very useful to me to help devs wire things explicitly but progressively.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-21T21:59:40Z
+
+Exception message enhanced a bit more, with suggestions for already aliased types:
+```
+    [Symfony\Component\DependencyInjection\Exception\RuntimeException]
+    Cannot autowire argument $entityManager of method AppBundle\EventListener\C
+    heckRequirementsSubscriber::__construct() for service "AppBundle\EventListe
+    ner\CheckRequirementsSubscriber": Service "Doctrine\ORM\EntityManager" does
+     not exist. This type could be aliased to the existing "doctrine.orm.defaul
+    t_entity_manager" service. This service is already aliased to "Doctrine\ORM
+    \EntityManagerInterface".
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-22T12:06:16Z
+
+Hi guys!
+
+Let me summarize the new mode! This mode no longer looks through the system and tries to find services that match the type-hint. Instead, it's much simpler: it only looks to see if a service id exists that matches the type-hint. Otherwise, it throws an exception: it does *not* try to automatically create an autowired private service for that class (if it's a class).
+
+I like this! (but I don't like having 2 modes). It doesn't work how I expect autowiring to work (i.e. finding services matching a type-hint), but it's perfectly straightforward. Also, if you take the other mode to an extreme, you would have *zero* services explicitly wired (other than controllers) because the type-hints in classes would cause autowiring to auto-create services. But with this mode, we're saying: all services must be explicitly wired (while in reality for DX, the PSR-4 loader helps a lot here). That *feels* a bit better: I will be able to see in my `services.yml` file why every service exists.
+
+Anyways, I like this... but I don't like the 2 modes. I don't mean we should remove the old one. Instead, if we accept this, it should be with the intention that this becomes *the* recommended mode for autowiring.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-03-22T12:41:34Z
+
+Wholeheartedly agree with @weaverryan 😄
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-24T10:00:12Z
+
+Test case added, failure unrelated. Ready.

@@ -87,6 +87,18 @@ abstract class Controller implements ContainerAwareInterface
     {
         return new RedirectResponse($url, $status);
     }
+    
+    /**
+     * @param string         $route         The name of the route to generate redirect
+     * @param mixed          $parameters    An array of parameters for URL generate
+     * @param integer        $status        The status code to use for the Response
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     * @return RedirectResponse
+     */
+    public function generateRedirect($route, $parameters = array(), $status = 302, $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->redirect($this->generateUrl($route, $parameters, $referenceType), $status);
+    }
 
     /**
      * Returns a RedirectResponse to the given route with the given parameters.

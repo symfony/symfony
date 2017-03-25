@@ -39,6 +39,10 @@
 
         <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" public="false" />
 
+        <service id="assets.json_manifest_version_strategy" class="Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy" abstract="true" public="false">
+            <argument /> <!-- manifest path -->
+        </service>
+
         <service id="assets.preload_manager" class="Symfony\Component\Asset\Preload\PreloadManager" public="false" />
 
         <service id="asset.preload_listener" class="Symfony\Component\Asset\EventListener\PreloadListener">

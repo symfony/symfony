@@ -551,6 +551,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('version_strategy')->defaultNull()->end()
                         ->scalarNode('version')->defaultNull()->end()
                         ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
+                        ->scalarNode('json_manifest_path')->defaultNull()->end()
                         ->scalarNode('base_path')->defaultValue('')->end()
                         ->arrayNode('base_urls')
                             ->requiresAtLeastOneElement()
@@ -567,6 +568,18 @@ class Configuration implements ConfigurationInterface
                         })
                         ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets".')
                     ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                        })
+                        ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return isset($v['version']) && isset($v['json_manifest_path']);
+                        })
+                        ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets".')
+                    ->end()
                     ->fixXmlConfig('package')
                     ->children()
                         ->arrayNode('packages')
@@ -582,6 +595,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
+                                    ->scalarNode('json_manifest_path')->defaultNull()->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()
                                     ->arrayNode('base_urls')
                                         ->requiresAtLeastOneElement()
@@ -597,6 +611,18 @@ class Configuration implements ConfigurationInterface
                                         return isset($v['version_strategy']) && isset($v['version']);
                                     })
                                     ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets" packages.')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                                    })
+                                    ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return isset($v['version']) && isset($v['json_manifest_path']);
+                                    })
+                                    ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.')
                                 ->end()
                             ->end()
                         ->end()

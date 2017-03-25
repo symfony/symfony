@@ -21,6 +21,7 @@
             <framework:package name="bar_version_strategy" version-strategy="assets.custom_version_strategy">
                 <framework:base-url>https://bar_version_strategy.example.com</framework:base-url>
             </framework:package>
+            <framework:package name="json_manifest_strategy" json-manifest-path="/path/to/manifest.json" />
         </framework:assets>
     </framework:config>
 </container>

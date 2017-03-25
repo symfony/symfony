@@ -33,7 +33,7 @@ final class CachePoolClearCommand extends ContainerAwareCommand
         $this
             ->setName('cache:pool:clear')
             ->setDefinition(array(
-                new InputArgument('pools', InputArgument::IS_ARRAY, 'A list of cache pools or cache pool clearers'),
+                new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ))
             ->setDescription('Clears cache pools')
             ->setHelp(<<<'EOF'

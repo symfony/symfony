@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
@@ -278,18 +277,6 @@ class ControllerResolverTest extends TestCase
         $this->assertEquals(array(null, null, 'value', 'mandatory'), $resolver->getArguments($request, $controller));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The controller for URI "/" is not callable. Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract.
-     */
-    public function testGetControllerFailsUsingParentClassForProxies()
-    {
-        $resolver = new ControllerResolver();
-        $request = Request::create('/');
-        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerProxy::protectedAction');
-        $resolver->getController($request);
-    }
-
     protected function createControllerResolver(LoggerInterface $logger = null)
     {
         return new ControllerResolver($logger);
@@ -341,8 +328,4 @@ class ControllerTest
     public static function staticAction()
     {
     }
-}
-
-class ControllerProxy extends ControllerTest implements InheritanceProxyInterface
-{
 }

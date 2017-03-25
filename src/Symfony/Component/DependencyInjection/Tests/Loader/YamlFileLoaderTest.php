@@ -425,15 +425,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
-    public function testGetter()
-    {
-        $container = new ContainerBuilder();
-        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('services31.yml');
-
-        $this->assertEquals(array('getbar' => array('bar' => new Reference('bar'))), $container->getDefinition('foo')->getOverriddenGetters());
-    }
-
     public function testNamedArguments()
     {
         $container = new ContainerBuilder();

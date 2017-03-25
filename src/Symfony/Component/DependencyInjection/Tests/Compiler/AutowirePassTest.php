@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\GetterOverriding;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
@@ -533,51 +532,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
 
         $this->assertSame(A::class, $container->getDefinition('autowired.'.A::class)->getClass());
-    }
-
-    /**
-     * @requires PHP 7.1
-     */
-    public function testGetterOverriding()
-    {
-        $container = new ContainerBuilder();
-        $container->register('b', B::class);
-
-        $container
-            ->register('getter_overriding', GetterOverriding::class)
-            ->setOverriddenGetter('getExplicitlyDefined', new Reference('b'))
-            ->setAutowired(true)
-        ;
-
-        $pass = new AutowirePass();
-        $pass->process($container);
-
-        $overridenGetters = $container->getDefinition('getter_overriding')->getOverriddenGetters();
-        $this->assertEquals(array(
-            'getexplicitlydefined' => new Reference('b'),
-            'getfoo' => new Reference('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Foo'),
-            'getbar' => new Reference('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Bar'),
-        ), $overridenGetters);
-    }
-
-    /**
-     * @requires PHP 7.1
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire service "getter_overriding": multiple candidate services exist for class "Symfony\Component\DependencyInjection\Tests\Compiler\Foo". This type-hint could be aliased to one of these existing services: "a1", "a2".
-     */
-    public function testGetterOverridingWithAmbiguousServices()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a1', Foo::class);
-        $container->register('a2', Foo::class);
-
-        $container
-            ->register('getter_overriding', GetterOverriding::class)
-            ->setAutowired(true)
-        ;
-
-        $pass = new AutowirePass();
-        $pass->process($container);
     }
 
     /**

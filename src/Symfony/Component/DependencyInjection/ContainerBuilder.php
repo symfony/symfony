@@ -37,8 +37,6 @@ use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
-use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
-use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
@@ -1042,9 +1040,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
         if (null !== $factory = $definition->getFactory()) {
-            if ($definition->getOverriddenGetters()) {
-                throw new RuntimeException(sprintf('Cannot create service "%s": factories and overridden getters are incompatible with each other.', $id));
-            }
             if (is_array($factory)) {
                 $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
             } elseif (!is_string($factory)) {
@@ -1063,30 +1058,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
+            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+
             if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
                 @trigger_error(sprintf('The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name), E_USER_DEPRECATED);
-            }
-            if ($definition->getOverriddenGetters()) {
-                static $salt;
-                if (null === $salt) {
-                    $salt = str_replace('.', '', uniqid('', true));
-                }
-                $service = sprintf('%s implements \\%s { private $container%4$s; private $getters%4$s; %s }', $r->name, InheritanceProxyInterface::class, $this->generateOverriddenMethods($id, $definition, $r, $salt), $salt);
-                if (!class_exists($proxyClass = 'SymfonyProxy_'.md5($service), false)) {
-                    eval(sprintf('class %s extends %s', $proxyClass, $service));
-                }
-                $r = new \ReflectionClass($proxyClass);
-                $constructor = $r->getConstructor();
-                if ($constructor && !defined('HHVM_VERSION') && $constructor->getDeclaringClass()->isInternal()) {
-                    $constructor = null;
-                }
-                $service = $constructor ? $r->newInstanceWithoutConstructor() : $r->newInstanceArgs($arguments);
-                call_user_func(\Closure::bind(function ($c, $g, $s) { $this->{'container'.$s} = $c; $this->{'getters'.$s} = $g; }, $service, $service), $this, $definition->getOverriddenGetters(), $salt);
-                if ($constructor) {
-                    $constructor->invokeArgs($service, $arguments);
-                }
-            } else {
-                $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
             }
         }
 
@@ -1346,44 +1321,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->envCounters;
-    }
-
-    private function generateOverriddenMethods($id, Definition $definition, \ReflectionClass $class, $salt)
-    {
-        if ($class->isFinal()) {
-            throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" cannot be marked as final.', $id, $class->name));
-        }
-
-        return $this->generateOverriddenGetters($id, $definition, $class, $salt);
-    }
-
-    private function generateOverriddenGetters($id, Definition $definition, \ReflectionClass $class, $salt)
-    {
-        $getters = '';
-
-        foreach ($definition->getOverriddenGetters() as $name => $returnValue) {
-            $r = InheritanceProxyHelper::getGetterReflector($class, $name, $id);
-            $signature = InheritanceProxyHelper::getSignature($r);
-            $visibility = $r->isProtected() ? 'protected' : 'public';
-            $getters .= <<<EOF
-
-{$visibility} function {$signature} {
-    \$c = \$this->container{$salt};
-    \$b = \$c->getParameterBag();
-    \$v = \$this->getters{$salt}['{$name}'];
-
-    foreach (\$c->getServiceConditionals(\$v) as \$s) {
-        if (!\$c->has(\$s)) {
-            return parent::{$r->name}();
-        }
-    }
-
-    return \$c->resolveServices(\$b->unescapeValue(\$b->resolveValue(\$v)));
-}
-EOF;
-        }
-
-        return $getters;
     }
 
     /**

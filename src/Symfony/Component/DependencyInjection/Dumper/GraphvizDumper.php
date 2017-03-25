@@ -80,13 +80,6 @@ class GraphvizDumper extends Dumper
                     $this->findEdges($id, $call[1], false, $call[0].'()')
                 );
             }
-
-            foreach ($definition->getOverriddenGetters() as $name => $value) {
-                $this->edges[$id] = array_merge(
-                    $this->edges[$id],
-                    $this->findEdges($id, $value, false, $name.'()')
-                );
-            }
         }
 
         return $this->container->resolveEnvPlaceholders($this->startDot().$this->addNodes().$this->addEdges().$this->endDot(), '__ENV_%s__');

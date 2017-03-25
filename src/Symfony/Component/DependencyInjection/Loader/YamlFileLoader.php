@@ -48,7 +48,6 @@ class YamlFileLoader extends FileLoader
         'file' => 'file',
         'arguments' => 'arguments',
         'properties' => 'properties',
-        'getters' => 'getters',
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
@@ -71,7 +70,6 @@ class YamlFileLoader extends FileLoader
         'factory' => 'factory',
         'arguments' => 'arguments',
         'properties' => 'properties',
-        'getters' => 'getters',
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
@@ -88,7 +86,6 @@ class YamlFileLoader extends FileLoader
         'factory' => 'factory',
         'arguments' => 'arguments',
         'properties' => 'properties',
-        'getters' => 'getters',
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
@@ -425,10 +422,6 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['configurator'])) {
             $definition->setConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file));
-        }
-
-        if (isset($service['getters'])) {
-            $definition->setOverriddenGetters($this->resolveServices($service['getters'], $file));
         }
 
         if (isset($service['calls'])) {

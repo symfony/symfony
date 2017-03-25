@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
+use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -111,7 +111,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 // create a per-method map of argument-names to service/type-references
                 $args = array();
                 foreach ($parameters as $p) {
-                    $type = $target = InheritanceProxyHelper::getTypeHint($r, $p, true);
+                    $type = $target = ProxyHelper::getTypeHint($r, $p, true);
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
 
                     if (isset($arguments[$r->name][$p->name])) {

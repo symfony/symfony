@@ -75,7 +75,6 @@ abstract class AbstractCloner implements ClonerInterface
         'Exception' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castException'),
         'Error' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castError'),
         'Symfony\Component\DependencyInjection\ContainerInterface' => array('Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'),
-        'Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface' => array('Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castInheritanceProxy'),
         'Symfony\Component\HttpFoundation\Request' => array('Symfony\Component\VarDumper\Caster\SymfonyCaster', 'castRequest'),
         'Symfony\Component\VarDumper\Exception\ThrowingCasterException' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castThrowingCasterException'),
         'Symfony\Component\VarDumper\Caster\TraceStub' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castTraceStub'),

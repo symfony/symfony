@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
+use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
@@ -125,7 +125,6 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
-            $overriddenGetters = $this->autowireOverridenGetters($value->getOverriddenGetters(), $autowiredMethods);
 
             if ($constructor) {
                 list(, $arguments) = array_shift($methodCalls);
@@ -137,10 +136,6 @@ class AutowirePass extends AbstractRecursivePass
 
             if ($methodCalls !== $value->getMethodCalls()) {
                 $value->setMethodCalls($methodCalls);
-            }
-
-            if ($overriddenGetters !== $value->getOverriddenGetters()) {
-                $value->setOverriddenGetters($overriddenGetters);
             }
 
             return parent::processValue($value, $isRoot);
@@ -165,7 +160,7 @@ class AutowirePass extends AbstractRecursivePass
             $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
         }
 
-        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $reflectionMethod) {
+        foreach ($reflectionClass->getMethods() as $reflectionMethod) {
             $r = $reflectionMethod;
 
             while (true) {
@@ -224,9 +219,6 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         foreach ($autowiredMethods as $lcMethod => $reflectionMethod) {
-            if (!$reflectionMethod->getNumberOfParameters()) {
-                continue; // skip getters
-            }
             $method = $reflectionMethod->name;
 
             if (!$reflectionMethod->isPublic()) {
@@ -270,7 +262,7 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            $type = InheritanceProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
+            $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
 
             if (!$type) {
                 // no default value? Then fail
@@ -309,41 +301,6 @@ class AutowirePass extends AbstractRecursivePass
         ksort($arguments);
 
         return $arguments;
-    }
-
-    /**
-     * Autowires getters.
-     *
-     * @param array $overridenGetters
-     * @param array $autowiredMethods
-     *
-     * @return array
-     */
-    private function autowireOverridenGetters(array $overridenGetters, array $autowiredMethods)
-    {
-        foreach ($autowiredMethods as $lcMethod => $reflectionMethod) {
-            if (isset($overridenGetters[$lcMethod]) || $reflectionMethod->getNumberOfParameters() || $reflectionMethod->isConstructor()) {
-                continue;
-            }
-            $class = $reflectionMethod->class;
-            $method = $reflectionMethod->name;
-
-            if (!$type = InheritanceProxyHelper::getTypeHint($reflectionMethod, null, true)) {
-                $type = InheritanceProxyHelper::getTypeHint($reflectionMethod);
-
-                throw new RuntimeException(sprintf('Cannot autowire service "%s": getter %s() must%s have its return value be configured explicitly.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $type ? '' : ' have a return-type hint or'));
-            }
-
-            if (!$typeRef = $this->getAutowiredReference($type)) {
-                $this->container->log($this, $this->createTypeNotFoundMessage($type, sprintf('return value of method %s()', $class !== $this->currentId ? $class.'::'.$method : $method)));
-                continue;
-            }
-
-            $overridenGetters[$lcMethod] = $typeRef;
-            $this->usedTypes[$type] = $this->currentId;
-        }
-
-        return $overridenGetters;
     }
 
     /**

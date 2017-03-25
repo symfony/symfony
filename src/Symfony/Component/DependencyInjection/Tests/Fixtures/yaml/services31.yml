@@ -1,6 +1,0 @@
-services:
-    foo:
-        class: Foo
-        getters:
-            getBar: { bar: '@bar' }
-

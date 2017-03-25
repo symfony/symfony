@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -234,10 +233,6 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
         }
 
         $className = is_object($controller) ? get_class($controller) : $controller;
-
-        if (is_subclass_of($className, InheritanceProxyInterface::class)) {
-            $className = get_parent_class($className);
-        }
 
         if (method_exists($controller, $method)) {
             return sprintf('Method "%s" on class "%s" should be public and non-abstract.', $method, $className);

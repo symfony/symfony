@@ -905,65 +905,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals(array($second, $first), $configs);
     }
 
-    public function testOverriddenGetter()
-    {
-        $builder = new ContainerBuilder();
-        $builder
-            ->register('foo', 'ReflectionClass')
-            ->addArgument('stdClass')
-            ->setOverriddenGetter('getName', 'bar');
-
-        $foo = $builder->get('foo');
-
-        $this->assertInstanceOf('ReflectionClass', $foo);
-        $this->assertSame('bar', $foo->getName());
-    }
-
-    public function testOverriddenGetterOnInvalid()
-    {
-        $builder = new ContainerBuilder();
-        $builder
-            ->register('foo', 'ReflectionClass')
-            ->addArgument('stdClass')
-            ->setOverriddenGetter('getName', new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE));
-
-        $foo = $builder->get('foo');
-
-        $this->assertInstanceOf('ReflectionClass', $foo);
-        $this->assertSame('stdClass', $foo->getName());
-    }
-
-    /**
-     * @dataProvider provideBadOverridenGetters
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     */
-    public function testBadOverridenGetters($expectedMessage, $getter, $id = 'foo')
-    {
-        $container = include __DIR__.'/Fixtures/containers/container30.php';
-        $container->getDefinition($id)->setOverriddenGetter($getter, 123);
-
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(RuntimeException::class);
-            $this->expectExceptionMessage($expectedMessage);
-        } else {
-            $this->setExpectedException(RuntimeException::class, $expectedMessage);
-        }
-
-        $container->get($id);
-    }
-
-    public function provideBadOverridenGetters()
-    {
-        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getnotfound" does not exist.', 'getNotFound');
-        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getPrivate" must be public or protected.', 'getPrivate');
-        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getStatic" cannot be static.', 'getStatic');
-        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getFinal" cannot be marked as final.', 'getFinal');
-        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getRef" cannot return by reference.', 'getRef');
-        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getParam" cannot have any arguments.', 'getParam');
-        yield array('Unable to configure service "bar": class "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Bar" cannot be marked as final.', 'getParam', 'bar');
-        yield array('Cannot create service "baz": factories and overridden getters are incompatible with each other.', 'getParam', 'baz');
-    }
-
     public function testAbstractAlias()
     {
         $container = new ContainerBuilder();

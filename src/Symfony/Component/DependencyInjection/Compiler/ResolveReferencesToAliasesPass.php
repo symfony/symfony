@@ -42,7 +42,6 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
             $definition->setArguments($this->processArguments($definition->getArguments()));
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
-            $definition->setOverriddenGetters($this->processArguments($definition->getOverriddenGetters()));
             $definition->setProperties($this->processArguments($definition->getProperties()));
             $definition->setFactory($this->processFactory($definition->getFactory()));
         }

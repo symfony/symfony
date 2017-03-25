@@ -11,40 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\LazyProxy;
 
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
-class InheritanceProxyHelper
+class ProxyHelper
 {
-    public static function getGetterReflector(\ReflectionClass $class, $name, $id)
-    {
-        if (!$class->hasMethod($name)) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" does not exist.', $id, $class->name, $name));
-        }
-        $r = $class->getMethod($name);
-        if ($r->isPrivate()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" must be public or protected.', $id, $class->name, $r->name));
-        }
-        if ($r->isStatic()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be static.', $id, $class->name, $r->name));
-        }
-        if ($r->isFinal()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be marked as final.', $id, $class->name, $r->name));
-        }
-        if ($r->returnsReference()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot return by reference.', $id, $class->name, $r->name));
-        }
-        if (0 < $r->getNumberOfParameters()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot have any arguments.', $id, $class->name, $r->name));
-        }
-
-        return $r;
-    }
-
     /**
      * @return string The signature of the passed function, return type and function/method name included if any
      */

@@ -253,7 +253,6 @@ class XmlFileLoader extends FileLoader
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', false, $definition instanceof ChildDefinition));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
-        $definition->setOverriddenGetters($this->getArgumentsAsPhp($service, 'getter'));
 
         if ($factories = $this->getChildren($service, 'factory')) {
             $factory = $factories[0];
@@ -380,7 +379,7 @@ class XmlFileLoader extends FileLoader
         $xpath->registerNamespace('container', self::NS);
 
         // anonymous services as arguments/properties
-        if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]|//container:getter[@type="service"][not(@id)]')) {
+        if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
                 $id = sprintf('%d_%s', ++$count, hash('sha256', $file));

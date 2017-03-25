@@ -1,14 +1,6 @@
 imports:
     - { resource: ./../config/default.yml }
 
-services:
-    csrf_form_login.form.type:
-        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType
-        arguments:
-            - '@request_stack'
-        tags:
-            - { name: form.type }
-
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
@@ -31,11 +23,6 @@ security:
             form_login:
                 check_path: /login_check
                 default_target_path: /profile
-                target_path_parameter: "user_login[_target_path]"
-                failure_path_parameter: "user_login[_failure_path]"
-                username_parameter: "user_login[username]"
-                password_parameter: "user_login[password]"
-                csrf_parameter: "user_login[_token]"
                 csrf_token_generator: security.csrf.token_manager
             anonymous: ~
             logout:

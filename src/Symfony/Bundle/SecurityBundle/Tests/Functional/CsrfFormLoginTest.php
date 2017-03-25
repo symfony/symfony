@@ -21,8 +21,8 @@ class CsrfFormLoginTest extends WebTestCase
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
-        $form['user_login[username]'] = 'johannes';
-        $form['user_login[password]'] = 'test';
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
         $client->submit($form);
 
         $this->assertRedirect($client->getResponse(), '/profile');
@@ -46,12 +46,34 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
+    public function testFormLoginWithBadCredentialsAndCsrfTokens($config)
+    {
+        $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'wrong';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/login');
+
+        $crawler = $client->followRedirect();
+
+        $this->assertContains('Bad credentials.', $crawler->text());
+
+        $usernameInput = $crawler->filter('[name="_username"]');
+        $this->assertSame('johannes', $usernameInput->attr('value'));
+    }
+
+    /**
+     * @dataProvider getConfigs
+     */
     public function testFormLoginWithInvalidCsrfToken($config)
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
-        $form['user_login[_token]'] = '';
+        $form['_csrf_token'] = '';
         $client->submit($form);
 
         $this->assertRedirect($client->getResponse(), '/login');
@@ -68,9 +90,9 @@ class CsrfFormLoginTest extends WebTestCase
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
-        $form['user_login[username]'] = 'johannes';
-        $form['user_login[password]'] = 'test';
-        $form['user_login[_target_path]'] = '/foo';
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $form['_target_path'] = '/foo';
         $client->submit($form);
 
         $this->assertRedirect($client->getResponse(), '/foo');
@@ -91,8 +113,8 @@ class CsrfFormLoginTest extends WebTestCase
         $this->assertRedirect($client->getResponse(), '/login');
 
         $form = $client->followRedirect()->selectButton('login')->form();
-        $form['user_login[username]'] = 'johannes';
-        $form['user_login[password]'] = 'test';
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
         $client->submit($form);
         $this->assertRedirect($client->getResponse(), '/protected-resource');
 

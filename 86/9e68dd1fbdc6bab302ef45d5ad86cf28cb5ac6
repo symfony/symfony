@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-24T15:25:22Z
+
+@lyrixx Can you add a tests to avoid regressions?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2017-03-25T09:40:50Z
+
+I think we should also trigger this event when CommandNotFound exceptions are thrown. What about allowing `null` for the `command` in `ConsoleErrorEvent`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-25T12:46:41Z
+
++1 for having the event fired on command not found. As there is currently no working case where the command is null I think it's safe to make it nullable in this specific event.

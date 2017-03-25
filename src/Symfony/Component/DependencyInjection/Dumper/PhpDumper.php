@@ -646,10 +646,11 @@ EOF;
         }
 
         if ($definition->isAutowired()) {
+            $autowired = Definition::AUTOWIRE_BY_TYPE === $definition->getAutowired() ? 'types' : 'ids';
             $doc .= <<<EOF
 
      *
-     * This service is autowired.
+     * This service is autowired by {$autowired}.
 EOF;
         }
 

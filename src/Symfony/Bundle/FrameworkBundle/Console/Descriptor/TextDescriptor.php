@@ -295,7 +295,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Lazy', $definition->isLazy() ? 'yes' : 'no');
         $tableRows[] = array('Shared', $definition->isShared() ? 'yes' : 'no');
         $tableRows[] = array('Abstract', $definition->isAbstract() ? 'yes' : 'no');
-        $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
+        $tableRows[] = array('Autowired', $definition->isAutowired() ? (Definition::AUTOWIRE_BY_TYPE === $definition->getAutowired() ? 'by-type' : 'by-id') : 'no');
 
         if ($autowiringTypes = $definition->getAutowiringTypes(false)) {
             $tableRows[] = array('Autowiring Types', implode(', ', $autowiringTypes));

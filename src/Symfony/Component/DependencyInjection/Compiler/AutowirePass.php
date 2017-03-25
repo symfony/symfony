@@ -312,6 +312,10 @@ class AutowirePass extends AbstractRecursivePass
             return new Reference($type);
         }
 
+        if (Definition::AUTOWIRE_BY_ID === $this->currentDefinition->getAutowired()) {
+            return;
+        }
+
         if (null === $this->types) {
             $this->populateAvailableTypes();
         }
@@ -462,10 +466,18 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeNotFoundMessage($type, $label)
     {
-        if (!$classOrInterface = class_exists($type, false) ? 'class' : (interface_exists($type, false) ? 'interface' : null)) {
+        $autowireById = Definition::AUTOWIRE_BY_ID === $this->currentDefinition->getAutowired();
+        if (!$classOrInterface = class_exists($type, $autowireById) ? 'class' : (interface_exists($type, false) ? 'interface' : null)) {
             return sprintf('Cannot autowire service "%s": %s has type "%s" but this class does not exist.', $this->currentId, $label, $type);
         }
-        $message = sprintf('no services were found matching the "%s" %s and it cannot be auto-registered for %s.', $type, $classOrInterface, $label);
+        if (null === $this->types) {
+            $this->populateAvailableTypes();
+        }
+        if ($autowireById) {
+            $message = sprintf('%s references %s "%s" but no such service exists.%s', $label, $classOrInterface, $type, $this->createTypeAlternatives($type));
+        } else {
+            $message = sprintf('no services were found matching the "%s" %s and it cannot be auto-registered for %s.', $type, $classOrInterface, $label);
+        }
 
         return sprintf('Cannot autowire service "%s": %s', $this->currentId, $message);
     }

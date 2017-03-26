@@ -11,17 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
-use Symfony\Component\HttpKernel\EventListener\SessionListener as BaseSessionListener;
+use Symfony\Component\HttpKernel\EventListener\ContainerAwareSessionListener;
 
-@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', SessionListener::class, BaseSessionListener::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', ContainerAwareSessionListener::class, BaseSessionListener::class), E_USER_DEPRECATED);
 
 /**
  * Sets the session in the request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseSessionListener} instead
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link ContainerAwareSessionListener} instead
  */
-class SessionListener extends BaseSessionListener
+class SessionListener extends ContainerAwareSessionListener
 {
 }

@@ -40,10 +40,6 @@ class ServerStopCommand extends ServerCommand
 The <info>%command.name%</info> stops the local web server:
 
   <info>php %command.full_name%</info>
-
-To change the default bind address and the default port use the <info>address</info> argument:
-
-  <info>php %command.full_name% 127.0.0.1:8080</info>
 EOF
             )
         ;

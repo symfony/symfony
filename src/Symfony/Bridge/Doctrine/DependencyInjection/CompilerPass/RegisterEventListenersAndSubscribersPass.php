@@ -109,15 +109,12 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
                 }
 
-                if ($lazy = isset($tag['lazy']) && $tag['lazy']) {
+                if ($lazy = !empty($tag['lazy'])) {
                     $taggedListenerDef->setPublic(true);
                 }
 
                 // we add one call per event per service so we have the correct order
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', array(
-                    $tag['event'],
-                    $lazy ? $id : new Reference($id),
-                ));
+                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', array(array($tag['event']), $lazy ? $id : new Reference($id)));
             }
         }
     }

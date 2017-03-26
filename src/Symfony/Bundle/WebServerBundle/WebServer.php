@@ -58,7 +58,8 @@ class WebServer
 
     public function start(WebServerConfig $config, $pidFile = null)
     {
-        if ($this->isRunning()) {
+        $pidFile = $pidFile ?: $this->getDefaultPidFile();
+        if ($this->isRunning($pidFile)) {
             throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $config->getAddress()));
         }
 
@@ -84,7 +85,6 @@ class WebServer
             throw new \RuntimeException('Unable to start the server process.');
         }
 
-        $pidFile = $pidFile ?: $this->getDefaultPidFile();
         file_put_contents($pidFile, $config->getAddress());
 
         // stop the web server when the lock file is removed

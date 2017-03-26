@@ -185,6 +185,29 @@ class Response
         510 => 'Not Extended',                                                // RFC2774
         511 => 'Network Authentication Required',                             // RFC6585
     );
+    private static $deprecatedMethods = array(
+        'setDate', 'getDate',
+        'setExpires', 'getExpires',
+        'setLastModified', 'getLastModified',
+        'setProtocolVersion', 'getProtocolVersion',
+        'setStatusCode', 'getStatusCode',
+        'setCharset', 'getCharset',
+        'setPrivate', 'setPublic',
+        'getAge', 'getMaxAge', 'setMaxAge', 'setSharedMaxAge',
+        'getTtl', 'setTtl', 'setClientTtl',
+        'getEtag', 'setEtag',
+        'hasVary', 'getVary', 'setVary',
+        'isInvalid', 'isSuccessful', 'isRedirection',
+        'isClientError', 'isOk', 'isForbidden',
+        'isNotFound', 'isRedirect', 'isEmpty',
+    );
+    private static $deprecationsTriggered = array(
+        __CLASS__ => true,
+        BinaryFileResponse::class => true,
+        JsonResponse::class => true,
+        RedirectResponse::class => true,
+        StreamedResponse::class => true,
+    );
 
     /**
      * Constructor.

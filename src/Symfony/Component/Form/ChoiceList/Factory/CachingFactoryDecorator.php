@@ -20,7 +20,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CachingFactoryDecorator implements ExpandedChoiceListFactoryInterface
+class CachingFactoryDecorator implements ChoiceListFactoryInterface
 {
     /**
      * @var ChoiceListFactoryInterface
@@ -152,43 +152,22 @@ class CachingFactoryDecorator implements ExpandedChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
-    {
-        return $this->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createExpandedView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
         $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr));
 
         if (!isset($this->views[$hash])) {
-            // BC layer
-            if ($this->decoratedFactory instanceof ExpandedChoiceListFactoryInterface) {
-                $choiceView = $this->decoratedFactory->createExpandedView(
-                    $list,
-                    $preferredChoices,
-                    $label,
-                    $index,
-                    $groupBy,
-                    $attr,
-                    $labelAttr
-                );
-            } else {
-                $choiceView = $this->decoratedFactory->createView(
-                    $list,
-                    $preferredChoices,
-                    $label,
-                    $index,
-                    $groupBy,
-                    $attr
-                );
-            }
-            $this->views[$hash] = $choiceView;
+            $this->views[$hash] = $this->decoratedFactory->createView(
+                $list,
+                $preferredChoices,
+                $label,
+                $index,
+                $groupBy,
+                $attr,
+                $labelAttr
+            );
         }
 
         return $this->views[$hash];

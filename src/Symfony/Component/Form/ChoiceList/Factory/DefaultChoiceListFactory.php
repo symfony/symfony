@@ -24,7 +24,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class DefaultChoiceListFactory implements ExpandedChoiceListFactoryInterface
+class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
     /**
      * {@inheritdoc}
@@ -45,15 +45,7 @@ class DefaultChoiceListFactory implements ExpandedChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
-    {
-        return $this->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createExpandedView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $preferredViews = array();
         $otherViews = array();

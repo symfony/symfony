@@ -452,16 +452,10 @@ class ChoiceType extends AbstractType
 
     private function createChoiceListView(ChoiceListInterface $choiceList, array $options)
     {
-        if ($this->choiceListFactory instanceof ExpandedChoiceListFactoryInterface) {
-            return $this->choiceListFactory->createExpandedView(
-                $choiceList,
-                $options['preferred_choices'],
-                $options['choice_label'],
-                $options['choice_name'],
-                $options['group_by'],
-                $options['choice_attr'],
-                $options['choice_label_attr']
-            );
+        // BC
+        $refMethod = new \ReflectionMethod($this->choiceListFactory, 'createView');
+        if (6 > $refMethod->getNumberOfParameters()) {
+            @trigger_error(sprintf('Not passing a "$labelAttr" as sixth argument of "%s" is deprecated since version 3.3 and will trigger an error in 4.0.', $refMethod->getNamespaceName()));
         }
 
         return $this->choiceListFactory->createView(
@@ -470,7 +464,8 @@ class ChoiceType extends AbstractType
             $options['choice_label'],
             $options['choice_name'],
             $options['group_by'],
-            $options['choice_attr']
+            $options['choice_attr'],
+            $options['choice_label_attr']
         );
     }
 }

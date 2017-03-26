@@ -39,7 +39,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PropertyAccessDecorator implements ExpandedChoiceListFactoryInterface
+class PropertyAccessDecorator implements ChoiceListFactoryInterface
 {
     /**
      * @var ChoiceListFactoryInterface
@@ -139,11 +139,6 @@ class PropertyAccessDecorator implements ExpandedChoiceListFactoryInterface
         return $this->decoratedFactory->createListFromLoader($loader, $value);
     }
 
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
-    {
-        return $this->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr);
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -157,7 +152,7 @@ class PropertyAccessDecorator implements ExpandedChoiceListFactoryInterface
      *
      * @return ChoiceListView The choice list view
      */
-    public function createExpandedView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $accessor = $this->propertyAccessor;
 
@@ -231,13 +226,6 @@ class PropertyAccessDecorator implements ExpandedChoiceListFactoryInterface
             };
         }
 
-        // BC Layer
-        if ($this->decoratedFactory instanceof ExpandedChoiceListFactoryInterface) {
-            $choiceView = $this->decoratedFactory->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr);
-        } else {
-            $choiceView = $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
-        }
-
-        return $choiceView;
+        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr);
     }
 }

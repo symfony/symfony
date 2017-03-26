@@ -90,11 +90,11 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $this->assertEquals(
             array(
-                array('addEventListener', array('foo_bar', new Reference('c'))),
-                array('addEventListener', array('foo_bar', new Reference('a'))),
-                array('addEventListener', array('bar', new Reference('a'))),
-                array('addEventListener', array('foo', new Reference('b'))),
-                array('addEventListener', array('foo', new Reference('a'))),
+                array('addEventListener', array(array('foo_bar'), new Reference('c'))),
+                array('addEventListener', array(array('foo_bar'), new Reference('a'))),
+                array('addEventListener', array(array('bar'), new Reference('a'))),
+                array('addEventListener', array(array('foo'), new Reference('b'))),
+                array('addEventListener', array(array('foo'), new Reference('a'))),
             ),
             $methodCalls
         );
@@ -138,16 +138,16 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $this->assertEquals(
             array(
-                array('addEventListener', array('onFlush', new Reference('a'))),
-                array('addEventListener', array('onFlush', new Reference('b'))),
+                array('addEventListener', array(array('onFlush'), new Reference('a'))),
+                array('addEventListener', array(array('onFlush'), new Reference('b'))),
             ),
             $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls()
         );
 
         $this->assertEquals(
             array(
-                array('addEventListener', array('onFlush', new Reference('a'))),
-                array('addEventListener', array('onFlush', new Reference('c'))),
+                array('addEventListener', array(array('onFlush'), new Reference('a'))),
+                array('addEventListener', array(array('onFlush'), new Reference('c'))),
             ),
             $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls()
         );

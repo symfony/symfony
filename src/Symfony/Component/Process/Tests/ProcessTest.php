@@ -1406,13 +1406,13 @@ class ProcessTest extends TestCase
     public function testEnvBackupDoesNotDeleteExistingVars()
     {
         putenv('existing_var=foo');
-        $process = $this->getProcess('echo "$new_test_var"');
+        $process = $this->getProcess('php -r "echo getenv(\'new_test_var\');"');
         $process->setEnv(array('existing_var' => 'bar', 'new_test_var' => 'foo'));
         $process->inheritEnvironmentVariables();
 
         $process->run();
 
-        $this->assertSame('foo'.PHP_EOL, $process->getOutput());
+        $this->assertSame('foo', $process->getOutput());
         $this->assertSame('foo', getenv('existing_var'));
         $this->assertFalse(getenv('new_test_var'));
     }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 
 /**
@@ -110,6 +111,19 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);
+    }
+
+    public function testTypedArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments(array('$apiKey' => '123', CaseSensitiveClass::class => new Reference('foo')));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+
+        $this->assertEquals(array(new Reference('foo'), '123'), $definition->getArguments());
     }
 }
 

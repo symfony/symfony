@@ -4,7 +4,7 @@ services:
     another_one:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy
         arguments:
-            0: ~
             $apiKey: ABCD
+            Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass: ~
         calls:
             - ['setApiKey', { $apiKey: '123' }]

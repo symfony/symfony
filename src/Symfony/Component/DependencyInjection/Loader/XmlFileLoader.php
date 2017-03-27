@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -165,6 +166,7 @@ class XmlFileLoader extends FileLoader
         }
         $defaults = array(
             'tags' => $this->getChildren($defaultsNode, 'tag'),
+            'bind' => array_map(function ($v) { return new BoundArgument($v); }, $this->getArgumentsAsPhp($defaultsNode, 'bind', $file)),
         );
 
         foreach ($defaults['tags'] as $tag) {
@@ -172,6 +174,7 @@ class XmlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The tag name for tag "<defaults>" in %s must be a non-empty string.', $file));
             }
         }
+
         if ($defaultsNode->hasAttribute('autowire')) {
             $defaults['autowire'] = XmlUtils::phpize($defaultsNode->getAttribute('autowire'));
         }
@@ -221,6 +224,13 @@ class XmlFileLoader extends FileLoader
                 if ('tags' === $k) {
                     // since tags are never inherited from parents, there is no confusion
                     // thus we can safely add them as defaults to ChildDefinition
+                    continue;
+                }
+                if ('bind' === $k) {
+                    if ($defaults['bind']) {
+                        throw new InvalidArgumentException(sprintf('Bound values on service "%s" cannot be inherited from "defaults" when a "parent" is set. Move your child definitions to a separate file.', $k, $service->getAttribute('id')));
+                    }
+
                     continue;
                 }
                 if (!$service->hasAttribute($k)) {
@@ -344,6 +354,15 @@ class XmlFileLoader extends FileLoader
             $definition->addAutowiringType($type->textContent);
         }
 
+        $bindings = $this->getArgumentsAsPhp($service, 'bind', $file);
+        if (isset($defaults['bind'])) {
+            // deep clone, to avoid multiple process of the same instance in the passes
+            $bindings = array_merge(unserialize(serialize($defaults['bind'])), $bindings);
+        }
+        if ($bindings) {
+            $definition->setBindings($bindings);
+        }
+
         if ($value = $service->getAttribute('decorates')) {
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
             $priority = $service->hasAttribute('decoration-priority') ? $service->getAttribute('decoration-priority') : 0;
@@ -391,7 +410,7 @@ class XmlFileLoader extends FileLoader
         $xpath->registerNamespace('container', self::NS);
 
         // anonymous services as arguments/properties
-        if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]|//container:factory[not(@service)]|//container:configurator[not(@service)]')) {
+        if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]|//container:bind[not(@id)]|//container:factory[not(@service)]|//container:configurator[not(@service)]')) {
             foreach ($nodes as $node) {
                 if ($services = $this->getChildren($node, 'service')) {
                     // give it a unique name

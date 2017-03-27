@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
+use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Annotation\GetterAccessor;
+use Symfony\Component\PropertyAccess\Annotation\SetterAccessor;
+
 class TestClass
 {
     public $publicProperty;
     protected $protectedProperty;
-    private $privateProperty;
 
     private $publicAccessor;
     private $publicMethodAccessor;
@@ -28,7 +31,14 @@ class TestClass
     private $publicGetter;
     private $date;
 
-    public function __construct($value)
+    private $quantity;
+
+    /**
+     * @PropertyAccessor(getter="customGetterTest", setter="customSetterTest")
+     */
+    private $customGetterSetter;
+
+    public function __construct($value, $quantity = 2, $pricePerUnit = 10)
     {
         $this->publicProperty = $value;
         $this->publicAccessor = $value;
@@ -40,6 +50,9 @@ class TestClass
         $this->publicIsAccessor = $value;
         $this->publicHasAccessor = $value;
         $this->publicGetter = $value;
+        $this->customGetterSetter = $value;
+        $this->quantity = $quantity;
+        $this->pricePerUnit = $pricePerUnit;
     }
 
     public function setPublicAccessor($value)
@@ -183,5 +196,41 @@ class TestClass
     public function getDate()
     {
         return $this->date;
+    }
+
+    public function customGetterTest()
+    {
+        return $this->customGetterSetter;
+    }
+
+    public function customSetterTest($value)
+    {
+        $this->customGetterSetter = $value;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @GetterAccessor(property="total")
+     */
+    public function getTotal()
+    {
+        return $this->quantity * $this->pricePerUnit;
+    }
+
+    /**
+     * @SetterAccessor(property="total")
+     *
+     * @param mixed $total
+     */
+    public function setTotal($total)
+    {
+        $this->quantity = $total / $this->pricePerUnit;
     }
 }

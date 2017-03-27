@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\PropertyAccess\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * A configurable builder to create a PropertyAccessor.
@@ -27,6 +28,11 @@ class PropertyAccessorBuilder
      * @var CacheItemPoolInterface|null
      */
     private $cacheItemPool;
+
+    /**
+     * @var MetadataFactoryInterface|null
+     */
+    private $metadataFactory;
 
     /**
      * Enables the use of "__call" by the PropertyAccessor.
@@ -122,12 +128,36 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Sets a metadata loader.
+     *
+     * @param MetadataFactoryInterface|null $metadataFactory
+     *
+     * @return PropertyAccessorBuilder The builder object
+     */
+    public function setMetadataFactory(MetadataFactoryInterface $metadataFactory = null)
+    {
+        $this->metadataFactory = $metadataFactory;
+
+        return $this;
+    }
+
+    /**
+     * Gets the used metadata loader.
+     *
+     * @return MetadataFactoryInterface|null
+     */
+    public function getMetadataFactory()
+    {
+        return $this->metadataFactory;
+    }
+
+    /**
      * Builds and returns a new PropertyAccessor object.
      *
      * @return PropertyAccessorInterface The built PropertyAccessor
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool);
+        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool, $this->metadataFactory);
     }
 }

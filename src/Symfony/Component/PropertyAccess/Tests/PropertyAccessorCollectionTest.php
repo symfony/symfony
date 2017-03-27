@@ -11,19 +11,79 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Component\PropertyAccess\Annotation\AdderAccessor;
+use Symfony\Component\PropertyAccess\Annotation\GetterAccessor;
+use Symfony\Component\PropertyAccess\Annotation\RemoverAccessor;
+use Symfony\Component\PropertyAccess\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
 
+    /**
+     * @Symfony\Component\PropertyAccess\Annotation\PropertyAccessor(adder="addAxisTest", remover="removeAxisTest")
+     */
+    private $customAxes;
+
+    // This property will only have its adder accessor overriden
+    /**
+     * @Symfony\Component\PropertyAccess\Annotation\PropertyAccessor(adder="addAxis2Test")
+     */
+    private $customAxes2;
+
+    // This property will only have its remover accessor overriden
+    /**
+     * @Symfony\Component\PropertyAccess\Annotation\PropertyAccessor(remover="removeAxis3Test")
+     */
+    private $customAxes3;
+
+    /**
+     * @param array|null $axes
+     */
     public function __construct($axes = null)
     {
         $this->axes = $axes;
+        $this->customAxes = $axes;
+        $this->customAxes2 = $axes;
+        $this->customAxes3 = $axes;
     }
 
     // In the test, use a name that StringUtil can't uniquely singularify
     public function addAxis($axis)
     {
         $this->axes[] = $axis;
+    }
+
+    // In the test, use a name that StringUtil can't uniquely singularify
+    /**
+     * @AdderAccessor(property="customVirtualAxes")
+     * @param $axis
+     */
+    public function addAxisTest($axis)
+    {
+        $this->customAxes[] = $axis;
+    }
+
+    // Only override adder accessor
+    /**
+     * @AdderAccessor(property="customVirtualAxes2")
+     * @param $axis
+     */
+    public function addAxis2Test($axis)
+    {
+        $this->customAxes2[] = $axis;
+    }
+
+    /**
+     * @param $axis
+     */
+    public function addCustomAxes3($axis)
+    {
+        $this->customAxes3[] = $axis;
     }
 
     public function removeAxis($axis)
@@ -37,9 +97,80 @@ class PropertyAccessorCollectionTest_Car
         }
     }
 
+    /**
+     * @RemoverAccessor(property="customVirtualAxes")
+     * @param $axis
+     */
+    public function removeAxisTest($axis)
+    {
+        foreach ($this->customAxes as $key => $value) {
+            if ($value === $axis) {
+                unset($this->customAxes[$key]);
+
+                return;
+            }
+        }
+    }
+
+    // Default customAxes2 remover
+    /**
+     * @param $axis
+     */
+    public function removeCustomAxes2($axis)
+    {
+        foreach ($this->customAxes2 as $key => $value) {
+            if ($value === $axis) {
+                unset($this->customAxes2[$key]);
+
+                return;
+            }
+        }
+    }
+
+    // Only override remover accessor
+    /**
+     * @RemoverAccessor(property="customAxis3")
+     * @param $axis
+     */
+    public function removeAxis3Test($axis)
+    {
+        foreach ($this->customAxes3 as $key => $value) {
+            if ($value === $axis) {
+                unset($this->customAxes3[$key]);
+
+                return;
+            }
+        }
+    }
+
     public function getAxes()
     {
         return $this->axes;
+    }
+
+    /**
+     * @GetterAccessor(property="customVirtualAxes")
+     * @return array|null
+     */
+    public function getCustomAxes()
+    {
+        return $this->customAxes;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getCustomAxes2()
+    {
+        return $this->customAxes2;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getCustomAxes3()
+    {
+        return $this->customAxes3;
     }
 }
 
@@ -144,6 +275,50 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
             ->with('third');
 
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
+    }
+
+    /**
+     * @param $propertyPath string Property path to test
+     */
+    private function baseTestAdderAndRemoverPropertyPath($propertyPath, $getMethod)
+    {
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
+        $axesMerged = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axesAfter = $this->getContainer(array(1 => 'second', 5 => 'first', 6 => 'third'));
+        $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
+
+        // Don't use a mock in order to test whether the collections are
+        // modified while iterating them
+        $car = new PropertyAccessorCollectionTest_Car($axesBefore);
+
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
+        $this->propertyAccessor = new PropertyAccessor(false, false, null, new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+
+        $this->propertyAccessor->setValue($car, $propertyPath, $axesMerged);
+
+        $this->assertEquals($axesAfter, $car->$getMethod());
+
+        // The passed collection was not modified
+        $this->assertEquals($axesMergedCopy, $axesMerged);
+    }
+    public function testSetValueCallsCustomAdderAndRemoverForCollections()
+    {
+        $this->baseTestAdderAndRemoverPropertyPath('customAxes', 'getCustomAxes');
+    }
+
+    public function testSetValueCallsCustomAdderAndRemoverForCollectionsMethodAnnotation()
+    {
+        $this->baseTestAdderAndRemoverPropertyPath('customVirtualAxes', 'getCustomAxes');
+    }
+
+    public function testSetValueCallsCustomAdderButNotRemoverForCollectionsMethodAnnotation()
+    {
+        $this->baseTestAdderAndRemoverPropertyPath('customAxes2', 'getCustomAxes2');
+    }
+
+    public function testSetValueCallsCustomRemoverButNotAdderForCollectionsMethodAnnotation()
+    {
+        $this->baseTestAdderAndRemoverPropertyPath('customAxes3', 'getCustomAxes3');
     }
 
     /**

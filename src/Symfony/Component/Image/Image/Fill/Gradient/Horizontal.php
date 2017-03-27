@@ -14,7 +14,7 @@ namespace Symfony\Component\Image\Image\Fill\Gradient;
 use Symfony\Component\Image\Image\PointInterface;
 
 /**
- * Horizontal gradient fill
+ * Horizontal gradient fill.
  */
 final class Horizontal extends Linear
 {

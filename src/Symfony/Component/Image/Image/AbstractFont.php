@@ -14,7 +14,7 @@ namespace Symfony\Component\Image\Image;
 use Symfony\Component\Image\Image\Palette\Color\ColorInterface;
 
 /**
- * Abstract font base class
+ * Abstract font base class.
  */
 abstract class AbstractFont implements FontInterface
 {
@@ -24,7 +24,7 @@ abstract class AbstractFont implements FontInterface
     protected $file;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $size;
 
@@ -34,18 +34,18 @@ abstract class AbstractFont implements FontInterface
     protected $color;
 
     /**
-     * Constructs a font with specified $file, $size and $color
+     * Constructs a font with specified $file, $size and $color.
      *
      * The font size is to be specified in points (e.g. 10pt means 10)
      *
      * @param string         $file
-     * @param integer        $size
+     * @param int            $size
      * @param ColorInterface $color
      */
     public function __construct($file, $size, ColorInterface $color)
     {
-        $this->file  = $file;
-        $this->size  = $size;
+        $this->file = $file;
+        $this->size = $size;
         $this->color = $color;
     }
 

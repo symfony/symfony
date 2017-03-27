@@ -17,27 +17,26 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 final class RGB implements ColorInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $r;
 
     /**
-     * @var integer
+     * @var int
      */
     private $g;
 
     /**
-     * @var integer
+     * @var int
      */
     private $b;
 
     /**
-     * @var integer
+     * @var int
      */
     private $alpha;
 
     /**
-     *
      * @var RGBPalette
      */
     private $palette;
@@ -67,9 +66,9 @@ final class RGB implements ColorInterface
     }
 
     /**
-     * Returns RED value of the color
+     * Returns RED value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getRed()
     {
@@ -77,9 +76,9 @@ final class RGB implements ColorInterface
     }
 
     /**
-     * Returns GREEN value of the color
+     * Returns GREEN value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getGreen()
     {
@@ -87,9 +86,9 @@ final class RGB implements ColorInterface
     }
 
     /**
-     * Returns BLUE value of the color
+     * Returns BLUE value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getBlue()
     {
@@ -167,7 +166,7 @@ final class RGB implements ColorInterface
     }
 
     /**
-     * Returns hex representation of the color
+     * Returns hex representation of the color.
      *
      * @return string
      */
@@ -177,11 +176,9 @@ final class RGB implements ColorInterface
     }
 
     /**
-     * Internal
+     * Performs checks for validity of given alpha value and sets it.
      *
-     * Performs checks for validity of given alpha value and sets it
-     *
-     * @param integer $alpha
+     * @param int $alpha
      *
      * @throws InvalidArgumentException
      */
@@ -195,9 +192,7 @@ final class RGB implements ColorInterface
     }
 
     /**
-     * Internal
-     *
-     * Performs checks for color validity (array of array(R, G, B))
+     * Performs checks for color validity (array of array(R, G, B)).
      *
      * @param array $color
      *
@@ -207,6 +202,12 @@ final class RGB implements ColorInterface
     {
         if (count($color) !== 3) {
             throw new InvalidArgumentException('Color argument must look like array(R, G, B), where R, G, B are the integer values between 0 and 255 for red, green and blue color indexes accordingly');
+        }
+
+        foreach ($color as $c) {
+            if ($c > 255 || $c < 0) {
+                throw new InvalidArgumentException('Color argument must look like array(R, G, B), where R, G, B are the integer values between 0 and 255 for red, green and blue color indexes accordingly');
+            }
         }
 
         list($this->r, $this->g, $this->b) = array_values($color);

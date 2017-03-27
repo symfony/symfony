@@ -14,36 +14,36 @@ namespace Symfony\Component\Image\Image;
 use Symfony\Component\Image\Image\Palette\Color\ColorInterface;
 
 /**
- * The font interface
+ * The font interface.
  */
 interface FontInterface
 {
     /**
-     * Gets the fontfile for current font
+     * Gets the fontfile for current font.
      *
      * @return string
      */
     public function getFile();
 
     /**
-     * Gets font's integer point size
+     * Gets font's integer point size.
      *
-     * @return integer
+     * @return int
      */
     public function getSize();
 
     /**
-     * Gets font's color
+     * Gets font's color.
      *
      * @return ColorInterface
      */
     public function getColor();
 
     /**
-     * Gets BoxInterface of font size on the image based on string and angle
+     * Gets BoxInterface of font size on the image based on string and angle.
      *
-     * @param string  $string
-     * @param integer $angle
+     * @param string $string
+     * @param int    $angle
      *
      * @return BoxInterface
      */

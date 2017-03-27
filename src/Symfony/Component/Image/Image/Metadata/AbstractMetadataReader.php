@@ -56,7 +56,7 @@ abstract class AbstractMetadataReader implements MetadataReaderInterface
     }
 
     /**
-     * Gets the URI from a stream resource
+     * Gets the URI from a stream resource.
      *
      * @param resource $resource
      *
@@ -77,7 +77,7 @@ abstract class AbstractMetadataReader implements MetadataReaderInterface
     }
 
     /**
-     * Extracts metadata from a file
+     * Extracts metadata from a file.
      *
      * @param $file
      *
@@ -86,7 +86,7 @@ abstract class AbstractMetadataReader implements MetadataReaderInterface
     abstract protected function extractFromFile($file);
 
     /**
-     * Extracts metadata from raw data
+     * Extracts metadata from raw data.
      *
      * @param $data
      *
@@ -95,7 +95,7 @@ abstract class AbstractMetadataReader implements MetadataReaderInterface
     abstract protected function extractFromData($data);
 
     /**
-     * Extracts metadata from a stream
+     * Extracts metadata from a stream.
      *
      * @param $resource
      *

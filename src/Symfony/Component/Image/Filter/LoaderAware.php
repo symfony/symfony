@@ -15,7 +15,7 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 use Symfony\Component\Image\Image\LoaderInterface;
 
 /**
- * LoaderAware base class
+ * LoaderAware base class.
  */
 abstract class LoaderAware implements FilterInterface
 {

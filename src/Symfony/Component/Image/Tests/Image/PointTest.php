@@ -25,10 +25,10 @@ class PointTest extends TestCase
      *
      * @dataProvider getCoordinates
      *
-     * @param integer      $x
-     * @param integer      $y
+     * @param int          $x
+     * @param int          $y
      * @param BoxInterface $box
-     * @param Boolean      $expected
+     * @param bool         $expected
      */
     public function testShouldAssignXYCoordinates($x, $y, BoxInterface $box, $expected)
     {
@@ -41,7 +41,7 @@ class PointTest extends TestCase
     }
 
     /**
-     * Data provider for testShouldAssignXYCoordinates
+     * Data provider for testShouldAssignXYCoordinates.
      *
      * @return array
      */
@@ -63,8 +63,8 @@ class PointTest extends TestCase
      *
      * @dataProvider getInvalidCoordinates
      *
-     * @param integer $x
-     * @param integer $y
+     * @param int $x
+     * @param int $y
      */
     public function testShouldThrowExceptionOnInvalidCoordinates($x, $y)
     {
@@ -72,7 +72,7 @@ class PointTest extends TestCase
     }
 
     /**
-     * Data provider for testShouldThrowExceptionOnInvalidCoordinates
+     * Data provider for testShouldThrowExceptionOnInvalidCoordinates.
      *
      * @return array
      */
@@ -80,7 +80,7 @@ class PointTest extends TestCase
     {
         return array(
             array(-1, 0),
-            array(0, -1)
+            array(0, -1),
         );
     }
 
@@ -91,11 +91,11 @@ class PointTest extends TestCase
      *
      * @dataProvider getMoves
      *
-     * @param integer $x
-     * @param integer $y
-     * @param integer $move
-     * @param integer $x1
-     * @param integer $y1
+     * @param int $x
+     * @param int $y
+     * @param int $move
+     * @param int $x1
+     * @param int $y1
      */
     public function testShouldMoveByGivenAmount($x, $y, $move, $x1, $y1)
     {

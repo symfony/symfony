@@ -57,7 +57,7 @@ abstract class AbstractLoader implements LoaderInterface
      *
      * @return string
      *
-     * @throws InvalidArgumentException In case the given path is invalid.
+     * @throws InvalidArgumentException in case the given path is invalid
      */
     protected function checkPath($path)
     {

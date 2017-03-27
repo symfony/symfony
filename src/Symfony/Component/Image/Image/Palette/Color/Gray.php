@@ -17,17 +17,16 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 final class Gray implements ColorInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $gray;
 
     /**
-     * @var integer
+     * @var int
      */
     private $alpha;
 
     /**
-     *
      * @var Grayscale
      */
     private $palette;
@@ -53,9 +52,9 @@ final class Gray implements ColorInterface
     }
 
     /**
-     * Returns Gray value of the color
+     * Returns Gray value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getGray()
     {
@@ -121,7 +120,7 @@ final class Gray implements ColorInterface
     }
 
     /**
-     * Returns hex representation of the color
+     * Returns hex representation of the color.
      *
      * @return string
      */
@@ -131,9 +130,9 @@ final class Gray implements ColorInterface
     }
 
     /**
-     * Performs checks for validity of given alpha value and sets it
+     * Performs checks for validity of given alpha value and sets it.
      *
-     * @param integer $alpha
+     * @param int $alpha
      *
      * @throws InvalidArgumentException
      */
@@ -147,7 +146,7 @@ final class Gray implements ColorInterface
     }
 
     /**
-     * Performs checks for color validity (array of array(gray))
+     * Performs checks for color validity (array of array(gray)).
      *
      * @param array $color
      *

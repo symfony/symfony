@@ -31,8 +31,8 @@ class GrayscaleTest extends FilterTestCase
      */
     public function testGrayscaling(BoxInterface $size, ColorInterface $color, ColorInterface $filteredColor)
     {
-        $image       = $this->getImage();
-        $imageWidth  = $size->getWidth();
+        $image = $this->getImage();
+        $imageWidth = $size->getWidth();
         $imageHeight = $size->getHeight();
 
         $size = $this->getMockBuilder(BoxInterface::class)->getMock();
@@ -48,20 +48,20 @@ class GrayscaleTest extends FilterTestCase
             ->method('getSize')
             ->will($this->returnValue($size));
 
-        $image->expects($this->exactly($imageWidth*$imageHeight))
+        $image->expects($this->exactly($imageWidth * $imageHeight))
             ->method('getColorAt')
             ->will($this->returnValue($color));
 
-        $color->expects($this->exactly($imageWidth*$imageHeight))
+        $color->expects($this->exactly($imageWidth * $imageHeight))
             ->method('grayscale')
             ->will($this->returnValue($filteredColor));
 
         $draw = $this->getDrawer();
-        $draw->expects($this->exactly($imageWidth*$imageHeight))
+        $draw->expects($this->exactly($imageWidth * $imageHeight))
             ->method('dot')
             ->with($this->isInstanceOf(Point::class), $this->equalTo($filteredColor));
 
-        $image->expects($this->exactly($imageWidth*$imageHeight))
+        $image->expects($this->exactly($imageWidth * $imageHeight))
               ->method('draw')
               ->will($this->returnValue($draw));
 
@@ -70,7 +70,7 @@ class GrayscaleTest extends FilterTestCase
     }
 
     /**
-     * Data provider for testShouldCanvasImageAndReturnResult
+     * Data provider for testShouldCanvasImageAndReturnResult.
      *
      * @return array
      */

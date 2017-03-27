@@ -16,7 +16,7 @@ use Symfony\Component\Image\Image\Box;
 use Symfony\Component\Image\Image\Palette\Color\ColorInterface;
 
 /**
- * Font implementation using the Imagick PHP extension
+ * Font implementation using the Imagick PHP extension.
  */
 final class Font extends AbstractFont
 {
@@ -28,7 +28,7 @@ final class Font extends AbstractFont
     /**
      * @param \Imagick       $imagick
      * @param string         $file
-     * @param integer        $size
+     * @param int            $size
      * @param ColorInterface $color
      */
     public function __construct(\Imagick $imagick, $file, $size, ColorInterface $color)
@@ -47,12 +47,12 @@ final class Font extends AbstractFont
 
         $text->setFont($this->file);
 
-        /**
+        /*
          * @see http://www.php.net/manual/en/imagick.queryfontmetrics.php#101027
          *
          * ensure font resolution is the same as GD's hard-coded 96
          */
-        if (version_compare(phpversion("imagick"), "3.0.2", ">=")) {
+        if (version_compare(phpversion('imagick'), '3.0.2', '>=')) {
             $text->setResolution(96, 96);
             $text->setFontSize($this->size);
         } else {

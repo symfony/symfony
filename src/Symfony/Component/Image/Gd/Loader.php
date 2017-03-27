@@ -22,7 +22,7 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 use Symfony\Component\Image\Exception\RuntimeException;
 
 /**
- * Loader implementation using the GD library
+ * Loader implementation using the GD library.
  */
 final class Loader extends AbstractLoader
 {
@@ -45,7 +45,7 @@ final class Loader extends AbstractLoader
      */
     public function create(BoxInterface $size, ColorInterface $color = null)
     {
-        $width  = $size->getWidth();
+        $width = $size->getWidth();
         $height = $size->getHeight();
 
         $resource = imagecreatetruecolor($width, $height);
@@ -143,7 +143,7 @@ final class Loader extends AbstractLoader
             list($width, $height) = array(imagesx($resource), imagesy($resource));
 
             // create transparent truecolor canvas
-            $truecolor   = imagecreatetruecolor($width, $height);
+            $truecolor = imagecreatetruecolor($width, $height);
             $transparent = imagecolorallocatealpha($truecolor, 255, 255, 255, 127);
 
             imagefill($truecolor, 0, 0, $transparent);

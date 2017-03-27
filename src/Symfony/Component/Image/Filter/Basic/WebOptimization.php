@@ -16,7 +16,7 @@ use Symfony\Component\Image\Image\Palette\RGB;
 use Symfony\Component\Image\Filter\FilterInterface;
 
 /**
- * A filter to render web-optimized images
+ * A filter to render web-optimized images.
  */
 class WebOptimization implements FilterInterface
 {
@@ -28,10 +28,19 @@ class WebOptimization implements FilterInterface
     {
         $this->path = $path;
         $this->options = array_replace(array(
-            'resolution-units' => ImageInterface::RESOLUTION_PIXELSPERINCH,
-            'resolution-y'     => 72,
-            'resolution-x'     => 72,
+            'resolution_units' => ImageInterface::RESOLUTION_PIXELSPERINCH,
+            'resolution_y' => 72,
+            'resolution_x' => 72,
         ), $options);
+
+        foreach (array('resolution-x', 'resolution-y', 'resolution-units') as $option) {
+            if (isset($this->options[$option])) {
+                @trigger_error(sprintf('"%s" as been deprecated in Symfony 3.3 in favor of "%"', $option, str_replace('-', '_', $option)), E_USER_DEPRECATED);
+                $this->options[str_replace('-', '_', $option)] = $this->options[$option];
+                unset($this->options[$option]);
+            }
+        }
+
         $this->palette = new RGB();
     }
 

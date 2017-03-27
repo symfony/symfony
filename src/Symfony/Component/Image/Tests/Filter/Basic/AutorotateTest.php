@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Image\Tests\Filter\Basic;
 
-USE Symfony\Component\Image\Filter\Basic\Autorotate;
+use Symfony\Component\Image\Filter\Basic\Autorotate;
 use Symfony\Component\Image\Image\Metadata\MetadataBag;
 use Symfony\Component\Image\Tests\Filter\FilterTestCase;
 

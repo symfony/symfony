@@ -16,9 +16,9 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 class ColorParser
 {
     /**
-     * Parses a color to a RGB tuple
+     * Parses a color to a RGB tuple.
      *
-     * @param string|array|integer $color
+     * @param string|array|int $color
      *
      * @return array
      *
@@ -40,9 +40,9 @@ class ColorParser
     }
 
     /**
-     * Parses a color to a CMYK tuple
+     * Parses a color to a CMYK tuple.
      *
-     * @param string|array|integer $color
+     * @param string|array|int $color
      *
      * @return array
      *
@@ -60,10 +60,10 @@ class ColorParser
             $k = 1 - max($r, $g, $b);
 
             $color = array(
-                1 === $k ? 0 : round((1 - $r - $k) / (1- $k) * 100),
-                1 === $k ? 0 : round((1 - $g - $k) / (1- $k) * 100),
-                1 === $k ? 0 : round((1 - $b - $k) / (1- $k) * 100),
-                round($k * 100)
+                1 === $k ? 0 : round((1 - $r - $k) / (1 - $k) * 100),
+                1 === $k ? 0 : round((1 - $g - $k) / (1 - $k) * 100),
+                1 === $k ? 0 : round((1 - $b - $k) / (1 - $k) * 100),
+                round($k * 100),
             );
         }
 
@@ -71,9 +71,9 @@ class ColorParser
     }
 
     /**
-     * Parses a color to a grayscale value
+     * Parses a color to a grayscale value.
      *
-     * @param string|array|integer $color
+     * @param string|array|int $color
      *
      * @return array
      *
@@ -95,9 +95,9 @@ class ColorParser
     }
 
     /**
-     * Parses a color
+     * Parses a color.
      *
-     * @param string|array|integer $color
+     * @param string|array|int $color
      *
      * @return array
      *
@@ -137,7 +137,7 @@ class ColorParser
                 }
 
                 if (strlen($color) === 3) {
-                    $color = $color[0] . $color[0] . $color[1] . $color[1] . $color[2] . $color[2];
+                    $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
                 }
 
                 $color = array_map('hexdec', str_split($color, 2));

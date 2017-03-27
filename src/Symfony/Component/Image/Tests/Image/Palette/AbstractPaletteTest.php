@@ -63,7 +63,6 @@ abstract class AbstractPaletteTest extends TestCase
         $palette->useProfile($new);
 
         $this->assertEquals($new, $palette->profile());
-
     }
 
     public function testProfile()

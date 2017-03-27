@@ -22,7 +22,7 @@ use Symfony\Component\Image\Image\Point;
 use Symfony\Component\Image\Image\PointInterface;
 
 /**
- * Drawer implementation using the Gmagick PHP extension
+ * Drawer implementation using the Gmagick PHP extension.
  */
 final class Drawer implements DrawerInterface
 {
@@ -44,14 +44,14 @@ final class Drawer implements DrawerInterface
      */
     public function arc(PointInterface $center, BoxInterface $size, $start, $end, ColorInterface $color, $thickness = 1)
     {
-        $x      = $center->getX();
-        $y      = $center->getY();
-        $width  = $size->getWidth();
+        $x = $center->getX();
+        $y = $center->getY();
+        $width = $size->getWidth();
         $height = $size->getHeight();
 
         try {
             $pixel = $this->getColor($color);
-            $arc   = new \GmagickDraw();
+            $arc = new \GmagickDraw();
 
             $arc->setstrokecolor($pixel);
             $arc->setstrokewidth(max(1, (int) $thickness));
@@ -65,7 +65,7 @@ final class Drawer implements DrawerInterface
                 $end
             );
 
-            $this->gmagick->drawImage($arc);
+            $this->gmagick->drawimage($arc);
 
             $pixel = null;
 
@@ -82,9 +82,9 @@ final class Drawer implements DrawerInterface
      */
     public function chord(PointInterface $center, BoxInterface $size, $start, $end, ColorInterface $color, $fill = false, $thickness = 1)
     {
-        $x      = $center->getX();
-        $y      = $center->getY();
-        $width  = $size->getWidth();
+        $x = $center->getX();
+        $y = $center->getY();
+        $width = $size->getWidth();
         $height = $size->getHeight();
 
         try {
@@ -109,7 +109,7 @@ final class Drawer implements DrawerInterface
 
             $chord->arc($x - $width / 2, $y - $height / 2, $x + $width / 2, $y + $height / 2, $start, $end);
 
-            $this->gmagick->drawImage($chord);
+            $this->gmagick->drawimage($chord);
 
             $pixel = null;
 
@@ -126,11 +126,11 @@ final class Drawer implements DrawerInterface
      */
     public function ellipse(PointInterface $center, BoxInterface $size, ColorInterface $color, $fill = false, $thickness = 1)
     {
-        $width  = $size->getWidth();
+        $width = $size->getWidth();
         $height = $size->getHeight();
 
         try {
-            $pixel   = $this->getColor($color);
+            $pixel = $this->getColor($color);
             $ellipse = new \GmagickDraw();
 
             $ellipse->setstrokecolor($pixel);
@@ -150,7 +150,7 @@ final class Drawer implements DrawerInterface
                 0, 360
             );
 
-            $this->gmagick->drawImage($ellipse);
+            $this->gmagick->drawimage($ellipse);
 
             $pixel = null;
 
@@ -169,7 +169,7 @@ final class Drawer implements DrawerInterface
     {
         try {
             $pixel = $this->getColor($color);
-            $line  = new \GmagickDraw();
+            $line = new \GmagickDraw();
 
             $line->setstrokecolor($pixel);
             $line->setstrokewidth(max(1, (int) $thickness));
@@ -181,7 +181,7 @@ final class Drawer implements DrawerInterface
                 $end->getY()
             );
 
-            $this->gmagick->drawImage($line);
+            $this->gmagick->drawimage($line);
 
             $pixel = null;
 
@@ -198,7 +198,7 @@ final class Drawer implements DrawerInterface
      */
     public function pieSlice(PointInterface $center, BoxInterface $size, $start, $end, ColorInterface $color, $fill = false, $thickness = 1)
     {
-        $width  = $size->getWidth();
+        $width = $size->getWidth();
         $height = $size->getHeight();
 
         $x1 = round($center->getX() + $width / 2 * cos(deg2rad($start)));
@@ -267,7 +267,7 @@ final class Drawer implements DrawerInterface
         }, $coordinates);
 
         try {
-            $pixel   = $this->getColor($color);
+            $pixel = $this->getColor($color);
             $polygon = new \GmagickDraw();
 
             $polygon->setstrokecolor($pixel);
@@ -281,7 +281,7 @@ final class Drawer implements DrawerInterface
 
             $polygon->polygon($points);
 
-            $this->gmagick->drawImage($polygon);
+            $this->gmagick->drawimage($polygon);
 
             unset($pixel, $polygon);
         } catch (\GmagickException $e) {
@@ -298,10 +298,10 @@ final class Drawer implements DrawerInterface
     {
         try {
             $pixel = $this->getColor($font->getColor());
-            $text  = new \GmagickDraw();
+            $text = new \GmagickDraw();
 
             $text->setfont($font->getFile());
-            /**
+            /*
              * @see http://www.php.net/manual/en/imagick.queryfontmetrics.php#101027
              *
              * ensure font resolution is the same as GD's hard-coded 96
@@ -310,9 +310,9 @@ final class Drawer implements DrawerInterface
             $text->setfillcolor($pixel);
 
             $info = $this->gmagick->queryfontmetrics($text, $string);
-            $rad  = deg2rad($angle);
-            $cos  = cos($rad);
-            $sin  = sin($rad);
+            $rad = deg2rad($angle);
+            $cos = cos($rad);
+            $sin = sin($rad);
 
             $x1 = round(0 * $cos - 0 * $sin);
             $x2 = round($info['textWidth'] * $cos - $info['textHeight'] * $sin);
@@ -337,7 +337,7 @@ final class Drawer implements DrawerInterface
     }
 
     /**
-     * Gets specifically formatted color string from Color instance
+     * Gets specifically formatted color string from Color instance.
      *
      * @param ColorInterface $color
      *

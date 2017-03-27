@@ -14,25 +14,25 @@ namespace Symfony\Component\Image\Image;
 use Symfony\Component\Image\Exception\InvalidArgumentException;
 
 /**
- * A box implementation
+ * A box implementation.
  */
 final class Box implements BoxInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $width;
 
     /**
-     * @var integer
+     * @var int
      */
     private $height;
 
     /**
-     * Constructs the Size with given width and height
+     * Constructs the Size with given width and height.
      *
-     * @param integer $width
-     * @param integer $height
+     * @param int $width
+     * @param int $height
      *
      * @throws InvalidArgumentException
      */
@@ -42,7 +42,7 @@ final class Box implements BoxInterface
             throw new InvalidArgumentException(sprintf('Length of either side cannot be 0 or negative, current size is %sx%s', $width, $height));
         }
 
-        $this->width  = (int) $width;
+        $this->width = (int) $width;
         $this->height = (int) $height;
     }
 
@@ -67,7 +67,7 @@ final class Box implements BoxInterface
      */
     public function scale($ratio)
     {
-        return new Box(round($ratio * $this->width), round($ratio * $this->height));
+        return new self(round($ratio * $this->width), round($ratio * $this->height));
     }
 
     /**
@@ -75,7 +75,7 @@ final class Box implements BoxInterface
      */
     public function increase($size)
     {
-        return new Box((int) $size + $this->width, (int) $size + $this->height);
+        return new self((int) $size + $this->width, (int) $size + $this->height);
     }
 
     /**

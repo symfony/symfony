@@ -14,25 +14,25 @@ namespace Symfony\Component\Image\Image;
 use Symfony\Component\Image\Exception\InvalidArgumentException;
 
 /**
- * The point class
+ * The point class.
  */
 final class Point implements PointInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $x;
 
     /**
-     * @var integer
+     * @var int
      */
     private $y;
 
     /**
-     * Constructs a point of coordinates
+     * Constructs a point of coordinates.
      *
-     * @param integer $x
-     * @param integer $y
+     * @param int $x
+     * @param int $y
      *
      * @throws InvalidArgumentException
      */
@@ -75,7 +75,7 @@ final class Point implements PointInterface
      */
     public function move($amount)
     {
-        return new Point($this->x + $amount, $this->y + $amount);
+        return new self($this->x + $amount, $this->y + $amount);
     }
 
     /**

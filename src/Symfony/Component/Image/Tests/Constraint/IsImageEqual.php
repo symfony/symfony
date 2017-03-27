@@ -12,14 +12,29 @@
 namespace Symfony\Component\Image\Tests\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Util\InvalidArgumentHelper;
 use Symfony\Component\Image\Image\ImageInterface;
 use Symfony\Component\Image\Image\Histogram\Bucket;
 use Symfony\Component\Image\Image\Histogram\Range;
 
 if (class_exists(\PHPUnit_Framework_Constraint::class)) {
-    abstract class PHPUnitConstraint extends \PHPUnit_Framework_Constraint{}
+    abstract class PHPUnitConstraint extends \PHPUnit_Framework_Constraint
+    {
+    }
 } else {
-    abstract class PHPUnitConstraint extends Constraint{}
+    abstract class PHPUnitConstraint extends Constraint
+    {
+    }
+}
+
+if (class_exists(\PHPUnit_Util_InvalidArgumentHelper::class)) {
+    abstract class PHPUnitInvalidArgumentHelper extends \PHPUnit_Util_InvalidArgumentHelper
+    {
+    }
+} else {
+    abstract class PHPUnitInvalidArgumentHelper extends InvalidArgumentHelper
+    {
+    }
 }
 
 class IsImageEqual extends PHPUnitConstraint
@@ -35,33 +50,33 @@ class IsImageEqual extends PHPUnitConstraint
     private $delta;
 
     /**
-     * @var integer
+     * @var int
      */
     private $buckets;
 
     /**
      * @param \Symfony\Component\Image\Image\ImageInterface $value
-     * @param float                        $delta
-     * @param integer                      $buckets
+     * @param float                                         $delta
+     * @param int                                           $buckets
      *
      * @throws InvalidArgumentException
      */
     public function __construct($value, $delta = 0.1, $buckets = 4)
     {
         if (!$value instanceof ImageInterface) {
-            throw \PHPUnit_Util_InvalidArgumentHelper::factory(1, ImageInterface::class);
+            throw PHPUnitInvalidArgumentHelper::factory(1, ImageInterface::class);
         }
 
         if (!is_numeric($delta)) {
-            throw \PHPUnit_Util_InvalidArgumentHelper::factory(2, 'numeric');
+            throw PHPUnitInvalidArgumentHelper::factory(2, 'numeric');
         }
 
         if (!is_integer($buckets) || $buckets <= 0) {
-            throw \PHPUnit_Util_InvalidArgumentHelper::factory(3, 'integer');
+            throw PHPUnitInvalidArgumentHelper::factory(3, 'integer');
         }
 
-        $this->value   = $value;
-        $this->delta   = $delta;
+        $this->value = $value;
+        $this->delta = $delta;
         $this->buckets = $buckets;
     }
 
@@ -71,11 +86,11 @@ class IsImageEqual extends PHPUnitConstraint
     public function evaluate($other, $description = '', $returnResult = false)
     {
         if (!$other instanceof ImageInterface) {
-            throw \PHPUnit_Util_InvalidArgumentHelper::factory(1, ImageInterface::class);
+            throw PHPUnitInvalidArgumentHelper::factory(1, ImageInterface::class);
         }
 
         list($currentRed, $currentGreen, $currentBlue, $currentAlpha) = $this->normalize($this->value);
-        list($otherRed, $otherGreen, $otherBlue, $otherAlpha)         = $this->normalize($other);
+        list($otherRed, $otherGreen, $otherBlue, $otherAlpha) = $this->normalize($other);
 
         $total = 0;
 
@@ -113,18 +128,18 @@ class IsImageEqual extends PHPUnitConstraint
      */
     private function normalize(ImageInterface $image)
     {
-        $step    = (int) round(255 / $this->buckets);
+        $step = (int) round(255 / $this->buckets);
 
         $red =
         $green =
         $blue =
         $alpha = array();
 
-        for ($i = 1; $i <= $this->buckets; $i++) {
-            $range   = new Range(($i - 1) * $step, $i * $step);
-            $red[]   = new Bucket($range);
+        for ($i = 1; $i <= $this->buckets; ++$i) {
+            $range = new Range(($i - 1) * $step, $i * $step);
+            $red[] = new Bucket($range);
             $green[] = new Bucket($range);
-            $blue[]  = new Bucket($range);
+            $blue[] = new Bucket($range);
             $alpha[] = new Bucket($range);
         }
 

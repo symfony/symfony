@@ -96,12 +96,11 @@ abstract class AbstractImageTest extends TestCase
         $image->usePalette($targetPalette);
 
         $this->assertEquals($targetPalette, $image->palette());
-        $image->save(__DIR__ . '/tmp.jpg');
+        $image->save($this->getTempDir().'/tmp.jpg');
 
-        $image = $this->getLoader()->open(__DIR__ . '/tmp.jpg');
+        $image = $this->getLoader()->open($this->getTempDir().'/tmp.jpg');
 
         $this->assertInstanceOf($to, $image->palette());
-        unlink(__DIR__ . '/tmp.jpg');
     }
 
     public function testSaveWithoutFormatShouldSaveInOriginalFormat()
@@ -110,7 +109,7 @@ abstract class AbstractImageTest extends TestCase
             $this->markTestSkipped('The EXIF extension is required for this test');
         }
 
-        $tmpFile = __DIR__ . '/tmpfile';
+        $tmpFile = $this->getTempDir().'/tmpfile';
 
         $this
             ->getLoader()
@@ -119,17 +118,12 @@ abstract class AbstractImageTest extends TestCase
 
         $data = exif_read_data($tmpFile);
         $this->assertEquals('image/jpeg', $data['MimeType']);
-        unlink($tmpFile);
     }
 
     public function testSaveWithoutPathFileFromImageLoadShouldBeOkay()
     {
         $source = FixturesLoader::getFixture('google.png');
-        $tmpFile = __DIR__ . '/../results/google.tmp.png';
-
-        if (file_exists($tmpFile)) {
-            unlink($tmpFile);
-        }
+        $tmpFile = $this->getTempDir().'/google.tmp.png';
 
         copy($source, $tmpFile);
 
@@ -142,7 +136,6 @@ abstract class AbstractImageTest extends TestCase
             ->save();
 
         $this->assertNotEquals(md5_file($source), md5_file($tmpFile));
-        unlink($tmpFile);
     }
 
     public function testSaveWithoutPathFileFromImageCreationShouldFail()
@@ -227,7 +220,7 @@ abstract class AbstractImageTest extends TestCase
         $factory = $this->getLoader();
 
         $image = $factory->open(FixturesLoader::getFixture('google.png'));
-        $size  = $image->getSize();
+        $size = $image->getSize();
 
         $image = $image->paste(
             $image->copy()
@@ -300,7 +293,7 @@ abstract class AbstractImageTest extends TestCase
         $factory = $this->getLoader();
         $image = $factory->open(FixturesLoader::getFixture('google.png'));
         $this->setExpectedException(InvalidArgumentException::class, 'Invalid mode specified');
-        $image->thumbnail(new Box(20, 20), "boumboum");
+        $image->thumbnail(new Box(20, 20), 'boumboum');
     }
 
     public function testResizeShouldReturnTheImage()
@@ -319,8 +312,8 @@ abstract class AbstractImageTest extends TestCase
     public function testThumbnailGeneration($sourceW, $sourceH, $thumbW, $thumbH, $mode, $expectedW, $expectedH)
     {
         $factory = $this->getLoader();
-        $image   = $factory->create(new Box($sourceW, $sourceH));
-        $inset   = $image->thumbnail(new Box($thumbW, $thumbH), $mode);
+        $image = $factory->create(new Box($sourceW, $sourceH));
+        $inset = $image->thumbnail(new Box($thumbW, $thumbH), $mode);
 
         $size = $inset->getSize();
 
@@ -377,13 +370,13 @@ abstract class AbstractImageTest extends TestCase
         $height = $test_image_height + 1;
 
         $factory = $this->getLoader();
-        $image   = $factory->open($test_image);
+        $image = $factory->open($test_image);
         $size = $image->getSize();
 
         $this->assertEquals($test_image_width, $size->getWidth());
         $this->assertEquals($test_image_height, $size->getHeight());
 
-        $inset   = $image->thumbnail(new Box($width, $height), ImageInterface::THUMBNAIL_INSET);
+        $inset = $image->thumbnail(new Box($width, $height), ImageInterface::THUMBNAIL_INSET);
         $size = $inset->getSize();
         unset($inset);
 
@@ -422,9 +415,9 @@ abstract class AbstractImageTest extends TestCase
 
         $palette = new RGB();
 
-        $image   = $factory->create(new Box(400, 300), $palette->color('000'));
+        $image = $factory->create(new Box(400, 300), $palette->color('000'));
 
-        $size  = $image->getSize();
+        $size = $image->getSize();
 
         unset($image);
 
@@ -438,8 +431,8 @@ abstract class AbstractImageTest extends TestCase
 
         $palette = new RGB();
 
-        $size    = new Box(100, 50);
-        $image   = $factory->create($size, $palette->color('f00'));
+        $size = new Box(100, 50);
+        $image = $factory->create($size, $palette->color('f00'));
 
         $image->paste(
                 $factory->create($size, $palette->color('ff0'))
@@ -471,15 +464,13 @@ abstract class AbstractImageTest extends TestCase
         $image = $factory->open(FixturesLoader::getFixture('google.png'));
 
         $image->applyMask($image->mask())
-            ->save(__DIR__.'/../results/mask.png');
+            ->save($this->getTempDir().'/mask.png');
 
-        $size = $factory->open(__DIR__.'/../results/mask.png')
+        $size = $factory->open($this->getTempDir().'/mask.png')
             ->getSize();
 
         $this->assertEquals(364, $size->getWidth());
         $this->assertEquals(126, $size->getHeight());
-
-        unlink(__DIR__.'/../results/mask.png');
     }
 
     public function testColorHistogram()
@@ -495,11 +486,11 @@ abstract class AbstractImageTest extends TestCase
     {
         $loader = $this->getLoader();
         $image = $loader->open(FixturesLoader::getFixture('resize/210-design-19933.jpg'));
-        $outfile = __DIR__.'/../results/reduced.jpg';
+        $outfile = $this->getTempDir().'/reduced.jpg';
         $image->save($outfile, array(
-            'resolution-units' => ImageInterface::RESOLUTION_PIXELSPERINCH,
-            'resolution-x' => 144,
-            'resolution-y' => 144
+            'resolution_units' => ImageInterface::RESOLUTION_PIXELSPERINCH,
+            'resolution_x' => 144,
+            'resolution_y' => 144,
         ));
 
         if ($loader instanceof ImagickLoader) {
@@ -514,24 +505,22 @@ abstract class AbstractImageTest extends TestCase
             $this->assertEquals(144, $info['x']);
             $this->assertEquals(144, $info['y']);
         }
-
-        unlink($outfile);
     }
 
     public function testInOutResult()
     {
-        $this->processInOut("trans", "png","png");
-        $this->processInOut("trans", "png","gif");
-        $this->processInOut("trans", "png","jpg");
-        $this->processInOut("anima", "gif","png");
-        $this->processInOut("anima", "gif","gif");
-        $this->processInOut("anima", "gif","jpg");
-        $this->processInOut("trans", "gif","png");
-        $this->processInOut("trans", "gif","gif");
-        $this->processInOut("trans", "gif","jpg");
-        $this->processInOut("large", "jpg","png");
-        $this->processInOut("large", "jpg","gif");
-        $this->processInOut("large", "jpg","jpg");
+        $this->processInOut('trans', 'png', 'png');
+        $this->processInOut('trans', 'png', 'gif');
+        $this->processInOut('trans', 'png', 'jpg');
+        $this->processInOut('anima', 'gif', 'png');
+        $this->processInOut('anima', 'gif', 'gif');
+        $this->processInOut('anima', 'gif', 'jpg');
+        $this->processInOut('trans', 'gif', 'png');
+        $this->processInOut('trans', 'gif', 'gif');
+        $this->processInOut('trans', 'gif', 'jpg');
+        $this->processInOut('large', 'jpg', 'png');
+        $this->processInOut('large', 'jpg', 'gif');
+        $this->processInOut('large', 'jpg', 'jpg');
     }
 
     public function testLayerReturnsALayerInterface()
@@ -680,8 +669,7 @@ abstract class AbstractImageTest extends TestCase
             $frame->resize(new Box(121, 124));
         }
 
-        $image->save(__DIR__.'/../results/anima-half-size.gif', array('animated' => true));
-        @unlink(__DIR__.'/../results/anima-half-size.gif');
+        $image->save($this->getTempDir().'/anima-half-size.gif', array('animated' => true));
 
         $image = $loader->open(FixturesLoader::getFixture('anima2.gif'));
 
@@ -694,12 +682,10 @@ abstract class AbstractImageTest extends TestCase
             $frame->resize(new Box(200, 144));
         }
 
-        $target = __DIR__.'/../results/anima2-half-size.gif';
+        $target = $this->getTempDir().'/anima2-half-size.gif';
         $image->save($target, array('animated' => true));
 
         $this->assertFileExists($target);
-
-        @unlink($target);
     }
 
     public function testMetadataReturnsMetadataInstance()
@@ -732,19 +718,18 @@ abstract class AbstractImageTest extends TestCase
      */
     public function testResolutionOnSave($source)
     {
-        $file = __DIR__ . '/test-resolution.jpg';
+        $file = __DIR__.'/test-resolution.jpg';
 
         $image = $this->getLoader()->open($source);
         $image->save($file, array(
-            'resolution-units' => ImageInterface::RESOLUTION_PIXELSPERINCH,
-            'resolution-x' => 150,
-            'resolution-y' => 120,
-            'resampling-filter' => ImageInterface::FILTER_LANCZOS,
+            'resolution_units' => ImageInterface::RESOLUTION_PIXELSPERINCH,
+            'resolution_x' => 150,
+            'resolution_y' => 120,
+            'resampling_filter' => ImageInterface::FILTER_LANCZOS,
         ));
 
         $saved = $this->getLoader()->open($file);
         $this->assertEquals(array('x' => 150, 'y' => 120), $this->getImageResolution($saved));
-        unlink($file);
     }
 
     public function provideVariousSources()
@@ -759,8 +744,8 @@ abstract class AbstractImageTest extends TestCase
     {
         $loader = $this->getLoader();
         $palette = new RGB();
-        $image = $loader->create(new Box(1, 1), $palette->color("#f00"));
-        $fill = new Horizontal(100, $palette->color("#f00", 17), $palette->color("#f00", 73));
+        $image = $loader->create(new Box(1, 1), $palette->color('#f00'));
+        $fill = new Horizontal(100, $palette->color('#f00', 17), $palette->color('#f00', 73));
         $image->fill($fill);
 
         $actualColor = $image->getColorAt(new Point(0, 0));
@@ -770,10 +755,10 @@ abstract class AbstractImageTest extends TestCase
     public function testImageCreatedAlpha()
     {
         $palette = new RGB();
-        $image = $this->getLoader()->create(new Box(1, 1), $palette->color("#7f7f7f", 10));
+        $image = $this->getLoader()->create(new Box(1, 1), $palette->color('#7f7f7f', 10));
         $actualColor = $image->getColorAt(new Point(0, 0));
 
-        $this->assertEquals("#7f7f7f", (string) $actualColor);
+        $this->assertEquals('#7f7f7f', (string) $actualColor);
         $this->assertEquals(10, $actualColor->getAlpha());
     }
 
@@ -792,17 +777,13 @@ abstract class AbstractImageTest extends TestCase
     protected function processInOut($file, $in, $out)
     {
         $factory = $this->getLoader();
-        $class = preg_replace('/\\\\/', "_", get_called_class());
+        $class = preg_replace('/\\\\/', '_', get_called_class());
         $image = $factory->open(FixturesLoader::getFixture($file.'.'.$in));
         $thumb = $image->thumbnail(new Box(50, 50), ImageInterface::THUMBNAIL_OUTBOUND);
-        if (!is_dir(__DIR__.'/../results/in_out')) {
-            mkdir(__DIR__.'/../results/in_out', 0777, true);
-        }
-        $target = __DIR__."/../results/in_out/{$class}_{$file}_from_{$in}_to.{$out}";
+        $target = $this->getTempDir()."/{$class}_{$file}_from_{$in}_to.{$out}";
         $thumb->save($target);
 
         $this->assertFileExists($target);
-        unlink($target);
     }
 
     /**
@@ -811,7 +792,7 @@ abstract class AbstractImageTest extends TestCase
     abstract protected function getLoader();
 
     /**
-     * @return boolean
+     * @return bool
      */
     abstract protected function supportMultipleLayers();
 }

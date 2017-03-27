@@ -16,12 +16,12 @@ use Symfony\Component\Image\Image\Fill\FillInterface;
 use Symfony\Component\Image\Image\PointInterface;
 
 /**
- * Linear gradient fill
+ * Linear gradient fill.
  */
 abstract class Linear implements FillInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $length;
 
@@ -37,17 +37,17 @@ abstract class Linear implements FillInterface
 
     /**
      * Constructs a linear gradient with overall gradient length, and start and
-     * end shades, which default to 0 and 255 accordingly
+     * end shades, which default to 0 and 255 accordingly.
      *
-     * @param integer        $length
+     * @param int            $length
      * @param ColorInterface $start
      * @param ColorInterface $end
      */
     final public function __construct($length, ColorInterface $start, ColorInterface $end)
     {
         $this->length = $length;
-        $this->start  = $start;
-        $this->end    = $end;
+        $this->start = $start;
+        $this->end = $end;
     }
 
     /**
@@ -85,11 +85,11 @@ abstract class Linear implements FillInterface
     }
 
     /**
-     * Get the distance of the position relative to the beginning of the gradient
+     * Get the distance of the position relative to the beginning of the gradient.
      *
      * @param PointInterface $position
      *
-     * @return integer
+     * @return int
      */
     abstract protected function getDistance(PointInterface $position);
 }

@@ -19,10 +19,10 @@ class PasteTest extends FilterTestCase
 {
     public function testShouldFlipImage()
     {
-        $start   = new Point(0, 0);
-        $image   = $this->getImage();
+        $start = new Point(0, 0);
+        $image = $this->getImage();
         $toPaste = $this->getImage();
-        $filter  = new Paste($toPaste, $start);
+        $filter = new Paste($toPaste, $start);
 
         $image->expects($this->once())
             ->method('paste')

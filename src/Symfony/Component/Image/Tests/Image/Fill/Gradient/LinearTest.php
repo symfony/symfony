@@ -37,14 +37,14 @@ abstract class LinearTest extends TestCase
     protected function setUp()
     {
         $this->start = $this->getStart();
-        $this->end   = $this->getEnd();
-        $this->fill  = $this->getFill($this->start, $this->end);
+        $this->end = $this->getEnd();
+        $this->fill = $this->getFill($this->start, $this->end);
     }
 
     /**
      * @dataProvider getPointsAndColors
      *
-     * @param integer                      $shade
+     * @param int                                           $shade
      * @param \Symfony\Component\Image\Image\PointInterface $position
      */
     public function testShouldProvideCorrectColorsValues(ColorInterface $color, PointInterface $position)

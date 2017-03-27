@@ -36,7 +36,7 @@ abstract class AbstractImage implements ImageInterface
         $imageSize = $this->getSize();
         $ratios = array(
             $size->getWidth() / $imageSize->getWidth(),
-            $size->getHeight() / $imageSize->getHeight()
+            $size->getHeight() / $imageSize->getHeight(),
         );
 
         $thumbnail = $this->copy();
@@ -83,7 +83,7 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Updates a given array of save options for backward compatibility with legacy names
+     * Updates a given array of save options for backward compatibility with legacy names.
      *
      * @param array $options
      *
@@ -91,9 +91,31 @@ abstract class AbstractImage implements ImageInterface
      */
     protected function updateSaveOptions(array $options)
     {
-        // Preserve BC until version 1.0
+        if (isset($options['quality'])) {
+            @trigger_error('Using the "quality" option is deprecated in Symfony 3.3. Use the "jpeg_quality" or "png_compression_level" instead.', E_USER_DEPRECATED);
+        }
+
+        if (isset($options['filters'])) {
+            @trigger_error('Using the "filters" option is deprecated in Symfony 3.3. Use the "png_compression_filter" instead.', E_USER_DEPRECATED);
+        }
+
+        foreach (array('resolution-x', 'resolution-y', 'resolution-units', 'resampling-filter') as $option) {
+            if (isset($options[$option])) {
+                @trigger_error(sprintf('"%s" as been deprecated in Symfony 3.3 in favor of "%"', $option, str_replace('-', '_', $option)), E_USER_DEPRECATED);
+                $options[str_replace('-', '_', $option)] = $options[$option];
+                unset($options[$option]);
+            }
+        }
+
         if (isset($options['quality']) && !isset($options['jpeg_quality'])) {
             $options['jpeg_quality'] = $options['quality'];
+        }
+
+        if (isset($options['quality']) && !isset($options['png_compression_level'])) {
+            $options['png_compression_level'] = round((100 - $options['quality']) * 9 / 100);
+        }
+        if (isset($options['filters']) && !isset($options['png_compression_filter'])) {
+            $options['png_compression_filter'] = $options['filters'];
         }
 
         return $options;
@@ -108,7 +130,7 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Assures the metadata instance will be cloned, too
+     * Assures the metadata instance will be cloned, too.
      */
     public function __clone()
     {
@@ -116,5 +138,4 @@ abstract class AbstractImage implements ImageInterface
             $this->metadata = clone $this->metadata;
         }
     }
-
 }

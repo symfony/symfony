@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Image\Tests\Issues;
+namespace Symfony\Component\Image\Tests\Regression;
 
 use Symfony\Component\Image\Fixtures\Loader as FixturesLoader;
 use Symfony\Component\Image\Imagick\Loader as ImagickLoader;
@@ -8,9 +8,8 @@ use Symfony\Component\Image\Gmagick\Loader as GmagickLoader;
 use Symfony\Component\Image\Exception\RuntimeException;
 use Symfony\Component\Image\Tests\TestCase;
 
-class Issue131Test extends TestCase
+class RegressionSaveTest extends TestCase
 {
-
     private function getTemporaryDir()
     {
         $tempDir = tempnam(sys_get_temp_dir(), 'symfony-image');
@@ -61,13 +60,13 @@ class Issue131Test extends TestCase
     public function testShouldSaveOneFileWithImagick()
     {
         $dir = realpath($this->getTemporaryDir());
-        $targetFile = $dir . '/myfile.png';
+        $targetFile = $dir.'/myfile.png';
 
         $loader = $this->getImagickLoader(FixturesLoader::getFixture('multi-layer.psd'));
 
         $loader->save($targetFile);
 
-        if ( ! $this->probeOneFileAndCleanup($dir, $targetFile)) {
+        if (!$this->probeOneFileAndCleanup($dir, $targetFile)) {
             $this->fail('Imagick failed to generate one file');
         }
     }
@@ -75,13 +74,13 @@ class Issue131Test extends TestCase
     public function testShouldSaveOneFileWithGmagick()
     {
         $dir = realpath($this->getTemporaryDir());
-        $targetFile = $dir . '/myfile.png';
+        $targetFile = $dir.'/myfile.png';
 
         $loader = $this->getGmagickLoader(FixturesLoader::getFixture('multi-layer.psd'));
 
         $loader->save($targetFile);
 
-        if ( ! $this->probeOneFileAndCleanup($dir, $targetFile)) {
+        if (!$this->probeOneFileAndCleanup($dir, $targetFile)) {
             $this->fail('Gmagick failed to generate one file');
         }
     }

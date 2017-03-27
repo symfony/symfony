@@ -23,8 +23,8 @@ class TransformationTest extends FilterTestCase
     public function testSimpleStack()
     {
         $image = $this->getImage();
-        $size  = new Box(50, 50);
-        $path  = sys_get_temp_dir();
+        $size = new Box(50, 50);
+        $path = sys_get_temp_dir();
 
         $image->expects($this->once())
             ->method('resize')
@@ -45,13 +45,13 @@ class TransformationTest extends FilterTestCase
 
     public function testComplexFlow()
     {
-        $image      = $this->getImage();
-        $clone      = $this->getImage();
-        $thumbnail  = $this->getImage();
-        $path       = sys_get_temp_dir();
-        $size       = new Box(50, 50);
-        $resize     = new Box(200, 200);
-        $angle      = 90;
+        $image = $this->getImage();
+        $clone = $this->getImage();
+        $thumbnail = $this->getImage();
+        $path = sys_get_temp_dir();
+        $size = new Box(50, 50);
+        $resize = new Box(200, 200);
+        $angle = 90;
         $background = $this->getPalette()->color('fff');
 
         $image->expects($this->once())
@@ -91,10 +91,10 @@ class TransformationTest extends FilterTestCase
 
     public function testCropFlipPasteShow()
     {
-        $img1  = $this->getImage();
-        $img2  = $this->getImage();
+        $img1 = $this->getImage();
+        $img2 = $this->getImage();
         $start = new Point(0, 0);
-        $size  = new Box(50, 50);
+        $size = new Box(50, 50);
 
         $img1->expects($this->once())
             ->method('paste')

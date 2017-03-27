@@ -58,7 +58,7 @@ class ImageTest extends AbstractImageTest
 
         $image
             ->resize(new Box(1500, 750))
-            ->save(__DIR__.'/../results/large.png')
+            ->save($this->getTempDir().'/large.png')
         ;
 
         $this->assertSame(1500, $image->getSize()->getWidth());
@@ -66,14 +66,11 @@ class ImageTest extends AbstractImageTest
 
         $image
             ->resize(new Box(100, 50))
-            ->save(__DIR__.'/../results/small.png')
+            ->save($this->getTempDir().'/small.png')
         ;
 
         $this->assertSame(100, $image->getSize()->getWidth());
         $this->assertSame(50, $image->getSize()->getHeight());
-
-        unlink(__DIR__.'/../results/large.png');
-        unlink(__DIR__.'/../results/small.png');
     }
 
     public function testAnimatedGifResize()
@@ -82,13 +79,12 @@ class ImageTest extends AbstractImageTest
         $image = $loader->open(FixturesLoader::getFixture('anima3.gif'));
         $image
             ->resize(new Box(150, 100))
-            ->save(__DIR__.'/../results/anima3-150x100-actual.gif', array('animated' => true))
+            ->save($this->getTempDir().'/anima3-150x100-actual.gif', array('animated' => true))
         ;
         $this->assertImageEquals(
             $loader->open(FixturesLoader::getFixture('resize/anima3-150x100.gif')),
-            $loader->open(__DIR__.'/../results/anima3-150x100-actual.gif')
+            $loader->open($this->getTempDir().'/anima3-150x100-actual.gif')
         );
-        unlink(__DIR__.'/../results/anima3-150x100-actual.gif');
     }
 
     // Older imagemagick versions does not support colorspace conversion
@@ -133,15 +129,13 @@ class ImageTest extends AbstractImageTest
                 new Point(0, 0),
                 new Box(150, 100)
             )
-            ->save(__DIR__.'/../results/anima3-topleft-actual.gif', array('animated' => true))
+            ->save($this->getTempDir().'/anima3-topleft-actual.gif', array('animated' => true))
         ;
         $this->assertImageEquals(
             $loader->open(FixturesLoader::getFixture('crop/anima3-topleft.gif')),
-            $loader->open(__DIR__.'/../results/anima3-topleft-actual.gif')
+            $loader->open($this->getTempDir().'/anima3-topleft-actual.gif')
         );
-        unlink(__DIR__.'/../results/anima3-topleft-actual.gif');
     }
-
 
     protected function supportMultipleLayers()
     {

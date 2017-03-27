@@ -43,7 +43,7 @@ class CropTest extends FilterTestCase
     }
 
     /**
-     * Provides coordinates and sizes for testShouldApplyCropAndReturnResult
+     * Provides coordinates and sizes for testShouldApplyCropAndReturnResult.
      *
      * @return array
      */
@@ -51,7 +51,7 @@ class CropTest extends FilterTestCase
     {
         return array(
             array(new Point(0, 0), new Box(40, 50)),
-            array(new Point(0, 15), new Box(50, 32))
+            array(new Point(0, 15), new Box(50, 32)),
         );
     }
 }

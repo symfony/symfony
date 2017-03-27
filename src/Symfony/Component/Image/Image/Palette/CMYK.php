@@ -82,7 +82,7 @@ class CMYK implements PaletteInterface
      */
     public function blend(ColorInterface $color1, ColorInterface $color2, $amount)
     {
-        if (!$color1 instanceof CMYKColor || ! $color2 instanceof CMYKColor) {
+        if (!$color1 instanceof CMYKColor || !$color2 instanceof CMYKColor) {
             throw new RuntimeException('CMYK palette can only blend CMYK colors');
         }
 
@@ -110,7 +110,7 @@ class CMYK implements PaletteInterface
     public function profile()
     {
         if (!$this->profile) {
-            $this->profile = Profile::fromPath(__DIR__ . '/../../Resources/Adobe/CMYK/USWebUncoated.icc');
+            $this->profile = Profile::fromPath(__DIR__.'/../../Resources/Adobe/CMYK/USWebUncoated.icc');
         }
 
         return $this->profile;

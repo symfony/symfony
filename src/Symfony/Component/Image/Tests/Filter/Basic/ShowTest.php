@@ -18,8 +18,8 @@ class ShowTest extends FilterTestCase
 {
     public function testShouldShowImageAndReturnResult()
     {
-        $image   = $this->getImage();
-        $format  = 'jpg';
+        $image = $this->getImage();
+        $format = 'jpg';
         $command = new Show($format);
 
         $image->expects($this->once())

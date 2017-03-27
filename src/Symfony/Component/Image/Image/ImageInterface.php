@@ -19,7 +19,7 @@ use Symfony\Component\Image\Exception\RuntimeException;
 use Symfony\Component\Image\Exception\OutOfBoundsException;
 
 /**
- * The image interface
+ * The image interface.
  */
 interface ImageInterface extends ManipulatorInterface
 {
@@ -49,7 +49,7 @@ interface ImageInterface extends ManipulatorInterface
     const FILTER_SINC = 'sinc';
 
     /**
-     * Returns the image content as a binary string
+     * Returns the image content as a binary string.
      *
      * @param string $format
      * @param array  $options
@@ -61,7 +61,7 @@ interface ImageInterface extends ManipulatorInterface
     public function get($format, array $options = array());
 
     /**
-     * Returns the image content as a PNG binary string
+     * Returns the image content as a PNG binary string.
      *
      * @throws RuntimeException
      *
@@ -70,7 +70,7 @@ interface ImageInterface extends ManipulatorInterface
     public function __toString();
 
     /**
-     * Instantiates and returns a DrawerInterface instance for image drawing
+     * Instantiates and returns a DrawerInterface instance for image drawing.
      *
      * @return DrawerInterface
      */
@@ -82,7 +82,7 @@ interface ImageInterface extends ManipulatorInterface
     public function effects();
 
     /**
-     * Returns current image size
+     * Returns current image size.
      *
      * @return BoxInterface
      */
@@ -90,21 +90,21 @@ interface ImageInterface extends ManipulatorInterface
 
     /**
      * Transforms creates a grayscale mask from current image, returns a new
-     * image, while keeping the existing image unmodified
+     * image, while keeping the existing image unmodified.
      *
      * @return ImageInterface
      */
     public function mask();
 
     /**
-     * Returns array of image colors as Symfony\Component\Image\Image\Palette\Color\ColorInterface instances
+     * Returns array of image colors as Symfony\Component\Image\Image\Palette\Color\ColorInterface instances.
      *
      * @return array
      */
     public function histogram();
 
     /**
-     * Returns color at specified positions of current image
+     * Returns color at specified positions of current image.
      *
      * @param PointInterface $point
      *
@@ -125,7 +125,7 @@ interface ImageInterface extends ManipulatorInterface
     public function layers();
 
     /**
-     * Enables or disables interlacing
+     * Enables or disables interlacing.
      *
      * @param string $scheme
      *
@@ -136,7 +136,7 @@ interface ImageInterface extends ManipulatorInterface
     public function interlace($scheme);
 
     /**
-     * Return the current color palette
+     * Return the current color palette.
      *
      * @return PaletteInterface
      */
@@ -154,7 +154,7 @@ interface ImageInterface extends ManipulatorInterface
     public function usePalette(PaletteInterface $palette);
 
     /**
-     * Applies a color profile on the Image
+     * Applies a color profile on the Image.
      *
      * @param ProfileInterface $profile
      *
@@ -165,7 +165,7 @@ interface ImageInterface extends ManipulatorInterface
     public function profile(ProfileInterface $profile);
 
     /**
-     * Returns the Image's meta data
+     * Returns the Image's meta data.
      *
      * @return Metadata\MetadataBag
      */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Image\Image\Fill\Gradient;
 use Symfony\Component\Image\Image\PointInterface;
 
 /**
- * Vertical gradient fill
+ * Vertical gradient fill.
  */
 final class Vertical extends Linear
 {

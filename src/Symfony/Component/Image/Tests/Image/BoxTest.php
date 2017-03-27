@@ -25,8 +25,8 @@ class BoxTest extends TestCase
      *
      * @dataProvider getSizes
      *
-     * @param integer $width
-     * @param integer $height
+     * @param int $width
+     * @param int $height
      */
     public function testShouldAssignWidthAndHeight($width, $height)
     {
@@ -37,7 +37,7 @@ class BoxTest extends TestCase
     }
 
     /**
-     * Data provider for testShouldAssignWidthAndHeight
+     * Data provider for testShouldAssignWidthAndHeight.
      *
      * @return array
      */
@@ -46,7 +46,7 @@ class BoxTest extends TestCase
         return array(
             array(1, 1),
             array(10, 10),
-            array(15, 36)
+            array(15, 36),
         );
     }
 
@@ -57,8 +57,8 @@ class BoxTest extends TestCase
      *
      * @dataProvider getInvalidSizes
      *
-     * @param integer $width
-     * @param integer $height
+     * @param int $width
+     * @param int $height
      */
     public function testShouldThrowExceptionOnInvalidSize($width, $height)
     {
@@ -66,7 +66,7 @@ class BoxTest extends TestCase
     }
 
     /**
-     * Data provider for testShouldThrowExceptionOnInvalidSize
+     * Data provider for testShouldThrowExceptionOnInvalidSize.
      *
      * @return array
      */
@@ -76,7 +76,7 @@ class BoxTest extends TestCase
             array(0, 0),
             array(15, 0),
             array(0, 25),
-            array(-1, 4)
+            array(-1, 4),
         );
     }
 
@@ -88,7 +88,7 @@ class BoxTest extends TestCase
      * @param BoxInterface   $size
      * @param BoxInterface   $box
      * @param PointInterface $start
-     * @param Boolean        $expected
+     * @param bool           $expected
      */
     public function testShouldDetermineIfASizeContainsABoxAtAStartPosition(
         BoxInterface       $size,
@@ -100,7 +100,7 @@ class BoxTest extends TestCase
     }
 
     /**
-     * Data provider for testShouldDetermineIfASizeContainsABoxAtAStartPosition
+     * Data provider for testShouldDetermineIfASizeContainsABoxAtAStartPosition.
      *
      * @return array
      */
@@ -140,9 +140,9 @@ class BoxTest extends TestCase
     /**
      * @dataProvider getSizesAndSquares
      *
-     * @param integer $width
-     * @param integer $height
-     * @param integer $square
+     * @param int $width
+     * @param int $height
+     * @param int $square
      */
     public function testShouldCalculateSquare($width, $height, $square)
     {
@@ -163,10 +163,10 @@ class BoxTest extends TestCase
     /**
      * @dataProvider getDimensionsAndTargets
      *
-     * @param integer $width
-     * @param integer $height
-     * @param integer $targetWidth
-     * @param integer $targetHeight
+     * @param int $width
+     * @param int $height
+     * @param int $targetWidth
+     * @param int $targetHeight
      */
     public function testShouldResizeToTargetWidthAndHeight($width, $height, $targetWidth, $targetHeight)
     {

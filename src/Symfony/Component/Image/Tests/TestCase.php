@@ -12,22 +12,45 @@
 namespace Symfony\Component\Image\Tests;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Image\Tests\Constraint\IsImageEqual;
 
 class TestCase extends PHPUnitTestCase
 {
     const HTTP_IMAGE = 'http://symfony.com/images/common/logo/logo_symfony_header.png';
 
+    private $tmpDir;
     private static $supportMockingImagick;
 
+    protected function tearDown()
+    {
+        if ($this->tmpDir !== null) {
+            $fs = new Filesystem();
+            $fs->remove($this->tmpDir);
+            $this->tmpDir = null;
+        }
+
+        parent::tearDown();
+    }
+
+    public function getTempDir()
+    {
+        if ($this->tmpDir === null) {
+            $fs = new Filesystem();
+            $this->tmpDir = sys_get_temp_dir().'/sf-image-'.microtime(true);
+            $fs->mkdir($this->tmpDir);
+        }
+        return $this->tmpDir;
+    }
+
     /**
-     * Asserts that two images are equal using color histogram comparison method
+     * Asserts that two images are equal using color histogram comparison method.
      *
      * @param ImageInterface $expected
      * @param ImageInterface $actual
      * @param string         $message
      * @param float          $delta
-     * @param integer        $buckets
+     * @param int            $buckets
      */
     public static function assertImageEquals($expected, $actual, $message = '', $delta = 0.1, $buckets = 4)
     {
@@ -52,7 +75,7 @@ class TestCase extends PHPUnitTestCase
     }
 
     /**
-     * Actually it's not possible on some HHVM versions
+     * Actually it's not possible on some HHVM versions.
      */
     protected function supportsMockingImagick()
     {

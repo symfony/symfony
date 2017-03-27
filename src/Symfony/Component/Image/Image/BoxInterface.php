@@ -12,26 +12,26 @@
 namespace Symfony\Component\Image\Image;
 
 /**
- * Interface for a box
+ * Interface for a box.
  */
 interface BoxInterface
 {
     /**
-     * Gets current image height
+     * Gets current image height.
      *
-     * @return integer
+     * @return int
      */
     public function getHeight();
 
     /**
-     * Gets current image width
+     * Gets current image width.
      *
-     * @return integer
+     * @return int
      */
     public function getWidth();
 
     /**
-     * Creates new BoxInterface instance with ratios applied to both sides
+     * Creates new BoxInterface instance with ratios applied to both sides.
      *
      * @param float $ratio
      *
@@ -40,9 +40,9 @@ interface BoxInterface
     public function scale($ratio);
 
     /**
-     * Creates new BoxInterface, adding given size to both sides
+     * Creates new BoxInterface, adding given size to both sides.
      *
-     * @param integer $size
+     * @param int $size
      *
      * @return BoxInterface
      */
@@ -50,43 +50,43 @@ interface BoxInterface
 
     /**
      * Checks whether current box can fit given box at a given start position,
-     * start position defaults to top left corner xy(0,0)
+     * start position defaults to top left corner xy(0,0).
      *
      * @param BoxInterface   $box
      * @param PointInterface $start
      *
-     * @return Boolean
+     * @return bool
      */
     public function contains(BoxInterface $box, PointInterface $start = null);
 
     /**
      * Gets current box square, useful for getting total number of pixels in a
-     * given box
+     * given box.
      *
-     * @return integer
+     * @return int
      */
     public function square();
 
     /**
-     * Returns a string representation of the current box
+     * Returns a string representation of the current box.
      *
      * @return string
      */
     public function __toString();
 
     /**
-     * Resizes box to given width, constraining proportions and returns the new box
+     * Resizes box to given width, constraining proportions and returns the new box.
      *
-     * @param integer $width
+     * @param int $width
      *
      * @return BoxInterface
      */
     public function widen($width);
 
     /**
-     * Resizes box to given height, constraining proportions and returns the new box
+     * Resizes box to given height, constraining proportions and returns the new box.
      *
-     * @param integer $height
+     * @param int $height
      *
      * @return BoxInterface
      */

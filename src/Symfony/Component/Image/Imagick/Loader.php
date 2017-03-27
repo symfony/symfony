@@ -23,7 +23,7 @@ use Symfony\Component\Image\Image\Palette\RGB;
 use Symfony\Component\Image\Image\Palette\Grayscale;
 
 /**
- * Loader implementation using the Imagick PHP extension
+ * Loader implementation using the Imagick PHP extension.
  */
 final class Loader extends AbstractLoader
 {
@@ -65,7 +65,7 @@ final class Loader extends AbstractLoader
      */
     public function create(BoxInterface $size, ColorInterface $color = null)
     {
-        $width  = $size->getWidth();
+        $width = $size->getWidth();
         $height = $size->getHeight();
 
         $palette = null !== $color ? $color->getPalette() : new RGB();
@@ -144,7 +144,7 @@ final class Loader extends AbstractLoader
     }
 
     /**
-     * Returns the palette corresponding to an \Imagick resource colorspace
+     * Returns the palette corresponding to an \Imagick resource colorspace.
      *
      * @param \Imagick $imagick
      *
@@ -168,7 +168,7 @@ final class Loader extends AbstractLoader
     }
 
     /**
-     * Returns ImageMagick version
+     * Returns ImageMagick version.
      *
      * @param \Imagick $imagick
      *

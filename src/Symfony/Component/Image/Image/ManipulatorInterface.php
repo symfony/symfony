@@ -18,15 +18,15 @@ use Symfony\Component\Image\Image\Palette\Color\ColorInterface;
 use Symfony\Component\Image\Image\Fill\FillInterface;
 
 /**
- * The manipulator interface
+ * The manipulator interface.
  */
 interface ManipulatorInterface
 {
-    const THUMBNAIL_INSET    = 'inset';
+    const THUMBNAIL_INSET = 'inset';
     const THUMBNAIL_OUTBOUND = 'outbound';
 
     /**
-     * Copies current source image into a new ImageInterface instance
+     * Copies current source image into a new ImageInterface instance.
      *
      * @throws RuntimeException
      *
@@ -36,7 +36,7 @@ interface ManipulatorInterface
 
     /**
      * Crops a specified box out of the source image (modifies the source image)
-     * Returns cropped self
+     * Returns cropped self.
      *
      * @param PointInterface $start
      * @param BoxInterface   $size
@@ -49,7 +49,7 @@ interface ManipulatorInterface
     public function crop(PointInterface $start, BoxInterface $size);
 
     /**
-     * Resizes current image and returns self
+     * Resizes current image and returns self.
      *
      * @param BoxInterface $size
      * @param string       $filter
@@ -65,7 +65,7 @@ interface ManipulatorInterface
      * Optional $background can be used to specify the fill color of the empty
      * area of rotated image.
      *
-     * @param integer        $angle
+     * @param int            $angle
      * @param ColorInterface $background
      *
      * @throws RuntimeException
@@ -77,7 +77,7 @@ interface ManipulatorInterface
     /**
      * Pastes an image into a parent image
      * Throws exceptions if image exceeds parent image borders or if paste
-     * operation fails
+     * operation fails.
      *
      * Returns source image
      *
@@ -95,7 +95,7 @@ interface ManipulatorInterface
     /**
      * Saves the image at a specified path, the target file extension is used
      * to determine file format, only jpg, jpeg, gif, png, wbmp and xbm are
-     * supported
+     * supported.
      *
      * @param string $path
      * @param array  $options
@@ -107,7 +107,7 @@ interface ManipulatorInterface
     public function save($path = null, array $options = array());
 
     /**
-     * Outputs the image content
+     * Outputs the image content.
      *
      * @param string $format
      * @param array  $options
@@ -119,7 +119,7 @@ interface ManipulatorInterface
     public function show($format, array $options = array());
 
     /**
-     * Flips current image using horizontal axis
+     * Flips current image using horizontal axis.
      *
      * @throws RuntimeException
      *
@@ -128,7 +128,7 @@ interface ManipulatorInterface
     public function flipHorizontally();
 
     /**
-     * Flips current image using vertical axis
+     * Flips current image using vertical axis.
      *
      * @throws RuntimeException
      *
@@ -137,7 +137,7 @@ interface ManipulatorInterface
     public function flipVertically();
 
     /**
-     * Remove all profiles and comments
+     * Remove all profiles and comments.
      *
      * @throws RuntimeException
      *
@@ -147,7 +147,7 @@ interface ManipulatorInterface
 
     /**
      * Generates a thumbnail from a current image
-     * Returns it as a new image, doesn't modify the current image
+     * Returns it as a new image, doesn't modify the current image.
      *
      * @param BoxInterface $size
      * @param string       $mode
@@ -160,7 +160,7 @@ interface ManipulatorInterface
     public function thumbnail(BoxInterface $size, $mode = self::THUMBNAIL_INSET, $filter = ImageInterface::FILTER_UNDEFINED);
 
     /**
-     * Applies a given mask to current image's alpha channel
+     * Applies a given mask to current image's alpha channel.
      *
      * @param ImageInterface $mask
      *
@@ -171,7 +171,7 @@ interface ManipulatorInterface
     /**
      * Fills image with provided filling, by replacing each pixel's color in
      * the current image with corresponding color from FillInterface, and
-     * returns modified image
+     * returns modified image.
      *
      * @param FillInterface $fill
      *

@@ -29,11 +29,11 @@ abstract class AbstractLayersTest extends TestCase
         foreach ($image->layers() as $layer) {
             $layer
                 ->draw()
-                ->polygon(array(new Point(0, 0),new Point(0, 20),new Point(20, 20),new Point(20, 0)), $palette->color('#FF0000'), true);
+                ->polygon(array(new Point(0, 0), new Point(0, 20), new Point(20, 20), new Point(20, 0)), $palette->color('#FF0000'), true);
         }
         $image->layers()->merge();
 
-        $this->assertEquals('#ff0000', (string) $image->getColorAt(new Point(5,5)));
+        $this->assertEquals('#ff0000', (string) $image->getColorAt(new Point(5, 5)));
     }
 
     public function testLayerArrayAccess()
@@ -177,15 +177,13 @@ abstract class AbstractLayersTest extends TestCase
         $layers[] = $this->getImage(FixturesLoader::getFixture('yellow.gif'));
         $layers[] = $this->getImage(FixturesLoader::getFixture('blue.gif'));
 
-        $target = __DIR__ . '/../results/temporary-gif.gif';
+        $target = $this->getTempDir().'/temporary-gif.gif';
 
         $image->save($target, array(
             'animated' => true,
         ));
 
         $this->assertFileExists($target);
-
-        @unlink($target);
     }
 
     /**
@@ -199,7 +197,7 @@ abstract class AbstractLayersTest extends TestCase
         $layers[] = $this->getImage(FixturesLoader::getFixture('yellow.gif'));
         $layers[] = $this->getImage(FixturesLoader::getFixture('blue.gif'));
 
-        $target = __DIR__ . '/../results/temporary-gif.gif';
+        $target = $this->getTempDir().'/temporary-gif.gif';
 
         $image->save($target, array(
             'animated' => true,
@@ -208,8 +206,6 @@ abstract class AbstractLayersTest extends TestCase
         ));
 
         $this->assertFileExists($target);
-
-        @unlink($target);
     }
 
     public function provideAnimationParameters()
@@ -234,15 +230,13 @@ abstract class AbstractLayersTest extends TestCase
         $layers[] = $this->getImage(FixturesLoader::getFixture('yellow.gif'));
         $layers[] = $this->getImage(FixturesLoader::getFixture('blue.gif'));
 
-        $target = __DIR__ . '/../results/temporary-gif.gif';
+        $target = $this->getTempDir().'/temporary-gif.gif';
 
         $image->save($target, array(
             'animated' => true,
             'animated.delay' => $delay,
             'animated.loops' => $loops,
         ));
-
-        @unlink($target);
     }
 
     public function provideWrongAnimationParameters()
@@ -279,5 +273,6 @@ abstract class AbstractLayersTest extends TestCase
      * @return LoaderInterface
      */
     abstract protected function getLoader();
+
     abstract protected function assertLayersEquals($expected, $actual);
 }

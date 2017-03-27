@@ -16,8 +16,6 @@ use Symfony\Component\Image\Image\Metadata\MetadataBag;
 use Symfony\Component\Image\Image\Metadata\MetadataReaderInterface;
 use Symfony\Component\Image\Tests\TestCase;
 
-/**
- */
 abstract class MetadataReaderTestCase extends TestCase
 {
     /**

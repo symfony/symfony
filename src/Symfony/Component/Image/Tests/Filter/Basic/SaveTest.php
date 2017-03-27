@@ -18,8 +18,8 @@ class SaveTest extends FilterTestCase
 {
     public function testShouldSaveImageAndReturnResult()
     {
-        $image   = $this->getImage();
-        $path    = '/path/to/image.jpg';
+        $image = $this->getImage();
+        $path = '/path/to/image.jpg';
         $command = new Save($path);
 
         $image->expects($this->once())

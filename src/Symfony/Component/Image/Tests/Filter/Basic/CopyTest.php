@@ -19,8 +19,8 @@ class CopyTest extends FilterTestCase
     public function testShouldCopyAndReturnResultingImage()
     {
         $command = new Copy();
-        $image   = $this->getImage();
-        $clone   = $this->getImage();
+        $image = $this->getImage();
+        $clone = $this->getImage();
 
         $image->expects($this->once())
             ->method('copy')

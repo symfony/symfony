@@ -20,8 +20,8 @@ class WebOptimizationTest extends FilterTestCase
 {
     public function testShouldNotSave()
     {
-        $image     = $this->getImage();
-        $filter    = new WebOptimization();
+        $image = $this->getImage();
+        $filter = new WebOptimization();
 
         $image->expects($this->once())
             ->method('usePalette')
@@ -40,12 +40,14 @@ class WebOptimizationTest extends FilterTestCase
 
     public function testShouldSaveWithCallbackAndCustomOption()
     {
-        $image     = $this->getImage();
-        $result    = '/path/to/ploum';
-        $path      = function (ImageInterface $image) use ($result) { return $result; };
-        $filter    = new WebOptimization($path, array(
+        $image = $this->getImage();
+        $result = '/path/to/ploum';
+        $path = function (ImageInterface $image) use ($result) {
+            return $result;
+        };
+        $filter = new WebOptimization($path, array(
             'custom-option' => 'custom-value',
-            'resolution-y'  => 100,
+            'resolution_y' => 100,
         ));
         $capturedOptions = null;
 
@@ -71,18 +73,18 @@ class WebOptimizationTest extends FilterTestCase
 
         $this->assertCount(4, $capturedOptions);
         $this->assertEquals('custom-value', $capturedOptions['custom-option']);
-        $this->assertEquals(ImageInterface::RESOLUTION_PIXELSPERINCH, $capturedOptions['resolution-units']);
-        $this->assertEquals(72, $capturedOptions['resolution-x']);
-        $this->assertEquals(100, $capturedOptions['resolution-y']);
+        $this->assertEquals(ImageInterface::RESOLUTION_PIXELSPERINCH, $capturedOptions['resolution_units']);
+        $this->assertEquals(72, $capturedOptions['resolution_x']);
+        $this->assertEquals(100, $capturedOptions['resolution_y']);
     }
 
     public function testShouldSaveWithPathAndCustomOption()
     {
-        $image     = $this->getImage();
-        $path      = '/path/to/dest';
-        $filter    = new WebOptimization($path, array(
+        $image = $this->getImage();
+        $path = '/path/to/dest';
+        $filter = new WebOptimization($path, array(
             'custom-option' => 'custom-value',
-            'resolution-y'  => 100,
+            'resolution_y' => 100,
         ));
         $capturedOptions = null;
 
@@ -108,8 +110,8 @@ class WebOptimizationTest extends FilterTestCase
 
         $this->assertCount(4, $capturedOptions);
         $this->assertEquals('custom-value', $capturedOptions['custom-option']);
-        $this->assertEquals(ImageInterface::RESOLUTION_PIXELSPERINCH, $capturedOptions['resolution-units']);
-        $this->assertEquals(72, $capturedOptions['resolution-x']);
-        $this->assertEquals(100, $capturedOptions['resolution-y']);
+        $this->assertEquals(ImageInterface::RESOLUTION_PIXELSPERINCH, $capturedOptions['resolution_units']);
+        $this->assertEquals(72, $capturedOptions['resolution_x']);
+        $this->assertEquals(100, $capturedOptions['resolution_y']);
     }
 }

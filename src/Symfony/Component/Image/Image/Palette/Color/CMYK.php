@@ -18,27 +18,26 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 final class CMYK implements ColorInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $c;
 
     /**
-     * @var integer
+     * @var int
      */
     private $m;
 
     /**
-     * @var integer
+     * @var int
      */
     private $y;
 
     /**
-     * @var integer
+     * @var int
      */
     private $k;
 
     /**
-     *
      * @var CMYK
      */
     private $palette;
@@ -69,9 +68,9 @@ final class CMYK implements ColorInterface
     }
 
     /**
-     * Returns Cyan value of the color
+     * Returns Cyan value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getCyan()
     {
@@ -79,9 +78,9 @@ final class CMYK implements ColorInterface
     }
 
     /**
-     * Returns Magenta value of the color
+     * Returns Magenta value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getMagenta()
     {
@@ -89,9 +88,9 @@ final class CMYK implements ColorInterface
     }
 
     /**
-     * Returns Yellow value of the color
+     * Returns Yellow value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getYellow()
     {
@@ -99,9 +98,9 @@ final class CMYK implements ColorInterface
     }
 
     /**
-     * Returns Key value of the color
+     * Returns Key value of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getKeyline()
     {
@@ -187,7 +186,7 @@ final class CMYK implements ColorInterface
     }
 
     /**
-     * Returns hex representation of the color
+     * Returns hex representation of the color.
      *
      * @return string
      */
@@ -197,7 +196,7 @@ final class CMYK implements ColorInterface
     }
 
     /**
-     * Internal, Performs checks for color validity (an of array(C, M, Y, K))
+     * Performs checks for color validity (an of array(C, M, Y, K)).
      *
      * @param array $color
      *

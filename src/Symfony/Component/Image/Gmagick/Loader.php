@@ -24,7 +24,7 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 use Symfony\Component\Image\Exception\RuntimeException;
 
 /**
- * Loader implementation using the Gmagick PHP extension
+ * Loader implementation using the Gmagick PHP extension.
  */
 class Loader extends AbstractLoader
 {
@@ -73,10 +73,10 @@ class Loader extends AbstractLoader
             if ($color instanceof CMYKColor) {
                 $switchPalette = $palette;
                 $palette = new RGB();
-                $pixel   = new \GmagickPixel($palette->color((string) $color));
+                $pixel = new \GmagickPixel($palette->color((string) $color));
             } else {
                 $switchPalette = null;
-                $pixel   = new \GmagickPixel((string) $color);
+                $pixel = new \GmagickPixel((string) $color);
             }
 
             if ($color->getPalette()->supportsAlpha() && $color->getAlpha() < 100) {

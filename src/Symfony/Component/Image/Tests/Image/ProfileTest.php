@@ -43,7 +43,7 @@ class ProfileTest extends TestCase
      */
     public function testFromInvalidPath()
     {
-        $file = __DIR__ . '/non-existent-profile.icc';
+        $file = __DIR__.'/non-existent-profile.icc';
         Profile::fromPath($file);
     }
 }

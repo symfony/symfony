@@ -29,7 +29,7 @@ class Layers extends AbstractLayers
      */
     private $resource;
     /**
-     * @var integer
+     * @var int
      */
     private $offset = 0;
     /**
@@ -110,7 +110,7 @@ class Layers extends AbstractLayers
         }
 
         $count = $coalescedResource->getNumberImages();
-        for ($offset = 0; $offset < $count; $offset++) {
+        for ($offset = 0; $offset < $count; ++$offset) {
             try {
                 $coalescedResource->setIteratorIndex($offset);
                 $this->layers[$offset] = new Image($coalescedResource->getImage(), $this->palette, new MetadataBag());
@@ -129,11 +129,12 @@ class Layers extends AbstractLayers
     }
 
     /**
-     * Tries to extract layer at given offset
+     * Tries to extract layer at given offset.
      *
-     * @param integer $offset
+     * @param int $offset
      *
      * @return Image
+     *
      * @throws RuntimeException
      */
     private function extractAt($offset)

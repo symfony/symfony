@@ -27,8 +27,8 @@ abstract class AbstractLoaderTest extends TestCase
     public function testShouldCreateEmptyImage()
     {
         $factory = $this->getLoader();
-        $image   = $factory->create(new Box(50, 50));
-        $size    = $image->getSize();
+        $image = $factory->create(new Box(50, 50));
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(50, $size->getWidth());
@@ -39,8 +39,8 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $source = FixturesLoader::getFixture('google.png');
         $factory = $this->getLoader();
-        $image   = $factory->open($source);
-        $size    = $image->getSize();
+        $image = $factory->open($source);
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(364, $size->getWidth());
@@ -57,8 +57,8 @@ abstract class AbstractLoaderTest extends TestCase
         $source = FixturesLoader::getFixture('google.png');
         $resource = new \SplFileInfo($source);
         $factory = $this->getLoader();
-        $image   = $factory->open($resource);
-        $size    = $image->getSize();
+        $image = $factory->open($resource);
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(364, $size->getWidth());
@@ -89,8 +89,8 @@ abstract class AbstractLoaderTest extends TestCase
     public function testShouldOpenAnHttpImage()
     {
         $factory = $this->getLoader();
-        $image   = $factory->open(self::HTTP_IMAGE);
-        $size    = $image->getSize();
+        $image = $factory->open(self::HTTP_IMAGE);
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(240, $size->getWidth());
@@ -105,8 +105,8 @@ abstract class AbstractLoaderTest extends TestCase
     public function testShouldCreateImageFromString()
     {
         $factory = $this->getLoader();
-        $image   = $factory->load(file_get_contents(FixturesLoader::getFixture('google.png')));
-        $size    = $image->getSize();
+        $image = $factory->load(file_get_contents(FixturesLoader::getFixture('google.png')));
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(364, $size->getWidth());
@@ -123,8 +123,8 @@ abstract class AbstractLoaderTest extends TestCase
         $source = FixturesLoader::getFixture('google.png');
         $factory = $this->getLoader();
         $resource = fopen($source, 'r');
-        $image   = $factory->read($resource);
-        $size    = $image->getSize();
+        $image = $factory->read($resource);
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(364, $size->getWidth());
@@ -140,8 +140,8 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $factory = $this->getLoader();
         $resource = fopen(self::HTTP_IMAGE, 'r');
-        $image   = $factory->read($resource);
-        $size    = $image->getSize();
+        $image = $factory->read($resource);
+        $size = $image->getSize();
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(240, $size->getWidth());
@@ -160,8 +160,8 @@ abstract class AbstractLoaderTest extends TestCase
         }
 
         $palette = new RGB();
-        $path    = FixturesLoader::getFixture('font/Arial.ttf');
-        $black   = $palette->color('000');
+        $path = FixturesLoader::getFixture('font/Arial.ttf');
+        $black = $palette->color('000');
         $factory = $this->getLoader();
 
         $this->assertEquals($this->getEstimatedFontBox(), $factory->font($path, 36, $black)->box('string'));
@@ -171,7 +171,7 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $loader = $this->getLoader();
         $palette = new RGB();
-        $image   = $loader->create(new Box(1, 1), $palette->color("#f00", 17));
+        $image = $loader->create(new Box(1, 1), $palette->color('#f00', 17));
         $actualColor = $image->getColorAt(new Point(0, 0));
         $this->assertEquals(17, $actualColor->getAlpha());
     }

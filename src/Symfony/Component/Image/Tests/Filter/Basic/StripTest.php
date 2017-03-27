@@ -18,7 +18,7 @@ class StripTest extends FilterTestCase
 {
     public function testShouldStripImage()
     {
-        $image  = $this->getImage();
+        $image = $this->getImage();
         $filter = new Strip();
 
         $image->expects($this->once())

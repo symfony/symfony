@@ -20,10 +20,10 @@ class ThumbnailTest extends FilterTestCase
 {
     public function testShouldMakeAThumbnail()
     {
-        $image     = $this->getImage();
+        $image = $this->getImage();
         $thumbnail = $this->getImage();
-        $size      = new Box(50, 50);
-        $filter    = new Thumbnail($size);
+        $size = new Box(50, 50);
+        $filter = new Thumbnail($size);
 
         $image->expects($this->once())
             ->method('thumbnail')

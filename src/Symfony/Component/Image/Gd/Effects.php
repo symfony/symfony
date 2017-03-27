@@ -17,7 +17,7 @@ use Symfony\Component\Image\Image\Palette\Color\ColorInterface;
 use Symfony\Component\Image\Image\Palette\Color\RGB as RGBColor;
 
 /**
- * Effects implementation using the GD library
+ * Effects implementation using the GD library.
  */
 class Effects implements EffectsInterface
 {
@@ -46,7 +46,7 @@ class Effects implements EffectsInterface
     public function negative()
     {
         if (false === imagefilter($this->resource, IMG_FILTER_NEGATE)) {
-           throw new RuntimeException('Failed to negate the image');
+            throw new RuntimeException('Failed to negate the image');
         }
 
         return $this;
@@ -58,7 +58,7 @@ class Effects implements EffectsInterface
     public function grayscale()
     {
         if (false === imagefilter($this->resource, IMG_FILTER_GRAYSCALE)) {
-           throw new RuntimeException('Failed to grayscale the image');
+            throw new RuntimeException('Failed to grayscale the image');
         }
 
         return $this;
@@ -85,7 +85,7 @@ class Effects implements EffectsInterface
      */
     public function sharpen()
     {
-        $sharpenMatrix = array(array(-1,-1,-1), array(-1,16,-1), array(-1,-1,-1));
+        $sharpenMatrix = array(array(-1, -1, -1), array(-1, 16, -1), array(-1, -1, -1));
         $divisor = array_sum(array_map('array_sum', $sharpenMatrix));
 
         if (false === imageconvolution($this->resource, $sharpenMatrix, $divisor, 0)) {

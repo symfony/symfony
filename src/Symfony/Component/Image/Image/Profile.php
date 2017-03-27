@@ -41,9 +41,9 @@ class Profile implements ProfileInterface
     }
 
     /**
-     * Creates a profile from a path to a file
+     * Creates a profile from a path to a file.
      *
-     * @param String $path
+     * @param string $path
      *
      * @return Profile
      *

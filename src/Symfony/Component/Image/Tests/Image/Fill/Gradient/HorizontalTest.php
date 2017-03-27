@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\Image\Tests\Image\Fill\Gradient;
 
 use Symfony\Component\Image\Image\Fill\Gradient\Horizontal;
@@ -16,7 +17,8 @@ use Symfony\Component\Image\Image\Point;
 class HorizontalTest extends LinearTest
 {
     /**
-     * (non-PHPdoc)
+     * (non-PHPdoc).
+     *
      * @see Symfony\Component\Image\Image\Fill\Gradient\LinearTest::getEnd()
      */
     protected function getEnd()
@@ -25,7 +27,8 @@ class HorizontalTest extends LinearTest
     }
 
     /**
-     * (non-PHPdoc)
+     * (non-PHPdoc).
+     *
      * @see Symfony\Component\Image\Image\Fill\Gradient\LinearTest::getStart()
      */
     protected function getStart()
@@ -34,7 +37,8 @@ class HorizontalTest extends LinearTest
     }
 
     /**
-     * (non-PHPdoc)
+     * (non-PHPdoc).
+     *
      * @see Symfony\Component\Image\Image\Fill\Gradient\LinearTest::getMask()
      */
     protected function getFill(ColorInterface $start, ColorInterface $end)
@@ -43,7 +47,8 @@ class HorizontalTest extends LinearTest
     }
 
     /**
-     * (non-PHPdoc)
+     * (non-PHPdoc).
+     *
      * @see Symfony\Component\Image\Image\Fill\Gradient\LinearTest::getPointsAndShades()
      */
     public function getPointsAndColors()
@@ -51,7 +56,7 @@ class HorizontalTest extends LinearTest
         return array(
             array($this->getColor('fff'), new Point(100, 5)),
             array($this->getColor('000'), new Point(0, 15)),
-            array($this->getColor(array(128, 128, 128)), new Point(50, 25))
+            array($this->getColor(array(128, 128, 128)), new Point(50, 25)),
         );
     }
 }

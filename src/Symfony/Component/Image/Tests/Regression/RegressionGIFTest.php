@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Component\Image\Tests\Issues;
+namespace Symfony\Component\Image\Tests\Regression;
 
 use Symfony\Component\Image\Fixtures\Loader as FixturesLoader;
 use Symfony\Component\Image\Gd\Loader;
 use Symfony\Component\Image\Exception\RuntimeException;
 use Symfony\Component\Image\Tests\TestCase;
 
-class Issue67Test extends TestCase
+class RegressionGIFTest extends TestCase
 {
     private function getLoader()
     {
@@ -20,16 +20,17 @@ class Issue67Test extends TestCase
         return $loader;
     }
 
-    /**
-    * @expectedException \Symfony\Component\Image\Exception\RuntimeException
-    */
-    public function testShouldThrowExceptionNotError()
+    public function testShouldSaveGifImageWithMoreThan256TransparentPixels()
     {
-        $invalidPath = '/thispathdoesnotexist';
-
         $loader = $this->getLoader();
+        $new = sys_get_temp_dir().'/sample.jpeg';
 
-        $loader->open(FixturesLoader::getFixture('large.jpg'))
-            ->save($invalidPath . '/myfile.jpg');
+        $image = $loader
+            ->open(FixturesLoader::getFixture('sample.gif'))
+            ->save($new)
+        ;
+
+        $this->assertSame(700, $image->getSize()->getWidth());
+        $this->assertSame(440, $image->getSize()->getHeight());
     }
 }

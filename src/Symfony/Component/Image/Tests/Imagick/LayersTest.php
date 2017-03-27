@@ -79,10 +79,10 @@ class LayersTest extends AbstractLayersTest
         $width = null;
         $height = null;
 
-        $resource = new \Imagick;
+        $resource = new \Imagick();
         $palette = new RGB();
-        $resource->newImage(20, 10, new \ImagickPixel("black"));
-        $resource->newImage(10, 10, new \ImagickPixel("black"));
+        $resource->newImage(20, 10, new \ImagickPixel('black'));
+        $resource->newImage(10, 10, new \ImagickPixel('black'));
 
         $layers = new Layers(new Image($resource, $palette, new MetadataBag()), $palette, $resource);
         $layers->coalesce();

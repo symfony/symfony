@@ -31,19 +31,19 @@ interface ColorInterface
      *
      * @param string $component One of the ColorInterface::COLOR_* component
      *
-     * @return Integer
+     * @return int
      */
     public function getValue($component);
 
     /**
-     * Returns percentage of transparency of the color
+     * Returns percentage of transparency of the color.
      *
-     * @return integer
+     * @return int
      */
     public function getAlpha();
 
     /**
-     * Returns the palette attached to the current color
+     * Returns the palette attached to the current color.
      *
      * @return PaletteInterface
      */
@@ -51,9 +51,9 @@ interface ColorInterface
 
     /**
      * Returns a copy of current color, incrementing the alpha channel by the
-     * given amount
+     * given amount.
      *
-     * @param integer $alpha
+     * @param int $alpha
      *
      * @return ColorInterface
      */
@@ -61,9 +61,9 @@ interface ColorInterface
 
     /**
      * Returns a copy of the current color, lightened by the specified number
-     * of shades
+     * of shades.
      *
-     * @param integer $shade
+     * @param int $shade
      *
      * @return ColorInterface
      */
@@ -71,25 +71,25 @@ interface ColorInterface
 
     /**
      * Returns a copy of the current color, darkened by the specified number of
-     * shades
+     * shades.
      *
-     * @param integer $shade
+     * @param int $shade
      *
      * @return ColorInterface
      */
     public function darken($shade);
 
     /**
-     * Returns a gray related to the current color
+     * Returns a gray related to the current color.
      *
      * @return ColorInterface
      */
     public function grayscale();
 
     /**
-     * Checks if the current color is opaque
+     * Checks if the current color is opaque.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isOpaque();
 }

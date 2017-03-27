@@ -32,7 +32,7 @@ class CMYKTest extends AbstractPaletteTest
     public function provideColorAndAlpha()
     {
         return array(
-            array(array(4, 3, 2, 1), null)
+            array(array(4, 3, 2, 1), null),
         );
     }
 

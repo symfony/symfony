@@ -28,8 +28,8 @@ class BucketTest extends TestCase
     /**
      * @dataProvider getCountAndValues
      *
-     * @param integer $count
-     * @param array   $values
+     * @param int   $count
+     * @param array $values
      */
     public function testShouldOnlyRegisterValuesInRange($count, array $values)
     {

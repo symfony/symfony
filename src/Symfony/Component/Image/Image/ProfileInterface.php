@@ -14,16 +14,16 @@ namespace Symfony\Component\Image\Image;
 interface ProfileInterface
 {
     /**
-     * Returns the name of the profile
+     * Returns the name of the profile.
      *
-     * @return String
+     * @return string
      */
     public function name();
 
     /**
-     * Returns the profile data
+     * Returns the profile data.
      *
-     * @return String
+     * @return string
      */
     public function data();
 }

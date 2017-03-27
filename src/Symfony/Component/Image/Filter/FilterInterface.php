@@ -14,13 +14,13 @@ namespace Symfony\Component\Image\Filter;
 use Symfony\Component\Image\Image\ImageInterface;
 
 /**
- * Interface for filters
+ * Interface for filters.
  */
 interface FilterInterface
 {
     /**
      * Applies scheduled transformation to ImageInterface instance
-     * Returns processed ImageInterface instance
+     * Returns processed ImageInterface instance.
      *
      * @param ImageInterface $image
      *

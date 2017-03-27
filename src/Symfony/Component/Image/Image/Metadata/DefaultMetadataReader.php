@@ -12,7 +12,7 @@
 namespace Symfony\Component\Image\Image\Metadata;
 
 /**
- * Default metadata reader
+ * Default metadata reader.
  */
 class DefaultMetadataReader extends AbstractMetadataReader
 {

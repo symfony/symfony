@@ -18,7 +18,7 @@ class FlipVerticallyTest extends FilterTestCase
 {
     public function testShouldFlipImage()
     {
-        $image  = $this->getImage();
+        $image = $this->getImage();
         $filter = new FlipVertically();
 
         $image->expects($this->once())

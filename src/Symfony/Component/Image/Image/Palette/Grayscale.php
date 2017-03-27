@@ -79,7 +79,7 @@ class Grayscale implements PaletteInterface
     public function profile()
     {
         if (!$this->profile) {
-            $this->profile = Profile::fromPath(__DIR__ . '/../../Resources/colormanagement.org/ISOcoated_v2_grey1c_bas.ICC');
+            $this->profile = Profile::fromPath(__DIR__.'/../../Resources/colormanagement.org/ISOcoated_v2_grey1c_bas.ICC');
         }
 
         return $this->profile;
@@ -109,7 +109,7 @@ class Grayscale implements PaletteInterface
      */
     public function blend(ColorInterface $color1, ColorInterface $color2, $amount)
     {
-        if (!$color1 instanceof GrayColor || ! $color2 instanceof GrayColor) {
+        if (!$color1 instanceof GrayColor || !$color2 instanceof GrayColor) {
             throw new RuntimeException('Grayscale palette can only blend Grayscale colors');
         }
 

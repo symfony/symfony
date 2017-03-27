@@ -52,7 +52,7 @@ class CMYKTest extends AbstractColorTest
     public function provideColorAndAlphaTuples()
     {
         return array(
-            array(null, $this->getColor())
+            array(null, $this->getColor()),
         );
     }
 

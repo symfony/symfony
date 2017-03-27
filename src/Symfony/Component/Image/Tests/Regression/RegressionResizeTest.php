@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Image\Tests\Issues;
+namespace Symfony\Component\Image\Tests\Regression;
 
 use Symfony\Component\Image\Fixtures\Loader as FixturesLoader;
 use Symfony\Component\Image\Image\ImageInterface;
@@ -9,7 +9,7 @@ use Symfony\Component\Image\Gd\Loader;
 use Symfony\Component\Image\Exception\RuntimeException;
 use Symfony\Component\Image\Tests\TestCase;
 
-class Issue17Test extends TestCase
+class RegressionResizeTest extends TestCase
 {
     private function getLoader()
     {
@@ -24,19 +24,17 @@ class Issue17Test extends TestCase
 
     public function testShouldResize()
     {
-        $size    = new Box(100, 10);
+        $size = new Box(100, 10);
         $loader = $this->getLoader();
 
         $loader->open(FixturesLoader::getFixture('large.jpg'))
             ->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND)
-            ->save(__DIR__.'/../results/resized.jpg');
+            ->save($this->getTempDir().'/resized.jpg');
 
-        $this->assertTrue(file_exists(__DIR__.'/../results/resized.jpg'));
+        $this->assertFileExists($this->getTempDir().'/resized.jpg');
         $this->assertEquals(
             $size,
-            $loader->open(__DIR__.'/../results/resized.jpg')->getSize()
+            $loader->open($this->getTempDir().'/resized.jpg')->getSize()
         );
-
-        unlink(__DIR__.'/../results/resized.jpg');
     }
 }

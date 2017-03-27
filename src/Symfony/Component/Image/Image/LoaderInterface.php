@@ -16,12 +16,12 @@ use Symfony\Component\Image\Exception\InvalidArgumentException;
 use Symfony\Component\Image\Exception\RuntimeException;
 
 /**
- * The loader interface
+ * The loader interface.
  */
 interface LoaderInterface
 {
     /**
-     * Creates a new empty image with an optional background color
+     * Creates a new empty image with an optional background color.
      *
      * @param BoxInterface   $size
      * @param ColorInterface $color
@@ -34,7 +34,7 @@ interface LoaderInterface
     public function create(BoxInterface $size, ColorInterface $color = null);
 
     /**
-     * Opens an existing image from $path
+     * Opens an existing image from $path.
      *
      * @param string $path
      *
@@ -45,7 +45,7 @@ interface LoaderInterface
     public function open($path);
 
     /**
-     * Loads an image from a binary $string
+     * Loads an image from a binary $string.
      *
      * @param string $string
      *
@@ -56,7 +56,7 @@ interface LoaderInterface
     public function load($string);
 
     /**
-     * Loads an image from a resource $resource
+     * Loads an image from a resource $resource.
      *
      * @param resource $resource
      *
@@ -67,12 +67,12 @@ interface LoaderInterface
     public function read($resource);
 
     /**
-     * Constructs a font with specified $file, $size and $color
+     * Constructs a font with specified $file, $size and $color.
      *
      * The font size is to be specified in points (e.g. 10pt means 10)
      *
      * @param string         $file
-     * @param integer        $size
+     * @param int            $size
      * @param ColorInterface $color
      *
      * @return FontInterface

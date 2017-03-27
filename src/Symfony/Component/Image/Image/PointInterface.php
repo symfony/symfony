@@ -12,43 +12,44 @@
 namespace Symfony\Component\Image\Image;
 
 /**
- * The point interface
+ * The point interface.
  */
 interface PointInterface
 {
     /**
-     * Gets points x coordinate
+     * Gets points x coordinate.
      *
-     * @return integer
+     * @return int
      */
     public function getX();
 
     /**
-     * Gets points y coordinate
+     * Gets points y coordinate.
      *
-     * @return integer
+     * @return int
      */
     public function getY();
 
     /**
-     * Checks if current coordinate is inside a given box
+     * Checks if current coordinate is inside a given box.
      *
      * @param BoxInterface $box
      *
-     * @return Boolean
+     * @return bool
      */
     public function in(BoxInterface $box);
 
     /**
-     * Returns another point, moved by a given amount from current coordinates
+     * Returns another point, moved by a given amount from current coordinates.
      *
-     * @param  integer        $amount
+     * @param int $amount
+     *
      * @return ImageInterface
      */
     public function move($amount);
 
     /**
-     * Gets a string representation for the current point
+     * Gets a string representation for the current point.
      *
      * @return string
      */

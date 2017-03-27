@@ -83,7 +83,7 @@ class RGB implements PaletteInterface
     public function profile()
     {
         if (!$this->profile) {
-            $this->profile = Profile::fromPath(__DIR__ . '/../../Resources/color.org/sRGB_IEC61966-2-1_black_scaled.icc');
+            $this->profile = Profile::fromPath(__DIR__.'/../../Resources/color.org/sRGB_IEC61966-2-1_black_scaled.icc');
         }
 
         return $this->profile;
@@ -113,7 +113,7 @@ class RGB implements PaletteInterface
      */
     public function blend(ColorInterface $color1, ColorInterface $color2, $amount)
     {
-        if (!$color1 instanceof RGBColor || ! $color2 instanceof RGBColor) {
+        if (!$color1 instanceof RGBColor || !$color2 instanceof RGBColor) {
             throw new RuntimeException('RGB palette can only blend RGB colors');
         }
 

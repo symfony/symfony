@@ -21,10 +21,10 @@ interface PaletteInterface
     const PALETTE_CMYK = 'cmyk';
 
     /**
-     * Returns a color given some values
+     * Returns a color given some values.
      *
-     * @param string|array|integer $color A color
-     * @param integer|null         $alpha Set alpha to null to disable it
+     * @param string|array|int $color A color
+     * @param int|null         $alpha Set alpha to null to disable it
      *
      * @return ColorInterface
      *
@@ -34,7 +34,7 @@ interface PaletteInterface
     public function color($color, $alpha = null);
 
     /**
-     * Blend two colors given an amount
+     * Blend two colors given an amount.
      *
      * @param ColorInterface $color1
      * @param ColorInterface $color2
@@ -64,9 +64,9 @@ interface PaletteInterface
 
     /**
      * Returns the name of this Palette, one of PaletteInterface::PALETTE_*
-     * constants
+     * constants.
      *
-     * @return String
+     * @return string
      */
     public function name();
 
@@ -79,9 +79,9 @@ interface PaletteInterface
     public function pixelDefinition();
 
     /**
-     * Tells if alpha channel is supported in this palette
+     * Tells if alpha channel is supported in this palette.
      *
-     * @return Boolean
+     * @return bool
      */
     public function supportsAlpha();
 }

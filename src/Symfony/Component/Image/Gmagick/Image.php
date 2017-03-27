@@ -27,7 +27,7 @@ use Symfony\Component\Image\Image\PointInterface;
 use Symfony\Component\Image\Image\ProfileInterface;
 
 /**
- * Image implementation using the Gmagick PHP extension
+ * Image implementation using the Gmagick PHP extension.
  */
 final class Image extends AbstractImage
 {
@@ -47,11 +47,11 @@ final class Image extends AbstractImage
 
     private static $colorspaceMapping = array(
         PaletteInterface::PALETTE_CMYK => \Gmagick::COLORSPACE_CMYK,
-        PaletteInterface::PALETTE_RGB  => \Gmagick::COLORSPACE_RGB,
+        PaletteInterface::PALETTE_RGB => \Gmagick::COLORSPACE_RGB,
     );
 
     /**
-     * Constructs a new Image instance
+     * Constructs a new Image instance.
      *
      * @param \Gmagick         $gmagick
      * @param PaletteInterface $palette
@@ -66,7 +66,7 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Destroys allocated gmagick resources
+     * Destroys allocated gmagick resources.
      */
     public function __destruct()
     {
@@ -77,7 +77,7 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Returns gmagick instance
+     * Returns gmagick instance.
      *
      * @return \Gmagick
      */
@@ -203,21 +203,21 @@ final class Image extends AbstractImage
     {
         static $supportedFilters = array(
             ImageInterface::FILTER_UNDEFINED => \Gmagick::FILTER_UNDEFINED,
-            ImageInterface::FILTER_BESSEL    => \Gmagick::FILTER_BESSEL,
-            ImageInterface::FILTER_BLACKMAN  => \Gmagick::FILTER_BLACKMAN,
-            ImageInterface::FILTER_BOX       => \Gmagick::FILTER_BOX,
-            ImageInterface::FILTER_CATROM    => \Gmagick::FILTER_CATROM,
-            ImageInterface::FILTER_CUBIC     => \Gmagick::FILTER_CUBIC,
-            ImageInterface::FILTER_GAUSSIAN  => \Gmagick::FILTER_GAUSSIAN,
-            ImageInterface::FILTER_HANNING   => \Gmagick::FILTER_HANNING,
-            ImageInterface::FILTER_HAMMING   => \Gmagick::FILTER_HAMMING,
-            ImageInterface::FILTER_HERMITE   => \Gmagick::FILTER_HERMITE,
-            ImageInterface::FILTER_LANCZOS   => \Gmagick::FILTER_LANCZOS,
-            ImageInterface::FILTER_MITCHELL  => \Gmagick::FILTER_MITCHELL,
-            ImageInterface::FILTER_POINT     => \Gmagick::FILTER_POINT,
+            ImageInterface::FILTER_BESSEL => \Gmagick::FILTER_BESSEL,
+            ImageInterface::FILTER_BLACKMAN => \Gmagick::FILTER_BLACKMAN,
+            ImageInterface::FILTER_BOX => \Gmagick::FILTER_BOX,
+            ImageInterface::FILTER_CATROM => \Gmagick::FILTER_CATROM,
+            ImageInterface::FILTER_CUBIC => \Gmagick::FILTER_CUBIC,
+            ImageInterface::FILTER_GAUSSIAN => \Gmagick::FILTER_GAUSSIAN,
+            ImageInterface::FILTER_HANNING => \Gmagick::FILTER_HANNING,
+            ImageInterface::FILTER_HAMMING => \Gmagick::FILTER_HAMMING,
+            ImageInterface::FILTER_HERMITE => \Gmagick::FILTER_HERMITE,
+            ImageInterface::FILTER_LANCZOS => \Gmagick::FILTER_LANCZOS,
+            ImageInterface::FILTER_MITCHELL => \Gmagick::FILTER_MITCHELL,
+            ImageInterface::FILTER_POINT => \Gmagick::FILTER_POINT,
             ImageInterface::FILTER_QUADRATIC => \Gmagick::FILTER_QUADRATIC,
-            ImageInterface::FILTER_SINC      => \Gmagick::FILTER_SINC,
-            ImageInterface::FILTER_TRIANGLE  => \Gmagick::FILTER_TRIANGLE
+            ImageInterface::FILTER_SINC => \Gmagick::FILTER_SINC,
+            ImageInterface::FILTER_TRIANGLE => \Gmagick::FILTER_TRIANGLE,
         );
 
         if (!array_key_exists($filter, $supportedFilters)) {
@@ -255,9 +255,7 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Internal
-     *
-     * Applies options before save or output
+     * Applies options before save or output.
      *
      * @param \Gmagick $image
      * @param array    $options
@@ -272,7 +270,7 @@ final class Image extends AbstractImage
         } elseif ('' !== $extension = pathinfo($path, \PATHINFO_EXTENSION)) {
             $format = $extension;
         } else {
-            $format = pathinfo($image->getImageFilename(), \PATHINFO_EXTENSION);
+            $format = pathinfo($image->getimagefilename(), \PATHINFO_EXTENSION);
         }
 
         $format = strtolower($format);
@@ -307,16 +305,16 @@ final class Image extends AbstractImage
             $image->setCompressionQuality($compression);
         }
 
-        if (isset($options['resolution-units']) && isset($options['resolution-x']) && isset($options['resolution-y'])) {
-            if ($options['resolution-units'] == ImageInterface::RESOLUTION_PIXELSPERCENTIMETER) {
+        if (isset($options['resolution_units']) && isset($options['resolution_x']) && isset($options['resolution_y'])) {
+            if ($options['resolution_units'] == ImageInterface::RESOLUTION_PIXELSPERCENTIMETER) {
                 $image->setimageunits(\Gmagick::RESOLUTION_PIXELSPERCENTIMETER);
-            } elseif ($options['resolution-units'] == ImageInterface::RESOLUTION_PIXELSPERINCH) {
+            } elseif ($options['resolution_units'] == ImageInterface::RESOLUTION_PIXELSPERINCH) {
                 $image->setimageunits(\Gmagick::RESOLUTION_PIXELSPERINCH);
             } else {
                 throw new InvalidArgumentException('Unsupported image unit format');
             }
 
-            $image->setimageresolution($options['resolution-x'], $options['resolution-y']);
+            $image->setimageresolution($options['resolution_x'], $options['resolution_y']);
         }
     }
 
@@ -327,7 +325,7 @@ final class Image extends AbstractImage
      */
     public function save($path = null, array $options = array())
     {
-        $path = null === $path ? $this->gmagick->getImageFilename() : $path;
+        $path = null === $path ? $this->gmagick->getimagefilename() : $path;
 
         if ('' === trim($path)) {
             throw new RuntimeException('You can omit save path only if image has been open from a file');
@@ -433,7 +431,7 @@ final class Image extends AbstractImage
         try {
             $i = $this->gmagick->getimageindex();
             $this->gmagick->setimageindex(0); //rewind
-            $width  = $this->gmagick->getimagewidth();
+            $width = $this->gmagick->getimagewidth();
             $height = $this->gmagick->getimageheight();
             $this->gmagick->setimageindex($i);
         } catch (\GmagickException $e) {
@@ -501,8 +499,8 @@ final class Image extends AbstractImage
             $w = $size->getWidth();
             $h = $size->getHeight();
 
-            for ($x = 0; $x < $w; $x++) {
-                for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; ++$x) {
+                for ($y = 0; $y < $h; ++$y) {
                     $pixel = $this->getColor($fill->getColor(new Point($x, $y)));
 
                     $draw->setfillcolor($pixel);
@@ -550,10 +548,10 @@ final class Image extends AbstractImage
         }
 
         try {
-            $cropped   = clone $this->gmagick;
+            $cropped = clone $this->gmagick;
             $histogram = $cropped
                 ->cropImage(1, 1, $point->getX(), $point->getY())
-                ->getImageHistogram();
+                ->getimagehistogram();
         } catch (\GmagickException $e) {
             throw new RuntimeException('Unable to get the pixel', $e->getCode(), $e);
         }
@@ -566,7 +564,7 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Returns a color given a pixel, depending the Palette context
+     * Returns a color given a pixel, depending the Palette context.
      *
      * Note : this method is public for PHP 5.3 compatibility
      *
@@ -579,15 +577,15 @@ final class Image extends AbstractImage
     public function pixelToColor(\GmagickPixel $pixel)
     {
         static $colorMapping = array(
-            ColorInterface::COLOR_RED     => \Gmagick::COLOR_RED,
-            ColorInterface::COLOR_GREEN   => \Gmagick::COLOR_GREEN,
-            ColorInterface::COLOR_BLUE    => \Gmagick::COLOR_BLUE,
-            ColorInterface::COLOR_CYAN    => \Gmagick::COLOR_CYAN,
+            ColorInterface::COLOR_RED => \Gmagick::COLOR_RED,
+            ColorInterface::COLOR_GREEN => \Gmagick::COLOR_GREEN,
+            ColorInterface::COLOR_BLUE => \Gmagick::COLOR_BLUE,
+            ColorInterface::COLOR_CYAN => \Gmagick::COLOR_CYAN,
             ColorInterface::COLOR_MAGENTA => \Gmagick::COLOR_MAGENTA,
-            ColorInterface::COLOR_YELLOW  => \Gmagick::COLOR_YELLOW,
+            ColorInterface::COLOR_YELLOW => \Gmagick::COLOR_YELLOW,
             ColorInterface::COLOR_KEYLINE => \Gmagick::COLOR_BLACK,
             // There is no gray component in \Gmagick, let's use one of the RGB comp
-            ColorInterface::COLOR_GRAY    => \Gmagick::COLOR_RED,
+            ColorInterface::COLOR_GRAY => \Gmagick::COLOR_RED,
         );
 
         if ($this->palette->supportsAlpha()) {
@@ -629,9 +627,9 @@ final class Image extends AbstractImage
     public function interlace($scheme)
     {
         static $supportedInterlaceSchemes = array(
-            ImageInterface::INTERLACE_NONE      => \Gmagick::INTERLACE_NO,
-            ImageInterface::INTERLACE_LINE      => \Gmagick::INTERLACE_LINE,
-            ImageInterface::INTERLACE_PLANE     => \Gmagick::INTERLACE_PLANE,
+            ImageInterface::INTERLACE_NONE => \Gmagick::INTERLACE_NO,
+            ImageInterface::INTERLACE_LINE => \Gmagick::INTERLACE_LINE,
+            ImageInterface::INTERLACE_PLANE => \Gmagick::INTERLACE_PLANE,
             ImageInterface::INTERLACE_PARTITION => \Gmagick::INTERLACE_PARTITION,
         );
 
@@ -639,7 +637,7 @@ final class Image extends AbstractImage
             throw new InvalidArgumentException('Unsupported interlace type');
         }
 
-        $this->gmagick->setInterlaceScheme($supportedInterlaceSchemes[$scheme]);
+        $this->gmagick->setinterlacescheme($supportedInterlaceSchemes[$scheme]);
 
         return $this;
     }
@@ -649,8 +647,8 @@ final class Image extends AbstractImage
      */
     public function usePalette(PaletteInterface $palette)
     {
-        if (!isset(static::$colorspaceMapping[$palette->name()])) {
-            throw new InvalidArgumentException(sprintf('The palette %s is not supported by Gmagick driver',$palette->name()));
+        if (!isset(self::$colorspaceMapping[$palette->name()])) {
+            throw new InvalidArgumentException(sprintf('The palette %s is not supported by Gmagick driver', $palette->name()));
         }
 
         if ($this->palette->name() === $palette->name()) {
@@ -659,7 +657,7 @@ final class Image extends AbstractImage
 
         try {
             try {
-                $hasICCProfile = (Boolean) $this->gmagick->getimageprofile('ICM');
+                $hasICCProfile = (bool) $this->gmagick->getimageprofile('ICM');
             } catch (\GmagickException $e) {
                 $hasICCProfile = false;
             }
@@ -706,18 +704,16 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Internal
-     *
      * Flatten the image.
      */
     private function flatten()
     {
-        /**
+        /*
          * @see http://pecl.php.net/bugs/bug.php?id=22435
          */
-        if (method_exists($this->gmagick, 'flattenImages')) {
+        if (method_exists($this->gmagick, 'flattenimages')) {
             try {
-                $this->gmagick = $this->gmagick->flattenImages();
+                $this->gmagick = $this->gmagick->flattenimages();
             } catch (\GmagickException $e) {
                 throw new RuntimeException('Flatten operation failed', $e->getCode(), $e);
             }
@@ -725,7 +721,7 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Gets specifically formatted color string from Color instance
+     * Gets specifically formatted color string from Color instance.
      *
      * @param ColorInterface $color
      *
@@ -743,8 +739,6 @@ final class Image extends AbstractImage
     }
 
     /**
-     * Internal
-     *
      * Get the mime type based on format.
      *
      * @param string $format
@@ -757,15 +751,15 @@ final class Image extends AbstractImage
     {
         static $mimeTypes = array(
             'jpeg' => 'image/jpeg',
-            'jpg'  => 'image/jpeg',
-            'gif'  => 'image/gif',
-            'png'  => 'image/png',
+            'jpg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'png' => 'image/png',
             'wbmp' => 'image/vnd.wap.wbmp',
-            'xbm'  => 'image/xbm',
+            'xbm' => 'image/xbm',
         );
 
         if (!isset($mimeTypes[$format])) {
-            throw new InvalidArgumentException(sprintf('Unsupported format given. Only %s are supported, %s given', implode(", ", array_keys($mimeTypes)), $format));
+            throw new InvalidArgumentException(sprintf('Unsupported format given. Only %s are supported, %s given', implode(', ', array_keys($mimeTypes)), $format));
         }
 
         return $mimeTypes[$format];
@@ -780,11 +774,11 @@ final class Image extends AbstractImage
      */
     private function setColorspace(PaletteInterface $palette)
     {
-        if (!isset(static::$colorspaceMapping[$palette->name()])) {
+        if (!isset(self::$colorspaceMapping[$palette->name()])) {
             throw new InvalidArgumentException(sprintf('The palette %s is not supported by Gmagick driver', $palette->name()));
         }
 
-        $this->gmagick->setimagecolorspace(static::$colorspaceMapping[$palette->name()]);
+        $this->gmagick->setimagecolorspace(self::$colorspaceMapping[$palette->name()]);
         $this->palette = $palette;
     }
 }

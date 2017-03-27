@@ -19,7 +19,6 @@ use Symfony\Component\Image\Tests\TestCase;
 
 abstract class AbstractEffectsTest extends TestCase
 {
-
     public function testNegate()
     {
         $palette = new RGB();

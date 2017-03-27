@@ -47,7 +47,7 @@ class CanvasTest extends FilterTestCase
     }
 
     /**
-     * Data provider for testShouldCanvasImageAndReturnResult
+     * Data provider for testShouldCanvasImageAndReturnResult.
      *
      * @return array
      */

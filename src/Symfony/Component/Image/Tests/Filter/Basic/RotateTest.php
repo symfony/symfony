@@ -18,8 +18,8 @@ class RotateTest extends FilterTestCase
 {
     public function testShouldRotateImageAndReturnResult()
     {
-        $image   = $this->getImage();
-        $angle   = 90;
+        $image = $this->getImage();
+        $angle = 90;
         $command = new Rotate($angle);
 
         $image->expects($this->once())

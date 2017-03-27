@@ -33,10 +33,10 @@ class GdTransparentGifHandlingTest extends TestCase
     public function testShouldResize()
     {
         $loader = $this->getLoader();
-        $new     = sys_get_temp_dir()."/sample.jpeg";
+        $new = sys_get_temp_dir().'/sample.jpeg';
 
         $image = $loader->open(FixturesLoader::getFixture('xparent.gif'));
-        $size  = $image->getSize()->scale(0.5);
+        $size = $image->getSize()->scale(0.5);
 
         $image
             ->resize($size)
@@ -50,7 +50,5 @@ class GdTransparentGifHandlingTest extends TestCase
 
         $this->assertSame(272, $image->getSize()->getWidth());
         $this->assertSame(171, $image->getSize()->getHeight());
-
-        unlink($new);
     }
 }

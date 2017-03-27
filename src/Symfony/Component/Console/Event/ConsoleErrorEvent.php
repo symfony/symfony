@@ -27,7 +27,7 @@ class ConsoleErrorEvent extends ConsoleExceptionEvent
     private $error;
     private $handled = false;
 
-    public function __construct(Command $command, InputInterface $input, OutputInterface $output, $error, $exitCode)
+    public function __construct(InputInterface $input, OutputInterface $output, $error, $exitCode, Command $command = null)
     {
         if (!$error instanceof \Throwable && !$error instanceof \Exception) {
             throw new InvalidArgumentException(sprintf('The error passed to ConsoleErrorEvent must be an instance of \Throwable or \Exception, "%s" was passed instead.', is_object($error) ? get_class($error) : gettype($error)));

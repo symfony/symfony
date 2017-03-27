@@ -111,7 +111,7 @@ class ExceptionListenerTest extends TestCase
 
     private function getConsoleErrorEvent(\Exception $exception, InputInterface $input, $exitCode)
     {
-        return new ConsoleErrorEvent(new Command('test:run'), $input, $this->getOutput(), $exception, $exitCode);
+        return new ConsoleErrorEvent($input, $this->getOutput(), $exception, $exitCode, new Command('test:run'));
     }
 
     private function getConsoleTerminateEvent(InputInterface $input, $exitCode)

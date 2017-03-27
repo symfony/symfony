@@ -128,8 +128,8 @@ class Application
             $exception = new FatalThrowableError($e);
         }
 
-        if (null !== $this->runningCommand && null !== $e && null !== $this->dispatcher) {
-            $event = new ConsoleErrorEvent($this->runningCommand, $input, $output, $e, $e->getCode());
+        if (null !== $e && null !== $this->dispatcher) {
+            $event = new ConsoleErrorEvent($input, $output, $e, $e->getCode(), $this->runningCommand);
             $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
 
             $e = $event->getError();

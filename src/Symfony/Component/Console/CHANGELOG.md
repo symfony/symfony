@@ -10,6 +10,8 @@ CHANGELOG
   with value optional explicitly passed empty
 * added console.error event to catch exceptions thrown by other listeners
 * deprecated console.exception event in favor of console.error
+* added ability to handle `CommandNotFoundException` through the 
+ `console.error` event
 
 3.2.0
 ------

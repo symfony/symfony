@@ -231,18 +231,6 @@ class ContainerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Non-string service identifiers are deprecated since Symfony 3.3 and won't be supported in 4.0 for service "foo" ("Symfony\Component\DependencyInjection\Alias" given.) Cast it to string beforehand.
-     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.3.
-     */
-    public function testNonStringNormalizeId()
-    {
-        $sc = new ProjectServiceContainer();
-        $this->assertSame('foo', $sc->normalizeId(new Alias('foo')));
-        $this->assertSame('foo', $sc->normalizeId('Foo'));
-    }
-
-    /**
-     * @group legacy
      * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "foo" instead of "Foo" is deprecated since version 3.3.
      */
     public function testNormalizeIdKeepsCase()

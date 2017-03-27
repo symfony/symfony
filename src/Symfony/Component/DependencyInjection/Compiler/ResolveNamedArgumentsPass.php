@@ -46,12 +46,12 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
             $resolvedArguments = array();
 
             foreach ($arguments as $key => $argument) {
-                if (is_int($key) || '' === $key || '$' !== $key[0]) {
-                    if (!is_int($key)) {
-                        @trigger_error(sprintf('Using key "%s" for defining arguments of method "%s" for service "%s" is deprecated since Symfony 3.3 and will throw an exception in 4.0. Use no keys or $named arguments instead.', $key, $method, $this->currentId), E_USER_DEPRECATED);
-                    }
+                if (is_int($key)) {
                     $resolvedArguments[] = $argument;
                     continue;
+                }
+                if ('' === $key || '$' !== $key[0]) {
+                    throw new InvalidArgumentException(sprintf('Invalid key "%s" found in arguments of method "%s" for service "%s": only integer or $named arguments are allowed.', $key, $method, $this->currentId));
                 }
 
                 $parameters = null !== $parameters ? $parameters : $this->getParameters($class, $method);

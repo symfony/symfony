@@ -73,6 +73,12 @@ Debug
 DependencyInjection
 -------------------
 
+ * `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
+
+ * Non-numeric keys in methods and constructors arguments have never been supported and are now forbidden. Please remove them if you happen to have one.
+
+ * Service names that start with an underscore are now reserved in Yaml files. Please rename any services with such names.
+
  * Autowiring-types have been removed, use aliases instead.
 
    Before:

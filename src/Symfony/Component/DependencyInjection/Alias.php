@@ -22,12 +22,7 @@ class Alias
      */
     public function __construct($id, $public = true)
     {
-        if (!is_string($id)) {
-            $type = is_object($id) ? get_class($id) : gettype($id);
-            $id = (string) $id;
-            @trigger_error(sprintf('Non-string identifiers are deprecated since Symfony 3.3 and won\'t be supported in 4.0 for Alias to "%s" ("%s" given.) Cast it to string beforehand.', $id, $type), E_USER_DEPRECATED);
-        }
-        $this->id = $id;
+        $this->id = (string) $id;
         $this->public = $public;
     }
 

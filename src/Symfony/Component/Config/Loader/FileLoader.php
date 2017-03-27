@@ -79,6 +79,7 @@ abstract class FileLoader extends Loader
      *
      * @throws FileLoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
+     * @throws FileLocatorFileNotFoundException
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {

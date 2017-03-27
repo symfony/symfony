@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by alcaeus at 2017-03-27T07:29:22Z
+
+No idea what the build failure on PHP 7 is about - ~~travis is not giving any output~~.
+
+Edit: travis gives build errors, not sure they are related to the PR though. Couldn't reproduce them on PHP 7 locally.

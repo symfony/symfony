@@ -106,7 +106,7 @@ class WebServerConfig
     private function findBestPort()
     {
         $port = 8000;
-        while (false !== $fp = @fsockopen('127.0.0.1', $port, $errno, $errstr, 1)) {
+        while (false !== $fp = @fsockopen($this->hostname, $port, $errno, $errstr, 1)) {
             fclose($fp);
             if ($port++ >= 8100) {
                 throw new \RuntimeException('Unable to find a port available to run the web server.');

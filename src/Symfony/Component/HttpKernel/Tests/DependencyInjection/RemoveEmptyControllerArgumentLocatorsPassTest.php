@@ -24,7 +24,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
 
         $container->register('stdClass', 'stdClass');
         $container->register(parent::class, 'stdClass');
@@ -35,33 +35,49 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $pass = new RegisterControllerArgumentLocatorsPass();
         $pass->process($container);
 
-        $this->assertCount(2, $container->getDefinition('arguments.c1:fooAction')->getArgument(0));
-        $this->assertCount(1, $container->getDefinition('arguments.c2:setTestCase')->getArgument(0));
-        $this->assertCount(1, $container->getDefinition('arguments.c2:fooAction')->getArgument(0));
+        $controllers = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $pass = new ResolveInvalidReferencesPass();
-        $pass->process($container);
+        $this->assertCount(2, $container->getDefinition((string) $controllers['c1:fooAction']->getValues()[0])->getArgument(0));
+        $this->assertCount(1, $container->getDefinition((string) $controllers['c2:setTestCase']->getValues()[0])->getArgument(0));
+        $this->assertCount(1, $container->getDefinition((string) $controllers['c2:fooAction']->getValues()[0])->getArgument(0));
 
-        $this->assertCount(1, $container->getDefinition('arguments.c2:setTestCase')->getArgument(0));
-        $this->assertSame(array(), $container->getDefinition('arguments.c2:fooAction')->getArgument(0));
+        (new ResolveInvalidReferencesPass())->process($container);
 
-        $pass = new RemoveEmptyControllerArgumentLocatorsPass();
-        $pass->process($container);
+        $this->assertCount(1, $container->getDefinition((string) $controllers['c2:setTestCase']->getValues()[0])->getArgument(0));
+        $this->assertSame(array(), $container->getDefinition((string) $controllers['c2:fooAction']->getValues()[0])->getArgument(0));
 
-        $this->assertFalse($container->hasDefinition('arguments.c2:setTestCase'));
-        $this->assertFalse($container->hasDefinition('arguments.c2:fooAction'));
+        (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
 
-        $this->assertCount(1, $container->getDefinition('arguments.c1:fooAction')->getArgument(0));
-        $this->assertArrayHasKey('bar', $container->getDefinition('arguments.c1:fooAction')->getArgument(0));
+        $controllers = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+
+        $this->assertSame(array('c1:fooAction'), array_keys($controllers));
+        $this->assertSame(array('bar'), array_keys($container->getDefinition((string) $controllers['c1:fooAction']->getValues()[0])->getArgument(0)));
 
         $expectedLog = array(
-            'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing method "setTestCase" of service "c2" from controller candidates: the method is called at instantiation, thus cannot be an action.',
             'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing service-argument-resolver for controller "c2:fooAction": no corresponding definitions were found for the referenced services/types. Did you forget to enable autowiring?',
+            'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing method "setTestCase" of service "c2" from controller candidates: the method is called at instantiation, thus cannot be an action.',
         );
 
         $this->assertSame($expectedLog, $container->getCompiler()->getLog());
+    }
 
-        $this->assertEquals(array('c1:fooAction' => new ServiceClosureArgument(new Reference('arguments.c1:fooAction'))), $container->getDefinition('argument_resolver.service')->getArgument(0)->getArgument(0));
+    public function testSameIdClass()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register(RegisterTestController::class, RegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+        (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
+
+        $expected = array(
+            RegisterTestController::class.':fooAction' => new ServiceClosureArgument(new Reference('service_locator.37b6201ea2e9e6ade00ab09ae7a6ceb3')),
+            RegisterTestController::class.'::fooAction' => new ServiceClosureArgument(new Reference('service_locator.37b6201ea2e9e6ade00ab09ae7a6ceb3')),
+        );
+        $this->assertEquals($expected, $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0));
     }
 }
 

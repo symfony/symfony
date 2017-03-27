@@ -17,14 +17,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
@@ -262,10 +261,10 @@ class SecurityExtension extends Extension
                 ->replaceArgument(2, new Reference($configId))
             ;
 
-            $contextRefs[$contextId] = new ServiceClosureArgument(new Reference($contextId));
+            $contextRefs[$contextId] = new Reference($contextId);
             $map[$contextId] = $matcher;
         }
-        $mapDef->replaceArgument(0, (new Definition(ServiceLocator::class, array($contextRefs)))->addTag('container.service_locator'));
+        $mapDef->replaceArgument(0, ServiceLocatorTagPass::register($container, $contextRefs));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
 
         // add authentication providers to authentication manager

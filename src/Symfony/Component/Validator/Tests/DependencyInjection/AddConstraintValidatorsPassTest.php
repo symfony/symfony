@@ -38,11 +38,12 @@ class AddConstraintValidatorsPassTest extends TestCase
         $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
         $addConstraintValidatorsPass->process($container);
 
-        $this->assertEquals((new Definition(ServiceLocator::class, array(array(
+        $expected = (new Definition(ServiceLocator::class, array(array(
             Validator1::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
             'my_constraint_validator_alias1' => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
             Validator2::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service2')),
-        ))))->addTag('container.service_locator'), $validatorFactory->getArgument(0));
+        ))))->addTag('container.service_locator')->setPublic(false);
+        $this->assertEquals($expected, $container->getDefinition((string) $validatorFactory->getArgument(0)));
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition()

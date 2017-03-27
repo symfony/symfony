@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -22,7 +24,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ServiceLocatorTagPass extends AbstractRecursivePass
+final class ServiceLocatorTagPass extends AbstractRecursivePass
 {
     protected function processValue($value, $isRoot = false)
     {
@@ -48,7 +50,52 @@ class ServiceLocatorTagPass extends AbstractRecursivePass
             }
             $arguments[0][$k] = new ServiceClosureArgument($v);
         }
+        ksort($arguments[0]);
 
-        return $value->setArguments($arguments);
+        $value->setArguments($arguments);
+
+        if ($public = $value->isPublic()) {
+            $value->setPublic(false);
+        }
+        $id = 'service_locator.'.md5(serialize($value));
+
+        if ($isRoot) {
+            if ($id !== $this->currentId) {
+                $this->container->setAlias($id, new Alias($this->currentId, $public));
+            }
+
+            return $value;
+        }
+
+        $this->container->setDefinition($id, $value);
+
+        return new Reference($id);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param Reference[]      $refMap
+     * @param int|bool         $autowired
+     *
+     * @return Reference
+     */
+    public static function register(ContainerBuilder $container, array $refMap, $autowired = false)
+    {
+        foreach ($refMap as $id => $ref) {
+            $refMap[$id] = new ServiceClosureArgument($ref);
+        }
+        ksort($refMap);
+
+        $locator = (new Definition(ServiceLocator::class))
+            ->addArgument($refMap)
+            ->setPublic(false)
+            ->setAutowired($autowired)
+            ->addTag('container.service_locator');
+
+        if (!$container->has($id = 'service_locator.'.md5(serialize($locator)))) {
+            $container->setDefinition($id, $locator);
+        }
+
+        return new Reference($id);
     }
 }

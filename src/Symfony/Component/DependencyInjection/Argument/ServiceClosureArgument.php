@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Argument;
 
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Represents a service wrapped in a memoizing closure.
@@ -28,11 +28,17 @@ class ServiceClosureArgument implements ArgumentInterface
         $this->values = array($reference);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getValues()
     {
         return $this->values;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setValues(array $values)
     {
         if (array(0) !== array_keys($values) || !($values[0] instanceof Reference || null === $values[0])) {

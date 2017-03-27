@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 /**
@@ -64,10 +62,10 @@ class FragmentRendererPass implements CompilerPassInterface
             }
 
             foreach ($tags as $tag) {
-                $renderers[$tag['alias']] = new ServiceClosureArgument(new Reference($id));
+                $renderers[$tag['alias']] = new Reference($id);
             }
         }
 
-        $definition->replaceArgument(0, (new Definition(ServiceLocator::class, array($renderers)))->addTag('container.service_locator'));
+        $definition->replaceArgument(0, ServiceLocatorTagPass::register($container, $renderers));
     }
 }

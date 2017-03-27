@@ -277,7 +277,7 @@ class Process implements \IteratorAggregate
             }
 
             foreach ($env as $k => $v) {
-                $envBackup[$k] = getenv($v);
+                $envBackup[$k] = getenv($k);
                 putenv(false === $v || null === $v ? $k : "$k=$v");
             }
             $env = null;

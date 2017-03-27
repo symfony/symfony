@@ -160,14 +160,6 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function provideCheckTypes()
-    {
-        return array(
-            array('checkMX', Email::MX_CHECK_FAILED_ERROR),
-            array('checkHost', Email::HOST_CHECK_FAILED_ERROR),
-        );
-    }
-
     /**
      * @dataProvider provideCheckTypes
      */
@@ -186,5 +178,13 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', '"foo@bar.fr@"')
             ->setCode($violation)
             ->assertRaised();
+    }
+
+    public function provideCheckTypes()
+    {
+        return array(
+            array('checkMX', Email::MX_CHECK_FAILED_ERROR),
+            array('checkHost', Email::HOST_CHECK_FAILED_ERROR),
+        );
     }
 }

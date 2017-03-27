@@ -23,6 +23,8 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -431,7 +433,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_named_args.yml');
 
         $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
-        $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition('another_one')->getArguments());
+        $this->assertEquals(array('$apiKey' => 'ABCD', CaseSensitiveClass::class => null), $container->getDefinition('another_one')->getArguments());
 
         $container->compile();
 
@@ -447,7 +449,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_instanceof.yml');
         $container->compile();
 
-        $definition = $container->getDefinition(Foo::class);
+        $definition = $container->getDefinition(Bar::class);
         $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
@@ -646,12 +648,38 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_instanceof.yml');
     }
-}
 
-interface FooInterface
-{
-}
+    public function testBindings()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_bindings.yml');
+        $container->compile();
 
-class Foo implements FooInterface
-{
+        $definition = $container->getDefinition('bar');
+        $this->assertEquals(array(
+            'NonExistent' => null,
+            BarInterface::class => new Reference(Bar::class),
+            '$foo' => array(null),
+            '$quz' => 'quz',
+            '$factory' => 'factory',
+        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+        $this->assertEquals(array(
+            'quz',
+            null,
+            new Reference(Bar::class),
+            array(null),
+        ), $definition->getArguments());
+
+        $definition = $container->getDefinition(Bar::class);
+        $this->assertEquals(array(
+            null,
+            'factory',
+        ), $definition->getArguments());
+        $this->assertEquals(array(
+            'NonExistent' => null,
+            '$quz' => 'quz',
+            '$factory' => 'factory',
+        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+    }
 }

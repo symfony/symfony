@@ -75,4 +75,14 @@ class WorkflowExtensionTest extends TestCase
         $this->assertTrue($this->extension->hasMarkedPlace($subject, 'waiting_for_payment'));
         $this->assertFalse($this->extension->hasMarkedPlace($subject, 'processed'));
     }
+
+    public function testGetMarkedPlaces()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array();
+        $subject->marking = array('ordered' => 1, 'waiting_for_payment' => 1);
+
+        $this->assertSame(array('ordered', 'waiting_for_payment'), $this->extension->getMarkedPlaces($subject));
+        $this->assertSame($subject->marking, $this->extension->getMarkedPlaces($subject, false));
+    }
 }

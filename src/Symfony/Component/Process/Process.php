@@ -303,7 +303,7 @@ class Process implements \IteratorAggregate
         $envBackup = array();
         if (null !== $env && $inheritEnv) {
             foreach ($env as $k => $v) {
-                $envBackup[$k] = getenv($v);
+                $envBackup[$k] = getenv($k);
                 putenv(false === $v || null === $v ? $k : "$k=$v");
             }
             $env = null;

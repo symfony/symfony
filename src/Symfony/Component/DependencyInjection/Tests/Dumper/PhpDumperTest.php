@@ -561,7 +561,7 @@ class PhpDumperTest extends TestCase
             ->setAutowired(true)
             ->addArgument(new Reference('container'))
             ->addTag('container.service_subscriber', array(
-                'key' => 'test',
+                'key' => 'bar',
                 'id' => 'TestServiceSubscriber',
             ))
         ;

@@ -115,4 +115,23 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
         $this->assertEquals($expected, $locator->getArgument(0));
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Service key "test" does not exist in the map returned by TestServiceSubscriber::getSubscribedServices() for service "foo_service".
+     */
+    public function testExtraServiceSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', 'TestServiceSubscriber')
+            ->setAutowired(true)
+            ->addArgument(new Reference('container'))
+            ->addTag('container.service_subscriber', array(
+                'key' => 'test',
+                'id' => 'TestServiceSubscriber',
+            ))
+        ;
+        $container->register('TestServiceSubscriber', 'TestServiceSubscriber');
+        $container->compile();
+    }
 }

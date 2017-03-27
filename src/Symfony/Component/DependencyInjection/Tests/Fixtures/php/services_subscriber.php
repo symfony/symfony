@@ -102,7 +102,7 @@ class ProjectServiceContainer extends Container
         }, 'stdClass' => function () {
             $f = function (\stdClass $v = null) { return $v; }; return $f(${($_ = isset($this->services['autowired.stdClass']) ? $this->services['autowired.stdClass'] : $this->getAutowired_StdClassService()) && false ?: '_'});
         }, 'bar' => function () {
-            $f = function (\stdClass $v) { return $v; }; return $f(${($_ = isset($this->services['autowired.stdClass']) ? $this->services['autowired.stdClass'] : $this->getAutowired_StdClassService()) && false ?: '_'});
+            $f = function (\stdClass $v) { return $v; }; return $f(${($_ = isset($this->services['TestServiceSubscriber']) ? $this->services['TestServiceSubscriber'] : $this->get('TestServiceSubscriber')) && false ?: '_'});
         }, 'baz' => function () {
             $f = function (\stdClass $v = null) { return $v; }; return $f(${($_ = isset($this->services['autowired.stdClass']) ? $this->services['autowired.stdClass'] : $this->getAutowired_StdClassService()) && false ?: '_'});
         })));

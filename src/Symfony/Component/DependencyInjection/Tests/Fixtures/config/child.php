@@ -5,7 +5,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use App\BarService;
 
 return function (ContainerConfigurator $c) {
-
     $c->services()
         ->set('bar', 'Class1')
         ->set(BarService::class)
@@ -20,5 +19,4 @@ return function (ContainerConfigurator $c) {
             ->parent('bar')
             ->parent(BarService::class)
     ;
-
 };

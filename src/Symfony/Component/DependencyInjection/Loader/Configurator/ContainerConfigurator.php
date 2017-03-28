@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -113,6 +114,18 @@ function inline($class = null)
 function iterator(array $values)
 {
     return new IteratorArgument(AbstractConfigurator::processValue($values, true));
+}
+
+/**
+ * Creates a lazy iterator by tag name.
+ *
+ * @param string $tag
+ *
+ * @return TaggedIteratorArgument
+ */
+function tagged($tag)
+{
+    return new TaggedIteratorArgument($tag);
 }
 
 /**

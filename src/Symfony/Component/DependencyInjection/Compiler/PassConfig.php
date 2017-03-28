@@ -61,6 +61,7 @@ class PassConfig
             new AutowireRequiredMethodsPass(),
             new ResolveBindingsPass(),
             new AutowirePass(false),
+            new ResolveTaggedIteratorArgumentPass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),

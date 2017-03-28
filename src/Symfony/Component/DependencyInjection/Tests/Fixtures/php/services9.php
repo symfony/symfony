@@ -56,6 +56,8 @@ class ProjectServiceContainer extends Container
             'new_factory' => 'getNewFactoryService',
             'new_factory_service' => 'getNewFactoryServiceService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
+            'tagged_iterator' => 'getTaggedIteratorService',
+            'tagged_iterator_foo' => 'getTaggedIteratorFooService',
         );
         $this->privates = array(
             'configurator_service' => true,
@@ -63,6 +65,7 @@ class ProjectServiceContainer extends Container
             'factory_simple' => true,
             'inlined' => true,
             'new_factory' => true,
+            'tagged_iterator_foo' => true,
         );
         $this->aliases = array(
             'Psr\\Container\\ContainerInterface' => 'service_container',
@@ -338,6 +341,18 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the public 'tagged_iterator' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getTaggedIteratorService()
+    {
+        return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
+    }
+
+    /**
      * Gets the private 'configurator_service' shared service.
      *
      * @return \ConfClass
@@ -402,6 +417,16 @@ class ProjectServiceContainer extends Container
         $instance->foo = 'bar';
 
         return $instance;
+    }
+
+    /**
+     * Gets the private 'tagged_iterator_foo' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getTaggedIteratorFooService()
+    {
+        return $this->services['tagged_iterator_foo'] = new \Bar();
     }
 
     /**

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-27T18:08:09Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-27T18:24:49Z
+
+Given the linked issue.. what about adding `factory` and `deprecated` to the defaults white list?
+
+edit: while reading adding deprecated may sound weird.. but from a per-file perspective it could make sense to deprecate a bunch of services (old namespace?) at once.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-03-27T20:26:24Z
+
+I'm obviously in favor of the BC break here, as the case is just about too hypothetical to consider at all. It doesn't close #22143 though, just its symptoms. The real issue there is the `factory` attribute not working.
+
+> what about adding factory and deprecated to the defaults white list
+
+I'm surprised to discover there *is* a whitelist. I was expecting even `calls` just to get optimistically merged based on method name to be honest. Same goes for deprecated, it may not be terribly useful, but why disable it just because we can't think of a really good use case right now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-27T21:18:22Z
+
+@curry684 yes, there is a whitelist. Many attributes make no sense as defaults. See #21071 for the discussion about it. You missed learning about that because you did not get the exception you were supposed to - and that would have told about it (fixed here.)
+
+Allowing factory/whatever in "defaults" is another discussion. So to me, this closes your issue, and you should open another issue as a feat request (yes, I know your issue was about that also, but let's split things now that we learned there are two things, isn't it? :) )

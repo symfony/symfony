@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 abstract class AbstractRecursivePass implements CompilerPassInterface
 {
+    /**
+     * @var ContainerBuilder
+     */
     protected $container;
     protected $currentId;
 

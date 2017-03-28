@@ -23,8 +23,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     public function match($pathinfo)
     {
         $allow = array();
-        $pathinfo = rawurldecode($pathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
+        $pathinfo = \rawurldecode($pathinfo);
+        $trimmedPathinfo = \rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
         $requestMethod = $canonicalMethod = $context->getMethod();
@@ -35,7 +35,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
 
-        if (0 === strpos($pathinfo, '/a')) {
+        if (0 === \strpos($pathinfo, '/a')) {
             // a_first
             if ('/a/11' === $pathinfo) {
                 return array('_route' => 'a_first');
@@ -54,14 +54,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
         // a_wildcard
-        if (preg_match('#^/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'a_wildcard')), array ());
+        if (\preg_match('#^/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
+            return $this->mergeDefaults(\array_replace($matches, array('_route' => 'a_wildcard')), array ());
         }
 
-        if (0 === strpos($pathinfo, '/a')) {
+        if (0 === \strpos($pathinfo, '/a')) {
             // a_fourth
             if ('/a/44' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'a_fourth');
                 }
 
@@ -70,7 +70,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // a_fifth
             if ('/a/55' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'a_fifth');
                 }
 
@@ -79,7 +79,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // a_sixth
             if ('/a/66' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'a_sixth');
                 }
 
@@ -89,14 +89,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
         // nested_wildcard
-        if (0 === strpos($pathinfo, '/nested') && preg_match('#^/nested/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
-            return $this->mergeDefaults(array_replace($matches, array('_route' => 'nested_wildcard')), array ());
+        if (0 === \strpos($pathinfo, '/nested') && \preg_match('#^/nested/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
+            return $this->mergeDefaults(\array_replace($matches, array('_route' => 'nested_wildcard')), array ());
         }
 
-        if (0 === strpos($pathinfo, '/nested/group')) {
+        if (0 === \strpos($pathinfo, '/nested/group')) {
             // nested_a
             if ('/nested/group/a' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'nested_a');
                 }
 
@@ -105,7 +105,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // nested_b
             if ('/nested/group/b' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'nested_b');
                 }
 
@@ -114,7 +114,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // nested_c
             if ('/nested/group/c' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'nested_c');
                 }
 
@@ -123,10 +123,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        elseif (0 === strpos($pathinfo, '/slashed/group')) {
+        elseif (0 === \strpos($pathinfo, '/slashed/group')) {
             // slashed_a
             if ('/slashed/group' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'slashed_a');
                 }
 
@@ -135,7 +135,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // slashed_b
             if ('/slashed/group/b' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'slashed_b');
                 }
 
@@ -144,7 +144,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // slashed_c
             if ('/slashed/group/c' === $trimmedPathinfo) {
-                if (substr($pathinfo, -1) !== '/') {
+                if (\substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'slashed_c');
                 }
 
@@ -153,6 +153,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
+        throw 0 < \count($allow) ? new MethodNotAllowedException(\array_unique($allow)) : new ResourceNotFoundException();
     }
 }

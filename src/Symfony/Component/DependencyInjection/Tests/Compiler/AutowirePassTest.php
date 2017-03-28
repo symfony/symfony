@@ -486,6 +486,75 @@ class AutowirePassTest extends TestCase
             array('CannotBeAutowiredReverseOrder'),
         );
     }
+
+    public function testAutoDiscoverWithAnyOrderParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', __NAMESPACE__.'\\'.'Jordan')
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertTrue($container->hasDefinition('a'));
+
+        $this->assertEquals(
+            array(
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\i'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\i'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\d'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\j'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\d'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\j'),
+            ),
+            $container->getDefinition('a')->getArguments()
+        );
+    }
+
+    public function testAutoDiscoverWithAnyOrderServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('montreal', __NAMESPACE__.'\\'.'Montreal')
+            ->setAutowired(true);
+        $container->register('paris', __NAMESPACE__.'\\'.'Paris')
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertTrue($container->hasDefinition('montreal'));
+        $this->assertTrue($container->hasDefinition('paris'));
+
+        $this->assertEquals(
+            array(
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\j'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\d'),
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\d'),
+            ),
+            $container->getDefinition('montreal')->getArguments()
+        );
+
+        $this->assertEquals(
+            array(
+                new Reference('autowired.symfony\component\dependencyinjection\tests\compiler\j'),
+            ),
+            $container->getDefinition('paris')->getArguments()
+        );
+    }
+}
+
+class Montreal
+{
+    public function __construct(JInterface $j, DInterface $d, D $d2)
+    {
+    }
+}
+
+class Paris
+{
+    public function __construct(J $j)
+    {
+    }
 }
 
 class Foo
@@ -522,6 +591,10 @@ interface EInterface extends DInterface
 {
 }
 
+interface JInterface
+{
+}
+
 interface IInterface
 {
 }
@@ -544,6 +617,21 @@ class G
 class H
 {
     public function __construct(B $b, DInterface $d)
+    {
+    }
+}
+
+class D implements DInterface
+{
+}
+
+class J implements JInterface
+{
+}
+
+class Jordan
+{
+    public function __construct(IInterface $i, I $i2, DInterface $d, JInterface $j, D $d2, J $j2)
     {
     }
 }

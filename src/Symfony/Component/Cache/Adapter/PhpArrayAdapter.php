@@ -57,7 +57,8 @@ class PhpArrayAdapter implements AdapterInterface
      * stores arrays in its latest versions. This factory method decorates the given
      * fallback pool with this adapter only if the current PHP version is supported.
      *
-     * @param string $file The PHP file were values are cached
+     * @param string                 $file         The PHP file were values are cached
+     * @param CacheItemPoolInterface $fallbackPool Fallback for old PHP versions or opcache disabled
      *
      * @return CacheItemPoolInterface
      */

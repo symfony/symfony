@@ -80,6 +80,12 @@ Debug
 DependencyInjection
 -------------------
 
+ * [BC BREAK] `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
+
+ * [BC BREAK] non-numeric keys in methods and constructors arguments have never been supported and are now forbidden. Please remove them if you happen to have one.
+
+ * Service names that start with an underscore are deprecated in Yaml files and will be reserved in 4.0. Please rename any services with such names.
+
  * Autowiring-types have been deprecated, use aliases instead.
 
    Before:

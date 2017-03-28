@@ -205,10 +205,16 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "services" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
-        if ($this->isUnderscoredParamValid($content, '_instanceof', $file)) {
+        if (isset($content['services']['_instanceof'])) {
+            $instanceof = $content['services']['_instanceof'];
+            unset($content['services']['_instanceof']);
+
+            if (!is_array($instanceof)) {
+                throw new InvalidArgumentException(sprintf('Service "_instanceof" key must be an array, "%s" given in "%s".', gettype($instanceof), $file));
+            }
             $this->instanceof = array();
             $this->isLoadingInstanceof = true;
-            foreach ($content['services']['_instanceof'] as $id => $service) {
+            foreach ($instanceof as $id => $service) {
                 if (!$service || !is_array($service)) {
                     throw new InvalidArgumentException(sprintf('Type definition "%s" must be a non-empty array within "_instanceof" in %s. Check your YAML syntax.', $id, $file));
                 }
@@ -217,7 +223,6 @@ class YamlFileLoader extends FileLoader
                 }
                 $this->parseDefinition($id, $service, $file, array());
             }
-            unset($content['services']['_instanceof']);
         }
 
         $this->isLoadingInstanceof = false;
@@ -237,12 +242,15 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefaults(array &$content, $file)
     {
-        if (!$this->isUnderscoredParamValid($content, '_defaults', $file)) {
+        if (!isset($content['services']['_defaults'])) {
             return array();
         }
-
         $defaults = $content['services']['_defaults'];
         unset($content['services']['_defaults']);
+
+        if (!is_array($defaults)) {
+            throw new InvalidArgumentException(sprintf('Service "_defaults" key must be an array, "%s" given in "%s".', gettype($defaults), $file));
+        }
 
         foreach ($defaults as $key => $default) {
             if (!isset(self::$defaultsKeywords[$key])) {
@@ -279,21 +287,6 @@ class YamlFileLoader extends FileLoader
         }
 
         return $defaults;
-    }
-
-    private function isUnderscoredParamValid($content, $name, $file)
-    {
-        if (!isset($content['services'][$name])) {
-            return false;
-        }
-
-        if (!is_array($underscoreParam = $content['services'][$name])) {
-            throw new InvalidArgumentException(sprintf('Service "%s" key must be an array, "%s" given in "%s".', $name, gettype($underscoreParam), $file));
-        }
-
-        // @deprecated condition, to be removed in 4.0
-
-        return !isset($underscoreParam['alias']) && !isset($underscoreParam['class']) && !isset($underscoreParam['factory']);
     }
 
     /**

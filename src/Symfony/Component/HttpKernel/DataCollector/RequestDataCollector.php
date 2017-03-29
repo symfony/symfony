@@ -39,6 +39,21 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $this->data = array();
+        $this->doCollect($request, $response, $exception);
+        $this->data = $this->cloneVar($this->data);
+    }
+
+    /**
+     * Handle data collection.
+     * Store all collected data in $this->data before it get's cloned with VarCloner.
+     *
+     * @param Request    $request   A Request instance
+     * @param Response   $response  A Response instance
+     * @param \Exception $exception An Exception instance
+     */
+    protected function doCollect(Request $request, Response $response, \Exception $exception = null)
+    {
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         $route = '';
@@ -147,8 +162,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 ));
             }
         }
-
-        $this->data = $this->cloneVar($this->data);
     }
 
     public function getMethod()

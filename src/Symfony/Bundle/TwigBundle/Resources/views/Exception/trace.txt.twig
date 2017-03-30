@@ -1,5 +1,5 @@
 {% if trace.function %}
-    {{- trace.class ~ trace.type ~ trace.function }}()
+    {{- trace.class ~ trace.type ~ trace.function }}({{ trace.args|format_args }})
 {%- else -%}
     n/a
 {%- endif -%}

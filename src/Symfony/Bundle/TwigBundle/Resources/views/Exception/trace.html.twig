@@ -1,6 +1,6 @@
 {% if trace.file|default(false) %}
-    <span class="icon icon-close">{{ block('icon_minus_square', '@Twig/Exception/_images.twig') }}</span>
-    <span class="icon icon-open">{{ block('icon_plus_square', '@Twig/Exception/_images.twig') }}</span>
+    <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
+    <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>
 {% endif %}
 
 {% if trace.function %}

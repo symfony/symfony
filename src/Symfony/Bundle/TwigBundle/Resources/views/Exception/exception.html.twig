@@ -2,32 +2,31 @@
     <div class="exception-metadata">
         <div class="container">
             <h2 class="exception-hierarchy">
-                {{ exception.class|abbr_class }}
-                {% for previousException in exception.allPrevious %}
-                    <span class="icon">{{ block('icon_chevron_left', '@Twig/Exception/_images.twig') }}</span>
+                {% for previousException in exception.allPrevious|reverse %}
                     {{ previousException.class|abbr_class }}
+                    <span class="icon">{{ include('@Twig/images/chevron-right.svg') }}</span>
                 {% endfor %}
+                {{ exception.class|abbr_class }}
             </h2>
             <h2 class="exception-http">
-                <small>HTTP</small> <strong>{{ status_code }}</strong> {{ status_text }}
+                HTTP {{ status_code }} <small>{{ status_text }}</small>
             </h2>
         </div>
     </div>
     <div class="container">
         <div class="exception-message-wrapper">
-            <h1 class="break-long-words exception-message">
+            <h1 class="break-long-words exception-message {{ exception.message|length > 180 ? 'long' }}">
                 {{- exception.message|nl2br|format_file_from_text -}}
             </h1>
 
             <div class="exception-illustration hidden-xs-down">
-                {{ block('symfony_ghost', '@Twig/Exception/_images.twig') }}
+                {{ include('@Twig/images/symfony-ghost.svg') }}
             </div>
         </div>
     </div>
 </div>
 
 <div class="container">
-<div class="main">
     <div class="sf-tabs">
         <div class="tab">
             {% set exception_as_array = exception.toarray %}
@@ -89,5 +88,4 @@
         </div>
         {% endif %}
     </div>
-</div>
 </div>

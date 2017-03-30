@@ -10,8 +10,8 @@
                         </span>
                         {{ exception.class|split('\\')|last }}
 
-                        <span class="icon icon-close">{{ block('icon_minus_square_o', '@Twig/Exception/_images.twig') }}</span>
-                        <span class="icon icon-open">{{ block('icon_plus_square_o', '@Twig/Exception/_images.twig') }}</span>
+                        <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square-o.svg') }}</span>
+                        <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square-o.svg') }}</span>
                     </h3>
 
                     {% if exception.message is not empty and index > 1 %}
@@ -22,9 +22,12 @@
         </thead>
 
         <tbody id="trace-html-{{ index }}" class="sf-toggle-content">
+        {% set _is_first_user_code = true %}
         {% for i, trace in exception.trace %}
+            {% set _display_code_snippet = _is_first_user_code and ('/vendor/' not in trace.file) %}
+            {% if _display_code_snippet %}{% set _is_first_user_code = false %}{% endif %}
             <tr>
-                <td class="trace-line {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ index }}-{{ i }}" data-toggle-initial="{{ loop.first ? 'display' }}">
+                <td class="trace-line {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ index }}-{{ i }}" data-toggle-initial="{{ _display_code_snippet ? 'display' }}">
                     {{ include('@Twig/Exception/trace.html.twig', { prefix: index, i: i, trace: trace }, with_context = false) }}
                 </td>
             </tr>

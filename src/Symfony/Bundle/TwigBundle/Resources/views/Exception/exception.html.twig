@@ -48,7 +48,7 @@
         <div class="tab {{ logger is empty ? 'disabled' }}">
             <h3 class="tab-title">
                 Logs
-                {% if logger.counterrors %}<span class="badge status-error">{{ logger.counterrors }}</span>{% endif %}
+                {% if logger.counterrors ?? false %}<span class="badge status-error">{{ logger.counterrors }}</span>{% endif %}
             </h3>
 
             <div class="tab-content">

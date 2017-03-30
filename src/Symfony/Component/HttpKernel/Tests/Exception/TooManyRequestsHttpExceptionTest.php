@@ -12,6 +12,19 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
         $this->assertSame(array('Retry-After' => 10), $exception->getHeaders());
     }
 
+    public function testWithHeaderConstruct()
+    {
+        $headers = array(
+            'Cache-Control' => 'public, s-maxage=69',
+        );
+
+        $exception = new TooManyRequestsHttpException(69, null, null, null, $headers);
+
+        $headers['Retry-After'] = 69;
+
+        $this->assertSame($headers, $exception->getHeaders());
+    }
+
     /**
      * @dataProvider headerDataProvider
      */

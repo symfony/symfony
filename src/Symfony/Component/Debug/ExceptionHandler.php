@@ -219,9 +219,12 @@ class ExceptionHandler
                     $ind = $count - $position + 1;
                     $class = $this->formatClass($e['class']);
                     $message = nl2br($this->escapeHtml($e['message']));
+                    $path = $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']);
+                    $googleLink = $this->formatGoogleLink($class . $path . ' ' . $message);
                     $content .= sprintf(<<<'EOF'
                         <h2 class="block_exception clear_fix">
                             <span class="exception_counter">%d/%d</span>
+                            <span class="exception_google_link">%s</span>
                             <span class="exception_title">%s%s:</span>
                             <span class="exception_message">%s</span>
                         </h2>
@@ -229,7 +232,7 @@ class ExceptionHandler
                             <ol class="traces list_exception">
 
 EOF
-                        , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
+                        , $ind, $total, $googleLink, $class, $path, $message);
                     foreach ($e['trace'] as $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
@@ -287,6 +290,8 @@ EOF;
             .sf-reset em { font-style:italic; }
             .sf-reset h1, .sf-reset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
             .sf-reset .exception_counter { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; float: left; display: block; }
+            .sf-reset .exception_google_link { float: right; display: block;  }
+            .sf-reset .exception_google_link a { cursor: pointer; }
             .sf-reset .exception_title { margin-left: 3em; margin-bottom: 0.7em; display: block; }
             .sf-reset .exception_message { margin-left: 3em; display: block; }
             .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
@@ -398,5 +403,13 @@ EOF;
     private function escapeHtml($str)
     {
         return htmlspecialchars($str, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
+    }
+    
+    /**
+     * Returns link to search query on Google
+     */
+    private function formatGoogleLink($query)
+    {
+        return '<a href="https://google.com/search?q=' . urlencode(strip_tags($query)) . '" target="_blank" rel="noopener noreferrer" title="Search error on Google">Search on Google</a>';
     }
 }

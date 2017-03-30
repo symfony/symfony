@@ -5,15 +5,15 @@
         <meta name="robots" content="noindex,nofollow" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>{% block title %}{% endblock %}</title>
-        <link rel="icon" type="image/png" href="data:image/png;base64,{{ block('favicon_symfony_ghost', '@Twig/Exception/_images.twig') }}">
+        <link rel="icon" type="image/png" href="{{ include('@Twig/images/favicon.png.base64') }}">
         <style>
             html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type="checkbox"],input[type="radio"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{height:auto}input[type="search"]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}
 
             html {
-                {# always display the vertical scrollbar to avoid jumps when toggling contents #}
+                /* always display the vertical scrollbar to avoid jumps when toggling contents */
                 overflow-y: scroll;
             }
-            body { background-color: #F9F9F9; color: #222; font: 14px/1.4 Helvetica, Arial, sans-serif; }
+            body { background-color: #F9F9F9; color: #222; font: 14px/1.4 Helvetica, Arial, sans-serif; padding-bottom: 45px; }
 
             a { cursor: pointer; text-decoration: none; }
             a:hover { text-decoration: underline; }
@@ -68,32 +68,30 @@
             .container { max-width: 1024px; margin: 0 auto; padding: 0 15px; }
             .container::after { content: ""; display: table; clear: both; }
 
-            .main { padding-bottom: 45px; }
-
-            header { background-color: #222; height: 33px; padding: 0; }
-            header .container { display: flex; fflex-direction: row; justify-content: space-between; }
-            .logo { color: #FFF; flex: 1; font-size: 16px; font-weight: normal; line-height: 33px; margin: 0; padding: 0; }
-            .logo span { color: #CCC; }
-            .logo svg { height: 21px; width: 21px; opacity: .8; vertical-align: -5px; }
+            header { background-color: #222; color: rgba(255, 255, 255, 0.75); font-size: 13px; height: 33px; line-height: 33px; padding: 0; }
+            header .container { display: flex; justify-content: space-between; }
+            .logo { flex: 1; font-size: 13px; font-weight: normal; margin: 0; padding: 0; }
+            .logo svg { height: 18px; width: 18px; opacity: .8; vertical-align: -5px; }
 
             .help-link { margin-left: 15px; }
-            .help-link a { color: #CCC; font-size: 14px; line-height: 33px; }
-            .help-link .icon svg { height: 16px; width: 16px; opacity: .7; vertical-align: -2px; }
+            .help-link a { color: inherit; }
+            .help-link .icon svg { height: 15px; width: 15px; opacity: .7; vertical-align: -2px; }
             .help-link a:hover { color: #EEE; text-decoration: none; }
             .help-link a:hover svg { opacity: .9; }
 
-            .exception-summary { background: #B0413E; border-bottom: 2px solid rgba(0, 0, 0, 0.1); flex: 0 0 auto; margin-bottom: 15px; }
+            .exception-summary { background: #B0413E; border-bottom: 2px solid rgba(0, 0, 0, 0.1); border-top: 1px solid rgba(0, 0, 0, .3); flex: 0 0 auto; margin-bottom: 15px; }
             .exception-metadata { background: rgba(0, 0, 0, 0.1); padding: 7px 0; }
             .exception-metadata .container { display: flex; flex-direction: row; justify-content: space-between; }
-            .exception-metadata h2 { color: rgba(255, 255, 255, 0.8); font-size: 14px; font-weight: 400; margin: 0; }
-            .exception-http small { color: inherit; font-size: 13px; }
+            .exception-metadata h2 { color: rgba(255, 255, 255, 0.8); font-size: 13px; font-weight: 400; margin: 0; }
+            .exception-http small { font-size: 13px; opacity: .7; }
             .exception-hierarchy { flex: 1; }
             .exception-hierarchy .icon { margin: 0 3px; opacity: .7; }
             .exception-hierarchy .icon svg { height: 13px; width: 13px; vertical-align: -2px; }
 
-            .exception-message-wrapper { display: flex; align-items: center; min-height: 76px; padding: 8px 0 6px; }
+            .exception-message-wrapper { display: flex; align-items: flex-start; min-height: 70px; padding: 10px 0 8px; }
             .exception-message { flex-grow: 1; }
             .exception-message, .exception-message a { color: #FFF; font-size: 21px; font-weight: 400; margin: 0; }
+            .exception-message.long { font-size: 18px; }
             .exception-message a { text-decoration: none; }
             .exception-message a:hover { text-decoration: underline; }
 
@@ -120,11 +118,12 @@
             .trace-method { color: #B0413E; color: #222; font-weight: bold; color: #B0413E; }
             .trace-arguments { color: #222; color: #999; font-weight: normal; color: #795da3; color: #777; padding-left: 2px; }
 
-            .trace-code { background: #FFF; color: #CCC; font-size: 12px; margin: 10px 0; padding: 10px; }
+            .trace-code { background: #FFF; font-size: 12px; margin: 10px 0 2px; padding: 10px; }
             .trace-code ol { margin: 0; }
-            .trace-code li { margin: 0; padding-left: 10px; }
+            .trace-code li { color: #969896; margin: 0; padding-left: 10px; }
             .trace-code li + li { margin-top: 10px; }
             .trace-code li.selected { background: #F8EEC7; padding: 3px 0 3px 10px; }
+            .trace-code li code { color: #222; }
 
             .trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
 
@@ -138,18 +137,18 @@
     <body>
         <header>
             <div class="container">
-                <h1 class="logo">{{ block('symfony_logo', '@Twig/Exception/_images.twig') }} Symfony <span>Exception</span></h1>
+                <h1 class="logo">{{ include('@Twig/images/symfony-logo.svg') }} Symfony Exception</h1>
 
                 <div class="help-link">
                     <a href="https://symfony.com/doc">
-                        <span class="icon">{{ block('icon_book', '@Twig/Exception/_images.twig') }}</span>
+                        <span class="icon">{{ include('@Twig/images/icon-book.svg') }}</span>
                         <span class="hidden-xs-down">Symfony</span> Docs
                     </a>
                 </div>
 
                 <div class="help-link">
                     <a href="https://symfony.com/support">
-                        <span class="icon">{{ block('icon_support', '@Twig/Exception/_images.twig') }}</span>
+                        <span class="icon">{{ include('@Twig/images/icon-support.svg') }}</span>
                         <span class="hidden-xs-down">Symfony</span> Support
                     </a>
                 </div>

@@ -602,6 +602,17 @@ YAML;
         $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
+    public function testCanParseContentWithTrailingSpaces()
+    {
+        $yaml = "items:  \n  foo: bar";
+
+        $expected = array(
+            'items' => array('foo' => 'bar'),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     /**
      * @group legacy
      * @dataProvider invalidDumpedObjectProvider

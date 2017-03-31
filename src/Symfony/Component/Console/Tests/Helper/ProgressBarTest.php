@@ -770,7 +770,6 @@ class ProgressBarTest extends TestCase
         $bar->start();
         rewind($output->getStream());
         $this->assertEquals(5, $bar->getBarWidth(), stream_get_contents($output->getStream()));
-        
         putenv('COLUMNS=120');
     }
 }

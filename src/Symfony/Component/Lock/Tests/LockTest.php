@@ -103,7 +103,7 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->atLeast(1))
+            ->expects($this->any())
             ->method('exists')
             ->with($key)
             ->willReturn(true);
@@ -123,7 +123,7 @@ class LockTest extends TestCase
             ->with($key);
 
         $store
-            ->expects($this->atLeast(1))
+            ->expects($this->once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
@@ -145,6 +145,8 @@ class LockTest extends TestCase
             ->expects($this->once())
             ->method('delete')
         ;
+
+        $lock->acquire(false);
         unset($lock);
     }
 
@@ -158,12 +160,12 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->atLeast(1))
+            ->expects($this->once())
             ->method('delete')
             ->with($key);
 
         $store
-            ->expects($this->atLeast(1))
+            ->expects($this->once())
             ->method('exists')
             ->with($key)
             ->willReturn(true);

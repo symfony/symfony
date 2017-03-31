@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-29T14:34:39Z
+
+👍  nice catch
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-29T15:50:41Z
+
+applies to rowspan as well.. looking at it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-29T16:12:07Z
+
+too bad.. the trick doesnt seem to work in that case
+
+ie this one still fails;
+```php
+$table = new Table($output);
+$table->setRow(0, array(new TableCell('f<error>o'."\n".'o</error>o', array('rowspan' => 2)), 'a'));
+$table->setRow(1, array('b'));
+$table->render();
+```
+
+edit: the same trick does work at first sight.. but breaks tests (e.g. `Cell with rowspan and colspan contains new line break`).
+
+edit2: all good now :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-29T17:38:16Z
+
+Status: needs review
+then :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-29T17:40:16Z
+
+Agree. Had to add a tiny new feature as well.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-30T10:13:30Z
+
+Status: Reviewed

@@ -372,6 +372,7 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
+        $serviceXML->setAttribute('autoconfigured', $definition->isAutoconfigured() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
         $calls = $definition->getMethodCalls();

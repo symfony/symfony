@@ -57,6 +57,7 @@ class YamlFileLoader extends FileLoader
         'decoration_priority' => 'decoration_priority',
         'autowire' => 'autowire',
         'autowiring_types' => 'autowiring_types',
+        'autoconfigure' => 'autoconfigure',
     );
 
     private static $prototypeKeywords = array(
@@ -75,6 +76,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'inherit_tags' => 'inherit_tags',
         'autowire' => 'autowire',
+        'autoconfigure' => 'autoconfigure',
     );
 
     private static $instanceofKeywords = array(
@@ -86,6 +88,7 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'autoconfigure' => 'autoconfigure',
     );
 
     private static $defaultsKeywords = array(
@@ -93,6 +96,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'inherit_tags' => 'inherit_tags',
         'autowire' => 'autowire',
+        'autoconfigure' => 'autoconfigure',
     );
 
     private $yamlParser;
@@ -369,6 +373,9 @@ class YamlFileLoader extends FileLoader
             if (isset($defaults['autowire'])) {
                 $definition->setAutowired($defaults['autowire']);
             }
+            if (isset($defaults['autoconfigure'])) {
+                $definition->setAutoconfigured($defaults['autoconfigure']);
+            }
 
             $definition->setChanges(array());
         }
@@ -508,6 +515,10 @@ class YamlFileLoader extends FileLoader
                     $definition->addAutowiringType($autowiringType);
                 }
             }
+        }
+
+        if (isset($service['autoconfigure'])) {
+            $definition->setAutoconfigured($service['autoconfigure']);
         }
 
         if (array_key_exists('resource', $service)) {

@@ -30,6 +30,7 @@ class Definition
     private $properties = array();
     private $calls = array();
     private $instanceof = array();
+    private $autoconfigured = false;
     private $configurator;
     private $tags = array();
     private $public = true;
@@ -386,6 +387,30 @@ class Definition
     public function getInstanceofConditionals()
     {
         return $this->instanceof;
+    }
+
+    /**
+     * Sets whether or not instanceof conditionals should be prepended with a global set.
+     *
+     * @param bool $autoconfigured
+     *
+     * @return $this
+     */
+    public function setAutoconfigured($autoconfigured)
+    {
+        $this->changes['autoconfigured'] = true;
+
+        $this->autoconfigured = $autoconfigured;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutoconfigured()
+    {
+        return $this->autoconfigured;
     }
 
     /**

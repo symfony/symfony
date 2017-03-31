@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -142,6 +143,11 @@ class TwigExtension extends Extension
         unset($config['autoescape_service'], $config['autoescape_service_method']);
 
         $container->getDefinition('twig')->replaceArgument(1, $config);
+
+        $container->registerForAutoconfiguration(\Twig_ExtensionInterface::class)
+            ->addTag('twig.extension');
+        $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)
+            ->addTag('twig.loader');
 
         if (PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(

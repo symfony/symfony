@@ -567,6 +567,26 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(array('%env(Bar)%'), $config->resolveEnvPlaceholders(array($bag->get('env(Bar)'))));
         $container->merge($config);
         $this->assertEquals(array('Foo' => 0, 'Bar' => 1), $container->getEnvCounters());
+
+        $container = new ContainerBuilder();
+        $config = new ContainerBuilder();
+        $childDefA = $container->registerForAutoconfiguration('AInterface');
+        $childDefB = $config->registerForAutoconfiguration('BInterface');
+        $container->merge($config);
+        $this->assertSame(array('AInterface' => $childDefA, 'BInterface' => $childDefB), $container->getAutomaticInstanceofDefinitions());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage AInterface has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.
+     */
+    public function testMergeThrowsExceptionForDuplicateAutomaticInstanceofDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $config = new ContainerBuilder();
+        $container->registerForAutoconfiguration('AInterface');
+        $config->registerForAutoconfiguration('AInterface');
+        $container->merge($config);
     }
 
     public function testResolveEnvValues()
@@ -1096,6 +1116,17 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertInstanceOf(ServiceLocator::class, $foo = $container->get('foo_service'));
         $this->assertSame($container->get('bar_service'), $foo->get('bar'));
+    }
+
+    public function testRegisterForAutoconfiguration()
+    {
+        $container = new ContainerBuilder();
+        $childDefA = $container->registerForAutoconfiguration('AInterface');
+        $childDefB = $container->registerForAutoconfiguration('BInterface');
+        $this->assertSame(array('AInterface' => $childDefA, 'BInterface' => $childDefB), $container->getAutomaticInstanceofDefinitions());
+
+        // when called multiple times, the same instance is returned
+        $this->assertSame($childDefA, $container->registerForAutoconfiguration('AInterface'));
     }
 }
 

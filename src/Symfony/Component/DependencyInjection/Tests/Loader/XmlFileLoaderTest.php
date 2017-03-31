@@ -693,6 +693,16 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($definition->isLazy());
         $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
     }
+
+    public function testAutoConfigureInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_autoconfigure.xml');
+
+        $this->assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
+        $this->assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
+    }
 }
 
 interface BarInterface

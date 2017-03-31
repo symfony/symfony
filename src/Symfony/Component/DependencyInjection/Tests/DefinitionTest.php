@@ -344,6 +344,7 @@ class DefinitionTest extends TestCase
         $def->addTag('foo_tag');
         $def->addMethodCall('methodCall');
         $def->setProperty('fooprop', true);
+        $def->setAutoconfigured(true);
 
         $this->assertSame(array(
             'class' => true,
@@ -356,6 +357,7 @@ class DefinitionTest extends TestCase
             'lazy' => true,
             'public' => true,
             'shared' => true,
+            'autoconfigured' => true,
         ), $def->getChanges());
 
         $def->setChanges(array());
@@ -376,5 +378,13 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->hasAutowiringType('Bar'));
         $this->assertSame($def, $def->removeAutowiringType('Foo'));
         $this->assertEquals(array('Bar'), $def->getAutowiringTypes());
+    }
+
+    public function testShouldAutoconfigure()
+    {
+        $def = new Definition('stdClass');
+        $this->assertFalse($def->isAutoconfigured());
+        $def->setAutoconfigured(true);
+        $this->assertTrue($def->isAutoconfigured());
     }
 }

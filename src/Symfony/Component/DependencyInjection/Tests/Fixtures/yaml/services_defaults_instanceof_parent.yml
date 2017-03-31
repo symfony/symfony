@@ -1,11 +1,13 @@
 services:
     _defaults:
         autowire: true
+        autoconfigure: true
 
     _instanceof:
         Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStubParent:
             # should override _defaults
             autowire: false
+            autoconfigure: false
             shared: false
             tags:
                 - { name: foo_tag, tag_option: from_instanceof }
@@ -30,6 +32,7 @@ services:
         class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
         # override instanceof
         autowire: true
+        autoconfigure: true
 
     parent_service:
         abstract: true

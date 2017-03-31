@@ -11,6 +11,7 @@
         "shared": true,
         "abstract": false,
         "autowire": false,
+        "autoconfigure": false,
         "file": "\/path\/to\/file",
         "factory_service": "factory.service",
         "factory_method": "get",

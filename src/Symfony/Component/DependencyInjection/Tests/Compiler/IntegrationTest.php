@@ -130,6 +130,7 @@ class IntegrationTest extends TestCase
         // instanceof overrides defaults
         $simpleService = $container->getDefinition('service_simple');
         $this->assertFalse($simpleService->isAutowired());
+        $this->assertFalse($simpleService->isAutoconfigured());
         $this->assertFalse($simpleService->isShared());
 
         // all tags are kept
@@ -156,6 +157,7 @@ class IntegrationTest extends TestCase
         // service override instanceof
         $overrideService = $container->getDefinition('service_override_instanceof');
         $this->assertTrue($overrideService->isAutowired());
+        $this->assertTrue($overrideService->isAutoconfigured());
 
         // children definitions get no instanceof
         $childDef = $container->getDefinition('child_service');

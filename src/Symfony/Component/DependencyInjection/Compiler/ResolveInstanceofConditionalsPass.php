@@ -38,25 +38,37 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 
     private function processDefinition(ContainerBuilder $container, $id, Definition $definition)
     {
-        if (!$instanceofConditionals = $definition->getInstanceofConditionals()) {
+        $instanceofConditionals = $definition->getInstanceofConditionals();
+        $automaticInstanceofConditionals = $definition->isAutoconfigured() ? $container->getAutomaticInstanceofDefinitions() : array();
+
+        if (!$instanceofConditionals && !$automaticInstanceofConditionals) {
             return $definition;
         }
+
         if (!$class = $container->getParameterBag()->resolveValue($definition->getClass())) {
             return $definition;
         }
+
+        $conditionals = $this->mergeConditionals($automaticInstanceofConditionals, $instanceofConditionals);
 
         $definition->setInstanceofConditionals(array());
         $parent = $shared = null;
         $instanceofTags = array();
 
-        foreach ($instanceofConditionals as $interface => $instanceofDef) {
+        foreach ($conditionals as $interface => $instanceofDefs) {
             if ($interface !== $class && (!$container->getReflectionClass($interface) || !$container->getReflectionClass($class))) {
                 continue;
             }
-            if ($interface === $class || is_subclass_of($class, $interface)) {
+
+            if ($interface !== $class && !is_subclass_of($class, $interface)) {
+                continue;
+            }
+
+            foreach ($instanceofDefs as $key => $instanceofDef) {
+                /** @var ChildDefinition $instanceofDef */
                 $instanceofDef = clone $instanceofDef;
                 $instanceofDef->setAbstract(true)->setInheritTags(false)->setParent($parent ?: 'abstract.instanceof.'.$id);
-                $parent = 'instanceof.'.$interface.'.'.$id;
+                $parent = 'instanceof.'.$interface.'.'.$key.'.'.$id;
                 $container->setDefinition($parent, $instanceofDef);
                 $instanceofTags[] = $instanceofDef->getTags();
                 $instanceofDef->setTags(array());
@@ -99,5 +111,21 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         }
 
         return $definition;
+    }
+
+    private function mergeConditionals(array $automaticInstanceofConditionals, array $instanceofConditionals)
+    {
+        // make each value an array of ChildDefinition
+        $conditionals = array_map(function($childDef) { return array($childDef); }, $automaticInstanceofConditionals);
+
+        foreach ($instanceofConditionals as $interface => $instanceofDef) {
+            if (!isset($automaticInstanceofConditionals[$interface])) {
+                $conditionals[$interface] = array();
+            }
+
+            $conditionals[$interface][] = $instanceofDef;
+        }
+
+        return $conditionals;
     }
 }

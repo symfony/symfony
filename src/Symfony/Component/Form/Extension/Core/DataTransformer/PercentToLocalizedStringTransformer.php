@@ -120,7 +120,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
         $formatter = $this->getNumberFormatter();
         // replace normal spaces so that the formatter can read them
-        $value = $formatter->parse(str_replace(' ', ' ', $value));
+        $value = $formatter->parse(str_replace(' ', "\xc2\xa0", $value));
 
         if (intl_is_failure($formatter->getErrorCode())) {
             throw new TransformationFailedException($formatter->getErrorMessage());

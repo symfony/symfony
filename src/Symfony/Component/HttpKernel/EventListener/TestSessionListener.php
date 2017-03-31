@@ -11,42 +11,74 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Sets the session in the request.
+ * TestSessionListener.
  *
+ * Saves session in test environment.
+ *
+ * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since version 3.3
  */
-class TestSessionListener extends AbstractTestSessionListener implements ServiceSubscriberInterface
+abstract class TestSessionListener implements EventSubscriberInterface
 {
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function onKernelRequest(GetResponseEvent $event)
     {
-        $this->container = $container;
-    }
-
-    protected function getSession()
-    {
-        if (!$this->container->has('session')) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 
-        return $this->container->get('session');
+        // bootstrap the session
+        $session = $this->getSession();
+        if (!$session) {
+            return;
+        }
+
+        $cookies = $event->getRequest()->cookies;
+
+        if ($cookies->has($session->getName())) {
+            $session->setId($cookies->get($session->getName()));
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * Checks if session was initialized and saves if current request is master
+     * Runs on 'kernel.response' in test environment.
+     *
+     * @param FilterResponseEvent $event
      */
-    public static function getSubscribedServices()
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
+        $session = $event->getRequest()->getSession();
+        if ($session && $session->isStarted()) {
+            $session->save();
+            $params = session_get_cookie_params();
+            $event->getResponse()->headers->setCookie(new Cookie($session->getName(), $session->getId(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+        }
+    }
+
+    public static function getSubscribedEvents()
     {
         return array(
-            'session' => '?'.SessionInterface::class,
+            KernelEvents::REQUEST => array('onKernelRequest', 192),
+            KernelEvents::RESPONSE => array('onKernelResponse', -128),
         );
     }
+
+    /**
+     * Gets the session object.
+     *
+     * @return SessionInterface|null A SessionInterface instance or null if no session is available
+     */
+    abstract protected function getSession();
 }

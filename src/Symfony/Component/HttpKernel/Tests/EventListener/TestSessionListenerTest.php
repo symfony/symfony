@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -39,7 +40,7 @@ class TestSessionListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
+        $this->listener = $this->getMockForAbstractClass(TestSessionListener::class);
         $this->session = $this->getSession();
     }
 

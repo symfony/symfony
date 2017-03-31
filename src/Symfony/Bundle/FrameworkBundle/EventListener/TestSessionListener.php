@@ -13,31 +13,15 @@ namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\HttpKernel\EventListener\TestSessionListener instead.', TestSessionListener::class), E_USER_DEPRECATED);
 
-use Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\EventListener\ContainerAwareTestSessionListener;
 
 /**
  * TestSessionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since version 3.3, to be removed in 4.0.
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link ContainerAwareTestSessionListener} instead
  */
-class TestSessionListener extends AbstractTestSessionListener
+class TestSessionListener extends ContainerAwareTestSessionListener
 {
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    protected function getSession()
-    {
-        if (!$this->container->has('session')) {
-            return;
-        }
-
-        return $this->container->get('session');
-    }
 }

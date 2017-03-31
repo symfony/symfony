@@ -51,7 +51,7 @@
 
         <service id="session.handler.write_check" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler" public="false" />
 
-        <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\SessionListener">
+        <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\ContainerAwareSessionListener">
             <tag name="kernel.event_subscriber" />
             <tag name="container.service_subscriber" id="session" />
             <argument type="service" id="container" />

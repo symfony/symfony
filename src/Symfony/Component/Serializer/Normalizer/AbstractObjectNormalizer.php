@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -52,8 +51,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {

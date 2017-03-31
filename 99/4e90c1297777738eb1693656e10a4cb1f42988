@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-31T12:30:49Z
+
+The failure is not related to my PR. It also fails in the 2.7 and 2.8 branches. See https://github.com/symfony/symfony/pull/22235 for the fix.

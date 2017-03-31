@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-29T05:46:41Z
+
+I would add a note somewhere in the code or in the XML service definition to avoid breaking this again in the future. Can we also check that we don't have any other similar issues?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-29T06:28:57Z
+
+Note added as a test case.
+The other implementations of ServiceSubscriberInterface are all in bundles,
+where DI is already a requirement.
+Ready.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-03-29T16:38:52Z
+
+> Removing the `ServiceSubscriberInterface` solves the issue of having a hard dependency to the DI component. But ...
+> * What is the benefit of renaming the classes (Test)SessionListener that are here since 2013? What is the purpose of the abstract classes if overloading method can be done in subclass: that is what we end up doing in Silex.
+> * Maybe the ServiceSubscriberInterface was added for valuable reasons in #21708?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-29T17:14:39Z
+
+@GromNaN These classes are abstract and missed the`Abstract` prefix. There is no gain in adding it apart from making them consistent with others by convention. The thing is that we moved concrete implementations from the framework to the component. These classes being named the same as their abstract parent, we grabbed the opportunity for renaming which is fine I think.
+
+> What is the purpose of the abstract classes if overloading method can be done in subclass
+
+The added implementations are useful on their own. A day Silex could use a PSR-11 container and remove their concrete implementations in favor of them.
+
+About the change reverted here, these classes can live without. New features are used in the core as possible, but it's not worth breaking consumers code nor forcing them to require a new component.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-30T10:17:38Z
+
+Status: reviewed

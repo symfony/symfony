@@ -207,9 +207,8 @@ FrameworkBundle
 HttpFoundation
 --------------
 
- * The `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument - not setting it is deprecated.
-   Set it to `Request::HEADER_FORWARDED` if your reverse-proxy uses the RFC7239 `Forwarded` header,
-   or to `Request::HEADER_X_FORWARDED_ALL` if it is using `X-Forwarded-*` headers instead.
+ * [BC BREAK] The `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument.
+   See http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info.
 
  * The `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods are deprecated,
    use the RFC7239 `Forwarded` header, or the `X-Forwarded-*` headers instead.

@@ -2127,22 +2127,6 @@ class RequestTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The Symfony\Component\HttpFoundation\Request::setTrustedProxies() method expects a bit field of Request::HEADER_* as second argument. Not defining it is deprecated since version 3.3 and will be required in 4.0.
-     * @expectedDeprecation The "Symfony\Component\HttpFoundation\Request::getTrustedHeaderName()" method is deprecated since version 3.3 and will be removed in 4.0. Use the Request::getTrustedHeaderSet() method instead.
-     */
-    public function testSetTrustedProxiesNoSecondArg()
-    {
-        Request::setTrustedProxies(array('8.8.8.8'));
-
-        $this->assertSame('FORWARDED', Request::getTrustedHeaderName(Request::HEADER_FORWARDED));
-        $this->assertSame('X_FORWARDED_FOR', Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP));
-        $this->assertSame('X_FORWARDED_HOST', Request::getTrustedHeaderName(Request::HEADER_CLIENT_HOST));
-        $this->assertSame('X_FORWARDED_PORT', Request::getTrustedHeaderName(Request::HEADER_CLIENT_PORT));
-        $this->assertSame('X_FORWARDED_PROTO', Request::getTrustedHeaderName(Request::HEADER_CLIENT_PROTO));
-    }
-
-    /**
-     * @group legacy
      */
     public function testGetTrustedHeaderName()
     {

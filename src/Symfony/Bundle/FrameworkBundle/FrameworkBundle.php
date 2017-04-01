@@ -61,10 +61,12 @@ class FrameworkBundle extends Bundle
     {
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
 
-        if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
+        if ($this->container->hasParameter('kernel.trusted_proxies')) {
             @trigger_error('The "kernel.trusted_proxies" parameter is deprecated since version 3.3 and will be removed in 4.0. Use the Request::setTrustedProxies() method in your front controller instead.', E_USER_DEPRECATED);
 
-            Request::setTrustedProxies($trustedProxies, Request::getTrustedHeaderSet());
+            if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
+                Request::setTrustedProxies($trustedProxies, Request::getTrustedHeaderSet());
+            }
         }
 
         if ($this->container->getParameter('kernel.http_method_override')) {

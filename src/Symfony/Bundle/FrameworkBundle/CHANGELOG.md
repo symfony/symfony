@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * [BC BREAK] Removed the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
  * Added a new new version strategy option called json_manifest_path
    that allows you to use the `JsonManifestVersionStrategy`.
  * Added `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`. It provides
@@ -11,7 +12,6 @@ CHANGELOG
    injection container, in order to encourage explicit dependency declarations.
  * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
  * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
- * Deprecated the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
  * Changed default configuration for
    assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
    `canBeDisabled()` when Flex is used

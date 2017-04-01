@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-$operators = array('not', '!', 'or', '||', '&&', 'and', '|', '^', '&', '==', '===', '!=', '!==', '<', '>', '>=', '<=', 'not in', 'in', '..', '+', '-', '~', '*', '/', '%', 'matches', '**');
+$operators = array('->', 'not', '!', 'or', '||', '&&', 'and', '|', '^', '&', '==', '===', '!=', '!==', '<', '>', '>=', '<=', 'not in', 'in', '..', '+', '-', '~', '*', '/', '%', 'matches', '**');
 $operators = array_combine($operators, array_map('strlen', $operators));
 arsort($operators);
 

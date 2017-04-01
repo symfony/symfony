@@ -43,10 +43,10 @@ class ParserTest extends TestCase
     /**
      * @dataProvider getParseData
      */
-    public function testParse($node, $expression, $names = array())
+    public function testParse($node, $expression, $names = array(), $funcs = array())
     {
         $lexer = new Lexer();
-        $parser = new Parser(array());
+        $parser = new Parser($funcs);
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
@@ -154,6 +154,55 @@ class ParserTest extends TestCase
                 new Node\NameNode('foo'),
                 'bar',
                 array('foo' => 'bar'),
+            ),
+
+            array(
+                new Node\AnonFuncNode(
+                    array(
+                        new Node\NameNode('foo'),
+                        new Node\NameNode('bar'),
+                    ),
+                    new Node\BinaryNode(
+                        '*',
+                        new Node\NameNode('foo'),
+                        new Node\NameNode('bar')
+                    )
+                ),
+                '(foo, bar) -> { foo * bar }',
+            ),
+
+            array(
+                new Node\AnonFuncNode(
+                    array(
+                        new Node\NameNode('foo'),
+                        new Node\NameNode('bars'),
+                    ),
+                    new Node\BinaryNode(
+                        '*',
+                        new Node\NameNode('foo'),
+                        new Node\FunctionNode(
+                            'map',
+                            new Node\Node(
+                                array(
+                                    new Node\NameNode('bars'),
+                                    new Node\AnonFuncNode(
+                                        array(
+                                            new Node\NameNode('bar'),
+                                        ),
+                                        new Node\BinaryNode(
+                                            '*',
+                                            new Node\NameNode('bar'),
+                                            new Node\NameNode('baz')
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    )
+                ),
+                '(foo, bars) -> { foo * map(bars, (bar) -> { bar * baz }) }',
+                array('baz'),
+                array('map' => 'array_map'),
             ),
         );
     }

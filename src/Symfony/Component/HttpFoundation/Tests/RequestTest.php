@@ -306,20 +306,18 @@ class RequestTest extends TestCase
      */
     public function testGetFormatFromMimeType($format, $mimeTypes)
     {
-        $request = new Request();
         foreach ($mimeTypes as $mime) {
-            $this->assertEquals($format, $request->getFormat($mime));
+            $this->assertEquals($format, Request::getFormat($mime));
         }
-        $request->setFormat($format, $mimeTypes);
+        Request::setFormat($format, $mimeTypes);
         foreach ($mimeTypes as $mime) {
-            $this->assertEquals($format, $request->getFormat($mime));
+            $this->assertEquals($format, Request::getFormat($mime));
         }
     }
 
     public function testGetFormatFromMimeTypeWithParameters()
     {
-        $request = new Request();
-        $this->assertEquals('json', $request->getFormat('application/json; charset=utf-8'));
+        $this->assertEquals('json', Request::getFormat('application/json; charset=utf-8'));
     }
 
     /**
@@ -328,8 +326,7 @@ class RequestTest extends TestCase
     public function testGetMimeTypeFromFormat($format, $mimeTypes)
     {
         if (null !== $format) {
-            $request = new Request();
-            $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
+            $this->assertEquals($mimeTypes[0], Request::getMimeType($format));
         }
     }
 
@@ -345,8 +342,7 @@ class RequestTest extends TestCase
 
     public function testGetMimeTypesFromInexistentFormat()
     {
-        $request = new Request();
-        $this->assertNull($request->getMimeType('foo'));
+        $this->assertNull(Request::getMimeType('foo'));
         $this->assertEquals(array(), Request::getMimeTypes('foo'));
     }
 

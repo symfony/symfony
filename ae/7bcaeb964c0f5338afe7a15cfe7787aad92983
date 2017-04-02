@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2017-03-23T01:13:10Z
+
+Trigger 3/3 successfully build.
+
+https://travis-ci.org/symfony/symfony/builds/214069252
+https://travis-ci.org/symfony/symfony/builds/214071713
+https://travis-ci.org/symfony/symfony/builds/214076363
+
+1. Failled test is not related to this Component.
+2. Not exactly the same travis.yml to be able to build php 7.1 with the lock component
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-04-01T21:02:55Z
+
+After several successful builds, I think this PR is ready to be merged. It will stabilize tests.

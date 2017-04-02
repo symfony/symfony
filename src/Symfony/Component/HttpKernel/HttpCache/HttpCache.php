@@ -734,4 +734,41 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         return $wait < 5000000;
     }
+
+    /**
+     * Checks whether the given (cached) response may be served as "stale" when a revalidation
+     * is currently in progress.
+     *
+     * @param Response $entry
+     *
+     * @return bool True when the stale response may be served, false otherwise.
+     */
+    private function mayServeStaleWhileRevalidate(Response $entry)
+    {
+        $timeout = $entry->headers->getCacheControlDirective('stale-while-revalidate');
+
+        if ($timeout === null) {
+            $timeout = $this->options['stale_while_revalidate'];
+        }
+
+        return abs($entry->getTtl()) < $timeout;
+    }
+
+    /**
+     * Waits for the store to release a locked entry.
+     *
+     * @param Request $request The request to wait for
+     *
+     * @return bool True if the lock was released before the internal timeout was hit; false if the wait timeout was exceeded.
+     */
+    private function waitForLock(Request $request)
+    {
+        $wait = 0;
+        while ($this->store->isLocked($request) && $wait < 5000000) {
+            usleep(50000);
+            $wait += 50000;
+        }
+
+        return $wait < 5000000;
+    }
 }

@@ -60,9 +60,15 @@ class Glob
 
             $firstByte = '/' === $car;
 
-            if ($firstByte && $strictWildcardSlash && isset($glob[$i + 3]) && '**/' === $glob[$i + 1].$glob[$i + 2].$glob[$i + 3]) {
-                $car = $strictLeadingDot ? '/(?:(?=[^\.])[^/]++/)*' : '/(?:[^/]++/)*';
-                $i += 3;
+            if ($firstByte && $strictWildcardSlash) {
+                if (isset($glob[$i + 3]) && '**/' === $glob[$i + 1].$glob[$i + 2].$glob[$i + 3]) {
+                    $car = $strictLeadingDot ? '/(?:(?=[^\.])[^/]++/)*' : '/(?:[^/]++/)*';
+                    $i += 3;
+                } elseif (isset($glob[$i + 2]) && '**' === $glob[$i + 1].$glob[$i + 2]) {
+                    $car = '/.*';
+                    $i += 2;
+                }
+
                 if ('/' === $delimiter) {
                     $car = str_replace('/', '\\/', $car);
                 }

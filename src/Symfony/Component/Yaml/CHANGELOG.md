@@ -13,6 +13,7 @@ CHANGELOG
    ```php
    Yaml::dump([], 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
    ```
+ * Added support for ::class constants
 
 3.2.0
 -----

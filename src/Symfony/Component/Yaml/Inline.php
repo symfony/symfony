@@ -627,6 +627,10 @@ class Inline
                                 return constant($const);
                             }
 
+                            if (class_exists($constWithoutClassSuffix = str_replace('::class', '', $const))) {
+                                return $constWithoutClassSuffix;
+                            }
+
                             throw new ParseException(sprintf('The constant "%s" is not defined.', $const));
                         }
                         if (self::$exceptionOnInvalidType) {

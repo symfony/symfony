@@ -35,37 +35,39 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
         }
 
         $serviceResolver = $container->getDefinition($this->resolverServiceId);
-        $controllers = $serviceResolver->getArgument(0)->getArgument(0);
+        $controllerLocator = $container->getDefinition((string) $serviceResolver->getArgument(0));
+        $controllers = $controllerLocator->getArgument(0);
 
-        foreach ($container->findTaggedServiceIds('controller.arguments_locator') as $id => $tags) {
-            $argumentLocator = $container->getDefinition($id)->clearTag('controller.arguments_locator');
-            list($class, $service, $action) = $tags[0];
+        foreach ($controllers as $controller => $argumentRef) {
+            $argumentLocator = $container->getDefinition((string) $argumentRef->getValues()[0]);
 
             if (!$argumentLocator->getArgument(0)) {
                 // remove empty argument locators
-                $reason = sprintf('Removing service-argument-resolver for controller "%s:%s": no corresponding definitions were found for the referenced services/types.%s', $service, $action, !$argumentLocator->isAutowired() ? ' Did you forget to enable autowiring?' : '');
+                $reason = sprintf('Removing service-argument-resolver for controller "%s": no corresponding definitions were found for the referenced services/types.%s', $controller, !$argumentLocator->isAutowired() ? ' Did you forget to enable autowiring?' : '');
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;
-                foreach ($container->getDefinition($service)->getMethodCalls() as list($method, $args)) {
+                $action = substr(strrchr($controller, ':'), 1);
+                $id = substr($controller, 0, -1 - strlen($action));
+                $controllerDef = $container->getDefinition($id);
+                foreach ($controllerDef->getMethodCalls() as list($method, $args)) {
                     if (0 === strcasecmp($action, $method)) {
-                        $reason = sprintf('Removing method "%s" of service "%s" from controller candidates: the method is called at instantiation, thus cannot be an action.', $action, $service);
+                        $reason = sprintf('Removing method "%s" of service "%s" from controller candidates: the method is called at instantiation, thus cannot be an action.', $action, $id);
                         break;
                     }
                 }
                 if (!$reason) {
+                    if ($controllerDef->getClass() === $id) {
+                        $controllers[$id.'::'.$action] = $argumentRef;
+                    }
                     continue;
                 }
             }
 
-            $container->removeDefinition($id);
-            unset($controllers[$service.':'.$action]);
-            if ($service === $class) {
-                unset($controllers[$service.'::'.$action]);
-            }
+            unset($controllers[$controller]);
             $container->log($this, $reason);
         }
 
-        $serviceResolver->getArgument(0)->replaceArgument(0, $controllers);
+        $controllerLocator->replaceArgument(0, $controllers);
     }
 }

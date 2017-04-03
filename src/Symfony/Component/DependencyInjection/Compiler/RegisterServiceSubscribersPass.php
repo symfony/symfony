@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
@@ -87,7 +85,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $serviceMap[$key] = new Reference($type);
             }
 
-            $subscriberMap[$key] = new ServiceClosureArgument(new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE));
+            $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
             unset($serviceMap[$key]);
         }
 
@@ -97,12 +95,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         }
 
         $serviceLocator = $this->serviceLocator;
-        $this->serviceLocator = 'container.'.$this->currentId.'.'.md5(serialize($value));
-        $this->container->register($this->serviceLocator, ServiceLocator::class)
-            ->addArgument($subscriberMap)
-            ->setPublic(false)
-            ->setAutowired($value->isAutowired())
-            ->addTag('container.service_locator');
+        $this->serviceLocator = (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $value->getAutowired());
 
         try {
             return parent::processValue($value);

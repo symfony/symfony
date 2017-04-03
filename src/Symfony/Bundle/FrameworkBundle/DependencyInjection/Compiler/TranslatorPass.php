@@ -11,11 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 
 class TranslatorPass implements CompilerPassInterface
 {
@@ -46,7 +45,7 @@ class TranslatorPass implements CompilerPassInterface
 
         $container
             ->findDefinition('translator.default')
-            ->replaceArgument(0, (new Definition(ServiceLocator::class, array($loaderRefs)))->addTag('container.service_locator'))
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $loaderRefs))
             ->replaceArgument(3, $loaders)
         ;
     }

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Validator\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -48,15 +46,15 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
             }
 
             if (isset($attributes[0]['alias'])) {
-                $validators[$attributes[0]['alias']] = new ServiceClosureArgument(new Reference($id));
+                $validators[$attributes[0]['alias']] = new Reference($id);
             }
 
-            $validators[$definition->getClass()] = new ServiceClosureArgument(new Reference($id));
+            $validators[$definition->getClass()] = new Reference($id);
         }
 
         $container
             ->getDefinition('validator.validator_factory')
-            ->replaceArgument(0, (new Definition(ServiceLocator::class, array($validators)))->addTag('container.service_locator'))
+            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $validators))
         ;
     }
 }

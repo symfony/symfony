@@ -12,14 +12,13 @@
 namespace Symfony\Component\Form\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Adds all services with the tags "form.type", "form.type_extension" and
@@ -60,17 +59,16 @@ class FormPass implements CompilerPassInterface
     {
         // Get service locator argument
         $servicesMap = array();
-        $locator = $definition->getArgument(0);
 
         // Builds an array with fully-qualified type class names as keys and service IDs as values
         foreach ($container->findTaggedServiceIds($this->formTypeTag) as $serviceId => $tag) {
             $serviceDefinition = $container->getDefinition($serviceId);
 
             // Add form type service to the service locator
-            $servicesMap[$serviceDefinition->getClass()] = new ServiceClosureArgument(new Reference($serviceId));
+            $servicesMap[$serviceDefinition->getClass()] = new Reference($serviceId);
         }
 
-        return (new Definition(ServiceLocator::class, array($servicesMap)))->addTag('container.service_locator');
+        return ServiceLocatorTagPass::register($container, $servicesMap);
     }
 
     private function processFormTypeExtensions(ContainerBuilder $container)

@@ -326,6 +326,23 @@ class RequestTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider getFormatToMimeTypeMapProviderForAccept
+     */
+    public function testGetMimeTypeFromFormatWithAccept($format, $mimeTypes, $accepts)
+    {
+        if (null !== $format) {
+            $request = new Request();
+            $request->setFormat($format, $mimeTypes);
+
+            $request->headers->set('Accept', $accepts);
+            // BC behavior.
+            // If accept is inside of the $format mime type array, return it, otherwise behave as you currently do.
+            $return = $accepts ?: $mimeTypes[0];
+            $this->assertEquals($return, $request->getMimeType($format));
+        }
+    }
+
     public function testGetFormatWithCustomMimeType()
     {
         $request = new Request();
@@ -344,6 +361,20 @@ class RequestTest extends TestCase
             array('xml', array('text/xml', 'application/xml', 'application/x-xml')),
             array('rdf', array('application/rdf+xml')),
             array('atom', array('application/atom+xml')),
+        );
+    }
+
+    public function getFormatToMimeTypeMapProviderForAccept()
+    {
+        return array(
+            array(null, array(null, 'unexistent-mime-type'), null),
+            array('txt', array('text/plain'), null),
+            array('js', array('application/javascript', 'application/x-javascript', 'text/javascript'), null),
+            array('css', array('text/css'), null),
+            array('json', array('application/json', 'application/x-json', 'application/json;version=1.0', 'application/json;version=1.1'), 'application/json;version=1.0'),
+            array('xml', array('text/xml', 'application/xml', 'application/x-xml', 'application/xml;version=1.0', 'application/xml;version=2.0'), 'application/xml;version=2.0'),
+            array('rdf', array('application/rdf+xml'), null),
+            array('atom', array('application/atom+xml'), null),
         );
     }
 

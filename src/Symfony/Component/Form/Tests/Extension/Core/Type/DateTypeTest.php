@@ -608,7 +608,7 @@ class DateTypeTest extends BaseTypeTest
         ));
 
         $form->submit(array(
-            'day' => '0',
+            'day' => '1',
             'month' => '6',
             'year' => '2010',
         ));

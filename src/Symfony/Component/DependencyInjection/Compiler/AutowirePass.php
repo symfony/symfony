@@ -29,6 +29,7 @@ class AutowirePass implements CompilerPassInterface
     private $types;
     private $notGuessableTypes = array();
     private $usedTypes = array();
+    private $secondPassDefinitions = array();
 
     /**
      * {@inheritdoc}
@@ -44,6 +45,10 @@ class AutowirePass implements CompilerPassInterface
                 if ($definition->isAutowired()) {
                     $this->completeDefinition($id, $definition);
                 }
+            }
+
+            foreach ($this->secondPassDefinitions as $id => $definition) {
+                $this->completeDefinition($id, $definition);
             }
 
             foreach ($this->usedTypes as $type => $id) {
@@ -67,6 +72,7 @@ class AutowirePass implements CompilerPassInterface
         $this->types = null;
         $this->notGuessableTypes = array();
         $this->usedTypes = array();
+        $this->secondPassDefinitions = array();
 
         if (isset($e)) {
             throw $e;
@@ -94,7 +100,8 @@ class AutowirePass implements CompilerPassInterface
         }
 
         $arguments = $definition->getArguments();
-        foreach ($constructor->getParameters() as $index => $parameter) {
+        $parameters = $this->getPriorityToInstantiableParameters($constructor->getParameters());
+        foreach ($parameters as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
             }
@@ -131,7 +138,12 @@ class AutowirePass implements CompilerPassInterface
                         } elseif ($parameter->isDefaultValueAvailable()) {
                             $value = $parameter->getDefaultValue();
                         } else {
-                            throw $e;
+                            if (isset($this->secondPassDefinitions[$id])) {
+                                throw $e;
+                            }
+                            $this->secondPassDefinitions[$id] = $definition;
+
+                            return;
                         }
                     }
                 }
@@ -298,5 +310,31 @@ class AutowirePass implements CompilerPassInterface
         }
 
         return $this->reflectionClasses[$id] = $reflector;
+    }
+
+    /**
+     * Priority for Instantiable parameters.
+     *
+     * @param array $parameters
+     *
+     * @return array
+     */
+    private function getPriorityToInstantiableParameters(array $parameters)
+    {
+        $result = array();
+
+        foreach ($parameters as $index => $parameter) {
+            try {
+                if (($typeHint = $parameter->getClass()) && $typeHint->isInstantiable()) {
+                    $result = array($index => $parameter) + $result;
+                } else {
+                    $result = $result + array($index => $parameter);
+                }
+            } catch (\Exception $e) {
+                $result = $result + array($index => $parameter);
+            }
+        }
+
+        return $result;
     }
 }

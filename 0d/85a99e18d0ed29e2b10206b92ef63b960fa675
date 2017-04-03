@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-30T13:34:51Z
+
+The refactoring made in #22043 is not the cause, reverting it makes this test keep failing on windows.
+
+---------------------------------------------------------------------------
+
+by mheki at 2017-03-30T19:14:48Z
+
+Wouldn't be better to fix the error on Windows or create alternative test which won't break there, instead of skipping the test?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-30T21:08:08Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-03T09:42:47Z
+
+Spent some hours at trying to debug it and I can't find the bottleneck, so keep skipping on windows as it runs fine on other platforms.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-03T09:42:54Z
+
+Status: needs review

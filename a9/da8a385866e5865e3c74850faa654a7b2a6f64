@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T08:17:50Z
+
+fabbot failure - but shouldn't this be done on master instead? a new public method looks like a new feature to me - the DX "fix" looks like DX "improvement" to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-03T08:54:45Z
+
+well, the new method is quite internal (I should tag it as `@internal` btw)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-03T08:57:38Z
+
+Regarding the target, the original PR was on 2.7. But deciding between 2.7 and master can be discussed. The current exceptions when using a wrong expression in a DI configuration are totally impossible to debug (the error message does not contain the expression, and the stack trace does not contain the config file containing the expression as the expression is parsed only later when dumping the compiled container). So I would still be in favor of adding it in 2.7

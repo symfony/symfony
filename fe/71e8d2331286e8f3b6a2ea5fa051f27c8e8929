@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-30T13:33:59Z
+
+should be done in master.
+
+---------------------------------------------------------------------------
+
+by Zarcox at 2017-03-30T23:27:40Z
+
+Sorry, that's my first pull request x) !
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-31T13:44:58Z
+
+@Zarcox thanks for submitting your first contribution! I hope this is the first of many :)
+
+Although your PR looks simple, it's related to a controversial topic. In theory, any string added in the code is considered "a magic string" and must be moved to a constant. But in practice, sometimes we keep the strings when they are not part of a critical feature or the occurrences are not many.
+
+For example:
+
+* This proposal to remove "magic strings" was merged: https://github.com/symfony/symfony/commit/e5536f0fe10421da7ebbe0071343e94d039dfb97
+* This proposal to remove "magic strings" was rejected: https://github.com/symfony/symfony/pull/22147
+
+So maybe this PR gets rejected too, but please don't let that discourage you to send more PR in the future. Thanks!
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-03-31T13:59:44Z
+
+In this specific case the improvement is obvious, as it's now an error prone constant - the official name is [XML in caps](https://www.w3.org/XML/) and `'XML'` does not work currently. For the HTTP response codes to any developer worth his salt `302` is much clearer than the 'human readable equivalent', besides being [rigidly standardized](https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) in its own right. 302 is therefore not really a magic string, it's just The Constant itself.
+
+So I'm in favor of this change.

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-03T15:31:59Z
+
+1. Correct me if I'm wrong, but #22162 has nothing to do with discovered services does it?
+
+>auto-registered services should not be used as type-candidates
+
+2. How does that translate concretely in the end for the users? I'm not sure to understand the real consequences of that :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T15:39:40Z
+
+@theofidry it is directly related: #22162 uses `MyRepository` as an auto-registered type-hint, which depending on the order of declarations might or might not be used as *the* implementation for `RepositoryInterface`, found in another constructor.
+
+The concrete consequence of this PR is that instead of failing to autowire in some order-related situations, it will make it to always fail (#22170 tries to make it always work, but I'd prefer to get rid of the existing 💩 instead :).)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-03T15:49:49Z
+
+@nicolas-grekas I prefer your approach rather than adding more complex magic requiring a 2-step processing of definitions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T20:56:12Z
+
+Not sure where this should be added. It will be in the changelog as usual of course.

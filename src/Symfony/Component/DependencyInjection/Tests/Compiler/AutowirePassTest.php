@@ -422,10 +422,6 @@ class AutowirePassTest extends TestCase
             array(
                 new Reference('a'),
                 new Reference('lille'),
-                // third arg shouldn't *need* to be passed
-                // but that's hard to "pull of" with autowiring, so
-                // this assumes passing the default val is ok
-                'some_val',
             ),
             $definition->getArguments()
         );
@@ -460,23 +456,6 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
 
         $this->assertEquals(array(new Reference('a'), '', new Reference('lille')), $container->getDefinition('foo')->getArguments());
-    }
-
-    /**
-     * @dataProvider provideAutodiscoveredAutowiringOrder
-     *
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB).
-     */
-    public function testAutodiscoveredAutowiringOrder($class)
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('a', __NAMESPACE__.'\\'.$class)
-            ->setAutowired(true);
-
-        $pass = new AutowirePass();
-        $pass->process($container);
     }
 
     public function provideAutodiscoveredAutowiringOrder()

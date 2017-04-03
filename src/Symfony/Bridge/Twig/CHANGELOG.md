@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added a `workflow_has_marked_place` function
+ * added a `workflow_marked_places` function
 
 3.2.0
 -----

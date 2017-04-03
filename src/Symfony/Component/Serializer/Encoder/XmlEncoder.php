@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {
+    const FORMAT = 'xml';
+
     /**
      * @var \DOMDocument
      */
@@ -143,7 +145,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     public function supportsEncoding($format)
     {
-        return 'xml' === $format;
+        return self::FORMAT === $format;
     }
 
     /**
@@ -151,7 +153,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     public function supportsDecoding($format)
     {
-        return 'xml' === $format;
+        return self::FORMAT === $format;
     }
 
     /**

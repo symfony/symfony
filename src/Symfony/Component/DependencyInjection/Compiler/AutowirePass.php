@@ -74,6 +74,10 @@ class AutowirePass implements CompilerPassInterface
      */
     private function completeDefinition($id, Definition $definition)
     {
+        if ($definition->getFactory() || $definition->getFactoryClass(false) || $definition->getFactoryService(false)) {
+            throw new RuntimeException(sprintf('Service "%s" can use either autowiring or a factory, not both.', $id));
+        }
+
         if (!$reflectionClass = $this->getReflectionClass($id, $definition)) {
             return;
         }

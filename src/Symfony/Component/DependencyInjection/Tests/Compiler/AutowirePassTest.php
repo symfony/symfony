@@ -465,6 +465,22 @@ class AutowirePassTest extends TestCase
             array('CannotBeAutowiredReverseOrder'),
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Service "a" can use either autowiring or a factory, not both.
+     */
+    public function testWithFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A')
+            ->setFactory('foo')
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
 }
 
 class Foo

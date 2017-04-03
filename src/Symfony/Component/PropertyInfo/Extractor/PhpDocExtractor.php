@@ -242,7 +242,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @param string $ucFirstProperty
      * @param int    $type
      *
-     * @return DocBlock|null
+     * @return array|null
      */
     private function getDocBlockFromMethod($class, $ucFirstProperty, $type)
     {
@@ -337,10 +337,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 $collectionValueType = null;
             } else {
                 $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-                $collectionValueType = new Type($phpType, false, $class);
+                $collectionValueType = new Type($phpType, $nullable, $class);
             }
 
-            return new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, $collectionKeyType, $collectionValueType);
+            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
         }
 
         return new Type($phpType, $nullable, $class);

@@ -589,9 +589,8 @@ class Request
         self::$trustedProxies = $proxies;
 
         if (2 > func_num_args()) {
-            @trigger_error(sprintf('The %s() method expects a bit field of Request::HEADER_* as second argument. Not defining it is deprecated since version 3.3 and will be required in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-            return;
+            // @deprecated code path in 3.3, to be replaced by mandatory argument in 4.0.
+            throw new \InvalidArgumentException(sprintf('The %s() method expects a bit field of Request::HEADER_* as second argument. Defining it is required since version 3.3. See http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info.', __METHOD__));
         }
         $trustedHeaderSet = func_get_arg(1);
 

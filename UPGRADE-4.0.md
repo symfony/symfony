@@ -300,8 +300,7 @@ HttpFoundation
 --------------
 
  * The `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument.
-   Set it to `Request::HEADER_FORWARDED` if your reverse-proxy uses the RFC7239 `Forwarded` header,
-   or to `Request::HEADER_X_FORWARDED_ALL` if it is using `X-Forwarded-*` headers instead.
+   See http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info.
 
  * The `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods have been removed.
 

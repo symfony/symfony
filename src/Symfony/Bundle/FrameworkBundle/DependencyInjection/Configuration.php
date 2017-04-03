@@ -59,48 +59,16 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['trusted_proxies']); })
-                ->then(function ($v) {
-                    @trigger_error('The "framework.trusted_proxies" configuration key is deprecated since version 3.3 and will be removed in 4.0. Use the Request::setTrustedProxies() method in your front controller instead.', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
                     ->defaultTrue()
                 ->end()
-                ->arrayNode('trusted_proxies')
+                ->arrayNode('trusted_proxies') // @deprecated in version 3.3, to be removed in 4.0
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return !is_array($v) && null !== $v; })
-                        ->then(function ($v) { return is_bool($v) ? array() : preg_split('/\s*,\s*/', $v); })
-                    ->end()
-                    ->prototype('scalar')
-                        ->validate()
-                            ->ifTrue(function ($v) {
-                                if (empty($v)) {
-                                    return false;
-                                }
-
-                                if (false !== strpos($v, '/')) {
-                                    if ('0.0.0.0/0' === $v) {
-                                        return false;
-                                    }
-
-                                    list($v, $mask) = explode('/', $v, 2);
-
-                                    if (strcmp($mask, (int) $mask) || $mask < 1 || $mask > (false !== strpos($v, ':') ? 128 : 32)) {
-                                        return true;
-                                    }
-                                }
-
-                                return !filter_var($v, FILTER_VALIDATE_IP);
-                            })
-                            ->thenInvalid('Invalid proxy IP "%s"')
-                        ->end()
+                        ->always()
+                        ->thenInvalid('The "framework.trusted_proxies" configuration key has been removed in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.')
                     ->end()
                 ->end()
                 ->scalarNode('ide')->defaultNull()->end()

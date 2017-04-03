@@ -43,70 +43,6 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }
 
-    /**
-     * @group legacy
-     * @dataProvider getTestValidTrustedProxiesData
-     */
-    public function testValidTrustedProxies($trustedProxies, $processedProxies)
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, array(array(
-            'secret' => 's3cr3t',
-            'trusted_proxies' => $trustedProxies,
-        )));
-
-        $this->assertEquals($processedProxies, $config['trusted_proxies']);
-    }
-
-    public function getTestValidTrustedProxiesData()
-    {
-        return array(
-            array(array('127.0.0.1'), array('127.0.0.1')),
-            array(array('::1'), array('::1')),
-            array(array('127.0.0.1', '::1'), array('127.0.0.1', '::1')),
-            array(null, array()),
-            array(false, array()),
-            array(array(), array()),
-            array(array('10.0.0.0/8'), array('10.0.0.0/8')),
-            array(array('::ffff:0:0/96'), array('::ffff:0:0/96')),
-            array(array('0.0.0.0/0'), array('0.0.0.0/0')),
-        );
-    }
-
-    /**
-     * @group legacy
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testInvalidTypeTrustedProxies()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(
-            array(
-                'secret' => 's3cr3t',
-                'trusted_proxies' => 'Not an IP address',
-            ),
-        ));
-    }
-
-    /**
-     * @group legacy
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testInvalidValueTrustedProxies()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(true);
-
-        $processor->processConfiguration($configuration, array(
-            array(
-                'secret' => 's3cr3t',
-                'trusted_proxies' => array('Not an IP address'),
-            ),
-        ));
-    }
-
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();
@@ -188,7 +124,6 @@ class ConfigurationTest extends TestCase
     {
         return array(
             'http_method_override' => true,
-            'trusted_proxies' => array(),
             'ide' => null,
             'default_locale' => 'en',
             'csrf_protection' => array(

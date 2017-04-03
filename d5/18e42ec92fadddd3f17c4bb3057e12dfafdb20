@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by keradus at 2017-03-31T09:46:41Z
+
+```
+1) Symfony\Component\Form\Tests\Extension\Core\Type\BirthdayTypeTest::testIsSynchronizedReturnsTrueIfChoiceAndCompletelyFilled
+Failed asserting that false is true.
+
+2) Symfony\Component\Form\Tests\Extension\Core\Type\DateTypeTest::testIsSynchronizedReturnsTrueIfChoiceAndCompletelyFilled
+Failed asserting that false is true.
+```
+
+are failing also on pure 2.7 line, wtf?

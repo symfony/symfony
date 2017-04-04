@@ -138,6 +138,9 @@ class Application
                 $e = null;
                 $exitCode = 0;
             } else {
+                if (!$e instanceof \Exception) {
+                    throw $e;
+                }
                 $exitCode = $e->getCode();
             }
 

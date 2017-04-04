@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T14:50:51Z
+
+Travis is hanging?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-04T14:52:16Z
+
+@ro0NL No, it's just that there is a lot of activity, and the queue is quite large right now :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T15:39:20Z
+
+Monitoring travis.. and PHP7 still fails. What a day...
+
+edit: wait.. that could actually be a deps issue.. ill have a look at composer file.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T15:50:45Z
+
+Not sure what needs to be done here;
+
+```
+# frameworkbundle composer.json
+"symfony/console": "~2.8.8|~3.0.8",
+```
+
+```
+# travis, PHP7, deps=high
+- Installing symfony/console (3.0.x-dev 926061e): Loading from cache
+```
+
+```
+# travis, PHP7.1, deps=low
+- Installing symfony/console (v2.8.8): Downloading (100%)
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-04T16:34:25Z
+
+@ro0NL Not sure but I'd say `~2.8.19|~3.3`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-04T16:39:42Z
+
+~~No, in 2.8, we cannot depend on anything else but 3.0. I think we dropped 3.0 in some cases though, so `~2.8.19` should be the way to go I suppose.~~ Actually, that's a bad idea.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T16:52:41Z
+
+:tada: thx @chalasr for helping out and pointing out these issues.

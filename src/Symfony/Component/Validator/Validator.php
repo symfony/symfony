@@ -151,7 +151,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
                 ? '"'.$containingValue.'"'
                 : 'the value of type '.gettype($containingValue);
 
-            throw new ValidatorException(sprintf('The metadata for '.$valueAsString.' does not support properties.'));
+            throw new ValidatorException(sprintf('The metadata for %s does not support properties.', $valueAsString));
         }
 
         // If $containingValue is passed as class name, take $value as root

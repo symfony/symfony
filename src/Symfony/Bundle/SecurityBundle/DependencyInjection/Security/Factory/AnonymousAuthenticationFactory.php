@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -44,13 +44,13 @@ class AnonymousAuthenticationFactory implements SecurityFactoryInterface
     {
         $listenerId = 'security.authentication.listener.anonymous.'.$id;
         $container
-            ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
+            ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))
             ->replaceArgument(1, $config['secret'])
         ;
 
         $providerId = 'security.authentication.provider.anonymous.'.$id;
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
+            ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.anonymous'))
             ->replaceArgument(0, $config['secret'])
         ;
 

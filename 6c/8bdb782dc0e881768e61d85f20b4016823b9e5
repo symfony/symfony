@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-04T09:41:53Z
+
+I confirm this fixes the console test which is broken on 3.2 + master, to be merged in 3.2.
+However, some FrameworkBundle tests remain broken from 2.8 up to master, not sure if it related to the same change. (console descriptors, see appveyor, familiar to you? I can try to look into otherwise).
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T09:44:08Z
+
+Confirming this affects 3.2 as well (2.7 + 2.8 are good)
+
+Note im only testing `./phpunit src/Symfony/Component/Console/Tests/ApplicationTest.php --filter testRenderExceptionEscapesLine` currently.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-04T09:54:13Z
+
+@ro0NL In fact this test relies on the deprecated `getTerminalWidth()`, that's where the merge went wrong, the need for `putenv` is normal. Here is the patch:
+
+```diff
+diff --git a/src/Symfony/Component/Console/Tests/ApplicationTest.php b/src/Symfony/Component/Console/Tests/ApplicationTest.php
+index 61a9e97..072f0d0 100644
+--- a/src/Symfony/Component/Console/Tests/ApplicationTest.php
++++ b/src/Symfony/Component/Console/Tests/ApplicationTest.php
+@@ -588,11 +588,8 @@ class ApplicationTest extends TestCase
+
+     public function testRenderExceptionEscapesLines()
+     {
+-        $application = $this->getMockBuilder('Symfony\Component\Console\Application')->setMethods(array('getTerminalWidth'))->getMock();
++        $application = new Application();
+         $application->setAutoExit(false);
+-        $application->expects($this->any())
+-            ->method('getTerminalWidth')
+-            ->will($this->returnValue(22));
+         putenv('COLUMNS=22');
+         $application->register('foo')->setCode(function () {
+             throw new \Exception('dont break here <info>!</info>');
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T10:01:33Z
+
+Thanks. Fixed it.. i guess the `$width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;` confused me.. :)
+
+:+1:

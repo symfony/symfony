@@ -100,6 +100,9 @@ class DigestDataTest extends TestCase
         $this->assertEquals('"u\\ser"', $digestAuth->getUsername());
     }
 
+    /**
+     * @group time-sensitive
+     */
     public function testValidateAndDecode()
     {
         $time = microtime(true);
@@ -112,11 +115,11 @@ class DigestDataTest extends TestCase
             'response="b52938fc9e6d7c01be7702ece9031b42"'
         );
 
-        try {
-            $digestAuth->validateAndDecode($key, 'Welcome, robot!');
-        } catch (\Exception $e) {
-            $this->fail(sprintf('testValidateAndDecode fail with message: %s', $e->getMessage()));
-        }
+        $digestAuth->validateAndDecode($key, 'Welcome, robot!');
+
+        sleep(1);
+
+        $this->assertTrue($digestAuth->isNonceExpired());
     }
 
     public function testCalculateServerDigest()

@@ -313,6 +313,10 @@ class RequestTest extends TestCase
         $request->setFormat($format, $mimeTypes);
         foreach ($mimeTypes as $mime) {
             $this->assertEquals($format, $request->getFormat($mime));
+
+            if (null !== $format) {
+                $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
+            }
         }
     }
 
@@ -843,7 +847,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider testGetClientIpsProvider
+     * @dataProvider getClientIpsProvider
      */
     public function testGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
@@ -853,7 +857,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider testGetClientIpsProvider
+     * @dataProvider getClientIpsProvider
      */
     public function testGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
@@ -863,7 +867,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider testGetClientIpsForwardedProvider
+     * @dataProvider getClientIpsForwardedProvider
      */
     public function testGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
     {
@@ -872,7 +876,7 @@ class RequestTest extends TestCase
         $this->assertEquals($expected, $request->getClientIps());
     }
 
-    public function testGetClientIpsForwardedProvider()
+    public function getClientIpsForwardedProvider()
     {
         //              $expected                                  $remoteAddr  $httpForwarded                                       $trustedProxies
         return array(
@@ -885,7 +889,7 @@ class RequestTest extends TestCase
         );
     }
 
-    public function testGetClientIpsProvider()
+    public function getClientIpsProvider()
     {
         //        $expected                   $remoteAddr                $httpForwardedFor            $trustedProxies
         return array(
@@ -942,7 +946,7 @@ class RequestTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
-     * @dataProvider testGetClientIpsWithConflictingHeadersProvider
+     * @dataProvider getClientIpsWithConflictingHeadersProvider
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
@@ -961,7 +965,7 @@ class RequestTest extends TestCase
         $request->getClientIps();
     }
 
-    public function testGetClientIpsWithConflictingHeadersProvider()
+    public function getClientIpsWithConflictingHeadersProvider()
     {
         //        $httpForwarded                   $httpXForwardedFor
         return array(
@@ -974,9 +978,9 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider testGetClientIpsWithAgreeingHeadersProvider
+     * @dataProvider getClientIpsWithAgreeingHeadersProvider
      */
-    public function testGetClientIpsWithAgreeingHeaders($httpForwarded, $httpXForwardedFor)
+    public function testGetClientIpsWithAgreeingHeaders($httpForwarded, $httpXForwardedFor, $expectedIps)
     {
         $request = new Request();
 
@@ -990,19 +994,21 @@ class RequestTest extends TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
-        $request->getClientIps();
+        $clientIps = $request->getClientIps();
+
+        $this->assertSame($expectedIps, $clientIps);
     }
 
-    public function testGetClientIpsWithAgreeingHeadersProvider()
+    public function getClientIpsWithAgreeingHeadersProvider()
     {
         //        $httpForwarded                               $httpXForwardedFor
         return array(
-            array('for="192.0.2.60"',                          '192.0.2.60'),
-            array('for=192.0.2.60, for=87.65.43.21',           '192.0.2.60,87.65.43.21'),
-            array('for="[::face]", for=192.0.2.60',            '::face,192.0.2.60'),
-            array('for="192.0.2.60:80"',                       '192.0.2.60'),
-            array('for=192.0.2.60;proto=http;by=203.0.113.43', '192.0.2.60'),
-            array('for="[2001:db8:cafe::17]:4711"',            '2001:db8:cafe::17'),
+            array('for="192.0.2.60"',                          '192.0.2.60',             array('192.0.2.60')),
+            array('for=192.0.2.60, for=87.65.43.21',           '192.0.2.60,87.65.43.21', array('87.65.43.21', '192.0.2.60')),
+            array('for="[::face]", for=192.0.2.60',            '::face,192.0.2.60',      array('192.0.2.60', '::face')),
+            array('for="192.0.2.60:80"',                       '192.0.2.60',             array('192.0.2.60')),
+            array('for=192.0.2.60;proto=http;by=203.0.113.43', '192.0.2.60',             array('192.0.2.60')),
+            array('for="[2001:db8:cafe::17]:4711"',            '2001:db8:cafe::17',      array('2001:db8:cafe::17')),
         );
     }
 

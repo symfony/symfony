@@ -145,13 +145,16 @@ class ArrayNodeDefinitionTest extends TestCase
 
     public function testNestedPrototypedArrayNodes()
     {
-        $node = new ArrayNodeDefinition('root');
-        $node
+        $nodeDefinition = new ArrayNodeDefinition('root');
+        $nodeDefinition
             ->addDefaultChildrenIfNoneSet()
             ->prototype('array')
                   ->prototype('array')
         ;
-        $node->getNode();
+        $node = $nodeDefinition->getNode();
+
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\PrototypedArrayNode', $node);
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\PrototypedArrayNode', $node->getPrototype());
     }
 
     public function testEnabledNodeDefaults()

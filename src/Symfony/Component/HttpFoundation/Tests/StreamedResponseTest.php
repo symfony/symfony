@@ -51,10 +51,12 @@ class StreamedResponseTest extends TestCase
 
     public function testPrepareWithHeadRequest()
     {
-        $response = new StreamedResponse(function () { echo 'foo'; });
+        $response = new StreamedResponse(function () { echo 'foo'; }, 200, array('Content-Length' => '123'));
         $request = Request::create('/', 'HEAD');
 
         $response->prepare($request);
+
+        $this->assertSame('123', $response->headers->get('Content-Length'));
     }
 
     public function testPrepareWithCacheHeaders()

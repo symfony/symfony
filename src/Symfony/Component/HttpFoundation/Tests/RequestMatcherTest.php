@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 class RequestMatcherTest extends TestCase
 {
     /**
-     * @dataProvider testMethodFixtures
+     * @dataProvider getMethodData
      */
     public function testMethod($requestMethod, $matcherMethod, $isMatch)
     {
@@ -32,7 +32,7 @@ class RequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function testMethodFixtures()
+    public function getMethodData()
     {
         return array(
             array('get', 'get', true),
@@ -64,7 +64,7 @@ class RequestMatcherTest extends TestCase
     }
 
     /**
-     * @dataProvider testHostFixture
+     * @dataProvider getHostData
      */
     public function testHost($pattern, $isMatch)
     {
@@ -78,7 +78,7 @@ class RequestMatcherTest extends TestCase
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function testHostFixture()
+    public function getHostData()
     {
         return array(
             array('.*\.example\.com', true),

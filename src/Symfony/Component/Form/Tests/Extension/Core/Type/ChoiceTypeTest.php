@@ -102,7 +102,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceListAndChoicesCanBeEmpty()
     {
-        $this->factory->create(static::TESTED_TYPE);
+        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        )));
     }
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
@@ -1705,9 +1707,9 @@ class ChoiceTypeTest extends BaseTypeTest
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
+        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'choices' => array(),
-        ));
+        )));
     }
 
     public function testInitializeWithDefaultObjectChoice()

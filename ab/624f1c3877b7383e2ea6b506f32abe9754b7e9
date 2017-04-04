@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-27T18:28:10Z
+
+What is the benefit of this change ?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-01-27T18:32:44Z
+
+The benefits are :
+ - prevent instancing all the voters when not needed.
+ - remove the need for the setVoters method to allow voters to depend on the AccessDecisionManager.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T19:17:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-31T07:52:24Z
+
+I did not look at the exact logic: in `AccessDecisionManager::decideUnanimous`, would it be possible to swap the two `foreach`, ie iterate over voters, then over attributes inside? That may prevent instantiating some voters if eg a grant is denied early.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-01T16:14:31Z
+
+@jvasseur can you please rebase? there are failures related to this PR isn't it?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-03-01T16:42:26Z
+
+Rebased and fix the test failure that was related to the changes in this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T22:58:32Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T22:58:52Z
+
+A quick rebase to ensure that tests are all-right would be good as well.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-03-23T08:53:07Z
+
+@fabpot rebased on current master.
+
+Remaining test failures are unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-23T09:49:32Z
+
+So did someone try this PR in a real project and made sure that this will not break the security profiler?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-03-23T10:00:53Z
+
+I did try it on a real project and everything was working. But since I made some changes to the PR since then I will try to do it again when I have some free time.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-23T10:01:51Z
+
+CHANGELOG/UPGRADE-* still need an update.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T10:10:24Z
+
+ping @jvasseur
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-04-04T13:03:29Z
+
+Note added to CHANGELOG/UPGRADE.

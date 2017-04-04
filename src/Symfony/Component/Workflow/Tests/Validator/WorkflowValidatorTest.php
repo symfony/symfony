@@ -28,6 +28,9 @@ class WorkflowValidatorTest extends TestCase
         $definition = $this->createSimpleWorkflowDefinition();
 
         (new WorkflowValidator(true))->validate($definition, 'foo');
+
+        // the test simply ensures that the validation does not fail (i.e. it does not throw any exceptions)
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -60,5 +63,8 @@ class WorkflowValidatorTest extends TestCase
         $definition = new Definition($places, $transitions);
 
         (new WorkflowValidator())->validate($definition, 'foo');
+
+        // the test simply ensures that the validation does not fail (i.e. it does not throw any exceptions)
+        $this->addToAssertionCount(1);
     }
 }

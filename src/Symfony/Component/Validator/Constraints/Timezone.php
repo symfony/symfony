@@ -24,7 +24,7 @@ class Timezone extends Constraint
 {
     const NO_SUCH_TIMEZONE_ERROR = '45de6628-3479-46d6-a210-00ad584f530a';
 
-    public $timezone = \DateTimeZone::ALL;
+    public $zone = \DateTimeZone::ALL;
 
     public $countryCode;
 
@@ -39,13 +39,13 @@ class Timezone extends Constraint
      */
     public function __construct($options = null)
     {
-        if (isset($options['timezone'])) {
-            $this->timezone = $options['timezone'];
+        if (isset($options['zone'])) {
+            $this->zone = $options['zone'];
         }
 
         if (isset($options['countryCode'])) {
-            if (\DateTimeZone::PER_COUNTRY !== $this->timezone) {
-                throw new ConstraintDefinitionException('The option "countryCode" can only be used when "timezone" option has `\DateTimeZone::PER_COUNTRY` as value');
+            if (\DateTimeZone::PER_COUNTRY !== $this->zone) {
+                throw new ConstraintDefinitionException('The option "countryCode" can only be used when "zone" option has `\DateTimeZone::PER_COUNTRY` as value');
             }
 
             $this->countryCode = $options['countryCode'];

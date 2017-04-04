@@ -40,11 +40,11 @@ class TimezoneValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $timezoneIds = \DateTimeZone::listIdentifiers($constraint->timezone, $constraint->countryCode);
+        $timezoneIds = \DateTimeZone::listIdentifiers($constraint->zone, $constraint->countryCode);
 
         if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ extra_info }}', $this->formatExtraInfo($constraint->timezone, $constraint->countryCode))
+                ->setParameter('{{ extra_info }}', $this->formatExtraInfo($constraint->zone, $constraint->countryCode))
                 ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
                 ->addViolation();
         }
@@ -55,28 +55,28 @@ class TimezoneValidator extends ConstraintValidator
      */
     public function getDefaultOption()
     {
-        return 'timezone';
+        return 'zone';
     }
 
     /**
      * Format the extra info which is appended to validation message based on
      * constraint options
      *
-     * @param int $timezone
+     * @param int $zone
      * @param string|null $countryCode
      *
      * @return string
      */
-    protected function formatExtraInfo($timezone, $countryCode = null)
+    protected function formatExtraInfo($zone, $countryCode = null)
     {
-        if (!$timezone) {
+        if (!$zone) {
             return '';
         }
         $r = new \ReflectionClass('\DateTimeZone');
         $consts = $r->getConstants();
 
-        if (!$value = array_search($timezone, $consts, true)) {
-            $value = $timezone;
+        if (!$value = array_search($zone, $consts, true)) {
+            $value = $zone;
         }
 
         $value = ' for "'.$value.'" zone';

@@ -76,7 +76,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testValidGroupedTimezones($timezone, $what)
     {
         $constraint = new Timezone(array(
-            'timezone' => $what,
+            'zone' => $what,
         ));
 
         $this->validator->validate($timezone, $constraint);
@@ -135,7 +135,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidGroupedTimezones($timezone, $what, $extraInfo)
     {
         $constraint = new Timezone(array(
-            'timezone' => $what,
+            'zone' => $what,
             'message' => 'myMessage',
         ));
 
@@ -164,7 +164,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testValidGroupedTimezonesByCountry($timezone, $what, $country)
     {
         $constraint = new Timezone(array(
-            'timezone' => $what,
+            'zone' => $what,
             'countryCode' => $country,
         ));
 
@@ -199,7 +199,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Timezone(array(
             'message' => 'myMessage',
-            'timezone' => $what,
+            'zone' => $what,
             'countryCode' => $country,
         ));
 

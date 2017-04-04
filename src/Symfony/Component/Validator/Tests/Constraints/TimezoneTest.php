@@ -25,13 +25,13 @@ class TimezoneTest extends TestCase
 
         $constraint = new Timezone(array(
             'message' => 'myMessage',
-            'timezone' => \DateTimeZone::PER_COUNTRY,
+            'zone' => \DateTimeZone::PER_COUNTRY,
             'countryCode' => 'AR',
         ));
 
         $constraint = new Timezone(array(
             'message' => 'myMessage',
-            'timezone' => \DateTimeZone::ALL,
+            'zone' => \DateTimeZone::ALL,
         ));
     }
 
@@ -42,7 +42,7 @@ class TimezoneTest extends TestCase
     {
         $constraint = new Timezone(array(
             'message' => 'myMessage',
-            'timezone' => \DateTimeZone::ALL,
+            'zone' => \DateTimeZone::ALL,
             'countryCode' => 'AR',
         ));
     }

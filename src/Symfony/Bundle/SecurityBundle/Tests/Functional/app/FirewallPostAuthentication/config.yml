@@ -1,0 +1,24 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+services:
+    test.security.access_denied_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallPostAuthenticationBundle\Security\AccessDeniedHandler
+
+security:
+    firewalls:
+        default:
+            access_denied_handler: test.security.access_denied_handler
+            http_basic: ~
+            # Intentionally register the factory before anon
+            custom_access: ~
+            anonymous: ~
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    john: { password: password, roles: [] }
+                    jane: { password: password, roles: [] }
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext

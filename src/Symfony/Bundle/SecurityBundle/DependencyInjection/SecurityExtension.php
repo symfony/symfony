@@ -38,7 +38,7 @@ class SecurityExtension extends Extension
     private $requestMatchers = array();
     private $expressions = array();
     private $contextListeners = array();
-    private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
+    private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me', 'anon', 'post_authentication');
     private $factories = array();
     private $userProviderFactories = array();
     private $expressionLanguage;
@@ -429,10 +429,6 @@ class SecurityExtension extends Extension
             }
         }
 
-        if (isset($firewall['anonymous'])) {
-            $listenerKeys[] = 'anonymous';
-        }
-
         $config->replaceArgument(10, $listenerKeys);
 
         return array($matcher, $listeners, $exceptionListener);
@@ -454,45 +450,33 @@ class SecurityExtension extends Extension
     private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, $defaultEntryPoint)
     {
         $listeners = array();
-        $hasListeners = false;
-
+        $hasAuthenticationProvider = false;
         foreach ($this->listenerPositions as $position) {
+
             foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
 
                 if (isset($firewall[$key])) {
+
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+                    list($authenticationProvider, $listenerId, $entryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+
+                    if ($entryPoint !== null) {
+                        $defaultEntryPoint = $entryPoint;
+                    }
 
                     $listeners[] = new Reference($listenerId);
-                    $authenticationProviders[] = $provider;
-                    $hasListeners = true;
+
+                    if ($authenticationProvider !== null) {
+                        $hasAuthenticationProvider = true;
+                        $authenticationProviders[] = $authenticationProvider;
+                    }
                 }
             }
         }
 
-        // Anonymous
-        if (isset($firewall['anonymous'])) {
-            $listenerId = 'security.authentication.listener.anonymous.'.$id;
-            $container
-                ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))
-                ->replaceArgument(1, $firewall['anonymous']['secret'])
-            ;
-
-            $listeners[] = new Reference($listenerId);
-
-            $providerId = 'security.authentication.provider.anonymous.'.$id;
-            $container
-                ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.anonymous'))
-                ->replaceArgument(0, $firewall['anonymous']['secret'])
-            ;
-
-            $authenticationProviders[] = $providerId;
-            $hasListeners = true;
-        }
-
-        if (false === $hasListeners) {
+        if (false === $hasAuthenticationProvider) {
             throw new InvalidConfigurationException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 

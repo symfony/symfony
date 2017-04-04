@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-04T09:50:39Z
+
+Can you cover this with an unit test?
+
+---------------------------------------------------------------------------
+
+by insekticid at 2017-04-04T13:01:40Z
+
+Added phpunit tests
+I have fixed code style and updated code with master + force push to my patch-1 branch
+
+You need manually rerun build checks:
+
+> If you have write access to the repo: On the build's detail screen, there is a button ↻ with the tooltip "Restart Build".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-04T14:26:29Z
+
+small rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-04T14:26:59Z
+
+should be merged on 2.7, isn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-04T14:27:08Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by insekticid at 2017-04-04T14:29:55Z
+
+Symfony 2.7+ So what to do now? It will be automatically merged into Symfony 3 too?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-04T14:43:25Z
+
+@insekticid That's correct. We are merging bug fixes in the lowest branch where the bug exist and then merge it back to all other branches (2.8, 3.2, and master right now). Can you change the target of the PR and rebase it? Thanks.
+
+---------------------------------------------------------------------------
+
+by insekticid at 2017-04-04T14:57:00Z
+
+@fabpot PropertyInfo exists since Sf 2.8 so I remade patch-1 for remotes/origin/2.8
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-04T15:04:20Z
+
+@insekticid You forgot to change the branch of the PR
+
+---------------------------------------------------------------------------
+
+by insekticid at 2017-04-04T15:05:30Z
+
+@fabpot where? in commit message?

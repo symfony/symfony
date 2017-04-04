@@ -60,9 +60,9 @@ class TimezoneValidator extends ConstraintValidator
 
     /**
      * Format the extra info which is appended to validation message based on
-     * constraint options
+     * constraint options.
      *
-     * @param int $zone
+     * @param int         $zone
      * @param string|null $countryCode
      *
      * @return string

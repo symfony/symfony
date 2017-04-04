@@ -33,7 +33,10 @@ abstract class WebTestCase extends KernelTestCase
         static::bootKernel($options);
 
         $client = static::$kernel->getContainer()->get('test.client');
-        $client->setServerParameters($server);
+        
+        foreach ($server as $key => $value) {
+            $client->setServerParameter($key, $value);
+        }
 
         return $client;
     }

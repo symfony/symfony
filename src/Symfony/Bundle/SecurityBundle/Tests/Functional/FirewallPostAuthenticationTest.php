@@ -24,7 +24,7 @@ class FirewallPostAuthenticationTest extends WebTestCase
         $this->assertEquals(
             SecureController::CONTENT,
             $response->getContent(),
-            "Custom authorization failed"
+            'Custom authorization failed'
         );
     }
 
@@ -35,7 +35,7 @@ class FirewallPostAuthenticationTest extends WebTestCase
         $this->assertEquals(
             Response::HTTP_FORBIDDEN,
             $response->getStatusCode(),
-            "Access should be denied to incorrect user"
+            'Access should be denied to incorrect user'
         );
     }
 
@@ -46,20 +46,20 @@ class FirewallPostAuthenticationTest extends WebTestCase
         $this->assertEquals(
             Response::HTTP_UNAUTHORIZED,
             $response->getStatusCode(),
-            "Access should be denied to anon"
+            'Access should be denied to anon'
         );
     }
 
     private function getResponseAsUser($username)
     {
-        $client = $this->createClient(['test_case' => 'FirewallPostAuthentication']);
+        $client = $this->createClient(array('test_case' => 'FirewallPostAuthentication'));
 
-        $server = !$username ? [] : [
+        $server = !$username ? array() : array(
             'PHP_AUTH_USER' => $username,
-            'PHP_AUTH_PW'   => 'password',
-        ];
+            'PHP_AUTH_PW' => 'password',
+        );
 
-        $client->request('GET', '/secure', [], [], $server);
+        $client->request('GET', '/secure', array(), array(), $server);
 
         return $client->getResponse();
     }

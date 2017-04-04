@@ -123,7 +123,7 @@ class SecurityExtensionTest extends TestCase
 
     public function testAddPostAuthenticationFirewallListener()
     {
-        $container = $this->getRawContainer([new SomePostAuthenticationFactory()]);
+        $container = $this->getRawContainer(array(new SomePostAuthenticationFactory()));
 
         $container->loadFromExtension('security', array(
             'providers' => array(
@@ -145,6 +145,7 @@ class SecurityExtensionTest extends TestCase
 
     /**
      * @param SecurityFactoryInterface[] $factories
+     *
      * @return ContainerBuilder
      */
     protected function getRawContainer(array $factories = array())

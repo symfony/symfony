@@ -452,12 +452,10 @@ class SecurityExtension extends Extension
         $listeners = array();
         $hasAuthenticationProvider = false;
         foreach ($this->listenerPositions as $position) {
-
             foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
 
                 if (isset($firewall[$key])) {
-
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
                     list($authenticationProvider, $listenerId, $entryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);

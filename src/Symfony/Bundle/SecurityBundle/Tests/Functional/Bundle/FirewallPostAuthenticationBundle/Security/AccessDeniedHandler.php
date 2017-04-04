@@ -22,10 +22,11 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 class AccessDeniedHandler implements AccessDeniedHandlerInterface
 {
     /**
-     * Returns empty forbidden response
+     * Returns empty forbidden response.
      *
      * @param Request               $request
      * @param AccessDeniedException $accessDeniedException
+     *
      * @return Response
      */
     public function handle(Request $request, AccessDeniedException $accessDeniedException)

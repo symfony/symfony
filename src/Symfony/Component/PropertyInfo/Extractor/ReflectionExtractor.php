@@ -81,7 +81,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             if (!$propertyName || isset($properties[$propertyName])) {
                 continue;
             }
-            if (!preg_match('/^[A-Z]{2,}/', $propertyName)) {
+            if (!$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
                 $propertyName = lcfirst($propertyName);
             }
             $properties[$propertyName] = true;

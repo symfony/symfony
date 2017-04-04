@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2017-04-03T22:59:38Z
+
+BC bug fixes should have a unit test to ensure the issue will not surface again.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-03T23:01:12Z
+
+Yeah, I didn't find a relevant way to test this yet.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-04-04T08:02:24Z
+
+Sure, it'll fix the BC break. Thank you for creating the issue and for this PR. 😃
+
+In https://github.com/symfony/symfony/pull/20808 however, I also wanted to add support for handling errors natively & easily with the standalone component, when you don't use an error handler like the one in the Debug component.
+It may not challenge this PR as is, but it depends how we'd like to proceed. With your solution, we could for instance provide a default error listener in the component, marking errors as handled by the Application and running `Application::renderException()` ([as the `DebugHandlersListener ` does](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/EventListener/DebugHandlersListener.php#L113)). Problem: the exit code is set to `0` as soon as the event declares the exception is handled.
+
+Regarding the test, why not just testing the error is properly re-thrown by Application? You don't need to test an error handler is called.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-04T09:04:01Z
+
+Test added, I was missing something.
+
+> we could for instance provide a default error listener in the component, marking errors as handled by the Application and running Application::renderException() (as the DebugHandlersListener does).
+
+As discussed together, I think we can first merge this as is in order to fix the introduced BC break and improve the situation in a next time but indeed, having a default error handler in the console seems like a good compromise to me.
+
+PR ready, build failures unrelated.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-04T12:54:31Z
+
+```
+public function execute(InputInterface $input, OutputInterface $output)
+{
+    $this->foo();
+}
+
+public function fooo()
+{
+}
+```
+
+Before:
+![before](http://image.prntscr.com/image/42dda003d66743048420a45388b448fd.png)
+
+After:
+![after](http://image.prntscr.com/image/935c5e287def4919976351412991f19e.png)

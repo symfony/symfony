@@ -30,18 +30,11 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $parameterBag = $this->container->getParameterBag();
-
-        if ($class = $value->getClass()) {
-            $class = $parameterBag->resolveValue($class);
-        }
-
         $calls = $value->getMethodCalls();
         $calls[] = array('__construct', $value->getArguments());
 
         foreach ($calls as $i => $call) {
             list($method, $arguments) = $call;
-            $method = $parameterBag->resolveValue($method);
             $parameters = null;
             $resolvedArguments = array();
 
@@ -51,10 +44,14 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                     continue;
                 }
                 if ('' === $key || '$' !== $key[0]) {
-                    throw new InvalidArgumentException(sprintf('Invalid key "%s" found in arguments of method "%s" for service "%s": only integer or $named arguments are allowed.', $key, $method, $this->currentId));
+                    throw new InvalidArgumentException(sprintf('Invalid key "%s" found in arguments of method "%s()" for service "%s": only integer or $named arguments are allowed.', $key, $method, $this->currentId));
                 }
 
-                $parameters = null !== $parameters ? $parameters : $this->getParameters($class, $method);
+                if (null === $parameters) {
+                    $r = $this->getReflectionMethod($value, $method);
+                    $class = $r instanceof \ReflectionMethod ? $r->class : $this->currentId;
+                    $parameters = $r->getParameters();
+                }
 
                 foreach ($parameters as $j => $p) {
                     if ($key === '$'.$p->name) {
@@ -64,7 +61,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                     }
                 }
 
-                throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s::%s" has no argument named "%s". Check your service definition.', $this->currentId, $class, $method, $key));
+                throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s()" has no argument named "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
             }
 
             if ($resolvedArguments !== $call[1]) {
@@ -83,35 +80,5 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
         }
 
         return parent::processValue($value, $isRoot);
-    }
-
-    /**
-     * @param string|null $class
-     * @param string      $method
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return array
-     */
-    private function getParameters($class, $method)
-    {
-        if (!$class) {
-            throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": the class is not set.', $this->currentId));
-        }
-
-        if (!$r = $this->container->getReflectionClass($class)) {
-            throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": class "%s" does not exist.', $this->currentId, $class));
-        }
-
-        if (!$r->hasMethod($method)) {
-            throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s::%s" does not exist.', $this->currentId, $class, $method));
-        }
-
-        $method = $r->getMethod($method);
-        if (!$method->isPublic()) {
-            throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s::%s" must be public.', $this->currentId, $class, $method->name));
-        }
-
-        return $method->getParameters();
     }
 }

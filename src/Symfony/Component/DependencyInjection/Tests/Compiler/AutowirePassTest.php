@@ -611,20 +611,19 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(array(new Reference('a'), '', new Reference('lille')), $container->getDefinition('foo')->getArguments());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Service "a" can use either autowiring or a factory, not both.
-     */
     public function testWithFactory()
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A')
-            ->setFactory('foo')
+        $container->register('foo', Foo::class);
+        $definition = $container->register('a', A::class)
+            ->setFactory(array(A::class, 'create'))
             ->setAutowired(true);
 
         $pass = new AutowirePass();
         $pass->process($container);
+
+        $this->assertEquals(array(new Reference('foo')), $definition->getArguments());
     }
 
     /**
@@ -662,7 +661,7 @@ class AutowirePassTest extends TestCase
     {
         return array(
             array('setNotAutowireable', 'Cannot autowire service "foo": argument $n of method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable() has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class does not exist.'),
-            array(null, 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod() must be public.'),
+            array(null, 'Cannot autowire service "foo": method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod()" must be public.'),
         );
     }
 
@@ -745,6 +744,9 @@ class Bar
 
 class A
 {
+    public static function create(Foo $foo)
+    {
+    }
 }
 
 class B extends A

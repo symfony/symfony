@@ -95,9 +95,6 @@ class AutowirePass extends AbstractRecursivePass
             if (!$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
                 return parent::processValue($value, $isRoot);
             }
-            if ($value->getFactory()) {
-                throw new RuntimeException(sprintf('Service "%s" can use either autowiring or a factory, not both.', $this->currentId));
-            }
             if (!$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
                 $this->container->log($this, sprintf('Skipping service "%s": Class or interface "%s" does not exist.', $this->currentId, $value->getClass()));
 
@@ -107,8 +104,8 @@ class AutowirePass extends AbstractRecursivePass
             $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
             $methodCalls = $value->getMethodCalls();
 
-            if ($constructor = $reflectionClass->getConstructor()) {
-                array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
+            if ($constructor = $this->getConstructor($value, false)) {
+                array_unshift($methodCalls, array($constructor, $value->getArguments()));
             }
 
             $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
@@ -143,12 +140,12 @@ class AutowirePass extends AbstractRecursivePass
         $found = array();
         $methodsToAutowire = array();
 
-        if ($reflectionMethod = $reflectionClass->getConstructor()) {
-            $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
-        }
-
         foreach ($reflectionClass->getMethods() as $reflectionMethod) {
             $r = $reflectionMethod;
+
+            if ($r->isConstructor()) {
+                continue;
+            }
 
             while (true) {
                 if (false !== $doc = $r->getDocComment()) {
@@ -183,19 +180,13 @@ class AutowirePass extends AbstractRecursivePass
         foreach ($methodCalls as $i => $call) {
             list($method, $arguments) = $call;
 
-            if (isset($autowiredMethods[$lcMethod = strtolower($method)]) && $autowiredMethods[$lcMethod]->isPublic()) {
+            if ($method instanceof \ReflectionFunctionAbstract) {
+                $reflectionMethod = $method;
+            } elseif (isset($autowiredMethods[$lcMethod = strtolower($method)]) && $autowiredMethods[$lcMethod]->isPublic()) {
                 $reflectionMethod = $autowiredMethods[$lcMethod];
                 unset($autowiredMethods[$lcMethod]);
             } else {
-                if (!$reflectionClass->hasMethod($method)) {
-                    $class = $reflectionClass->name;
-                    throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s() does not exist.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
-                }
-                $reflectionMethod = $reflectionClass->getMethod($method);
-                if (!$reflectionMethod->isPublic()) {
-                    $class = $reflectionClass->name;
-                    throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s() must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
-                }
+                $reflectionMethod = $this->getReflectionMethod($this->currentDefinition, $method);
             }
 
             $arguments = $this->autowireMethod($reflectionMethod, $arguments);
@@ -210,7 +201,7 @@ class AutowirePass extends AbstractRecursivePass
 
             if (!$reflectionMethod->isPublic()) {
                 $class = $reflectionClass->name;
-                throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s() must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
+                throw new RuntimeException(sprintf('Cannot autowire service "%s": method "%s()" must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
             }
             $methodCalls[] = array($method, $this->autowireMethod($reflectionMethod, array()));
         }
@@ -221,16 +212,16 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Autowires the constructor or a method.
      *
-     * @param \ReflectionMethod $reflectionMethod
-     * @param array             $arguments
+     * @param \ReflectionFunctionAbstract $reflectionMethod
+     * @param array                       $arguments
      *
      * @return array The autowired arguments
      *
      * @throws RuntimeException
      */
-    private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments)
+    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments)
     {
-        $class = $reflectionMethod->class;
+        $class = $reflectionMethod instanceof \ReflectionMethod ? $reflectionMethod->class : $this->currentId;
         $method = $reflectionMethod->name;
         $parameters = $reflectionMethod->getParameters();
         if (method_exists('ReflectionMethod', 'isVariadic') && $reflectionMethod->isVariadic()) {

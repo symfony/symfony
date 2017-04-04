@@ -638,11 +638,9 @@ class ApplicationTest extends TestCase
 
     public function testRenderExceptionEscapesLines()
     {
-        $application = $this->getMockBuilder('Symfony\Component\Console\Application')->setMethods(array('getTerminalWidth'))->getMock();
+        $application = new Application();
         $application->setAutoExit(false);
-        $application->expects($this->any())
-            ->method('getTerminalWidth')
-            ->will($this->returnValue(22));
+        putenv('COLUMNS=22');
         $application->register('foo')->setCode(function () {
             throw new \Exception('dont break here <info>!</info>');
         });
@@ -650,6 +648,7 @@ class ApplicationTest extends TestCase
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_escapeslines.txt', $tester->getDisplay(true), '->renderException() escapes lines containing formatting');
+        putenv('COLUMNS=120');
     }
 
     public function testRun()

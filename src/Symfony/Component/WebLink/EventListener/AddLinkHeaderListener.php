@@ -9,26 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Asset\EventListener;
+namespace Symfony\Component\WebLink\EventListener;
 
-use Symfony\Component\Asset\Preload\PreloadManager;
-use Symfony\Component\Asset\Preload\PreloadManagerInterface;
+use Psr\Link\LinkProviderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
- * Adds the preload Link HTTP header to the response.
+ * Adds the Link HTTP header to the response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final
  */
-class PreloadListener implements EventSubscriberInterface
+class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private $preloadManager;
+    private $serializer;
 
-    public function __construct(PreloadManagerInterface $preloadManager)
+    public function __construct()
     {
-        $this->preloadManager = $preloadManager;
+        $this->serializer = new HttpHeaderSerializer();
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -37,12 +39,12 @@ class PreloadListener implements EventSubscriberInterface
             return;
         }
 
-        if ($value = $this->preloadManager->buildLinkValue()) {
-            $event->getResponse()->headers->set('Link', $value, false);
-
-            // Free memory
-            $this->preloadManager->clear();
+        $linkProvider = $event->getRequest()->attributes->get('_links');
+        if (!$linkProvider instanceof LinkProviderInterface || !$links = $linkProvider->getLinks()) {
+            return;
         }
+
+        $event->getResponse()->headers->set('Link', $this->serializer->serialize($links), false);
     }
 
     /**

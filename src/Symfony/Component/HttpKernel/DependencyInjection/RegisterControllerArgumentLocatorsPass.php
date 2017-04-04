@@ -52,7 +52,6 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 continue;
             }
             $class = $def->getClass();
-            $autowired = $def->getAutowired();
 
             // resolve service class, taking parent definitions into account
             while (!$class && $def instanceof ChildDefinition) {
@@ -129,7 +128,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {
-                    $controllers[$id.':'.$r->name] = ServiceLocatorTagPass::register($container, $args, $autowired);
+                    $controllers[$id.':'.$r->name] = ServiceLocatorTagPass::register($container, $args);
                 }
             }
         }

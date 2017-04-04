@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
@@ -58,11 +59,7 @@ class FragmentRendererPassTest extends TestCase
             'my_content_renderer' => array(array('alias' => 'foo')),
         );
 
-        $renderer = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $renderer
-            ->expects($this->once())
-            ->method('replaceArgument')
-            ->with(0, $this->equalTo(new Reference('service_locator.5ae0a401097c64ca63ed976c71bc9642')));
+        $renderer = new Definition('', array(null));
 
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $definition->expects($this->atLeastOnce())
@@ -90,6 +87,8 @@ class FragmentRendererPassTest extends TestCase
 
         $pass = new FragmentRendererPass();
         $pass->process($builder);
+
+        $this->assertInstanceOf(Reference::class, $renderer->getArgument(0));
     }
 }
 

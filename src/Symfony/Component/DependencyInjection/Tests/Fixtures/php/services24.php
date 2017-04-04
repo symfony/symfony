@@ -70,7 +70,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * This service is autowired by types.
+     * This service is autowired.
      *
      * @return \Foo A Foo instance
      */

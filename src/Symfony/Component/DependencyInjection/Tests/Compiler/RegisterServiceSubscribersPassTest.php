@@ -71,7 +71,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $foo = $container->getDefinition('foo');
         $locator = $container->getDefinition((string) $foo->getArgument(0));
 
-        $this->assertFalse($locator->isAutowired());
         $this->assertFalse($locator->isPublic());
         $this->assertSame(ServiceLocator::class, $locator->getClass());
 
@@ -102,7 +101,6 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $foo = $container->getDefinition('foo');
         $locator = $container->getDefinition((string) $foo->getArgument(0));
 
-        $this->assertTrue($locator->isAutowired());
         $this->assertFalse($locator->isPublic());
         $this->assertSame(ServiceLocator::class, $locator->getClass());
 

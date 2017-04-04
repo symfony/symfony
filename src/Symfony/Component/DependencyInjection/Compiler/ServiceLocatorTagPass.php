@@ -75,11 +75,10 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     /**
      * @param ContainerBuilder $container
      * @param Reference[]      $refMap
-     * @param int|bool         $autowired
      *
      * @return Reference
      */
-    public static function register(ContainerBuilder $container, array $refMap, $autowired = false)
+    public static function register(ContainerBuilder $container, array $refMap)
     {
         foreach ($refMap as $id => $ref) {
             $refMap[$id] = new ServiceClosureArgument($ref);
@@ -89,7 +88,6 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         $locator = (new Definition(ServiceLocator::class))
             ->addArgument($refMap)
             ->setPublic(false)
-            ->setAutowired($autowired)
             ->addTag('container.service_locator');
 
         if (!$container->has($id = 'service_locator.'.md5(serialize($locator)))) {

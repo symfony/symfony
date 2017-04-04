@@ -486,14 +486,6 @@ class YamlFileLoader extends FileLoader
 
         $autowire = isset($service['autowire']) ? $service['autowire'] : (isset($defaults['autowire']) ? $defaults['autowire'] : null);
         if (null !== $autowire) {
-            if ('by_type' === $autowire) {
-                $autowire = Definition::AUTOWIRE_BY_TYPE;
-            } elseif ('by_id' === $autowire) {
-                $autowire = Definition::AUTOWIRE_BY_ID;
-            } elseif (!is_bool($autowire)) {
-                throw new InvalidArgumentException(sprintf('Invalid autowire attribute: "by_type", "by_id", true or false expected, "%s" given in "%s".', is_string($autowire) ? $autowire : gettype($autowire), $file));
-            }
-
             $definition->setAutowired($autowire);
         }
 

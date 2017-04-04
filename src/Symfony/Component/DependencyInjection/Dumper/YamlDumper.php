@@ -106,7 +106,7 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->isAutowired()) {
-            $code .= sprintf("        autowire: %s\n", Definition::AUTOWIRE_BY_TYPE === $definition->getAutowired() ? 'by_type' : 'by_id');
+            $code .= "        autowire: true\n";
         }
 
         $autowiringTypesCode = '';

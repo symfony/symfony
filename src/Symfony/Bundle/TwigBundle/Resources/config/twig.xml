@@ -74,10 +74,6 @@
             <argument type="service" id="assets.packages" />
         </service>
 
-        <service id="twig.extension.preload" class="Symfony\Bridge\Twig\Extension\PreloadExtension" public="false">
-            <argument type="service" id="assets.preload_manager" />
-        </service>
-
         <service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="debug.file_link_formatter" on-invalid="ignore" />

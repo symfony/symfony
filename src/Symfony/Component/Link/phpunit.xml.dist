@@ -11,7 +11,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Symfony Preload Component Test Suite">
+        <testsuite name="Symfony Link Component Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>

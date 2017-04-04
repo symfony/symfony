@@ -29,6 +29,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Link\LinkManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -206,6 +207,14 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['links'])) {
+            if (!interface_exists(LinkManagerInterface::class)) {
+                throw new LogicException('Link support cannot be enabled as the Link component is not installed.');
+            }
+
+            $loader->load('links.xml');
         }
 
         $this->addAnnotatedClassesToCompile(array(

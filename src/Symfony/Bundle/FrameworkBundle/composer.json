@@ -39,6 +39,7 @@
         "symfony/console": "~3.3",
         "symfony/css-selector": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",
+        "symfony/link": "~3.3",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/security": "~2.8|~3.0",
         "symfony/form": "~3.3",

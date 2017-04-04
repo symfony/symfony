@@ -11,12 +11,13 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
+use Symfony\Bridge\Twig\Extension\LinkExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Preload\PreloadManagerInterface;
+use Symfony\Component\Link\LinkManagerInterface;
 
 /**
  * TwigExtension.
@@ -49,8 +50,10 @@ class TwigExtension extends Extension
             $container->removeDefinition('twig.translation.extractor');
         }
 
-        if (!interface_exists(PreloadManagerInterface::class)) {
-            $container->removeDefinition('twig.extension.preload');
+        if (interface_exists(LinkManagerInterface::class)) {
+            $definition = $container->register('twig.extension.link', LinkExtension::class);
+            $definition->setPublic(false);
+            $definition->addArgument(new Reference('link.manager'));
         }
 
         foreach ($configs as $key => $config) {

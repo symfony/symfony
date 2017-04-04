@@ -9,25 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Preload\EventListener;
+namespace Symfony\Component\Link\EventListener;
 
-use Symfony\Component\Preload\PreloadManagerInterface;
+use Symfony\Component\Link\LinkManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Adds the preload Link HTTP header to the response.
+ * Adds the Link HTTP header to the response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PreloadListener implements EventSubscriberInterface
+class LinkListener implements EventSubscriberInterface
 {
-    private $preloadManager;
+    private $linkManager;
 
-    public function __construct(PreloadManagerInterface $preloadManager)
+    public function __construct(LinkManagerInterface $linkManager)
     {
-        $this->preloadManager = $preloadManager;
+        $this->linkManager = $linkManager;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -36,11 +36,11 @@ class PreloadListener implements EventSubscriberInterface
             return;
         }
 
-        if ($value = $this->preloadManager->buildLinkValue()) {
+        if ($value = $this->linkManager->buildValues()) {
             $event->getResponse()->headers->set('Link', $value, false);
 
             // Free memory
-            $this->preloadManager->clear();
+            $this->linkManager->clear();
         }
     }
 

@@ -1,8 +1,8 @@
 {
-    "name": "symfony/preload",
+    "name": "symfony/link",
     "type": "library",
-    "description": "Symfony Preload Component",
-    "keywords": ["HTTP/2", "preload", "prefetch", "push", "performance"],
+    "description": "Symfony Link Component",
+    "keywords": ["link", "http", "HTTP/2", "preload", "prefetch", "pre-render", "dns-prefetch", "push", "performance"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -22,10 +22,12 @@
         "symfony/http-kernel": ""
     },
     "require-dev": {
+        "symfony/event-dispatcher": "^2.8 || ^3.0",
+        "symfony/http-foundation": "^2.8 || ^3.0",
         "symfony/http-kernel": "^2.8 || ^3.0"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Preload\\": "" },
+        "psr-4": { "Symfony\\Component\\Link\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

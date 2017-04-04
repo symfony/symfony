@@ -408,10 +408,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
-    public function testAssetHasPreloadListener()
+    public function testLinks()
     {
-        $container = $this->createContainerFromFile('assets');
-        $this->assertTrue($container->hasDefinition('asset.preload_listener'));
+        $container = $this->createContainerFromFile('links');
+        $this->assertTrue($container->hasDefinition('links.link_listener'));
     }
 
     public function testTranslator()

@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Link\LinkManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -101,6 +101,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyInfoSection($rootNode);
         $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
+        $this->addLinksSection($rootNode);
 
         return $treeBuilder;
     }
@@ -802,6 +803,18 @@ class Configuration implements ConfigurationInterface
                             ->treatNullLike($this->debug)
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addLinksSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('links')
+                    ->info('links configuration')
+                    ->{!class_exists(FullStack::class) && interface_exists(LinkManagerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end()
         ;

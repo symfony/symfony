@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Preload\Tests\EventListener;
+namespace Symfony\Component\Link\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Preload\EventListener\PreloadListener;
-use Symfony\Component\Preload\PreloadManager;
+use Symfony\Component\Link\EventListener\LinkListener;
+use Symfony\Component\Link\LinkManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -22,14 +22,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PreloadListenerTest extends TestCase
+class LinkListenerTest extends TestCase
 {
     public function testOnKernelResponse()
     {
-        $manager = new PreloadManager();
-        $manager->addResource('/foo');
+        $manager = new LinkManager();
+        $manager->add('/foo', 'preload');
 
-        $subscriber = new PreloadListener($manager);
+        $subscriber = new LinkListener($manager);
         $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
 
         $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
@@ -46,11 +46,11 @@ class PreloadListenerTest extends TestCase
         );
 
         $this->assertEquals($expected, $response->headers->get('Link', null, false));
-        $this->assertNull($manager->buildLinkValue());
+        $this->assertNull($manager->buildValues());
     }
 
     public function testSubscribedEvents()
     {
-        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), PreloadListener::getSubscribedEvents());
+        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), LinkListener::getSubscribedEvents());
     }
 }

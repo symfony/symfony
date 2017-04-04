@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-04T11:13:06Z
+
+Looks good :+1: about the table list;
+
+- i would make the time column the most right one
+- are complex values by default collapsed?
+- `Arguments` should be `Argument`
+- i would add a dot after `No calls were made..` (most empty blocks do this i noticed)
+- aligning it horizontally is probably a good idea; just make sure argument/result have the most space
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-04T11:33:11Z
+
+> I would make the time column the most right one
+
+I prefer the leftmost column because that's where we display the time in other panels (e.g. Doctrine)
+
+> are complex values by default collapsed?
+
+Semi-collapsed: depth = 1
+
+> Arguments should be Argument
+
+Fixed!
+
+> I would add a dot after No calls were made.. (most empty blocks do this i noticed)
+
+Fixed!
+
+> aligning it horizontally is probably a good idea; just make sure argument/result have the most space
+
+We're lucky because this should work OK in most of cases. The time, call, etc. columns will always  be narrow, so the arguments and results column will be able to grow as needed.

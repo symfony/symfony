@@ -129,7 +129,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         }
 
         if (null !== $currentKey) {
-            throw new \InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
+            throw new \InvalidArgumentException('Malformed path. Path must end with "]".');
         }
 
         return $value;

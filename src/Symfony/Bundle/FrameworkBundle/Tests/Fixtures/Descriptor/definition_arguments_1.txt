@@ -12,11 +12,11 @@
   Autowired        no                                         
   Factory Class    Full\Qualified\FactoryClass                
   Factory Method   get                                        
-  Arguments        Service(definition2)                       
-                   %parameter%                                
-                   Inlined Service                            
-                   Array (3 element(s))                       
-                   Iterator (2 element(s))                    
-                   ClosureProxy(Service(definition1)::get())  
+[39;49m  Arguments        Service(definition2)[39;49m[39;49m                       [39;49m
+[39;49m                   [39;49m[39;49m%parameter%[39;49m[39;49m                                [39;49m
+[39;49m                   [39;49m[39;49mInlined Service[39;49m[39;49m                            [39;49m
+[39;49m                   [39;49m[39;49mArray (3 element(s))[39;49m[39;49m                       [39;49m
+[39;49m                   [39;49m[39;49mIterator (2 element(s))[39;49m[39;49m                    [39;49m
+[39;49m                   [39;49mClosureProxy(Service(definition1)::get())  
  ---------------- ------------------------------------------- 
 

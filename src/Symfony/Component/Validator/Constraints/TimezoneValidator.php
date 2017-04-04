@@ -40,7 +40,7 @@ class TimezoneValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $timezoneIds = \DateTimeZone::listIdentifiers($constraint->value);
+        $timezoneIds = \DateTimeZone::listIdentifiers($constraint->timezone, $constraint->countryCode);
 
         if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
             $this->context->buildViolation($constraint->message)
@@ -55,6 +55,6 @@ class TimezoneValidator extends ConstraintValidator
      */
     public function getDefaultOption()
     {
-        return 'value';
+        return 'timezone';
     }
 }

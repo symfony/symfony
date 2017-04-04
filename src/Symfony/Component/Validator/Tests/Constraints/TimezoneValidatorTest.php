@@ -76,7 +76,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testValidGroupedTimezones($timezone, $what)
     {
         $constraint = new Timezone(array(
-            'value' => $what,
+            'timezone' => $what,
         ));
 
         $this->validator->validate($timezone, $constraint);
@@ -135,7 +135,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidGroupedTimezones($timezone, $what)
     {
         $constraint = new Timezone(array(
-            'value' => $what,
+            'timezone' => $what,
             'message' => 'myMessage',
         ));
 
@@ -154,6 +154,67 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             array('America/Barbados', \DateTimeZone::ANTARCTICA),
             array('Europe/Kiev', \DateTimeZone::ARCTIC),
             array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN),
+        );
+    }
+
+    /**
+     * @dataProvider getValidGroupedTimezonesByCountry
+     */
+    public function testValidGroupedTimezonesByCountry($timezone, $what, $country)
+    {
+        $constraint = new Timezone(array(
+            'timezone' => $what,
+            'countryCode' => $country,
+        ));
+
+        $this->validator->validate($timezone, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidGroupedTimezonesByCountry()
+    {
+        return array(
+            array('America/Argentina/Cordoba', \DateTimeZone::PER_COUNTRY, 'AR'),
+            array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'BB'),
+            array('Africa/Cairo', \DateTimeZone::PER_COUNTRY, 'EG'),
+            array('Atlantic/Cape_Verde', \DateTimeZone::PER_COUNTRY, 'CV'),
+            array('Europe/Bratislava', \DateTimeZone::PER_COUNTRY, 'SK'),
+            array('Indian/Christmas', \DateTimeZone::PER_COUNTRY, 'CX'),
+            array('Pacific/Kiritimati', \DateTimeZone::PER_COUNTRY, 'KI'),
+            array('Pacific/Kiritimati', \DateTimeZone::PER_COUNTRY, 'KI'),
+            array('Pacific/Kiritimati', \DateTimeZone::PER_COUNTRY, 'KI'),
+            array('Arctic/Longyearbyen', \DateTimeZone::PER_COUNTRY, 'SJ'),
+            array('Asia/Beirut', \DateTimeZone::PER_COUNTRY, 'LB'),
+            array('Atlantic/Bermuda', \DateTimeZone::PER_COUNTRY, 'BM'),
+            array('Atlantic/Azores', \DateTimeZone::PER_COUNTRY, 'PT'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidGroupedTimezonesByCountry
+     */
+    public function testInvalidGroupedTimezonesByCountry($timezone, $what, $country)
+    {
+        $constraint = new Timezone(array(
+            'message' => 'myMessage',
+            'timezone' => $what,
+            'countryCode' => $country,
+        ));
+
+        $this->validator->validate($timezone, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ timezone_group }}', '"'.$timezone.'"')
+            ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidGroupedTimezonesByCountry()
+    {
+        return array(
+            array('America/Argentina/Cordoba', \DateTimeZone::PER_COUNTRY, 'FR'),
+            array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'PT'),
         );
     }
 }

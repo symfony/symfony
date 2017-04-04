@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
@@ -23,7 +24,9 @@ class Timezone extends Constraint
 {
     const NO_SUCH_TIMEZONE_ERROR = '45de6628-3479-46d6-a210-00ad584f530a';
 
-    public $value = \DateTimeZone::ALL;
+    public $timezone = \DateTimeZone::ALL;
+
+    public $countryCode;
 
     public $message = 'This value is not a valid timezone at {{ timezone_group }}.';
 
@@ -36,8 +39,16 @@ class Timezone extends Constraint
      */
     public function __construct($options = null)
     {
-        if (isset($options['value'])) {
-            $this->value = $options['value'];
+        if (isset($options['timezone'])) {
+            $this->timezone = $options['timezone'];
+        }
+
+        if (isset($options['countryCode'])) {
+            if (\DateTimeZone::PER_COUNTRY !== $this->timezone) {
+                throw new ConstraintDefinitionException('The option "countryCode" can only be used when "timezone" option has `\DateTimeZone::PER_COUNTRY` as value');
+            }
+
+            $this->countryCode = $options['countryCode'];
         }
 
         parent::__construct($options);

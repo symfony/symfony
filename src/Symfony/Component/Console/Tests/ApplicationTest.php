@@ -588,11 +588,8 @@ class ApplicationTest extends TestCase
 
     public function testRenderExceptionEscapesLines()
     {
-        $application = $this->getMockBuilder('Symfony\Component\Console\Application')->setMethods(array('getTerminalWidth'))->getMock();
+        $application = new Application();
         $application->setAutoExit(false);
-        $application->expects($this->any())
-            ->method('getTerminalWidth')
-            ->will($this->returnValue(22));
         putenv('COLUMNS=22');
         $application->register('foo')->setCode(function () {
             throw new \Exception('dont break here <info>!</info>');

@@ -258,6 +258,8 @@ Security
  * The `LogoutUrlGenerator::registerListener()` method will expect a 6th `$context = null` argument in 4.0.
    Define the argument when overriding this method.
 
+ * The `AccessDecisionManager::setVoters()` has been deprecated. Pass the voters to the constructor instead.
+
 SecurityBundle
 --------------
 

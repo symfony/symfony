@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * deprecated `setVoters()` of the `AccessDecisionManager` class in favor of passing the voters to the constructor.
+
 3.2.0
 -----
 

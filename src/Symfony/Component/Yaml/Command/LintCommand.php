@@ -102,10 +102,20 @@ EOF
 
     private function validate($content, $file = null)
     {
+        $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
+            if (E_USER_DEPRECATED === $level) {
+                throw new ParseException($message);
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
+        });
+
         try {
             $this->getParser()->parse($content);
         } catch (ParseException $e) {
             return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
+        } finally {
+            restore_error_handler();
         }
 
         return array('file' => $file, 'valid' => true);

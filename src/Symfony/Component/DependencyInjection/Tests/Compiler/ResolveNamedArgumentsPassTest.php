@@ -37,8 +37,23 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals(array(array('setApiKey', array('123'))), $definition->getMethodCalls());
     }
 
+    public function testWithFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('factory', NoConstructor::class);
+        $definition = $container->register('foo', NoConstructor::class)
+            ->setFactory(array(new Reference('factory'), 'create'))
+            ->setArguments(array('$apiKey' => '123'));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+
+        $this->assertSame(array(0 => '123'), $definition->getArguments());
+    }
+
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testClassNull()
     {
@@ -52,7 +67,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testClassNotExist()
     {
@@ -66,7 +81,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testClassNoConstructor()
     {
@@ -96,4 +111,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
 class NoConstructor
 {
+    public static function create($apiKey)
+    {
+    }
 }

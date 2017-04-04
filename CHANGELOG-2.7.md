@@ -7,6 +7,37 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.26 (2017-04-04)
+
+ * bug #22229 [ExpressionLanguage] Provide the expression in syntax errors (k0pernikus, stof)
+ * bug #22240 [DI] Fix fatal error at ContainerBuilder::compile() if config is not installed (chalasr)
+ * bug #22140 [Form] Improve the exceptions when trying to get the data in a PRE_SET_DATA listener and the data has not already been set (fancyweb)
+ * bug #22217 [Console] Fix table cell styling (ro0NL)
+ * bug #22194 [Console] CommandTester: disable color support detection (julienfalque)
+ * bug #22188 [Console] Revised exception rendering (ro0NL)
+ * bug #22154 [WebProfilerBundle] Normalize whitespace in exceptions passed in headers (curry684)
+ * bug #22142 [Console] Escape exception messages in renderException (chalasr)
+ * bug #22172 Fix port usage in server:status command (alcaeus)
+ * bug #22164 [Bridge\Doctrine] Fix change breaking doctrine-bundle test suite (nicolas-grekas)
+ * bug #22133 [Filesystem] normalize paths before making them relative (xabbuh)
+ * bug #22138 [HttpFoundation][bugfix] $bags should always be initialized (MacDada)
+ * bug #21810 #21809 [SecurityBundle] bugfix: if security provider's name contains upper cases then container didn't compile (Antanas Arvasevicius)
+ * bug #19778 [Security] Fixed roles serialization on token from user object (eko)
+ * bug #22022 [Validator] fix URL validator to detect non supported chars according to RFC 3986 (e-moe)
+ * bug #21968 Fixed pathinfo calculation for requests starting with a question mark. (syzygymsu)
+ * bug #21846 [HttpFoundation] Fix Request::getHost() when having several hosts in X_FORWARDED_HOST (nicolas-grekas)
+ * bug #21208 [Validator] Add object handling of invalid constraints in Composite (SenseException)
+ * bug #22044 [Serializer] [XML] Ignore Process Instruction (jordscream)
+ * bug #22079 [HttpKernel] Fixed bug with purging of HTTPS URLs (ausi)
+ * bug #21523 #20411 fix Yaml parsing for very long quoted strings (RichardBradley)
+ * bug #22001 [Doctrine Bridge] fix priority for doctrine event listeners (dmaicher)
+ * bug #21981 [Console] Use proper line endings in BufferedOutput (julienfalque)
+ * bug #21957 [Form] Choice type int values (BC Fix) (mcfedr)
+ * bug #21923 [travis] Test with hhvm 3.18 (nicolas-grekas)
+ * bug #21823 dumpFile(), preserve existing file permissions (chs2)
+ * bug #21865 [Security] context listener: hardening user provider handling (xabbuh)
+ * bug #21883 [HttpKernel] fix Kernel name when stored in a directory starting with a number (fabpot)
+
 * 2.7.25 (2017-03-06)
 
  * bug #21671 [Serializer] Xml encoder throws exception for valid data (gr1ev0us)

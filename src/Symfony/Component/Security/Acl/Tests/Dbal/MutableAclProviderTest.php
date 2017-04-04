@@ -19,8 +19,6 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Domain\Entry;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\Acl;
-use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
-use Symfony\Component\Security\Acl\Exception\ConcurrentModificationException;
 use Symfony\Component\Security\Acl\Dbal\AclProvider;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Dbal\MutableAclProvider;
@@ -79,23 +77,25 @@ class MutableAclProviderTest extends TestCase
         $this->assertTrue($acl->getObjectIdentity()->equals($oid));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\AclNotFoundException
+     */
     public function testDeleteAcl()
     {
         $provider = $this->getProvider();
         $oid = new ObjectIdentity(1, 'Foo');
-        $acl = $provider->createAcl($oid);
+        $provider->createAcl($oid);
 
         $provider->deleteAcl($oid);
         $loadedAcls = $this->getField($provider, 'loadedAcls');
         $this->assertCount(0, $loadedAcls['Foo']);
 
-        try {
-            $provider->findAcl($oid);
-            $this->fail('ACL has not been properly deleted.');
-        } catch (AclNotFoundException $e) {
-        }
+        $provider->findAcl($oid);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\AclNotFoundException
+     */
     public function testDeleteAclDeletesChildren()
     {
         $provider = $this->getProvider();
@@ -105,11 +105,7 @@ class MutableAclProviderTest extends TestCase
         $provider->updateAcl($acl);
         $provider->deleteAcl($parentAcl->getObjectIdentity());
 
-        try {
-            $provider->findAcl(new ObjectIdentity(1, 'Foo'));
-            $this->fail('Child-ACLs have not been deleted.');
-        } catch (AclNotFoundException $e) {
-        }
+        $provider->findAcl(new ObjectIdentity(1, 'Foo'));
     }
 
     public function testFindAclsAddsPropertyListener()
@@ -273,6 +269,9 @@ class MutableAclProviderTest extends TestCase
         $provider->updateAcl($acl);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Acl\Exception\ConcurrentModificationException
+     */
     public function testUpdateAclThrowsExceptionOnConcurrentModificationOfSharedProperties()
     {
         $provider = $this->getProvider();
@@ -291,11 +290,7 @@ class MutableAclProviderTest extends TestCase
 
         $acl1->insertClassAce($sid, 3);
         $acl2->insertClassAce($sid, 5);
-        try {
-            $provider->updateAcl($acl1);
-            $this->fail('Provider failed to detect a concurrent modification.');
-        } catch (ConcurrentModificationException $e) {
-        }
+        $provider->updateAcl($acl1);
     }
 
     public function testUpdateAcl()
@@ -366,7 +361,7 @@ class MutableAclProviderTest extends TestCase
         $this->assertEquals($newParentParentAcl->getId(), $reloadedAcl->getParentAcl()->getParentAcl()->getId());
     }
 
-    public function testUpdateAclInsertingMultipleObjectFieldAcesThrowsDBConstraintViolations()
+    public function testUpdateAclInsertingMultipleObjectFieldAcesDoesNotThrowDBConstraintViolations()
     {
         $provider = $this->getProvider();
         $oid = new ObjectIdentity(1, 'Foo');
@@ -386,9 +381,11 @@ class MutableAclProviderTest extends TestCase
         $acl = $provider->findAcl($oid);
         $acl->insertObjectFieldAce($fieldName, $sid3, 4);
         $provider->updateAcl($acl);
+
+        $this->assertCount(3, $provider->findAcl($oid)->getObjectFieldAces($fieldName));
     }
 
-    public function testUpdateAclDeletingObjectFieldAcesThrowsDBConstraintViolations()
+    public function testUpdateAclDeletingObjectFieldAcesDoesNotThrowDBConstraintViolations()
     {
         $provider = $this->getProvider();
         $oid = new ObjectIdentity(1, 'Foo');
@@ -412,6 +409,8 @@ class MutableAclProviderTest extends TestCase
         $acl = $provider->findAcl($oid);
         $acl->insertObjectFieldAce($fieldName, $sid3, 4);
         $provider->updateAcl($acl);
+
+        $this->assertCount(2, $provider->findAcl($oid)->getObjectFieldAces($fieldName));
     }
 
     public function testUpdateUserSecurityIdentity()

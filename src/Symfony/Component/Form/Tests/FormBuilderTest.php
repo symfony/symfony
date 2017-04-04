@@ -161,6 +161,8 @@ class FormBuilderTest extends TestCase
     {
         $this->builder->add(new ButtonBuilder('reset'));
         $this->builder->add(new SubmitButtonBuilder('submit'));
+
+        $this->assertCount(2, $this->builder->all());
     }
 
     public function testGetUnknown()

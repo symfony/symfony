@@ -43,11 +43,13 @@ class CountryTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE, 'country')
             ->createView()->vars['choices'];
 
+        $countryCodes = array();
+
         foreach ($choices as $choice) {
-            if ('ZZ' === $choice->value) {
-                $this->fail('Should not contain choice "ZZ"');
-            }
+            $countryCodes[] = $choice->value;
         }
+
+        $this->assertNotContains('ZZ', $countryCodes);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

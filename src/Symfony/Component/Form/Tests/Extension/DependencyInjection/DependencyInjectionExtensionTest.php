@@ -46,16 +46,21 @@ class DependencyInjectionExtensionTest extends TestCase
 
     public function testThrowExceptionForInvalidExtendedType()
     {
+        $formTypeExtension = $this->createFormTypeExtensionMock('unmatched');
+
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
         $container->expects($this->any())
             ->method('get')
             ->with('extension')
-            ->willReturn($this->createFormTypeExtensionMock('unmatched'));
+            ->willReturn($formTypeExtension);
 
         $extension = new DependencyInjectionExtension($container, array(), array('test' => array('extension')), array());
 
-        $extension->getTypeExtensions('test');
+        $extensions = $extension->getTypeExtensions('test');
+
+        $this->assertCount(1, $extensions);
+        $this->assertSame($formTypeExtension, $extensions[0]);
     }
 
     public function testGetTypeGuesser()

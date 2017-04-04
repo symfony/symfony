@@ -59,6 +59,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
+    private $projectDir;
+
     const VERSION = '3.3.0-DEV';
     const VERSION_ID = 30300;
     const MAJOR_VERSION = 3;
@@ -80,6 +82,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->environment = $environment;
         $this->debug = (bool) $debug;
         $this->rootDir = $this->getRootDir();
+        $this->projectDir = $this->getProjectDir();
         $this->name = $this->getName();
 
         if ($this->debug) {
@@ -304,6 +307,28 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         return $this->rootDir;
+    }
+
+    /**
+     * Gets the application root dir (path of the project's composer file).
+     *
+     * @return string The project root dir
+     */
+    public function getProjectDir()
+    {
+        if (null === $this->projectDir) {
+            $r = new \ReflectionObject($this);
+            $dir = $rootDir = dirname($r->getFileName());
+            while (!file_exists($dir.'/composer.json')) {
+                if ($dir === dirname($dir)) {
+                    return $this->projectDir = $rootDir;
+                }
+                $dir = dirname($dir);
+            }
+            $this->projectDir = $dir;
+        }
+
+        return $this->projectDir;
     }
 
     /**
@@ -553,6 +578,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return array_merge(
             array(
                 'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
+                'kernel.project_dir' => realpath($this->projectDir) ?: $this->projectDir,
                 'kernel.environment' => $this->environment,
                 'kernel.debug' => $this->debug,
                 'kernel.name' => $this->name,

@@ -67,7 +67,7 @@ class TimezoneValidator extends ConstraintValidator
      *
      * @return string
      */
-    protected function formatExtraInfo($zone, $countryCode = null)
+    private function formatExtraInfo($zone, $countryCode = null)
     {
         if (!$zone) {
             return '';

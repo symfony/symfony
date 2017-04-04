@@ -230,13 +230,8 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments)
     {
-        $isConstructor = $reflectionMethod->isConstructor();
         $class = $reflectionMethod->class;
         $method = $reflectionMethod->name;
-
-        if (!$isConstructor && !$arguments && !$reflectionMethod->getNumberOfRequiredParameters()) {
-            throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s() has only optional arguments, thus must be wired explicitly.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
-        }
         $parameters = $reflectionMethod->getParameters();
         if (method_exists('ReflectionMethod', 'isVariadic') && $reflectionMethod->isVariadic()) {
             array_pop($parameters);
@@ -245,9 +240,6 @@ class AutowirePass extends AbstractRecursivePass
         foreach ($parameters as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
-            }
-            if (!$isConstructor && $parameter->isOptional() && !array_key_exists($index, $arguments)) {
-                break;
             }
 
             $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
@@ -258,7 +250,7 @@ class AutowirePass extends AbstractRecursivePass
                 }
 
                 // no default value? Then fail
-                if (!$parameter->isOptional()) {
+                if (!$parameter->isDefaultValueAvailable()) {
                     throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
                 }
 

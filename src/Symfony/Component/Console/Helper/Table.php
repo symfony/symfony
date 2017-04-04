@@ -426,7 +426,7 @@ class Table
                 if (!strstr($cell, "\n")) {
                     continue;
                 }
-                $lines = explode("\n", $cell);
+                $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
                 foreach ($lines as $lineKey => $line) {
                     if ($cell instanceof TableCell) {
                         $line = new TableCell($line, array('colspan' => $cell->getColspan()));
@@ -467,7 +467,7 @@ class Table
                 $nbLines = $cell->getRowspan() - 1;
                 $lines = array($cell);
                 if (strstr($cell, "\n")) {
-                    $lines = explode("\n", $cell);
+                    $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
                     $nbLines = count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
 
                     $rows[$line][$column] = new TableCell($lines[0], array('colspan' => $cell->getColspan()));
@@ -602,9 +602,10 @@ class Table
 
                 foreach ($row as $i => $cell) {
                     if ($cell instanceof TableCell) {
-                        $textLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+                        $textContent = Helper::removeDecoration($this->output->getFormatter(), $cell);
+                        $textLength = Helper::strlen($textContent);
                         if ($textLength > 0) {
-                            $contentColumns = str_split($cell, ceil($textLength / $cell->getColspan()));
+                            $contentColumns = str_split($textContent, ceil($textLength / $cell->getColspan()));
                             foreach ($contentColumns as $position => $content) {
                                 $row[$i + $position] = $content;
                             }

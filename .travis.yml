@@ -86,7 +86,7 @@ install:
     - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
     - if [[ ! $skip && $deps ]]; then export SYMFONY_DEPRECATIONS_HELPER=weak; fi
     - if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
-    - if [[ ! $skip ]]; then composer update; fi
+    - if [[ ! $skip ]]; then composer update --no-suggest; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
 
@@ -97,8 +97,8 @@ script:
     - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi
     - if [[ ! $deps && $PHP = hhvm* ]]; then $PHPUNIT --exclude-group benchmark,intl-data; fi
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'echo "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi
-    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --ansi; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY"$REPORT"; fi
-    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --ansi --prefer-lowest --prefer-stable; $PHPUNIT --exclude-group tty,benchmark,intl-data'"$REPORT"; fi
+    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --no-suggest --ansi; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY"$REPORT"; fi
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable; $PHPUNIT --exclude-group tty,benchmark,intl-data'"$REPORT"; fi
     # Test the PhpUnit bridge using the original phpunit script
     - if [[ $deps = low ]]; then (cd src/Symfony/Bridge/PhpUnit && wget https://phar.phpunit.de/phpunit-4.8.phar); fi
     - if [[ $deps = low ]]; then (cd src/Symfony/Bridge/PhpUnit && phpenv global 5.3 && php --version && composer update && php phpunit-4.8.phar); fi

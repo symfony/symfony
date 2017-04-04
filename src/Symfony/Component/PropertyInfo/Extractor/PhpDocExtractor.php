@@ -211,7 +211,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @param string $ucFirstProperty
      * @param int    $type
      *
-     * @return array
+     * @return array|null
      */
     private function getDocBlockFromMethod($class, $ucFirstProperty, $type)
     {

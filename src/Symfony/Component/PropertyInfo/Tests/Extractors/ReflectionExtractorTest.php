@@ -39,6 +39,7 @@ class ReflectionExtractorTest extends TestCase
                 'parent',
                 'collection',
                 'B',
+                'g',
                 'foo',
                 'foo2',
                 'foo3',

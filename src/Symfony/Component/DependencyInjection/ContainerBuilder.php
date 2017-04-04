@@ -26,6 +26,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -68,7 +69,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $compiler;
 
-    private $trackResources = true;
+    private $trackResources;
 
     /**
      * @var InstantiatorInterface|null
@@ -84,6 +85,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var ExpressionFunctionProviderInterface[]
      */
     private $expressionLanguageProviders = array();
+
+    public function __construct(ParameterBagInterface $parameterBag = null)
+    {
+        parent::__construct($parameterBag);
+
+        $this->trackResources = interface_exists('Symfony\Component\Config\Resource\ResourceInterface');
+    }
 
     /**
      * @var string[] with tag names used by findTaggedServiceIds

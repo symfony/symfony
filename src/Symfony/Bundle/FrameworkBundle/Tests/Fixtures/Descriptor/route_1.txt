@@ -11,7 +11,7 @@
 | Requirements | name: [a-z]+                                            |
 | Class        | Symfony\Component\Routing\Route                         |
 | Defaults     | name: Joseph                                            |
-| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler |
-|              | opt1: val1                                              |
-|              | opt2: val2                                              |
+[39;49m| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler[39;49m[39;49m |[39;49m
+[39;49m|              | [39;49m[39;49mopt1: val1[39;49m[39;49m                                              |[39;49m
+[39;49m|              | [39;49mopt2: val2                                              |
 +--------------+---------------------------------------------------------+

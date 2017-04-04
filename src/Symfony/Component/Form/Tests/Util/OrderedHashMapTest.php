@@ -114,8 +114,11 @@ class OrderedHashMapTest extends TestCase
     public function testUnsetNonExistingSucceeds()
     {
         $map = new OrderedHashMap();
+        $map['second'] = 2;
 
         unset($map['first']);
+
+        $this->assertSame(array('second' => 2), iterator_to_array($map));
     }
 
     public function testEmptyIteration()

@@ -198,23 +198,23 @@ class FormTypeTest extends BaseTypeTest
 
     public function testDataClassMayBeNull()
     {
-        $this->factory->createBuilder(static::TESTED_TYPE, null, array(
+        $this->assertInstanceOf('Symfony\Component\Form\FormBuilderInterface', $this->factory->createBuilder(static::TESTED_TYPE, null, array(
             'data_class' => null,
-        ));
+        )));
     }
 
     public function testDataClassMayBeAbstractClass()
     {
-        $this->factory->createBuilder(static::TESTED_TYPE, null, array(
+        $this->assertInstanceOf('Symfony\Component\Form\FormBuilderInterface', $this->factory->createBuilder(static::TESTED_TYPE, null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
-        ));
+        )));
     }
 
     public function testDataClassMayBeInterface()
     {
-        $this->factory->createBuilder(static::TESTED_TYPE, null, array(
+        $this->assertInstanceOf('Symfony\Component\Form\FormBuilderInterface', $this->factory->createBuilder(static::TESTED_TYPE, null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
-        ));
+        )));
     }
 
     /**
@@ -701,7 +701,7 @@ class FormTypeTest extends BaseTypeTest
         $form = $builder->getForm();
 
         //This method should not throw a Fatal Error Exception.
-        $form->getErrorsAsString();
+        $this->assertInternalType('string', $form->getErrorsAsString());
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

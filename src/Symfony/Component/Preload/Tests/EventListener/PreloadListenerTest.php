@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Asset\Tests\EventListener;
+namespace Symfony\Component\Preload\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Asset\EventListener\PreloadListener;
-use Symfony\Component\Asset\Preload\PreloadManager;
+use Symfony\Component\Preload\EventListener\PreloadListener;
+use Symfony\Component\Preload\PreloadManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;

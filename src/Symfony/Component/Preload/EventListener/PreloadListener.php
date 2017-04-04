@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Asset\EventListener;
+namespace Symfony\Component\Preload\EventListener;
 
-use Symfony\Component\Asset\Preload\PreloadManager;
-use Symfony\Component\Asset\Preload\PreloadManagerInterface;
+use Symfony\Component\Preload\PreloadManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;

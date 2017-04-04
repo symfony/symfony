@@ -12,14 +12,13 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Extension\AssetExtension;
-use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\Preload\PreloadManager;
+use Symfony\Bridge\Twig\Extension\PreloadExtension;
+use Symfony\Component\Preload\PreloadManager;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AssetExtensionTest extends TestCase
+class PreloadExtensionTest extends TestCase
 {
     public function testGetAndPreloadAssetUrl()
     {
@@ -28,18 +27,9 @@ class AssetExtensionTest extends TestCase
         }
 
         $preloadManager = new PreloadManager();
-        $extension = new AssetExtension(new Packages(), $preloadManager);
+        $extension = new PreloadExtension($preloadManager);
 
         $this->assertEquals('/foo.css', $extension->preload('/foo.css', 'style', true));
         $this->assertEquals('</foo.css>; rel=preload; as=style; nopush', $preloadManager->buildLinkValue());
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testNoConfiguredPreloadManager()
-    {
-        $extension = new AssetExtension(new Packages());
-        $extension->preload('/foo.css');
     }
 }

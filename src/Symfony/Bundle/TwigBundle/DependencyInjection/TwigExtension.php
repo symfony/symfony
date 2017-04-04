@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Preload\PreloadManagerInterface;
 
 /**
  * TwigExtension.
@@ -46,6 +47,10 @@ class TwigExtension extends Extension
 
         if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
             $container->removeDefinition('twig.translation.extractor');
+        }
+
+        if (!interface_exists(PreloadManagerInterface::class)) {
+            $container->removeDefinition('twig.extension.preload');
         }
 
         foreach ($configs as $key => $config) {

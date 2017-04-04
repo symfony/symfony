@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Asset\Preload;
+namespace Symfony\Component\Preload;
 
 /**
  * Manages preload HTTP headers.

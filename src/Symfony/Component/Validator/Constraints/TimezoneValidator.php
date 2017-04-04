@@ -44,7 +44,7 @@ class TimezoneValidator extends ConstraintValidator
 
         if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ timezone_group }}', $this->formatValue($value))
+                ->setParameter('{{ extra_info }}', $this->formatExtraInfo($constraint->timezone, $constraint->countryCode))
                 ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
                 ->addViolation();
         }
@@ -56,5 +56,35 @@ class TimezoneValidator extends ConstraintValidator
     public function getDefaultOption()
     {
         return 'timezone';
+    }
+
+    /**
+     * Format the extra info which is appended to validation message based on
+     * constraint options
+     *
+     * @param int $timezone
+     * @param string|null $countryCode
+     *
+     * @return string
+     */
+    protected function formatExtraInfo($timezone, $countryCode = null)
+    {
+        if (!$timezone) {
+            return '';
+        }
+        $r = new \ReflectionClass('\DateTimeZone');
+        $consts = $r->getConstants();
+
+        if (!$value = array_search($timezone, $consts, true)) {
+            $value = $timezone;
+        }
+
+        $value = ' for "'.$value.'" zone';
+
+        if ($countryCode) {
+            $value = ' for ISO 3166-1 country code '.$countryCode;
+        }
+
+        return $this->formatValue($value);
     }
 }

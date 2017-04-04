@@ -28,7 +28,7 @@ class Timezone extends Constraint
 
     public $countryCode;
 
-    public $message = 'This value is not a valid timezone at {{ timezone_group }}.';
+    public $message = 'This value is not a valid timezone{{ extra_info }}.';
 
     protected static $errorNames = array(
         self::NO_SUCH_TIMEZONE_ERROR => 'NO_SUCH_TIMEZONE_ERROR',

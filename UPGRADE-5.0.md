@@ -1,6 +1,11 @@
 UPGRADE FROM 4.x to 5.0
 =======================
 
+Config
+------
+
+ * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
+
 EventDispatcher
 ---------------
 

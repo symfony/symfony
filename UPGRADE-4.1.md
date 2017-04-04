@@ -1,6 +1,12 @@
 UPGRADE FROM 4.0 to 4.1
 =======================
 
+Config
+------
+
+ * Implementing `ParentNodeDefinitionInterface` without the `getChildNodeDefinitions()` method
+   is deprecated and will be unsupported in 5.0.
+
 EventDispatcher
 ---------------
 

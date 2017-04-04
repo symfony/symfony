@@ -23,6 +23,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  */
 abstract class BaseNode implements NodeInterface
 {
+    const DEFAULT_PATH_SEPARATOR = '.';
+
     protected $name;
     protected $parent;
     protected $normalizationClosures = array();
@@ -32,18 +34,20 @@ abstract class BaseNode implements NodeInterface
     protected $deprecationMessage = null;
     protected $equivalentValues = array();
     protected $attributes = array();
+    protected $pathSeparator;
 
     /**
      * @throws \InvalidArgumentException if the name contains a period
      */
-    public function __construct(?string $name, NodeInterface $parent = null)
+    public function __construct(?string $name, NodeInterface $parent = null, string $pathSeparator = self::DEFAULT_PATH_SEPARATOR)
     {
-        if (false !== strpos($name, '.')) {
-            throw new \InvalidArgumentException('The name must not contain ".".');
+        if (false !== strpos($name, $pathSeparator)) {
+            throw new \InvalidArgumentException('The name must not contain "'.$pathSeparator.'".');
         }
 
         $this->name = $name;
         $this->parent = $parent;
+        $this->pathSeparator = $pathSeparator;
     }
 
     public function setAttribute($key, $value)
@@ -230,13 +234,11 @@ abstract class BaseNode implements NodeInterface
      */
     public function getPath()
     {
-        $path = $this->name;
-
         if (null !== $this->parent) {
-            $path = $this->parent->getPath().'.'.$path;
+            return $this->parent->getPath().$this->pathSeparator.$this->name;
         }
 
-        return $path;
+        return $this->name;
     }
 
     /**

@@ -246,6 +246,27 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('Exception: foo', $response->headers->get('X-Debug-Error'));
     }
 
+    public function testThrowingErrorCleanup()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $urlGenerator = $this->getUrlGeneratorMock();
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', array('token' => 'xxxxxxxx'))
+            ->will($this->throwException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline")))
+        ;
+
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $urlGenerator);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('Exception: This multiline tabbed text should come out on a single plain line', $response->headers->get('X-Debug-Error'));
+    }
+
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->setMethods(array('getSession', 'isXmlHttpRequest', 'getRequestFormat'))->disableOriginalConstructor()->getMock();

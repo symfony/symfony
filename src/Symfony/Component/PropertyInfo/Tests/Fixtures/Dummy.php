@@ -51,6 +51,13 @@ class Dummy extends ParentDummy
      */
     public $B;
 
+    /**
+     * Nullable array.
+     *
+     * @var array|null
+     */
+    public $g;
+
     public static function getStatic()
     {
     }

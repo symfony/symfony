@@ -444,10 +444,6 @@ class AutowirePassTest extends TestCase
             array(
                 new Reference('a'),
                 new Reference('lille'),
-                // third arg shouldn't *need* to be passed
-                // but that's hard to "pull of" with autowiring, so
-                // this assumes passing the default val is ok
-                'some_val',
             ),
             $definition->getArguments()
         );
@@ -618,28 +614,19 @@ class AutowirePassTest extends TestCase
     }
 
     /**
-     * @dataProvider provideAutodiscoveredAutowiringOrder
-     *
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMEssage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for service "a". Multiple services exist for this interface: autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA, autowired.Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB.
+     * @expectedExceptionMessage Service "a" can use either autowiring or a factory, not both.
      */
-    public function testAutodiscoveredAutowiringOrder($class)
+    public function testWithFactory()
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\\'.$class)
+        $container->register('a', __NAMESPACE__.'\A')
+            ->setFactory('foo')
             ->setAutowired(true);
 
         $pass = new AutowirePass();
         $pass->process($container);
-    }
-
-    public function provideAutodiscoveredAutowiringOrder()
-    {
-        return array(
-            array('CannotBeAutowiredForwardOrder'),
-            array('CannotBeAutowiredReverseOrder'),
-        );
     }
 
     /**
@@ -678,19 +665,6 @@ class AutowirePassTest extends TestCase
             array('setOptionalArgNoAutowireable', 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setOptionalArgNoAutowireable() has only optional arguments, thus must be wired explicitly.'),
             array(null, 'Cannot autowire service "foo": method Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod() must be public.'),
         );
-    }
-
-    public function testAutoregisterRestoresStateOnFailure()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('e', E::class)
-            ->setAutowired(true);
-
-        $pass = new AutowirePass();
-        $pass->process($container);
-
-        $this->assertSame(array('service_container', 'e'), array_keys($container->getDefinitions()));
     }
 
     /**

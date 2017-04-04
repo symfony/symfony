@@ -51,7 +51,7 @@ install:
     - copy /Y .composer\* %APPDATA%\Composer\
     - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - php composer.phar update --no-progress --ansi
+    - php composer.phar update --no-progress --no-suggest --ansi
     - php phpunit install
 
 test_script:

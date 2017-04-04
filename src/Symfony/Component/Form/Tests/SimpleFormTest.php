@@ -896,6 +896,7 @@ class SimpleFormTest extends AbstractFormTest
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.
      */
     public function testSetDataCannotInvokeItself()
     {
@@ -1060,6 +1061,51 @@ class SimpleFormTest extends AbstractFormTest
         $child->setParent($parent);
 
         $child->initialize();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call getData() if the form data has not already been set. You should call getData() on the FormEvent object instead.
+     */
+    public function testCannotCallGetDataInPreSetDataListenerIfDataHasNotAlreadyBeenSet()
+    {
+        $config = new FormConfigBuilder('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->getData();
+        });
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call getNormData() if the form data has not already been set.
+     */
+    public function testCannotCallGetNormDataInPreSetDataListener()
+    {
+        $config = new FormConfigBuilder('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->getNormData();
+        });
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call getViewData() if the form data has not already been set.
+     */
+    public function testCannotCallGetViewDataInPreSetDataListener()
+    {
+        $config = new FormConfigBuilder('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->getViewData();
+        });
+        $form = new Form($config);
+
+        $form->setData('foo');
     }
 
     protected function createForm()

@@ -532,12 +532,12 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(3, $instanceof);
         $this->assertArrayHasKey('DummyInterface', $instanceof);
 
-        $args = $instanceof['DummyInterface']->getArguments();
-        $this->assertCount(1, $args);
-        $this->assertInstanceOf(Reference::class, $args[0]);
-        $this->assertTrue($container->has((string) $args[0]));
+        $properties = $instanceof['DummyInterface']->getProperties();
+        $this->assertCount(1, $properties);
+        $this->assertInstanceOf(Reference::class, $properties['fooprop']);
+        $this->assertTrue($container->has((string) $properties['fooprop']));
 
-        $anonymous = $container->getDefinition((string) $args[0]);
+        $anonymous = $container->getDefinition((string) $properties['fooprop']);
         $this->assertEquals('Anonymous', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
         $this->assertEmpty($anonymous->getInstanceofConditionals());

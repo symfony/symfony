@@ -330,4 +330,47 @@ class DefinitionTest extends TestCase
         $this->assertSame($def, $def->removeAutowiringType('Foo'));
         $this->assertEquals(array('Bar'), $def->getAutowiringTypes());
     }
+
+    public function testGetConfiguredPartsNoChanges()
+    {
+        $def = new Definition();
+
+        $this->assertSame(array(), $def->getConfiguredParts());
+    }
+
+    public function testGetConfiguredPartsWithChanges()
+    {
+        $def = new Definition('stdClass', array('fooarg'));
+
+        $def->setAbstract(true);
+        $def->setAutowired(true);
+        $def->setConfigurator('configuration_func');
+        $def->setDecoratedService(null);
+        $def->setDeprecated(true);
+        $def->setFactory('factory_func');
+        $def->setFile('foo.php');
+        $def->setLazy(true);
+        $def->setPublic(true);
+        $def->setShared(true);
+        $def->setSynthetic(true);
+        // changes aren't tracked for these, class or arguments
+        $def->setInstanceofConditionals([]);
+        $def->addTag('foo_tag');
+        $def->addMethodCall('methodCall');
+        $def->setProperty('fooprop', true);
+
+        $this->assertSame(array(
+            'abstract' => true,
+            'autowired' => true,
+            'configurator' => true,
+            'decorated_service' => true,
+            'deprecated' => true,
+            'factory' => true,
+            'file' => true,
+            'lazy' => true,
+            'public' => true,
+            'shared' => true,
+            'synthetic' => true,
+        ), $def->getConfiguredParts());
+    }
 }

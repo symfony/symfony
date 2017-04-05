@@ -21,21 +21,20 @@ class ResolveDefinitionInheritancePassTest extends TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $def = $container->register('parent', self::class)->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
+        $def = $container->register('parent', self::class)
+            ->setProperty('foo', 'moo');
         $def->setInstanceofConditionals(array(
             parent::class => (new ChildDefinition(''))
-                ->replaceArgument(0, 'a')
                 ->setProperty('foo', 'bar')
-                ->setClass('bar'),
+                ->setProperty('otherProp', 'baz')
         ));
 
         $this->process($container);
 
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertSame($def, $container->getDefinition('parent'));
-        $this->assertEquals('bar', $def->getClass());
-        $this->assertEquals(array('a', 'b'), $def->getArguments());
-        $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
+        // foo property is not replaced, but otherProp is added
+        $this->assertEquals(array('foo' => 'moo', 'otherProp' => 'baz'), $def->getProperties());
     }
 
     public function testProcessAppendsMethodCallsAlways()
@@ -59,21 +58,6 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         ), $container->getDefinition('parent')->getMethodCalls());
     }
 
-    public function testProcessDoesReplaceAbstract()
-    {
-        $container = new ContainerBuilder();
-
-        $def = $container->register('parent', 'stdClass');
-
-        $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setAbstract(true),
-        ));
-
-        $this->process($container);
-
-        $this->assertTrue($def->isAbstract());
-    }
-
     public function testProcessDoesReplaceShared()
     {
         $container = new ContainerBuilder();
@@ -95,17 +79,17 @@ class ResolveDefinitionInheritancePassTest extends TestCase
 
         $def = $container
             ->register('parent', self::class)
-            ->setArguments(array('foo', 'bar', 'c'))
+            ->setProperties(array('foo' => 'fooval', 'bar' => 'barval', 'baz' => 'bazval'))
         ;
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->replaceArgument(1, 'b'),
-            self::class => (new ChildDefinition(''))->replaceArgument(0, 'a'),
+            parent::class => (new ChildDefinition(''))->setProperty('bar', 'barval_changed'),
+            self::class => (new ChildDefinition(''))->setProperty('foo', 'fooval_changed'),
         ));
 
         $this->process($container);
 
-        $this->assertEquals(array('a', 'b', 'c'), $def->getArguments());
+        $this->assertEquals(array('foo' => 'fooval', 'bar' => 'barval', 'baz' => 'bazval'), $def->getProperties());
     }
 
     public function testSetLazyOnServiceHasParent()
@@ -127,39 +111,21 @@ class ResolveDefinitionInheritancePassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent', self::class)->addTag('parent');
-
-        $def = $container->setDefinition('child', new ChildDefinition('parent'))
-            ->addTag('child')
-            ->setInheritTags(true)
+        $def = $container->register('parent', self::class)
+            ->addTag('tag_foo')
+            ->addTag('tag_bar', array('priority' => 100))
         ;
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->addTag('foo'),
+            parent::class => (new ChildDefinition(''))
+                ->addTag('tag_bar', array('priority' => 500))
+                ->addTag('tag_baz'),
         ));
 
         $this->process($container);
 
         $t = array(array());
-        $this->assertSame(array('foo' => $t, 'child' => $t, 'parent' => $t), $def->getTags());
-    }
-
-    public function testProcessResolvesAliasesAndTags()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('parent', self::class);
-        $container->setAlias('parent_alias', 'parent');
-        $def = $container->setDefinition('child', new ChildDefinition('parent_alias'));
-        $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->addTag('foo'),
-        ));
-
-        $this->process($container);
-
-        $this->assertSame(array('foo' => array(array())), $def->getTags());
-        $this->assertSame($def, $container->getDefinition('child'));
-        $this->assertEmpty($def->getClass());
+        $this->assertSame(array('tag_foo' => $t, 'tag_bar' => array(array('priority' => 100)), 'tag_baz' => $t), $def->getTags());
     }
 
     protected function process(ContainerBuilder $container)

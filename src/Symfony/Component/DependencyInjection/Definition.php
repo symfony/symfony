@@ -39,6 +39,7 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
+    private $configuredParts = array();
 
     protected $arguments;
 
@@ -66,6 +67,8 @@ class Definition
         }
 
         $this->factory = $factory;
+
+        $this->configuredParts['factory'] = true;
 
         return $this;
     }
@@ -96,6 +99,8 @@ class Definition
         if ($renamedId && $id == $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
+
+        $this->configuredParts['decorated_service'] = true;
 
         if (null === $id) {
             $this->decoratedService = null;
@@ -448,6 +453,7 @@ class Definition
      */
     public function setFile($file)
     {
+        $this->configuredParts['file'] = true;
         $this->file = $file;
 
         return $this;
@@ -472,6 +478,7 @@ class Definition
      */
     public function setShared($shared)
     {
+        $this->configuredParts['shared'] = true;
         $this->shared = (bool) $shared;
 
         return $this;
@@ -496,6 +503,7 @@ class Definition
      */
     public function setPublic($boolean)
     {
+        $this->configuredParts['public'] = true;
         $this->public = (bool) $boolean;
 
         return $this;
@@ -520,6 +528,7 @@ class Definition
      */
     public function setLazy($lazy)
     {
+        $this->configuredParts['lazy'] = true;
         $this->lazy = (bool) $lazy;
 
         return $this;
@@ -545,6 +554,7 @@ class Definition
      */
     public function setSynthetic($boolean)
     {
+        $this->configuredParts['synthetic'] = true;
         $this->synthetic = (bool) $boolean;
 
         return $this;
@@ -571,6 +581,7 @@ class Definition
      */
     public function setAbstract($boolean)
     {
+        $this->configuredParts['abstract'] = true;
         $this->abstract = (bool) $boolean;
 
         return $this;
@@ -612,6 +623,7 @@ class Definition
             $this->deprecationTemplate = $template;
         }
 
+        $this->configuredParts['deprecated'] = true;
         $this->deprecated = (bool) $status;
 
         return $this;
@@ -653,6 +665,7 @@ class Definition
             $configurator = explode('::', $configurator, 2);
         }
 
+        $this->configuredParts['configurator'] = true;
         $this->configurator = $configurator;
 
         return $this;
@@ -709,6 +722,7 @@ class Definition
      */
     public function setAutowired($autowired)
     {
+        $this->configuredParts['autowired'] = true;
         $this->autowired = (bool) $autowired;
 
         return $this;
@@ -780,5 +794,15 @@ class Definition
         @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
 
         return isset($this->autowiringTypes[$type]);
+    }
+
+    /**
+     * Returns all parts of this Definition that were explicitly configured.
+     *
+     * @return array An array of configured parts for this Definition
+     */
+    public function getConfiguredParts()
+    {
+        return $this->configuredParts;
     }
 }

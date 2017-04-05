@@ -27,7 +27,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $class = $value instanceof ChildDefinition ? $this->resolveDefinition($value) : $value->getClass();
+        $class = $value->getClass();
 
         if (!$class || false !== strpos($class, '%') || !$instanceof = $value->getInstanceofConditionals()) {
             return parent::processValue($value, $isRoot);
@@ -39,57 +39,50 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
                 continue;
             }
             if ($interface === $class || is_subclass_of($class, $interface)) {
-                $this->mergeDefinition($value, $definition);
+                $this->mergeInstanceofDefinition($value, $definition);
             }
         }
 
         return parent::processValue($value, $isRoot);
     }
 
-    /**
-     * Populates the class and tags from parent definitions.
-     */
-    private function resolveDefinition(ChildDefinition $definition)
+    private function mergeInstanceofDefinition(Definition $def, ChildDefinition $instanceofDefinition)
     {
-        if (!$this->container->has($parent = $definition->getParent())) {
-            return;
+        $configured = $def->getConfiguredParts();
+        $changes = $instanceofDefinition->getChanges();
+        if (!isset($configured['shared']) && isset($changes['shared'])) {
+            $def->setShared($instanceofDefinition->isShared());
         }
-
-        $parentDef = $this->container->findDefinition($parent);
-        $class = $parentDef instanceof ChildDefinition ? $this->resolveDefinition($parentDef) : $parentDef->getClass();
-        $class = $definition->getClass() ?: $class;
-
-        // append parent tags when inheriting is enabled
-        if ($definition->getInheritTags()) {
-            $definition->setInheritTags(false);
-
-            foreach ($parentDef->getTags() as $k => $v) {
-                foreach ($v as $v) {
-                    $definition->addTag($k, $v);
-                }
+        if (!isset($configured['configurator']) && isset($changes['configurator'])) {
+            $def->setConfigurator($instanceofDefinition->getConfigurator());
+        }
+        if (!isset($configured['public']) && isset($changes['public'])) {
+            $def->setPublic($instanceofDefinition->isPublic());
+        }
+        if (!isset($configured['lazy']) && isset($changes['lazy'])) {
+            $def->setLazy($instanceofDefinition->isLazy());
+        }
+        if (!isset($configured['autowired']) && isset($changes['autowired'])) {
+            $def->setAutowired($instanceofDefinition->getAutowired());
+        }
+        // merge properties
+        $properties = $def->getProperties();
+        foreach ($instanceofDefinition->getProperties() as $k => $v) {
+            // don't override properties set explicitly on the service
+            if (!isset($properties[$k])) {
+                $def->setProperty($k, $v);
             }
         }
-
-        return $class;
-    }
-
-    private function mergeDefinition(Definition $def, ChildDefinition $definition)
-    {
-        $changes = $definition->getChanges();
-        if (isset($changes['shared'])) {
-            $def->setShared($definition->isShared());
+        // append method calls
+        if ($calls = $instanceofDefinition->getMethodCalls()) {
+            $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
         }
-        if (isset($changes['abstract'])) {
-            $def->setAbstract($definition->isAbstract());
-        }
-
-        ResolveDefinitionTemplatesPass::mergeDefinition($def, $definition);
-
-        // prepend instanceof tags
-        $tailTags = $def->getTags();
-        if ($headTags = $definition->getTags()) {
-            $def->setTags($headTags);
-            foreach ($tailTags as $k => $v) {
+        // merge tags
+        $tags = $def->getTags();
+        foreach ($instanceofDefinition->getTags() as $k => $v) {
+            // don't add a tag if one by that name was already added
+            if (!isset($tags[$k])) {
+                // loop over the tag attributes arrays, add each
                 foreach ($v as $v) {
                     $def->addTag($k, $v);
                 }

@@ -1,0 +1,167 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-12-16T11:03:48Z
+
+Nice work! Looking at the screenshots, I saw that the plain text stack traces do not include function parameters anymore. E.g. it only says `call_user_func_array` without the parameters (the html stack traces shows them). Is this on purpose? Looks like valuable info is lost there.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-16T11:08:28Z
+
+@Tobion good catch, I missed this change.
+
+I think that the plain-text version should keep the args, otherwise copy/pasting the plaintext trace in a bug report will give only partial info
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-16T11:20:00Z
+
+@Tobion @stof yes, that's done on purpose. The main reason is that I wanted to have the same stack traces as the rest of the industry (from Java to Node.js). @stof made me change it a bit to display the (ugly) full namespace of the classes. But I don't think adding the args is necessary there. Java, Node.js, etc. don't do that and we already show that information in the first panel, which is where a developer should always look for info (the stack trace is to just share some info about the exception with other colleagues or publicly).
+
+Another reason is that arguments can contain highly sensitive information. In the Symfony repo we regularly ask users to share the stack traces. We don't want them to share critical information. That's why we also remove your local project directory in the file paths (the first panel shows the absolute file paths when you put your mouse over the file paths, but the stack traces only shows paths relative to the project root directory).
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-12-17T10:44:42Z
+
+@javiereguiluz: Please take a look on how tracy/tracy does it. We've replaced the default exceptions with that via TracyBundle in all of our projects. The exceptions are a lot more detailed and having having dumps deduped in production in the log directory is invaluable.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-17T11:08:47Z
+
+Very nice job @javiereguiluz! Some little notes:
+
+ * Looking at [a previously proposed PR](https://github.com/symfony/symfony/pull/15792) to improve the exception page, can we maybe use the var-dumper for the arguments in the detailed trace? This would be more awesome than just having `object(Post)`.
+ * Can we use the var-dumper colors in the code example, to make all colorscheme's consistent throughout exception page - profiler page - dump output?
+ * The top sections of the page look way to dense compared to the below sections. This ratio doesn't seem to be 100% correct. Can we maybe add some vertical whitespace at the top? (e.g. the red box with the exception message in it).
+ * Not sure about this one, but the second exception seems more hidden than in the original design (at first, I couldn't find the second exception at all). This is a bit of a problem, as the second exception is often more usefull than the first one (e.g. with Twig or file loader exceptions).
+ * You probably are already aware of this, but the basic exception page that's triggered when a fatal error occurs also need to be updated: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Debug/ExceptionHandler.php#L203-L393
+
+---------------------------------------------------------------------------
+
+by King2500 at 2016-12-18T11:32:07Z
+
+In the sense of DX I suggest the visible source snippet should be the first user land code, not from vendor/* libraries. What do you think?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-18T21:46:07Z
+
+(I haven't replied to most of your comments yet ... but I'm reading them with keen interest, so please keep adding comments and proposing changes. Thanks!)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-19T03:09:45Z
+
+@javiereguiluz
+
+First off: amazing work. Love the direction. Think this should absolutely be the basis for whatever eventually makes it into `master`. I'll be adding some more comments (re the code itself) but as for the design:
+
+- The top section needs some additional vertical space. The first row (black) is fine, but the two below it should have more verticle space.
+- The second row order (with left chevron) seems "off" to me, would prefer the items were reverse with right chevron.
+- Syntax highlighting has too much red: there is enough red elsewhere and that makes it overpowering. Can we use a colorful syntax highlighting?
+- *Very strongly* think the stack trace should remain intact (include parameters). The information provided there can be very important to understand the context and provide a valuable resolution in the context of an issue/ticket. Someone posting sensitive information (or censoring sensitive information) should be their own responsibility.
+- On "Exceptions" tab, the InvalidArgumentException doesn't have the message under it as Twig_Error_Loader does; what happens if there are more than two exceptions with the sub-text (the exception message)?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-19T05:51:06Z
+
+As @mvrhov mentioned, [nette/tracy](https://tracy.nette.org/) does a really nice job; it is definitely worth taking a look at their [live](https://nette.github.io/tracy/tracy-exception.html) [examples](https://nette.github.io/tracy/tracy-error.html) to glean some inspiration for this Symfony exception page re-design/re-write. I love the simplicity, yet the power, of the call stack functionality.
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-12-19T08:56:20Z
+
+Indeed. I think it would be useful to include the Environment, HTTP request, HTTP response as this could be related to the failure.
+
+Concerning the parameters, is it possible add a JavaScript toggle to hide/show them?
+
+---------------------------------------------------------------------------
+
+by gaetan-petit at 2016-12-19T21:32:59Z
+
+The red header is a bit too much.
+My suggestion: just keep the red line mentioning the error and the HTTP code status.
+Go back to grey for the error message and ghost.
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-12-27T09:56:01Z
+
+@gaetan-petit I'm having mixed feelings on that, the exception only happens when something is wrong and red indicates danger giving you a direct indication something is wrong, so only the upper bar would a bit small.
+
+But when you use a dark UI or can't bare bright colors I can imagine this would be to much.
+*I have actually spend 10 years daily on a website where the main color was red and white. So I'm used to bright colors* 😄
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-27T18:30:55Z
+
+@gaetan-petit I actually like the move away from dull grays, on both the redesigned debug toolbar and profiler pages, as well as this new exception pages.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-19T11:37:52Z
+
+@javiereguiluz what is the status of this PR ? Are you continuing the work ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-19T11:44:18Z
+
+Yes, I'm continuing the work ... but I'm taking a break here to think about your comments and proposals.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-16T14:03:36Z
+
+Any news? Do we want this to be ready for 3.3?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-16T14:09:35Z
+
+I'll have this ready for Symfony 3.3 (we're still 7 weeks away from the "feature freeze"). I want to make some of the changes proposed by reviewers.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T18:28:33Z
+
+Last call for 3.3.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-30T13:57:56Z
+
+OK, I've updated this PR to make it mergeable.
+
+---
+
+I've made these changes as requested by reviewers:
+
+* Fixed all errors spotted by @stof (thanks for the review!)
+* Moved icons/images to individual image files
+* Added some vertical white space to the main exception message
+* Reversed the order of the chained exceptions: "Parent > Child 1 > Child 2" instead of "Child 2 < Child 1 < Parent"
+* Reduce the font size when the main exception message is long
+* Instead of always expanding the first code snippet, now the first code snippet that belongs to the application is expanded
+* Included again all the function/method arguments in the text-based trace
+
+I've decided to ignore these suggestions:
+
+* "Too much red" *(I think it has the appropriate amount of red for an exception page ... but I can be wrong, and we'll see that when people actually use this page and give more feedback)*
+* "Use VarDumper for arguments" *(This behavior is very different from the existing exception page, and I'm afraid of the performance penalty that could introduce hundreds of calls to VarDumper. I'd recommend to try to make this change in Symfony 3.4)*
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-03-30T15:34:52Z
+
+@javiereguiluz Looks like this will be a great change. Can't wait for its inclusion!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-31T14:41:43Z
+
+The failing tests on AppVeyor are unrelated. Please tell me if I can do anything else to make this mergeable for 3.3. Thanks!

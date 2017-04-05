@@ -69,20 +69,16 @@ class TimezoneValidator extends ConstraintValidator
      */
     private function formatExtraInfo($zone, $countryCode = null)
     {
-        if (!$zone) {
-            return '';
-        }
-        $r = new \ReflectionClass('\DateTimeZone');
-        $consts = $r->getConstants();
-
-        if (!$value = array_search($zone, $consts, true)) {
-            $value = $zone;
-        }
-
-        $value = ' for "'.$value.'" zone';
-
         if ($countryCode) {
-            $value = ' for ISO 3166-1 country code '.$countryCode;
+            $value = ' for ISO 3166-1 country code "'.$countryCode.'"';
+        } else {
+            $r = new \ReflectionClass('\DateTimeZone');
+            $consts = $r->getConstants();
+            if ($value = array_search($zone, $consts, true)) {
+                $value = ' for "'.$value.'" zone';
+            } else {
+                $value = ' for zone with identifier '.$zone;
+            }
         }
 
         return $this->formatValue($value);

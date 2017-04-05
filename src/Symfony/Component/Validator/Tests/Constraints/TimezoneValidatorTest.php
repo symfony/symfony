@@ -154,7 +154,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             array('America/Barbados', \DateTimeZone::ANTARCTICA, ' for "ANTARCTICA" zone'),
             array('Europe/Kiev', \DateTimeZone::ARCTIC, ' for "ARCTIC" zone'),
             array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN, ' for "INDIAN" zone'),
-            array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN | \DateTimeZone::ANTARCTICA, ' for "260" zone'),
+            array('Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN | \DateTimeZone::ANTARCTICA, ' for zone with identifier 260'),
         );
     }
 
@@ -214,8 +214,8 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidGroupedTimezonesByCountry()
     {
         return array(
-            array('America/Argentina/Cordoba', \DateTimeZone::PER_COUNTRY, 'FR', ' for ISO 3166-1 country code FR'),
-            array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'PT', ' for ISO 3166-1 country code PT'),
+            array('America/Argentina/Cordoba', \DateTimeZone::PER_COUNTRY, 'FR', ' for ISO 3166-1 country code "FR"'),
+            array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'PT', ' for ISO 3166-1 country code "PT"'),
         );
     }
 }

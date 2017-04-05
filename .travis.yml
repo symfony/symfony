@@ -84,13 +84,12 @@ install:
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
 
 script:
-    - REPORT=' && echo -e "\\e[32mOK\\e[0m {}\\n" || (echo -e "\\e[41mKO\\e[0m {}\\n" && $(exit 1))'
-    - FOLD_START='FOLD=$(echo "{}"|tr / .); echo -e "travis_fold:start:$FOLD\\n"; '
-    - FOLD_END=' echo -e "travis_fold:end:$FOLD\\n"'
+    - FOLD_START='echo "travis_fold:start:$FOLD"; echo -e "\\e[32m$FOLD\\e[0m"'
+    - FOLD_END='echo "travis_fold:end:$FOLD"'
     - if [[ $skip ]]; then echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"; fi
-    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo "$COMPONENTS" | parallel --gnu $FOLD_START'$PHPUNIT --exclude-group tty,benchmark,intl-data {}'$FOLD_END"$REPORT"; fi
-    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi
-    - if [[ ! $deps && $PHP = hhvm* ]]; then $PHPUNIT --exclude-group benchmark,intl-data; fi
-    - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'echo "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi
-    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% $FOLD_START'cd {}; composer update --no-progress --no-suggest --ansi 2>&1; $PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY;'$FOLD_END"$REPORT"; fi
-    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% $FOLD_START'cd {}; composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1; $PHPUNIT --exclude-group tty,benchmark,intl-data'$FOLD_END"$REPORT"; fi
+    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo "$COMPONENTS" | parallel --gnu 'FOLD=$(echo "{}.PHPUnit"|tr / .); '$FOLD_START'; $PHPUNIT --exclude-group tty,benchmark,intl-data {} && '$FOLD_END; fi
+    - if [[ ! $deps && ! $PHP = hhvm* ]]; then FOLD="PHPUnit.tty"; eval $FOLD_START; $PHPUNIT --group tty && eval $FOLD_END; fi
+    - if [[ ! $deps && $PHP = hhvm* ]]; then FOLD="PHPUnit.hhvm"; $PHPUNIT --exclude-group benchmark,intl-data && eval $FOLD_END; fi
+    - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'FOLD="PHPUnit.sigchild"; '$FOLD_START'; ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/ && '$FOLD_END; fi
+    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'FOLD=$(echo "{}.composer"|tr / .); '$FOLD_START'; cd {}; composer update --no-progress --no-suggest --ansi 2>&1 && '$FOLD_END'; FOLD=$(echo "{}.PHPUnit"|tr / .); '$FOLD_START'; $PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY && '$FOLD_END; fi
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'FOLD=$(echo "{}.composer"|tr / .); '$FOLD_START'; cd {}; composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1 && '$FOLD_END'; FOLD=$(echo "{}.PHPUnit"|tr / .); '$FOLD_START'; $PHPUNIT --exclude-group tty,benchmark,intl-data && '$FOLD_END; fi

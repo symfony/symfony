@@ -24,7 +24,7 @@ class Timezone extends Constraint
 {
     const NO_SUCH_TIMEZONE_ERROR = '45de6628-3479-46d6-a210-00ad584f530a';
 
-    public $zone = \DateTimeZone::ALL;
+    public $zone;
 
     public $countryCode;
 

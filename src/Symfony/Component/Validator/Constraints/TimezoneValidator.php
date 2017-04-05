@@ -40,7 +40,8 @@ class TimezoneValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $timezoneIds = \DateTimeZone::listIdentifiers($constraint->zone, $constraint->countryCode);
+        $zone = null !== $constraint->zone ? $constraint->zone : \DateTimeZone::ALL;
+        $timezoneIds = \DateTimeZone::listIdentifiers($zone, $constraint->countryCode);
 
         if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
             $this->context->buildViolation($constraint->message)
@@ -62,13 +63,16 @@ class TimezoneValidator extends ConstraintValidator
      * Format the extra info which is appended to validation message based on
      * constraint options.
      *
-     * @param int         $zone
+     * @param int|null    $zone
      * @param string|null $countryCode
      *
      * @return string
      */
     private function formatExtraInfo($zone, $countryCode = null)
     {
+        if (null === $zone) {
+            return '';
+        }
         if ($countryCode) {
             $value = ' for ISO 3166-1 country code "'.$countryCode.'"';
         } else {

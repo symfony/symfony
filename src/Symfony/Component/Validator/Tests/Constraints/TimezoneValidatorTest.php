@@ -106,7 +106,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidTimezones
      */
-    public function testInvalidTimezones($timezone, $extraInfo)
+    public function testInvalidTimezonesWithoutZone($timezone, $extraInfo)
     {
         $constraint = new Timezone(array(
             'message' => 'myMessage',
@@ -115,7 +115,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ extra_info }}', '"'.$extraInfo.'"')
+            ->setParameter('{{ extra_info }}', $extraInfo)
             ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
             ->assertRaised();
     }
@@ -123,9 +123,9 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function getInvalidTimezones()
     {
         return array(
-            array('Buenos_Aires/Argentina/America', ' for "ALL" zone'),
-            array('Mayotte/Indian', ' for "ALL" zone'),
-            array('foobar', ' for "ALL" zone'),
+            array('Buenos_Aires/Argentina/America', ''),
+            array('Mayotte/Indian', ''),
+            array('foobar', ''),
         );
     }
 

@@ -1,0 +1,192 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-05T14:14:51Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T14:26:32Z
+
+It breaks the main idea of autowiring and the DX improvement it provides:
+
+currently: create a `Slugger`class in `src/`, type-hint it in a (autowired) controller, it works with 0 config.
+"by id": you need to register manually all classes you want to type-hint, worse DX. The `psr-4` loader may help, but if it means registering automatically all classes in `src/`, it's worst than the current solution.
+
+Constructing automatically the object graph is what make autowiring amazing to use.
+
+But maybe am I missing something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-05T15:43:08Z
+
+The list of pros is quite sexy to me, fixes lots of code smell (eg #22282 being the last one.)
+
+On the DX side, it feels really good: Yes, "by-id" autowiring will require you to add explicit aliases/services for the services in *your* namespace. But most bundles will ship with default aliases that will just work (as already done by SF core).
+
+For those services in your namespace, the DX is really improved *vs* full manual wiring:
+- you start by declaring some service (eg via psr4 loading).
+- compilation fails because a required type-hint misses a corresponding service (DX improvement 1. *vs* manual wiring)
+- you read the exception message that you just got and you learn that some existing service(s) already ship(s) the `FooInterface` that you hinted for (DX improvement 2. *vs* manual wiring)
+- you decide to alias some service for this interface by yourself (DX improvement 3. *vs* "by-type" autowiring: you take full responsibility for wiring)
+- iterate until compilation succeeds
+- done
+
+So, DX wise, "by-id" autowiring is "compiler-assisted explicit wiring". I already experienced it, and I want it everywhere :)
+
+> It breaks the main idea of autowiring and the DX improvement it provides
+
+To me, the most important promise of autowiring is: tell me you need a LoggerInterface, I'll ship you one.
+"By-id" autowiring does just that. So it's still a huge DX improvement over manual wiring. But freed from "by-type" downsides.
+
+> create a Sluggerclass in src/, type-hint it in a (autowired) controller, it works
+
+It *feels* it works, but it can also break, because of ambiguities, which are waiting around the corner. Then DX is badly hurt.
+
+> the psr-4 loader may help, but it means registering automatically all classes in src/
+
+That would certainly be a bad idea indeed!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T15:51:43Z
+
+> To me, the most important promise of autowiring is: tell me you need a LoggerInterface, I'll ship you one.
+> "By-id" autowiring does just that. So it's still a huge DX improvment over manual wiring. But freed from downsides.
+
+I'm not arguing against the `by-id` feature. I'll definitely use it in **some cases**. But it's not the same thing than the current autowiring, and IMO it should complement it, not replace it.
+
+What I want when using autowiring is to only write PHP. It's basically a tool for prototyping and RAD. What I want is creating a Symfony app as fast possible without having to write config files. The steps you describe are really interesting in some cases, but it breaks this "config-less" experience we already have (when using ActionBundle fi). IMO it's a regression. Having both modes is better because it lets the developer choose how he want to code its app instead of forcing it to do some work that is currently not necessary.
+
+> It feels it works, but it can also break, because of ambiguities, which are waiting at the corner.
+
+Yes, and it's intended when using the standard autowiring. It cannot breaks at runtime, only at compile time, and when it breaks, it's time to move to explicit (or - now - `by id` wiring).
+
+Btw, I would suggest to change `autowire: by-id`/`autowire: by-type` by `wire: auto` and `wire: by-id` because the `by-id` mode is not really automatic anymore.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-05T17:10:18Z
+
+Big :+1: for no-questions-asked config, i.e. `autowire: true|false`. I personally dont want to make any choice here in terms of which "mode" should i pick; just autowire the service, or tell me if you cant. The only alternative should be explicit/manual wiring, IMO :)
+
+Given that.. we could still improve a single type match right, creating the alias automatically when `This type-hint could be aliased to the existing "x" service.` occurs?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-05T17:17:26Z
+
+@nicolas-grekas if our typehint is a class rather than an interface, would it still require registering a service explicitly ? This is what makes the experience harder for simple cases like the Slugger above. All your explanations about by-id wiring always talk abut interface typehints.
+
+@ro0NL creating the alias automatically when there is no ambiguity is what happens in the by-type matching (among other things). And this is what breaks often: as soon as you register a second service matching the type (for a totally unrelated feature), the automatically-added alias is not added anymore and things blow up. And this second service might come from elsewhere than your own code (adding a new bundle, etc...).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-05T17:23:14Z
+
+> the automatically-added alias is not added anymore and things blow up.
+
+Yes; in case we fallback to the process described by @nicolas-grekas https://github.com/symfony/symfony/pull/22295#issuecomment-291903364
+
+I understand it sort of brings back the original issue; but on the other hand, it's truly convenient :) most project src dirs i've seen practically contain nothing but unique type services :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T17:25:04Z
+
+@ro0NL it's why I'm against dropping the original feature :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-05T17:32:59Z
+
+Then again... `Some\FQCN: ['@arg']` will probably become a very common notation for those cases... fixing it out-of-the-box as well.
+
+Guess letting the user updating some service id to a FQCN is a better approach, compared to SF creating an alias for your "FQCN to id convention".. which i've also seen thousands of :) causing very cluttered configs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-05T18:32:19Z
+
+> if our typehint is a class rather than an interface, would it still require registering a service explicitly
+
+yes, that's what I mean by being side-effect free (and call "auto-registration" this "by-type" behavior).
+
+take this `Slugger` example: if no service has that name, then auto-registering this class as a `Slugger` service is a *maybe* decision. The service could very well exist under the "slugger" id. No-go.
+
+We could implement something in between if this is the corner stone of the discussion.
+We could have this logic:
+- when `Slugger` is not found
+- then look at all existing services
+- if *none* exists with that class in its type hierarchy, then auto-register `Slugger`
+- otherwise (if at least one exists), throw with a suggestion (as already done in "by-id")
+
+That would not be a strict as I'd like it to be - but at least that would fix most of the issues we have with "by-type" (but it would still be "magic" by requiring some container-wide introspection - meaning will lead to unwanted side-effects at some point).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T18:43:13Z
+
+> We could implement something in between if this is the corner stone of the discussion.
+We could have this logic:
+>
+> when Slugger is not found
+> then look at all existing services
+> if none exists with that class in its type hierarchy, then auto-register Slugger
+> otherwise (if at least one exists), throw with a suggestion (as already done in "by-id")
+
+Give me some time to double-think about it, but it looks like a nice compromise. Will this behavior be recursive (e.g, will FooController -> MyApiClient -> MyRestClient works with no config if there is only 1 type available in the hierarchy for each class)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-05T18:47:28Z
+
+As I see it, this would be recursive yes, same as today (ie these would private + autowired).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-05T18:49:12Z
+
+Oh, I see just one difference that I'd like to put in the compromise: as soon as a type is optional, we should not auto-register.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-05T19:04:49Z
+
+I'd always use explicit binding aka current `by-id` or "define things once and profit while keeping control", #22282 was really painful to debug and e.g. https://github.com/symfony/symfony/issues/21351 would have been really hard to achieve using the current `by-type`, that's where time winning ends to me and I think end users shouldn't be bothered by such issues.
+Using the current `by-type` as a last resort looks like a good compromise indeed, that's how laravel behaves I believe: if no explicit binding exists then try to guess it. IMHO there should be no choice to do, only 1 behavior performing some different strategies to achieve one final goal: wiring the service, which is the only thing I need as an user.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T19:55:53Z
+
+> Oh, I see just one difference that I'd like to put in the compromise: as soon as a type is optional, we should not auto-register.
+
+Ok for me, if there is no alias defined, `?Foo` should be wired but `?Foo = null` should not.
+
+> Using the current by-type as a last resort looks like a good compromise indeed, that's how laravel behaves I believe: if no explicit binding exists then try to guess it. IMHO there should be no choice to do, only 1 behavior performing some different strategies to achieve one final goal: wiring the service, which is the only thing I need as an user.
+
+I agree, and we need to make it clear in the doc that autowiring is for simple cases only. For advanced uses, you must use explicit wiring (this feature as always been designed with this in mind).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-05T21:18:23Z
+
+PR updated, autoregistration is back, with the following logic:
+- when a `Slugger` type-hint has no corresponding service
+- when also the related argument is required
+- then look at all existing services
+- if none exists with that class in its type hierarchy, then auto-register Slugger
+- otherwise (if at least one exists), throw with a suggestion
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-04-05T23:01:28Z
+
+Personally, I only use "by-id" for two of the reasons @nicolas-grekas already pointed out, and therefore have no issue with the removal of "by-type" completely:
+
+> - it is free from any ambiguities (vs the Damocles' sword of breaking config just by enabling some unrelated bundle)
+> - it is easily introspected: just look at DI config files (vs inspecting the type-hierarchy of all services + their type-hints)
+
+The middle-ground approach recently discussed is also fine, but again, I will only ever use "by-id" myself. ;-)

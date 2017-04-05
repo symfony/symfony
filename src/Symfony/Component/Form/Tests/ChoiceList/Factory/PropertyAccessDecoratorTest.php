@@ -417,6 +417,9 @@ class PropertyAccessDecoratorTest extends TestCase
         ));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateViewAttrAsPropertyPath()
     {
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
@@ -460,6 +463,9 @@ class PropertyAccessDecoratorTest extends TestCase
         ));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateViewAttrAsPropertyPathInstance()
     {
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\ExpandedChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
@@ -34,6 +35,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransfo
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ChoiceType extends AbstractType
 {
@@ -320,6 +322,14 @@ class ChoiceType extends AbstractType
             return $choiceTranslationDomain;
         };
 
+        $choiceAttrNormalizer = function (Options $options, $choiceAttr) {
+            if (is_string($choiceAttr) || $choiceAttr instanceof PropertyPath) {
+                @trigger_error(sprintf('Using "choice_attr" option as a string property path or a "%s" instance is deprecated since version 3.3 and will throw an exception in 4.0. Use a callable instead.', PropertyPath::class), E_USER_DEPRECATED);
+            }
+
+            return $choiceAttr;
+        };
+
         $resolver->setDefaults(array(
             'multiple' => false,
             'expanded' => false,
@@ -329,7 +339,8 @@ class ChoiceType extends AbstractType
             'choice_label' => null,
             'choice_name' => null,
             'choice_value' => null,
-            'choice_attr' => null,
+            'choice_attr' => array(),
+            'choice_label_attr' => array(),
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -346,6 +357,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
         $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
+        $resolver->setNormalizer('choice_attr', $choiceAttrNormalizer);
 
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
@@ -354,6 +366,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_name', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_value', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_attr', array('null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
+        $resolver->setAllowedTypes('choice_label_attr', array('array', 'callable'));
         $resolver->setAllowedTypes('preferred_choices', array('array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('group_by', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
     }
@@ -405,6 +418,7 @@ class ChoiceType extends AbstractType
             'value' => $choiceView->value,
             'label' => $choiceView->label,
             'attr' => $choiceView->attr,
+            'label_attr' => $choiceView->labelAttr,
             'translation_domain' => $options['translation_domain'],
             'block_name' => 'entry',
         );
@@ -438,13 +452,20 @@ class ChoiceType extends AbstractType
 
     private function createChoiceListView(ChoiceListInterface $choiceList, array $options)
     {
+        // BC
+        $refMethod = new \ReflectionMethod($this->choiceListFactory, 'createView');
+        if (6 > $refMethod->getNumberOfParameters()) {
+            @trigger_error(sprintf('Not passing a "$labelAttr" as sixth argument of "%s" is deprecated since version 3.3 and will trigger an error in 4.0.', $refMethod->getNamespaceName()));
+        }
+
         return $this->choiceListFactory->createView(
             $choiceList,
             $options['preferred_choices'],
             $options['choice_label'],
             $options['choice_name'],
             $options['group_by'],
-            $options['choice_attr']
+            $options['choice_attr'],
+            $options['choice_label_attr']
         );
     }
 }

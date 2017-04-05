@@ -130,6 +130,71 @@ Finder
 
  * The `ExceptionInterface` has been deprecated and will be removed in 4.0.
 
+Form
+----
+
+ * Using `choice_attr` option as an array of nested arrays has been deprecated
+   and indexes will be considered as attributes in 4.0. Use a unique array for
+   all choices or a `callable` instead.
+
+   Before:
+
+   ```php
+   // Single array for all choices using callable
+   'choice_attr' => function () {
+       return array('class' => 'choice-options');
+   },
+
+   // Different arrays per choices using array
+   'choices' => array(
+       'Yes' => true,
+       'No' => false,
+       'Maybe' => null,
+   'choice_attr' => array(
+       'Yes' => array('class' => 'option-green'),
+       'No' => array('class' => 'option-red'),
+   ),
+   ```
+
+   After:
+
+   ```php
+   // Single array for all choices using array
+   'choice_attr' => array('class' => 'choice-options'),
+
+   // Different arrays per choices using callable
+   'choices' => array(
+       'Yes' => true,
+       'No' => false,
+       'Maybe' => null,
+   'choice_attr' => function ($choice, $index, $value) {
+       if ('Yes' === $index) {
+           return array('class' => 'option-green');
+       }
+       if ('No' === $index) {
+           return array('class' => 'option-red');
+       }
+    
+       return array();
+   },
+   ```
+
+ * Using `choice_attr` option as a string or a `ProprertyPath` instance has been
+   deprecated and will throw an exception in 4.0. Use a `callable` instead.
+
+   Before:
+
+   ```php
+   'choice_attr' => 'htmlAttributes',
+   ```
+
+   After:
+
+   ```php
+   'choice_attr' => function ($choice, $value, $index) {
+       return $choice->getHtmlAttributes();
+   ```
+
 FrameworkBundle
 ---------------
 

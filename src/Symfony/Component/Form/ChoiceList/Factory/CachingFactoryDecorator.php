@@ -152,7 +152,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
@@ -165,7 +165,8 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
                 $label,
                 $index,
                 $groupBy,
-                $attr
+                $attr,
+                $labelAttr
             );
         }
 

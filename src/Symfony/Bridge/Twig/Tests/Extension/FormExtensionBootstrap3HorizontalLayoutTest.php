@@ -26,6 +26,7 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
 
     protected $testableFeatures = array(
         'choice_attr',
+        'choice_label_attr',
     );
 
     private $renderer;

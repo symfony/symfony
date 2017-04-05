@@ -148,10 +148,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      * @param null|callable|string|PropertyPath       $index            The callable or path generating the view indices
      * @param null|callable|string|PropertyPath       $groupBy          The callable or path generating the group names
      * @param null|array|callable|string|PropertyPath $attr             The callable or path generating the HTML attributes
+     * @param null|array|callable                     $labelAttr        The array or callable generating the label HTML attributes
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $accessor = $this->propertyAccessor;
 
@@ -218,12 +219,13 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             @trigger_error('Passing callable strings is deprecated since version 3.1 and PropertyAccessDecorator will treat them as property paths in 4.0. You should use a "\Closure" instead.', E_USER_DEPRECATED);
         }
 
+        // Deprecated since 3.3 and to be removed in 4.0 with the condition above
         if ($attr instanceof PropertyPath) {
             $attr = function ($choice) use ($accessor, $attr) {
                 return $accessor->getValue($choice, $attr);
             };
         }
 
-        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr);
     }
 }

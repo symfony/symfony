@@ -5,7 +5,7 @@ services:
         synthetic: true
     foo:
         class: Foo
-        autowire: by_type
+        autowire: true
     Psr\Container\ContainerInterface:
         alias: service_container
         public: false

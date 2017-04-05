@@ -967,13 +967,13 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
+        $container->register(A::class);
         $bDefinition = $container->register('b', __NAMESPACE__.'\B');
         $bDefinition->setAutowired(true);
 
         $container->compile();
 
-        $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
+        $this->assertEquals(A::class, (string) $container->getDefinition('b')->getArgument(0));
     }
 
     public function testClosureProxy()

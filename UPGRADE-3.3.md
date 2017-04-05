@@ -80,6 +80,8 @@ Debug
 DependencyInjection
 -------------------
 
+ * [BC BREAK] autowiring now happens only when a type-hint matches its corresponding FQCN id or alias. Please follow the suggestions provided by the exceptions thrown at compilation to upgrade your service configuration.
+
  * [BC BREAK] `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
 
  * [BC BREAK] non-numeric keys in methods and constructors arguments have never been supported and are now forbidden. Please remove them if you happen to have one.

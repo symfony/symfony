@@ -100,7 +100,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());
         $def->setLazy($parentDef->isLazy());
-        $def->setAutowired($parentDef->getAutowired());
+        $def->setAutowired($parentDef->isAutowired());
 
         self::mergeDefinition($def, $definition);
 
@@ -146,7 +146,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
             $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
         }
         if (isset($changes['autowired'])) {
-            $def->setAutowired($definition->getAutowired());
+            $def->setAutowired($definition->isAutowired());
         }
         if (isset($changes['decorated_service'])) {
             $decoratedService = $definition->getDecoratedService();

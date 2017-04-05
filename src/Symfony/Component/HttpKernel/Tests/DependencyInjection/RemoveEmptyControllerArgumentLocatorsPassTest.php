@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInvalidReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -74,10 +73,10 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
 
         $expected = array(
-            RegisterTestController::class.':fooAction' => new ServiceClosureArgument(new Reference('service_locator.37b6201ea2e9e6ade00ab09ae7a6ceb3')),
-            RegisterTestController::class.'::fooAction' => new ServiceClosureArgument(new Reference('service_locator.37b6201ea2e9e6ade00ab09ae7a6ceb3')),
+            RegisterTestController::class.':fooAction',
+            RegisterTestController::class.'::fooAction',
         );
-        $this->assertEquals($expected, $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0));
+        $this->assertEquals($expected, array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0)));
     }
 }
 

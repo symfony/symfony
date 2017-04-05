@@ -73,6 +73,8 @@ Debug
 DependencyInjection
 -------------------
 
+ * Autowiring now happens only when a type-hint matches its corresponding FQCN id or alias.
+
  * `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
 
  * Non-numeric keys in methods and constructors arguments have never been supported and are now forbidden. Please remove them if you happen to have one.

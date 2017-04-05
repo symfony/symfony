@@ -221,7 +221,7 @@ class JsonDescriptor extends Descriptor
             'lazy' => $definition->isLazy(),
             'shared' => $definition->isShared(),
             'abstract' => $definition->isAbstract(),
-            'autowire' => $definition->isAutowired() ? (Definition::AUTOWIRE_BY_TYPE === $definition->getAutowired() ? 'by-type' : 'by-id') : false,
+            'autowire' => $definition->isAutowired(),
         );
 
         foreach ($definition->getAutowiringTypes(false) as $autowiringType) {

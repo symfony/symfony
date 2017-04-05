@@ -182,7 +182,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
             ."\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no')
             ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no')
-            ."\n".'- Autowired: '.($definition->isAutowired() ? (Definition::AUTOWIRE_BY_TYPE === $definition->getAutowired() ? 'by-type' : 'by-id') : 'no')
+            ."\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no')
         ;
 
         foreach ($definition->getAutowiringTypes(false) as $autowiringType) {

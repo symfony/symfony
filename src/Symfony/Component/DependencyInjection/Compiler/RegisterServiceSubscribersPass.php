@@ -38,9 +38,11 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         }
 
         $serviceMap = array();
+        $autowire = $value->isAutowired();
 
         foreach ($value->getTag('container.service_subscriber') as $attributes) {
             if (!$attributes) {
+                $autowire = true;
                 continue;
             }
             ksort($attributes);
@@ -82,6 +84,9 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $key = $type;
             }
             if (!isset($serviceMap[$key])) {
+                if (!$autowire) {
+                    throw new InvalidArgumentException(sprintf('Service "%s" misses a "container.service_subscriber" tag with "key"/"id" attributes corresponding to entry "%s" as returned by %s::getSubscribedServices().', $this->currentId, $key, $class));
+                }
                 $serviceMap[$key] = new Reference($type);
             }
 
@@ -95,7 +100,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         }
 
         $serviceLocator = $this->serviceLocator;
-        $this->serviceLocator = (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $value->getAutowired());
+        $this->serviceLocator = (string) ServiceLocatorTagPass::register($this->container, $subscriberMap);
 
         try {
             return parent::processValue($value);

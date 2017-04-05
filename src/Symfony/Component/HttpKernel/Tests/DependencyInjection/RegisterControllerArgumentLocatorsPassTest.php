@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
@@ -130,7 +129,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
 
         $container->register('foo', RegisterTestController::class)
-            ->setAutowired(true)
             ->addTag('controller.service_arguments')
         ;
 
@@ -139,13 +137,13 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $this->assertEquals(array('foo:fooAction' => new ServiceClosureArgument(new Reference('service_locator.d964744f7278cba85dee823607f8c07f'))), $locator);
+        $this->assertEquals(array('foo:fooAction'), array_keys($locator));
+        $this->assertInstanceof(ServiceClosureArgument::class, $locator['foo:fooAction']);
 
         $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
 
         $this->assertSame(ServiceLocator::class, $locator->getClass());
         $this->assertFalse($locator->isPublic());
-        $this->assertTrue($locator->isAutowired());
 
         $expected = array('bar' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, false)));
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -166,7 +164,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
-        $this->assertFalse($locator->isAutowired());
 
         $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false)));
         $this->assertEquals($expected, $locator->getArgument(0));

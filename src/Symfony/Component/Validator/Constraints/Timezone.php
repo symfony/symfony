@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 class Timezone extends Constraint
 {
     const NO_SUCH_TIMEZONE_ERROR = '45de6628-3479-46d6-a210-00ad584f530a';
+    const NO_SUCH_TIMEZONE_IN_ZONE_ERROR = 'b57767b1-36c0-40ac-a3d7-629420c775b8';
+    const NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR = 'c4a22222-dc92-4fc0-abb0-d95b268c7d0b';
 
     public $zone;
 

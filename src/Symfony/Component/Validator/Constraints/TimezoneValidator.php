@@ -44,9 +44,17 @@ class TimezoneValidator extends ConstraintValidator
         $timezoneIds = \DateTimeZone::listIdentifiers($zone, $constraint->countryCode);
 
         if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
+            if ($constraint->countryCode) {
+                $code = Timezone::NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR;
+            } elseif (null !== $constraint->zone) {
+                $code = Timezone::NO_SUCH_TIMEZONE_IN_ZONE_ERROR;
+            } else {
+                $code = Timezone::NO_SUCH_TIMEZONE_ERROR;
+            }
+
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ extra_info }}', $this->formatExtraInfo($constraint->zone, $constraint->countryCode))
-                ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
+                ->setCode($code)
                 ->addViolation();
         }
     }

@@ -143,7 +143,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ extra_info }}', '"'.$extraInfo.'"')
-            ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
+            ->setCode(Timezone::NO_SUCH_TIMEZONE_IN_ZONE_ERROR)
             ->assertRaised();
     }
 
@@ -207,7 +207,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ extra_info }}', '"'.$extraInfo.'"')
-            ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
+            ->setCode(Timezone::NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR)
             ->assertRaised();
     }
 

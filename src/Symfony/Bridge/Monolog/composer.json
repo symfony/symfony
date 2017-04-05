@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "monolog/monolog": "~1.11",
+        "monolog/monolog": "~1.19",
         "symfony/http-kernel": "~2.8|~3.0"
     },
     "require-dev": {

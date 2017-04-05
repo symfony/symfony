@@ -46,8 +46,6 @@ abstract class FileLoader extends BaseFileLoader
      * @param Definition $prototype A definition to use as template
      * @param string     $namespace The namespace prefix of classes in the scanned directory
      * @param string     $resource  The directory to look for classes, glob-patterns allowed
-     *
-     * @experimental in version 3.3
      */
     public function registerClasses(Definition $prototype, $namespace, $resource)
     {
@@ -68,7 +66,10 @@ abstract class FileLoader extends BaseFileLoader
     }
 
     /**
-     * @experimental in version 3.3
+     * Registers a definition in the container with its instanceof-conditionals.
+     *
+     * @param string     $id
+     * @param Definition $definition
      */
     protected function setDefinition($id, Definition $definition)
     {

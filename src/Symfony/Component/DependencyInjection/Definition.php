@@ -335,8 +335,6 @@ class Definition
      * Sets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
      *
      * @param $instanceof ChildDefinition[]
-     *
-     * @experimental in version 3.3
      */
     public function setInstanceofConditionals(array $instanceof)
     {
@@ -349,8 +347,6 @@ class Definition
      * Gets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
      *
      * @return ChildDefinition[]
-     *
-     * @experimental in version 3.3
      */
     public function getInstanceofConditionals()
     {

@@ -8,8 +8,8 @@ CHANGELOG
  * added "container.service_locator" tag for defining service-locator services
  * added anonymous services support in YAML configuration files using the `!service` tag.
  * added "TypedReference" and "ServiceClosureArgument" for creating service-locator services
- * [EXPERIMENTAL] added "instanceof" section for local interface-defined configs
- * [EXPERIMENTAL] added prototype services for PSR4-based discovery and registration
+ * added "instanceof" section for local interface-defined configs
+ * added prototype services for PSR4-based discovery and registration
  * added `ContainerBuilder::getReflectionClass()` for retrieving and tracking reflection class info
  * deprecated `ContainerBuilder::getClassResource()`, use `ContainerBuilder::getReflectionClass()` or `ContainerBuilder::addObjectResource()` instead
  * added `ContainerBuilder::fileExists()` for checking and tracking file or directory existence

@@ -93,4 +93,4 @@ script:
     - if [[ ! $deps && $PHP = hhvm* ]]; then $PHPUNIT --exclude-group benchmark,intl-data; fi
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'echo "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi
     - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% $FOLD_START'cd {}; composer update --no-progress --no-suggest --ansi 2>&1; $PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY;'$FOLD_END"$REPORT"; fi
-    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% $FOLD_START'cd {}; composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable; $PHPUNIT --exclude-group tty,benchmark,intl-data'$FOLD_END"$REPORT"; fi
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% $FOLD_START'cd {}; composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1; $PHPUNIT --exclude-group tty,benchmark,intl-data'$FOLD_END"$REPORT"; fi

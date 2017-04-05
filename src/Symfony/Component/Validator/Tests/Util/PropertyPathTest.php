@@ -32,6 +32,7 @@ class PropertyPathTest extends TestCase
             array('foo', 'bar', 'foo.bar', 'It append the subPath to the basePath'),
             array('foo', '[bar]', 'foo[bar]', 'It does not include the dot separator if subPath uses the array notation'),
             array('0', 'bar', '0.bar', 'Leading zeros are kept.'),
+            array('children[foo].data', 'bar', 'children[foo].bar', 'It does not include data suffix if basePath start by contain children and finish by data (collection form validation context).'),
         );
     }
 }

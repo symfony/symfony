@@ -27,7 +27,7 @@ class ConsoleExceptionEvent extends ConsoleEvent
     private $exception;
     private $exitCode;
 
-    public function __construct(Command $command, InputInterface $input, OutputInterface $output, \Exception $exception, $exitCode, $deprecation = true)
+    public function __construct(Command $command = null, InputInterface $input, OutputInterface $output, \Exception $exception, $exitCode, $deprecation = true)
     {
         if ($deprecation) {
             @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use the ConsoleErrorEvent instead.', __CLASS__), E_USER_DEPRECATED);

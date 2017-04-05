@@ -1066,6 +1066,26 @@ class ApplicationTest extends TestCase
         $this->assertEquals(0, $tester->getStatusCode());
     }
 
+    public function testConsoleErrorEventIsTriggeredOnCommandNotFound()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            $this->assertNull($event->getCommand());
+            $this->assertInstanceOf(CommandNotFoundException::class, $event->getError());
+            $event->getOutput()->write('silenced command not found');
+            $event->markErrorAsHandled();
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'unknown'));
+        $this->assertContains('silenced command not found', $tester->getDisplay());
+        $this->assertEquals(0, $tester->getStatusCode());
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation The "console.exception" event is deprecated since version 3.3 and will be removed in 4.0. Use the "console.error" event instead.

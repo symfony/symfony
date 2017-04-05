@@ -173,11 +173,11 @@ EOF
         }
 
         if (!$this->getApplication()->getKernel()->isDebug()) {
-            throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
+            throw new \LogicException('Debug information about the container is only available in debug mode.');
         }
 
         if (!is_file($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
-            throw new \LogicException(sprintf('Debug information about the container could not be found. Please clear the cache and try again.'));
+            throw new \LogicException('Debug information about the container could not be found. Please clear the cache and try again.');
         }
 
         $container = new ContainerBuilder();

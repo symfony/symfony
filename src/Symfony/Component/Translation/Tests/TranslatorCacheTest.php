@@ -149,6 +149,17 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('OK', $translator->trans($msgid), '-> the cache was overwritten by another translator instance in '.($debug ? 'debug' : 'production'));
     }
 
+    public function testGeneratedCacheFilesAreOnlyBelongRequestedLocales()
+    {
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b'));
+        $translator->trans('bar');
+
+        $cachedFiles = glob($this->tmpDir.'/*.php');
+
+        $this->assertCount(1, $cachedFiles);
+    }
+
     public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
     {
         /*

@@ -595,6 +595,17 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
+    public function testProcessDoesNotTriggerDeprecations()
+    {
+        $container = new ContainerBuilder();
+        $container->register('deprecated', 'Symfony\Component\DependencyInjection\Tests\Fixtures\DeprecatedClass')->setDeprecated(true);
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $container->register('bar', __NAMESPACE__.'\Bar')->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
     public function testEmptyStringIsKept()
     {
         $container = new ContainerBuilder();

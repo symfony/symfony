@@ -355,8 +355,22 @@ class AutowirePass extends AbstractRecursivePass
             unset($this->ambiguousServiceTypes[$type]);
         }
 
-        if (!$reflectionClass = $this->container->getReflectionClass($definition->getClass(), true)) {
-            return;
+        if ($deprecated = $definition->isDeprecated()) {
+            $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
+                return (E_USER_DEPRECATED === $level || !$prevErrorHandler) ? false : $prevErrorHandler($level, $message, $file, $line);
+            });
+        }
+
+        $e = null;
+
+        try {
+            if (!$reflectionClass = $this->container->getReflectionClass($definition->getClass(), true)) {
+                return;
+            }
+        } finally {
+            if ($deprecated) {
+                restore_error_handler();
+            }
         }
 
         foreach ($reflectionClass->getInterfaces() as $reflectionInterface) {

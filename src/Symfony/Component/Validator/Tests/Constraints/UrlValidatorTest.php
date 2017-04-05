@@ -172,6 +172,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://example.com/exploit.html?<script>alert(1);</script>'),
             array('http://example.com/exploit.html?hel lo'),
             array('http://example.com/exploit.html?not_a%hex'),
+            array('http://'),
         );
     }
 

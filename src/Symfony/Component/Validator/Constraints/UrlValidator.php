@@ -82,7 +82,7 @@ class UrlValidator extends ConstraintValidator
         if ($constraint->checkDNS) {
             $host = parse_url($value, PHP_URL_HOST);
 
-            if (!checkdnsrr($host, 'ANY')) {
+            if (!is_string($host) || !checkdnsrr($host, 'ANY')) {
                 if ($this->context instanceof ExecutionContextInterface) {
                     $this->context->buildViolation($constraint->dnsMessage)
                         ->setParameter('{{ value }}', $this->formatValue($host))

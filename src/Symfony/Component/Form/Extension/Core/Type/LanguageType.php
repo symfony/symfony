@@ -38,7 +38,13 @@ class LanguageType extends AbstractType implements ChoiceLoaderInterface
     {
         $resolver->setDefaults(array(
             'choice_loader' => function (Options $options) {
-                return $options['choices'] ? null : $this;
+                if ($options['choices']) {
+                    @trigger_error(sprintf('Using the "choices" option in %s has been deprecated since version 3.3 and will be ignored in 4.0. Override the "choice_loader" option instead or set it to null.', __CLASS__), E_USER_DEPRECATED);
+
+                    return null;
+                }
+
+                return $this;
             },
             'choice_translation_domain' => false,
         ));

@@ -117,15 +117,15 @@
         };
 
         var startAjaxRequest = function(index) {
-            var request = requestStack[index];
-            pendingRequests++;
-            var row = document.createElement('tr');
-            request.DOMNode = row;
-
             var tbody = document.querySelector('.sf-toolbar-ajax-request-list');
             if (!tbody) {
                 return;
             }
+
+            var request = requestStack[index];
+            pendingRequests++;
+            var row = document.createElement('tr');
+            request.DOMNode = row;
 
             var methodCell = document.createElement('td');
             methodCell.textContent = request.method;
@@ -171,6 +171,9 @@
 
         var finishAjaxRequest = function(index) {
             var request = requestStack[index];
+            if (!request.DOMNode) {
+                return;
+            }
             pendingRequests--;
             var row = request.DOMNode;
             /* Unpack the children from the row */
@@ -356,6 +359,12 @@
                             el.innerHTML = xhr.responseText;
                             el.setAttribute('data-sfurl', url);
                             removeClass(el, 'loading');
+                            for (var i = 0; i < requestStack.length; i++) {
+                                startAjaxRequest(i);
+                                if (requestStack[i].duration) {
+                                    finishAjaxRequest(i);
+                                }
+                            }
                             (onSuccess || noop)(xhr, el);
                         },
                         function(xhr) { (onError || noop)(xhr, el); },

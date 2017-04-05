@@ -59,21 +59,6 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         ), $container->getDefinition('parent')->getMethodCalls());
     }
 
-    public function testProcessDoesReplaceAbstract()
-    {
-        $container = new ContainerBuilder();
-
-        $def = $container->register('parent', 'stdClass');
-
-        $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setAbstract(true),
-        ));
-
-        $this->process($container);
-
-        $this->assertTrue($def->isAbstract());
-    }
-
     public function testProcessDoesReplaceShared()
     {
         $container = new ContainerBuilder();

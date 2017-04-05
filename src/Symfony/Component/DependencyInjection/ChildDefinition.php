@@ -23,15 +23,12 @@ class ChildDefinition extends Definition
 {
     private $parent;
     private $inheritTags = false;
-    private $changes = array();
 
     /**
      * @param string $parent The id of Definition instance to decorate
      */
     public function __construct($parent)
     {
-        parent::__construct();
-
         $this->parent = $parent;
     }
 
@@ -46,13 +43,17 @@ class ChildDefinition extends Definition
     }
 
     /**
-     * Returns all changes tracked for the Definition object.
+     * Sets the Definition being decorated.
      *
-     * @return array An array of changes for this Definition
+     * @param string $parent
+     *
+     * @return $this
      */
-    public function getChanges()
+    public function setParent($parent)
     {
-        return $this->changes;
+        $this->parent = $parent;
+
+        return $this;
     }
 
     /**
@@ -77,116 +78,6 @@ class ChildDefinition extends Definition
     public function getInheritTags()
     {
         return $this->inheritTags;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setClass($class)
-    {
-        $this->changes['class'] = true;
-
-        return parent::setClass($class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFactory($callable)
-    {
-        $this->changes['factory'] = true;
-
-        return parent::setFactory($callable);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurator($callable)
-    {
-        $this->changes['configurator'] = true;
-
-        return parent::setConfigurator($callable);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFile($file)
-    {
-        $this->changes['file'] = true;
-
-        return parent::setFile($file);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setShared($boolean)
-    {
-        $this->changes['shared'] = true;
-
-        return parent::setShared($boolean);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPublic($boolean)
-    {
-        $this->changes['public'] = true;
-
-        return parent::setPublic($boolean);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setLazy($boolean)
-    {
-        $this->changes['lazy'] = true;
-
-        return parent::setLazy($boolean);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAbstract($boolean)
-    {
-        $this->changes['abstract'] = true;
-
-        return parent::setAbstract($boolean);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDecoratedService($id, $renamedId = null, $priority = 0)
-    {
-        $this->changes['decorated_service'] = true;
-
-        return parent::setDecoratedService($id, $renamedId, $priority);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDeprecated($boolean = true, $template = null)
-    {
-        $this->changes['deprecated'] = true;
-
-        return parent::setDeprecated($boolean, $template);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAutowired($autowired)
-    {
-        $this->changes['autowired'] = true;
-
-        return parent::setAutowired($autowired);
     }
 
     /**

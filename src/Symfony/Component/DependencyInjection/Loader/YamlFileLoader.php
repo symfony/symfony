@@ -380,9 +380,13 @@ class YamlFileLoader extends FileLoader
             $definition->setLazy($service['lazy']);
         }
 
-        $public = isset($service['public']) ? $service['public'] : (isset($defaults['public']) ? $defaults['public'] : null);
-        if (null !== $public) {
-            $definition->setPublic($public);
+        if (isset($service['public'])) {
+            $definition->setPublic($service['public']);
+        } elseif (isset($defaults['public'])) {
+            $definition
+                ->setTrackChanges(false)
+                ->setPublic($defaults['public'])
+                ->setTrackChanges(true);
         }
 
         if (isset($service['abstract'])) {
@@ -480,9 +484,23 @@ class YamlFileLoader extends FileLoader
             $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
-        $autowire = isset($service['autowire']) ? $service['autowire'] : (isset($defaults['autowire']) ? $defaults['autowire'] : null);
+        $autowire = null;
+        $autowireDefaultsUsed = false;
+        if (isset($service['autowire'])) {
+            $autowire = $service['autowire'];
+        } elseif (isset($defaults['autowire'])) {
+            $autowire = $defaults['autowire'];
+            $autowireDefaultsUsed = true;
+        }
+
         if (null !== $autowire) {
+            if ($autowireDefaultsUsed) {
+                $definition->setTrackChanges(false);
+            }
             $definition->setAutowired($autowire);
+            if ($autowireDefaultsUsed) {
+                $definition->setTrackChanges(true);
+            }
         }
 
         if (isset($service['autowiring_types'])) {

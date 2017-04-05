@@ -39,7 +39,8 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
-    private $configuredParts = array();
+    private $changes = array();
+    private $trackChanges = true;
 
     protected $arguments;
 
@@ -49,7 +50,9 @@ class Definition
      */
     public function __construct($class = null, array $arguments = array())
     {
-        $this->class = $class;
+        if (null !== $class) {
+            $this->setClass($class);
+        }
         $this->arguments = $arguments;
     }
 
@@ -66,9 +69,8 @@ class Definition
             $factory = explode('::', $factory, 2);
         }
 
+        $this->trackChange('factory');
         $this->factory = $factory;
-
-        $this->configuredParts['factory'] = true;
 
         return $this;
     }
@@ -100,7 +102,7 @@ class Definition
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
 
-        $this->configuredParts['decorated_service'] = true;
+        $this->trackChange('decorated_service');
 
         if (null === $id) {
             $this->decoratedService = null;
@@ -130,6 +132,7 @@ class Definition
      */
     public function setClass($class)
     {
+        $this->trackChange('class');
         $this->class = $class;
 
         return $this;
@@ -453,7 +456,7 @@ class Definition
      */
     public function setFile($file)
     {
-        $this->configuredParts['file'] = true;
+        $this->trackChange('file');
         $this->file = $file;
 
         return $this;
@@ -478,7 +481,7 @@ class Definition
      */
     public function setShared($shared)
     {
-        $this->configuredParts['shared'] = true;
+        $this->trackChange('shared');
         $this->shared = (bool) $shared;
 
         return $this;
@@ -503,7 +506,7 @@ class Definition
      */
     public function setPublic($boolean)
     {
-        $this->configuredParts['public'] = true;
+        $this->trackChange('public');
         $this->public = (bool) $boolean;
 
         return $this;
@@ -528,7 +531,7 @@ class Definition
      */
     public function setLazy($lazy)
     {
-        $this->configuredParts['lazy'] = true;
+        $this->trackChange('lazy');
         $this->lazy = (bool) $lazy;
 
         return $this;
@@ -554,7 +557,7 @@ class Definition
      */
     public function setSynthetic($boolean)
     {
-        $this->configuredParts['synthetic'] = true;
+        $this->trackChange('synthetic');
         $this->synthetic = (bool) $boolean;
 
         return $this;
@@ -581,7 +584,7 @@ class Definition
      */
     public function setAbstract($boolean)
     {
-        $this->configuredParts['abstract'] = true;
+        $this->trackChange('abstract');
         $this->abstract = (bool) $boolean;
 
         return $this;
@@ -623,7 +626,7 @@ class Definition
             $this->deprecationTemplate = $template;
         }
 
-        $this->configuredParts['deprecated'] = true;
+        $this->trackChange('deprecated');
         $this->deprecated = (bool) $status;
 
         return $this;
@@ -665,7 +668,7 @@ class Definition
             $configurator = explode('::', $configurator, 2);
         }
 
-        $this->configuredParts['configurator'] = true;
+        $this->trackChange('configurator');
         $this->configurator = $configurator;
 
         return $this;
@@ -722,7 +725,7 @@ class Definition
      */
     public function setAutowired($autowired)
     {
-        $this->configuredParts['autowired'] = true;
+        $this->trackChange('autowired');
         $this->autowired = (bool) $autowired;
 
         return $this;
@@ -797,12 +800,33 @@ class Definition
     }
 
     /**
-     * Returns all parts of this Definition that were explicitly configured.
+     * Returns all changes tracked for the Definition object.
      *
-     * @return array An array of configured parts for this Definition
+     * @return array An array of changes for this Definition
      */
-    public function getConfiguredParts()
+    public function getChanges()
     {
-        return $this->configuredParts;
+        return $this->changes;
+    }
+
+    /**
+     * Turn internal change tracking on or off.
+     *
+     * @param bool $trackChanges
+     *
+     * @return $this
+     */
+    public function setTrackChanges($trackChanges)
+    {
+        $this->trackChanges = $trackChanges;
+
+        return $this;
+    }
+
+    private function trackChange($type)
+    {
+        if ($this->trackChanges) {
+            $this->changes[$type] = true;
+        }
     }
 }

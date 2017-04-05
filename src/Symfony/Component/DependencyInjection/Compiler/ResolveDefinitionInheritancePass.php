@@ -48,7 +48,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
 
     private function mergeInstanceofDefinition(Definition $def, ChildDefinition $instanceofDefinition)
     {
-        $configured = $def->getConfiguredParts();
+        $configured = $def->getChanges();
         $changes = $instanceofDefinition->getChanges();
         if (!isset($configured['shared']) && isset($changes['shared'])) {
             $def->setShared($instanceofDefinition->isShared());

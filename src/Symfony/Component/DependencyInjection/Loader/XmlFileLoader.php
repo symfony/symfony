@@ -227,7 +227,10 @@ class XmlFileLoader extends FileLoader
         if ($publicAttr = $service->getAttribute('public')) {
             $definition->setPublic(XmlUtils::phpize($publicAttr));
         } elseif (isset($defaults['public'])) {
-            $definition->setPublic($defaults['public']);
+            $definition
+                ->setTrackChanges(false)
+                ->setPublic($defaults['public'])
+                ->setTrackChanges(true);
         }
 
         foreach (array('class', 'shared', 'synthetic', 'lazy', 'abstract') as $key) {
@@ -240,7 +243,10 @@ class XmlFileLoader extends FileLoader
         if ($value = $service->getAttribute('autowire')) {
             $definition->setAutowired(XmlUtils::phpize($value));
         } elseif (isset($defaults['autowire'])) {
-            $definition->setAutowired($defaults['autowire']);
+            $definition
+                ->setTrackChanges(false)
+                ->setAutowired($defaults['autowire'])
+                ->setTrackChanges(true);
         }
 
         if ($files = $this->getChildren($service, 'file')) {

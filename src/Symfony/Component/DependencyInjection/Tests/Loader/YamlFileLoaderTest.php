@@ -398,6 +398,8 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($container->getDefinition('with_defaults')->isPublic());
         $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_defaults')->getTags());
         $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
+        $this->assertArrayNotHasKey('public', $container->getDefinition('with_defaults')->getChanges());
+        $this->assertArrayNotHasKey('autowire', $container->getDefinition('with_defaults')->getChanges());
 
         $this->assertFalse($container->getAlias('with_defaults_aliased')->isPublic());
         $this->assertFalse($container->getAlias('with_defaults_aliased_short')->isPublic());

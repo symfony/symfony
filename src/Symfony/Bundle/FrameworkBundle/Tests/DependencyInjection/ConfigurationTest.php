@@ -238,7 +238,7 @@ class ConfigurationTest extends TestCase
                 'log' => true,
                 'throw' => true,
             ),
-            'links' => array(
+            'web_link' => array(
                 'enabled' => !class_exists(FullStack::class),
             ),
         );

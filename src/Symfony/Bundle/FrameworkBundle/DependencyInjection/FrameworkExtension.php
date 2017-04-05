@@ -29,7 +29,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Link\LinkManagerInterface;
+use Symfony\Component\WebLink\WebLinkManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -209,12 +209,12 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
-        if ($this->isConfigEnabled($container, $config['links'])) {
-            if (!interface_exists(LinkManagerInterface::class)) {
-                throw new LogicException('Link support cannot be enabled as the Link component is not installed.');
+        if ($this->isConfigEnabled($container, $config['web_link'])) {
+            if (!interface_exists(WebLinkManagerInterface::class)) {
+                throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed.');
             }
 
-            $loader->load('links.xml');
+            $loader->load('web_link.xml');
         }
 
         $this->addAnnotatedClassesToCompile(array(

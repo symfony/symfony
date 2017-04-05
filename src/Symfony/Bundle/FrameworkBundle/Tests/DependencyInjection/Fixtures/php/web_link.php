@@ -1,5 +1,5 @@
 <?php
 
 $container->loadFromExtension('framework', array(
-    'links' => array('enabled' => true),
+    'web_link' => array('enabled' => true),
 ));

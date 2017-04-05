@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Link;
+namespace Symfony\Component\WebLink;
 
 /**
  * {@inheritdoc}
@@ -18,7 +18,7 @@ namespace Symfony\Component\Link;
  *
  * @final
  */
-class LinkManager implements LinkManagerInterface
+class WebLinkManager implements WebLinkManagerInterface
 {
     private $resources = array();
 
@@ -41,7 +41,7 @@ class LinkManager implements LinkManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function buildValues()
+    public function buildHeaderValue()
     {
         $elements = array();
         foreach ($this->resources as $uri => $attributes) {

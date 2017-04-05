@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Link\Tests\EventListener;
+namespace Symfony\Component\WebLink\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Link\EventListener\LinkListener;
-use Symfony\Component\Link\LinkManager;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
+use Symfony\Component\WebLink\WebLinkManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -22,14 +22,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class LinkListenerTest extends TestCase
+class AddLinkHeaderListenerTest extends TestCase
 {
     public function testOnKernelResponse()
     {
-        $manager = new LinkManager();
+        $manager = new WebLinkManager();
         $manager->add('/foo', 'preload');
 
-        $subscriber = new LinkListener($manager);
+        $subscriber = new AddLinkHeaderListener($manager);
         $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
 
         $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
@@ -46,11 +46,11 @@ class LinkListenerTest extends TestCase
         );
 
         $this->assertEquals($expected, $response->headers->get('Link', null, false));
-        $this->assertNull($manager->buildValues());
+        $this->assertNull($manager->buildHeaderValue());
     }
 
     public function testSubscribedEvents()
     {
-        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), LinkListener::getSubscribedEvents());
+        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), AddLinkHeaderListener::getSubscribedEvents());
     }
 }

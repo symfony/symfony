@@ -9,21 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Link\Tests;
+namespace Symfony\Component\WebLink\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Link\LinkManager;
-use Symfony\Component\Link\LinkManagerInterface;
+use Symfony\Component\WebLink\WebLinkManager;
+use Symfony\Component\WebLink\WebLinkManagerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class LinkManagerTest extends TestCase
+class WebLinkManagerTest extends TestCase
 {
     public function testManageResources()
     {
-        $manager = new LinkManager();
-        $this->assertInstanceOf(LinkManagerInterface::class, $manager);
+        $manager = new WebLinkManager();
+        $this->assertInstanceOf(WebLinkManagerInterface::class, $manager);
 
         $manager->add('/hello.html', 'prerender', array('pr' => 0.7));
 
@@ -31,6 +31,6 @@ class LinkManagerTest extends TestCase
         $manager->add('/foo/baz.css', 'preload');
         $manager->add('/foo/bat.png', 'preload', array('as' => 'image', 'nopush' => true));
 
-        $this->assertEquals('</hello.html>; rel=prerender; pr=0.7,</foo/bar.js>; rel=preload; as=script,</foo/baz.css>; rel=preload,</foo/bat.png>; rel=preload; as=image; nopush', $manager->buildValues());
+        $this->assertEquals('</hello.html>; rel=prerender; pr=0.7,</foo/bar.js>; rel=preload; as=script,</foo/baz.css>; rel=preload,</foo/bat.png>; rel=preload; as=image; nopush', $manager->buildHeaderValue());
     }
 }

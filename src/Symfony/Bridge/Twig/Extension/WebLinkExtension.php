@@ -11,18 +11,18 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\Link\LinkManagerInterface;
+use Symfony\Component\WebLink\WebLinkManagerInterface;
 
 /**
- * Twig extension for the Symfony Preload component.
+ * Twig extension for the Symfony WebLink component.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class LinkExtension extends \Twig_Extension
+class WebLinkExtension extends \Twig_Extension
 {
     private $linkManager;
 
-    public function __construct(LinkManagerInterface $linkManager)
+    public function __construct(WebLinkManagerInterface $linkManager)
     {
         $this->linkManager = $linkManager;
     }
@@ -68,7 +68,7 @@ class LinkExtension extends \Twig_Extension
      */
     public function preload($uri, array $attributes = array())
     {
-        return $this->link($uri, 'preload', $attributes);
+        return $this->link($uri, WebLinkManagerInterface::REL_PRELOAD, $attributes);
     }
 
     /**
@@ -81,7 +81,7 @@ class LinkExtension extends \Twig_Extension
      */
     public function dnsPrefetch($uri, array $attributes = array())
     {
-        return $this->link($uri, 'dns-prefetch', $attributes);
+        return $this->link($uri, WebLinkManagerInterface::REL_DNS_PREFETCH, $attributes);
     }
 
     /**
@@ -94,11 +94,11 @@ class LinkExtension extends \Twig_Extension
      */
     public function preconnect($uri, array $attributes = array())
     {
-        return $this->link($uri, 'preconnect', $attributes);
+        return $this->link($uri, WebLinkManagerInterface::REL_PRECONNECT, $attributes);
     }
 
     /**
-     * Indicates to the client that it should prefetch this resource .
+     * Indicates to the client that it should prefetch this resource.
      *
      * @param string $uri        A public path
      * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
@@ -107,7 +107,7 @@ class LinkExtension extends \Twig_Extension
      */
     public function prefetch($uri, array $attributes = array())
     {
-        return $this->link($uri, 'prefetch', $attributes);
+        return $this->link($uri, WebLinkManagerInterface::REL_PREFETCH, $attributes);
     }
 
     /**
@@ -120,7 +120,7 @@ class LinkExtension extends \Twig_Extension
      */
     public function prerender($uri, array $attributes = array())
     {
-        return $this->link($uri, 'prerender', $attributes);
+        return $this->link($uri, WebLinkManagerInterface::REL_PRERENDER, $attributes);
     }
 
     /**
@@ -130,6 +130,6 @@ class LinkExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'link';
+        return 'web_link';
     }
 }

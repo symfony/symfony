@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Link\EventListener;
+namespace Symfony\Component\WebLink\EventListener;
 
-use Symfony\Component\Link\LinkManagerInterface;
+use Symfony\Component\WebLink\WebLinkManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -20,12 +20,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Adds the Link HTTP header to the response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final
  */
-class LinkListener implements EventSubscriberInterface
+class AddLinkHeaderListener implements EventSubscriberInterface
 {
     private $linkManager;
 
-    public function __construct(LinkManagerInterface $linkManager)
+    public function __construct(WebLinkManagerInterface $linkManager)
     {
         $this->linkManager = $linkManager;
     }
@@ -36,7 +38,7 @@ class LinkListener implements EventSubscriberInterface
             return;
         }
 
-        if ($value = $this->linkManager->buildValues()) {
+        if ($value = $this->linkManager->buildHeaderValue()) {
             $event->getResponse()->headers->set('Link', $value, false);
 
             // Free memory

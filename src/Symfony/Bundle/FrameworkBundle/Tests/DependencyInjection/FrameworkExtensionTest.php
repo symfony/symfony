@@ -408,10 +408,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
-    public function testLinks()
+    public function testWebLink()
     {
-        $container = $this->createContainerFromFile('links');
-        $this->assertTrue($container->hasDefinition('links.link_listener'));
+        $container = $this->createContainerFromFile('web_link');
+        $this->assertTrue($container->hasDefinition('web_link.manager'));
     }
 
     public function testTranslator()

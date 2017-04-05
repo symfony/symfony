@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -539,23 +538,28 @@ class XmlFileLoaderTest extends TestCase
         $foo = $container->getDefinition('foo');
 
         $fooFactory = $foo->getFactory();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactory[0]);
-        $this->assertSame('FooFactory', $fooFactory[0]->getClass());
+        $this->assertInstanceOf(Reference::class, $fooFactory[0]);
+        $this->assertTrue($container->has((string) $fooFactory[0]));
+        $fooFactoryDefinition = $container->getDefinition((string) $fooFactory[0]);
+        $this->assertSame('FooFactory', $fooFactoryDefinition->getClass());
         $this->assertSame('createFoo', $fooFactory[1]);
 
-        $fooFactoryFactory = $fooFactory[0]->getFactory();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactoryFactory[0]);
-        $this->assertSame('Foobar', $fooFactoryFactory[0]->getClass());
+        $fooFactoryFactory = $fooFactoryDefinition->getFactory();
+        $this->assertInstanceOf(Reference::class, $fooFactoryFactory[0]);
+        $this->assertTrue($container->has((string) $fooFactoryFactory[0]));
+        $this->assertSame('Foobar', $container->getDefinition((string) $fooFactoryFactory[0])->getClass());
         $this->assertSame('createFooFactory', $fooFactoryFactory[1]);
 
         $fooConfigurator = $foo->getConfigurator();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooConfigurator[0]);
-        $this->assertSame('Bar', $fooConfigurator[0]->getClass());
+        $this->assertInstanceOf(Reference::class, $fooConfigurator[0]);
+        $this->assertTrue($container->has((string) $fooConfigurator[0]));
+        $fooConfiguratorDefinition = $container->getDefinition((string) $fooConfigurator[0]);
+        $this->assertSame('Bar', $fooConfiguratorDefinition->getClass());
         $this->assertSame('configureFoo', $fooConfigurator[1]);
 
-        $barConfigurator = $fooConfigurator[0]->getConfigurator();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $barConfigurator[0]);
-        $this->assertSame('Baz', $barConfigurator[0]->getClass());
+        $barConfigurator = $fooConfiguratorDefinition->getConfigurator();
+        $this->assertInstanceOf(Reference::class, $barConfigurator[0]);
+        $this->assertSame('Baz', $container->getDefinition((string) $barConfigurator[0])->getClass());
         $this->assertSame('configureBar', $barConfigurator[1]);
     }
 

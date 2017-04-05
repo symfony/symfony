@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `AddValidatorInitializersPass`
  * added `AddConstraintValidatorsPass`
+ * added min/max amount of pixels check to `Image` constraint via `minPixels` and `maxPixels`
 
 3.2.0
 -----

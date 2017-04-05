@@ -41,6 +41,7 @@ class PassConfig
 
         $this->beforeOptimizationPasses = array(
             100 => array(
+                new RemoveInvalidAutoregisteredPass(),
                 $resolveClassPass = new ResolveClassPass(),
                 new ResolveDefinitionInheritancePass(),
             ),

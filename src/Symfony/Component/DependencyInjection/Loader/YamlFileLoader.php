@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -143,6 +142,7 @@ class YamlFileLoader extends FileLoader
             $this->parseDefinitions($content, $resource);
         } finally {
             $this->instanceof = array();
+            $this->fqcnReferences = array();
         }
     }
 
@@ -229,6 +229,11 @@ class YamlFileLoader extends FileLoader
         $defaults = $this->parseDefaults($content, $file);
         foreach ($content['services'] as $id => $service) {
             $this->parseDefinition($id, $service, $file, $defaults);
+        }
+        foreach ($this->fqcnReferences as $class) {
+            if (!$this->container->has($class)) {
+                $this->parseDefinition($class, array('tags' => array(array('name' => 'kernel.autoregistered'))), $file, $defaults);
+            }
         }
     }
 
@@ -731,7 +736,7 @@ class YamlFileLoader extends FileLoader
             }
 
             if (null !== $invalidBehavior) {
-                $value = new Reference($value, $invalidBehavior);
+                $value = $this->createReference($value, $invalidBehavior);
             }
         }
 

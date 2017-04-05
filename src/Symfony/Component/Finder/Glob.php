@@ -65,7 +65,7 @@ class Glob
                     $car = $strictLeadingDot ? '/(?:(?=[^\.])[^/]++/)*' : '/(?:[^/]++/)*';
                     $i += 3;
                 } elseif (isset($glob[$i + 2]) && '**' === $glob[$i + 1].$glob[$i + 2]) {
-                    $car = '/.*';
+                    $car = $strictLeadingDot ? '/(?=[^\.]).*' : '/.*';
                     $i += 2;
                 }
 

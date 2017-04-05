@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-29T14:37:12Z
+
+ping @wouterj
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-03-30T10:48:33Z
+
+Ready, build failure unrelated.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-05T11:16:46Z
+
+Bump, it will be harder to make this change after 3.3 (would involve deprecations).

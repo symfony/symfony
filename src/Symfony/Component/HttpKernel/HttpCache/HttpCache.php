@@ -464,7 +464,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // make sure HttpCache is a trusted proxy
         if (!in_array('127.0.0.1', $trustedProxies = Request::getTrustedProxies())) {
             $trustedProxies[] = '127.0.0.1';
-            Request::setTrustedProxies($trustedProxies);
+            Request::setTrustedProxies($trustedProxies, method_exists('Request', 'getTrustedHeaderSet') ? Request::getTrustedHeaderSet() : -1);
         }
 
         // always a "master" request (as the real master request can be in cache)

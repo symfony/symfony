@@ -134,14 +134,4 @@ class WebLinkExtension extends \Twig_Extension
     {
         return $this->link($uri, 'prerender', $attributes);
     }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'web_link';
-    }
 }

@@ -89,9 +89,4 @@ class WebLinkExtensionTest extends TestCase
         $link = (new Link('prerender', '/foo.css'))->withAttribute('as', 'style')->withAttribute('crossorigin', true);
         $this->assertEquals(array($link), array_values($this->request->attributes->get('_links')->getLinks()));
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('web_link', $this->extension->getName());
-    }
 }

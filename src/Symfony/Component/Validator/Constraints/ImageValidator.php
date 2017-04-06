@@ -155,6 +155,8 @@ class ImageValidator extends FileValidator
                 $this->context->buildViolation($constraint->maxPixelsMessage)
                     ->setParameter('{{ pixels }}', $pixels)
                     ->setParameter('{{ max_pixels }}', $constraint->maxPixels)
+                    ->setParameter('{{ height }}', $height)
+                    ->setParameter('{{ width }}', $width)
                     ->setCode(Image::TOO_MANY_PX_ERROR)
                     ->addViolation();
             }

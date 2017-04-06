@@ -25,6 +25,13 @@ class ResolveDefinitionInheritancePassTest extends TestCase
             ->setProperty('foo', 'moo');
         $def->setInstanceofConditionals(array(
             parent::class => (new ChildDefinition(''))
+                ->setShared(false)
+                ->setLazy(true)
+                ->setPublic(false)
+                ->setConfigurator('instanceof_configurator')
+                ->addMethodCall('foo_call')
+                ->addTag('foo_tag')
+                ->setAutowired(true)
                 ->setProperty('foo', 'bar')
                 ->setProperty('otherProp', 'baz')
         ));
@@ -33,6 +40,13 @@ class ResolveDefinitionInheritancePassTest extends TestCase
 
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertSame($def, $container->getDefinition('parent'));
+        $this->assertFalse($def->isShared());
+        $this->assertTrue($def->isLazy());
+        $this->assertFalse($def->isPublic());
+        $this->assertEquals('instanceof_configurator', $def->getConfigurator());
+        $this->assertEquals(array(array('foo_call', array())), $def->getMethodCalls());
+        $this->assertEquals(array('foo_tag' => array(array())), $def->getTags());
+        $this->assertTrue($def->isAutowired());
         // foo property is not replaced, but otherProp is added
         $this->assertEquals(array('foo' => 'moo', 'otherProp' => 'baz'), $def->getProperties());
     }

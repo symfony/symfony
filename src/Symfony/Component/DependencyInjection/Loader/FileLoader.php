@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -74,9 +73,6 @@ abstract class FileLoader extends BaseFileLoader
     protected function setDefinition($id, Definition $definition)
     {
         if ($this->isLoadingInstanceof) {
-            if (!$definition instanceof ChildDefinition) {
-                throw new InvalidArgumentException(sprintf('Invalid type definition "%s": ChildDefinition expected, "%s" given.', $id, get_class($definition)));
-            }
             $this->instanceof[$id] = $definition;
         } else {
             $this->container->setDefinition($id, $definition->setInstanceofConditionals($this->instanceof));

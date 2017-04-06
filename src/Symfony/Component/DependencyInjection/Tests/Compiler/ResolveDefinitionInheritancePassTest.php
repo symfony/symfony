@@ -51,24 +51,29 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $this->assertEquals(array('foo' => 'moo', 'otherProp' => 'baz'), $def->getProperties());
     }
 
-    public function testProcessAppendsMethodCallsAlways()
+    public function testProcessMergesMethodCallsAlways()
     {
         $container = new ContainerBuilder();
 
         $def = $container
             ->register('parent', self::class)
-            ->addMethodCall('foo', array('bar'));
+            ->addMethodCall('foo', array('bar'))
+            ->addMethodCall('setBaz', array('sunshine_baz'));
 
         $def->setInstanceofConditionals(array(
                 parent::class => (new ChildDefinition(''))
-                    ->addMethodCall('bar', array('foo')),
+                    ->addMethodCall('bar', array('foo'))
+                    ->addMethodCall('setBaz', array('rainbow_baz')),
         ));
 
         $this->process($container);
 
         $this->assertEquals(array(
-            array('foo', array('bar')),
+            // instanceof call is first
             array('bar', array('foo')),
+            array('foo', array('bar')),
+            // because it has the same name, the definition overrides instanceof
+            array('setBaz', array('sunshine_baz')),
         ), $container->getDefinition('parent')->getMethodCalls());
     }
 

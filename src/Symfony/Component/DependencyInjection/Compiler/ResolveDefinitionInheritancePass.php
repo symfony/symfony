@@ -74,11 +74,11 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
         }
         // merge method calls
         if ($instanceofCalls = $instanceofDefinition->getMethodCalls()) {
-            $currentCallMethods = array_map(function($call) {
+            $currentCallMethods = array_map(function ($call) {
                 return strtolower($call[0]);
             }, $def->getMethodCalls());
 
-            $uniqueInstanceofCalls = array_filter($instanceofCalls, function($instanceofCall) use ($currentCallMethods) {
+            $uniqueInstanceofCalls = array_filter($instanceofCalls, function ($instanceofCall) use ($currentCallMethods) {
                 // don't add an instanceof call if it was overridden on the service
                 return !in_array(strtolower($instanceofCall[0]), $currentCallMethods);
             });

@@ -149,7 +149,7 @@ class IntegrationTest extends TestCase
                 ->setAutowired(false)
                 ->setConfigurator('instanceof_configurator')
                 ->addTag('foo')
-                ->addTag('baz')
+                ->addTag('baz'),
         ));
 
         $container->compile();
@@ -164,7 +164,7 @@ class IntegrationTest extends TestCase
                 // foo tag on service (parent) overrides instanceof
                 'foo' => array(array('foo_tag_attr' => 'bar')),
                 'bar' => array(array()),
-                'baz' => array(array())
+                'baz' => array(array()),
             ),
             $container->getDefinition('child')->getTags()
         );

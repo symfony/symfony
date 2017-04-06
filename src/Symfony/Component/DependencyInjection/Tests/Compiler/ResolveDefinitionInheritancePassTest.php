@@ -35,7 +35,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
                 ->setAutowired(true)
                 ->setProperty('foo', 'bar')
                 ->setProperty('otherProp', 'baz')
-                ->setProperty('nullProp', 'will_be_overridden')
+                ->setProperty('nullProp', 'will_be_overridden'),
         ));
 
         $this->process($container);
@@ -173,7 +173,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
             parent::class => (new Definition())
                 // overrides autowired on _defaults
                 ->setAutowired(false)
-                ->setConfigurator('foo_configurator')
+                ->setConfigurator('foo_configurator'),
         ));
 
         $def

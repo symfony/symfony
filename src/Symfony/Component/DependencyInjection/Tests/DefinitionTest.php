@@ -367,7 +367,7 @@ class DefinitionTest extends TestCase
         $def->setShared(true);
         $def->setSynthetic(true);
         // changes aren't tracked for these, class or arguments
-        $def->setInstanceofConditionals([]);
+        $def->setInstanceofConditionals(array());
         $def->addTag('foo_tag');
         $def->addMethodCall('methodCall');
         $def->setProperty('fooprop', true);

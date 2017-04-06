@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ResolveDefinitionTemplatesPassTest extends TestCase
 {
@@ -370,10 +371,10 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container
             ->register('parent')
-            ->setInstanceofConditionals(array('Foo' => (new ChildDefinition(''))->setLazy(true)))
+            ->setInstanceofConditionals(array('Foo' => (new Definition())->setLazy(true)))
         ;
 
-        $conditionals = array('stdClass' => (new ChildDefinition(''))->setAutowired(true), 'Bar' => (new ChildDefinition(''))->setShared(false));
+        $conditionals = array('stdClass' => (new Definition())->setAutowired(true), 'Bar' => (new Definition())->setShared(false));
         $container
             ->setDefinition('child', new ChildDefinition('parent'))
             ->setInstanceofConditionals($conditionals)

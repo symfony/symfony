@@ -12,9 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionInheritancePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ResolveDefinitionInheritancePassTest extends TestCase
 {
@@ -24,7 +24,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $def = $container->register('parent', self::class)
             ->setProperty('foo', 'moo');
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))
+            parent::class => (new Definition())
                 ->setShared(false)
                 ->setLazy(true)
                 ->setPublic(false)
@@ -61,7 +61,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
             ->addMethodCall('setBaz', array('sunshine_baz'));
 
         $def->setInstanceofConditionals(array(
-                parent::class => (new ChildDefinition(''))
+                parent::class => (new Definition())
                     ->addMethodCall('bar', array('foo'))
                     ->addMethodCall('setBaz', array('rainbow_baz')),
         ));
@@ -84,7 +84,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $def = $container->register('parent', 'stdClass');
 
         $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setShared(false),
+            'stdClass' => (new Definition())->setShared(false),
         ));
 
         $this->process($container);
@@ -102,8 +102,8 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         ;
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->setProperty('bar', 'barval_changed'),
-            self::class => (new ChildDefinition(''))->setProperty('foo', 'fooval_changed'),
+            parent::class => (new Definition())->setProperty('bar', 'barval_changed'),
+            self::class => (new Definition())->setProperty('foo', 'fooval_changed'),
         ));
 
         $this->process($container);
@@ -118,7 +118,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $def = $container->register('parent', 'stdClass');
 
         $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setLazy(true),
+            'stdClass' => (new Definition())->setLazy(true),
         ));
 
         $this->process($container);
@@ -136,7 +136,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         ;
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))
+            parent::class => (new Definition())
                 ->addTag('tag_bar', array('priority' => 500))
                 ->addTag('tag_baz'),
         ));
@@ -167,7 +167,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
             ->setTrackChanges(true);
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))
+            parent::class => (new Definition())
                 // overrides autowired on _defaults
                 ->setAutowired(false)
                 ->setConfigurator('foo_configurator')

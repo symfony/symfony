@@ -142,7 +142,7 @@ class IntegrationTest extends TestCase
             // overrides instanceof below
             ->setAutowired(true)
             ->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))
+            parent::class => (new Definition())
                 ->setLazy(true)
                 // both autowired and configurator are overridden
                 ->setAutowired(false)

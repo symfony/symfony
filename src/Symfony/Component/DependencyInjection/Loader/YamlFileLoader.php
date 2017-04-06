@@ -351,7 +351,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if ($this->isLoadingInstanceof) {
-            $definition = new ChildDefinition('');
+            $definition = new Definition();
         } elseif (isset($service['parent'])) {
             $definition = new ChildDefinition($service['parent']);
 

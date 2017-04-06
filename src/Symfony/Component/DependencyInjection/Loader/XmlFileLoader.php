@@ -210,7 +210,7 @@ class XmlFileLoader extends FileLoader
         }
 
         if ($this->isLoadingInstanceof) {
-            $definition = new ChildDefinition('');
+            $definition = new Definition();
         } elseif ($parent = $service->getAttribute('parent')) {
             $definition = new ChildDefinition($parent);
 

@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-06T15:46:14Z
+
+This break was caused by #22254. @nicolas-grekas That PR strikes me itself as a BC break. This PR fixes the linked issue #22309... are there any other behavior changes due to #22254? And if so (and if we're ok with those minor breaks, because it was a bug), is the user seeing a very clear error when they upgrade? I'm uncomfortable with behavior changes in patch releases (but also realize it's trick with bugs)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-06T15:56:45Z
+
+#22254 fixes a bug, that hits people hard and in unexpected ways. For some, it looked like it worked, for others, it just didn't work. The discussion is in the PR. Every bug fix is a BC break. We couldn't live with this one a "bug-as-a-feature".
+
+This PR is fixes a "return" that I inadvertently added in the code (for a behavior that missed a test case).
+The rest is FUD ;)

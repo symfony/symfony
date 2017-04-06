@@ -82,7 +82,7 @@
         "symfony/yaml": "For using the debug:config and lint:yaml commands",
         "symfony/property-info": "For using the property_info service",
         "symfony/process": "For using the server:run, server:start, server:stop, and server:status commands",
-        "symfony/web-links": "For using web links features such as preloading, prefetching or prerendering"
+        "symfony/web-link": "For using web links, features such as preloading, prefetching or prerendering"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },

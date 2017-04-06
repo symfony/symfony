@@ -11,54 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
-use Symfony\Component\Workflow\Validator\StateMachineValidator;
-use Symfony\Component\Workflow\Validator\WorkflowValidator;
+use Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass as BaseValidateWorkflowsPass;
+
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', ValidateWorkflowsPass::class, BaseValidateWorkflowsPass::class), E_USER_DEPRECATED);
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseValidateWorkflowsPass} instead
  */
-class ValidateWorkflowsPass implements CompilerPassInterface
+class ValidateWorkflowsPass extends BaseValidateWorkflowsPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        $taggedServices = $container->findTaggedServiceIds('workflow.definition', true);
-        foreach ($taggedServices as $id => $tags) {
-            $definition = $container->get($id);
-            foreach ($tags as $tag) {
-                if (!array_key_exists('name', $tag)) {
-                    throw new RuntimeException(sprintf('The "name" for the tag "workflow.definition" of service "%s" must be set.', $id));
-                }
-                if (!array_key_exists('type', $tag)) {
-                    throw new RuntimeException(sprintf('The "type" for the tag "workflow.definition" of service "%s" must be set.', $id));
-                }
-                if (!array_key_exists('marking_store', $tag)) {
-                    throw new RuntimeException(sprintf('The "marking_store" for the tag "workflow.definition" of service "%s" must be set.', $id));
-                }
-
-                $this->createValidator($tag)->validate($definition, $tag['name']);
-            }
-        }
-    }
-
-    /**
-     * @param array $tag
-     *
-     * @return DefinitionValidatorInterface
-     */
-    private function createValidator($tag)
-    {
-        if ('state_machine' === $tag['type']) {
-            return new StateMachineValidator();
-        }
-
-        if ('single_state' === $tag['marking_store']) {
-            return new WorkflowValidator(true);
-        }
-
-        return new WorkflowValidator();
-    }
 }

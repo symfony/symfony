@@ -14,3 +14,4 @@ CHANGELOG
  * Added support for `Event::getWorkflowName()`.
  * Added `SupportStrategyInterface` to allow custom strategies to decide whether
    or not a workflow supports a subject.
+ * Added `ValidateWorkflowPass`.

@@ -154,7 +154,6 @@ class ResolveDefinitionInheritancePassTest extends TestCase
                 // instanceof tags are added first
                 'tag_baz' => $t,
                 'tag_foo' => $t,
-
             ),
             $def->getTags()
         );

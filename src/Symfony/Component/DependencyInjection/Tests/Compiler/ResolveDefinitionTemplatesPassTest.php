@@ -386,6 +386,20 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertSame($conditionals, $childDef->getInstanceofConditionals());
     }
 
+    public function testDefinitionOnlyShowsActualChanges()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'ParentClass');
+
+        $container->setDefinition('child', new ChildDefinition('parent'));
+
+        $this->process($container);
+
+        $childDef = $container->getDefinition('child');
+        $this->assertEquals(array('class' => true), $childDef->getChanges());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

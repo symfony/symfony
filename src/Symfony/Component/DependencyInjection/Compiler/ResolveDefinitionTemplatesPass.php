@@ -95,12 +95,26 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         if ($parentDef->isDeprecated()) {
             $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
-        $def->setFactory($parentDef->getFactory());
-        $def->setConfigurator($parentDef->getConfigurator());
-        $def->setFile($parentDef->getFile());
-        $def->setPublic($parentDef->isPublic());
-        $def->setLazy($parentDef->isLazy());
-        $def->setAutowired($parentDef->isAutowired());
+
+        $parentChanges = $parentDef->getChanges();
+        if (isset($parentChanges['factory'])) {
+            $def->setFactory($parentDef->getFactory());
+        }
+        if (isset($parentChanges['configurator'])) {
+            $def->setConfigurator($parentDef->getConfigurator());
+        }
+        if (isset($parentChanges['file'])) {
+            $def->setFile($parentDef->getFile());
+        }
+        if (isset($parentChanges['public'])) {
+            $def->setPublic($parentDef->isPublic());
+        }
+        if (isset($parentChanges['lazy'])) {
+            $def->setLazy($parentDef->isLazy());
+        }
+        if (isset($parentChanges['autowired'])) {
+            $def->setAutowired($parentDef->isAutowired());
+        }
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
@@ -169,8 +183,12 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         }
 
         // these attributes are always taken from the child
-        $def->setAbstract($definition->isAbstract());
-        $def->setShared($definition->isShared());
+        if (isset($changes['abstract'])) {
+            $def->setAbstract($definition->isAbstract());
+        }
+        if (isset($changes['shared'])) {
+            $def->setShared($definition->isShared());
+        }
         $def->setTags($definition->getTags());
         $def->setInstanceofConditionals($definition->getInstanceofConditionals());
 

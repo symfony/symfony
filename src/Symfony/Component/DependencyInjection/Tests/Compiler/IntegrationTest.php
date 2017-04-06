@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -112,6 +113,60 @@ class IntegrationTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('a'));
         $this->assertFalse($container->hasDefinition('b'));
+        $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
+    }
+
+    /**
+     * Tests that instanceof config applies through parent-child service definitions.
+     *
+     * This test involves multiple compiler passes.
+     */
+    public function testConfigurationOverridePriority()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+
+        $parentDef = $container->register('parent', self::class);
+        $container->setAlias('parent_alias', 'parent');
+        $def = new ChildDefinition('parent_alias');
+        $container->setDefinition('child', $def);
+
+        $parentDef
+            // overrides instanceof below
+            ->setConfigurator('parent_configurator')
+            ->addTag('foo', array('foo_tag_attr' => 'bar'))
+            ->addTag('bar');
+
+        $def
+            ->setInheritTags(true)
+            // overrides instanceof below
+            ->setAutowired(true)
+            ->setInstanceofConditionals(array(
+            parent::class => (new ChildDefinition(''))
+                ->setLazy(true)
+                // both autowired and configurator are overridden
+                ->setAutowired(false)
+                ->setConfigurator('instanceof_configurator')
+                ->addTag('foo')
+                ->addTag('baz')
+        ));
+
+        $container->compile();
+
+        // instanceof sets this
+        $childDef = $container->getDefinition('child');
+        $this->assertTrue($childDef->isLazy());
+        $this->assertTrue($childDef->isAutowired());
+        $this->assertEquals('parent_configurator', $childDef->getConfigurator());
+        $this->assertSame(
+            array(
+                // foo tag on service (parent) overrides instanceof
+                'foo' => array(array('foo_tag_attr' => 'bar')),
+                'bar' => array(array()),
+                'baz' => array(array())
+            ),
+            $container->getDefinition('child')->getTags()
+        );
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 }

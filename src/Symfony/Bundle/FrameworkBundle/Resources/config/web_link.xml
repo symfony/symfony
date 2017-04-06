@@ -6,10 +6,10 @@
 
     <services>
 
-        <service id="web_link.evolvable_link_provider" class="Fig\Link\GenericLinkProvider" public="false" />
-
         <service id="web_link.manager" class="Symfony\Component\WebLink\WebLinkManager" public="false">
-            <argument type="service" id="web_link.evolvable_link_provider" />
+            <argument type="service">
+                <service class="Fig\Link\GenericLinkProvider" public="false" />
+            </argument>
         </service>
         <service id="Symfony\Component\WebLink\WebLinkManagerInterface" alias="web_link.manager" public="false" />
 

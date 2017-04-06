@@ -345,8 +345,8 @@ class Filesystem
     /**
      * Given an existing path, convert it to a path relative to a given starting path.
      *
-     * @param string $endPath   Absolute path of target
-     * @param string $startPath Absolute path where traversal begins
+     * @param string $endPath   Path of target
+     * @param string $startPath Path where traversal begins
      *
      * @return string Path of target relative to starting path
      */

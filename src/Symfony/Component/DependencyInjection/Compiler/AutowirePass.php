@@ -116,7 +116,8 @@ class AutowirePass implements CompilerPassInterface
                 }
 
                 if (isset($this->autowired[$typeHint->name])) {
-                    return $this->autowired[$typeHint->name] ? new Reference($this->autowired[$typeHint->name]) : null;
+                    $arguments[$index] = $this->autowired[$typeHint->name] ? new Reference($this->autowired[$typeHint->name]) : null;
+                    continue;
                 }
 
                 if (null === $this->types) {

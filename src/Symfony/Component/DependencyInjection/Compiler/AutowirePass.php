@@ -30,6 +30,7 @@ class AutowirePass extends AbstractRecursivePass
     private $types;
     private $ambiguousServiceTypes = array();
     private $autowired = array();
+    private $lastFailure;
 
     /**
      * {@inheritdoc}
@@ -77,21 +78,19 @@ class AutowirePass extends AbstractRecursivePass
     {
         if ($value instanceof TypedReference) {
             if ($ref = $this->getAutowiredReference($value)) {
-                $value = $ref;
-            } else {
-                $this->container->log($this, $this->createTypeNotFoundMessage($value->getType(), 'typed reference'));
+                return $ref;
             }
+            $this->container->log($this, $this->createTypeNotFoundMessage($value->getType(), 'it'));
         }
-        if (!$value instanceof Definition) {
-            return parent::processValue($value, $isRoot);
-        }
-        if (!$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
-            return parent::processValue($value, $isRoot);
+        $value = parent::processValue($value, $isRoot);
+
+        if (!$value instanceof Definition || !$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
+            return $value;
         }
         if (!$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
             $this->container->log($this, sprintf('Skipping service "%s": Class or interface "%s" does not exist.', $this->currentId, $value->getClass()));
 
-            return parent::processValue($value, $isRoot);
+            return $value;
         }
 
         $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
@@ -115,7 +114,7 @@ class AutowirePass extends AbstractRecursivePass
             $value->setMethodCalls($methodCalls);
         }
 
-        return parent::processValue($value, $isRoot);
+        return $value;
     }
 
     /**
@@ -246,9 +245,7 @@ class AutowirePass extends AbstractRecursivePass
 
                 if ($parameter->isDefaultValueAvailable()) {
                     $value = $parameter->getDefaultValue();
-                } elseif ($parameter->allowsNull()) {
-                    $value = null;
-                } else {
+                } elseif (!$parameter->allowsNull()) {
                     throw new RuntimeException($failureMessage);
                 }
                 $this->container->log($this, $failureMessage);
@@ -279,6 +276,7 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function getAutowiredReference(TypedReference $reference)
     {
+        $this->lastFailure = null;
         $type = $reference->getType();
 
         if ($type !== (string) $reference || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
@@ -396,7 +394,8 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $currentId = $this->currentId;
-        $this->currentId = $this->autowired[$type] = $argumentId = sprintf('autowired.%s', $type);
+        $this->currentId = $type;
+        $this->autowired[$type] = $argumentId = sprintf('autowired.%s', $type);
         $argumentDefinition = new Definition($type);
         $argumentDefinition->setPublic(false);
         $argumentDefinition->setAutowired(true);
@@ -406,7 +405,8 @@ class AutowirePass extends AbstractRecursivePass
             $this->container->setDefinition($argumentId, $argumentDefinition);
         } catch (RuntimeException $e) {
             $this->autowired[$type] = false;
-            $this->container->log($this, $e->getMessage());
+            $this->lastFailure = $e->getMessage();
+            $this->container->log($this, $this->lastFailure);
 
             return;
         } finally {
@@ -427,7 +427,14 @@ class AutowirePass extends AbstractRecursivePass
             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($type));
         }
 
-        return sprintf('Cannot autowire service "%s": %s %s', $this->currentId, $label, $message);
+        $message = sprintf('Cannot autowire service "%s": %s %s', $this->currentId, $label, $message);
+
+        if (null !== $this->lastFailure) {
+            $message = $this->lastFailure."\n".$message;
+            $this->lastFailure = null;
+        }
+
+        return $message;
     }
 
     private function createTypeAlternatives($type)

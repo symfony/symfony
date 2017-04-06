@@ -20,6 +20,7 @@
         "twig/twig": "~1.28|~2.0"
     },
     "require-dev": {
+        "fig/link-util": "^1.0",
         "symfony/asset": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
         "symfony/form": "^3.2.5",

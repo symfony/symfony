@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\WebLink;
 
-use Fig\Link\GenericLinkProvider;
 use Psr\Link\EvolvableLinkProviderInterface;
 use Psr\Link\LinkInterface;
 
@@ -24,9 +23,9 @@ final class WebLinkManager implements WebLinkManagerInterface
 {
     private $linkProvider;
 
-    public function __construct(EvolvableLinkProviderInterface $linkProvider = null)
+    public function __construct(EvolvableLinkProviderInterface $linkProvider)
     {
-        $this->linkProvider = $linkProvider ? $linkProvider : new GenericLinkProvider();
+        $this->linkProvider = $linkProvider;
     }
 
     /**

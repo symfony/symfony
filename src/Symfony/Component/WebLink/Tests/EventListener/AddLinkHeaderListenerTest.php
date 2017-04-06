@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\WebLink\Tests\EventListener;
 
+use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
@@ -27,7 +28,7 @@ class AddLinkHeaderListenerTest extends TestCase
 {
     public function testOnKernelResponse()
     {
-        $manager = new WebLinkManager();
+        $manager = new WebLinkManager(new GenericLinkProvider());
         $manager->add(new Link('preload', '/foo'));
 
         $subscriber = new AddLinkHeaderListener($manager);

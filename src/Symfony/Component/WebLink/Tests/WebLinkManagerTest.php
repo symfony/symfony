@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\WebLink\Tests;
 
+use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\WebLinkManager;
@@ -28,7 +29,7 @@ class WebLinkManagerTest extends TestCase
 
     protected function setUp()
     {
-        $this->manager = new WebLinkManager();
+        $this->manager = new WebLinkManager(new GenericLinkProvider());
     }
 
     public function testAdd()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\WebLink\EventListener;
 
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\WebLink\WebLinkManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -25,11 +26,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private $linkManager;
+    private $manager;
+    private $serializer;
 
-    public function __construct(WebLinkManagerInterface $linkManager)
+    public function __construct(WebLinkManagerInterface $manager)
     {
-        $this->linkManager = $linkManager;
+        $this->manager = $manager;
+        $this->serializer = new HttpHeaderSerializer();
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -38,11 +41,11 @@ class AddLinkHeaderListener implements EventSubscriberInterface
             return;
         }
 
-        if ($value = $this->linkManager->buildHeaderValue()) {
+        if ($value = $this->serializer->serialize($this->manager->getLinkProvider())) {
             $event->getResponse()->headers->set('Link', $value, false);
 
             // Free memory
-            $this->linkManager->clear();
+            $this->manager->clear();
         }
     }
 

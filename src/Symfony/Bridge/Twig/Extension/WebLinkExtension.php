@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Fig\Link\Link;
 use Symfony\Component\WebLink\WebLinkManagerInterface;
 
 /**
@@ -20,11 +21,11 @@ use Symfony\Component\WebLink\WebLinkManagerInterface;
  */
 class WebLinkExtension extends \Twig_Extension
 {
-    private $linkManager;
+    private $manager;
 
-    public function __construct(WebLinkManagerInterface $linkManager)
+    public function __construct(WebLinkManagerInterface $manager)
     {
-        $this->linkManager = $linkManager;
+        $this->manager = $manager;
     }
 
     /**
@@ -53,7 +54,12 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function link($uri, $rel, array $attributes = array())
     {
-        $this->linkManager->add($uri, $rel, $attributes);
+        $link = new Link($rel, $uri);
+        foreach ($attributes as $key => $value) {
+            $link = $link->withAttribute($key, $value);
+        }
+
+        $this->manager->add($link);
 
         return $uri;
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\WebLink\Tests;
 
+use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\WebLinkManager;
 use Symfony\Component\WebLink\WebLinkManagerInterface;
@@ -20,17 +21,32 @@ use Symfony\Component\WebLink\WebLinkManagerInterface;
  */
 class WebLinkManagerTest extends TestCase
 {
-    public function testManageResources()
+    /**
+     * @var WebLinkManager
+     */
+    private $manager;
+
+    protected function setUp()
     {
-        $manager = new WebLinkManager();
-        $this->assertInstanceOf(WebLinkManagerInterface::class, $manager);
+        $this->manager = new WebLinkManager();
+    }
 
-        $manager->add('/hello.html', 'prerender', array('pr' => 0.7));
+    public function testAdd()
+    {
+        $this->assertInstanceOf(WebLinkManagerInterface::class, $this->manager);
 
-        $manager->add('/foo/bar.js', 'preload', array('as' => 'script', 'nopush' => false));
-        $manager->add('/foo/baz.css', 'preload');
-        $manager->add('/foo/bat.png', 'preload', array('as' => 'image', 'nopush' => true));
+        $this->manager->add($link1 = new Link());
+        $this->manager->add($link2 = new Link());
 
-        $this->assertEquals('</hello.html>; rel=prerender; pr=0.7,</foo/bar.js>; rel=preload; as=script,</foo/baz.css>; rel=preload,</foo/bat.png>; rel=preload; as=image; nopush', $manager->buildHeaderValue());
+        $this->assertSame(array($link1, $link2), array_values($this->manager->getLinkProvider()->getLinks()));
+    }
+
+    public function testClear() {
+        $this->manager->add($link1 = new Link());
+        $this->manager->add($link2 = new Link());
+
+        $this->manager->clear();
+
+        $this->assertEmpty($this->manager->getLinkProvider()->getLinks());
     }
 }

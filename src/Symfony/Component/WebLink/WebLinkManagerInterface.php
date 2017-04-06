@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\WebLink;
 
+use Psr\Link\LinkInterface;
+use Psr\Link\LinkProviderInterface;
+
 /**
  * Manages connections between resources according to the W3C specifications.
  *
@@ -44,23 +47,21 @@ interface WebLinkManagerInterface
     const REL_PRERENDER = 'prerender';
 
     /**
-     * Adds an element to the list of resources to preload.
+     * Adds a Link to the list.
      *
-     * @param string $uri        The relation URI
-     * @param string $rel        The relation type (e.g. "preload", "prefetch", "prerender" or "dns-prefetch")
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
+     * @param $link LinkInterface
      */
-    public function add($uri, $rel, array $attributes = array());
+    public function add(LinkInterface $link);
 
     /**
-     * Clears the list of resources.
+     * Gets a LinkProviderInterface instance.
+     *
+     * @return LinkProviderInterface
+     */
+    public function getLinkProvider();
+
+    /**
+     * Clears the list of links.
      */
     public function clear();
-
-    /**
-     * Builds the value of the "Link" HTTP header.
-     *
-     * @return string|null
-     */
-    public function buildHeaderValue();
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\WebLink\Tests\EventListener;
 
+use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\WebLinkManager;
@@ -27,7 +28,7 @@ class AddLinkHeaderListenerTest extends TestCase
     public function testOnKernelResponse()
     {
         $manager = new WebLinkManager();
-        $manager->add('/foo', 'preload');
+        $manager->add(new Link('preload', '/foo'));
 
         $subscriber = new AddLinkHeaderListener($manager);
         $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
@@ -42,11 +43,11 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $expected = array(
             '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"',
-            '</foo>; rel=preload',
+            '</foo>; rel="preload"',
         );
 
         $this->assertEquals($expected, $response->headers->get('Link', null, false));
-        $this->assertNull($manager->buildHeaderValue());
+        $this->assertEmpty($manager->getLinkProvider()->getLinks());
     }
 
     public function testSubscribedEvents()

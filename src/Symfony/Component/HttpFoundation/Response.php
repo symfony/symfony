@@ -204,7 +204,7 @@ class Response
 
         /* RFC2616 - 14.18 says all Responses need to have a Date */
         if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
+            $this->setDate(\DateTime::createFromFormat('U', time()));
         }
     }
 

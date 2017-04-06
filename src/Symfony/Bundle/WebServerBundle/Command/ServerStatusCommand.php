@@ -35,6 +35,7 @@ class ServerStatusCommand extends ServerCommand
             ->setName('server:status')
             ->setDefinition(array(
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
+                new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'The value to display (one of port, host, or address)'),
             ))
             ->setDescription('Outputs the status of the local web server for the given address')
         ;
@@ -47,10 +48,29 @@ class ServerStatusCommand extends ServerCommand
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $server = new WebServer();
-        if ($server->isRunning($input->getOption('pidfile'))) {
-            $io->success(sprintf('Web server still listening on http://%s', $server->getAddress($input->getOption('pidfile'))));
+        if ($filter = $input->getOption('filter')) {
+            if ($server->isRunning($input->getOption('pidfile'))) {
+                list($host, $port) = explode(':', $address = $server->getAddress($input->getOption('pidfile')));
+                if ('address' === $filter) {
+                    $output->write($address);
+                } elseif ('host' === $filter) {
+                    $output->write($host);
+                } elseif ('port' === $filter) {
+                    $output->write($port);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('"%s" is not a valid filter.', $filter));
+                }
+            } else {
+                return 1;
+            }
         } else {
-            $io->warning('No web server is listening.');
+            if ($server->isRunning($input->getOption('pidfile'))) {
+                $io->success(sprintf('Web server still listening on http://%s', $server->getAddress($input->getOption('pidfile'))));
+            } else {
+                $io->warning('No web server is listening.');
+
+                return 1;
+            }
         }
     }
 }

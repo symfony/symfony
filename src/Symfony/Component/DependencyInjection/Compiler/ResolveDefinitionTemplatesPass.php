@@ -172,6 +172,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setAbstract($definition->isAbstract());
         $def->setShared($definition->isShared());
         $def->setTags($definition->getTags());
+        $def->setInstanceofConditionals($definition->getInstanceofConditionals());
 
         // append parent tags when inheriting is enabled
         if ($definition->getInheritTags()) {

@@ -364,6 +364,28 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertSame('ParentClass', $def->getClass());
     }
 
+    public function testProcessInstanceofConditionals()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+            ->setInstanceofConditionals(array('Foo' => (new ChildDefinition(''))->setLazy(true)))
+        ;
+
+        $conditionals = array('stdClass' => (new ChildDefinition(''))->setAutowired(true), 'Bar' => (new ChildDefinition(''))->setShared(false));
+        $container
+            ->setDefinition('child', new ChildDefinition('parent'))
+            ->setInstanceofConditionals($conditionals)
+        ;
+
+        $this->process($container);
+
+        $childDef = $container->getDefinition('child');
+        // instanceof taken directly from child, parent ignored
+        $this->assertSame($conditionals, $childDef->getInstanceofConditionals());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

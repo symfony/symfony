@@ -147,7 +147,17 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $this->process($container);
 
         $t = array(array());
-        $this->assertSame(array('tag_foo' => $t, 'tag_bar' => array(array('priority' => 100)), 'tag_baz' => $t), $def->getTags());
+        $this->assertSame(
+            array(
+                // all tags are kept, and merged together
+                'tag_bar' => array(array('priority' => 500), array('priority' => 100)),
+                // instanceof tags are added first
+                'tag_baz' => $t,
+                'tag_foo' => $t,
+
+            ),
+            $def->getTags()
+        );
     }
 
     /**

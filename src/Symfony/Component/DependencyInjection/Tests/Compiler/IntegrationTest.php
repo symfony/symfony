@@ -161,10 +161,10 @@ class IntegrationTest extends TestCase
         $this->assertEquals('parent_configurator', $childDef->getConfigurator());
         $this->assertSame(
             array(
-                // foo tag on service (parent) overrides instanceof
-                'foo' => array(array('foo_tag_attr' => 'bar')),
-                'bar' => array(array()),
+                // foo tag is merged together, instanceof first
+                'foo' => array(array(), array('foo_tag_attr' => 'bar')),
                 'baz' => array(array()),
+                'bar' => array(array()),
             ),
             $container->getDefinition('child')->getTags()
         );

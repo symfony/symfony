@@ -85,12 +85,11 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
 
             $def->setMethodCalls(array_merge($uniqueInstanceofCalls, $def->getMethodCalls()));
         }
-        // merge tags
-        $tags = $def->getTags();
-        foreach ($instanceofDefinition->getTags() as $k => $v) {
-            // don't add a tag if one by that name was already added
-            if (!isset($tags[$k])) {
-                // loop over the tag attributes arrays, add each
+        // prepend instanceof tags
+        $tailTags = $def->getTags();
+        if ($headTags = $instanceofDefinition->getTags()) {
+            $def->setTags($headTags);
+            foreach ($tailTags as $k => $v) {
                 foreach ($v as $v) {
                     $def->addTag($k, $v);
                 }

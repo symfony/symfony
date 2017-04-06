@@ -145,7 +145,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame(ServiceLocator::class, $locator->getClass());
         $this->assertFalse($locator->isPublic());
 
-        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, false)));
+        $expected = array('bar' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, RegisterTestController::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
@@ -165,7 +165,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
 
-        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false)));
+        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class)));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
@@ -184,22 +184,26 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
 
-        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, false)));
+        $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 }
 
 class RegisterTestController
 {
-    public function __construct(\stdClass $bar)
+    public function __construct(ControllerDummy $bar)
     {
     }
 
-    public function fooAction(\stdClass $bar)
+    public function fooAction(ControllerDummy $bar)
     {
     }
 
-    protected function barAction(\stdClass $bar)
+    protected function barAction(ControllerDummy $bar)
     {
     }
+}
+
+class ControllerDummy
+{
 }

@@ -43,7 +43,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
 
             if (!$argumentLocator->getArgument(0)) {
                 // remove empty argument locators
-                $reason = sprintf('Removing service-argument-resolver for controller "%s": no corresponding definitions were found for the referenced services/types.%s', $controller, !$argumentLocator->isAutowired() ? ' Did you forget to enable autowiring?' : '');
+                $reason = sprintf('Removing service-argument resolver for controller "%s": no corresponding services exist for the referenced types.', $controller);
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;

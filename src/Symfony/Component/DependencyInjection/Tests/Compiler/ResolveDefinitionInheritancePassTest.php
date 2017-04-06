@@ -22,7 +22,8 @@ class ResolveDefinitionInheritancePassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $def = $container->register('parent', self::class)
-            ->setProperty('foo', 'moo');
+            ->setProperty('foo', 'moo')
+            ->setProperty('nullProp', null);
         $def->setInstanceofConditionals(array(
             parent::class => (new Definition())
                 ->setShared(false)
@@ -34,6 +35,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
                 ->setAutowired(true)
                 ->setProperty('foo', 'bar')
                 ->setProperty('otherProp', 'baz')
+                ->setProperty('nullProp', 'will_be_overridden')
         ));
 
         $this->process($container);
@@ -48,7 +50,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $this->assertEquals(array('foo_tag' => array(array())), $def->getTags());
         $this->assertTrue($def->isAutowired());
         // foo property is not replaced, but otherProp is added
-        $this->assertEquals(array('foo' => 'moo', 'otherProp' => 'baz'), $def->getProperties());
+        $this->assertEquals(array('foo' => 'moo', 'otherProp' => 'baz', 'nullProp' => null), $def->getProperties());
     }
 
     public function testProcessMergesMethodCallsAlways()

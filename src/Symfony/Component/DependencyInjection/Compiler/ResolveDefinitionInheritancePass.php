@@ -68,7 +68,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
         $properties = $def->getProperties();
         foreach ($instanceofDefinition->getProperties() as $k => $v) {
             // don't override properties set explicitly on the service
-            if (!isset($properties[$k])) {
+            if (!array_key_exists($k, $properties)) {
                 $def->setProperty($k, $v);
             }
         }

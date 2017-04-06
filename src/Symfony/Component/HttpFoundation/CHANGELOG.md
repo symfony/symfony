@@ -11,7 +11,8 @@ CHANGELOG
    disabling `Range` and `Content-Length` handling, switching to chunked encoding instead
  * added the `Cookie::fromString()` method that allows to create a cookie from a
    raw header string
-
+ * PdoSessionHandler: Deprecated the the `lifetime` column
+ 
 3.1.0
 -----
 

@@ -42,7 +42,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         $pdo = new \PDO('sqlite::memory:');
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $storage = new PdoSessionHandler($pdo);
+        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
         $storage->createTable();
 
         return $pdo;
@@ -56,7 +56,7 @@ class PdoSessionHandlerTest extends TestCase
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $storage = new PdoSessionHandler($pdo);
+        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
     }
 
     /**
@@ -64,7 +64,7 @@ class PdoSessionHandlerTest extends TestCase
      */
     public function testInexistentTable()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_table' => 'inexistent_table'));
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_table' => 'inexistent_table', 'db_lifetime_col' => false));
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
@@ -76,7 +76,7 @@ class PdoSessionHandlerTest extends TestCase
      */
     public function testCreateTableTwice()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
         $storage->createTable();
     }
 
@@ -84,7 +84,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         $dsn = $this->getPersistentSqliteDsn();
 
-        $storage = new PdoSessionHandler($dsn);
+        $storage = new PdoSessionHandler($dsn, array('db_lifetime_col' => false));
         $storage->createTable();
         $storage->open('', 'sid');
         $data = $storage->read('id');
@@ -103,7 +103,7 @@ class PdoSessionHandlerTest extends TestCase
         $dsn = $this->getPersistentSqliteDsn();
 
         // Open is called with what ini_set('session.save_path', $dsn) would mean
-        $storage = new PdoSessionHandler(null);
+        $storage = new PdoSessionHandler(null, array('db_lifetime_col' => false));
         $storage->open($dsn, 'sid');
         $storage->createTable();
         $data = $storage->read('id');
@@ -121,7 +121,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         $sessionData = 'da'."\0".'ta';
 
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
         $storage->open('', 'sid');
         $readData = $storage->read('id');
         $storage->write('id', $sessionData);
@@ -147,9 +147,9 @@ class PdoSessionHandlerTest extends TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->will($this->returnValue(array(array($stream, 42, time()))));
+            ->will($this->returnValue(array(array($stream, 42 + time()))));
 
-        $storage = new PdoSessionHandler($pdo);
+        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
         $result = $storage->read('foo');
 
         $this->assertSame($content, $result);
@@ -175,7 +175,7 @@ class PdoSessionHandlerTest extends TestCase
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
             ->will($this->returnCallback(function () use (&$exception, $stream) {
-                return $exception ? array(array($stream, 42, time())) : array();
+                return $exception ? array(array($stream, 42 + time())) : array();
             }));
 
         $insertStmt->expects($this->once())->method('execute')
@@ -183,7 +183,7 @@ class PdoSessionHandlerTest extends TestCase
                 throw $exception = new \PDOException('', '23');
             }));
 
-        $storage = new PdoSessionHandler($pdo);
+        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
         $result = $storage->read('foo');
 
         $this->assertSame($content, $result);
@@ -191,7 +191,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testReadingRequiresExactlySameId()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
         $storage->open('', 'sid');
         $storage->write('id', 'data');
         $storage->write('test', 'data');
@@ -216,7 +216,8 @@ class PdoSessionHandlerTest extends TestCase
      */
     public function testWriteDifferentSessionIdThanRead()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
+        $storage->open('', 'sid');
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->destroy('id');
@@ -233,7 +234,7 @@ class PdoSessionHandlerTest extends TestCase
     public function testWrongUsageStillWorks()
     {
         // wrong method sequence that should no happen, but still works
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
         $storage->write('id', 'data');
         $storage->write('other_id', 'other_data');
         $storage->destroy('inexistent');
@@ -249,7 +250,7 @@ class PdoSessionHandlerTest extends TestCase
     public function testSessionDestroy()
     {
         $pdo = $this->getMemorySqlitePdo();
-        $storage = new PdoSessionHandler($pdo);
+        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
 
         $storage->open('', 'sid');
         $storage->read('id');
@@ -273,7 +274,7 @@ class PdoSessionHandlerTest extends TestCase
     {
         $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
         $pdo = $this->getMemorySqlitePdo();
-        $storage = new PdoSessionHandler($pdo);
+        $storage = new PdoSessionHandler($pdo, array('db_lifetime_col' => false));
 
         $storage->open('', 'sid');
         $storage->read('id');
@@ -300,7 +301,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testGetConnection()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_lifetime_col' => false));
 
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);
@@ -310,7 +311,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testGetConnectionConnectsIfNeeded()
     {
-        $storage = new PdoSessionHandler('sqlite::memory:');
+        $storage = new PdoSessionHandler('sqlite::memory:', array('db_lifetime_col' => false));
 
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);

@@ -170,6 +170,11 @@ FrameworkBundle
 
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ 
+HttpFoundation
+--------------
+
+ * The `PdoSessionHandler` option `db_lifetime_col` has been deprecated.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass` class has been
    deprecated and will be removed in 4.0.

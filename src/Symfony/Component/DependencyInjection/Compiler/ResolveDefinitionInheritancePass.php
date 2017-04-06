@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -46,7 +45,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
         return parent::processValue($value, $isRoot);
     }
 
-    private function mergeInstanceofDefinition(Definition $def, ChildDefinition $instanceofDefinition)
+    private function mergeInstanceofDefinition(Definition $def, Definition $instanceofDefinition)
     {
         $configured = $def->getChanges();
         $changes = $instanceofDefinition->getChanges();

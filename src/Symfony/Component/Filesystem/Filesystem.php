@@ -372,11 +372,12 @@ class Filesystem
         $startPathArr = explode('/', trim($startPath, '/'));
         $endPathArr = explode('/', trim($endPath, '/'));
 
-        $normalizePathArray = function ($pathSegments) {
+        $normalizePathArray = function ($pathSegments, $path) {
+            $absolute = static::isAbsolutePath($path);
             $result = array();
 
             foreach ($pathSegments as $segment) {
-                if ('..' === $segment) {
+                if ('..' === $segment && ($absolute || count($result))) {
                     array_pop($result);
                 } elseif ('.' !== $segment) {
                     $result[] = $segment;
@@ -386,8 +387,8 @@ class Filesystem
             return $result;
         };
 
-        $startPathArr = $normalizePathArray($startPathArr);
-        $endPathArr = $normalizePathArray($endPathArr);
+        $startPathArr = $normalizePathArray($startPathArr, $startPath);
+        $endPathArr = $normalizePathArray($endPathArr, $endPath);
 
         // Find for which directory the common path stops
         $index = 0;

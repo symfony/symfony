@@ -139,7 +139,9 @@ class ImageValidator extends FileValidator
                 $this->context->buildViolation($constraint->minPixelsMessage)
                     ->setParameter('{{ pixels }}', $pixels)
                     ->setParameter('{{ min_pixels }}', $constraint->minPixels)
-                    ->setCode(Image::TOO_FEW_ERROR)
+                    ->setParameter('{{ height }}', $height)
+                    ->setParameter('{{ width }}', $width)
+                    ->setCode(Image::TOO_FEW_PX_ERROR)
                     ->addViolation();
             }
         }
@@ -153,7 +155,7 @@ class ImageValidator extends FileValidator
                 $this->context->buildViolation($constraint->maxPixelsMessage)
                     ->setParameter('{{ pixels }}', $pixels)
                     ->setParameter('{{ max_pixels }}', $constraint->maxPixels)
-                    ->setCode(Image::TOO_MANY_ERROR)
+                    ->setCode(Image::TOO_MANY_PX_ERROR)
                     ->addViolation();
             }
         }

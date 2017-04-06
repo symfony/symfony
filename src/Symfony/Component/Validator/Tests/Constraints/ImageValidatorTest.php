@@ -176,7 +176,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ pixels }}', '4')
             ->setParameter('{{ min_pixels }}', '5')
-            ->setCode(Image::TOO_FEW_ERROR)
+            ->setCode(Image::TOO_FEW_PX_ERROR)
             ->assertRaised();
     }
 
@@ -192,7 +192,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ pixels }}', '4')
             ->setParameter('{{ max_pixels }}', '3')
-            ->setCode(Image::TOO_MANY_ERROR)
+            ->setCode(Image::TOO_MANY_PX_ERROR)
             ->assertRaised();
     }
 

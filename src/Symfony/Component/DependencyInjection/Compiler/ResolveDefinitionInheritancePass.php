@@ -62,7 +62,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
             $def->setLazy($instanceofDefinition->isLazy());
         }
         if (!isset($configured['autowired']) && isset($changes['autowired'])) {
-            $def->setAutowired($instanceofDefinition->getAutowired());
+            $def->setAutowired($instanceofDefinition->isAutowired());
         }
         // merge properties
         $properties = $def->getProperties();

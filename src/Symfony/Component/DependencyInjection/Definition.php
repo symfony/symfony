@@ -69,7 +69,7 @@ class Definition
             $factory = explode('::', $factory, 2);
         }
 
-        $this->trackChange('factory');
+        $this->recordChange('factory');
         $this->factory = $factory;
 
         return $this;
@@ -102,7 +102,7 @@ class Definition
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
 
-        $this->trackChange('decorated_service');
+        $this->recordChange('decorated_service');
 
         if (null === $id) {
             $this->decoratedService = null;
@@ -132,7 +132,7 @@ class Definition
      */
     public function setClass($class)
     {
-        $this->trackChange('class');
+        $this->recordChange('class');
         $this->class = $class;
 
         return $this;
@@ -456,7 +456,7 @@ class Definition
      */
     public function setFile($file)
     {
-        $this->trackChange('file');
+        $this->recordChange('file');
         $this->file = $file;
 
         return $this;
@@ -481,7 +481,7 @@ class Definition
      */
     public function setShared($shared)
     {
-        $this->trackChange('shared');
+        $this->recordChange('shared');
         $this->shared = (bool) $shared;
 
         return $this;
@@ -506,7 +506,7 @@ class Definition
      */
     public function setPublic($boolean)
     {
-        $this->trackChange('public');
+        $this->recordChange('public');
         $this->public = (bool) $boolean;
 
         return $this;
@@ -531,7 +531,7 @@ class Definition
      */
     public function setLazy($lazy)
     {
-        $this->trackChange('lazy');
+        $this->recordChange('lazy');
         $this->lazy = (bool) $lazy;
 
         return $this;
@@ -557,7 +557,7 @@ class Definition
      */
     public function setSynthetic($boolean)
     {
-        $this->trackChange('synthetic');
+        $this->recordChange('synthetic');
         $this->synthetic = (bool) $boolean;
 
         return $this;
@@ -584,7 +584,7 @@ class Definition
      */
     public function setAbstract($boolean)
     {
-        $this->trackChange('abstract');
+        $this->recordChange('abstract');
         $this->abstract = (bool) $boolean;
 
         return $this;
@@ -626,7 +626,7 @@ class Definition
             $this->deprecationTemplate = $template;
         }
 
-        $this->trackChange('deprecated');
+        $this->recordChange('deprecated');
         $this->deprecated = (bool) $status;
 
         return $this;
@@ -668,7 +668,7 @@ class Definition
             $configurator = explode('::', $configurator, 2);
         }
 
-        $this->trackChange('configurator');
+        $this->recordChange('configurator');
         $this->configurator = $configurator;
 
         return $this;
@@ -725,7 +725,7 @@ class Definition
      */
     public function setAutowired($autowired)
     {
-        $this->trackChange('autowired');
+        $this->recordChange('autowired');
         $this->autowired = (bool) $autowired;
 
         return $this;
@@ -823,7 +823,7 @@ class Definition
         return $this;
     }
 
-    private function trackChange($type)
+    private function recordChange($type)
     {
         if ($this->trackChanges) {
             $this->changes[$type] = true;

@@ -497,10 +497,9 @@ class YamlFileLoader extends FileLoader
             if ($autowireDefaultsUsed) {
                 $definition->setTrackChanges(false);
             }
-            $definition->setAutowired($autowire);
-            if ($autowireDefaultsUsed) {
-                $definition->setTrackChanges(true);
-            }
+            $definition->setAutowired($autowire)
+                ->setTrackChanges(true)
+            ;
         }
 
         if (isset($service['autowiring_types'])) {

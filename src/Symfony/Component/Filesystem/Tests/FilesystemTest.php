@@ -881,6 +881,9 @@ class FilesystemTest extends FilesystemTestCase
             array('C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'),
             array('aa/bb', 'aa/cc', '../bb/'),
             array('aa/cc', 'bb/cc', '../../aa/cc/'),
+            array('aa/bb', 'aa/./cc', '../bb/'),
+            array('aa/./bb', 'aa/cc', '../bb/'),
+            array('aa/./bb', 'aa/./cc', '../bb/'),
         );
 
         if ('\\' === DIRECTORY_SEPARATOR) {

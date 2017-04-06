@@ -378,7 +378,7 @@ class Filesystem
             foreach ($pathSegments as $segment) {
                 if ('..' === $segment) {
                     array_pop($result);
-                } else {
+                } elseif ('.' !== $segment) {
                     $result[] = $segment;
                 }
             }

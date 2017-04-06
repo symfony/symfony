@@ -19,19 +19,19 @@ namespace Symfony\Component\DependencyInjection;
 class TypedReference extends Reference
 {
     private $type;
-    private $canBeAutoregistered;
+    private $requiringClass;
 
     /**
-     * @param string $id                  The service identifier
-     * @param string $type                The PHP type of the identified service
-     * @param int    $invalidBehavior     The behavior when the service does not exist
-     * @param bool   $canBeAutoregistered Whether autowiring can autoregister the referenced service when it's a FQCN or not
+     * @param string $id              The service identifier
+     * @param string $type            The PHP type of the identified service
+     * @param string $requiringClass  The class of the service that requires the referenced type
+     * @param int    $invalidBehavior The behavior when the service does not exist
      */
-    public function __construct($id, $type, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $canBeAutoregistered = true)
+    public function __construct($id, $type, $requiringClass = '', $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
         parent::__construct($id, $invalidBehavior);
         $this->type = $type;
-        $this->canBeAutoregistered = $canBeAutoregistered;
+        $this->requiringClass = $requiringClass;
     }
 
     public function getType()
@@ -39,8 +39,13 @@ class TypedReference extends Reference
         return $this->type;
     }
 
+    public function getRequiringClass()
+    {
+        return $this->requiringClass;
+    }
+
     public function canBeAutoregistered()
     {
-        return $this->canBeAutoregistered;
+        return $this->requiringClass && (false !== $i = strpos($this->type, '\\')) && 0 === strncasecmp($this->type, $this->requiringClass, 1 + $i);
     }
 }

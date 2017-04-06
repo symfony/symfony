@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
@@ -76,9 +75,9 @@ class AutowirePass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if ($value instanceof TypedReference && !$this->container->has((string) $value)) {
-            if ($ref = $this->getAutowiredReference($value->getType(), $value->canBeAutoregistered())) {
-                $value = new TypedReference((string) $ref, $value->getType(), $value->getInvalidBehavior(), $value->canBeAutoregistered());
+        if ($value instanceof TypedReference) {
+            if ($ref = $this->getAutowiredReference($value)) {
+                $value = $ref;
             } else {
                 $this->container->log($this, $this->createTypeNotFoundMessage($value->getType(), 'typed reference'));
             }
@@ -242,7 +241,7 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if (!$value = $this->getAutowiredReference($type, !$parameter->isOptional())) {
+            if (!$value = $this->getAutowiredReference(new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''))) {
                 $failureMessage = $this->createTypeNotFoundMessage($type, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                 if ($parameter->isDefaultValueAvailable()) {
@@ -276,16 +275,14 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * @return Reference|null A reference to the service matching the given type, if any
+     * @return TypedReference|null A reference to the service matching the given type, if any
      */
-    private function getAutowiredReference($type, $autoRegister)
+    private function getAutowiredReference(TypedReference $reference)
     {
-        if ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract()) {
-            return new Reference($type);
-        }
+        $type = $reference->getType();
 
-        if (isset($this->autowired[$type])) {
-            return $this->autowired[$type] ? new Reference($this->autowired[$type]) : null;
+        if ($type !== (string) $reference || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
+            return $reference;
         }
 
         if (null === $this->types) {
@@ -293,12 +290,18 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if (isset($this->definedTypes[$type])) {
-            return new Reference($this->types[$type]);
+            return new TypedReference($this->types[$type], $type);
         }
 
-        if ($autoRegister && !isset($this->types[$type]) && !isset($this->ambiguousServiceTypes[$type])) {
-            return $this->createAutowiredDefinition($type);
+        if (!$reference->canBeAutoregistered() || isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
+            return;
         }
+
+        if (isset($this->autowired[$type])) {
+            return $this->autowired[$type] ? new TypedReference($this->autowired[$type], $type) : null;
+        }
+
+        return $this->createAutowiredDefinition($type);
     }
 
     /**
@@ -384,7 +387,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @param string $type
      *
-     * @return Reference|null A reference to the registered definition
+     * @return TypedReference|null A reference to the registered definition
      */
     private function createAutowiredDefinition($type)
     {
@@ -412,7 +415,7 @@ class AutowirePass extends AbstractRecursivePass
 
         $this->container->log($this, sprintf('Type "%s" has been auto-registered for service "%s".', $type, $this->currentId));
 
-        return new Reference($argumentId);
+        return new TypedReference($argumentId, $type);
     }
 
     private function createTypeNotFoundMessage($type, $label)

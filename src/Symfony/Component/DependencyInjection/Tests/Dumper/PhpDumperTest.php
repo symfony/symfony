@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -557,15 +558,15 @@ class PhpDumperTest extends TestCase
     public function testServiceSubscriber()
     {
         $container = new ContainerBuilder();
-        $container->register('foo_service', 'TestServiceSubscriber')
+        $container->register('foo_service', TestServiceSubscriber::class)
             ->setAutowired(true)
             ->addArgument(new Reference('container'))
             ->addTag('container.service_subscriber', array(
                 'key' => 'bar',
-                'id' => 'TestServiceSubscriber',
+                'id' => TestServiceSubscriber::class,
             ))
         ;
-        $container->register('TestServiceSubscriber', 'TestServiceSubscriber');
+        $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class);
         $container->compile();
 
         $dumper = new PhpDumper($container);

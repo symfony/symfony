@@ -53,7 +53,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame(array('bar'), array_keys($container->getDefinition((string) $controllers['c1:fooAction']->getValues()[0])->getArgument(0)));
 
         $expectedLog = array(
-            'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing service-argument-resolver for controller "c2:fooAction": no corresponding definitions were found for the referenced services/types. Did you forget to enable autowiring?',
+            'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing service-argument resolver for controller "c2:fooAction": no corresponding services exist for the referenced types.',
             'Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass: Removing method "setTestCase" of service "c2" from controller candidates: the method is called at instantiation, thus cannot be an action.',
         );
 

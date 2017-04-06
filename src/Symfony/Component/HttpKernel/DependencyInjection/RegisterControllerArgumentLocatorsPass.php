@@ -52,6 +52,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 continue;
             }
             $class = $def->getClass();
+            $autowire = $def->isAutowired();
 
             // resolve service class, taking parent definitions into account
             while (!$class && $def instanceof ChildDefinition) {
@@ -76,6 +77,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             // validate and collect explicit per-actions and per-arguments service references
             foreach ($tags as $attributes) {
                 if (!isset($attributes['action']) && !isset($attributes['argument']) && !isset($attributes['id'])) {
+                    $autowire = true;
                     continue;
                 }
                 foreach (array('action', 'argument', 'id') as $k) {
@@ -120,11 +122,11 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
                             $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                         }
-                    } elseif (!$type) {
+                    } elseif (!$type || !$autowire) {
                         continue;
                     }
 
-                    $args[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, false) : new Reference($target, $invalidBehavior);
+                    $args[$p->name] = $type ? new TypedReference($target, $type, $r->class, $invalidBehavior) : new Reference($target, $invalidBehavior);
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {

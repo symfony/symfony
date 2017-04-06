@@ -108,20 +108,3 @@ class LazyContext
         $this->lazyValues = $lazyValues;
     }
 }
-
-class TestServiceSubscriber implements ServiceSubscriberInterface
-{
-    public function __construct($container)
-    {
-    }
-
-    public static function getSubscribedServices()
-    {
-        return array(
-            __CLASS__,
-            '?stdClass',
-            'bar' => 'stdClass',
-            'baz' => '?stdClass',
-        );
-    }
-}

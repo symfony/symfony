@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-06T16:46:26Z
+
+Here is how I'm using this in my Makefile:
+
+```
+bf-dev:
+	blackfire-player --endpoint=http://`bin/console server:status --filter=address` run tests/bkf/all.bkf
+.PHONY: bf-dev
+```

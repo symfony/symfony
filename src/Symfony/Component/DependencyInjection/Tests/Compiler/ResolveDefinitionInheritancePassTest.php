@@ -128,7 +128,49 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $this->assertSame(array('tag_foo' => $t, 'tag_bar' => array(array('priority' => 100)), 'tag_baz' => $t), $def->getTags());
     }
 
-    protected function process(ContainerBuilder $container)
+    /**
+     * Tests that service configuration cascades in the correct order.
+     *
+     * For configuration: defaults > instanceof > service. In
+     * other words, service-specific configuration is the strongest,
+     * then instanceof and finally defaults.
+     */
+    public function testConfigurationOverridePriority()
+    {
+        $container = new ContainerBuilder();
+
+        $def = $container->register('parent', self::class);
+        // mimic how _defaults/defaults is loaded in YAML/XML
+        $def
+            ->setTrackChanges(false)
+            ->setPublic(false)
+            ->setAutowired(true)
+            ->setTrackChanges(true);
+
+        $def->setInstanceofConditionals(array(
+            parent::class => (new ChildDefinition(''))
+                // overrides autowired on _defaults
+                ->setAutowired(false)
+                ->setConfigurator('foo_configurator')
+        ));
+
+        $def
+            // overrides public on _defaults
+            ->setPublic(true)
+            // overrides configurator on instanceof
+            ->setConfigurator('bar_configurator')
+        ;
+
+        $this->process($container);
+
+        // service-level wins over instanceof
+        $this->assertTrue($def->isPublic());
+        $this->assertEquals('bar_configurator', $def->getConfigurator());
+        // instanceof-level wins over defaults
+        $this->assertFalse($def->isAutowired());
+    }
+
+    private function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionInheritancePass();
         $pass->process($container);

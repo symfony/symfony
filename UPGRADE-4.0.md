@@ -61,6 +61,8 @@ Console
  * The `console.exception` event and the related `ConsoleExceptionEvent` class have
    been removed in favor of the `console.error` event and the `ConsoleErrorEvent` class.
 
+ * The `SymfonyQuestionHelper::ask` default validation has been removed in favor of `Question::setValidator`.
+
 Debug
 -----
 

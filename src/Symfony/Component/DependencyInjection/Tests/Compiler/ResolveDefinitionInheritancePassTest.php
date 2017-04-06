@@ -63,7 +63,8 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $def->setInstanceofConditionals(array(
                 parent::class => (new Definition())
                     ->addMethodCall('bar', array('foo'))
-                    ->addMethodCall('setBaz', array('rainbow_baz')),
+                    // lowercased - should still be overridden
+                    ->addMethodCall('setbaz', array('rainbow_baz')),
         ));
 
         $this->process($container);

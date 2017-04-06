@@ -847,6 +847,7 @@ class FilesystemTest extends FilesystemTestCase
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component/', '../'),
             array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
+            array('usr/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
             array('/aa/bb', '/aa/bb', './'),
             array('/aa/bb', '/aa/bb/', './'),
@@ -878,6 +879,8 @@ class FilesystemTest extends FilesystemTestCase
             array('C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'),
             array('C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'),
             array('C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'),
+            array('aa/bb', 'aa/cc', '../bb/'),
+            array('aa/cc', 'bb/cc', '../../aa/cc/'),
         );
 
         if ('\\' === DIRECTORY_SEPARATOR) {

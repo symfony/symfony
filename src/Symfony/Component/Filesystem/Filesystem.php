@@ -358,17 +358,19 @@ class Filesystem
             $startPath = str_replace('\\', '/', $startPath);
         }
 
+        $stripDriveLetter = function($path) {
+            if (strlen($path) > 2 && substr($path, 1, 2) === ':/' && ctype_alpha($path[0])) {
+                return substr($path, 2);
+            }
+            return $path;
+        };
+
+        $endPath = $stripDriveLetter($endPath);
+        $startPath = $stripDriveLetter($startPath);
+
         // Split the paths into arrays
         $startPathArr = explode('/', trim($startPath, '/'));
         $endPathArr = explode('/', trim($endPath, '/'));
-
-        if ('/' !== $startPath[0]) {
-            array_shift($startPathArr);
-        }
-
-        if ('/' !== $endPath[0]) {
-            array_shift($endPathArr);
-        }
 
         $normalizePathArray = function ($pathSegments) {
             $result = array();

@@ -1,7 +1,7 @@
 WebLink Component
 =================
 
-The Link component manages links between resources. It is particularly useful to advise clients
+The WebLink component manages links between resources. It is particularly useful to advise clients
 to preload and prefetch documents through HTTP and HTTP/2 pushes.
 
 This component implements the [HTML5's Links](https://www.w3.org/TR/html5/links.html), [Preload](https://www.w3.org/TR/preload/)

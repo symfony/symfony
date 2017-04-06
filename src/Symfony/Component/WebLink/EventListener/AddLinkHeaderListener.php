@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\WebLink\EventListener;
 
-use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Component\WebLink\WebLinkManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\WebLinkManagerInterface;
 
 /**
  * Adds the Link HTTP header to the response.

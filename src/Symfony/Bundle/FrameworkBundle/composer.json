@@ -53,7 +53,7 @@
         "symfony/workflow": "~3.3",
         "symfony/yaml": "~3.2",
         "symfony/property-info": "~3.3",
-        "symfony/weblink": "~3.3",
+        "symfony/web-link": "~3.3",
         "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0",
         "twig/twig": "~1.26|~2.0",

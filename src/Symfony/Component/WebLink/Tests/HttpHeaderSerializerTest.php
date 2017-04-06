@@ -23,11 +23,13 @@ class HttpHeaderSerializerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         $this->serializer = new HttpHeaderSerializer();
     }
 
-    public function testSerialize() {
+    public function testSerialize()
+    {
         $linkProvider = new GenericLinkProvider(array(
             new Link('prerender', '/1'),
             (new Link('dns-prefetch', '/2'))->withAttribute('pr', 0.7),
@@ -39,7 +41,8 @@ class HttpHeaderSerializerTest extends TestCase
         $this->assertEquals('</1>; rel="prerender",</2>; rel="dns-prefetch"; pr="0.7",</3>; rel="preload"; as="script",</4>; rel="preload"; as="image"; nopush,</5>; rel="alternate next"; hreflang="fr"; hreflang="de"; title="Hello"', $this->serializer->serialize($linkProvider));
     }
 
-    public function testSerializeEmpty() {
+    public function testSerializeEmpty()
+    {
         $this->assertNull($this->serializer->serialize(new GenericLinkProvider()));
     }
 }

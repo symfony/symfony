@@ -41,7 +41,8 @@ class WebLinkManagerTest extends TestCase
         $this->assertSame(array($link1, $link2), array_values($this->manager->getLinkProvider()->getLinks()));
     }
 
-    public function testClear() {
+    public function testClear()
+    {
         $this->manager->add($link1 = new Link());
         $this->manager->add($link2 = new Link());
 

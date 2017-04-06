@@ -120,6 +120,18 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }
 
+    /**
+     * @group legacy
+     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     * @expectedDeprecation The default question validator is deprecated since Symfony 3.4 and will not be used anymore in version 4.0. Set a custom question validator instead.
+     */
+    public function testLegacyAsk()
+    {
+        $dialog = new SymfonyQuestionHelper();
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' ')), $this->createOutputInterface(), new Question('Question'));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

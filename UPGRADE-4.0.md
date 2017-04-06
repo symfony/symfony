@@ -267,7 +267,10 @@ FrameworkBundle
    `serializer.mapping.cache.apc` and `serializer.mapping.cache.doctrine.apc`
    have been removed. APCu should now be automatically used when available.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been removed. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass` has been removed.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been removed.
+   Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass` class has been removed.
    Use the `Symfony\Component\Serializer\DependencyInjection\SerializerPass` class instead.

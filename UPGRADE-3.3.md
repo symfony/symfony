@@ -168,8 +168,10 @@ FrameworkBundle
 
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been deprecated and will be removed in 4.0. Use the Request::setTrustedProxies() method in your front controller instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass` has been deprecated.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated.
+   Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass` class has been
    deprecated and will be removed in 4.0.

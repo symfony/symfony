@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * Deprecated the `CompilerDebugDumpPass` class
  * [BC BREAK] Removed the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
  * Added a new new version strategy option called json_manifest_path
    that allows you to use the `JsonManifestVersionStrategy`.

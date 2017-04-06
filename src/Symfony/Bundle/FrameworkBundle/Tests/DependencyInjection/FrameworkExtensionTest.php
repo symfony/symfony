@@ -411,7 +411,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWebLink()
     {
         $container = $this->createContainerFromFile('web_link');
-        $this->assertTrue($container->hasDefinition('web_link.manager'));
+        $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
     }
 
     public function testTranslator()

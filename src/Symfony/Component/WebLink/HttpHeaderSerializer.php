@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\WebLink;
 
-use Psr\Link\LinkProviderInterface;
+use Psr\Link\LinkInterface;
 
 /**
  * Serializes a list of Link instances to a HTTP Link header.
@@ -25,14 +25,14 @@ final class HttpHeaderSerializer
     /**
      * Builds the value of the "Link" HTTP header.
      *
-     * @param LinkProviderInterface $linkProvider
+     * @param LinkInterface[]|\Traversable $links
      *
      * @return string|null
      */
-    public function serialize(LinkProviderInterface $linkProvider)
+    public function serialize($links)
     {
         $elements = array();
-        foreach ($linkProvider->getLinks() as $link) {
+        foreach ($links as $link) {
             if ($link->isTemplated()) {
                 continue;
             }

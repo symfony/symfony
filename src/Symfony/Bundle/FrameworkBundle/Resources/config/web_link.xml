@@ -6,16 +6,7 @@
 
     <services>
 
-        <service id="web_link.manager" class="Symfony\Component\WebLink\WebLinkManager" public="false">
-            <argument type="service">
-                <service class="Fig\Link\GenericLinkProvider" />
-            </argument>
-        </service>
-        <service id="Symfony\Component\WebLink\WebLinkManagerInterface" alias="web_link.manager" public="false" />
-
         <service id="web_link.add_link_header_listener" class="Symfony\Component\Link\WebLink\AddLinkHeaderListener" public="false">
-            <argument type="service" id="web_link.manager" />
-
             <tag name="kernel.event_subscriber" />
         </service>
 

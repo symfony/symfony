@@ -11,8 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
-use Symfony\Component\WebLink\WebLinkManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Twig extension for the Symfony WebLink component.
@@ -21,11 +22,11 @@ use Symfony\Component\WebLink\WebLinkManagerInterface;
  */
 class WebLinkExtension extends \Twig_Extension
 {
-    private $manager;
+    private $requestStack;
 
-    public function __construct(WebLinkManagerInterface $manager)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->manager = $manager;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -54,12 +55,17 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function link($uri, $rel, array $attributes = array())
     {
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            return $uri;
+        }
+
         $link = new Link($rel, $uri);
         foreach ($attributes as $key => $value) {
             $link = $link->withAttribute($key, $value);
         }
 
-        $this->manager->add($link);
+        $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+        $request->attributes->set('_links', $linkProvider->withLink($link));
 
         return $uri;
     }
@@ -74,7 +80,7 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function preload($uri, array $attributes = array())
     {
-        return $this->link($uri, WebLinkManagerInterface::REL_PRELOAD, $attributes);
+        return $this->link($uri, 'preload', $attributes);
     }
 
     /**
@@ -87,7 +93,7 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function dnsPrefetch($uri, array $attributes = array())
     {
-        return $this->link($uri, WebLinkManagerInterface::REL_DNS_PREFETCH, $attributes);
+        return $this->link($uri, 'dns-prefetch', $attributes);
     }
 
     /**
@@ -100,7 +106,7 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function preconnect($uri, array $attributes = array())
     {
-        return $this->link($uri, WebLinkManagerInterface::REL_PRECONNECT, $attributes);
+        return $this->link($uri, 'preconnect', $attributes);
     }
 
     /**
@@ -113,7 +119,7 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function prefetch($uri, array $attributes = array())
     {
-        return $this->link($uri, WebLinkManagerInterface::REL_PREFETCH, $attributes);
+        return $this->link($uri, 'prefetch', $attributes);
     }
 
     /**
@@ -126,7 +132,7 @@ class WebLinkExtension extends \Twig_Extension
      */
     public function prerender($uri, array $attributes = array())
     {
-        return $this->link($uri, WebLinkManagerInterface::REL_PRERENDER, $attributes);
+        return $this->link($uri, 'prerender', $attributes);
     }
 
     /**

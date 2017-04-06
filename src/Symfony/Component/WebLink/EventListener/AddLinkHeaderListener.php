@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\WebLink\EventListener;
 
+use Psr\Link\LinkProviderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Component\WebLink\WebLinkManagerInterface;
 
 /**
  * Adds the Link HTTP header to the response.
@@ -26,12 +26,10 @@ use Symfony\Component\WebLink\WebLinkManagerInterface;
  */
 class AddLinkHeaderListener implements EventSubscriberInterface
 {
-    private $manager;
     private $serializer;
 
-    public function __construct(WebLinkManagerInterface $manager)
+    public function __construct()
     {
-        $this->manager = $manager;
         $this->serializer = new HttpHeaderSerializer();
     }
 
@@ -41,12 +39,12 @@ class AddLinkHeaderListener implements EventSubscriberInterface
             return;
         }
 
-        if ($value = $this->serializer->serialize($this->manager->getLinkProvider())) {
-            $event->getResponse()->headers->set('Link', $value, false);
-
-            // Free memory
-            $this->manager->clear();
+        $linkProvider = $event->getRequest()->attributes->get('_links');
+        if (!$linkProvider instanceof LinkProviderInterface || !($links = $linkProvider->getLinks())) {
+            return;
         }
+
+        $event->getResponse()->headers->set('Link', $this->serializer->serialize($links), false);
     }
 
     /**

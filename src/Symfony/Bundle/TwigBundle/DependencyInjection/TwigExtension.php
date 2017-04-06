@@ -53,7 +53,7 @@ class TwigExtension extends Extension
         if (interface_exists(WebLinkManagerInterface::class)) {
             $definition = $container->register('twig.extension.weblink', WebLinkExtension::class);
             $definition->setPublic(false);
-            $definition->addArgument(new Reference('web_link.manager'));
+            $definition->addArgument(new Reference('request_stack'));
         }
 
         foreach ($configs as $key => $config) {

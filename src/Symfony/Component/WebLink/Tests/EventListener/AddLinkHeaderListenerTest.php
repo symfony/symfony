@@ -14,8 +14,8 @@ namespace Symfony\Component\WebLink\Tests\EventListener;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
-use Symfony\Component\WebLink\WebLinkManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -28,14 +28,14 @@ class AddLinkHeaderListenerTest extends TestCase
 {
     public function testOnKernelResponse()
     {
-        $manager = new WebLinkManager(new GenericLinkProvider());
-        $manager->add(new Link('preload', '/foo'));
-
-        $subscriber = new AddLinkHeaderListener($manager);
+        $request = new Request(array(), array(), array('_links' => new GenericLinkProvider(array(new Link('preload', '/foo')))));
         $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
+
+        $subscriber = new AddLinkHeaderListener();
 
         $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('isMasterRequest')->willReturn(true);
+        $event->method('getRequest')->willReturn($request);
         $event->method('getResponse')->willReturn($response);
 
         $subscriber->onKernelResponse($event);
@@ -48,7 +48,6 @@ class AddLinkHeaderListenerTest extends TestCase
         );
 
         $this->assertEquals($expected, $response->headers->get('Link', null, false));
-        $this->assertEmpty($manager->getLinkProvider()->getLinks());
     }
 
     public function testSubscribedEvents()

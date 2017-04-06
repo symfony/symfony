@@ -40,10 +40,13 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
                 continue;
             }
 
+            // don't record these as new changes to the Definition
+            $definition->setTrackChanges(false);
             $definition->setArguments($this->processArguments($definition->getArguments()));
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
             $definition->setProperties($this->processArguments($definition->getProperties()));
             $definition->setFactory($this->processFactory($definition->getFactory()));
+            $definition->setTrackChanges(true);
         }
 
         foreach ($container->getAliases() as $id => $alias) {

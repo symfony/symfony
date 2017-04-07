@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -187,6 +189,21 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
         $this->assertEquals($expected, $locator->getArgument(0));
     }
+
+    public function testSkipSetContainer()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', ContainerAwareRegisterTestController::class)
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertSame(array('foo:fooAction'), array_keys($locator));
+    }
 }
 
 class RegisterTestController
@@ -200,6 +217,15 @@ class RegisterTestController
     }
 
     protected function barAction(ControllerDummy $bar)
+    {
+    }
+}
+
+class ContainerAwareRegisterTestController implements ContainerAwareInterface
+{
+    use ContainerAwareTrait;
+
+    public function fooAction(ControllerDummy $bar)
     {
     }
 }

@@ -301,11 +301,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $data = array();
 
         foreach ($node->attributes as $attr) {
-            if (ctype_digit($attr->nodeValue)) {
-                $data['@'.$attr->nodeName] = (int) $attr->nodeValue;
-            } else {
-                $data['@'.$attr->nodeName] = $attr->nodeValue;
-            }
+            $data['@'.$attr->nodeName] = $attr->nodeValue;
         }
 
         return $data;

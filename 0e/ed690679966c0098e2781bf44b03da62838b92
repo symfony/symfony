@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-04-07T06:24:05Z
+
+Isn't ctype in php by default? Besides of that, it makes the code a lot more complex and in 3.2 there are a total of 45 ctype functions being used.
+
+I don't really think this is an undocumented dependency.
+
+---------------------------------------------------------------------------
+
+by nijel at 2017-04-07T06:39:32Z
+
+Obviously it's not default in all environments, otherwise people wouldn't complain about it (see https://github.com/phpmyadmin/docker/issues/115). At phpMyAdmin we're using just ExpressionLanguage from the Symfony and it's the only thing which needs ctype. So for us it's clearly better to avoid this dependency, but I can understand if it's not important for you.
+
+At least it should be properly stated in composer.json:
+
+```patch
+diff --git a/src/Symfony/Component/ExpressionLanguage/composer.json b/src/Symfony/Component/ExpressionLanguage/composer.json
+index fc7e3c3b89..1330a8f9d9 100644
+--- a/src/Symfony/Component/ExpressionLanguage/composer.json
++++ b/src/Symfony/Component/ExpressionLanguage/composer.json
+@@ -17,6 +17,7 @@
+     ],
+     "require": {
+         "php": ">=5.5.9",
++        "ext-ctype": "*",
+         "symfony/cache": "~3.1"
+     },
+     "autoload": {
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-04-07T06:47:53Z
+
+I agree that defining this in composer would be a good thing.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-07T09:49:10Z
+
+>  Beginning with PHP 4.2.0 these functions are enabled by default. For older versions you have to configure and compile PHP with --enable-ctype . You can disable ctype support with --disable-ctype .
+
+Why would anyone disable this? Some people... 💀 alternatively, we could provide a polyfill? or to much edge-case.
+
+---------------------------------------------------------------------------
+
+by nijel at 2017-04-07T11:04:00Z
+
+@sstok It's compiled as a separate module on [Alpine Linux](https://alpinelinux.org/), what is quite usual choice for Docker containers.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-07T11:16:44Z
+
+@sstok we already said in the past that polyfilling it is not worth the effort, especially given that we would have to make everyone installed the polyfill for nothing as all distributions I know of except Alpine Linux don't disable ctype.
+
+We already added ctype in the list of Symfony requirements in the requirement checker. We should not decide whether we want to enforce these requirements in composer.json.
+
+---------------------------------------------------------------------------
+
+by nijel at 2017-04-07T12:14:53Z
+
+Is there chance to get at least first hunk of the patch accepted? That is not really complicating the code, but actually removes the ctype dependency for the library use as I believe the generator is not used by the library...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-07T14:10:04Z
+
+@nijel I'm fine with the change you did in the Lexer.
+
+In general, I'm against removing ctype as a dependency, but I know that Alpine can be a PITA.
+
+Also, if we can help a major Open-Source project with such a little change, I'm all for it.
+
+However, I would not do the change in the script as it's only useful for the Symfony core team, so no need to complicate the code there.
+
+Can you update the code accordingly? Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-07T14:38:39Z
+
+@fabpot but this removes the ctype dependency in a single component, while other components still requires it. And then, would we make a BC promise to never reuse ctype in this component (at least not without adding it in composer.json) while other components use it without a composer requirement ?
+
+---------------------------------------------------------------------------
+
+by nijel at 2017-04-07T14:39:16Z
+
+Thanks! I've updated the patch.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-07T14:41:16Z
+
+@stof Let's be pragmatic here. The component is very stable and won't change that much. As for the other components, like I said, if that simple change helps another OS project, why not doing it? I would indeed reject a PR that removes the dependency across the board.

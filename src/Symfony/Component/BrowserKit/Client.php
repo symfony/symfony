@@ -476,7 +476,7 @@ abstract class Client
 
         $this->isMainRequest = false;
 
-        $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content);
+        $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content, false);
 
         $this->isMainRequest = true;
 

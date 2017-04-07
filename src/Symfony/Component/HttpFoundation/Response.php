@@ -226,6 +226,11 @@ class Response
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
 
+        /* RFC2616 - 14.18 says all Responses need to have a Date */
+        if (!$this->headers->has('Date')) {
+            $this->setDate(\DateTime::createFromFormat('U', time()));
+        }
+
         // Deprecations
         $class = get_class($this);
         if ($this instanceof \PHPUnit_Framework_MockObject_MockObject || $this instanceof \Prophecy\Doubler\DoubleInterface) {
@@ -241,11 +246,6 @@ class Response
             if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                 @trigger_error(sprintf('Extending %s::%s() in %s is deprecated since version 3.2 and won\'t be supported anymore in 4.0 as it will be final.', __CLASS__, $method, $class), E_USER_DEPRECATED);
             }
-        }
-
-        /* RFC2616 - 14.18 says all Responses need to have a Date */
-        if (!$this->headers->has('Date')) {
-            $this->setDate(\DateTime::createFromFormat('U', time()));
         }
     }
 

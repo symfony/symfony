@@ -33,7 +33,7 @@
             {% set _exceptions_with_user_code = [] %}
             {% for i, e in exception_as_array %}
                 {% for trace in e.trace %}
-                    {% if (trace.file is not empty) and ()'/vendor/' not in trace.file) and not loop.last %}
+                    {% if (trace.file is not empty) and ('/vendor/' not in trace.file) and not loop.last %}
                         {% set _exceptions_with_user_code = _exceptions_with_user_code|merge([i]) %}
                     {% endif %}
                 {% endfor %}
@@ -48,7 +48,7 @@
 
             <div class="tab-content">
                 {% for i, e in exception_as_array %}
-                    {{ include('@Twig/Exception/traces.html.twig', { exception: e, index: loop.index, expand: (i in _exceptions_with_user_code or _exceptions_with_user_code is empty) }, with_context = false) }}
+                    {{ include('@Twig/Exception/traces.html.twig', { exception: e, index: loop.index, expand: i in _exceptions_with_user_code or (_exceptions_with_user_code is empty and loop.first) }, with_context = false) }}
                 {% endfor %}
             </div>
         </div>

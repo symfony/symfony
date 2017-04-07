@@ -463,7 +463,7 @@ XML;
         $xml = $this->encoder->encode($obj, 'xml');
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
-    
+
     public function testDecodeBigDigitAttributes()
     {
         $source = '<?xml version="1.0"?>'.PHP_EOL.
@@ -473,7 +473,7 @@ XML;
             '@index' => '182077241760011681341821060401202210011000045913000000017100',
         );
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
-    }    
+    }
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException

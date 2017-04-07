@@ -78,6 +78,44 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         );
         $this->assertEquals($expected, array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0)));
     }
+
+    public function testInvoke()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('invokable', InvokableRegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+        (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
+
+        $this->assertEquals(
+            array('invokable:__invoke', 'invokable'),
+            array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0))
+        );
+    }
+
+    public function testInvokeSameIdClass()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register(InvokableRegisterTestController::class, InvokableRegisterTestController::class)
+            ->addTag('controller.service_arguments')
+        ;
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+        (new RemoveEmptyControllerArgumentLocatorsPass())->process($container);
+
+        $expected = array(
+            InvokableRegisterTestController::class.':__invoke',
+            InvokableRegisterTestController::class.'::__invoke',
+            InvokableRegisterTestController::class,
+        );
+        $this->assertEquals($expected, array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0)));
+    }
 }
 
 class RemoveTestController1
@@ -94,6 +132,13 @@ class RemoveTestController2
     }
 
     public function fooAction(NotFound $bar)
+    {
+    }
+}
+
+class InvokableRegisterTestController
+{
+    public function __invoke(\stdClass $bar)
     {
     }
 }

@@ -60,6 +60,9 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
                     if ($controllerDef->getClass() === $id) {
                         $controllers[$id.'::'.$action] = $argumentRef;
                     }
+                    if ('__invoke' === $action) {
+                        $controllers[$id] = $argumentRef;
+                    }
                     continue;
                 }
             }

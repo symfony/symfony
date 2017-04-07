@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by MetalArend at 2017-04-05T16:42:07Z
+
+The [actual code](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Form.php#L384) providing the `$forms` parameter is creating an `\RecursiveIteratorIterator`.

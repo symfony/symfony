@@ -7,6 +7,9 @@ CHANGELOG
  * [BC BREAK] The request method is dropped from POST to GET when the response
    status code is 301.
 
+ * [BC BREAK] Client will skip redirects during history navigation
+   (back and forward calls) according to W3C Browsers recommendation
+
 3.2.0
 -----
 

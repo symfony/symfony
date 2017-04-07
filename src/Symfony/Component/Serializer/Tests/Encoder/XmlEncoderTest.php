@@ -344,6 +344,19 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $xml = $this->encoder->encode($obj, 'xml');
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
+    
+    public function testDecodeBigDigitAttributes()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<document index="182077241760011681341821060401202210011000045913000000017100">Name</document>'."\n";
+
+        $expected = array(
+            '#' => 'Name',
+            '@index' => '182077241760011681341821060401202210011000045913000000017100',
+        );
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }    
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException

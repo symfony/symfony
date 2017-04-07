@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * Added `kernel.project_dir` and `Kernel::getProjectDir()`
+ * Deprecated `kernel.root_dir` and `Kernel::getRootDir()`
  * Deprecated `Kernel::getEnvParameters()`
  * Deprecated the special `SYMFONY__` environment variables
  * added the possibility to change the query string parameter used by `UriSigner`

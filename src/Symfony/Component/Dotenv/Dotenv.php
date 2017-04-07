@@ -48,7 +48,7 @@ final class Dotenv
     {
         // func_get_args() to be replaced by a variadic argument for Symfony 4.0
         foreach (func_get_args() as $path) {
-            if (!is_readable($path)) {
+            if (!is_readable($path) || is_dir($path)) {
                 throw new PathException($path);
             }
 

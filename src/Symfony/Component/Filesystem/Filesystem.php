@@ -358,10 +358,11 @@ class Filesystem
             $startPath = str_replace('\\', '/', $startPath);
         }
 
-        $stripDriveLetter = function($path) {
+        $stripDriveLetter = function ($path) {
             if (strlen($path) > 2 && substr($path, 1, 2) === ':/' && ctype_alpha($path[0])) {
                 return substr($path, 2);
             }
+
             return $path;
         };
 

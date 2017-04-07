@@ -322,6 +322,17 @@ more text
 EOF
         ));
     }
+
+    public function testFormatAndWrap()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertSame("pre\n\033[37;41mfoo\nbar\nbaz\033[39;49m\npos\nt", $formatter->formatAndWrap('pre <error>foo bar baz</error> post', 3));
+
+        $formatter = new OutputFormatter();
+
+        $this->assertSame("pre\nfoo\nbar\nbaz\npos\nt", $formatter->formatAndWrap('pre <error>foo bar baz</error> post', 3));
+    }
 }
 
 class TableCell

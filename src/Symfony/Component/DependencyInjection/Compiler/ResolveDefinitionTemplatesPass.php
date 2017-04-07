@@ -84,7 +84,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def = new Definition();
 
         // merge in parent definition
-        // purposely ignored attributes: abstract, tags
+        // purposely ignored attributes: abstract, shared, tags
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
@@ -101,27 +101,8 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setPublic($parentDef->isPublic());
         $def->setLazy($parentDef->isLazy());
         $def->setAutowired($parentDef->isAutowired());
+        $def->setChanges($parentDef->getChanges());
 
-        self::mergeDefinition($def, $definition);
-
-        // merge autowiring types
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $def->addAutowiringType($autowiringType);
-        }
-
-        // these attributes are always taken from the child
-        $def->setAbstract($definition->isAbstract());
-        $def->setShared($definition->isShared());
-        $def->setTags($definition->getTags());
-
-        return $def;
-    }
-
-    /**
-     * @internal
-     */
-    public static function mergeDefinition(Definition $def, ChildDefinition $definition)
-    {
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
         if (isset($changes['class'])) {
@@ -147,6 +128,9 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());
+        }
+        if (isset($changes['shared'])) {
+            $def->setShared($definition->isShared());
         }
         if (isset($changes['decorated_service'])) {
             $decoratedService = $definition->getDecoratedService();
@@ -182,5 +166,16 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         if ($calls = $definition->getMethodCalls()) {
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
         }
+
+        // merge autowiring types
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
+            $def->addAutowiringType($autowiringType);
+        }
+
+        // these attributes are always taken from the child
+        $def->setAbstract($definition->isAbstract());
+        $def->setTags($definition->getTags());
+
+        return $def;
     }
 }

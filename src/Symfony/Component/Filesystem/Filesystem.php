@@ -373,7 +373,7 @@ class Filesystem
         $endPathArr = explode('/', trim($endPath, '/'));
 
         $normalizePathArray = function ($pathSegments, $path) {
-            $absolute = static::isAbsolutePath($path);
+            $absolute = Filesystem::isAbsolutePath($path);
             $result = array();
 
             foreach ($pathSegments as $segment) {

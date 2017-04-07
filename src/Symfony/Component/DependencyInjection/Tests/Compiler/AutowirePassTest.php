@@ -242,8 +242,9 @@ class AutowirePassTest extends TestCase
         $pass = new AutowirePass();
         $pass->process($container);
 
-        $this->assertCount(1, $container->getDefinition('coop_tilleuls')->getArguments());
+        $this->assertCount(2, $container->getDefinition('coop_tilleuls')->getArguments());
         $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas', $container->getDefinition('coop_tilleuls')->getArgument(0));
+        $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas', $container->getDefinition('coop_tilleuls')->getArgument(1));
 
         $dunglasDefinition = $container->getDefinition('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas');
         $this->assertEquals(__NAMESPACE__.'\Dunglas', $dunglasDefinition->getClass());
@@ -833,7 +834,7 @@ class Dunglas
 
 class LesTilleuls
 {
-    public function __construct(Dunglas $k)
+    public function __construct(Dunglas $j, Dunglas $k)
     {
     }
 }

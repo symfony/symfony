@@ -40,7 +40,7 @@ class AddLinkHeaderListener implements EventSubscriberInterface
         }
 
         $linkProvider = $event->getRequest()->attributes->get('_links');
-        if (!$linkProvider instanceof LinkProviderInterface || !($links = $linkProvider->getLinks())) {
+        if (!$linkProvider instanceof LinkProviderInterface || !$links = $linkProvider->getLinks()) {
             return;
         }
 

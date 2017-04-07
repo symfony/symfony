@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2017-04-06T16:52:58Z
+
+~~wouldn't it make sense in 4.0 to use `root_dir` instead ?~~ didn't see the part on the BC, so nvm
+
+And it's a bit related (but not so much too...), but having the path to the console binary (if there's one) could be useful too
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-04-06T17:27:41Z
+
+Finally! \o/

@@ -41,6 +41,9 @@ class LocaleValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        if ($constraint->canonicalize) {
+            $value = \Locale::canonicalize($value);
+        }
         $locales = Intl::getLocaleBundle()->getLocaleNames();
         $aliases = Intl::getLocaleBundle()->getAliases();
 

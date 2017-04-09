@@ -28,4 +28,5 @@ class Locale extends Constraint
     );
 
     public $message = 'This value is not a valid locale.';
+    public $canonicalize = false;
 }

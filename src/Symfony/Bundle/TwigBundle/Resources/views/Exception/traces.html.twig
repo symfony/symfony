@@ -24,7 +24,7 @@
         <tbody id="trace-html-{{ index }}" class="sf-toggle-content">
         {% set _is_first_user_code = true %}
         {% for i, trace in exception.trace %}
-            {% set _display_code_snippet = _is_first_user_code and ('/vendor/' not in trace.file) and (trace.file is not empty) %}
+            {% set _display_code_snippet = _is_first_user_code and ('/vendor/' not in trace.file) and ('/var/cache/' not in trace.file) and (trace.file is not empty) %}
             {% if _display_code_snippet %}{% set _is_first_user_code = false %}{% endif %}
             <tr>
                 <td class="trace-line {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ index }}-{{ i }}" data-toggle-initial="{{ _display_code_snippet ? 'display' }}">

@@ -218,4 +218,44 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             array('America/Barbados', \DateTimeZone::PER_COUNTRY, 'PT', ' for ISO 3166-1 country code "PT"'),
         );
     }
+
+    /**
+     * @dataProvider getDeprecatedTimezones
+     */
+    public function testDeprecatedTimezonesAreVaildWithBC($timezone)
+    {
+        $constraint = new Timezone(array(
+            'zone' => \DateTimeZone::ALL_WITH_BC,
+        ));
+
+        $this->validator->validate($timezone, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getDeprecatedTimezones
+     */
+    public function testDeprecatedTimezonesAreInvaildWithoutBC($timezone)
+    {
+        $constraint = new Timezone(array(
+            'message' => 'myMessage',
+        ));
+
+        $this->validator->validate($timezone, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ extra_info }}', '')
+            ->setCode(Timezone::NO_SUCH_TIMEZONE_ERROR)
+            ->assertRaised();
+    }
+
+    public function getDeprecatedTimezones()
+    {
+        return array(
+            array('America/Buenos_Aires'),
+            array('Etc/GMT'),
+            array('US/Pacific'),
+        );
+    }
 }

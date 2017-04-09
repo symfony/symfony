@@ -469,6 +469,24 @@ EOF;
         );
     }
 
+    public function testLocateResourceWithGlob()
+    {
+        $kernel = $this->getKernel(array('getBundle'));
+        $kernel
+            ->expects($this->once())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+        ;
+
+        $this->assertEquals(
+            array(
+                __DIR__.'/Fixtures/Bundle1Bundle/bar.txt',
+                __DIR__.'/Fixtures/Bundle1Bundle/foo.txt',
+            ),
+            $kernel->locateResource('@Bundle1Bundle/*.txt', __DIR__.'/Fixtures', null, false)
+        );
+    }
+
     public function testLocateResourceReturnsTheDirOneForResources()
     {
         $kernel = $this->getKernel(array('getBundle'));

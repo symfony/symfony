@@ -249,11 +249,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $files[] = $file;
             }
 
-            if (file_exists($file = $bundle->getPath().'/'.$path)) {
+            if ($paths = glob($bundle->getPath().'/'.$path, defined('GLOB_BRACE') ? GLOB_BRACE : 0)) {
                 if ($first && !$isResource) {
-                    return $file;
+                    return $paths[0];
                 }
-                $files[] = $file;
+
+                $files = array_merge($files, $paths);
                 $resourceBundle = $bundle->getName();
             }
         }

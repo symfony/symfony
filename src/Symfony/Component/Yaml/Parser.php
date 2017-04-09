@@ -64,23 +64,51 @@ class Parser
         if (false === preg_match('//u', $value)) {
             throw new ParseException('The YAML value does not appear to be valid UTF-8.');
         }
-        $this->currentLineNb = -1;
-        $this->currentLine = '';
-        $value = $this->cleanup($value);
-        $this->lines = explode("\n", $value);
 
-        if (null === $this->totalNumberOfLines) {
-            $this->totalNumberOfLines = count($this->lines);
-        }
+        $this->refs = array();
+
+        $mbEncoding = null;
+        $e = null;
+        $data = null;
 
         if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
             $mbEncoding = mb_internal_encoding();
             mb_internal_encoding('UTF-8');
         }
 
+        try {
+            $data = $this->doParse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        if (null !== $mbEncoding) {
+            mb_internal_encoding($mbEncoding);
+        }
+
+        if (null !== $e) {
+            throw $e;
+        }
+
+        return $data;
+    }
+
+    private function doParse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
+    {
+        $this->currentLineNb = -1;
+        $this->currentLine = '';
+        $value = $this->cleanup($value);
+        $this->lines = explode("\n", $value);
+        $this->locallySkippedLineNumbers = array();
+
+        if (null === $this->totalNumberOfLines) {
+            $this->totalNumberOfLines = count($this->lines);
+        }
+
         $data = array();
         $context = null;
         $allowOverwrite = false;
+
         while ($this->moveToNextLine()) {
             if ($this->isCurrentLineEmpty()) {
                 continue;
@@ -246,19 +274,11 @@ class Parser
                         throw $e;
                     }
 
-                    if (isset($mbEncoding)) {
-                        mb_internal_encoding($mbEncoding);
-                    }
-
                     return $value;
                 }
 
                 throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
-        }
-
-        if (isset($mbEncoding)) {
-            mb_internal_encoding($mbEncoding);
         }
 
         if ($objectForMap && !is_object($data) && 'mapping' === $context) {
@@ -289,7 +309,7 @@ class Parser
         $parser = new self($offset, $this->totalNumberOfLines, $skippedLineNumbers);
         $parser->refs = &$this->refs;
 
-        return $parser->parse($yaml, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+        return $parser->doParse($yaml, $exceptionOnInvalidType, $objectSupport, $objectForMap);
     }
 
     /**

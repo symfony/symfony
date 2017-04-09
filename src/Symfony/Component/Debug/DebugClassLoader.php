@@ -186,7 +186,7 @@ class DebugClassLoader
 
         $exists = class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
 
-        if ('\\' === $class[0]) {
+        if ($class && '\\' === $class[0]) {
             $class = substr($class, 1);
         }
 

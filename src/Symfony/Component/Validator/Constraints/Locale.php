@@ -28,4 +28,18 @@ class Locale extends Constraint
     );
 
     public $message = 'This value is not a valid locale.';
+
+    public $canonicalize = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($options = null)
+    {
+        if (isset($options['canonicalize'])) {
+            $this->canonicalize = $options['canonicalize'];
+        }
+
+        parent::__construct($options);
+    }
 }

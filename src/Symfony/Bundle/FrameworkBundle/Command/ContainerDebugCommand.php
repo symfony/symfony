@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -176,18 +177,16 @@ EOF
             return $this->containerBuilder;
         }
 
-        if (!$this->getApplication()->getKernel()->isDebug()) {
-            throw new \LogicException('Debug information about the container is only available in debug mode.');
+        $kernel = $this->getApplication()->getKernel();
+
+        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
+            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, get_class($kernel));
+            $container = $buildContainer();
+            $container->getCompilerPassConfig()->setRemovingPasses(array());
+            $container->compile();
+        } else {
+            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
         }
-
-        if (!is_file($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
-            throw new \LogicException('Debug information about the container could not be found. Please clear the cache and try again.');
-        }
-
-        $container = new ContainerBuilder();
-
-        $loader = new XmlFileLoader($container, new FileLocator());
-        $loader->load($cachedFile);
 
         return $this->containerBuilder = $container;
     }

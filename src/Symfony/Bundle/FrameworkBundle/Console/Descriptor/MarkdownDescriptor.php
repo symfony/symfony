@@ -128,7 +128,6 @@ class MarkdownDescriptor extends Descriptor
         $this->write($title."\n".str_repeat('=', strlen($title)));
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
@@ -136,7 +135,9 @@ class MarkdownDescriptor extends Descriptor
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
             if ($service instanceof Alias) {
-                $services['aliases'][$serviceId] = $service;
+                if ($showPrivate || $service->isPublic()) {
+                    $services['aliases'][$serviceId] = $service;
+                }
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
                     $services['definitions'][$serviceId] = $service;

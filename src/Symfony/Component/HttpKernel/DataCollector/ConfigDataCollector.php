@@ -22,7 +22,7 @@ use Symfony\Component\VarDumper\Caster\LinkStub;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigDataCollector extends DataCollector
+class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     /**
      * @var KernelInterface
@@ -97,6 +97,10 @@ class ConfigDataCollector extends DataCollector
             $this->data['php_version'] = $matches[1];
             $this->data['php_version_extra'] = $matches[2];
         }
+    }
+
+    public function lateCollect()
+    {
         $this->data = $this->cloneVar($this->data);
     }
 

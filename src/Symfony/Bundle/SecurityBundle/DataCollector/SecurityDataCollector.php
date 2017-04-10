@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -30,7 +31,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SecurityDataCollector extends DataCollector
+class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $tokenStorage;
     private $roleHierarchy;
@@ -157,7 +158,10 @@ class SecurityDataCollector extends DataCollector
                 );
             }
         }
+    }
 
+    public function lateCollect()
+    {
         $this->data = $this->cloneVar($this->data);
     }
 

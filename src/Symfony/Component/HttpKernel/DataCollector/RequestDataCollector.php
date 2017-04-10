@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestDataCollector extends DataCollector implements EventSubscriberInterface
+class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
     /** @var \SplObjectStorage */
     protected $controllers;
@@ -147,7 +147,10 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 ));
             }
         }
+    }
 
+    public function lateCollect()
+    {
         $this->data = $this->cloneVar($this->data);
     }
 

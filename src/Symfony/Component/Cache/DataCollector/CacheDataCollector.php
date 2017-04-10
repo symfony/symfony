@@ -16,12 +16,13 @@ use Symfony\Component\Cache\Adapter\TraceableAdapterEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class CacheDataCollector extends DataCollector
+class CacheDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     /**
      * @var TraceableAdapter[]
@@ -50,7 +51,10 @@ class CacheDataCollector extends DataCollector
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics'] = $this->calculateTotalStatistics();
+    }
 
+    public function lateCollect()
+    {
         $this->data = $this->cloneVar($this->data);
     }
 

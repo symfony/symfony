@@ -34,6 +34,7 @@ class RequestDataCollectorTest extends TestCase
         $c = new RequestDataCollector();
 
         $c->collect($request = $this->createRequest(), $this->createResponse());
+        $c->lateCollect();
 
         $attributes = $c->getRequestAttributes();
 
@@ -65,6 +66,7 @@ class RequestDataCollectorTest extends TestCase
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
+        $c->lateCollect();
 
         $this->assertEquals(array(), $c->getRouteParams());
     }
@@ -93,6 +95,7 @@ class RequestDataCollectorTest extends TestCase
         $response = $this->createResponse();
         $this->injectController($c, $callable, $request);
         $c->collect($request, $response);
+        $c->lateCollect();
 
         $this->assertSame($expected, $c->getController()->getValue(true), sprintf('Testing: %s', $name));
     }

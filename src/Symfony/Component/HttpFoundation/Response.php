@@ -158,10 +158,10 @@ class Response
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
-        416 => 'Requested Range Not Satisfiable',
+        416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
         418 => 'I\'m a teapot',                                               // RFC2324
         421 => 'Misdirected Request',                                         // RFC7540
@@ -180,7 +180,7 @@ class Response
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported',
-        506 => 'Variant Also Negotiates (Experimental)',                      // RFC2295
+        506 => 'Variant Also Negotiates',                                     // RFC2295
         507 => 'Insufficient Storage',                                        // RFC4918
         508 => 'Loop Detected',                                               // RFC5842
         510 => 'Not Extended',                                                // RFC2774

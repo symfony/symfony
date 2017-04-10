@@ -354,9 +354,7 @@ stream resource {@{$ref}
         : } catch (%s \$e) {
       }
       %sCliDumperTest.php:{$line}: {
-        :         }
-        :     };'),
-        : ));
+%A
       }
     }
   }

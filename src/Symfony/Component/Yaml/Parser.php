@@ -89,18 +89,45 @@ class Parser
         if (false === preg_match('//u', $value)) {
             throw new ParseException('The YAML value does not appear to be valid UTF-8.');
         }
-        $this->currentLineNb = -1;
-        $this->currentLine = '';
-        $value = $this->cleanup($value);
-        $this->lines = explode("\n", $value);
 
-        if (null === $this->totalNumberOfLines) {
-            $this->totalNumberOfLines = count($this->lines);
-        }
+        $this->refs = array();
+
+        $mbEncoding = null;
+        $e = null;
+        $data = null;
 
         if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
             $mbEncoding = mb_internal_encoding();
             mb_internal_encoding('UTF-8');
+        }
+
+        try {
+            $data = $this->doParse($value, $flags);
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        if (null !== $mbEncoding) {
+            mb_internal_encoding($mbEncoding);
+        }
+
+        if (null !== $e) {
+            throw $e;
+        }
+
+        return $data;
+    }
+
+    private function doParse($value, $flags)
+    {
+        $this->currentLineNb = -1;
+        $this->currentLine = '';
+        $value = $this->cleanup($value);
+        $this->lines = explode("\n", $value);
+        $this->locallySkippedLineNumbers = array();
+
+        if (null === $this->totalNumberOfLines) {
+            $this->totalNumberOfLines = count($this->lines);
         }
 
         if (!$this->moveToNextLine()) {
@@ -324,10 +351,6 @@ class Parser
                         throw $e;
                     }
 
-                    if (isset($mbEncoding)) {
-                        mb_internal_encoding($mbEncoding);
-                    }
-
                     return $value;
                 }
 
@@ -375,10 +398,6 @@ class Parser
             $data = new TaggedValue($tag, $data);
         }
 
-        if (isset($mbEncoding)) {
-            mb_internal_encoding($mbEncoding);
-        }
-
         if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && !is_object($data) && 'mapping' === $context) {
             $object = new \stdClass();
 
@@ -408,10 +427,9 @@ class Parser
         $parser->offset = $offset;
         $parser->totalNumberOfLines = $this->totalNumberOfLines;
         $parser->skippedLineNumbers = $skippedLineNumbers;
-
         $parser->refs = &$this->refs;
 
-        return $parser->parse($yaml, $flags);
+        return $parser->doParse($yaml, $flags);
     }
 
     /**

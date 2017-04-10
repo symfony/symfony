@@ -161,16 +161,11 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         foreach ($definition->getArguments() as $k => $v) {
             if (is_numeric($k)) {
                 $def->addArgument($v);
-                continue;
+            } elseif (0 === strpos($k, 'index_')) {
+                $def->replaceArgument((int) substr($k, strlen('index_')), $v);
+            } else {
+                $def->setArgument($k, $v);
             }
-
-            if (0 === strpos($k, 'index_')) {
-                $index = (int) substr($k, strlen('index_'));
-            } elseif (0 !== strpos($k, '$')) {
-                throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
-            }
-
-            $def->replaceArgument($index, $v);
         }
 
         // merge properties

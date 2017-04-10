@@ -216,6 +216,13 @@ class Definition
         return $this;
     }
 
+    public function setArgument($key, $value)
+    {
+        $this->arguments[$key] = $value;
+
+        return $this;
+    }
+
     /**
      * Gets the arguments to pass to the service constructor/factory method.
      *

@@ -39,12 +39,13 @@ final class Dotenv
     /**
      * Loads one or several .env files.
      *
-     * @param ...string A list of files to load
+     * @param string    $path  A file to load
+     * @param ...string $paths A list of additionnal files to load
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function load(/*...$paths*/)
+    public function load($path/*, ...$paths*/)
     {
         // func_get_args() to be replaced by a variadic argument for Symfony 4.0
         foreach (func_get_args() as $path) {

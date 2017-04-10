@@ -2,7 +2,7 @@
     "name": "symfony/web-link",
     "type": "library",
     "description": "Symfony WebLink Component",
-    "keywords": ["link", "psr13", "http", "HTTP/2", "preload", "prefetch", "pre-render", "dns-prefetch", "push", "performance"],
+    "keywords": ["link", "psr13", "http", "HTTP/2", "preload", "prefetch", "prerender", "dns-prefetch", "push", "performance"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

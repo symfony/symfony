@@ -28,9 +28,9 @@ class RequestDataCollector extends BaseRequestCollector implements EventSubscrib
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    protected function doCollect(Request $request, Response $response, \Exception $exception = null)
     {
-        parent::collect($request, $response, $exception);
+        parent::doCollect($request, $response, $exception);
 
         if ($parentRequestAttributes = $request->attributes->get('_forwarded')) {
             if ($parentRequestAttributes instanceof ParameterBag) {

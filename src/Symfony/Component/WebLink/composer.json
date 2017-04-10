@@ -17,13 +17,13 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "fig/link-util": "^1.0",
         "psr/link": "^1.0"
     },
     "suggest": {
         "symfony/http-kernel": ""
     },
     "require-dev": {
-        "fig/link-util": "^1.0",
         "symfony/event-dispatcher": "^2.8|^3.0",
         "symfony/http-foundation": "^2.8|^3.0",
         "symfony/http-kernel": "^2.8|^3.0"

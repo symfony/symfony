@@ -174,6 +174,13 @@ class AppVariable
             return $session->getFlashBag()->get($types);
         }
 
-        return array_intersect_key($session->getFlashBag()->all(), array_flip($types));
+        $result = array();
+        foreach ($types as $type) {
+            if ($value = $session->getFlashBag()->get($type)) {
+                $result[$type] = $value;
+            }
+        }
+
+        return $result;
     }
 }

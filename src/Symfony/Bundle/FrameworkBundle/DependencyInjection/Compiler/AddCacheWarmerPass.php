@@ -11,34 +11,21 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass as BaseAddCacheWarmerPass;
+
+@trigger_error('The '.AddCacheWarmerPass::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use the '.BaseAddCacheWarmerPass::class.' class instead.', E_USER_DEPRECATED);
 
 /**
  * Registers the cache warmers.
  *
+ * @deprecated This class is deprecated since 3.3, and will be removed in 4.0. Use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass instead.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AddCacheWarmerPass implements CompilerPassInterface
+class AddCacheWarmerPass extends BaseAddCacheWarmerPass
 {
-    use PriorityTaggedServiceTrait;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function __construct()
     {
-        if (!$container->hasDefinition('cache_warmer')) {
-            return;
-        }
-
-        $warmers = $this->findAndSortTaggedServices('kernel.cache_warmer', $container);
-
-        if (empty($warmers)) {
-            return;
-        }
-
-        $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
+        parent::__construct('cache_warmer', 'kernel.cache_warmer');
     }
 }

@@ -11,31 +11,21 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass as BaseAddCacheClearerPass;
+
+@trigger_error('The '.AddCacheClearerPass::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use the '.BaseAddCacheClearerPass::class.' class instead.', E_USER_DEPRECATED);
 
 /**
  * Registers the cache clearers.
  *
+ * @deprecated This class is deprecated since 3.3, and will be removed in 4.0. Use Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass instead.
+ *
  * @author Dustin Dobervich <ddobervich@gmail.com>
  */
-class AddCacheClearerPass implements CompilerPassInterface
+class AddCacheClearerPass extends BaseAddCacheClearerPass
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function __construct()
     {
-        if (!$container->hasDefinition('cache_clearer')) {
-            return;
-        }
-
-        $clearers = array();
-        foreach ($container->findTaggedServiceIds('kernel.cache_clearer') as $id => $attributes) {
-            $clearers[] = new Reference($id);
-        }
-
-        $container->getDefinition('cache_clearer')->replaceArgument(0, $clearers);
+        parent::__construct('cache_clearer', 'kernel.cache_clearer');
     }
 }

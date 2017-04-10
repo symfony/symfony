@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
+use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass;
 
 class AddCacheWarmerPassTest extends TestCase
 {
@@ -48,7 +48,7 @@ class AddCacheWarmerPassTest extends TestCase
                 new Reference('my_cache_warmer_service3'),
             ));
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass = new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer');
         $addCacheWarmerPass->process($container);
     }
 
@@ -65,7 +65,7 @@ class AddCacheWarmerPassTest extends TestCase
             ->will($this->returnValue(false));
         $definition->expects($this->never())->method('replaceArgument');
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass = new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer');
         $addCacheWarmerPass->process($container);
     }
 
@@ -85,7 +85,7 @@ class AddCacheWarmerPassTest extends TestCase
 
         $definition->expects($this->never())->method('replaceArgument');
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass = new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer');
         $addCacheWarmerPass->process($container);
     }
 }

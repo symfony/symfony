@@ -364,6 +364,23 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertSame('ParentClass', $def->getClass());
     }
 
+    public function testProcessSetsArguments()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'ParentClass')->setArguments(array(0));
+        $container->setDefinition('child', (new ChildDefinition('parent'))->setArguments(array(
+            1,
+            'index_0' => 2,
+            'foo' => 3,
+        )));
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertSame(array(2, 1, 'foo' => 3), $def->getArguments());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

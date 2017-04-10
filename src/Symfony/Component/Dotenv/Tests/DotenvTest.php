@@ -145,4 +145,13 @@ class DotenvTest extends TestCase
 
         return $tests;
     }
+
+    /**
+     * @expectedException \Symfony\Component\Dotenv\Exception\PathException
+     */
+    public function testLoadDirectory()
+    {
+        $dotenv = new Dotenv();
+        $dotenv->load(__DIR__);
+    }
 }

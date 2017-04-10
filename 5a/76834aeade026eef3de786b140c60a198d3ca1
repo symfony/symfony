@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-04T12:18:16Z
+
+A better name would probably be "Link Component": https://html.spec.whatwg.org/multipage/semantics.html#links
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-04T14:49:32Z
+
+Added to the 3.3 milestone because this is only about new features already planned for 3.3
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-04T16:08:33Z
+
+Not changing the service definition for `assets.preload_manager` looks suspicious to me (and btw, the name should be changed)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-04T17:08:25Z
+
+I've renamed the component Link, added support for generic "Link" headers (preloading and resource hints) and introduced new Twig helpers for `dns-prefetch`, `preconnect`, `prefetch` and `prerender`.
+
+This new component now support all types of prefetching and is smart enough to manage generic Link headers (for instance, when it will be available https://github.com/api-platform/core/blob/master/src/Hydra/EventListener/AddLinkHeaderListener.php in API Platform may be removed).
+
+@stof comment also addressed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T07:03:21Z
+
+Tests should be green after the merge.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2017-04-05T10:02:57Z
+
+Please, call this "HttpLink".
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T10:44:40Z
+
+@teohhanhui it's not really related to HTTP (only the listener is). It can also handle HTML links and in general links in any other protocol.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T10:49:53Z
+
+@xabbuh's comments fixed
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2017-04-05T10:53:49Z
+
+I believe it's defined in [RFC 5988 - Web Linking](https://tools.ietf.org/html/rfc5988). Perhaps it can be named WebLink or ResourceLink.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T10:55:00Z
+
+I like `WebLink`.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2017-04-05T11:03:57Z
+
+`WebLink` is fine, but then the `buildValues` method on `LinkManagerInterface` should not mention `HTTP headers`
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T11:27:21Z
+
+This method should be renamed `buildHeaderValue()` (obviously, it's not the same format for HTML links).
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-04-05T21:08:59Z
+
+Is there any relation with PSR-13 about links? Would it make sense to implement it?
+
+For reference:
+
+- the GitHub package: https://github.com/php-fig/link
+- the standard: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-13-links.md
+
+I am not familiar at all with the standard so I may be completely off.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T21:21:36Z
+
+@mnapoli I had totally forgotten this PSR, but it's related. We may use https://github.com/php-fig/link-util instead of the primitive types. Are you aware of other PSR-13 implementations?
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-04-05T21:25:02Z
+
+@dunglas not really, pinging @Crell who may have some insight. On Packagist there are not a lot of dependent packages: https://packagist.org/packages/psr/link/dependents
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-05T21:35:42Z
+
+So, about PSR-13, the manager can be transformed in a serializer (according to the PSR terminology) and it can use https://github.com/php-fig/link-util/blob/master/src/GenericLinkProvider.php instead of the current simple array.
+
+It's a minor change and will improve interoperability with other libraries using this PSR (Drupal?). WDYT @symfony/deciders?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-05T21:51:17Z
+
+Let's use PSR-13 then!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-06T09:20:15Z
+
+PSR-13 support added (it deserves a review because of how I deal with immutability).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-06T09:36:52Z
+
+Failures not related or will be fixed by the merge.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-06T15:18:04Z
+
+Implementation revamped to get rid of the stateful service and use a request attribute instead.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-10T15:16:15Z
+
+Some tests are broken on Travis.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-10T15:33:38Z
+
+@fabpot IIUC, only because the component is not available on Packagist yet (DEPS=low)?

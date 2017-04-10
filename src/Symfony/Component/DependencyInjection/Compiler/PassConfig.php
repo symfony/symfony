@@ -42,13 +42,13 @@ class PassConfig
         $this->beforeOptimizationPasses = array(
             100 => array(
                 $resolveClassPass = new ResolveClassPass(),
-                new ResolveDefinitionInheritancePass(),
             ),
         );
 
         $this->optimizationPasses = array(array(
             new ExtensionCompilerPass(),
             new ResolveDefinitionTemplatesPass(),
+            new ResolveDefinitionInheritancePass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(),

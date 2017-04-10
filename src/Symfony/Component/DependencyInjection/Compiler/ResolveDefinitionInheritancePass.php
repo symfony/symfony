@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
@@ -27,7 +26,7 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $class = $value instanceof ChildDefinition ? $this->resolveDefinition($value) : $value->getClass();
+        $class = $value->getClass();
 
         if (!$class || false !== strpos($class, '%') || !$instanceof = $value->getInstanceofConditionals()) {
             return parent::processValue($value, $isRoot);
@@ -39,55 +38,56 @@ class ResolveDefinitionInheritancePass extends AbstractRecursivePass
                 continue;
             }
             if ($interface === $class || is_subclass_of($class, $interface)) {
-                $this->mergeDefinition($value, $definition);
+                $this->mergeInstanceofDefinition($value, $definition);
             }
         }
 
         return parent::processValue($value, $isRoot);
     }
 
-    /**
-     * Populates the class and tags from parent definitions.
-     */
-    private function resolveDefinition(ChildDefinition $definition)
+    private function mergeInstanceofDefinition(Definition $def, Definition $instanceofDefinition)
     {
-        if (!$this->container->has($parent = $definition->getParent())) {
-            return;
+        $configured = $def->getChanges();
+        $changes = $instanceofDefinition->getChanges();
+        if (!isset($configured['shared']) && isset($changes['shared'])) {
+            $def->setShared($instanceofDefinition->isShared());
         }
-
-        $parentDef = $this->container->findDefinition($parent);
-        $class = $parentDef instanceof ChildDefinition ? $this->resolveDefinition($parentDef) : $parentDef->getClass();
-        $class = $definition->getClass() ?: $class;
-
-        // append parent tags when inheriting is enabled
-        if ($definition->getInheritTags()) {
-            $definition->setInheritTags(false);
-
-            foreach ($parentDef->getTags() as $k => $v) {
-                foreach ($v as $v) {
-                    $definition->addTag($k, $v);
-                }
+        if (!isset($configured['configurator']) && isset($changes['configurator'])) {
+            $def->setConfigurator($instanceofDefinition->getConfigurator());
+        }
+        if (!isset($configured['public']) && isset($changes['public'])) {
+            $def->setPublic($instanceofDefinition->isPublic());
+        }
+        if (!isset($configured['lazy']) && isset($changes['lazy'])) {
+            $def->setLazy($instanceofDefinition->isLazy());
+        }
+        if (!isset($configured['autowired']) && isset($changes['autowired'])) {
+            $def->setAutowired($instanceofDefinition->isAutowired());
+        }
+        // merge properties
+        $properties = $def->getProperties();
+        foreach ($instanceofDefinition->getProperties() as $k => $v) {
+            // don't override properties set explicitly on the service
+            if (!array_key_exists($k, $properties)) {
+                $def->setProperty($k, $v);
             }
         }
+        // merge method calls
+        if ($instanceofCalls = $instanceofDefinition->getMethodCalls()) {
+            $currentCallMethods = array_map(function ($call) {
+                return strtolower($call[0]);
+            }, $def->getMethodCalls());
 
-        return $class;
-    }
+            $uniqueInstanceofCalls = array_filter($instanceofCalls, function ($instanceofCall) use ($currentCallMethods) {
+                // don't add an instanceof call if it was overridden on the service
+                return !in_array(strtolower($instanceofCall[0]), $currentCallMethods);
+            });
 
-    private function mergeDefinition(Definition $def, ChildDefinition $definition)
-    {
-        $changes = $definition->getChanges();
-        if (isset($changes['shared'])) {
-            $def->setShared($definition->isShared());
+            $def->setMethodCalls(array_merge($uniqueInstanceofCalls, $def->getMethodCalls()));
         }
-        if (isset($changes['abstract'])) {
-            $def->setAbstract($definition->isAbstract());
-        }
-
-        ResolveDefinitionTemplatesPass::mergeDefinition($def, $definition);
-
         // prepend instanceof tags
         $tailTags = $def->getTags();
-        if ($headTags = $definition->getTags()) {
+        if ($headTags = $instanceofDefinition->getTags()) {
             $def->setTags($headTags);
             foreach ($tailTags as $k => $v) {
                 foreach ($v as $v) {

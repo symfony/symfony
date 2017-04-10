@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ResolveDefinitionTemplatesPassTest extends TestCase
 {
@@ -362,6 +363,42 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $def = $container->getDefinition('child');
         $this->assertSame('ParentClass', $def->getClass());
+    }
+
+    public function testProcessInstanceofConditionals()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+            ->setInstanceofConditionals(array('Foo' => (new Definition())->setLazy(true)))
+        ;
+
+        $conditionals = array('stdClass' => (new Definition())->setAutowired(true), 'Bar' => (new Definition())->setShared(false));
+        $container
+            ->setDefinition('child', new ChildDefinition('parent'))
+            ->setInstanceofConditionals($conditionals)
+        ;
+
+        $this->process($container);
+
+        $childDef = $container->getDefinition('child');
+        // instanceof taken directly from child, parent ignored
+        $this->assertSame($conditionals, $childDef->getInstanceofConditionals());
+    }
+
+    public function testDefinitionOnlyShowsActualChanges()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'ParentClass');
+
+        $container->setDefinition('child', new ChildDefinition('parent'));
+
+        $this->process($container);
+
+        $childDef = $container->getDefinition('child');
+        $this->assertEquals(array('class' => true), $childDef->getChanges());
     }
 
     protected function process(ContainerBuilder $container)

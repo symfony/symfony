@@ -12,66 +12,72 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionInheritancePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ResolveDefinitionInheritancePassTest extends TestCase
 {
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $def = $container->register('parent', self::class)->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
+        $def = $container->register('parent', self::class)
+            ->setProperty('foo', 'moo')
+            ->setProperty('nullProp', null);
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))
-                ->replaceArgument(0, 'a')
+            parent::class => (new Definition())
+                ->setShared(false)
+                ->setLazy(true)
+                ->setPublic(false)
+                ->setConfigurator('instanceof_configurator')
+                ->addMethodCall('foo_call')
+                ->addTag('foo_tag')
+                ->setAutowired(true)
                 ->setProperty('foo', 'bar')
-                ->setClass('bar'),
+                ->setProperty('otherProp', 'baz')
+                ->setProperty('nullProp', 'will_be_overridden'),
         ));
 
         $this->process($container);
 
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertSame($def, $container->getDefinition('parent'));
-        $this->assertEquals('bar', $def->getClass());
-        $this->assertEquals(array('a', 'b'), $def->getArguments());
-        $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
+        $this->assertFalse($def->isShared());
+        $this->assertTrue($def->isLazy());
+        $this->assertFalse($def->isPublic());
+        $this->assertEquals('instanceof_configurator', $def->getConfigurator());
+        $this->assertEquals(array(array('foo_call', array())), $def->getMethodCalls());
+        $this->assertEquals(array('foo_tag' => array(array())), $def->getTags());
+        $this->assertTrue($def->isAutowired());
+        // foo property is not replaced, but otherProp is added
+        $this->assertEquals(array('foo' => 'moo', 'otherProp' => 'baz', 'nullProp' => null), $def->getProperties());
     }
 
-    public function testProcessAppendsMethodCallsAlways()
+    public function testProcessMergesMethodCallsAlways()
     {
         $container = new ContainerBuilder();
 
         $def = $container
             ->register('parent', self::class)
-            ->addMethodCall('foo', array('bar'));
+            ->addMethodCall('foo', array('bar'))
+            ->addMethodCall('setBaz', array('sunshine_baz'));
 
         $def->setInstanceofConditionals(array(
-                parent::class => (new ChildDefinition(''))
-                    ->addMethodCall('bar', array('foo')),
+                parent::class => (new Definition())
+                    ->addMethodCall('bar', array('foo'))
+                    // lowercased - should still be overridden
+                    ->addMethodCall('setbaz', array('rainbow_baz')),
         ));
 
         $this->process($container);
 
         $this->assertEquals(array(
-            array('foo', array('bar')),
+            // instanceof call is first
             array('bar', array('foo')),
+            array('foo', array('bar')),
+            // because it has the same name, the definition overrides instanceof
+            array('setBaz', array('sunshine_baz')),
         ), $container->getDefinition('parent')->getMethodCalls());
-    }
-
-    public function testProcessDoesReplaceAbstract()
-    {
-        $container = new ContainerBuilder();
-
-        $def = $container->register('parent', 'stdClass');
-
-        $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setAbstract(true),
-        ));
-
-        $this->process($container);
-
-        $this->assertTrue($def->isAbstract());
     }
 
     public function testProcessDoesReplaceShared()
@@ -81,7 +87,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $def = $container->register('parent', 'stdClass');
 
         $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setShared(false),
+            'stdClass' => (new Definition())->setShared(false),
         ));
 
         $this->process($container);
@@ -95,17 +101,17 @@ class ResolveDefinitionInheritancePassTest extends TestCase
 
         $def = $container
             ->register('parent', self::class)
-            ->setArguments(array('foo', 'bar', 'c'))
+            ->setProperties(array('foo' => 'fooval', 'bar' => 'barval', 'baz' => 'bazval'))
         ;
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->replaceArgument(1, 'b'),
-            self::class => (new ChildDefinition(''))->replaceArgument(0, 'a'),
+            parent::class => (new Definition())->setProperty('bar', 'barval_changed'),
+            self::class => (new Definition())->setProperty('foo', 'fooval_changed'),
         ));
 
         $this->process($container);
 
-        $this->assertEquals(array('a', 'b', 'c'), $def->getArguments());
+        $this->assertEquals(array('foo' => 'fooval', 'bar' => 'barval', 'baz' => 'bazval'), $def->getProperties());
     }
 
     public function testSetLazyOnServiceHasParent()
@@ -115,7 +121,7 @@ class ResolveDefinitionInheritancePassTest extends TestCase
         $def = $container->register('parent', 'stdClass');
 
         $def->setInstanceofConditionals(array(
-            'stdClass' => (new ChildDefinition(''))->setLazy(true),
+            'stdClass' => (new Definition())->setLazy(true),
         ));
 
         $this->process($container);
@@ -127,42 +133,75 @@ class ResolveDefinitionInheritancePassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent', self::class)->addTag('parent');
-
-        $def = $container->setDefinition('child', new ChildDefinition('parent'))
-            ->addTag('child')
-            ->setInheritTags(true)
+        $def = $container->register('parent', self::class)
+            ->addTag('tag_foo')
+            ->addTag('tag_bar', array('priority' => 100))
         ;
 
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->addTag('foo'),
+            parent::class => (new Definition())
+                ->addTag('tag_bar', array('priority' => 500))
+                ->addTag('tag_baz'),
         ));
 
         $this->process($container);
 
         $t = array(array());
-        $this->assertSame(array('foo' => $t, 'child' => $t, 'parent' => $t), $def->getTags());
+        $this->assertSame(
+            array(
+                // all tags are kept, and merged together
+                'tag_bar' => array(array('priority' => 500), array('priority' => 100)),
+                // instanceof tags are added first
+                'tag_baz' => $t,
+                'tag_foo' => $t,
+            ),
+            $def->getTags()
+        );
     }
 
-    public function testProcessResolvesAliasesAndTags()
+    /**
+     * Tests that service configuration cascades in the correct order.
+     *
+     * For configuration: defaults > instanceof > service. In
+     * other words, service-specific configuration is the strongest,
+     * then instanceof and finally defaults.
+     */
+    public function testConfigurationOverridePriority()
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent', self::class);
-        $container->setAlias('parent_alias', 'parent');
-        $def = $container->setDefinition('child', new ChildDefinition('parent_alias'));
+        $def = $container->register('parent', self::class);
+        // mimic how _defaults/defaults is loaded in YAML/XML
+        $def
+            ->setTrackChanges(false)
+            ->setPublic(false)
+            ->setAutowired(true)
+            ->setTrackChanges(true);
+
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->addTag('foo'),
+            parent::class => (new Definition())
+                // overrides autowired on _defaults
+                ->setAutowired(false)
+                ->setConfigurator('foo_configurator'),
         ));
+
+        $def
+            // overrides public on _defaults
+            ->setPublic(true)
+            // overrides configurator on instanceof
+            ->setConfigurator('bar_configurator')
+        ;
 
         $this->process($container);
 
-        $this->assertSame(array('foo' => array(array())), $def->getTags());
-        $this->assertSame($def, $container->getDefinition('child'));
-        $this->assertEmpty($def->getClass());
+        // service-level wins over instanceof
+        $this->assertTrue($def->isPublic());
+        $this->assertEquals('bar_configurator', $def->getConfigurator());
+        // instanceof-level wins over defaults
+        $this->assertFalse($def->isAutowired());
     }
 
-    protected function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionInheritancePass();
         $pass->process($container);

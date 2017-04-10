@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-04-05T16:16:59Z
+
+@nicolas-grekas updated the PR and added [this comment](https://github.com/symfony/symfony/pull/22239#discussion_r109961065).
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-04-06T09:26:50Z
+
+@nicolas-grekas unfortunately your two-line change wasn't an option because of the `/` at the end. I've pushed a refactored version to allow this `/` not to be there when just using `**` without `/` after.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-04-06T17:29:49Z
+
+The built errored on Travis, could someone with super-powers could restart it? :)
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-07T14:10:33Z
+
+Amend your commit and then force push (with the branch name) and should restart Travis 👍
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-04-09T12:35:16Z
+
+All green 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-10T17:32:15Z
+
+Can you add a note in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-04-10T17:42:18Z
+
+@fabpot don't you think that [@nicolas-grekas' one](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Finder/CHANGELOG.md#330) already for 3.3.0 is enough?

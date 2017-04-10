@@ -194,44 +194,44 @@ class RepeatedTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testSetOptionsForCompareNotCallableOrNull()
+    public function testSetOptionsForComparatorNotCallableOrNull()
     {
         $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'compare' => 'test',
+            'comparator' => 'test',
         ));
     }
 
-    public function testSetOptionsForCompareCallableAsNull()
+    public function testSetOptionsForComparatorCallableAsNull()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'compare' => null,
+            'comparator' => null,
         ));
 
-        $this->assertNull($form->getConfig()->getOption('compare'));
+        $this->assertNull($form->getConfig()->getOption('comparator'));
     }
 
-    public function testSetOptionsForCompareCallableAsCallable()
+    public function testSetOptionsForComparatorCallableAsCallable()
     {
         $callable = function ($value1, $value2) {
             return $value1 === $value2;
         };
 
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'compare' => $callable,
+            'comparator' => $callable,
         ));
 
-        $this->assertSame($callable, $form->getConfig()->getOption('compare'));
+        $this->assertSame($callable, $form->getConfig()->getOption('comparator'));
     }
 
-    public function compare($value1, $value2)
+    public function comparator($value1, $value2)
     {
         return 0 === strcmp($value1, $value2);
     }
 
-    public function testSetOptionsForCompareNativeFunction()
+    public function testSetOptionsForComparatorNativeFunction()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'compare' => array($this, 'compare'),
+            'comparator' => array($this, 'comparator'),
         ));
 
         $input = array('first' => 'foo', 'second' => 'foo');

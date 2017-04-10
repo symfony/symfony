@@ -35,7 +35,7 @@ class RepeatedType extends AbstractType
             ->addViewTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],
                 $options['second_name'],
-            ), $options['compare']))
+            ), $options['comparator']))
             ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
             ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
         ;
@@ -54,13 +54,13 @@ class RepeatedType extends AbstractType
             'first_name' => 'first',
             'second_name' => 'second',
             'error_bubbling' => false,
-            'compare' => null,
+            'comparator' => null,
         ));
 
         $resolver->setAllowedTypes('options', 'array');
         $resolver->setAllowedTypes('first_options', 'array');
         $resolver->setAllowedTypes('second_options', 'array');
-        $resolver->setAllowedTypes('compare', array('null', 'callable'));
+        $resolver->setAllowedTypes('comparator', array('null', 'callable'));
     }
 
     /**

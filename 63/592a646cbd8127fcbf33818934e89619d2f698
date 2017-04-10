@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by pierredup at 2017-04-09T14:45:33Z
+
+> PHP ini session.use_strict_mode was added in PHP 5.5.2 so I didn't target 2.8 as this still uses PHP 5.3
+
+You can still run SF 2.x on PHP 5.5 and want to set this option. So IMO this can go into 2.7 (earlier versions of PHP should just ignore the option if you set it)
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-09T16:31:29Z
+
+Rebased on 2.7.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2017-04-10T04:48:22Z
+
+Is there a good reason not to enable it by default?  I'm not 100% sure of the intricacies of the option, so maybe it's a bad idea.

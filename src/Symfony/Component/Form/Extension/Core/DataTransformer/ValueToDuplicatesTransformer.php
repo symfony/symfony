@@ -22,6 +22,12 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
     private $keys;
     private $comparator;
 
+    /**
+     * Constructor.
+     *
+     * @param array    $keys       The compared keys
+     * @param callable $comparator The comparator callable to compare values
+     */
     public function __construct(array $keys, callable $comparator = null)
     {
         $this->keys = $keys;

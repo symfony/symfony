@@ -33,10 +33,11 @@ class ProfilerTest extends TestCase
         $profiler = new Profiler($this->storage);
         $profiler->add($collector);
         $profile = $profiler->collect($request, $response);
+        $profiler->saveProfile($profile);
 
         $this->assertSame(204, $profile->getStatusCode());
         $this->assertSame('GET', $profile->getMethod());
-        $this->assertSame('bar', $profiler->get('request')->getRequestQuery()->all()['foo']->getValue());
+        $this->assertSame('bar', $profile->getCollector('request')->getRequestQuery()->all()['foo']->getValue());
     }
 
     public function testFindWorksWithDates()

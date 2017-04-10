@@ -63,6 +63,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
         $collector->collect($this->getRequest(), $this->getResponse());
+        $collector->lateCollect();
 
         $this->assertTrue($collector->isEnabled());
         $this->assertTrue($collector->isAuthenticated());
@@ -90,6 +91,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
         $collector->collect($request, $this->getResponse());
+        $collector->lateCollect();
         $collected = $collector->getFirewall();
 
         $this->assertSame($firewallConfig->getName(), $collected['name']);

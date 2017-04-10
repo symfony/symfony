@@ -11,11 +11,13 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
+use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * TwigExtension.
@@ -46,6 +48,12 @@ class TwigExtension extends Extension
 
         if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
             $container->removeDefinition('twig.translation.extractor');
+        }
+
+        if (class_exists(HttpHeaderSerializer::class)) {
+            $definition = $container->register('twig.extension.weblink', WebLinkExtension::class);
+            $definition->setPublic(false);
+            $definition->addArgument(new Reference('request_stack'));
         }
 
         foreach ($configs as $key => $config) {

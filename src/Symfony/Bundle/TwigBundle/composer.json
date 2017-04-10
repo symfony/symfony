@@ -34,6 +34,7 @@
         "symfony/templating": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/framework-bundle": "^3.2.2",
+        "symfony/web-link": "~3.3",
         "doctrine/annotations": "~1.0"
     },
     "conflict": {

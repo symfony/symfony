@@ -20,6 +20,7 @@
         "twig/twig": "~1.28|~2.0"
     },
     "require-dev": {
+        "fig/link-util": "^1.0",
         "symfony/asset": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
         "symfony/form": "^3.2.5",
@@ -34,7 +35,8 @@
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/console": "~2.8|~3.0",
         "symfony/var-dumper": "~2.8.10|~3.1.4|~3.2",
-        "symfony/expression-language": "~2.8|~3.0"
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/web-link": "~3.3"
     },
     "suggest": {
         "symfony/finder": "",
@@ -48,7 +50,8 @@
         "symfony/security": "For using the SecurityExtension",
         "symfony/stopwatch": "For using the StopwatchExtension",
         "symfony/var-dumper": "For using the DumpExtension",
-        "symfony/expression-language": "For using the ExpressionExtension"
+        "symfony/expression-language": "For using the ExpressionExtension",
+        "symfony/web-link": "For using the WebLinkExtension"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Twig\\": "" },

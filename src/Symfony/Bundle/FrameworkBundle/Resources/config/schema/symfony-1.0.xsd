@@ -14,6 +14,7 @@
             <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
             <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
             <xsd:element name="fragments" type="fragments" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="web-link" type="web_link" minOccurs="0" maxOccurs="1" />
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
             <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
@@ -60,6 +61,10 @@
     <xsd:complexType name="fragments">
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="web_link">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler">

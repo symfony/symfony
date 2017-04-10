@@ -18,10 +18,10 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * FrameworkExtension configuration structure.
@@ -101,6 +101,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyInfoSection($rootNode);
         $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
+        $this->addWebLinkSection($rootNode);
 
         return $treeBuilder;
     }
@@ -802,6 +803,18 @@ class Configuration implements ConfigurationInterface
                             ->treatNullLike($this->debug)
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addWebLinkSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('web_link')
+                    ->info('web links configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(HttpHeaderSerializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end()
         ;

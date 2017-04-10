@@ -43,13 +43,5 @@
             <argument /> <!-- manifest path -->
         </service>
 
-        <service id="assets.preload_manager" class="Symfony\Component\Asset\Preload\PreloadManager" public="false" />
-
-        <service id="asset.preload_listener" class="Symfony\Component\Asset\EventListener\PreloadListener">
-            <argument type="service" id="assets.preload_manager" />
-
-            <tag name="kernel.event_subscriber" />
-        </service>
-
     </services>
 </container>

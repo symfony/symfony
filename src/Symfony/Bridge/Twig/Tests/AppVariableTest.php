@@ -215,7 +215,8 @@ class AppVariableTest extends TestCase
 
         $this->assertEquals(
             array('warning' => $flashMessages['warning']),
-            $this->appVariable->getFlashes(array('warning'))
+            $this->appVariable->getFlashes(array('warning')),
+            'After getting some flash types (e.g. "notice" and "error"), the rest of flash messages must remain (e.g. "warning").'
         );
     }
 

@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
-use Symfony\Component\WebLink\WebLinkManagerInterface;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 
 /**
@@ -210,7 +210,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
-            if (!interface_exists(WebLinkManagerInterface::class)) {
+            if (!class_exists(HttpHeaderSerializer::class)) {
                 throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed.');
             }
 

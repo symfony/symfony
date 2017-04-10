@@ -21,7 +21,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\WebLink\WebLinkManagerInterface;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * FrameworkExtension configuration structure.
@@ -814,7 +814,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('web_link')
                     ->info('web links configuration')
-                    ->{!class_exists(FullStack::class) && interface_exists(WebLinkManagerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{!class_exists(FullStack::class) && class_exists(HttpHeaderSerializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end()
         ;

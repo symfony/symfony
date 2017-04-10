@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\WebLink\WebLinkManagerInterface;
+use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * TwigExtension.
@@ -50,7 +50,7 @@ class TwigExtension extends Extension
             $container->removeDefinition('twig.translation.extractor');
         }
 
-        if (interface_exists(WebLinkManagerInterface::class)) {
+        if (class_exists(HttpHeaderSerializer::class)) {
             $definition = $container->register('twig.extension.weblink', WebLinkExtension::class);
             $definition->setPublic(false);
             $definition->addArgument(new Reference('request_stack'));

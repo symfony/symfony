@@ -25,8 +25,6 @@ class RemoveAbstractDefinitionsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
-
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($definition->isAbstract()) {
                 $container->removeDefinition($id);

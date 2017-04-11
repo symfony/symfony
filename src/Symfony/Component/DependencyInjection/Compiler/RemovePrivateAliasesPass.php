@@ -29,8 +29,6 @@ class RemovePrivateAliasesPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
-
         foreach ($container->getAliases() as $id => $alias) {
             if ($alias->isPublic()) {
                 continue;

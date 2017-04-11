@@ -37,8 +37,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
-        $graph = $compiler->getServiceReferenceGraph();
+        $graph = $container->getCompiler()->getServiceReferenceGraph();
 
         $hasChanged = false;
         foreach ($container->getDefinitions() as $id => $definition) {

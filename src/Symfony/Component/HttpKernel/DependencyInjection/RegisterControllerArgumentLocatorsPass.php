@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
- * Creates the service-locators required by ServiceArgumentValueResolver.
+ * Creates the service-locators required by ServiceValueResolver.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

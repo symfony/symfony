@@ -176,9 +176,7 @@ class AppVariable
 
         $result = array();
         foreach ($types as $type) {
-            if ($value = $session->getFlashBag()->get($type)) {
-                $result[$type] = $value;
-            }
+            $result[$type] = $session->getFlashBag()->get($type);
         }
 
         return $result;

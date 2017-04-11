@@ -277,14 +277,29 @@ class InlineTest extends TestCase
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
-    public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
+    public function testParseUnquotedScalarStartingWithReservedAtIndicator()
     {
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse('{ foo: @foo }');
     }
 
-    public function getReservedIndicators()
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar "`foo " starting with "`" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithReservedBacktickIndicator()
     {
-        return array(array('@'), array('`'));
+        Inline::parse('{ foo: `foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar "|foo " starting with "|" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithLiteralStyleIndicator()
+    {
+        Inline::parse('{ foo: |foo }');
     }
 
     /**
@@ -292,9 +307,9 @@ class InlineTest extends TestCase
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
-    public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
+    public function testParseUnquotedScalarStartingWithFoldedStyleIndicator()
     {
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse('{ foo: >foo }');
     }
 
     public function getScalarIndicators()

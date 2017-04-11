@@ -85,6 +85,8 @@ abstract class FileLoader extends BaseFileLoader
 
     private function findClasses($namespace, $resource)
     {
+        $parameterBag = $this->container->getParameterBag();
+        $resource = $parameterBag->unescapeValue($parameterBag->resolveValue($resource));
         $classes = array();
         $extRegexp = defined('HHVM_VERSION') ? '/\\.(?:php|hh)$/' : '/\\.php$/';
         $prefixLen = null;

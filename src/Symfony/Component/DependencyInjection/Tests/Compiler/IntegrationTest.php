@@ -12,7 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -113,5 +115,80 @@ class IntegrationTest extends TestCase
         $this->assertTrue($container->hasDefinition('a'));
         $this->assertFalse($container->hasDefinition('b'));
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
+    }
+
+    public function testInstanceofDefaultsAndParentDefinitionResolution()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+
+        // loading YAML with an expressive test-case in that file
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml'));
+        $loader->load('services_defaults_instanceof_parent.yml');
+        $container->compile();
+
+        // instanceof overrides defaults
+        $simpleService = $container->getDefinition('service_simple');
+        $this->assertFalse($simpleService->isAutowired());
+        $this->assertFalse($simpleService->isShared());
+
+        // all tags are kept
+        $this->assertEquals(
+            array(
+                'foo_tag' => array(array('priority' => 100), array()),
+                'bar_tag' => array(array()),
+            ),
+            $simpleService->getTags()
+        );
+
+        // calls are all kept, but service-level calls are last
+        $this->assertEquals(
+            array(
+                // from instanceof
+                array('setSunshine', array('bright')),
+                // from service
+                array('enableSummer', array(true)),
+                array('setSunshine', array('warm')),
+            ),
+            $simpleService->getMethodCalls()
+        );
+
+        // service override instanceof
+        $overrideService = $container->getDefinition('service_override_instanceof');
+        $this->assertTrue($overrideService->isAutowired());
+
+        // children definitions get no instanceof
+        $childDef = $container->getDefinition('child_service');
+        $this->assertEmpty($childDef->getTags());
+
+        $childDef2 = $container->getDefinition('child_service_with_parent_instanceof');
+        // taken from instanceof applied to parent
+        $this->assertFalse($childDef2->isAutowired());
+        // override the instanceof
+        $this->assertTrue($childDef2->isShared());
+        // tags inherit like normal
+        $this->assertEquals(
+            array(
+                'foo_tag' => array(array('priority' => 100), array()),
+                'bar_tag' => array(array()),
+            ),
+            $simpleService->getTags()
+        );
+    }
+}
+
+class IntegrationTestStub extends IntegrationTestStubParent
+{
+}
+
+class IntegrationTestStubParent
+{
+    public function enableSummer($enable)
+    {
+        // methods used in calls - added here to prevent errors for not existing
+    }
+
+    public function setSunshine($type)
+    {
     }
 }

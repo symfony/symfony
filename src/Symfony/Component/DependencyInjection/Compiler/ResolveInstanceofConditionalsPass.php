@@ -30,6 +30,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         $didProcess = false;
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($definition instanceof ChildDefinition) {
+                // don't apply "instanceof" to children: it will be applied to their parent
                 continue;
             }
             if ($definition !== $processedDefinition = $this->processDefinition($container, $id, $definition)) {

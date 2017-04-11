@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Applies tags inheritance to definitions.
@@ -31,7 +32,7 @@ class ResolveTagsInheritancePass extends AbstractRecursivePass
         $value->setInheritTags(false);
 
         if (!$this->container->has($parent = $value->getParent())) {
-            return parent::processValue($value, $isRoot);
+            throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
         }
 
         $parentDef = $this->container->findDefinition($parent);

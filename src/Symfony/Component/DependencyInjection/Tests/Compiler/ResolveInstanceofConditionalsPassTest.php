@@ -22,9 +22,9 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $def = $container->register('foo', self::class);
+        $def = $container->register('foo', self::class)->addTag('tag')->setAutowired(true)->setChanges(array());
         $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->setProperty('foo', 'bar'),
+            parent::class => (new ChildDefinition(''))->setProperty('foo', 'bar')->addTag('baz', array('attr' => 123)),
         ));
 
         (new ResolveInstanceofConditionalsPass())->process($container);
@@ -33,9 +33,14 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $def = $container->getDefinition('foo');
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertInstanceof(ChildDefinition::class, $def);
-        $this->assertTrue($def->getInheritTags());
+        $this->assertTrue($def->isAutowired());
+        $this->assertFalse($def->getInheritTags());
         $this->assertSame($parent, $def->getParent());
-        $this->assertEquals(array('foo' => 'bar'), $container->getDefinition($parent)->getProperties());
+        $this->assertSame(array('tag' => array(array()), 'baz' => array(array('attr' => 123))), $def->getTags());
+
+        $parent = $container->getDefinition($parent);
+        $this->assertSame(array('foo' => 'bar'), $parent->getProperties());
+        $this->assertSame(array(), $parent->getTags());
     }
 
     public function testProcessInheritance()

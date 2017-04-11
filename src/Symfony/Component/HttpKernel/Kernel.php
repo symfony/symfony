@@ -539,12 +539,32 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = true;
         if (!$cache->isFresh()) {
-            $container = $this->buildContainer();
+            if ($this->debug) {
+                $collectedLogs = array();
+                $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
+                    if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+                        return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
+                    }
+
+                    $collectedLogs[] = array(
+                        'type' => $type,
+                        'message' => $message,
+                        'file' => $file,
+                        'line' => $line,
+                    );
+                });
+            }
+
             try {
+                $container = null;
+                $container = $this->buildContainer();
                 $container->compile();
             } finally {
                 if ($this->debug) {
-                    file_put_contents($this->getCacheDir().'/'.$class.'Compiler.log', implode("\n", $container->getCompiler()->getLog()));
+                    restore_error_handler();
+
+                    file_put_contents($this->getCacheDir().'/'.$class.'Deprecations.log', serialize($collectedLogs));
+                    file_put_contents($this->getCacheDir().'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
                 }
             }
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());

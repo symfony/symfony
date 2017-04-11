@@ -89,18 +89,19 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         return str_replace("\n</pre", '</pre', rtrim($dump));
     }
 
-    public function dumpLog(\Twig_Environment $env, $message, Data $context)
+    public function dumpLog(\Twig_Environment $env, $message, Data $context = null)
     {
         $message = twig_escape_filter($env, $message);
+        $message = preg_replace('/&quot;(.*?)&quot;/', '&quot;<b>$1</b>&quot;', $message);
 
-        if (false === strpos($message, '{')) {
+        if (null === $context || false === strpos($message, '{')) {
             return '<span class="dump-inline">'.$message.'</span>';
         }
 
         $replacements = array();
         foreach ($context as $k => $v) {
             $k = '{'.twig_escape_filter($env, $k).'}';
-            $replacements['&quot;'.$k.'&quot;'] = $replacements[$k] = $this->dumpData($env, $v);
+            $replacements['&quot;<b>'.$k.'</b>&quot;'] = $replacements['&quot;'.$k.'&quot;'] = $replacements[$k] = $this->dumpData($env, $v);
         }
 
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';

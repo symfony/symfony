@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="web_link.add_link_header_listener" class="Symfony\Component\WebLink\AddLinkHeaderListener" public="false">
+        <service id="web_link.add_link_header_listener" class="Symfony\Component\WebLink\EventListener\AddLinkHeaderListener" public="false">
             <tag name="kernel.event_subscriber" />
         </service>
 

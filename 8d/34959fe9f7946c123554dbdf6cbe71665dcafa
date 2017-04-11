@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-11T16:07:06Z
+
+@xabbuh is there a way to enforce that new tests should not be risky, to avoid having to do such cleanups in the future ? Can we make PHPUnit exit with a failure code on risky (once all our branches are clean) ?

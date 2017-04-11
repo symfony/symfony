@@ -186,8 +186,10 @@ class AppVariableTest extends TestCase
         $flashMessages = $this->setFlashMessages();
         $this->assertEquals($flashMessages, $this->appVariable->getFlashes(array()));
 
+        $flashMessages = $this->setFlashMessages();
         $this->assertEquals(array(), $this->appVariable->getFlashes('this-does-not-exist'));
 
+        $flashMessages = $this->setFlashMessages();
         $this->assertEquals(
             array('this-does-not-exist' => array()),
             $this->appVariable->getFlashes(array('this-does-not-exist'))

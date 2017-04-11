@@ -452,6 +452,10 @@ class AutowirePassTest extends TestCase
 
         $pass = new AutowirePass();
         $pass->process($container);
+
+        $this->assertTrue($container->hasDefinition('deprecated'));
+        $this->assertTrue($container->hasDefinition('foo'));
+        $this->assertTrue($container->hasDefinition('bar'));
     }
 
     public function testEmptyStringIsKept()

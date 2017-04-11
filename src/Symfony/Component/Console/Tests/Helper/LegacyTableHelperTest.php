@@ -34,7 +34,7 @@ class LegacyTableHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider testRenderProvider
+     * @dataProvider renderProvider
      */
     public function testRender($headers, $rows, $layout, $expected)
     {
@@ -50,7 +50,7 @@ class LegacyTableHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider testRenderProvider
+     * @dataProvider renderProvider
      */
     public function testRenderAddRows($headers, $rows, $layout, $expected)
     {
@@ -66,7 +66,7 @@ class LegacyTableHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider testRenderProvider
+     * @dataProvider renderProvider
      */
     public function testRenderAddRowsOneByOne($headers, $rows, $layout, $expected)
     {
@@ -83,7 +83,7 @@ class LegacyTableHelperTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testRenderProvider()
+    public function renderProvider()
     {
         $books = array(
             array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),

@@ -27,26 +27,25 @@ trait FilesystemAdapterTrait
     {
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().'/symfony-cache';
+        } else {
+            $directory = realpath($directory) ?: $directory;
         }
         if (isset($namespace[0])) {
             if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
                 throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
-            $directory .= '/'.$namespace;
+            $directory .= DIRECTORY_SEPARATOR.$namespace;
         }
-        if (!file_exists($dir = $directory.'/.')) {
+        if (!file_exists($directory)) {
             @mkdir($directory, 0777, true);
         }
-        if (false === $dir = realpath($dir) ?: (file_exists($dir) ? $dir : false)) {
-            throw new InvalidArgumentException(sprintf('Cache directory does not exist (%s)', $directory));
-        }
-        $dir .= DIRECTORY_SEPARATOR;
+        $directory .= DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
-        if ('\\' === DIRECTORY_SEPARATOR && strlen($dir) > 234) {
+        if ('\\' === DIRECTORY_SEPARATOR && strlen($directory) > 234) {
             throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
         }
 
-        $this->directory = $dir;
+        $this->directory = $directory;
     }
 
     /**

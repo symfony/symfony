@@ -23,8 +23,9 @@ class Terminal
      */
     public function getWidth()
     {
-        if ($width = trim(getenv('COLUMNS'))) {
-            return (int) $width;
+        $width = getenv('COLUMNS');
+        if (false !== $width) {
+            return (int) trim($width);
         }
 
         if (null === self::$width) {
@@ -41,8 +42,9 @@ class Terminal
      */
     public function getHeight()
     {
-        if ($height = trim(getenv('LINES'))) {
-            return (int) $height;
+        $height = getenv('LINES');
+        if (false !== $height) {
+            return (int) trim($height);
         }
 
         if (null === self::$height) {

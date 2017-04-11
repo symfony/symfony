@@ -30,4 +30,15 @@ class TerminalTest extends TestCase
         $this->assertSame(120, $terminal->getWidth());
         $this->assertSame(60, $terminal->getHeight());
     }
+
+    public function test_zero_values()
+    {
+        putenv('COLUMNS=0');
+        putenv('LINES=0');
+
+        $terminal = new Terminal();
+
+        $this->assertSame(0, $terminal->getWidth());
+        $this->assertSame(0, $terminal->getHeight());
+    }
 }

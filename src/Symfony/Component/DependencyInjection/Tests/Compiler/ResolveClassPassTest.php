@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
@@ -23,11 +24,10 @@ class ResolveClassPassTest extends TestCase
      */
     public function testResolveClassFromId($serviceId)
     {
-        $pass = new ResolveClassPass();
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
 
-        $pass->process($container);
+        (new ResolveClassPass())->process($container);
 
         $this->assertSame($serviceId, $def->getClass());
     }
@@ -43,11 +43,10 @@ class ResolveClassPassTest extends TestCase
      */
     public function testWontResolveClassFromId($serviceId)
     {
-        $pass = new ResolveClassPass();
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
 
-        $pass->process($container);
+        (new ResolveClassPass())->process($container);
 
         $this->assertNull($def->getClass());
     }
@@ -57,5 +56,42 @@ class ResolveClassPassTest extends TestCase
         yield array(\stdClass::class);
         yield array('bar');
         yield array('\DateTime');
+    }
+
+    public function testNonFqcnChildDefinition()
+    {
+        $container = new ContainerBuilder();
+        $parent = $container->register('App\Foo', null);
+        $child = $container->setDefinition('App\Foo.child', new ChildDefinition('App\Foo'));
+
+        (new ResolveClassPass())->process($container);
+
+        $this->assertSame('App\Foo', $parent->getClass());
+        $this->assertNull($child->getClass());
+    }
+
+    public function testClassFoundChildDefinition()
+    {
+        $container = new ContainerBuilder();
+        $parent = $container->register('App\Foo', null);
+        $child = $container->setDefinition(self::class, new ChildDefinition('App\Foo'));
+
+        (new ResolveClassPass())->process($container);
+
+        $this->assertSame('App\Foo', $parent->getClass());
+        $this->assertSame(self::class, $child->getClass());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Service definition "App\Foo\Child" has a parent but no class, and its name looks like a FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.
+     */
+    public function testAmbiguousChildDefinition()
+    {
+        $container = new ContainerBuilder();
+        $parent = $container->register('App\Foo', null);
+        $child = $container->setDefinition('App\Foo\Child', new ChildDefinition('App\Foo'));
+
+        (new ResolveClassPass())->process($container);
     }
 }

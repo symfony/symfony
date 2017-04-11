@@ -193,27 +193,42 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @dataProvider getReservedIndicators
+     * @expectedDeprecation Not quoting the scalar "@foo " starting with "@" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
      * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
      */
-    public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
+    public function testParseUnquotedScalarStartingWithReservedAtIndicator()
     {
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
-    }
-
-    public function getReservedIndicators()
-    {
-        return array(array('@'), array('`'));
+        Inline::parse('{ foo: @foo }');
     }
 
     /**
      * @group legacy
-     * @dataProvider getScalarIndicators
+     * @expectedDeprecation Not quoting the scalar "`foo " starting with "`" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
      * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
      */
-    public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
+    public function testParseUnquotedScalarStartingWithReservedBacktickIndicator()
     {
-        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+        Inline::parse('{ foo: `foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar "|foo " starting with "|" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithLiteralStyleIndicator()
+    {
+        Inline::parse('{ foo: |foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar ">foo " starting with ">" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithFoldedStyleIndicator()
+    {
+        Inline::parse('{ foo: >foo }');
     }
 
     public function getScalarIndicators()

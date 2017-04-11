@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-11T15:29:08Z
+
+@nicolas-grekas are we sure that the existing code treats 0 as unbounded though ?
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2017-04-11T15:32:56Z
+
+For [formatting exceptions](https://github.com/symfony/symfony/blob/44008e8a98d7008e4d29f756e659fdaf4d0dc477/src/Symfony/Component/Console/Application.php#L673) it does, although not technically "unbounded" I guess (`PHP_INT_MAX`)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-11T15:40:14Z
+
+@duncan3dc yeah, fine enough 😄

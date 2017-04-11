@@ -39,8 +39,9 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
+    private $changes = array();
 
-    protected $arguments;
+    protected $arguments = array();
 
     /**
      * @param string|null $class     The service class
@@ -48,8 +49,32 @@ class Definition
      */
     public function __construct($class = null, array $arguments = array())
     {
-        $this->class = $class;
+        if (null !== $class) {
+            $this->setClass($class);
+        }
         $this->arguments = $arguments;
+    }
+
+    /**
+     * Returns all changes tracked for the Definition object.
+     *
+     * @return array An array of changes for this Definition
+     */
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
+     * Sets the tracked changes for the Definition object.
+     *
+     * @return $this
+     */
+    public function setChanges(array $changes)
+    {
+        $this->changes = $changes;
+
+        return $this;
     }
 
     /**
@@ -61,6 +86,8 @@ class Definition
      */
     public function setFactory($factory)
     {
+        $this->changes['factory'] = true;
+
         if (is_string($factory) && strpos($factory, '::') !== false) {
             $factory = explode('::', $factory, 2);
         }
@@ -97,6 +124,8 @@ class Definition
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
 
+        $this->changes['decorated_service'] = true;
+
         if (null === $id) {
             $this->decoratedService = null;
         } else {
@@ -125,6 +154,8 @@ class Definition
      */
     public function setClass($class)
     {
+        $this->changes['class'] = true;
+
         $this->class = $class;
 
         return $this;
@@ -455,6 +486,8 @@ class Definition
      */
     public function setFile($file)
     {
+        $this->changes['file'] = true;
+
         $this->file = $file;
 
         return $this;
@@ -479,6 +512,8 @@ class Definition
      */
     public function setShared($shared)
     {
+        $this->changes['shared'] = true;
+
         $this->shared = (bool) $shared;
 
         return $this;
@@ -503,6 +538,8 @@ class Definition
      */
     public function setPublic($boolean)
     {
+        $this->changes['public'] = true;
+
         $this->public = (bool) $boolean;
 
         return $this;
@@ -527,6 +564,8 @@ class Definition
      */
     public function setLazy($lazy)
     {
+        $this->changes['lazy'] = true;
+
         $this->lazy = (bool) $lazy;
 
         return $this;
@@ -619,6 +658,8 @@ class Definition
             $this->deprecationTemplate = $template;
         }
 
+        $this->changes['deprecated'] = true;
+
         $this->deprecated = (bool) $status;
 
         return $this;
@@ -656,6 +697,8 @@ class Definition
      */
     public function setConfigurator($configurator)
     {
+        $this->changes['configurator'] = true;
+
         if (is_string($configurator) && strpos($configurator, '::') !== false) {
             $configurator = explode('::', $configurator, 2);
         }
@@ -716,6 +759,8 @@ class Definition
      */
     public function setAutowired($autowired)
     {
+        $this->changes['autowired'] = true;
+
         $this->autowired = (bool) $autowired;
 
         return $this;

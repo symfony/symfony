@@ -81,10 +81,6 @@ class YamlFileLoader extends FileLoader
         'shared' => 'shared',
         'lazy' => 'lazy',
         'public' => 'public',
-        'abstract' => 'abstract',
-        'deprecated' => 'deprecated',
-        'factory' => 'factory',
-        'arguments' => 'arguments',
         'properties' => 'properties',
         'configurator' => 'configurator',
         'calls' => 'calls',
@@ -366,6 +362,15 @@ class YamlFileLoader extends FileLoader
             $defaults = array();
         } else {
             $definition = new Definition();
+
+            if (isset($defaults['public'])) {
+                $definition->setPublic($defaults['public']);
+            }
+            if (isset($defaults['autowire'])) {
+                $definition->setAutowired($defaults['autowire']);
+            }
+
+            $definition->setChanges(array());
         }
 
         if (isset($service['class'])) {
@@ -384,9 +389,8 @@ class YamlFileLoader extends FileLoader
             $definition->setLazy($service['lazy']);
         }
 
-        $public = isset($service['public']) ? $service['public'] : (isset($defaults['public']) ? $defaults['public'] : null);
-        if (null !== $public) {
-            $definition->setPublic($public);
+        if (isset($service['public'])) {
+            $definition->setPublic($service['public']);
         }
 
         if (isset($service['abstract'])) {
@@ -484,9 +488,8 @@ class YamlFileLoader extends FileLoader
             $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
-        $autowire = isset($service['autowire']) ? $service['autowire'] : (isset($defaults['autowire']) ? $defaults['autowire'] : null);
-        if (null !== $autowire) {
-            $definition->setAutowired($autowire);
+        if (isset($service['autowire'])) {
+            $definition->setAutowired($service['autowire']);
         }
 
         if (isset($service['autowiring_types'])) {

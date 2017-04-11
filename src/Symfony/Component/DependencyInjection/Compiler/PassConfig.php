@@ -42,7 +42,8 @@ class PassConfig
         $this->beforeOptimizationPasses = array(
             100 => array(
                 $resolveClassPass = new ResolveClassPass(),
-                new ResolveDefinitionInheritancePass(),
+                new ResolveInstanceofConditionalsPass(),
+                new ResolveTagsInheritancePass(),
             ),
         );
 

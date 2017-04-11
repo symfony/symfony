@@ -24,7 +24,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -398,6 +397,8 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($container->getDefinition('with_defaults')->isPublic());
         $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_defaults')->getTags());
         $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
+        $this->assertArrayNotHasKey('public', $container->getDefinition('with_defaults')->getChanges());
+        $this->assertArrayNotHasKey('autowire', $container->getDefinition('with_defaults')->getChanges());
 
         $this->assertFalse($container->getAlias('with_defaults_aliased')->isPublic());
         $this->assertFalse($container->getAlias('with_defaults_aliased_short')->isPublic());
@@ -532,12 +533,12 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(3, $instanceof);
         $this->assertArrayHasKey('DummyInterface', $instanceof);
 
-        $args = $instanceof['DummyInterface']->getArguments();
+        $args = $instanceof['DummyInterface']->getProperties();
         $this->assertCount(1, $args);
-        $this->assertInstanceOf(Reference::class, $args[0]);
-        $this->assertTrue($container->has((string) $args[0]));
+        $this->assertInstanceOf(Reference::class, $args['foo']);
+        $this->assertTrue($container->has((string) $args['foo']));
 
-        $anonymous = $container->getDefinition((string) $args[0]);
+        $anonymous = $container->getDefinition((string) $args['foo']);
         $this->assertEquals('Anonymous', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
         $this->assertEmpty($anonymous->getInstanceofConditionals());

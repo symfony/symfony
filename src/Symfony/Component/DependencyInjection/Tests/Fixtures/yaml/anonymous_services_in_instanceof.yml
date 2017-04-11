@@ -5,7 +5,8 @@ services:
             autowire: true
 
         DummyInterface:
-            arguments: [ !service { class: Anonymous } ]
+            properties:
+                foo: !service { class: Anonymous }
 
         # Ensure next conditionals are not considered as services
         Bar:

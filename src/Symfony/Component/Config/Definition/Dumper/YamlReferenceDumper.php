@@ -123,6 +123,11 @@ class YamlReferenceDumper
             $comments[] = 'Required';
         }
 
+        // deprecated?
+        if ($node->isDeprecated()) {
+            $comments[] = sprintf('Deprecated (%s)', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+        }
+
         // example
         if ($example && !is_array($example)) {
             $comments[] = 'Example: '.$example;

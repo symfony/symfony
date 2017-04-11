@@ -153,6 +153,10 @@ class XmlReferenceDumper
                         $comments[] = 'Required';
                     }
 
+                    if ($child->isDeprecated()) {
+                        $comments[] = sprintf('Deprecated (%s)', $child->getDeprecationMessage($child->getName(), $child->getPath()));
+                    }
+
                     if ($child instanceof EnumNode) {
                         $comments[] = 'One of '.implode('; ', array_map('json_encode', $child->getValues()));
                     }

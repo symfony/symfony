@@ -56,14 +56,14 @@ final class CachePoolClearerPass implements CompilerPassInterface
             return;
         }
         $factory = array(AbstractAdapter::class, 'createSystemCache');
-        $annotationsPool = $container->getDefinition('cache.annotations');
+        $annotationsPool = $container->findDefinition('cache.annotations');
         if ($factory !== $annotationsPool->getFactory() || 4 !== count($annotationsPool->getArguments())) {
             return;
         }
         if ($container->has('monolog.logger.cache')) {
             $annotationsPool->addArgument(new Reference('monolog.logger.cache'));
         } elseif ($container->has('cache.system')) {
-            $systemPool = $container->getDefinition('cache.system');
+            $systemPool = $container->findDefinition('cache.system');
             if ($factory === $systemPool->getFactory() && 5 <= count($systemArgs = $systemPool->getArguments())) {
                 $annotationsPool->addArgument($systemArgs[4]);
             }

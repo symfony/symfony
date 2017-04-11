@@ -593,7 +593,10 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->hardlink($file, $link);
 
-        $this->filesystem->chown($link, $this->getFileOwner($link));
+        $owner = $this->getFileOwner($link);
+        $this->filesystem->chown($link, $owner);
+
+        $this->assertSame($owner, $this->getFileOwner($link));
     }
 
     /**
@@ -699,7 +702,10 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->hardlink($file, $link);
 
-        $this->filesystem->chgrp($link, $this->getFileGroup($link));
+        $group = $this->getFileGroup($link);
+        $this->filesystem->chgrp($link, $group);
+
+        $this->assertSame($group, $this->getFileGroup($link));
     }
 
     /**

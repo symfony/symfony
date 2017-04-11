@@ -36,7 +36,8 @@ class AbstractObjectNormalizerTest extends TestCase
         $context = array();
 
         $normalizer = new AbstractObjectNormalizerDummy();
-        $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), array());
+
+        $this->assertInstanceOf(__NAMESPACE__.'\Dummy', $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), array()));
     }
 
     /**

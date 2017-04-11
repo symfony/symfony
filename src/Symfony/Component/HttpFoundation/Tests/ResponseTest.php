@@ -845,6 +845,16 @@ class ResponseTest extends ResponseTestCase
         }
     }
 
+    public function testNoDeprecationsAreTriggered()
+    {
+        new DefaultResponse();
+        $this->getMockBuilder(Response::class)->getMock();
+
+        // we just need to ensure that subclasses of Response can be created without any deprecations
+        // being triggered if the subclass does not override any final methods
+        $this->addToAssertionCount(1);
+    }
+
     public function validContentProvider()
     {
         return array(
@@ -883,6 +893,67 @@ class ResponseTest extends ResponseTestCase
     protected function provideResponse()
     {
         return new Response();
+    }
+
+    /**
+     * @see       http://github.com/zendframework/zend-diactoros for the canonical source repository
+     *
+     * @author    Fábio Pacheco
+     * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
+     * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
+     */
+    public function ianaCodesReasonPhrasesProvider()
+    {
+        if (!in_array('https', stream_get_wrappers(), true)) {
+            $this->markTestSkipped('The "https" wrapper is not available');
+        }
+
+        $ianaHttpStatusCodes = new \DOMDocument();
+
+        libxml_set_streams_context(stream_context_create(array(
+            'http' => array(
+                'method' => 'GET',
+                'timeout' => 30,
+            ),
+        )));
+
+        $ianaHttpStatusCodes->load('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml');
+        if (!$ianaHttpStatusCodes->relaxNGValidate('https://www.iana.org/assignments/http-status-codes/http-status-codes.rng')) {
+            self::fail('Invalid IANA\'s HTTP status code list.');
+        }
+
+        $ianaCodesReasonPhrases = array();
+
+        $xpath = new \DomXPath($ianaHttpStatusCodes);
+        $xpath->registerNamespace('ns', 'http://www.iana.org/assignments');
+
+        $records = $xpath->query('//ns:record');
+        foreach ($records as $record) {
+            $value = $xpath->query('.//ns:value', $record)->item(0)->nodeValue;
+            $description = $xpath->query('.//ns:description', $record)->item(0)->nodeValue;
+
+            if (in_array($description, array('Unassigned', '(Unused)'), true)) {
+                continue;
+            }
+
+            if (preg_match('/^([0-9]+)\s*\-\s*([0-9]+)$/', $value, $matches)) {
+                for ($value = $matches[1]; $value <= $matches[2]; ++$value) {
+                    $ianaCodesReasonPhrases[] = array($value, $description);
+                }
+            } else {
+                $ianaCodesReasonPhrases[] = array($value, $description);
+            }
+        }
+
+        return $ianaCodesReasonPhrases;
+    }
+
+    /**
+     * @dataProvider ianaCodesReasonPhrasesProvider
+     */
+    public function testReasonPhraseDefaultsAgainstIana($code, $reasonPhrase)
+    {
+        $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
     }
 }
 

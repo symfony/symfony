@@ -111,6 +111,12 @@ class Parser
             mb_internal_encoding($mbEncoding);
         }
 
+        $this->lines = array();
+        $this->currentLine = '';
+        $this->refs = array();
+        $this->skippedLineNumbers = array();
+        $this->locallySkippedLineNumbers = array();
+
         if (null !== $e) {
             throw $e;
         }

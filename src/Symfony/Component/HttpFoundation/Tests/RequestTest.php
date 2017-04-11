@@ -302,7 +302,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider getFormatToMimeTypeMapProvider
+     * @dataProvider getFormatToMimeTypeMapProviderWithAdditionalNullFormat
      */
     public function testGetFormatFromMimeType($format, $mimeTypes)
     {
@@ -320,6 +320,14 @@ class RequestTest extends TestCase
         }
     }
 
+    public function getFormatToMimeTypeMapProviderWithAdditionalNullFormat()
+    {
+        return array_merge(
+            array(array(null, array(null, 'unexistent-mime-type'))),
+            $this->getFormatToMimeTypeMapProvider()
+        );
+    }
+
     public function testGetFormatFromMimeTypeWithParameters()
     {
         $request = new Request();
@@ -331,10 +339,8 @@ class RequestTest extends TestCase
      */
     public function testGetMimeTypeFromFormat($format, $mimeTypes)
     {
-        if (null !== $format) {
-            $request = new Request();
-            $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
-        }
+        $request = new Request();
+        $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
     }
 
     /**
@@ -342,9 +348,7 @@ class RequestTest extends TestCase
      */
     public function testGetMimeTypesFromFormat($format, $mimeTypes)
     {
-        if (null !== $format) {
-            $this->assertEquals($mimeTypes, Request::getMimeTypes($format));
-        }
+        $this->assertEquals($mimeTypes, Request::getMimeTypes($format));
     }
 
     public function testGetMimeTypesFromInexistentFormat()
@@ -364,7 +368,6 @@ class RequestTest extends TestCase
     public function getFormatToMimeTypeMapProvider()
     {
         return array(
-            array(null, array(null, 'unexistent-mime-type')),
             array('txt', array('text/plain')),
             array('js', array('application/javascript', 'application/x-javascript', 'text/javascript')),
             array('css', array('text/css')),

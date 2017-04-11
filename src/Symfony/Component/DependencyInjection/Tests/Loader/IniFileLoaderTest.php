@@ -55,7 +55,7 @@ class IniFileLoaderTest extends TestCase
         }
 
         if (!$supported) {
-            return;
+            $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }
 
         $this->loader->load('types.ini');

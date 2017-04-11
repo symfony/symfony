@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 
 class DateIntervalTypeTest extends BaseTypeTest
 {
@@ -195,7 +196,7 @@ class DateIntervalTypeTest extends BaseTypeTest
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->factory->create(static::TESTED_TYPE, new \DateInterval('P0Y'));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateInterval('P0Y')));
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()

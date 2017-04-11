@@ -29,7 +29,7 @@
         "symfony/http-kernel": "^2.8|^3.0"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Link\\": "" },
+        "psr-4": { "Symfony\\Component\\WebLink\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

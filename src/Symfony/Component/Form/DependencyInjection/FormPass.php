@@ -61,10 +61,9 @@ class FormPass implements CompilerPassInterface
         $servicesMap = array();
 
         // Builds an array with fully-qualified type class names as keys and service IDs as values
-        foreach ($container->findTaggedServiceIds($this->formTypeTag) as $serviceId => $tag) {
-            $serviceDefinition = $container->getDefinition($serviceId);
-
+        foreach ($container->findTaggedServiceIds($this->formTypeTag, true) as $serviceId => $tag) {
             // Add form type service to the service locator
+            $serviceDefinition = $container->getDefinition($serviceId);
             $servicesMap[$serviceDefinition->getClass()] = new Reference($serviceId);
         }
 
@@ -98,7 +97,7 @@ class FormPass implements CompilerPassInterface
     private function processFormTypeGuessers(ContainerBuilder $container)
     {
         $guessers = array();
-        foreach ($container->findTaggedServiceIds($this->formTypeGuesserTag) as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds($this->formTypeGuesserTag, true) as $serviceId => $tags) {
             $guessers[] = new Reference($serviceId);
         }
 

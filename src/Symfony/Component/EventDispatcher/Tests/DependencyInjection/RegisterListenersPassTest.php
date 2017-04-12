@@ -89,7 +89,7 @@ class RegisterListenersPassTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "foo" must not be abstract as event listeners are lazy-loaded.
+     * @expectedExceptionMessage The service "foo" tagged "kernel.event_listener" must not be abstract.
      */
     public function testAbstractEventListener()
     {
@@ -103,7 +103,7 @@ class RegisterListenersPassTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "foo" must not be abstract as event subscribers are lazy-loaded.
+     * @expectedExceptionMessage The service "foo" tagged "kernel.event_subscriber" must not be abstract.
      */
     public function testAbstractEventSubscriber()
     {

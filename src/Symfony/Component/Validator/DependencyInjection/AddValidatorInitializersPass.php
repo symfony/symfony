@@ -37,11 +37,7 @@ class AddValidatorInitializersPass implements CompilerPassInterface
         }
 
         $initializers = array();
-        foreach ($container->findTaggedServiceIds($this->initializerTag) as $id => $attributes) {
-            if ($container->getDefinition($id)->isAbstract()) {
-                continue;
-            }
-
+        foreach ($container->findTaggedServiceIds($this->initializerTag, true) as $id => $attributes) {
             $initializers[] = new Reference($id);
         }
 

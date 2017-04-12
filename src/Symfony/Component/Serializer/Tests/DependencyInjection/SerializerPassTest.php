@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 
@@ -59,7 +60,7 @@ class SerializerPassTest extends TestCase
                     array()
               ));
 
-        $container->expects($this->once())
+        $container->expects($this->atLeastOnce())
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 
@@ -83,11 +84,14 @@ class SerializerPassTest extends TestCase
            new Reference('n3'),
        );
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getDefinition'))->getMock();
 
         $container->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
+        $container->expects($this->any())
+            ->method('getDefinition')
+            ->will($this->returnValue(new Definition()));
 
         $serializerPass = new SerializerPass();
 

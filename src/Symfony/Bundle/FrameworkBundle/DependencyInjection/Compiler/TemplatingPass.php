@@ -33,6 +33,9 @@ class TemplatingPass implements CompilerPassInterface
         if ($container->hasDefinition('templating.engine.php')) {
             $helpers = array();
             foreach ($container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
+                if ($container->getDefinition($id)->isAbstract()) {
+                    continue;
+                }
                 if (isset($attributes[0]['alias'])) {
                     $helpers[$attributes[0]['alias']] = $id;
                 }

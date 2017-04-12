@@ -30,6 +30,9 @@ class TranslationExtractorPass implements CompilerPassInterface
         $definition = $container->getDefinition('translation.extractor');
 
         foreach ($container->findTaggedServiceIds('translation.extractor') as $id => $attributes) {
+            if ($container->getDefinition($id)->isAbstract()) {
+                continue;
+            }
             if (!isset($attributes[0]['alias'])) {
                 throw new RuntimeException(sprintf('The alias for the tag "translation.extractor" of service "%s" must be set.', $id));
             }

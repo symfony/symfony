@@ -135,7 +135,7 @@ class IntegrationTest extends TestCase
         // all tags are kept
         $this->assertEquals(
             array(
-                'foo_tag' => array(array('priority' => 100), array()),
+                'foo_tag' => array(array('tag_option' => 'from_service'), array('tag_option' => 'from_instanceof')),
                 'bar_tag' => array(array()),
             ),
             $simpleService->getTags()
@@ -169,10 +169,10 @@ class IntegrationTest extends TestCase
         // tags inherit like normal
         $this->assertEquals(
             array(
-                'foo_tag' => array(array('priority' => 100), array()),
+                'foo_tag' => array(array('tag_option' => 'from_child_def'), array('tag_option' => 'from_parent_def'), array('tag_option' => 'from_instanceof')),
                 'bar_tag' => array(array()),
             ),
-            $simpleService->getTags()
+            $childDef2->getTags()
         );
     }
 }

@@ -8,7 +8,7 @@ services:
             autowire: false
             shared: false
             tags:
-                - { name: foo_tag }
+                - { name: foo_tag, tag_option: from_instanceof }
             calls:
                 - [setSunshine, [bright]]
 
@@ -20,8 +20,8 @@ services:
     service_simple:
         class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
         tags:
-            - { name: foo_tag, priority: 100 }
-            # calls from instanceof are kept, but this comes later
+            - { name: foo_tag, tag_option: from_service }
+        # calls from instanceof are kept, but this comes later
         calls:
             - [enableSummer, [true]]
             - [setSunshine, [warm]]
@@ -43,7 +43,12 @@ services:
     parent_service_with_class:
         abstract: true
         class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        tags:
+            - { name: foo_tag, tag_option: from_parent_def }
 
     child_service_with_parent_instanceof:
         parent: parent_service_with_class
         shared: true
+        inherit_tags: true
+        tags:
+            - { name: foo_tag, tag_option: from_child_def }

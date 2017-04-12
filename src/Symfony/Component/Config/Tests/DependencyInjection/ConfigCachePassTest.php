@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\DependencyInjection\ConfigCachePass;
 
@@ -20,33 +21,22 @@ class ConfigCachePassTest extends TestCase
 {
     public function testThatCheckersAreProcessedInPriorityOrder()
     {
-        $services = array(
-            'checker_2' => array(0 => array('priority' => 100)),
-            'checker_1' => array(0 => array('priority' => 200)),
-            'checker_3' => array(0 => array()),
-        );
+        $container = new ContainerBuilder();
 
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getDefinition', 'hasDefinition'))->getMock();
-
-        $container->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
-        $container->expects($this->atLeastOnce())
-            ->method('getDefinition')
-            ->with('config_cache_factory')
-            ->will($this->returnValue($definition));
-
-        $definition->expects($this->once())
-            ->method('replaceArgument')
-            ->with(0, new IteratorArgument(array(
-                    new Reference('checker_1'),
-                    new Reference('checker_2'),
-                    new Reference('checker_3'),
-                )));
+        $definition = $container->register('config_cache_factory')->addArgument(null);
+        $container->register('checker_2')->addTag('config_cache.resource_checker', array('priority' => 100));
+        $container->register('checker_1')->addTag('config_cache.resource_checker', array('priority' => 200));
+        $container->register('checker_3')->addTag('config_cache.resource_checker');
 
         $pass = new ConfigCachePass();
         $pass->process($container);
+
+        $expected = new IteratorArgument(array(
+            new Reference('checker_1'),
+            new Reference('checker_2'),
+            new Reference('checker_3'),
+        ));
+        $this->assertEquals($expected, $definition->getArgument(0));
     }
 
     public function testThatCheckersCanBeMissing()

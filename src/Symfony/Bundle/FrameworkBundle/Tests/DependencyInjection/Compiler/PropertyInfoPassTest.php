@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -20,38 +22,37 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class PropertyInfoPassTest extends TestCase
 {
-    public function testServicesAreOrderedAccordingToPriority()
+    /**
+     * @dataProvider provideTags
+     */
+    public function testServicesAreOrderedAccordingToPriority($index, $tag)
     {
-        $services = array(
-            'n3' => array(array()),
-            'n1' => array(array('priority' => 200)),
-            'n2' => array(array('priority' => 100)),
-        );
+        $container = new ContainerBuilder();
 
-        $expected = array(
+        $definition = $container->register('property_info')->setArguments(array(null, null, null, null));
+        $container->register('n2')->addTag($tag, array('priority' => 100));
+        $container->register('n1')->addTag($tag, array('priority' => 200));
+        $container->register('n3')->addTag($tag);
+
+        $propertyInfoPass = new PropertyInfoPass();
+        $propertyInfoPass->process($container);
+
+        $expected = new IteratorArgument(array(
             new Reference('n1'),
             new Reference('n2'),
             new Reference('n3'),
+        ));
+        $this->assertEquals($expected, $definition->getArgument($index));
+    }
+
+    public function provideTags()
+    {
+        return array(
+            array(0, 'property_info.list_extractor'),
+            array(1, 'property_info.type_extractor'),
+            array(2, 'property_info.description_extractor'),
+            array(3, 'property_info.access_extractor'),
         );
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
-
-        $container
-            ->expects($this->any())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
-
-        $propertyInfoPass = new PropertyInfoPass();
-
-        $method = new \ReflectionMethod(
-            'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass',
-            'findAndSortTaggedServices'
-        );
-        $method->setAccessible(true);
-
-        $actual = $method->invoke($propertyInfoPass, 'tag', $container);
-
-        $this->assertEquals($expected, $actual);
     }
 
     public function testReturningEmptyArrayWhenNoService()

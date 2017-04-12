@@ -57,11 +57,9 @@ class PropertyInfoPass implements CompilerPassInterface
         $services = $container->findTaggedServiceIds($tagName);
 
         $sortedServices = array();
-        foreach ($services as $serviceId => $tags) {
-            foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
-            }
+        foreach ($services as $serviceId => $attributes) {
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $sortedServices[$priority][] = new Reference($serviceId);
         }
 
         if (empty($sortedServices)) {

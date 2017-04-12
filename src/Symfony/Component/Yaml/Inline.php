@@ -163,10 +163,6 @@ class Inline
                     return '!php/object:'.serialize($value);
                 }
 
-                if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \stdClass || $value instanceof \ArrayObject)) {
-                    return self::dumpArray((array) $value, $flags);
-                }
-
                 if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
                     throw new DumpException('Object support when dumping a YAML file has been disabled.');
                 }

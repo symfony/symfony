@@ -82,6 +82,10 @@ class Dumper
         $output = '';
         $prefix = $indent ? str_repeat(' ', $indent) : '';
 
+        if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($input instanceof \ArrayObject || $input instanceof \stdClass)) {
+            $input = $this->castObjectToArray($input);
+        }
+
         if ($inline <= 0 || !is_array($input) || empty($input)) {
             $output .= $prefix.Inline::dump($input, $flags);
         } else {
@@ -110,5 +114,18 @@ class Dumper
         }
 
         return $output;
+    }
+
+    private function castObjectToArray($object)
+    {
+        $array = (array) $object;
+
+        foreach ($array as $key => $value) {
+            if ($value instanceof \ArrayObject || $value instanceof \stdClass) {
+                $array[$key] = $this->castObjectToArray($value);
+            }
+        }
+
+        return $array;
     }
 }

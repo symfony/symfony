@@ -291,6 +291,12 @@ class AutowirePass extends AbstractRecursivePass
             return new TypedReference($this->types[$type], $type);
         }
 
+        if (isset($this->types[$type])) {
+            @trigger_error(sprintf('Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0. You should %s the "%s" service to "%s" instead.', isset($this->types[$this->types[$type]]) ? 'alias' : 'rename (or alias)', $this->types[$type], $type), E_USER_DEPRECATED);
+
+            return new TypedReference($this->types[$type], $type);
+        }
+
         if (!$reference->canBeAutoregistered() || isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
             return;
         }

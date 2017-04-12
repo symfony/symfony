@@ -73,7 +73,7 @@ Debug
 DependencyInjection
 -------------------
 
- * Autowiring now happens only when a type-hint matches its corresponding FQCN id or alias.
+ * Autowiring services based on the types they implement is not supported anymore. Rename (or alias) your services to their FQCN id to make them autowirable.
 
  * `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
 

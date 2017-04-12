@@ -80,7 +80,7 @@ Debug
 DependencyInjection
 -------------------
 
- * [BC BREAK] autowiring now happens only when a type-hint matches its corresponding FQCN id or alias. Please follow the suggestions provided by the exceptions thrown at compilation to upgrade your service configuration.
+ * Autowiring services based on the types they implement is deprecated and won't be supported in version 4.0. Rename (or alias) your services to their FQCN id to make them autowirable.
 
  * [BC BREAK] `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
 

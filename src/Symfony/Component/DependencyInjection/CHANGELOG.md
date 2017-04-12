@@ -4,8 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
- * [BC BREAK] autowiring now happens only when a type-hint matches its corresponding FQCN id or alias.
-   Please follow the suggestions provided by the exceptions thrown at compilation to upgrade your service configuration.
+ * deprecated autowiring services based on the types they implement;
+   rename (or alias) your services to their FQCN id to make them autowirable
  * added "ServiceSubscriberInterface" - to allow for per-class explicit service-locator definitions
  * added "container.service_locator" tag for defining service-locator services
  * added anonymous services support in YAML configuration files using the `!service` tag.

@@ -210,7 +210,7 @@ abstract class FileLoader extends Loader
                     throw $e;
                 }
 
-                throw new FileLoaderLoadException($resource, $sourceResource, null, $e);
+                throw new FileLoaderLoadException($resource, $sourceResource, null, $e, $type);
             }
         }
     }

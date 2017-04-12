@@ -22,6 +22,18 @@ class FileLoaderLoadExceptionTest extends TestCase
         $this->assertEquals('Cannot load resource "resource".', $exception->getMessage());
     }
 
+    public function testMessageCannotLoadResourceWithType()
+    {
+        $exception = new FileLoaderLoadException('resource', null, null, null, 'foobar');
+        $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
+    }
+
+    public function testMessageCannotLoadResourceWithAnnotationType()
+    {
+        $exception = new FileLoaderLoadException('resource', null, null, null, 'annotation');
+        $this->assertEquals('Cannot load resource "resource". Make sure annotations are enabled.', $exception->getMessage());
+    }
+
     public function testMessageCannotImportResourceFromSource()
     {
         $exception = new FileLoaderLoadException('resource', 'sourceResource');

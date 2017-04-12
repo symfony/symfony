@@ -20,6 +20,9 @@ CHANGELOG
 3.1.0
 -----
 
+ * Added support to dump `stdClass` and `ArrayAccess` objects as YAML mappings
+   through the `Yaml::DUMP_OBJECT_AS_MAP` flag.
+
  * Strings that are not UTF-8 encoded will be dumped as base64 encoded binary
    data.
 

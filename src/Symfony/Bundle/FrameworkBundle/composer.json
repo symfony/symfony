@@ -41,7 +41,7 @@
         "symfony/dom-crawler": "~2.8|~3.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/security": "~2.8|~3.0",
-        "symfony/form": "^2.8.18|^3.2.5",
+        "symfony/form": "^2.8.19|^3.2.5",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "symfony/security-core": "~3.2",

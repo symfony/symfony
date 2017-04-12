@@ -37,6 +37,9 @@ class TwigEnvironmentPass implements CompilerPassInterface
         $calls = $definition->getMethodCalls();
         $definition->setMethodCalls(array());
         foreach ($container->findTaggedServiceIds('twig.extension') as $id => $attributes) {
+            if ($container->getDefinition($id)->isAbstract()) {
+                continue;
+            }
             $definition->addMethodCall('addExtension', array(new Reference($id)));
         }
         $definition->setMethodCalls(array_merge($definition->getMethodCalls(), $calls));

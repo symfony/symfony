@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 
@@ -31,12 +32,16 @@ class PropertyInfoPassTest extends TestCase
             new Reference('n3'),
         );
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getDefinition'))->getMock();
 
         $container
             ->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
+        $container
+            ->expects($this->any())
+            ->method('getDefinition')
+            ->will($this->returnValue(new Definition()));
 
         $propertyInfoPass = new PropertyInfoPass();
 

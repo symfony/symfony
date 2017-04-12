@@ -54,6 +54,9 @@ class TwigLoaderPassTest extends TestCase
             ->with('twig.loader')
             ->will($this->returnValue($serviceIds));
         $this->builder->expects($this->once())
+            ->method('getDefinition')
+            ->will($this->returnValue(new Definition()));
+        $this->builder->expects($this->once())
             ->method('setAlias')
             ->with('twig.loader', 'test_loader_1');
 
@@ -79,10 +82,11 @@ class TwigLoaderPassTest extends TestCase
             ->method('findTaggedServiceIds')
             ->with('twig.loader')
             ->will($this->returnValue($serviceIds));
-        $this->builder->expects($this->once())
+        $this->builder->expects($this->exactly(3))
             ->method('getDefinition')
-            ->with('twig.loader.chain')
-            ->will($this->returnValue($this->chainLoader));
+            ->withConsecutive(array('test_loader_1'), array('test_loader_2'), array('twig.loader.chain'))
+            ->willReturnOnConsecutiveCalls(new Definition(), new Definition(), $this->chainLoader);
+
         $this->builder->expects($this->once())
             ->method('setAlias')
             ->with('twig.loader', 'twig.loader.chain');
@@ -115,10 +119,10 @@ class TwigLoaderPassTest extends TestCase
             ->method('findTaggedServiceIds')
             ->with('twig.loader')
             ->will($this->returnValue($serviceIds));
-        $this->builder->expects($this->once())
+        $this->builder->expects($this->exactly(3))
             ->method('getDefinition')
-            ->with('twig.loader.chain')
-            ->will($this->returnValue($this->chainLoader));
+            ->withConsecutive(array('test_loader_1'), array('test_loader_2'), array('twig.loader.chain'))
+            ->willReturnOnConsecutiveCalls(new Definition(), new Definition(), $this->chainLoader);
         $this->builder->expects($this->once())
             ->method('setAlias')
             ->with('twig.loader', 'twig.loader.chain');

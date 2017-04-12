@@ -37,7 +37,6 @@ class ConfigCachePassTest extends TestCase
             ->will($this->returnValue($services));
         $container->expects($this->atLeastOnce())
             ->method('getDefinition')
-            ->with('config_cache_factory')
             ->will($this->returnValue($definition));
 
         $definition->expects($this->once())

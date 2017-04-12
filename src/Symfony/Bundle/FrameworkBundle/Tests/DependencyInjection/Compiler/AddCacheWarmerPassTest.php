@@ -33,7 +33,6 @@ class AddCacheWarmerPassTest extends TestCase
             ->will($this->returnValue($services));
         $container->expects($this->atLeastOnce())
             ->method('getDefinition')
-            ->with('cache_warmer')
             ->will($this->returnValue($definition));
         $container->expects($this->atLeastOnce())
             ->method('hasDefinition')

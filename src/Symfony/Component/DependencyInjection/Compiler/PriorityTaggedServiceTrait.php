@@ -41,6 +41,9 @@ trait PriorityTaggedServiceTrait
         $services = array();
 
         foreach ($container->findTaggedServiceIds($tagName) as $serviceId => $tags) {
+            if ($container->getDefinition($serviceId)->isAbstract()) {
+                continue;
+            }
             foreach ($tags as $attributes) {
                 $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
                 $services[$priority][] = new Reference($serviceId);

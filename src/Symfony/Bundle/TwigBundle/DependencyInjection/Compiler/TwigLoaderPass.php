@@ -29,27 +29,28 @@ class TwigLoaderPass implements CompilerPassInterface
             return;
         }
 
-        // register additional template loaders
-        $loaderIds = $container->findTaggedServiceIds('twig.loader');
+        $prioritizedLoaders = array();
+        $found = 0;
 
-        if (count($loaderIds) === 0) {
+        foreach ($container->findTaggedServiceIds('twig.loader') as $id => $tags) {
+            if ($container->getDefinition($id)->isAbstract()) {
+                continue;
+            }
+            foreach ($tags as $tag) {
+                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
+                $prioritizedLoaders[$priority][] = $id;
+            }
+            ++$found;
+        }
+
+        if (!$found) {
             throw new LogicException('No twig loaders found. You need to tag at least one loader with "twig.loader"');
         }
 
-        if (count($loaderIds) === 1) {
-            $container->setAlias('twig.loader', key($loaderIds));
+        if (1 === $found) {
+            $container->setAlias('twig.loader', current($prioritizedLoaders)[0]);
         } else {
             $chainLoader = $container->getDefinition('twig.loader.chain');
-
-            $prioritizedLoaders = array();
-
-            foreach ($loaderIds as $id => $tags) {
-                foreach ($tags as $tag) {
-                    $priority = isset($tag['priority']) ? $tag['priority'] : 0;
-                    $prioritizedLoaders[$priority][] = $id;
-                }
-            }
-
             krsort($prioritizedLoaders);
 
             foreach ($prioritizedLoaders as $loaders) {

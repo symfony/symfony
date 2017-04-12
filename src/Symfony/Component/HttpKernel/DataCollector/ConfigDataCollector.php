@@ -78,6 +78,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'zend_opcache_enabled' => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles' => array(),
             'sapi_name' => PHP_SAPI,
+            'environment' => $_ENV,
         );
 
         if (isset($this->kernel)) {
@@ -302,6 +303,16 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function getName()
     {
         return 'config';
+    }
+
+    /**
+     * Gets the environment variables.
+     *
+     * @return string The environment variables
+     */
+    public function getEnvironment()
+    {
+        return $this->data['environment'];
     }
 
     /**

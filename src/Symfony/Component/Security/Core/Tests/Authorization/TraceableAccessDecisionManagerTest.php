@@ -47,8 +47,6 @@ class TraceableAccessDecisionManagerTest extends TestCase
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 
-        if (!$adm instanceof DebugAccessDecisionManager) {
-            $this->fail('For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
-        }
+        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm, 'For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
     }
 }

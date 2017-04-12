@@ -164,21 +164,35 @@ class FormPassTest extends TestCase
     /**
      * @dataProvider privateTaggedServicesProvider
      */
-    public function testPrivateTaggedServices($id, $tagName, array $tagAttributes = array())
+    public function testPrivateTaggedServices($id, $tagName, $argumentKey, $expectedArgument, array $tagAttributes = array())
     {
-        $container = $this->createContainerBuilder();
+        $formPass = new FormPass();
+        $container = new ContainerBuilder();
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
         $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, $tagAttributes);
-        $container->compile();
+        $formPass->process($container);
+
+        $this->assertEquals($expectedArgument, $container->getDefinition('form.extension')->getArgument($argumentKey));
     }
 
     public function privateTaggedServicesProvider()
     {
         return array(
-            array('my.type', 'form.type'),
-            array('my.type_extension', 'form.type_extension', array('extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType')),
-            array('my.guesser', 'form.type_guesser'),
+            array(
+                'my.type',
+                'form.type',
+                0,
+                new Reference('service_locator.c35554e29b2a3001b879847fc6a49848'),
+            ),
+            array(
+                'my.type_extension',
+                'form.type_extension',
+                1,
+                array('Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument(array(new Reference('my.type_extension')))),
+                array('extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'),
+            ),
+            array('my.guesser', 'form.type_guesser', 2, new IteratorArgument(array(new Reference('my.guesser')))),
         );
     }
 

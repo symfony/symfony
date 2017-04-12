@@ -126,6 +126,9 @@ class CheckCircularReferencesPassTest extends TestCase
         $container->register('b')->addArgument(new Reference('a'));
 
         $this->process($container);
+
+        // just make sure that a lazily loaded service does not trigger a CircularReferenceException
+        $this->addToAssertionCount(1);
     }
 
     public function testProcessIgnoresIteratorArguments()
@@ -135,6 +138,9 @@ class CheckCircularReferencesPassTest extends TestCase
         $container->register('b')->addArgument(new IteratorArgument(array(new Reference('a'))));
 
         $this->process($container);
+
+        // just make sure that an IteratorArgument does not trigger a CircularReferenceException
+        $this->addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

@@ -21,7 +21,7 @@
                     {{ log.channel }}
                 </td>
             {% endif %}
-            <td>{{ log.message }}</td>
+            <td>{{ log.message|format_log_message(log.context) }}</td>
         </tr>
     {% endfor %}
     </tbody>

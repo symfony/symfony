@@ -20,9 +20,9 @@ class PropertyInfoPassTest extends TestCase
     public function testServicesAreOrderedAccordingToPriority()
     {
         $services = array(
-            'n3' => array('tag' => array()),
-            'n1' => array('tag' => array('priority' => 200)),
-            'n2' => array('tag' => array('priority' => 100)),
+            'n3' => array(array()),
+            'n1' => array(array('priority' => 200)),
+            'n2' => array(array('priority' => 100)),
         );
 
         $expected = array(

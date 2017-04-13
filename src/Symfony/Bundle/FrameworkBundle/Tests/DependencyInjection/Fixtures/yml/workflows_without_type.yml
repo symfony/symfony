@@ -1,0 +1,7 @@
+framework:
+    workflows:
+        missing_type:
+            supports: stdClass
+            places: [ first, second ]
+            transitions:
+                go: {from: first, to: last }

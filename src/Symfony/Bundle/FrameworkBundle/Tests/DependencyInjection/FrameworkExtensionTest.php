@@ -208,6 +208,15 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation The "type" option of the "framework.workflows.missing_type" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.
+     */
+    public function testDeprecatedWorkflowMissingType()
+    {
+        $container = $this->createContainerFromFile('workflows_without_type');
+    }
+
+    /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage "type" and "service" cannot be used together.
      */

@@ -64,6 +64,7 @@ framework:
                     from: closed
                     to: review
         service_marking_store_workflow:
+            type: workflow
             marking_store:
                 service: workflow_service
             supports:

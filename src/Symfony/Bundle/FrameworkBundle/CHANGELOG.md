@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * Not defining the `type` option of the `framework.workflows.*` configuration entries is deprecated.
+   The default value will be `state_machine` in Symfony 4.0.
  * Deprecated the `CompilerDebugDumpPass` class
  * [BC BREAK] Removed the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
  * Added a new new version strategy option called json_manifest_path
@@ -33,13 +35,13 @@ CHANGELOG
  * Deprecated `ControllerArgumentValueResolverPass`. Use
    `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
  * Deprecated `RoutingResolverPass`, use `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` instead
- * [BC BREAK] The `server:run`, `server:start`, `server:stop` and 
-   `server:status` console commands have been moved to a dedicated bundle. 
-   Require `symfony/web-server-bundle` in your composer.json and register 
+ * [BC BREAK] The `server:run`, `server:start`, `server:stop` and
+   `server:status` console commands have been moved to a dedicated bundle.
+   Require `symfony/web-server-bundle` in your composer.json and register
    `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
  * Added `$defaultLocale` as 3rd argument of `Translator::__construct()`
    making `Translator` works with any PSR-11 container
- * Added `framework.serializer.mapping` config option allowing to define custom 
+ * Added `framework.serializer.mapping` config option allowing to define custom
    serialization mapping files and directories
  * Deprecated `AddValidatorInitializersPass`, use
    `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass` instead

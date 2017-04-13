@@ -89,6 +89,7 @@ $container->loadFromExtension('framework', array(
             ),
         ),
         'service_marking_store_workflow' => array(
+            'type' => 'workflow',
             'marking_store' => array(
                 'service' => 'workflow_service',
             ),

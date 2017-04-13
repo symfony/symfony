@@ -50,7 +50,11 @@ class AddConsoleCommandPassTest extends TestCase
         );
     }
 
-    public function testProcessSkipAbstractDefinitions()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The service "my-command" tagged "console.command" must not be abstract.
+     */
+    public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -62,8 +66,6 @@ class AddConsoleCommandPassTest extends TestCase
         $container->setDefinition('my-command', $definition);
 
         $container->compile();
-
-        $this->assertSame(array(), $container->getParameter('console.command.ids'));
     }
 
     /**

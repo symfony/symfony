@@ -32,7 +32,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
 
             if ($definition->isAbstract()) {
-                continue;
+                throw new \InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must not be abstract.', $id));
             }
 
             $class = $container->getParameterBag()->resolveValue($definition->getClass());

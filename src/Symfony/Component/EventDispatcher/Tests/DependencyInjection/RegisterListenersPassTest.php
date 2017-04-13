@@ -87,6 +87,10 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($builder);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The service "foo" must not be abstract as event listeners are lazy-loaded.
+     */
     public function testAbstractEventListener()
     {
         $container = new ContainerBuilder();
@@ -95,11 +99,13 @@ class RegisterListenersPassTest extends TestCase
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
-
-        $this->assertSame(array(), $container->getDefinition('event_dispatcher')->getMethodCalls());
     }
 
-    public function testAbstractEventSubscriberIsSkipped()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The service "foo" must not be abstract as event subscribers are lazy-loaded.
+     */
+    public function testAbstractEventSubscriber()
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_subscriber', array());
@@ -107,8 +113,6 @@ class RegisterListenersPassTest extends TestCase
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
-
-        $this->assertSame(array(), $container->getDefinition('event_dispatcher')->getMethodCalls());
     }
 
     public function testEventSubscriberResolvableClassName()

@@ -164,7 +164,7 @@ class FormPassTest extends TestCase
     /**
      * @dataProvider privateTaggedServicesProvider
      */
-    public function testPrivateTaggedServices($id, $tagName, $argumentKey, $expectedArgument, array $tagAttributes = array())
+    public function testPrivateTaggedServices($id, $tagName, callable $assertion, array $tagAttributes = array())
     {
         $formPass = new FormPass();
         $container = new ContainerBuilder();
@@ -173,7 +173,7 @@ class FormPassTest extends TestCase
         $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, $tagAttributes);
         $formPass->process($container);
 
-        $this->assertEquals($expectedArgument, $container->getDefinition('form.extension')->getArgument($argumentKey));
+        $assertion($container);
     }
 
     public function privateTaggedServicesProvider()
@@ -182,17 +182,34 @@ class FormPassTest extends TestCase
             array(
                 'my.type',
                 'form.type',
-                0,
-                new Reference('service_locator.c35554e29b2a3001b879847fc6a49848'),
+                function (ContainerBuilder $container) {
+                    $formTypes = $container->getDefinition('form.extension')->getArgument(0);
+
+                    $this->assertInstanceOf(Reference::class, $formTypes);
+
+                    $locator = $container->getDefinition((string) $formTypes);
+                    $expectedLocatorMap = array(
+                        'stdClass' => new ServiceClosureArgument(new Reference('my.type')),
+                    );
+
+                    $this->assertInstanceOf(Definition::class, $locator);
+                    $this->assertEquals($expectedLocatorMap, $locator->getArgument(0));
+                },
             ),
             array(
                 'my.type_extension',
                 'form.type_extension',
-                1,
-                array('Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument(array(new Reference('my.type_extension')))),
+                function (ContainerBuilder $container) {
+                    $this->assertEquals(
+                        array('Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument(array(new Reference('my.type_extension')))),
+                        $container->getDefinition('form.extension')->getArgument(1)
+                    );
+                },
                 array('extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'),
             ),
-            array('my.guesser', 'form.type_guesser', 2, new IteratorArgument(array(new Reference('my.guesser')))),
+            array('my.guesser', 'form.type_guesser', function (ContainerBuilder $container) {
+                $this->assertEquals(new IteratorArgument(array(new Reference('my.guesser'))), $container->getDefinition('form.extension')->getArgument(2));
+            }),
         );
     }
 

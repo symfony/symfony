@@ -86,9 +86,9 @@ install:
 
 script:
     - if [[ $skip ]]; then echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"; fi
-    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo "$COMPONENTS" | parallel --gnu 'tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data {}"'; fi
+    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo "$COMPONENTS" | parallel --gnu -k 'tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data {}"'; fi
     - if [[ ! $deps && ! $PHP = hhvm* ]]; then tfold PHPUnit.tty "$PHPUNIT --group tty"; fi
     - if [[ ! $deps && $PHP = hhvm* ]]; then $PHPUNIT --exclude-group benchmark,intl-data; fi
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'tfold PHPUnit.sigchild "ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/"'; fi
-    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; tfold {}.composer "composer update --no-progress --no-suggest --ansi 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY"'; fi
-    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; tfold {}.composer "composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data"'; fi
+    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -k -j10% 'cd {}; tfold {}.composer "composer update --no-progress --no-suggest --ansi 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY"'; fi
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -k -j10% 'cd {}; tfold {}.composer "composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data"'; fi

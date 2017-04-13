@@ -15,31 +15,22 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
  * Allows to handle throwables thrown while running a command.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
-class ConsoleErrorEvent extends ConsoleExceptionEvent
+final class ConsoleErrorEvent extends ConsoleEvent
 {
     private $error;
-    private $handled = false;
+    private $exitCode;
 
-    public function __construct(InputInterface $input, OutputInterface $output, $error, $exitCode, Command $command = null)
+    public function __construct(InputInterface $input, OutputInterface $output, $error, Command $command = null)
     {
-        if (!$error instanceof \Throwable && !$error instanceof \Exception) {
-            throw new InvalidArgumentException(sprintf('The error passed to ConsoleErrorEvent must be an instance of \Throwable or \Exception, "%s" was passed instead.', is_object($error) ? get_class($error) : gettype($error)));
-        }
+        parent::__construct($command, $input, $output);
 
-        $exception = $error;
-        if (!$error instanceof \Exception) {
-            $exception = new FatalThrowableError($error);
-        }
-        parent::__construct($command, $input, $output, $exception, $exitCode, false);
-
-        $this->error = $error;
+        $this->setError($error);
     }
 
     /**
@@ -67,46 +58,26 @@ class ConsoleErrorEvent extends ConsoleExceptionEvent
     }
 
     /**
-     * Marks the error/exception as handled.
+     * Sets the exit code.
      *
-     * If it is not marked as handled, the error/exception will be displayed in
-     * the command output.
+     * @param int $exitCode The command exit code
      */
-    public function markErrorAsHandled()
+    public function setExitCode($exitCode)
     {
-        $this->handled = true;
+        $this->exitCode = (int) $exitCode;
+
+        $r = new \ReflectionProperty($this->error, 'code');
+        $r->setAccessible(true);
+        $r->setValue($this->error, $this->exitCode);
     }
 
     /**
-     * Whether the error/exception is handled by a listener or not.
+     * Gets the exit code.
      *
-     * If it is not yet handled, the error/exception will be displayed in the
-     * command output.
-     *
-     * @return bool
+     * @return int The command exit code
      */
-    public function isErrorHandled()
+    public function getExitCode()
     {
-        return $this->handled;
-    }
-
-    /**
-     * @deprecated Since version 3.3, to be removed in 4.0. Use getError() instead
-     */
-    public function getException()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use ConsoleErrorEvent::getError() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return parent::getException();
-    }
-
-    /**
-     * @deprecated Since version 3.3, to be removed in 4.0. Use setError() instead
-     */
-    public function setException(\Exception $exception)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use ConsoleErrorEvent::setError() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        parent::setException($exception);
+        return null !== $this->exitCode ? $this->exitCode : ($this->error->getCode() ?: 1);
     }
 }

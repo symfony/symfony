@@ -12,9 +12,9 @@
 namespace Symfony\Component\Console\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @author James Halsall <james.t.halsall@googlemail.com>
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class ExceptionListener implements EventSubscriberInterface
+class ErrorListener implements EventSubscriberInterface
 {
     private $logger;
 

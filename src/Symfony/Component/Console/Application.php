@@ -119,46 +119,30 @@ class Application
             $output = new ConsoleOutput();
         }
 
+        if (null !== $this->dispatcher && $this->dispatcher->hasListeners(ConsoleEvents::EXCEPTION)) {
+            @trigger_error(sprintf('The "ConsoleEvents::EXCEPTION" event is deprecated since Symfony 3.3 and will be removed in 4.0. Listen to the "ConsoleEvents::ERROR" event instead.'), E_USER_DEPRECATED);
+        }
+
         $this->configureIO($input, $output);
 
         try {
             $e = null;
             $exitCode = $this->doRun($input, $output);
-        } catch (\Exception $e) {
-            $exception = $e;
-        } catch (\Throwable $e) {
-            $exception = new FatalThrowableError($e);
-        }
-
-        if (null !== $e && null !== $this->dispatcher) {
-            $event = new ConsoleErrorEvent($input, $output, $e, $e->getCode(), $this->runningCommand);
-            $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
-
-            $e = $event->getError();
-
-            if ($event->isErrorHandled()) {
-                $e = null;
-                $exitCode = 0;
-            } else {
-                if (!$e instanceof \Exception) {
-                    throw $e;
-                }
-                $exitCode = $e->getCode();
-            }
-
-            $event = new ConsoleTerminateEvent($this->runningCommand, $input, $output, $exitCode);
-            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        } catch (\Exception $x) {
+            $e = $x;
+        } catch (\Throwable $x) {
+            $e = new FatalThrowableError($x);
         }
 
         if (null !== $e) {
             if (!$this->catchExceptions) {
-                throw $e;
+                throw $x;
             }
 
             if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($exception, $output->getErrorOutput());
+                $this->renderException($e, $output->getErrorOutput());
             } else {
-                $this->renderException($exception, $output);
+                $this->renderException($e, $output);
             }
 
             $exitCode = $e->getCode();
@@ -214,8 +198,26 @@ class Application
             $input = new ArrayInput(array('command' => $this->defaultCommand));
         }
 
-        // the command name MUST be the first element of the input
-        $command = $this->find($name);
+        try {
+            $e = $this->runningCommand = null;
+            // the command name MUST be the first element of the input
+            $command = $this->find($name);
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+        if (null !== $e) {
+            if (null !== $this->dispatcher) {
+                $event = new ConsoleErrorEvent($input, $output, $e);
+                $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+                $e = $event->getError();
+
+                if (0 === $event->getExitCode()) {
+                    return 0;
+                }
+            }
+
+            throw $e;
+        }
 
         $this->runningCommand = $command;
         $exitCode = $this->doRunCommand($command, $input, $output);
@@ -864,13 +866,7 @@ class Application
         }
 
         if (null === $this->dispatcher) {
-            try {
-                return $command->run($input, $output);
-            } catch (\Exception $e) {
-                throw $e;
-            } catch (\Throwable $e) {
-                throw new FatalThrowableError($e);
-            }
+            return $command->run($input, $output);
         }
 
         // bind before the console.command event, so the listeners have access to input options/arguments
@@ -882,36 +878,44 @@ class Application
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);
-        $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
 
-        if ($event->commandShouldRun()) {
-            try {
-                $e = null;
+        try {
+            $e = null;
+            $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+
+            if ($event->commandShouldRun()) {
                 $exitCode = $command->run($input, $output);
-            } catch (\Exception $x) {
-                $e = $x;
-            } catch (\Throwable $x) {
-                $e = new FatalThrowableError($x);
+            } else {
+                $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             }
-
-            if (null !== $e) {
-                $event = new ConsoleExceptionEvent($command, $input, $output, $e, $e->getCode(), false);
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+        if (null !== $e) {
+            if ($this->dispatcher->hasListeners(ConsoleEvents::EXCEPTION)) {
+                $x = $e instanceof \Exception ? $e : new FatalThrowableError($e);
+                $event = new ConsoleExceptionEvent($command, $input, $output, $x, $x->getCode());
                 $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
 
-                if ($e !== $event->getException()) {
-                    @trigger_error('The "console.exception" event is deprecated since version 3.3 and will be removed in 4.0. Use the "console.error" event instead.', E_USER_DEPRECATED);
-
-                    $x = $e = $event->getException();
+                if ($x !== $event->getException()) {
+                    $e = $event->getException();
                 }
-
-                throw $x;
             }
-        } else {
-            $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
+            $event = new ConsoleErrorEvent($input, $output, $e, $command);
+            $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+            $e = $event->getError();
+
+            if (0 === $exitCode = $event->getExitCode()) {
+                $e = null;
+            }
         }
 
         $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
         $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+
+        if (null !== $e) {
+            throw $e;
+        }
 
         return $event->getExitCode();
     }

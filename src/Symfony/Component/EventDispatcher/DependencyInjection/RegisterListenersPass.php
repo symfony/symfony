@@ -60,11 +60,8 @@ class RegisterListenersPass implements CompilerPassInterface
 
         $definition = $container->findDefinition($this->dispatcherService);
 
-        foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
+        foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
             $def = $container->getDefinition($id);
-            if ($def->isAbstract()) {
-                continue;
-            }
 
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
@@ -87,11 +84,8 @@ class RegisterListenersPass implements CompilerPassInterface
 
         $extractingDispatcher = new ExtractingEventDispatcher();
 
-        foreach ($container->findTaggedServiceIds($this->subscriberTag) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->subscriberTag, true) as $id => $attributes) {
             $def = $container->getDefinition($id);
-            if ($def->isAbstract()) {
-                continue;
-            }
 
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
             $class = $container->getParameterBag()->resolveValue($def->getClass());

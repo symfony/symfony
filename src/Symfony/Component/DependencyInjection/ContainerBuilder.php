@@ -1200,16 +1200,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *     }
      * }
      *
-     * @param string $name The tag name
+     * @param string $name
+     * @param bool   $throwOnAbstract
      *
      * @return array An array of tags with the tagged service as key, holding a list of attribute arrays
      */
-    public function findTaggedServiceIds($name)
+    public function findTaggedServiceIds($name, $throwOnAbstract = false)
     {
         $this->usedTags[] = $name;
         $tags = array();
         foreach ($this->getDefinitions() as $id => $definition) {
             if ($definition->hasTag($name)) {
+                if ($throwOnAbstract && $definition->isAbstract()) {
+                    throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must not be abstract.', $id, $name));
+                }
                 $tags[$id] = $definition->getTag($name);
             }
         }

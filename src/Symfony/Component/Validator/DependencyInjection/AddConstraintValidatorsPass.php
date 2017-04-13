@@ -38,12 +38,8 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
         }
 
         $validators = array();
-        foreach ($container->findTaggedServiceIds($this->constraintValidatorTag) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->constraintValidatorTag, true) as $id => $attributes) {
             $definition = $container->getDefinition($id);
-
-            if ($definition->isAbstract()) {
-                continue;
-            }
 
             if (isset($attributes[0]['alias'])) {
                 $validators[$attributes[0]['alias']] = new Reference($id);

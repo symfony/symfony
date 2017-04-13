@@ -46,12 +46,8 @@ class FragmentRendererPass implements CompilerPassInterface
 
         $definition = $container->getDefinition($this->handlerService);
         $renderers = array();
-        foreach ($container->findTaggedServiceIds($this->rendererTag) as $id => $tags) {
+        foreach ($container->findTaggedServiceIds($this->rendererTag, true) as $id => $tags) {
             $def = $container->getDefinition($id);
-            if ($def->isAbstract()) {
-                continue;
-            }
-
             $class = $container->getParameterBag()->resolveValue($def->getClass());
 
             if (!$r = $container->getReflectionClass($class)) {

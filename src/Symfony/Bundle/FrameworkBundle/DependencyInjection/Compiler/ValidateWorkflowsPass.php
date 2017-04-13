@@ -25,7 +25,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $taggedServices = $container->findTaggedServiceIds('workflow.definition');
+        $taggedServices = $container->findTaggedServiceIds('workflow.definition', true);
         foreach ($taggedServices as $id => $tags) {
             $definition = $container->get($id);
             foreach ($tags as $tag) {

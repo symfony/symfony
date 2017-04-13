@@ -39,7 +39,7 @@ class RoutingResolverPass implements CompilerPassInterface
 
         $definition = $container->getDefinition($this->resolverServiceId);
 
-        foreach ($container->findTaggedServiceIds($this->loaderTag) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->loaderTag, true) as $id => $attributes) {
             $definition->addMethodCall('addLoader', array(new Reference($id)));
         }
     }

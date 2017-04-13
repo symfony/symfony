@@ -22,13 +22,13 @@ class ResolveTagsInheritancePassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('grandpa', self::class)->addTag('g');
-        $container->setDefinition('parent', new ChildDefinition('grandpa'))->addTag('p')->setInheritTags(true);
+        $container->setDefinition('parent', new ChildDefinition('grandpa'))->addTag('p')->setInheritTags(true)->setAbstract(true);
         $container->setDefinition('child', new ChildDefinition('parent'))->setInheritTags(true);
 
         (new ResolveTagsInheritancePass())->process($container);
 
         $expected = array('p' => array(array()), 'g' => array(array()));
-        $this->assertSame($expected, $container->getDefinition('parent')->getTags());
         $this->assertSame($expected, $container->getDefinition('child')->getTags());
+        $this->assertSame(array(), $container->getDefinition('parent')->getTags());
     }
 }

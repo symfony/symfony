@@ -55,8 +55,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             return;
         }
 
-        $taggedSubscribers = $container->findTaggedServiceIds($this->tagPrefix.'.event_subscriber');
-        $taggedListeners = $container->findTaggedServiceIds($this->tagPrefix.'.event_listener');
+        $taggedSubscribers = $container->findTaggedServiceIds($this->tagPrefix.'.event_subscriber', true);
+        $taggedListeners = $container->findTaggedServiceIds($this->tagPrefix.'.event_listener', true);
 
         if (empty($taggedSubscribers) && empty($taggedListeners)) {
             return;
@@ -78,10 +78,6 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
                 uasort($subscribers, $sortFunc);
                 foreach ($subscribers as $id => $instance) {
-                    if ($container->getDefinition($id)->isAbstract()) {
-                        continue;
-                    }
-
                     $em->addMethodCall('addEventSubscriber', array(new Reference($id)));
                 }
             }
@@ -94,10 +90,6 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
                 uasort($listeners, $sortFunc);
                 foreach ($listeners as $id => $instance) {
-                    if ($container->getDefinition($id)->isAbstract()) {
-                        continue;
-                    }
-
                     $em->addMethodCall('addEventListener', array(
                         array_unique($instance['event']),
                         isset($instance['lazy']) && $instance['lazy'] ? $id : new Reference($id),

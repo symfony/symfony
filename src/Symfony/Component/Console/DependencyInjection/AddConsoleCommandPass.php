@@ -25,16 +25,11 @@ class AddConsoleCommandPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $commandServices = $container->findTaggedServiceIds('console.command');
+        $commandServices = $container->findTaggedServiceIds('console.command', true);
         $serviceIds = array();
 
         foreach ($commandServices as $id => $tags) {
             $definition = $container->getDefinition($id);
-
-            if ($definition->isAbstract()) {
-                continue;
-            }
-
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (!$r = $container->getReflectionClass($class)) {

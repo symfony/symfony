@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testExceptionOnAbstractTaggedSubscriber()
     {
         $container = $this->createBuilder();
@@ -29,10 +32,12 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $container->setDefinition('a', $abstractDefinition);
 
         $this->process($container);
-        $this->assertSame(array(), $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
     }
 
-    public function testAbstractTaggedListenerIsSkipped()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedListener()
     {
         $container = $this->createBuilder();
 
@@ -43,7 +48,6 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $container->setDefinition('a', $abstractDefinition);
 
         $this->process($container);
-        $this->assertSame(array(), $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
     }
 
     public function testProcessEventListenersWithPriorities()

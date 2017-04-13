@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -21,6 +22,24 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ResolveTagsInheritancePass extends AbstractRecursivePass
 {
+    private $abstractInheritedParents = array();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContainerBuilder $container)
+    {
+        try {
+            parent::process($container);
+
+            foreach ($this->abstractInheritedParents as $id) {
+                $container->findDefinition($id)->setTags(array());
+            }
+        } finally {
+            $this->abstractInheritedParents = array();
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -36,6 +55,9 @@ class ResolveTagsInheritancePass extends AbstractRecursivePass
         }
 
         $parentDef = $this->container->findDefinition($parent);
+        if ($parentDef->isAbstract()) {
+            $this->abstractInheritedParents[$parent] = $parent;
+        }
 
         if ($parentDef instanceof ChildDefinition) {
             $this->processValue($parentDef);

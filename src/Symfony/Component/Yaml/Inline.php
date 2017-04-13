@@ -163,6 +163,10 @@ class Inline
                     return '!php/object:'.serialize($value);
                 }
 
+                if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \stdClass || $value instanceof \ArrayObject)) {
+                    return self::dumpMap((array) $value, $flags);
+                }
+
                 if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
                     throw new DumpException('Object support when dumping a YAML file has been disabled.');
                 }
@@ -257,6 +261,19 @@ class Inline
             return sprintf('[%s]', implode(', ', $output));
         }
 
+        return self::dumpMap($value, $flags);
+    }
+
+    /**
+     * Dumps a PHP array to a YAML string as map.
+     *
+     * @param array $value The PHP array to dump
+     * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
+     *
+     * @return string The YAML string representing the PHP array  as map
+     */
+    private static function dumpMap($value, $flags)
+    {
         // hash
         $output = array();
         foreach ($value as $key => $val) {

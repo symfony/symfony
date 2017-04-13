@@ -12,8 +12,8 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
 class DumperTest extends TestCase
@@ -388,6 +388,38 @@ outer2:
 
 YAML;
         $this->assertSame($expected, $yaml);
+    }
+
+    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
+    {
+        $deep = new \ArrayObject(array('d', 'e'));
+        $inner = new \ArrayObject(array('b', 'c', $deep));
+        $outer = new \ArrayObject(array('a', $inner));
+
+        $yaml = $this->dumper->dump($outer, 2, 0, Yaml::DUMP_OBJECT_AS_MAP);
+
+        $expected = <<<YAML
+0: a
+1:
+    0: b
+    1: c
+    2: { 0: d, 1: e }
+
+YAML;
+        $this->assertEquals($expected, $yaml);
+    }
+
+    public function testDumpingArrayObjectInstancesWithNumericKeysInlined()
+    {
+        $deep = new \ArrayObject(array('d', 'e'));
+        $inner = new \ArrayObject(array('b', 'c', $deep));
+        $outer = new \ArrayObject(array('a', $inner));
+
+        $yaml = $this->dumper->dump($outer, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
+        $expected = <<<YAML
+{ 0: a, 1: { 0: b, 1: c, 2: { 0: d, 1: e } } }
+YAML;
+        $this->assertEquals($expected, $yaml);
     }
 
     public function testDumpMultiLineStringAsScalarBlock()

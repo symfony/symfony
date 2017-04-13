@@ -82,7 +82,7 @@ install:
     - if [[ ! $skip ]]; then composer update --no-suggest; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
-    - .github/travis_fold.sh
+    - . .github/travis_fold.sh
 
 script:
     - if [[ $skip ]]; then echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"; fi
@@ -90,5 +90,5 @@ script:
     - if [[ ! $deps && ! $PHP = hhvm* ]]; then tfold PHPUnit.tty "$PHPUNIT --group tty"; fi
     - if [[ ! $deps && $PHP = hhvm* ]]; then $PHPUNIT --exclude-group benchmark,intl-data; fi
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'tfold PHPUnit.sigchild "ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/"'; fi
-    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'tfold {}.composer "cd {}; composer update --no-progress --no-suggest --ansi 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY"'; fi
-    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'tfold {}.composer "cd {}; composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data"'; fi
+    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; tfold {}.composer "composer update --no-progress --no-suggest --ansi 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data$LEGACY"'; fi
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; tfold {}.composer "composer update --no-progress --no-suggest --ansi --prefer-lowest --prefer-stable 2>&1"; tfold {}.PHPUnit "$PHPUNIT --exclude-group tty,benchmark,intl-data"'; fi

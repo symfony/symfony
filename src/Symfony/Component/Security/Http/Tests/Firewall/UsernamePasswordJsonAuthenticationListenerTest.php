@@ -162,6 +162,6 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
-        $this->assertEquals('ok', $event->getResponse()->getContent());
+        $this->assertSame('ok', $event->getResponse()->getContent());
     }
 }

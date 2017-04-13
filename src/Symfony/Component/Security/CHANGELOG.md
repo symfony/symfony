@@ -6,6 +6,7 @@ CHANGELOG
 
  * deprecated `AccessDecisionManager::setVoters()` in favor of passing the
    voters to the constructor.
+ * [EXPERIMENTAL] added a `json_login` listener for stateless authentication
 
 3.2.0
 -----

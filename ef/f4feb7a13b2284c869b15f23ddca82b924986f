@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-13T14:11:59Z
+
+:+1: we do not document "rethrow" (or we would have to virtually add it everywhere)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-13T14:31:53Z
+
+Some "rethrow" would be useful to document. In this case, we can bypass rethrow with ``ignoreValidationErrors()`` method. I think it's relevant to have this info in PHPDoc.

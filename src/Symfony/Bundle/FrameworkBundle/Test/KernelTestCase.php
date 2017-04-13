@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ClassLoader\ClassFinder;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -173,11 +174,9 @@ abstract class KernelTestCase extends TestCase
         if (count($results)) {
             $file = current($results);
 
-            $classes = get_declared_classes();
-            require_once $file;
-            $newClasses = array_diff(get_declared_classes(), $classes);
-            if ($newClasses) {
-                $kernelClass = reset($newClasses);
+            $classes = ClassFinder::findClasses($file);
+            if ($classes) {
+                $kernelClass = reset($classes);
             }
         }
 
@@ -218,6 +217,10 @@ abstract class KernelTestCase extends TestCase
      *
      *  * environment
      *  * debug
+     *  * test_case
+     *  * config_dir
+     *  * root_config
+     *  * root_dir
      *
      * @param array $options An array of options
      *

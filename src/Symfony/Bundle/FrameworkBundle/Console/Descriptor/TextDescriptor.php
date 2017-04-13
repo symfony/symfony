@@ -466,7 +466,13 @@ class TextDescriptor extends Descriptor
         }
 
         if ($callable instanceof \Closure) {
-            return '\Closure()';
+            $formatted = $this->formatClosure($callable);
+
+            if ('closure' === $formatted) {
+                return '\Closure()';
+            }
+
+            return $formatted.'()';
         }
 
         if (method_exists($callable, '__invoke')) {

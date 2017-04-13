@@ -906,7 +906,7 @@ class ResponseTest extends ResponseTestCase
         )));
 
         $ianaHttpStatusCodes->load('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml');
-        if (!$ianaHttpStatusCodes->relaxNGValidate('https://www.iana.org/assignments/http-status-codes/http-status-codes.rng')) {
+        if (!$ianaHttpStatusCodes->relaxNGValidate(__DIR__.'/schema/http-status-codes.rng')) {
             self::fail('Invalid IANA\'s HTTP status code list.');
         }
 

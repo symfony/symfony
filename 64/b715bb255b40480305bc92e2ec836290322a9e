@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-13T08:15:20Z
+
+Test case added, PR ready. Fixes two issues:
+- inheriting values from defaults
+- relying on "inherit-tag" on abstract child definitions (which played not very well with other parts)

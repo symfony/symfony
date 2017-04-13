@@ -16,7 +16,7 @@ security:
             pattern: ^/
             anonymous: true
             json_login:
-               check_path:    /mychk
+               check_path:    /chk
                username_path: user.login
                password_path: user.password
 

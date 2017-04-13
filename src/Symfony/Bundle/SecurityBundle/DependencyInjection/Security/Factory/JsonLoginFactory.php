@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * JsonLoginFactory creates services for JSON login authentication.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @experimental in version 3.3
  */
 class JsonLoginFactory extends AbstractFactory
 {
@@ -83,10 +85,10 @@ class JsonLoginFactory extends AbstractFactory
     {
         $listenerId = $this->getListenerId();
         $listener = new ChildDefinition($listenerId);
-        $listener->replaceArgument(2, $id);
-        $listener->replaceArgument(3, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
-        $listener->replaceArgument(4, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));
-        $listener->replaceArgument(5, array_intersect_key($config, $this->options));
+        $listener->replaceArgument(3, $id);
+        $listener->replaceArgument(4, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
+        $listener->replaceArgument(5, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));
+        $listener->replaceArgument(6, array_intersect_key($config, $this->options));
 
         $listenerId .= '.'.$id;
         $container->setDefinition($listenerId, $listener);

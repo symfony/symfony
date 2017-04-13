@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener;
+use Symfony\Component\Security\Http\HttpUtils;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -35,9 +36,15 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      */
     private $listener;
 
-    private function createListener(array $options = array(), $success = true)
+    private function createListener(array $options = array(), $success = true, $matchCheckPath = true)
     {
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $httpUtils = $this->getMockBuilder(HttpUtils::class)->getMock();
+        $httpUtils
+            ->expects($this->any())
+            ->method('checkRequestPath')
+            ->will($this->returnValue($matchCheckPath))
+        ;
         $authenticationManager = $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock();
 
         $authenticatedToken = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -53,7 +60,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $authenticationFailureHandler = $this->getMockBuilder(AuthenticationFailureHandlerInterface::class)->getMock();
         $authenticationFailureHandler->method('onAuthenticationFailure')->willReturn(new Response('ko'));
 
-        $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, 'providerKey', $authenticationSuccessHandler, $authenticationFailureHandler, $options);
+        $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, $httpUtils, 'providerKey', $authenticationSuccessHandler, $authenticationFailureHandler, $options);
     }
 
     public function testHandleSuccess()
@@ -135,5 +142,26 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
         $this->listener->handle($event);
         $this->assertSame('ko', $event->getResponse()->getContent());
+    }
+
+    public function testDoesNotAttemptAuthenticationIfRequestPathDoesNotMatchCheckPath()
+    {
+        $this->createListener(array('check_path' => '/'), true, false);
+        $request = new Request();
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+        $event->setResponse(new Response('original'));
+
+        $this->listener->handle($event);
+        $this->assertSame('original', $event->getResponse()->getContent());
+    }
+
+    public function testAttemptAuthenticationIfRequestPathMatchesCheckPath()
+    {
+        $this->createListener(array('check_path' => '/'));
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
+        $this->assertSame('ok', $event->getResponse()->getContent());
     }
 }

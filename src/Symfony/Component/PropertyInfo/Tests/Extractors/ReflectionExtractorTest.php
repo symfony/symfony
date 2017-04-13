@@ -32,7 +32,7 @@ class ReflectionExtractorTest extends TestCase
 
     public function testGetProperties()
     {
-        $this->assertEquals(
+        $this->assertSame(
             array(
                 'bal',
                 'parent',
@@ -49,6 +49,7 @@ class ReflectionExtractorTest extends TestCase
                 'a',
                 'DOB',
                 'Id',
+                '123',
                 'c',
                 'd',
                 'e',

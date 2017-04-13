@@ -40,16 +40,18 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
 
         $alias = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
-        if ($container->hasAlias($alias)) {
-            $this->assertSame('my-command', (string) $container->getAlias($alias));
+
+        if ($public) {
+            $this->assertFalse($container->hasAlias($alias));
+            $id = 'my-command';
         } else {
+            $id = $alias;
             // The alias is replaced by a Definition by the ReplaceAliasByActualDefinitionPass
             // in case the original service is private
             $this->assertFalse($container->hasDefinition('my-command'));
             $this->assertTrue($container->hasDefinition($alias));
         }
 
-        $id = $public ? 'my-command' : 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
         $this->assertTrue($container->hasParameter('console.command.ids'));
         $this->assertSame(array($id), $container->getParameter('console.command.ids'));
     }
@@ -95,22 +97,21 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
     }
 
-    public function testProcessServicesWithSameCommand()
+    public function testProcessPrivateServicesWithSameCommand()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
         $className = 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand';
 
         $definition1 = new Definition($className);
-        $definition1->addTag('console.command');
+        $definition1->addTag('console.command')->setPublic(false);
 
         $definition2 = new Definition($className);
-        $definition2->addTag('console.command');
+        $definition2->addTag('console.command')->setPublic(false);
 
         $container->setDefinition('my-command1', $definition1);
         $container->setDefinition('my-command2', $definition2);
 
-        $container->compile();
+        (new AddConsoleCommandPass())->process($container);
 
         $alias1 = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
         $alias2 = $alias1.'_my-command2';

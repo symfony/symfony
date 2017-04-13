@@ -27,19 +27,12 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $didProcess = false;
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($definition instanceof ChildDefinition) {
                 // don't apply "instanceof" to children: it will be applied to their parent
                 continue;
             }
-            if ($definition !== $processedDefinition = $this->processDefinition($container, $id, $definition)) {
-                $didProcess = true;
-                $container->setDefinition($id, $processedDefinition);
-            }
-        }
-        if ($didProcess) {
-            $container->register('abstract.'.__CLASS__, '')->setAbstract(true);
+            $container->setDefinition($id, $this->processDefinition($container, $id, $definition));
         }
     }
 
@@ -53,37 +46,56 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         }
 
         $definition->setInstanceofConditionals(array());
-        $instanceofParent = null;
-        $parent = 'abstract.'.__CLASS__;
-        $shared = null;
+        $parent = $shared = null;
+        $instanceofTags = array();
 
         foreach ($instanceofConditionals as $interface => $instanceofDef) {
             if ($interface !== $class && (!$container->getReflectionClass($interface) || !$container->getReflectionClass($class))) {
                 continue;
             }
             if ($interface === $class || is_subclass_of($class, $interface)) {
-                $instanceofParent = clone $instanceofDef;
-                $instanceofParent->setAbstract(true)->setInheritTags(true)->setParent($parent);
+                $instanceofDef = clone $instanceofDef;
+                $instanceofDef->setAbstract(true)->setInheritTags(false)->setParent($parent ?: 'abstract.instanceof.'.$id);
                 $parent = 'instanceof.'.$interface.'.'.$id;
-                $container->setDefinition($parent, $instanceofParent);
+                $container->setDefinition($parent, $instanceofDef);
+                $instanceofTags[] = $instanceofDef->getTags();
+                $instanceofDef->setTags(array());
 
-                if (isset($instanceofParent->getChanges()['shared'])) {
-                    $shared = $instanceofParent->isShared();
+                if (isset($instanceofDef->getChanges()['shared'])) {
+                    $shared = $instanceofDef->isShared();
                 }
             }
         }
 
-        if ($instanceofParent) {
+        if ($parent) {
+            $abstract = $container->setDefinition('abstract.instanceof.'.$id, $definition);
+
             // cast Definition to ChildDefinition
             $definition = serialize($definition);
             $definition = substr_replace($definition, '53', 2, 2);
             $definition = substr_replace($definition, 'Child', 44, 0);
             $definition = unserialize($definition);
-            $definition->setInheritTags(true)->setParent($parent);
+            $definition->setParent($parent);
 
             if (null !== $shared && !isset($definition->getChanges()['shared'])) {
                 $definition->setShared($shared);
             }
+
+            $i = count($instanceofTags);
+            while (0 <= --$i) {
+                foreach ($instanceofTags[$i] as $k => $v) {
+                    foreach ($v as $v) {
+                        $definition->addTag($k, $v);
+                    }
+                }
+            }
+
+            // reset fields with "merge" behavior
+            $abstract
+                ->setArguments(array())
+                ->setMethodCalls(array())
+                ->setTags(array())
+                ->setAbstract(true);
         }
 
         return $definition;

@@ -236,6 +236,10 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0.
    Use the `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` class instead.
+
 HttpFoundation
 --------------
 

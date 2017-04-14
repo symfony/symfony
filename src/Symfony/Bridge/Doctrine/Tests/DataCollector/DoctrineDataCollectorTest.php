@@ -24,6 +24,7 @@ class DoctrineDataCollectorTest extends TestCase
         $c = $this->createCollector(array());
         $c->collect(new Request(), new Response());
         $this->assertEquals(array('default' => 'doctrine.dbal.default_connection'), $c->getConnections());
+        $this->assertTrue(false);
     }
 
     public function testCollectManagers()

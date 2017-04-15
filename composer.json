@@ -46,6 +46,7 @@
         "symfony/dom-crawler": "self.version",
         "symfony/dotenv": "self.version",
         "symfony/event-dispatcher": "self.version",
+        "symfony/error-page-bundle": "self.version",
         "symfony/expression-language": "self.version",
         "symfony/filesystem": "self.version",
         "symfony/finder": "self.version",

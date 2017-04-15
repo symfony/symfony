@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="request" />
+            <argument>%twig.exception_listener.controller%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="twig.controller.exception" class="Symfony\Bundle\ErrorPageBundle\Controller\ExceptionController">
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="twig.controller.preview_error" class="Symfony\Bundle\ErrorPageBundle\Controller\PreviewErrorController">
+            <argument type="service" id="http_kernel" />
+            <argument>%twig.exception_listener.controller%</argument>
+        </service>
+    </services>
+</container>

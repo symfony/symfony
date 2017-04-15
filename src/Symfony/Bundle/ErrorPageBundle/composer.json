@@ -1,0 +1,55 @@
+{
+    "name": "symfony/error-page-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony ErrorPageBundle",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/config": "~3.2",
+        "symfony/twig-bridge": "^3.2.1",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8.16|~3.1.9|^3.2.2",
+        "twig/twig": "^1.32|^2.2"
+    },
+    "require-dev": {
+        "symfony/asset": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
+        "symfony/dependency-injection": "~3.3",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/finder": "~2.8|~3.0",
+        "symfony/form": "~2.8|~3.0",
+        "symfony/routing": "~2.8|~3.0",
+        "symfony/templating": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/framework-bundle": "^3.2.2",
+        "symfony/web-link": "~3.3",
+        "doctrine/annotations": "~1.0"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<3.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bundle\\ErrorPageBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.3-dev"
+        }
+    }
+}

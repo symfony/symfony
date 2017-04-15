@@ -1,0 +1,8 @@
+        <traces>
+{% for trace in exception.trace %}
+            <trace>
+{{ include('@ErrorPage/Exception/trace.txt.twig', { trace: trace }, with_context = false) }}
+
+            </trace>
+{% endfor %}
+        </traces>

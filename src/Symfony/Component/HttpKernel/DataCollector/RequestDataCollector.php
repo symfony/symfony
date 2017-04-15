@@ -158,6 +158,10 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         $this->data['identifier'] = $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
+
+        if ($response->headers->has('x-previous-debug-token')) {
+            $this->data['forward_token'] = $response->headers->get('x-previous-debug-token');
+        }
     }
 
     public function lateCollect()
@@ -320,6 +324,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getRedirect()
     {
         return isset($this->data['redirect']) ? $this->data['redirect'] : false;
+    }
+
+    public function getForwardToken()
+    {
+        return isset($this->data['forward_token']) ? $this->data['forward_token'] : null;
     }
 
     public function onKernelController(FilterControllerEvent $event)

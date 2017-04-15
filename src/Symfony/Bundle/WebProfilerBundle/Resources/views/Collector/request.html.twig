@@ -12,9 +12,10 @@
         {% endset %}
     {% endif %}
 
-    {% if collector.forward|default(false) %}
+    {% if collector.forwardtoken %}
+        {% set forward_profile = profile.childByToken(collector.forwardtoken) %}
         {% set forward_handler %}
-            {{ helper.set_handler(collector.forward.controller) }}
+            {{ helper.set_handler(forward_profile ? forward_profile.collector('request').controller : 'n/a') }}
         {% endset %}
     {% endif %}
 
@@ -24,7 +25,7 @@
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
             {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
-            {% if collector.forward|default(false) %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+            {% if collector.forwardtoken %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
             <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}
@@ -81,7 +82,7 @@
                     <b>Forwarded to</b>
                     <span>
                         {{ forward_handler }}
-                        (<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
+                        (<a href="{{ path('_profiler', { token: collector.forwardtoken }) }}">{{ collector.forwardtoken }}</a>)
                     </span>
                 </div>
             </div>

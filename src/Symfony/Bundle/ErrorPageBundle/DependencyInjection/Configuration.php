@@ -29,11 +29,11 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('twig');
+        $rootNode = $treeBuilder->root('error_page');
 
         $rootNode
             ->children()
-                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
+                ->scalarNode('exception_controller')->defaultValue('error_page.controller.exception:showAction')->end()
             ->end()
         ;
 

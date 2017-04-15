@@ -5,21 +5,21 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
+        <service id="error_page.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
-            <argument>%twig.exception_listener.controller%</argument>
+            <argument>%error_page.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="twig.controller.exception" class="Symfony\Bundle\ErrorPageBundle\Controller\ExceptionController">
+        <service id="error_page.controller.exception" class="Symfony\Bundle\ErrorPageBundle\Controller\ExceptionController">
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="twig.controller.preview_error" class="Symfony\Bundle\ErrorPageBundle\Controller\PreviewErrorController">
+        <service id="error_page.controller.preview_error" class="Symfony\Bundle\ErrorPageBundle\Controller\PreviewErrorController">
             <argument type="service" id="http_kernel" />
-            <argument>%twig.exception_listener.controller%</argument>
+            <argument>%error_page.exception_listener.controller%</argument>
         </service>
     </services>
 </container>

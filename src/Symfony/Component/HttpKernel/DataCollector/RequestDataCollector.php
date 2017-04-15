@@ -147,6 +147,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 ));
             }
         }
+
+        $this->data['identifier'] = $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
     }
 
     public function lateCollect()
@@ -263,7 +265,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function getIdentifier()
     {
-        return $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
+        return $this->data['identifier'];
     }
 
     /**

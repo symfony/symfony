@@ -20,4 +20,13 @@
         <attribute name="bar" max-depth="3" />
     </class>
 
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy">
+        <discriminator-map type-property="type">
+            <mapping type="first" class="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild" />
+            <mapping type="second" class="Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild" />
+        </discriminator-map>
+
+        <attribute name="foo" />
+    </class>
+
 </serializer>

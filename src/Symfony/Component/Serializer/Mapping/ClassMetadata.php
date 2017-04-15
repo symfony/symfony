@@ -39,9 +39,25 @@ class ClassMetadata implements ClassMetadataInterface
      */
     private $reflClass;
 
-    public function __construct(string $class)
+    /**
+     * @var ClassDiscriminatorMapping|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getClassDiscriminatorMapping()} instead.
+     */
+    public $classDiscriminatorMapping;
+
+    /**
+     * Constructs a metadata for the given class.
+     *
+     * @param string                         $class
+     * @param ClassDiscriminatorMapping|null $classDiscriminatorMapping
+     */
+    public function __construct(string $class, ClassDiscriminatorMapping $classDiscriminatorMapping = null)
     {
         $this->name = $class;
+        $this->classDiscriminatorMapping = $classDiscriminatorMapping;
     }
 
     /**
@@ -95,6 +111,22 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getClassDiscriminatorMapping()
+    {
+        return $this->classDiscriminatorMapping;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null)
+    {
+        $this->classDiscriminatorMapping = $mapping;
+    }
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -104,6 +136,7 @@ class ClassMetadata implements ClassMetadataInterface
         return array(
             'name',
             'attributesMetadata',
+            'classDiscriminatorMapping',
         );
     }
 }

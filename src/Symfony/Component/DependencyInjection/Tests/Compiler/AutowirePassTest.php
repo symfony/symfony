@@ -694,6 +694,7 @@ class AutowirePassTest extends TestCase
     {
         return array(
             array('setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class does not exist.'),
+            array('setDifferentNamespace', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setDifferentNamespace()" references class "stdClass" but no such service exists. It cannot be auto-registered because it is from a different root namespace.'),
             array(null, 'Cannot autowire service "foo": method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod()" must be public.'),
         );
     }
@@ -1016,6 +1017,10 @@ class NotWireable
     }
 
     public function setOptionalNotAutowireable(NotARealClass $n = null)
+    {
+    }
+
+    public function setDifferentNamespace(\stdClass $n)
     {
     }
 

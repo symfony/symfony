@@ -468,7 +468,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     private function needsCdataWrapping($val)
     {
-        return preg_match('/[<>&]/', $val);
+        return preg_match('/[<>&]/', $val) > 0;
     }
 
     /**

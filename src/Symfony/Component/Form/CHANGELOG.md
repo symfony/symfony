@@ -25,6 +25,7 @@ CHANGELOG
    * "choice_value"
    * "choice_attr"
    * "group_by"
+ * added PercentToLocalizedStringTransformer to accept both comma and dot as decimal separator, if possible
 
 2.6.2
 -----

@@ -332,7 +332,7 @@ EOTXT
 stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
-    -trace: {
+    trace: {
       %sTwig.php:2: {
         : foo bar
         :   twig source

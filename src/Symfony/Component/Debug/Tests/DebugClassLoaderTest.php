@@ -185,7 +185,7 @@ class DebugClassLoaderTest extends TestCase
 
         $xError = array(
             'type' => E_USER_DEPRECATED,
-            'message' => 'The Test\Symfony\Component\Debug\Tests\\'.$class.' class '.$type.' Symfony\Component\Debug\Tests\Fixtures\\'.$super.' that is deprecated but this is a test deprecation notice.',
+            'message' => 'The "Test\Symfony\Component\Debug\Tests\\'.$class.'" class '.$type.' "Symfony\Component\Debug\Tests\Fixtures\\'.$super.'" that is deprecated but this is a test deprecation notice.',
         );
 
         $this->assertSame($xError, $lastError);
@@ -263,7 +263,7 @@ class DebugClassLoaderTest extends TestCase
 
         $xError = array(
             'type' => E_USER_DEPRECATED,
-            'message' => 'Test\Symfony\Component\Debug\Tests\Float uses a reserved class name (Float) that will break on PHP 7 and higher',
+            'message' => 'The "Test\Symfony\Component\Debug\Tests\Float" class uses the reserved name "Float", it will break on PHP 7 and higher',
         );
 
         $this->assertSame($xError, $lastError);
@@ -285,7 +285,7 @@ class DebugClassLoaderTest extends TestCase
 
         $xError = array(
             'type' => E_USER_DEPRECATED,
-            'message' => 'The Symfony\Component\Debug\Tests\Fixtures\FinalClass class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from Test\Symfony\Component\Debug\Tests\ExtendsFinalClass.',
+            'message' => 'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass" class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass".',
         );
 
         $this->assertSame($xError, $lastError);
@@ -307,7 +307,7 @@ class DebugClassLoaderTest extends TestCase
 
         $xError = array(
             'type' => E_USER_DEPRECATED,
-            'message' => 'The Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod() method is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod.',
+            'message' => 'The "Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod()" method is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod".',
         );
 
         $this->assertSame($xError, $lastError);

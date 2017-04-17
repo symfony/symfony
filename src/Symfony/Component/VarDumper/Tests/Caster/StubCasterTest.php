@@ -141,7 +141,7 @@ EODUMP;
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
   <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="Symfony\Component\VarDumper\Tests\Caster\NotExisting
-52 characters"><span class=sf-dump-ellipsis>Symfony\Component\VarDumper\Tests\Caster</span>\NotExisting</span>"
+52 characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-class">Symfony\Component\VarDumper\Tests\Caster</span><span class=sf-dump-ellipsis>\</span>NotExisting</span>"
 </samp>]
 </bar>
 EODUMP;

@@ -315,5 +315,7 @@ class Locale
         if ('en' !== $locale) {
             throw new MethodNotImplementedException(__METHOD__);
         }
+
+        return true;
     }
 }

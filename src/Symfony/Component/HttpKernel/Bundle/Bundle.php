@@ -127,7 +127,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     /**
      * Returns the bundle parent name.
      *
-     * @return string The Bundle parent name it overrides or null if no parent
+     * @return string|null The Bundle parent name it overrides or null if no parent
      */
     public function getParent()
     {

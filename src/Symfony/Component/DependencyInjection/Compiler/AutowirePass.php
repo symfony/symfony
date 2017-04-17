@@ -80,7 +80,7 @@ class AutowirePass extends AbstractRecursivePass
             if ($ref = $this->getAutowiredReference($value)) {
                 return $ref;
             }
-            $this->container->log($this, $this->createTypeNotFoundMessage($value->getType(), 'it'));
+            $this->container->log($this, $this->createTypeNotFoundMessage($value, 'it'));
         }
         $value = parent::processValue($value, $isRoot);
 
@@ -240,8 +240,8 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if (!$value = $this->getAutowiredReference(new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''))) {
-                $failureMessage = $this->createTypeNotFoundMessage($type, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
+            if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''))) {
+                $failureMessage = $this->createTypeNotFoundMessage($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                 if ($parameter->isDefaultValueAvailable()) {
                     $value = $parameter->getDefaultValue();
@@ -424,13 +424,13 @@ class AutowirePass extends AbstractRecursivePass
         return new TypedReference($argumentId, $type);
     }
 
-    private function createTypeNotFoundMessage($type, $label)
+    private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
-        if (!$r = $this->container->getReflectionClass($type, true)) {
+        if (!$r = $this->container->getReflectionClass($type = $reference->getType(), true)) {
             $message = sprintf('has type "%s" but this class does not exist.', $type);
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
-            $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($type));
+            $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));
         }
 
         $message = sprintf('Cannot autowire service "%s": %s %s', $this->currentId, $label, $message);
@@ -443,12 +443,14 @@ class AutowirePass extends AbstractRecursivePass
         return $message;
     }
 
-    private function createTypeAlternatives($type)
+    private function createTypeAlternatives(TypedReference $reference)
     {
-        if (isset($this->ambiguousServiceTypes[$type])) {
+        if (isset($this->ambiguousServiceTypes[$type = $reference->getType()])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);
+        } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered()) {
+            return ' It cannot be auto-registered because it is from a different root namespace.';
         } else {
             return;
         }

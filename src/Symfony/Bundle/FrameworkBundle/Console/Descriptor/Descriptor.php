@@ -311,4 +311,15 @@ abstract class Descriptor implements DescriptorInterface
 
         return $serviceIds;
     }
+
+    protected function formatClosure(\Closure $closure)
+    {
+        $r = new \ReflectionFunction($closure);
+
+        if (preg_match('#^/\*\* @closure-proxy ([^: ]++)::([^: ]++) \*/$#', $r->getDocComment(), $m)) {
+            return sprintf('%s::%s', $m[1], $m[2]);
+        }
+
+        return 'closure';
+    }
 }

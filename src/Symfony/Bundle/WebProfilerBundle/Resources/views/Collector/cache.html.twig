@@ -130,18 +130,16 @@
                                         <th>#</th>
                                         <th>Time</th>
                                         <th>Call</th>
-                                        <th>Argument</th>
-                                        <th>Result</th>
+                                        <th>Hit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 {% for call in calls %}
                                     <tr>
                                         <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
-                                        <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
-                                        <td>{{ call.name }}()</td>
-                                        <td>{{ profiler_dump(call.value.argument, maxDepth=1) }}</td>
-                                        <td>{{ profiler_dump(call.value.result, maxDepth=1) }}</td>
+                                        <td class="nowrap">{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                        <td class="nowrap">{{ call.name }}()</td>
+                                        <td>{{ profiler_dump(call.value.result, maxDepth=2) }}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

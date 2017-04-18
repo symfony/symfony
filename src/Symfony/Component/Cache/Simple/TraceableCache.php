@@ -36,20 +36,20 @@ class TraceableCache implements CacheInterface
     public function get($key, $default = null)
     {
         $miss = null !== $default && is_object($default) ? $default : $this->miss;
-        $event = $this->start(__FUNCTION__, compact('key', 'default'));
+        $event = $this->start(__FUNCTION__);
         try {
             $value = $this->pool->get($key, $miss);
         } finally {
             $event->end = microtime(true);
         }
-        if ($miss !== $value) {
+        if ($event->result[$key] = $miss !== $value) {
             ++$event->hits;
         } else {
             ++$event->misses;
             $value = $default;
         }
 
-        return $event->result = $value;
+        return $value;
     }
 
     /**
@@ -57,9 +57,9 @@ class TraceableCache implements CacheInterface
      */
     public function has($key)
     {
-        $event = $this->start(__FUNCTION__, compact('key'));
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->has($key);
+            return $event->result[$key] = $this->pool->has($key);
         } finally {
             $event->end = microtime(true);
         }
@@ -70,9 +70,9 @@ class TraceableCache implements CacheInterface
      */
     public function delete($key)
     {
-        $event = $this->start(__FUNCTION__, compact('key'));
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->delete($key);
+            return $event->result[$key] = $this->pool->delete($key);
         } finally {
             $event->end = microtime(true);
         }
@@ -83,9 +83,9 @@ class TraceableCache implements CacheInterface
      */
     public function set($key, $value, $ttl = null)
     {
-        $event = $this->start(__FUNCTION__, compact('key', 'value', 'ttl'));
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->set($key, $value, $ttl);
+            return $event->result[$key] = $this->pool->set($key, $value, $ttl);
         } finally {
             $event->end = microtime(true);
         }
@@ -96,9 +96,23 @@ class TraceableCache implements CacheInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        $event = $this->start(__FUNCTION__, compact('values', 'ttl'));
+        $event = $this->start(__FUNCTION__);
+        $event->result['keys'] = array();
+
+        if ($values instanceof \Traversable) {
+            $values = function () use ($values, $event) {
+                foreach ($values as $k => $v) {
+                    $event->result['keys'][] = $k;
+                    yield $k => $v;
+                }
+            };
+            $values = $values();
+        } elseif (is_array($values)) {
+            $event->result['keys'] = array_keys($values);
+        }
+
         try {
-            return $event->result = $this->pool->setMultiple($values, $ttl);
+            return $event->result['result'] = $this->pool->setMultiple($values, $ttl);
         } finally {
             $event->end = microtime(true);
         }
@@ -110,7 +124,7 @@ class TraceableCache implements CacheInterface
     public function getMultiple($keys, $default = null)
     {
         $miss = null !== $default && is_object($default) ? $default : $this->miss;
-        $event = $this->start(__FUNCTION__, compact('keys', 'default'));
+        $event = $this->start(__FUNCTION__);
         try {
             $result = $this->pool->getMultiple($keys, $miss);
         } finally {
@@ -119,13 +133,13 @@ class TraceableCache implements CacheInterface
         $f = function () use ($result, $event, $miss, $default) {
             $event->result = array();
             foreach ($result as $key => $value) {
-                if ($miss !== $value) {
+                if ($event->result[$key] = $miss !== $value) {
                     ++$event->hits;
                 } else {
                     ++$event->misses;
                     $value = $default;
                 }
-                yield $key => $event->result[$key] = $value;
+                yield $key => $value;
             }
         };
 
@@ -150,9 +164,14 @@ class TraceableCache implements CacheInterface
      */
     public function deleteMultiple($keys)
     {
-        $event = $this->start(__FUNCTION__, compact('keys'));
+        $event = $this->start(__FUNCTION__);
+        if ($keys instanceof \Traversable) {
+            $keys = $event->result['keys'] = iterator_to_array($keys, false);
+        } else {
+            $event->result['keys'] = $keys;
+        }
         try {
-            return $event->result = $this->pool->deleteMultiple($keys);
+            return $event->result['result'] = $this->pool->deleteMultiple($keys);
         } finally {
             $event->end = microtime(true);
         }
@@ -167,11 +186,10 @@ class TraceableCache implements CacheInterface
         }
     }
 
-    private function start($name, array $arguments = null)
+    private function start($name)
     {
         $this->calls[] = $event = new TraceableCacheEvent();
         $event->name = $name;
-        $event->arguments = $arguments;
         $event->start = microtime(true);
 
         return $event;
@@ -181,7 +199,6 @@ class TraceableCache implements CacheInterface
 class TraceableCacheEvent
 {
     public $name;
-    public $arguments;
     public $start;
     public $end;
     public $result;

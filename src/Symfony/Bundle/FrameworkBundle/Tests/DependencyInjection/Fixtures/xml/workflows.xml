@@ -80,7 +80,7 @@
             </framework:transition>
         </framework:workflow>
 
-        <framework:workflow name="service_marking_store_workflow">
+        <framework:workflow name="service_marking_store_workflow" type="workflow">
             <framework:marking-store service="workflow_service"/>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place>first</framework:place>

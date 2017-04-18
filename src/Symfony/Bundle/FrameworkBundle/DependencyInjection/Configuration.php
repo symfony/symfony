@@ -230,7 +230,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->enumNode('type')
                                 ->values(array('workflow', 'state_machine'))
-                                ->defaultValue('workflow')
                             ->end()
                             ->arrayNode('marking_store')
                                 ->fixXmlConfig('argument')

@@ -198,14 +198,14 @@ Form
  * Using the "choices" option in ``CountryType``, ``CurrencyType``, ``LanguageType``,
    ``LocaleType``, and ``TimezoneType`` without overriding the ``choice_loader``
    option is now ignored.
-   
+
    Before:
    ```php
    $builder->add('custom_locales', LocaleType::class, array(
        'choices' => $availableLocales,
    ));
    ```
-   
+
    After:
    ```php
    $builder->add('custom_locales', LocaleType::class, array(
@@ -227,6 +227,8 @@ FrameworkBundle
    be done via the `cache:warmup` command.
 
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been removed. Use the `Request::setTrustedProxies()` method in your front controller instead.
+
+ * The default value of the `framework.workflows.[name].type` configuration options is now `state_machine`.
 
  * Support for absolute template paths has been removed.
 
@@ -415,7 +417,7 @@ Security
 
  * The `RoleInterface` has been removed. Extend the `Symfony\Component\Security\Core\Role\Role`
    class instead.
-   
+
  * The `LogoutUrlGenerator::registerListener()` method expects a 6th `$context = null` argument.
 
  * The `AccessDecisionManager::setVoters()` method has been removed. Pass the

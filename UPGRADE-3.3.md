@@ -138,14 +138,14 @@ Form
  * Using the "choices" option in ``CountryType``, ``CurrencyType``, ``LanguageType``,
    ``LocaleType``, and ``TimezoneType`` without overriding the ``choice_loader``
    option has been deprecated and will be ignored in 4.0.
-   
+
    Before:
    ```php
    $builder->add('custom_locales', LocaleType::class, array(
        'choices' => $availableLocales,
    ));
    ```
-   
+
    After:
    ```php
    $builder->add('custom_locales', LocaleType::class, array(
@@ -167,6 +167,9 @@ FrameworkBundle
    Warmup should be done via the `cache:warmup` command.
 
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been deprecated and will be removed in 4.0. Use the Request::setTrustedProxies() method in your front controller instead.
+
+ * Not defining the `type` option of the `framework.workflows.*` configuration entries is deprecated.
+   The default value will be `state_machine` in Symfony 4.0.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass` has been deprecated.
 

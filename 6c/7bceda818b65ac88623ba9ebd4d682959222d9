@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-13T18:19:38Z
+
+as pointed out in #21948 I think it makes sense to make this feature stateful and then it makes sense to support the check_path properly.
+
+another optional thing one could add to this is a check if the `Content-type` of the request is a json request .. something like:
+```
+if ('json' !== $request->getRequestFormat()) {
+    return;
+}
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-13T18:25:05Z
+
+@lsmith77 I just made the `check_path` optional, because people may effectively use this on every request.
+
+My personal use case is the following:
+a) Send username/password to e.g. /login_check (check_path) and if everything is ok, get a token in the success response (e.g. JWT)
+b) Pass the token for each request which requires one
+
+In this case, no need for both token and username/password authentications to be stateful. What I need is to be able to define the path that this listener should cover. I think most use cases for this listener will look like mine. But for those who want their users to resend username/password on each request, why not.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-13T18:28:48Z
+
+my point above regarding checking the content type is so that one could use `form_login` and `json_login` in parallel on the same routes and within the same firewall
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-13T18:42:27Z
+
+Sounds good to me. I think it should be discussed separately though, I'll open another PR if you don't do it before.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-13T19:42:00Z
+
+I propose to mark this feature as `@experimental` for now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-13T19:46:22Z
+
+If we talk about the whole `json_login` listener, I agree. Shall I do it here?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-13T20:17:06Z
+
+BTW the constructor signature now looks pretty much like that of `AbstractAuthenticationListener` .. with the main difference left is that the options I guess are not all the same.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-13T20:22:51Z
+
+@lsmith77 The abstract one offers a bit too much "stateful" stuff, its main methods couldn't be reused as is. I would keep this one standalone right now, flagging as experimental will give time to factorize as needed anyway.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-13T20:32:35Z
+
+sure .. thought it might mean the abstract class should maybe be refactored at some point
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-13T20:50:01Z
+
+@dunglas flag added in e94b5e4cee5d2129d0884ab24d20dd10a4cdda7e
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-15T11:09:01Z
+
+@phansys fixed.

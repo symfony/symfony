@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
-use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
 use Symfony\Component\Config\Loader\GlobFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -652,9 +652,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $container->merge($cont);
         }
 
-        if (PHP_VERSION_ID < 70000) {
-            $container->addCompilerPass(new AddClassesToCachePass($this));
-        }
+        $container->addCompilerPass(new AddAnnotatedClassesToCachePass($this));
         $container->addResource(new EnvParametersResource('SYMFONY__'));
 
         return $container;

@@ -255,6 +255,8 @@ HttpFoundation
 HttpKernel
 -----------
 
+ * The `Extension::addClassesToCompile()` method has been deprecated and will be removed in 4.0.
+
  * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array
    of pools indexed by name to the constructor instead.
 

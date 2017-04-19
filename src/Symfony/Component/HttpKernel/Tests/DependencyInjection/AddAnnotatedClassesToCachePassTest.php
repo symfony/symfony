@@ -12,18 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
 
-/**
- * @group legacy
- */
-class AddClassesToCachePassTest extends TestCase
+class AddAnnotatedClassesToCachePassTest extends TestCase
 {
     public function testExpandClasses()
     {
-        $r = new \ReflectionClass(AddClassesToCachePass::class);
+        $r = new \ReflectionClass(AddAnnotatedClassesToCachePass::class);
         $pass = $r->newInstanceWithoutConstructor();
-        $r = new \ReflectionMethod(AddClassesToCachePass::class, 'expandClasses');
+        $r = new \ReflectionMethod(AddAnnotatedClassesToCachePass::class, 'expandClasses');
         $r->setAccessible(true);
         $expand = $r->getClosure($pass);
 

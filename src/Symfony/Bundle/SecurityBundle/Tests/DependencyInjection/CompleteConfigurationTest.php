@@ -172,6 +172,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.access_listener',
             ),
         ), $listeners);
+
+        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
     }
 
     public function testFirewallRequestMatchers()
@@ -198,6 +200,14 @@ abstract class CompleteConfigurationTest extends TestCase
                 array('GET', 'POST'),
             ),
         ), $matchers);
+    }
+
+    public function testUserCheckerAliasIsRegistered()
+    {
+        $container = $this->getContainer('no_custom_user_checker');
+
+        $this->assertTrue($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'Alias for user checker is registered when no custom user checker service is registered'));
+        $this->assertFalse($container->getAlias('Symfony\Component\Security\Core\User\UserCheckerInterface')->isPublic());
     }
 
     public function testAccess()

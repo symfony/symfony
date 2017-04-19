@@ -245,10 +245,16 @@ class SecurityExtension extends Extension
         $arguments[1] = $userProviders;
         $definition->setArguments($arguments);
 
+        $customUserChecker = false;
+
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
         $map = $authenticationProviders = $contextRefs = array();
         foreach ($firewalls as $name => $firewall) {
+            if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
+                $customUserChecker = true;
+            }
+
             $configId = 'security.firewall.map.config.'.$name;
 
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
@@ -275,6 +281,11 @@ class SecurityExtension extends Extension
             ->getDefinition('security.authentication.manager')
             ->replaceArgument(0, new IteratorArgument($authenticationProviders))
         ;
+
+        // register an autowire alias for the UserCheckerInterface if no custom user checker service is configured
+        if (!$customUserChecker) {
+            $container->setAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', new Alias('security.user_checker', false));
+        }
     }
 
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, $configId)

@@ -68,7 +68,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $properties = array();
         foreach ($reflectionProperties as $reflectionProperty) {
             if ($reflectionProperty->isPublic()) {
-                $properties[$reflectionProperty->name] = true;
+                $properties[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }
 
@@ -84,10 +84,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             if (!$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
                 $propertyName = lcfirst($propertyName);
             }
-            $properties[$propertyName] = true;
+            $properties[$propertyName] = $propertyName;
         }
 
-        return array_keys($properties);
+        return array_values($properties);
     }
 
     /**

@@ -116,4 +116,8 @@ class Dummy extends ParentDummy
     public function getId()
     {
     }
+
+    public function get123()
+    {
+    }
 }

@@ -93,6 +93,6 @@ class TimezoneValidator extends ConstraintValidator
             }
         }
 
-        return $this->formatValue($value);
+        return $value;
     }
 }

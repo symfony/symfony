@@ -39,7 +39,11 @@ class ExceptionListener implements EventSubscriberInterface
 
         $error = $event->getError();
 
-        $this->logger->error('Error thrown while running command "{command}". Message: "{message}"', array('error' => $error, 'command' => $this->getInputString($event), 'message' => $error->getMessage()));
+        if (!$inputString = $this->getInputString($event)) {
+            return $this->logger->error('An error occurred while using the console. Message: "{message}"', array('error' => $error, 'message' => $error->getMessage()));
+        }
+
+        $this->logger->error('Error thrown while running command "{command}". Message: "{message}"', array('error' => $error, 'command' => $inputString, 'message' => $error->getMessage()));
     }
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
@@ -54,7 +58,11 @@ class ExceptionListener implements EventSubscriberInterface
             return;
         }
 
-        $this->logger->error('Command "{command}" exited with code "{code}"', array('command' => $this->getInputString($event), 'code' => $exitCode));
+        if (!$inputString = $this->getInputString($event)) {
+            return $this->logger->error('The console exited with code "{code}"', array('code' => $exitCode));
+        }
+
+        $this->logger->error('Command "{command}" exited with code "{code}"', array('command' => $inputString, 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()
@@ -67,11 +75,15 @@ class ExceptionListener implements EventSubscriberInterface
 
     private static function getInputString(ConsoleEvent $event)
     {
-        $commandName = $event->getCommand()->getName();
+        $commandName = $event->getCommand() ? $event->getCommand()->getName() : null;
         $input = $event->getInput();
 
         if (method_exists($input, '__toString')) {
-            return str_replace(array("'$commandName'", "\"$commandName\""), $commandName, (string) $input);
+            if ($commandName) {
+                return str_replace(array("'$commandName'", "\"$commandName\""), $commandName, (string) $input);
+            }
+
+            return (string) $input;
         }
 
         return $commandName;

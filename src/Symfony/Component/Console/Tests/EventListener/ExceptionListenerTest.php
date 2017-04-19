@@ -19,6 +19,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\EventListener\ExceptionListener;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,7 +38,22 @@ class ExceptionListenerTest extends TestCase
         ;
 
         $listener = new ExceptionListener($logger);
-        $listener->onConsoleError($this->getConsoleErrorEvent($exception, new ArgvInput(array('console.php', 'test:run', '--foo=baz', 'buzz')), 1));
+        $listener->onConsoleError($this->getConsoleErrorEvent($exception, new ArgvInput(array('console.php', 'test:run', '--foo=baz', 'buzz')), 1, new Command('test:run')));
+    }
+
+    public function testOnConsoleErrorWithNoCommandAndNoInputString()
+    {
+        $exception = new \RuntimeException('An error occurred');
+
+        $logger = $this->getLogger();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with('An error occurred while using the console. Message: "{message}"', array('error' => $exception, 'message' => 'An error occurred'))
+        ;
+
+        $listener = new ExceptionListener($logger);
+        $listener->onConsoleError($this->getConsoleErrorEvent($exception, new NonStringInput(), 1));
     }
 
     public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
@@ -109,9 +125,9 @@ class ExceptionListenerTest extends TestCase
         return $this->getMockForAbstractClass(LoggerInterface::class);
     }
 
-    private function getConsoleErrorEvent(\Exception $exception, InputInterface $input, $exitCode)
+    private function getConsoleErrorEvent(\Exception $exception, InputInterface $input, $exitCode, Command $command = null)
     {
-        return new ConsoleErrorEvent($input, $this->getOutput(), $exception, $exitCode, new Command('test:run'));
+        return new ConsoleErrorEvent($input, $this->getOutput(), $exception, $exitCode, $command);
     }
 
     private function getConsoleTerminateEvent(InputInterface $input, $exitCode)
@@ -122,5 +138,24 @@ class ExceptionListenerTest extends TestCase
     private function getOutput()
     {
         return $this->getMockBuilder(OutputInterface::class)->getMock();
+    }
+}
+
+class NonStringInput extends Input
+{
+    public function getFirstArgument()
+    {
+    }
+
+    public function hasParameterOption($values, $onlyParams = false)
+    {
+    }
+
+    public function getParameterOption($values, $default = false, $onlyParams = false)
+    {
+    }
+
+    public function parse()
+    {
     }
 }

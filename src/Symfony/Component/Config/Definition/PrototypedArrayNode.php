@@ -29,6 +29,8 @@ class PrototypedArrayNode extends ArrayNode
     protected $minNumberOfElements = 0;
     protected $defaultValue = array();
     protected $defaultChildren;
+    protected $preserveKeys = false;
+
     /**
      * @var NodeInterface[] An array of the prototypes of the simplified value children
      */
@@ -83,6 +85,11 @@ class PrototypedArrayNode extends ArrayNode
     public function getKeyAttribute()
     {
         return $this->keyAttribute;
+    }
+
+    public function setPreserveKeys()
+    {
+        $this->preserveKeys = true;
     }
 
     /**
@@ -314,7 +321,7 @@ class PrototypedArrayNode extends ArrayNode
 
         foreach ($rightSide as $k => $v) {
             // prototype, and key is irrelevant, so simply append the element
-            if (null === $this->keyAttribute) {
+            if (null === $this->keyAttribute && false === $this->preserveKeys) {
                 $leftSide[] = $v;
                 continue;
             }

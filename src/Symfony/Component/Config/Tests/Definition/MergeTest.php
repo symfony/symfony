@@ -168,6 +168,49 @@ class MergeTest extends TestCase
         ), $tree->merge($a, $b));
     }
 
+    public function testPreserveKeys()
+    {
+        $tb = new TreeBuilder();
+
+        $tree = $tb
+            ->root('config', 'array')
+                ->children()
+                    ->arrayNode('append_elements')
+                        ->preserveKeys()
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $a = array(
+            'append_elements' => array(
+                'key1' => 'a',
+                'key2' => 'b',
+            ),
+        );
+
+        $b = array(
+            'append_elements' => array(
+                'key3' => 'c',
+                'key4' => 'd',
+            ),
+        );
+
+        $expected = array(
+            'append_elements' => array(
+                'key1' => 'a',
+                'key2' => 'b',
+                'key3' => 'c',
+                'key4' => 'd',
+            ),
+        );
+
+        $this->assertEquals($expected, $tree->merge($a, $b));
+    }
+
     public function testPrototypeWithoutAKeyAttribute()
     {
         $tb = new TreeBuilder();

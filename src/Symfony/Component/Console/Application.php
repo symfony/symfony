@@ -65,6 +65,7 @@ class Application
     private $name;
     private $version;
     private $catchExceptions = true;
+    private $catchErrors = false;
     private $autoExit = true;
     private $definition;
     private $helperSet;
@@ -152,7 +153,14 @@ class Application
             if (!$this->catchExceptions) {
                 throw $e;
             }
+        } catch (\Error $e) {
+            if (!$this->catchErrors) {
+                throw $e;
+            }
+            $e = new FatalThrowableError($e);
+        }
 
+        if (isset($e)) {
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderException($exception, $output->getErrorOutput());
             } else {
@@ -297,6 +305,22 @@ class Application
     public function setCatchExceptions($boolean)
     {
         $this->catchExceptions = (bool) $boolean;
+    }
+
+    /**
+     * @return bool Whether errors are caught or not during commands execution
+     */
+    public function areErrorsCaught()
+    {
+        return $this->catchErrors;
+    }
+
+    /**
+     * @param bool $boolean Whether to catch errors or not during commands execution
+     */
+    public function setCatchErrors($boolean)
+    {
+        $this->catchErrors = (bool) $boolean;
     }
 
     /**

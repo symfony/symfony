@@ -165,7 +165,7 @@ install:
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'" &&
               # Test the PhpUnit bridge on PHP 5.3, using the original phpunit script
               tfold src/Symfony/Bridge/PhpUnit \
-              "cd src/Symfony/Bridge/PhpUnit && wget https://phar.phpunit.de/phpunit-4.8.phar && phpenv global 5.3 && $COMPOSER_UP && php phpunit-4.8.phar"
+              "cd src/Symfony/Bridge/PhpUnit && wget https://phar.phpunit.de/phpunit-4.8.phar && phpenv global 5.3 && composer update --no-progress --ansi && php phpunit-4.8.phar"
           elif [[ $PHP = hhvm* ]]; then
               $PHPUNIT --exclude-group benchmark,intl-data
           else

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -102,10 +103,37 @@ class FormFactory implements FormFactoryInterface
             return $this->createNamedBuilder($property, 'text', $data, $options);
         }
 
-        $typeGuess = $guesser->guessType($class, $property);
-        $maxLengthGuess = $guesser->guessMaxLength($class, $property);
-        $requiredGuess = $guesser->guessRequired($class, $property);
-        $patternGuess = $guesser->guessPattern($class, $property);
+        $typeGuess = null;
+        $maxLengthGuess = null;
+        $requiredGuess = null;
+        $patternGuess = null;
+
+        if (!empty($options['property_path'])) {
+            $propertyPath = new PropertyPath($options['property_path']);
+            $subProperty = null;
+
+            foreach ($propertyPath as $i => $subProperty) {
+                if ($propertyPath->isIndex($i)) {
+                    continue;
+                }
+
+                $typeGuess = $guesser->guessType($class, $subProperty);
+
+                if ($typeGuess->getType() === 'Symfony\Bridge\Doctrine\Form\Type\EntityType') {
+                    $guessedOptions = $typeGuess->getOptions();
+                    $class = $guessedOptions['class'];
+                }
+            }
+
+            $maxLengthGuess = $guesser->guessMaxLength($class, $subProperty);
+            $requiredGuess = $guesser->guessRequired($class, $subProperty);
+            $patternGuess = $guesser->guessPattern($class, $subProperty);
+        } else {
+            $typeGuess = $guesser->guessType($class, $property);
+            $maxLengthGuess = $guesser->guessMaxLength($class, $property);
+            $requiredGuess = $guesser->guessRequired($class, $property);
+            $patternGuess = $guesser->guessPattern($class, $property);
+        }
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 

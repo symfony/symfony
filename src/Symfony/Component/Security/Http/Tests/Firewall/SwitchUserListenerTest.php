@@ -227,4 +227,43 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame('page=3&section=2', $this->request->server->get('QUERY_STRING'));
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $this->tokenStorage->getToken());
     }
+
+    public function testSwitchUserWithReplacedToken()
+    {
+        $user = new User('username', 'password', array());
+        $token = new UsernamePasswordToken($user, '', 'provider123', array('ROLE_FOO'));
+
+        $user = new User('replaced', 'password', array());
+        $replacedToken = new UsernamePasswordToken($user, '', 'provider123', array('ROLE_BAR'));
+
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+
+        $this->accessDecisionManager->expects($this->any())
+            ->method('decide')->with($token, array('ROLE_ALLOWED_TO_SWITCH'))
+            ->will($this->returnValue(true));
+
+        $this->userProvider->expects($this->any())
+            ->method('loadUserByUsername')->with('kuba')
+            ->will($this->returnValue($user));
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(SecurityEvents::SWITCH_USER,
+                $this->callback(function (SwitchUserEvent $event) use ($replacedToken, $user) {
+                    if ($user !== $event->getTargetUser()) {
+                        return false;
+                    }
+                    $event->setToken($replacedToken);
+
+                    return true;
+                }));
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener->handle($this->event);
+
+        $this->assertSame($replacedToken, $this->tokenStorage->getToken());
+    }
 }

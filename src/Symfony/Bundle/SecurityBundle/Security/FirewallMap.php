@@ -124,7 +124,7 @@ class _FirewallMap
             return array(array(), null);
         }
 
-        return $context->getListeners();
+        return array($context->getListeners(), $context->getExceptionListener());
     }
 
     /**

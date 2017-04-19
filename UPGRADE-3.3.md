@@ -306,7 +306,7 @@ SecurityBundle
 --------------
 
  * The `FirewallContext::getContext()` method has been deprecated and will be removed in 4.0.
-   Use the `getListeners()` method instead.
+   Use the `getListeners()` and/or `getExceptionListener()` method instead.
 
  * The `FirewallMap::$map` and `$container` properties have been deprecated and will be removed in 4.0.
 

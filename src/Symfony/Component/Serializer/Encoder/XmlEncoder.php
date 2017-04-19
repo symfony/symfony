@@ -113,7 +113,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
             unset($data['@xmlns:xml']);
 
-            if (empty($data)) {
+            if (!$data) {
                 return $this->parseXml($rootNode);
             }
 
@@ -262,7 +262,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $value = $this->parseXmlValue($node);
 
-        if (!count($data)) {
+        if (!$data) {
             return $value;
         }
 
@@ -477,22 +477,42 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     {
         if (is_array($val)) {
             return $this->buildXml($node, $val);
-        } elseif ($val instanceof \SimpleXMLElement) {
+        }
+
+        if ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
-        } elseif ($val instanceof \Traversable) {
+
+            return true;
+        }
+
+        if ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
-        } elseif (is_object($val)) {
+
+            return true;
+        }
+
+        if (is_object($val)) {
             return $this->selectNodeType($node, $this->serializer->normalize($val, $this->format, $this->context));
-        } elseif (is_numeric($val)) {
+        }
+
+        if (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
-        } elseif (is_string($val) && $this->needsCdataWrapping($val)) {
+        }
+
+        if (is_string($val) && $this->needsCdataWrapping($val)) {
             return $this->appendCData($node, $val);
-        } elseif (is_string($val)) {
+        }
+
+        if (is_string($val)) {
             return $this->appendText($node, $val);
-        } elseif (is_bool($val)) {
+        }
+
+        if (is_bool($val)) {
             return $this->appendText($node, (int) $val);
-        } elseif ($val instanceof \DOMNode) {
+        }
+
+        if ($val instanceof \DOMNode) {
             $child = $this->dom->importNode($val, true);
             $node->appendChild($child);
         }
@@ -509,9 +529,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     private function resolveXmlRootName(array $context = array())
     {
-        return isset($context['xml_root_node_name'])
-            ? $context['xml_root_node_name']
-            : $this->rootNodeName;
+        return isset($context['xml_root_node_name']) ? $context['xml_root_node_name'] : $this->rootNodeName;
     }
 
     /**

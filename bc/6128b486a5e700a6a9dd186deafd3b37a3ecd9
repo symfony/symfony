@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-18T15:17:20Z
+
+PR ready, see https://travis-ci.org/symfony/symfony/builds/223193892 for a failing-case output
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-18T15:21:48Z
+
+also embeds a rewrite of the .travis.yml to make it more readable hopefully
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-18T15:25:00Z
+
+It's really more readable like this! :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-18T15:26:18Z
+
+@nicolas-grekas amazing work! The Travis output looks gorgeous and it's useful again!!  Just asking: should we use "green" instead of "blue" for tests that pass? See the before/after comparison of the output:
+
+![before-after](https://cloud.githubusercontent.com/assets/73419/25138930/1dcd5cc2-245c-11e7-8710-8ce5ac664fc8.png)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-18T15:41:44Z
+
+@javiereguiluz As it's me that have done this color change, I can response you. Outputs of Composer and PHPUnit use a lot of green color. Highlight title fold with an other color looks me fine for readability.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-18T15:48:59Z
+
+@maidmaid my reasoning is: if I see some fold green I think *"great, everything is working; no need to open it"*.  If I see a blue fold I think: *"Mmmm, a fold ... let's open it to see if it worked or failed"*.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-18T16:09:59Z
+
+Here is using "travis green": https://travis-ci.org/symfony/symfony/jobs/223214166
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-19T09:42:53Z
+
+I love this, it looks really cool 😄🤘
+
+But should tests with skipped tests be marked yellow instead of green?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-19T10:08:06Z
+
+@sstok we don't know what a skipped test is from this pov: we just run a command and color it based on its exit code. I don't think we should make the code more specific about what is running (phpunit or whatever)
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-19T11:22:46Z
+
+OK, no problem 😉
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-19T12:00:16Z
+
+I reverted to streaming the output instead of buffering it so that we always have a chance to get the output (buffering has the potential to swallow useful info when a bad failure happens). This means the green/red coloring of the folding title is gone, thus blue is used. Replaced by the previously existing green/red OK/KO line at the end of each folded block.
+PR is ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-19T13:00:44Z
+
+Just pushed a last tweak: `-x` mode for folded processes, in order to help people reproduce a specific command on their local machine.

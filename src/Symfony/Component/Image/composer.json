@@ -1,0 +1,52 @@
+{
+    "name": "symfony/image",
+    "type": "library",
+    "description": "Symfony Image Component",
+    "keywords": [
+        "image manipulation",
+        "image processing",
+        "drawing",
+        "graphics"
+    ],
+    "homepage": "https://symfony.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bulat Shakirzyanov",
+            "email": "mallluhuct@gmail.com",
+            "homepage": "http://avalanche123.com"
+        },
+        {
+            "name": "Romain Neutron",
+            "email": "imprec@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "require-dev": {
+        "symfony/filesystem": "^2.8",
+        "symfony/image-fixtures": "dev-master@dev"
+    },
+    "suggest": {
+        "ext-gd": "to use the Symfony Image GD implementation",
+        "ext-imagick": "to use the Symfony Image Imagick implementation",
+        "ext-gmagick": "to use the Symfony Image Gmagick implementation"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Image\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.3-dev"
+        }
+    }
+}

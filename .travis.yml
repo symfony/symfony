@@ -11,6 +11,12 @@ addons:
         - language-pack-fr-base
         - ldap-utils
         - slapd
+        - libtiff-dev
+        - libjpeg-dev
+        - libdjvulibre-dev
+        - libwmf-dev
+        - pkg-config
+        - liblcms2-dev
 
 env:
     global:
@@ -26,16 +32,18 @@ matrix:
           group: edge
         - php: 5.5
         - php: 5.6
+          env: IMAGE_DRIVER=gmagick
         - php: 7.0
           env: deps=high
         - php: 7.1
-          env: deps=low
+          env: deps=low IMAGE_DRIVER=imagick
     fast_finish: true
 
 cache:
     directories:
         - .phpunit
         - php-$MIN_PHP
+        - cache
 
 services:
     - memcached
@@ -90,6 +98,8 @@ install:
     - if [[ ! $skip ]]; then composer update --no-suggest; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+    - if [[ $IMAGE_DRIVER = imagick ]]; then ./.github/imagick.sh $INI_FILE; fi
+    - if [[ $IMAGE_DRIVER = gmagick ]]; then ./.github/gmagick.sh $TRAVIS_PHP_VERSION $INI_FILE; fi
 
 script:
     - REPORT=' && echo -e "\\e[32mOK\\e[0m {}\\n\\n" || (echo -e "\\e[41mKO\\e[0m {}\\n\\n" && $(exit 1))'

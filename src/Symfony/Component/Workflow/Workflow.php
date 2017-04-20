@@ -116,7 +116,7 @@ class Workflow
      */
     public function apply($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject);
+        $transitions = $this->getAvailableTransitions($subject);
 
         // We can shortcut the getMarking method in order to boost performance,
         // since the "getEnabledTransitions" method already checks the Marking
@@ -130,19 +130,23 @@ class Workflow
                 continue;
             }
 
-            $applied = true;
+            if ($this->doCan($subject, $marking, $transition)) {
+                $applied = true;
 
-            $this->leave($subject, $transition, $marking);
+                $this->leave($subject, $transition, $marking);
 
-            $this->transition($subject, $transition, $marking);
+                $this->transition($subject, $transition, $marking);
 
-            $this->enter($subject, $transition, $marking);
+                $this->enter($subject, $transition, $marking);
 
-            $this->markingStore->setMarking($subject, $marking);
+                $this->markingStore->setMarking($subject, $marking);
 
-            $this->entered($subject, $transition, $marking);
+                $this->entered($subject, $transition, $marking);
 
-            $this->announce($subject, $transition, $marking);
+                $this->announce($subject, $transition, $marking);
+            } else {
+                $this->guarded($subject, $transition, $marking);
+            }
         }
 
         if (!$applied) {
@@ -161,16 +165,33 @@ class Workflow
      */
     public function getEnabledTransitions($subject)
     {
-        $enabled = array();
+        return $this->getTransitions($subject, true);
+    }
+
+    /**
+     * Returns all available transitions.
+     *
+     * @param object $subject A subject
+     *
+     * @return Transition[] All available transitions
+     */
+    public function getAvailableTransitions($subject)
+    {
+        return $this->getTransitions($subject, false);
+    }
+
+    private function getTransitions($subject, $onlyEnabled = true)
+    {
+        $transitions = array();
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {
-            if ($this->doCan($subject, $marking, $transition)) {
-                $enabled[] = $transition;
+            if (!$onlyEnabled || $this->doCan($subject, $marking, $transition)) {
+                $transitions[] = $transition;
             }
         }
 
-        return $enabled;
+        return $transitions;
     }
 
     public function getName()
@@ -290,6 +311,19 @@ class Workflow
         foreach ($transition->getTos() as $place) {
             $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
         }
+    }
+
+    private function guarded($subject, Transition $transition, Marking $marking)
+    {
+        if (null === $this->dispatcher) {
+            return;
+        }
+
+        $event = new Event($subject, $marking, $transition, $this->name);
+
+        $this->dispatcher->dispatch('workflow.guarded', $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.guarded', $this->name), $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.guarded.%s', $this->name, $transition->getName()), $event);
     }
 
     private function announce($subject, Transition $initialTransition, Marking $marking)

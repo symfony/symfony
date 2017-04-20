@@ -28,6 +28,9 @@ class JsonLoginFactory extends AbstractFactory
     {
         $this->addOption('username_path', 'username');
         $this->addOption('password_path', 'password');
+        $this->defaultFailureHandlerOptions = array();
+        $this->defaultSuccessHandlerOptions = array();
+        $this->options['require_previous_session'] = false;
     }
 
     /**
@@ -86,8 +89,8 @@ class JsonLoginFactory extends AbstractFactory
         $listenerId = $this->getListenerId();
         $listener = new ChildDefinition($listenerId);
         $listener->replaceArgument(3, $id);
-        $listener->replaceArgument(4, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
-        $listener->replaceArgument(5, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));
+        $listener->replaceArgument(4, isset($config['success_handler']) ? new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)) : null);
+        $listener->replaceArgument(5, isset($config['failure_handler']) ? new Reference($this->createAuthenticationFailureHandler($container, $id, $config)) : null);
         $listener->replaceArgument(6, array_intersect_key($config, $this->options));
 
         $listenerId .= '.'.$id;

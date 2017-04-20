@@ -1,0 +1,32 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    dunglas: { password: foo, roles: [ROLE_USER] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            anonymous: true
+            json_login:
+               check_path:    /chk
+               username_path: user.login
+               password_path: user.password
+               success_handler: json_login.success_handler
+               failure_handler: json_login.failure_handler
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }
+
+services:
+    json_login.success_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLoginBundle\Security\Http\JsonAuthenticationSuccessHandler
+    json_login.failure_handler:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLoginBundle\Security\Http\JsonAuthenticationFailureHandler

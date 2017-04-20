@@ -1144,7 +1144,7 @@ UPGRADE FROM 2.x to 3.0
            'http_digest' => array('secret' => '%secret%'),
        ),
    ));
-  ```
+   ```
 
  * The `AbstractVoter` class was removed. Instead, extend the new `Voter` class,
    introduced in 2.8, and move your voting logic to the to the `supports($attribute, $subject)`

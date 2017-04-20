@@ -27,10 +27,6 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         $this->services = array();
-        $this->normalizedIds = array(
-            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
-            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
-        );
         $this->methodMap = array(
             'service_from_anonymous_factory' => 'getServiceFromAnonymousFactoryService',
             'service_with_method_call_and_factory' => 'getServiceWithMethodCallAndFactoryService',

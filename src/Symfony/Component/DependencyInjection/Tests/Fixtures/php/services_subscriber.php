@@ -29,9 +29,6 @@ class ProjectServiceContainer extends Container
         $this->services = array();
         $this->normalizedIds = array(
             'autowired.symfony\\component\\dependencyinjection\\tests\\fixtures\\customdefinition' => 'autowired.Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
-            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
-            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\customdefinition' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition',
             'symfony\\component\\dependencyinjection\\tests\\fixtures\\testservicesubscriber' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber',
         );
         $this->methodMap = array(

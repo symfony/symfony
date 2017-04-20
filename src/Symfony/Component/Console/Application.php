@@ -124,6 +124,10 @@ class Application
         try {
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        if (isset($e)) {
             if (!$this->catchExceptions) {
                 throw $e;
             }

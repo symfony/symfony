@@ -28,8 +28,6 @@ class ProjectServiceContainer extends Container
     {
         $this->services = array();
         $this->normalizedIds = array(
-            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
-            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
             'symfony\\component\\dependencyinjection\\tests\\fixtures\\container33\\foo' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo',
         );
         $this->methodMap = array(

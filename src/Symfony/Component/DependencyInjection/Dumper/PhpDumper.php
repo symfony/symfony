@@ -938,17 +938,16 @@ EOF;
      */
     private function addNormalizedIds()
     {
-        if (!$normalizedIds = $this->container->getNormalizedIds()) {
-            return '';
-        }
-
-        $code = "        \$this->normalizedIds = array(\n";
+        $code = '';
+        $normalizedIds = $this->container->getNormalizedIds();
         ksort($normalizedIds);
         foreach ($normalizedIds as $id => $normalizedId) {
-            $code .= '            '.$this->export($id).' => '.$this->export($normalizedId).",\n";
+            if ($this->container->has($normalizedId)) {
+                $code .= '            '.$this->export($id).' => '.$this->export($normalizedId).",\n";
+            }
         }
 
-        return $code."        );\n";
+        return $code ? "        \$this->normalizedIds = array(\n".$code."        );\n" : '';
     }
 
     /**

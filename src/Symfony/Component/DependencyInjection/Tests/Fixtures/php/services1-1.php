@@ -28,10 +28,6 @@ class Container extends AbstractContainer
     public function __construct()
     {
         $this->services = array();
-        $this->normalizedIds = array(
-            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
-            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
-        );
 
         $this->aliases = array();
     }

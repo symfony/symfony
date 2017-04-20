@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-02-01T20:08:26Z
+
+@nicolas-grekas I'm not sure about this approach. Can you check it ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-01T20:09:14Z
+
+Naming the tab ``container logs`` looks weird to me, as you are not storing the logs of the container builder, but the errors being logged during the initialization phase.
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-02-02T12:43:06Z
+
+`App Bootstrapping` could be a better name., in fact that's exactly what's done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-05T20:17:28Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-03-07T07:30:45Z
+
+Sorry but recents updates on master have interactions with this PR and it look like it's not working anymore.
+Investigating on it...
+
+**Edit:**
+Here we are:
+First way to do that was to flag handled logs before monolog is active.
+
+My bad idea was to think that if there are some flagged logs, it mean that we are bootstrapping the app.
+
+But in some case, the `var/cache/dev/classes.php` will always trigger logs (flagged). Causing different number of logs than the previous request, and so, meaning that we have a new app bootstrapping.
+
+Difficulty is to detect if a new application bootstrapping have been made from the `LoggerDataCollector` without the kernel (or creating a new DataCollector).
+
+Investigating on it...
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-03-22T19:38:52Z
+
+I've updated my PR using a `BootstrappingLoggerLoader`.
+
+The idea is to associate the "app bootstrapping logs" with the container built using the md5_file.
+
+This way, it display at every request, the handled logs before monolog is active (called app bootstrapping logs).
+
+<img width="341" alt="capture d ecran 2017-03-29 a 13 53 44" src="https://cloud.githubusercontent.com/assets/1017746/24453200/32b77ad0-1487-11e7-855b-f3f1cc8a5d0f.png">
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-04-05T20:04:29Z
+
+I've updated this PR to implement full tests of `BootstrappingLoggerLoader`.
+
+I hope it will help other devs to update easily their Symfony version (finding deprecation and logs who rarely happen).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-07T07:01:13Z
+
+can you please rebase against master to remove merge commits in the current git history in this PR?
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-04-12T20:37:41Z
+
+App bootstrapping:
+<img width="505" alt="capture d ecran 2017-04-12 a 22 32 50" src="https://cloud.githubusercontent.com/assets/1017746/24978216/2623aa6a-1fd0-11e7-93e0-5176c8cef355.png">
+
+New request (without buildContainer):
+<img width="505" alt="capture d ecran 2017-04-12 a 22 33 15" src="https://cloud.githubusercontent.com/assets/1017746/24978215/26233b48-1fd0-11e7-838c-0b0d17646b16.png">
+
+Deprecations handled during the build container process are merged with "regular" depractions:
+<img width="1323" alt="capture d ecran 2017-04-12 a 22 33 33" src="https://cloud.githubusercontent.com/assets/1017746/24978217/2623f5b0-1fd0-11e7-9985-b4b163b980a7.png">
+
+New tab with container compiler informations:
+<img width="1309" alt="capture d ecran 2017-04-12 a 22 33 51" src="https://cloud.githubusercontent.com/assets/1017746/24978214/2622be52-1fd0-11e7-8103-dc539560cd19.png">
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-13T06:56:21Z
+
+Looks nice!
+Here is a patch proposal with a few cleanups, but more importantly with the use of VarDumper:
+https://github.com/nicolas-grekas/symfony/commit/7e442ac1df69ef79bae71602745641827f005d6f
+(the template still needs to be updated)
+we could also group "Container Compilation" lines per "class", what do you think?
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-04-14T10:11:07Z
+
+Here are the view updated using `LinkStub`, thanks to @nicolas-grekas
+Deprecations message:
+<img width="1085" alt="capture d ecran 2017-04-14 a 11 49 00" src="https://cloud.githubusercontent.com/assets/1017746/25040499/0abfec08-210a-11e7-9949-703f5cdb4233.png">
+
+Container compilation are ordered by class emitter:
+<img width="1092" alt="capture d ecran 2017-04-14 a 11 49 15" src="https://cloud.githubusercontent.com/assets/1017746/25040617/d373cd7c-210a-11e7-8d08-3417e7ffda7a.png">
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-14T12:59:45Z
+
+Also, the "Container Compilation" count needs a fix
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-17T13:46:47Z
+
+@ScullWM FYI I pushed on your branch on your fork, adding a 2nd commit + tweaking yours a bit to fine tune DX.
+
+Here is a screenshot, showing:
+- trace excerpts are collapsed by default now
+- boot time deprecations have their file+line dumped trace-like
+- parts of log messages between double-quotes are put in bold (all panels)
+- paths are dumped with ellipsed prefixes, and this prefix is now computed based on vendor+composer.json location
+- ellipsis have a "tail" section, see "twig/twig" in the screenshot for what it is
+
+![capture du 2017-04-17 18-48-24](https://cloud.githubusercontent.com/assets/243674/25095993/7be37990-239e-11e7-9e95-c0311ed73d69.png)
+
+![capture du 2017-04-17 15-45-36](https://cloud.githubusercontent.com/assets/243674/25090680/eeeee984-2384-11e7-8de9-16e94d7f5b1d.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-17T16:53:55Z
+
+(fabbot failures are false-positives in this case)

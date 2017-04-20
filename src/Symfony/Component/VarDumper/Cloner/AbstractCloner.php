@@ -79,6 +79,7 @@ abstract class AbstractCloner implements ClonerInterface
         'Symfony\Component\VarDumper\Exception\ThrowingCasterException' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castThrowingCasterException'),
         'Symfony\Component\VarDumper\Caster\TraceStub' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castTraceStub'),
         'Symfony\Component\VarDumper\Caster\FrameStub' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castFrameStub'),
+        'Symfony\Component\Debug\Exception\SilencedErrorContext' => array('Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castSilencedErrorContext'),
 
         'PHPUnit_Framework_MockObject_MockObject' => array('Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'),
         'Prophecy\Prophecy\ProphecySubjectInterface' => array('Symfony\Component\VarDumper\Caster\StubCaster', 'cutInternals'),

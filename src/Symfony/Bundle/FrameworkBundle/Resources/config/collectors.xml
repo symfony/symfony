@@ -32,6 +32,7 @@
             <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300" />
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument>%kernel.cache_dir%/%kernel.container_class%</argument>
         </service>
 
         <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector" public="false">

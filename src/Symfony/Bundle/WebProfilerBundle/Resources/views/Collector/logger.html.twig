@@ -124,6 +124,52 @@
                 </div>
             </div>
 
+            {% set compilerLogTotal = 0 %}
+            {% for logs in collector.compilerLogs %}
+                {% set compilerLogTotal = compilerLogTotal + logs|length %}
+            {% endfor %}
+            <div class="tab">
+                <h3 class="tab-title">Container Compilation<span class="badge">{{ compilerLogTotal }}</span></h3>
+
+                <div class="tab-content">
+                    {% if collector.compilerLogs is empty %}
+                        <div class="empty">
+                            <p>There are no compiler log messages.</p>
+                        </div>
+                    {% else %}
+                        <table class="logs">
+                            <thead>
+                                <tr>
+                                    <th class="full-width">Class</th>
+                                    <th>Messages</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for class, logs in collector.compilerLogs %}
+                                    <tr class="">
+                                        <td class="font-normal">
+                                            {% set context_id = 'context-compiler-' ~ loop.index %}
+
+                                             <a class="btn btn-link sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="{{ class }}">{{ class }}</a>
+
+                                             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                                <ul>
+                                                {% for log in logs %}
+                                                    <li>{{ profiler_dump_log(log.message) }}</li>
+                                                {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td class="font-normal text-right">{{ logs|length }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
     {% endif %}
 {% endblock %}
@@ -165,16 +211,16 @@
 
                     {% endif %}
 
-                    <td class="font-normal">{{ helper.render_log_message(category, loop.index, log, is_deprecation) }}</td>
+                    <td class="font-normal">{{ helper.render_log_message(category, loop.index, log) }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% endmacro %}
 
-{% macro render_log_message(category, log_index, log, is_deprecation = false) %}
-    {% if is_deprecation %}
-        {{ log.message }}
+{% macro render_log_message(category, log_index, log) %}
+    {% if log.context.exception.trace is defined %}
+        {{ profiler_dump_log(log.message, log.context) }}
 
         {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
 
@@ -182,7 +228,7 @@
              <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
 
             <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                {{ profiler_dump(log.context.exception['\0Exception\0trace'], maxDepth=2) }}
+                {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
             </div>
         </span>
     {% elseif log.context is defined and log.context is not empty %}
@@ -198,6 +244,6 @@
             </div>
         </span>
     {% else %}
-        {{ log.message }}
+        {{ profiler_dump_log(log.message) }}
     {% endif %}
 {% endmacro %}

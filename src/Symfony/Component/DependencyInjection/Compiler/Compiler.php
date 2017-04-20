@@ -114,6 +114,10 @@ class Compiler
      */
     public function log(CompilerPassInterface $pass, $message)
     {
+        if (false !== strpos($message, "\n")) {
+            $message = str_replace("\n", "\n".get_class($pass).': ', trim($message));
+        }
+
         $this->log[] = get_class($pass).': '.$message;
     }
 

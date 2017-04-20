@@ -623,6 +623,9 @@ pre.sf-dump .sf-dump-ellipsis {
     overflow: hidden;
     vertical-align: top;
 }
+pre.sf-dump .sf-dump-ellipsis+.sf-dump-ellipsis {
+    max-width: none;
+}
 pre.sf-dump code {
     display:inline;
     padding:0;
@@ -788,9 +791,20 @@ EOHTML
         $map = static::$controlCharsMap;
 
         if (isset($attr['ellipsis'])) {
+            $class = 'sf-dump-ellipsis';
+            if (isset($attr['ellipsis-type'])) {
+                $class = sprintf('"%s sf-dump-ellipsis-%s"', $class, $attr['ellipsis-type']);
+            }
             $label = esc(substr($value, -$attr['ellipsis']));
             $style = str_replace(' title="', " title=\"$v\n", $style);
-            $v = sprintf('<span class=sf-dump-ellipsis>%s</span>%s', substr($v, 0, -strlen($label)), $label);
+            $v = sprintf('<span class=%s>%s</span>', $class, substr($v, 0, -strlen($label)));
+
+            if (!empty($attr['ellipsis-tail'])) {
+                $tail = strlen(esc(substr($value, -$attr['ellipsis'], $attr['ellipsis-tail'])));
+                $v .= sprintf('<span class=sf-dump-ellipsis>%s</span>%s', substr($label, 0, $tail), substr($label, $tail));
+            } else {
+                $v .= $label;
+            }
         }
 
         $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {

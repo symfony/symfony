@@ -643,7 +643,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         foreach ($container->getAutomaticInstanceofDefinitions() as $interface => $childDefinition) {
             if (isset($this->automaticInstanceofDefinitions[$interface])) {
-                throw new InvalidArgumentException(sprintf('%s has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.', $interface));
+                throw new InvalidArgumentException(sprintf('"%s" has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.', $interface));
             }
 
             $this->automaticInstanceofDefinitions[$interface] = $childDefinition;

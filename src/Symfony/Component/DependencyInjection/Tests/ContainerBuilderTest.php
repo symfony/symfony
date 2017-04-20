@@ -578,7 +578,7 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage AInterface has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.
+     * @expectedExceptionMessage "AInterface" has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.
      */
     public function testMergeThrowsExceptionForDuplicateAutomaticInstanceofDefinitions()
     {

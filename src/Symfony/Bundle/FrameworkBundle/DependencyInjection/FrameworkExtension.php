@@ -13,30 +13,49 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 
@@ -224,6 +243,45 @@ class FrameworkExtension extends Extension
             // Added explicitly so that we don't rely on the class map being dumped to make it work
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
+
+        $container->registerForAutoconfiguration(Command::class)
+            ->addTag('console.command');
+        $container->registerForAutoconfiguration(ResourceCheckerInterface::class)
+            ->addTag('config_cache.resource_checker');
+        $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
+            ->addTag('container.service_subscriber');
+        $container->registerForAutoconfiguration(AbstractController::class)
+            ->addTag('controller.service_arguments');
+        $container->registerForAutoconfiguration(Controller::class)
+            ->addTag('controller.service_arguments');
+        $container->registerForAutoconfiguration(DataCollectorInterface::class)
+            ->addTag('data_collector');
+        $container->registerForAutoconfiguration(FormTypeInterface::class)
+            ->addTag('form.type');
+        $container->registerForAutoconfiguration(FormTypeGuesserInterface::class)
+            ->addTag('form.type_guesser');
+        $container->registerForAutoconfiguration(CacheClearerInterface::class)
+            ->addTag('kernel.cache_clearer');
+        $container->registerForAutoconfiguration(CacheWarmerInterface::class)
+            ->addTag('kernel.cache_warmer');
+        $container->registerForAutoconfiguration(EventSubscriberInterface::class)
+            ->addTag('kernel.event_subscriber');
+        $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
+            ->addTag('property_info.list_extractor');
+        $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
+            ->addTag('property_info.type_extractor');
+        $container->registerForAutoconfiguration(PropertyDescriptionExtractorInterface::class)
+            ->addTag('property_info.description_extractor');
+        $container->registerForAutoconfiguration(PropertyAccessExtractorInterface::class)
+            ->addTag('property_info.access_extractor');
+        $container->registerForAutoconfiguration(EncoderInterface::class)
+            ->addTag('serializer.encoder');
+        $container->registerForAutoconfiguration(NormalizerInterface::class)
+            ->addTag('serializer.normalizer');
+        $container->registerForAutoconfiguration(ConstraintValidatorInterface::class)
+            ->addTag('validator.constraint_validator');
+        $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
+            ->addTag('validator.initializer');
 
         if (PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(

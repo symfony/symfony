@@ -567,6 +567,16 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('anonymous_services_in_parameters.yml');
     }
+
+    public function testAutoConfigureInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_autoconfigure.yml');
+
+        $this->assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
+        $this->assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
+    }
 }
 
 interface FooInterface

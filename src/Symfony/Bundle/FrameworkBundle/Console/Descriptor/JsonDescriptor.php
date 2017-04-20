@@ -222,6 +222,7 @@ class JsonDescriptor extends Descriptor
             'shared' => $definition->isShared(),
             'abstract' => $definition->isAbstract(),
             'autowire' => $definition->isAutowired(),
+            'autoconfigure' => $definition->isAutoconfigured(),
         );
 
         foreach ($definition->getAutowiringTypes(false) as $autowiringType) {

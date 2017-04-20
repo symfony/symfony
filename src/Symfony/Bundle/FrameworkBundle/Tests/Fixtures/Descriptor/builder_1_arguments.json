@@ -8,6 +8,7 @@
             "shared": true,
             "abstract": true,
             "autowire": false,
+            "autoconfigure": false,
             "arguments": [
                 {
                     "type": "service",
@@ -22,6 +23,7 @@
                     "shared": true,
                     "abstract": false,
                     "autowire": false,
+                    "autoconfigure": false,
                     "arguments": [
                         "arg1",
                         "arg2"
@@ -43,6 +45,7 @@
                         "shared": true,
                         "abstract": false,
                         "autowire": false,
+                        "autoconfigure": false,
                         "arguments": [],
                         "file": null,
                         "tags": []

@@ -180,6 +180,9 @@ class XmlFileLoader extends FileLoader
         if ($defaultsNode->hasAttribute('inherit-tags')) {
             $defaults['inherit-tags'] = XmlUtils::phpize($defaultsNode->getAttribute('inherit-tags'));
         }
+        if ($defaultsNode->hasAttribute('autoconfigure')) {
+            $defaults['autoconfigure'] = XmlUtils::phpize($defaultsNode->getAttribute('autoconfigure'));
+        }
 
         return $defaults;
     }
@@ -229,6 +232,9 @@ class XmlFileLoader extends FileLoader
             if (isset($defaults['autowire'])) {
                 $definition->setAutowired($defaults['autowire']);
             }
+            if (isset($defaults['autoconfigure'])) {
+                $definition->setAutoconfigured($defaults['autoconfigure']);
+            }
 
             $definition->setChanges(array());
         }
@@ -246,6 +252,10 @@ class XmlFileLoader extends FileLoader
 
         if ($value = $service->getAttribute('autowire')) {
             $definition->setAutowired(XmlUtils::phpize($value));
+        }
+
+        if ($value = $service->getAttribute('autoconfigure')) {
+            $definition->setAutoconfigured(XmlUtils::phpize($value));
         }
 
         if ($files = $this->getChildren($service, 'file')) {

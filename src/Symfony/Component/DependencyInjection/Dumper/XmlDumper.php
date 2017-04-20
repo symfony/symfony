@@ -205,6 +205,10 @@ class XmlDumper extends Dumper
             $service->appendChild($autowiringType);
         }
 
+        if ($definition->isAutoconfigured()) {
+            $service->setAttribute('autoconfigure', 'true');
+        }
+
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
 

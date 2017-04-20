@@ -19,13 +19,13 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * SecurityExtension.
@@ -109,6 +109,9 @@ class SecurityExtension extends Extension
         if (isset($config['acl'])) {
             $this->aclLoad($config['acl'], $container);
         }
+
+        $container->registerForAutoconfiguration(VoterInterface::class)
+            ->addTag('security.voter');
 
         if (PHP_VERSION_ID < 70000) {
             // add some required classes for compilation

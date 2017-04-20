@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveTagsInheritancePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveInstanceofConditionalsPassTest extends TestCase
@@ -29,7 +30,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
-        $parent = 'instanceof.'.parent::class.'.foo';
+        $parent = 'instanceof.'.parent::class.'.0.foo';
         $def = $container->getDefinition('foo');
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertInstanceof(ChildDefinition::class, $def);
@@ -105,5 +106,52 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertTrue($def->isAutowired());
         $this->assertTrue($def->isLazy());
         $this->assertTrue($def->isShared());
+    }
+
+    public function testProcessUsesAutomaticInstanceofDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('normal_service', self::class);
+        $def->setInstanceofConditionals(array(
+            parent::class => (new ChildDefinition(''))
+                ->addTag('local_instanceof_tag')
+                ->setFactory('locally_set_factory'),
+        ));
+        $def->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(parent::class)
+            ->addTag('automatic_instanceof_tag')
+            ->setAutowired(true)
+            ->setFactory('automatically_set_factory');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveTagsInheritancePass())->process($container);
+        (new ResolveDefinitionTemplatesPass())->process($container);
+
+        $def = $container->getDefinition('normal_service');
+        // autowired thanks to the automatic instanceof
+        $this->assertTrue($def->isAutowired());
+        // factory from the specific instanceof overrides global one
+        $this->assertEquals('locally_set_factory', $def->getFactory());
+        // tags are merged, the locally set one is first
+        $this->assertSame(array('local_instanceof_tag' => array(array()), 'automatic_instanceof_tag' => array(array())), $def->getTags());
+    }
+
+    public function testProcessDoesNotUseAutomaticInstanceofDefinitionsIfNotEnabled()
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('normal_service', self::class);
+        $def->setInstanceofConditionals(array(
+            parent::class => (new ChildDefinition(''))
+                ->addTag('foo_tag'),
+        ));
+        $container->registerForAutoconfiguration(parent::class)
+            ->setAutowired(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveDefinitionTemplatesPass())->process($container);
+
+        $def = $container->getDefinition('normal_service');
+        // no automatic_tag, it was not enabled on the Definition
+        $this->assertFalse($def->isAutowired());
     }
 }

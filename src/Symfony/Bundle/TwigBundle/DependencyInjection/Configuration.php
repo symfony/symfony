@@ -32,12 +32,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('twig');
 
-        $rootNode
-            ->children()
-                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
-            ->end()
-        ;
-
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);

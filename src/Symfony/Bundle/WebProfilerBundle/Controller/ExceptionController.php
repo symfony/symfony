@@ -105,7 +105,7 @@ class ExceptionController
 
     protected function getTemplate()
     {
-        return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
+        return '@ErrorPage/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
     }
 
     // to be removed when the minimum required version of Twig is >= 2.0

@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Bundle\ErrorPageBundle\ErrorPageBundle;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\FormLoginBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -18,5 +19,6 @@ return array(
     new FrameworkBundle(),
     new SecurityBundle(),
     new TwigBundle(),
+    new ErrorPageBundle(),
     new FormLoginBundle(),
 );

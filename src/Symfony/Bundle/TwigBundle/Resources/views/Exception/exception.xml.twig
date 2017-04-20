@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="{{ _charset }}" ?>
-
-<error code="{{ status_code }}" message="{{ status_text }}">
-{% for e in exception.toarray %}
-    <exception class="{{ e.class }}" message="{{ e.message }}">
-{{ include('@Twig/Exception/traces.xml.twig', { exception: e }, with_context = false) }}
-    </exception>
-{% endfor %}
-</error>

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * Error pages separated into ErrorPageBundle
+
 3.3.0
 -----
 

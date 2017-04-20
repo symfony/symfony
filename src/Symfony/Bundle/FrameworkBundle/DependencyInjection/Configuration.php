@@ -227,6 +227,7 @@ class Configuration implements ConfigurationInterface
                                     ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                                     ->prototype('scalar')->end()
                                 ->end()
+                                ->scalarNode('host')->end()
                             ->end()
                         ->end()
                     ->end()

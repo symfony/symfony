@@ -384,7 +384,7 @@ class FrameworkExtension extends Extension
         if ($this->isConfigEnabled($container, $config['matcher'])) {
             if (isset($config['matcher']['service'])) {
                 $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
-            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
+            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips']) || isset($config['matcher']['host'])) {
                 $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
                 $definition->setPublic(false);
 
@@ -398,6 +398,10 @@ class FrameworkExtension extends Extension
 
                 if (isset($config['matcher']['path'])) {
                     $definition->addMethodCall('matchPath', array($config['matcher']['path']));
+                }
+
+                if (isset($config['matcher']['host'])) {
+                    $definition->addMethodCall('matchHost', array($config['matcher']['host']));
                 }
             }
         }

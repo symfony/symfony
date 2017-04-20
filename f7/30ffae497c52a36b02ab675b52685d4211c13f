@@ -1,0 +1,201 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-03-31T11:39:09Z
+
+Would it be possible for 3rd party bundles to extend this functionality? Say my Bundle has an interface that works with a tag as well, it would be very nice for developers to automatically have the tags.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-03-31T11:58:41Z
+
+@iltar absolutely - and for that exact reason - auto-tagging by interface for a tag introduced by a third-party bundle :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-01T11:31:02Z
+
+This is ready! I added a note about an issue with the (already-merged) `instanceof` behavior and tags, which prevents us from adding a few *more* automatic tags. We can/should work that out over the next month.
+
+I would *love* to sneak this in for 3.3 - the current `_instanceof` lacks the DX it's meant to help! :).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-03T21:09:59Z
+
+I really like this proposal! Just some ideas to go further:
+
+Why putting `auto_configure_instanceof` as a child of the `_defaults` key? It's not really a default. What do you think of:
+
+```yaml
+services:
+  _auto_instanceof: true
+  # ...
+```
+
+And I wonder if this approach should not totally replace the actual `_instanceof` key? In my experience, `_instanceof` sections in config files rapidly get ugly, hard to read and to debug.
+In most cases, such mappings should be provided by bundles. Sometimes globally for an app. But I struggle to find a valid use case to do it in a specific config file. Doing it programmatically in bundles or in the app's kernel as you suggest looks more elegant to me. It's an advanced feature, and people will not have to deal often with it.
+In the same time, removing the support for config files will ease the maintenance.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-03T21:13:15Z
+
+Btw, ActionBundle only allows to configure the tag/interface mapping globally and having the ability to do it per file has never been requested.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-04T09:58:21Z
+
+👍 for
+```
+services:
+  _auto_instanceof: true
+  # ...
+```
+
+Instead of the defaults.
+
+About the replacing of the `_instanceof`, I'm not fully sure 🤔 we can't remove it now because we are already in feature freeze. And I'm actually using this 😅 but for the future it would make usage much more powerful 👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-04T10:06:31Z
+
+> we can't remove it now because we are already in feature freeze
+
+The feature freeze is exactly for this kind of fine tuning :)
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-04T10:09:35Z
+
+OK 🙂 https://imgflip.com/i/1mncy0
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-04T15:06:33Z
+
+Having the option in `_defaults` is relevant to me. It makes it conceptually aligned with the fact that this is a per-definition setting, which can be enabled on a file-by-file basis thanks to `_defaults`, but can also be *disabled* case-by-case.
+
+About the name, what about just using `autoconfigure`?
+```yaml
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-06T15:38:58Z
+
+I will still update from your comments and finish this - I think this is an easy and big win that makes the new `instanceof` work well. But, I'm waiting for #22294, which will affect the code in this one a bunch :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-11T17:35:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-12T16:42:54Z
+
+This is ready to go! The configuration is now called `instanceof` and I auto-tagged all tags that make sense (using `UnusedTagsPass` as a guide) - even if they are a rarely-used tag (so that we're consistent).
+
+As we've mentioned in a few other places, this makes it more likely that a tag will be applied to a service twice, but in #22398 I illustrate how the tags are already added in a specific order so that compiler passes can handle (de-dup) this situation. In #22396 (and related changes that are needed to 3.2, once that's merged up), we're fixing individual compiler passes that may not handle multiple tags gracefully yet. Most already handle them perfectly (because multi tags was always a valid situation).
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-12T18:42:09Z
+
+Changes made!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-12T19:42:26Z
+
+Updated again: the PR description accurately explains the feature.
+
+Most recent change is that:
+
+A) If you call `ContainerBuilder::registerForAutoconfiguration()` multiple times, you receive the same `ChildDefinition` each time, allowing you to edit it directly. This is an edge-case, but would allow the end-user to have full control over the autoconfig for a specific instance (e.g. via a compiler pass)
+
+B) In `ContainerBuilder::merge()`, if the same interface has been autoconfigured, we throw an exception. This is mainly to prevent 2 DI extensions from modifying the *same* interface... which is a problem because execution order isn't guaranteed. Configuring 2 instances is still totally possible, you just need to do it in a compiler pass (but probably shouldn't be done).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-13T10:04:00Z
+
+Test failures are unrelated - will be fixed by #22414
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-13T10:41:10Z
+
+@weaverryan please check other tags to see whether they have required attributes. I don't remember it for all of them.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-13T10:59:20Z
+
+I just re-audited all the tags: there were a few others that needed to be removed (unfortunately) because they have required attributes.
+
+I also think there are more tags hiding that could be applied. I used `UnusedTagsPass` as my guide, but what about `property_info.list_extractor`, `property_info.type_extractor` or `cache.pool`? I think `UnusedTagsPass` doesn't have everything...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-13T11:11:40Z
+
+I can answer for `cache.pool`: there is no autoconf to do for them. The tag is not linked to some behavior but to constructor wiring, so not "instanceof" related.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-13T11:12:09Z
+
+Sorry for the noise - I think I've got them all now.
+
+This is ready to go!
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-13T12:46:21Z
+
+> I think UnusedTagsPass doesn't have everything...
+
+@weaverryan I think this is totally possible. The pass might have been forgotten when adding new tags after it was introduced in Symfony.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-13T13:22:12Z
+
+This is ready again - tests passing `use` statements in `FrameworkExtension` re-ordered!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-16T11:24:02Z
+
+I just added one more autoconfigured tag: `controller.service_arguments` for `AbstractController`. If you're extending this, then your controller is registered as a service. And I think you should benefit from the argument autowiring automatically.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-17T10:18:44Z
+
+After talking with Nicolas, I just added `controller.service_arguments` also to `Controller`. It's actually 100% valid to register your class as a service but extend `\Controller`. In fact, everything 100% works, the only difference is that those classes have access to `$this->container`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-17T17:10:02Z
+
+We could also add setters to the list, based on "Aware" interfaces (or traits in fact):
+- LoggerAwareInterface => `setLogger(new Reference('logger'))`
+- ContainerAwareInterface  => `setContainer(new Reference('service_container'))`
+- EventManagerAwareInterface
+- RequestContextAwareInterface
+- DenormalizerAwareInterface
+- NormalizerAwareInterface
+- SerializerAwareInterface
+- InputAwareInterface
+- ObjectManagerAware => in DoctrineBundle?

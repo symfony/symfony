@@ -1,99 +1,102 @@
-.sf-reset .traces {
-    padding: 0 0 1em 1.5em;
-}
-.sf-reset .traces a {
-    font-size: 14px;
-}
-.sf-reset .traces abbr {
-    border-bottom-color: #AAA;
-    padding-bottom: 2px;
-}
-.sf-reset .traces li {
-    color: #222;
-    font-size: 14px;
-    padding: 5px 0;
-    list-style-type: decimal;
-    margin: 0 0 0 1em;
-}
-.sf-reset .traces li.selected {
-    background: rgba(255, 255, 153, 0.5);
-}
+.hidden-xs-down { display: none; }
+.block { display: block; }
+.hidden { display: none; }
+.nowrap { white-space: nowrap; }
+.newline { display: block; }
+.break-long-words { -ms-word-break: break-all; word-break: break-all; word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto; }
+.text-small { font-size: 12px !important; }
+.text-muted { color: #999; }
+.text-bold { font-weight: bold; }
+.empty { border: 4px dashed #E0E0E0; color: #999; margin: 1em 0; padding: .5em 2em; }
 
-.sf-reset .traces ol li {
-    font-size: 12px;
-    color: #777;
-}
-.sf-reset #logs .traces li.error {
-    color: #AA3333;
-}
-.sf-reset #logs .traces li.warning {
-    background: #FFCC00;
-}
-.sf-reset .trace {
-    border: 1px solid #DDD;
-    background: #FFF;
-    padding: 10px;
-    overflow: auto;
-    margin: 1em 0;
-}
-.sf-reset .trace code,
-#traces-text pre {
-    font-size: 13px;
-}
-.sf-reset .block-exception {
-    margin-bottom: 2em;
-    background-color: #FFF;
-    border: 1px solid #EEE;
-    padding: 28px;
-    word-wrap: break-word;
-    overflow: hidden;
-}
-.sf-reset .block-exception h1 {
-    font-size: 21px;
-    font-weight: normal;
-    margin: 0 0 12px;
-}
-.sf-reset .block-exception .linked {
-    margin-top: 1em;
-}
+.status-success { background: rgba(94, 151, 110, 0.3); }
+.status-warning { background: rgba(240, 181, 24, 0.3); }
+.status-error { background: rgba(176, 65, 62, 0.2); }
+.status-success td, .status-warning td, .status-error td { background: transparent; }
+tr.status-error td, tr.status-warning td { border-bottom: 1px solid #FAFAFA; border-top: 1px solid #FAFAFA; }
+.status-warning .colored { color: #A46A1F; }
+.status-error .colored  { color: #B0413E; }
 
-.sf-reset .block {
-    margin-bottom: 2em;
-}
-.sf-reset .block h2 {
-    font-size: 16px;
-}
-.sf-reset .block-exception div {
-    font-size: 14px;
-}
-.sf-reset .block-exception-detected .illustration-exception,
-.sf-reset .block-exception-detected .text-exception {
-    float: left;
-}
-.sf-reset .block-exception-detected .illustration-exception {
-    width: 110px;
-}
-.sf-reset .block-exception-detected .text-exception {
-    width: 650px;
-    margin-left: 20px;
-    padding: 30px 44px 24px 46px;
-    position: relative;
-}
-.sf-reset .text-exception .open-quote,
-.sf-reset .text-exception .close-quote {
-    font-family: Arial, Helvetica, sans-serif;
-    position: absolute;
-    color: #C9C9C9;
-    font-size: 8em;
-}
-.sf-reset .open-quote {
-    top: 0;
-    left: 0;
-}
-.sf-reset .close-quote {
-    bottom: -0.5em;
-    right: 50px;
-}
-.sf-reset .toggle {
-    vertical-align: middle;
+.sf-toggle { cursor: pointer; }
+.sf-toggle-content { -moz-transition: display .25s ease; -webkit-transition: display .25s ease; transition: display .25s ease; }
+.sf-toggle-content.sf-toggle-hidden { display: none; }
+.sf-toggle-content.sf-toggle-visible { display: block; }
+thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+.sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
+.sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
+
+.tab-navigation { margin: 0 0 1em 0; padding: 0; }
+.tab-navigation li { background: #FFF; border: 1px solid #DDD; color: #444; cursor: pointer; display: inline-block; font-size: 16px; margin: 0 0 0 -1px; padding: .5em .75em; z-index: 1; }
+.tab-navigation li:hover { background: #EEE; }
+.tab-navigation li.disabled { background: #F5F5F5; color: #999; }
+.tab-navigation li.active { background: #666; border-color: #666; color: #FAFAFA; z-index: 1100; }
+.tab-navigation li .badge { background-color: #F5F5F5; color: #777; display: inline-block; font-size: 14px; font-weight: bold; margin-left: 8px; min-width: 10px; padding: 1px 6px; text-align: center; }
+.tab-navigation li:hover .badge { background: #FAFAFA; color: #777; }
+.tab-navigation li.active .badge { background-color: #444; color: #FFF; }
+.tab-navigation li .badge.status-warning { background: #A46A1F; color: #FFF; }
+.tab-navigation li .badge.status-error { background: #B0413E; color: #FFF; }
+.tab-content > *:first-child { margin-top: 0; }
+
+header { background-color: #222; color: rgba(255, 255, 255, 0.75); font-size: 13px; height: 33px; line-height: 33px; padding: 0; }
+header .container { display: flex; justify-content: space-between; }
+.logo { flex: 1; font-size: 13px; font-weight: normal; margin: 0; padding: 0; }
+.logo svg { height: 18px; width: 18px; opacity: .8; vertical-align: -5px; }
+
+.help-link { margin-left: 15px; }
+.help-link a { color: inherit; }
+.help-link .icon svg { height: 15px; width: 15px; opacity: .7; vertical-align: -2px; }
+.help-link a:hover { color: #EEE; text-decoration: none; }
+.help-link a:hover svg { opacity: .9; }
+
+.exception-summary { background: #B0413E; border-bottom: 2px solid rgba(0, 0, 0, 0.1); border-top: 1px solid rgba(0, 0, 0, .3); flex: 0 0 auto; margin-bottom: 15px; }
+.exception-metadata { background: rgba(0, 0, 0, 0.1); padding: 7px 0; }
+.exception-metadata .container { display: flex; flex-direction: row; justify-content: space-between; }
+.exception-metadata h2 { color: rgba(255, 255, 255, 0.8); font-size: 13px; font-weight: 400; margin: 0; }
+.exception-http small { font-size: 13px; opacity: .7; }
+.exception-hierarchy { flex: 1; }
+.exception-hierarchy .icon { margin: 0 3px; opacity: .7; }
+.exception-hierarchy .icon svg { height: 13px; width: 13px; vertical-align: -2px; }
+
+.exception-message-wrapper { display: flex; align-items: flex-start; min-height: 70px; padding: 10px 0 8px; }
+.exception-message { flex-grow: 1; }
+.exception-message, .exception-message a { color: #FFF; font-size: 21px; font-weight: 400; margin: 0; }
+.exception-message.long { font-size: 18px; }
+.exception-message a { text-decoration: none; }
+.exception-message a:hover { text-decoration: underline; }
+
+.exception-illustration { flex-basis: 111px; flex-shrink: 0; height: 66px; margin-left: 15px; opacity: .7; }
+
+.trace + .trace { margin-top: 30px; }
+.trace-head { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+.trace-head .trace-class { color: #222; font-size: 18px; font-weight: bold; line-height: 1.3; margin: 0; position: relative; }
+.trace-head .trace-namespace { color: #999; display: block; font-size: 13px; }
+.trace-head .icon { position: absolute; right: 0; top: 0; }
+.trace-head .icon svg { height: 24px; width: 24px; }
+
+.trace-message { font-size: 14px; font-weight: normal; margin: .5em 0 0; }
+
+.trace-line { position: relative; padding-left: 36px; }
+.trace-line.sf-toggle:hover { background: #F5F5F5; }
+.trace-line a { color: #222; }
+.trace-line .icon { opacity: .4; position: absolute; left: 10px; top: 11px; }
+.trace-line .icon svg { height: 16px; width: 16px; }
+
+.trace-file-path, .trace-file-path a { margin-top: 3px; color: #999; color: #795da3; color: #B0413E; color: #222; font-size: 13px; }
+.trace-class { color: #B0413E; }
+.trace-type { padding: 0 2px; }
+.trace-method { color: #B0413E; color: #222; font-weight: bold; color: #B0413E; }
+.trace-arguments { color: #222; color: #999; font-weight: normal; color: #795da3; color: #777; padding-left: 2px; }
+
+.trace-code { background: #FFF; font-size: 12px; margin: 10px 0 2px; padding: 10px; }
+.trace-code ol { margin: 0; }
+.trace-code li { color: #969896; margin: 0; padding-left: 10px; }
+.trace-code li + li { margin-top: 10px; }
+.trace-code li.selected { background: #F8EEC7; padding: 3px 0 3px 10px; }
+.trace-code li code { color: #222; }
+
+.trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
+
+@media (min-width: 575px) {
+    .hidden-xs-down { display: initial; }
+    .help-link { margin-left: 30px; }
 }

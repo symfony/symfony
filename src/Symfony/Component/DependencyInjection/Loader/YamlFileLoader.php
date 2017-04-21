@@ -90,6 +90,7 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'factory' => 'factory',
     );
 
     private static $defaultsKeywords = array(
@@ -98,6 +99,7 @@ class YamlFileLoader extends FileLoader
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
+        'factory' => 'factory',
     );
 
     private $yamlParser;
@@ -401,6 +403,9 @@ class YamlFileLoader extends FileLoader
             }
             if (isset($defaults['autoconfigure'])) {
                 $definition->setAutoconfigured($defaults['autoconfigure']);
+            }
+            if (isset($defaults['factory'])) {
+                $definition->setFactory($this->parseCallable($defaults['factory'], 'factory', $id, $file));
             }
 
             $definition->setChanges(array());

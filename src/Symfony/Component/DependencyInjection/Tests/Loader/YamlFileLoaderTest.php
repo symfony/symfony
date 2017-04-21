@@ -595,6 +595,42 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($container->has('Bar'));
     }
 
+    public function testDefaultsWithFactory()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('factory_in_defaults.yml');
+
+        $definition = $container->getDefinition('Foo');
+        $this->assertSame(array('bar'), $definition->getArguments());
+        $factory = $definition->getFactory();
+        $this->assertCount(2, $factory);
+        $this->assertInstanceOf(Reference::class, $factory[0]);
+        $this->assertSame('default_factory', (string) $factory[0]);
+        $this->assertSame('foo', $factory[1]);
+    }
+
+    public function testInstanceOfWithFactory()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('factory_in_instanceof.yml');
+
+        $definition = $container->getDefinition(Foo::class);
+        $this->assertSame(array('bar'), $definition->getArguments());
+
+        $instanceof = $definition->getInstanceofConditionals();
+        $this->assertCount(1, $instanceof);
+        $this->assertArrayHasKey(FooInterface::class, $instanceof);
+
+        $interface = $instanceof[FooInterface::class];
+        $factory = $interface->getFactory();
+        $this->assertCount(2, $factory);
+        $this->assertInstanceOf(Reference::class, $factory[0]);
+        $this->assertSame('default_factory', (string) $factory[0]);
+        $this->assertSame('foo', $factory[1]);
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessageRegExp /Creating an alias using the tag "!service" is not allowed in ".+anonymous_services_alias\.yml"\./

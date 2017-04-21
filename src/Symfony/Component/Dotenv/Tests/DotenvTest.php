@@ -154,4 +154,24 @@ class DotenvTest extends TestCase
         $dotenv = new Dotenv();
         $dotenv->load(__DIR__);
     }
+
+    public function testServerSuperglobalIsNotOverriden()
+    {
+        $baseValue = $_SERVER['argc'];
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('argc' => 'whatever'));
+
+        $this->assertSame($baseValue, $_SERVER['argc']);
+    }
+
+    public function testEnvVarIsNotOverriden()
+    {
+        putenv('TEST_ENV_VAR=test_var');
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('TEST_ENV_VAR' => 'whatever'));
+
+        $this->assertSame('test_var', getenv('TEST_ENV_VAR'));
+    }
 }

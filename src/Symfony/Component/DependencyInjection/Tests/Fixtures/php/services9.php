@@ -321,12 +321,9 @@ class ProjectServiceContainer extends Container
     protected function getLazyContextService()
     {
         return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
-            yield 0 => 'foo';
-            yield 1 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
-            yield 2 => array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
-            yield 3 => true;
-            yield 4 => $this;
-        }, 5));
+            yield 'k1' => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+            yield 'k2' => $this;
+        }, 2));
     }
 
     /**

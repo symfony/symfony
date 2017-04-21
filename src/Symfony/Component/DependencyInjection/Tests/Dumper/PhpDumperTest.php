@@ -434,7 +434,7 @@ class PhpDumperTest extends TestCase
         $container->register('lazy_referenced', 'stdClass');
         $container
             ->register('lazy_context', 'LazyContext')
-            ->setArguments(array(new IteratorArgument(array('foo', new Reference('lazy_referenced'), 'k1' => array('foo' => 'bar'), true, 'k2' => new Reference('service_container')))))
+            ->setArguments(array(new IteratorArgument(array('k1' => new Reference('lazy_referenced'), 'k2' => new Reference('service_container')))))
         ;
         $container->compile();
 
@@ -450,24 +450,12 @@ class PhpDumperTest extends TestCase
         foreach ($lazyContext->lazyValues as $k => $v) {
             switch (++$i) {
                 case 0:
-                    $this->assertEquals(0, $k);
-                    $this->assertEquals('foo', $v);
+                    $this->assertEquals('k1', $k);
+                    $this->assertInstanceOf('stdCLass', $v);
                     break;
                 case 1:
-                    $this->assertEquals(1, $k);
-                    $this->assertInstanceOf('stdClass', $v);
-                    break;
-                case 2:
-                    $this->assertEquals('k1', $k);
-                    $this->assertEquals(array('foo' => 'bar'), $v);
-                    break;
-                case 3:
-                    $this->assertEquals(2, $k);
-                    $this->assertTrue($v);
-                    break;
-                case 4:
                     $this->assertEquals('k2', $k);
-                    $this->assertInstanceOf('\Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator', $v);
+                    $this->assertInstanceOf('Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator', $v);
                     break;
             }
         }

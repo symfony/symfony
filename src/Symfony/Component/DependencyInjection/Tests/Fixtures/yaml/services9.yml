@@ -112,7 +112,7 @@ services:
         factory: ['@factory_simple', getInstance]
     lazy_context:
         class: LazyContext
-        arguments: [!iterator [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']]
+        arguments: [!iterator {'k1': '@foo.baz', 'k2': '@service_container'}]
     lazy_context_ignore_invalid_ref:
         class: LazyContext
         arguments: [!iterator ['@foo.baz', '@?invalid']]

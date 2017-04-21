@@ -202,22 +202,20 @@ class PhpDumper extends Dumper
     /**
      * Generates Service local temp variables.
      *
-     * @param string $cId
-     * @param string $definition
+     * @param string     $cId
+     * @param Definition $definition
+     * @param array      $inlinedDefinitions
      *
      * @return string
      */
-    private function addServiceLocalTempVariables($cId, $definition)
+    private function addServiceLocalTempVariables($cId, Definition $definition, array $inlinedDefinitions)
     {
         static $template = "        \$%s = %s;\n";
 
-        $localDefinitions = array_merge(
-            array($definition),
-            $this->getInlinedDefinitions($definition)
-        );
+        array_unshift($inlinedDefinitions, $definition);
 
         $calls = $behavior = array();
-        foreach ($localDefinitions as $iDefinition) {
+        foreach ($inlinedDefinitions as $iDefinition) {
             $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior);
             $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior);
             $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior);
@@ -280,12 +278,13 @@ class PhpDumper extends Dumper
     /**
      * Generates the require_once statement for service includes.
      *
-     * @param string     $id         The service id
+     * @param string     $id
      * @param Definition $definition
+     * @param array      $inlinedDefinitions
      *
      * @return string
      */
-    private function addServiceInclude($id, $definition)
+    private function addServiceInclude($id, Definition $definition, array $inlinedDefinitions)
     {
         $template = "        require_once %s;\n";
         $code = '';
@@ -294,7 +293,7 @@ class PhpDumper extends Dumper
             $code .= sprintf($template, $this->dumpValue($file));
         }
 
-        foreach ($this->getInlinedDefinitions($definition) as $definition) {
+        foreach ($inlinedDefinitions as $definition) {
             if (null !== $file = $definition->getFile()) {
                 $code .= sprintf($template, $this->dumpValue($file));
             }
@@ -310,21 +309,20 @@ class PhpDumper extends Dumper
     /**
      * Generates the inline definition of a service.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
+     * @param array  $inlinedDefinitions
      *
      * @return string
      *
      * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
-    private function addServiceInlinedDefinitions($id, $definition)
+    private function addServiceInlinedDefinitions($id, array $inlinedDefinitions)
     {
         $code = '';
         $variableMap = $this->definitionVariables;
         $nbOccurrences = new \SplObjectStorage();
         $processed = new \SplObjectStorage();
-        $inlinedDefinitions = $this->getInlinedDefinitions($definition);
 
         foreach ($inlinedDefinitions as $definition) {
             if (false === $nbOccurrences->contains($definition)) {
@@ -375,14 +373,14 @@ class PhpDumper extends Dumper
     /**
      * Adds the service return statement.
      *
-     * @param string     $id         Service id
-     * @param Definition $definition
+     * @param string $id
+     * @param bool   $isSimpleInstance
      *
      * @return string
      */
-    private function addServiceReturn($id, $definition)
+    private function addServiceReturn($id, $isSimpleInstance)
     {
-        if ($this->isSimpleInstance($id, $definition)) {
+        if ($isSimpleInstance) {
             return "    }\n";
         }
 
@@ -394,13 +392,14 @@ class PhpDumper extends Dumper
      *
      * @param string     $id
      * @param Definition $definition
+     * @param bool       $isSimpleInstance
      *
      * @return string
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    private function addServiceInstance($id, Definition $definition)
+    private function addServiceInstance($id, Definition $definition, $isSimpleInstance)
     {
         $class = $definition->getClass();
 
@@ -414,18 +413,17 @@ class PhpDumper extends Dumper
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $simple = $this->isSimpleInstance($id, $definition);
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation = '';
 
         if (!$isProxyCandidate && $definition->isShared()) {
-            $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (!$simple) {
+            $instantiation = "\$this->services['$id'] = ".($isSimpleInstance ? '' : '$instance');
+        } elseif (!$isSimpleInstance) {
             $instantiation = '$instance';
         }
 
         $return = '';
-        if ($simple) {
+        if ($isSimpleInstance) {
             $return = 'return ';
         } else {
             $instantiation .= ' = ';
@@ -433,7 +431,7 @@ class PhpDumper extends Dumper
 
         $code = $this->addNewInstance($definition, $return, $instantiation, $id);
 
-        if (!$simple) {
+        if (!$isSimpleInstance) {
             $code .= "\n";
         }
 
@@ -500,20 +498,21 @@ class PhpDumper extends Dumper
     /**
      * Generates the inline definition setup.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
+     * @param array  $inlinedDefinitions
+     * @param bool   $isSimpleInstance
      *
      * @return string
      *
      * @throws ServiceCircularReferenceException when the container contains a circular reference
      */
-    private function addServiceInlinedDefinitionsSetup($id, Definition $definition)
+    private function addServiceInlinedDefinitionsSetup($id, array $inlinedDefinitions, $isSimpleInstance)
     {
         $this->referenceVariables[$id] = new Variable('instance');
 
         $code = '';
         $processed = new \SplObjectStorage();
-        foreach ($this->getInlinedDefinitions($definition) as $iDefinition) {
+        foreach ($inlinedDefinitions as $iDefinition) {
             if ($processed->contains($iDefinition)) {
                 continue;
             }
@@ -525,7 +524,7 @@ class PhpDumper extends Dumper
 
             // if the instance is simple, the return statement has already been generated
             // so, the only possible way to get there is because of a circular reference
-            if ($this->isSimpleInstance($id, $definition)) {
+            if ($isSimpleInstance) {
                 throw new ServiceCircularReferenceException($id, array($id));
             }
 
@@ -683,16 +682,19 @@ EOF;
             $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
         }
 
+        $inlinedDefinitions = $this->getInlinedDefinitions($definition);
+        $isSimpleInstance = $this->isSimpleInstance($id, $definition, $inlinedDefinitions);
+
         $code .=
-            $this->addServiceInclude($id, $definition).
-            $this->addServiceLocalTempVariables($id, $definition).
-            $this->addServiceInlinedDefinitions($id, $definition).
-            $this->addServiceInstance($id, $definition).
-            $this->addServiceInlinedDefinitionsSetup($id, $definition).
+            $this->addServiceInclude($id, $definition, $inlinedDefinitions).
+            $this->addServiceLocalTempVariables($id, $definition, $inlinedDefinitions).
+            $this->addServiceInlinedDefinitions($id, $inlinedDefinitions).
+            $this->addServiceInstance($id, $definition, $isSimpleInstance).
+            $this->addServiceInlinedDefinitionsSetup($id, $inlinedDefinitions, $isSimpleInstance).
             $this->addServiceProperties($id, $definition).
             $this->addServiceMethodCalls($id, $definition).
             $this->addServiceConfigurator($id, $definition).
-            $this->addServiceReturn($id, $definition)
+            $this->addServiceReturn($id, $isSimpleInstance)
         ;
 
         $this->definitionVariables = null;
@@ -1332,8 +1334,6 @@ EOF;
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument));
-            } elseif ($argument instanceof ArgumentInterface) {
-                $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument->getValues()));
             } elseif ($argument instanceof Definition) {
                 $definitions = array_merge(
                     $definitions,

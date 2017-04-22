@@ -505,7 +505,7 @@ class YamlFileLoaderTest extends TestCase
         $anonymous = $container->getDefinition((string) $args[0]);
         $this->assertEquals('Bar', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
-        $this->assertTrue($anonymous->isAutowired());
+        $this->assertFalse($anonymous->isAutowired());
 
         // Anonymous service in a callable
         $factory = $definition->getFactory();
@@ -518,7 +518,7 @@ class YamlFileLoaderTest extends TestCase
         $anonymous = $container->getDefinition((string) $factory[0]);
         $this->assertEquals('Quz', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
-        $this->assertFalse($anonymous->isAutowired());
+        $this->assertTrue($anonymous->isAutowired());
     }
 
     public function testAnonymousServicesInInstanceof()
@@ -532,6 +532,9 @@ class YamlFileLoaderTest extends TestCase
         $instanceof = $definition->getInstanceofConditionals();
         $this->assertCount(3, $instanceof);
         $this->assertArrayHasKey('DummyInterface', $instanceof);
+        $this->assertArrayHasKey('Quz', $instanceof);
+        $this->assertFalse($instanceof['Quz']->isAutowired());
+        $this->assertFalse($instanceof['DummyInterface']->isAutowired());
 
         $args = $instanceof['DummyInterface']->getProperties();
         $this->assertCount(1, $args);
@@ -541,9 +544,20 @@ class YamlFileLoaderTest extends TestCase
         $anonymous = $container->getDefinition((string) $args['foo']);
         $this->assertEquals('Anonymous', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
+        $this->assertTrue($anonymous->isAutowired());
         $this->assertEmpty($anonymous->getInstanceofConditionals());
 
         $this->assertFalse($container->has('Bar'));
+
+        $factory = $definition->getFactory();
+        $this->assertInternalType('array', $factory);
+        $this->assertInstanceOf(Reference::class, $factory[0]);
+        $this->assertTrue($container->has((string) $factory[0]));
+        $this->assertEquals('createDummy', $factory[1]);
+
+        $anonymous = $container->getDefinition((string) $factory[0]);
+        $this->assertTrue($anonymous->isAutowired());
+        $this->assertCount(3, $anonymous->getInstanceofConditionals());
     }
 
     /**

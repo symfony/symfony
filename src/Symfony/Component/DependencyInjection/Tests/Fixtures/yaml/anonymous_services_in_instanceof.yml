@@ -2,7 +2,7 @@ services:
     _instanceof:
         # Ensure previous conditionals aren't applied on anonymous services
         Quz:
-            autowire: true
+            autowire: false
 
         DummyInterface:
             properties:
@@ -10,6 +10,10 @@ services:
 
         # Ensure next conditionals are not considered as services
         Bar:
-            autowire: true
+            autowire: false
 
-    Dummy: ~
+    _defaults:
+        autowire: true
+
+    Dummy:
+        factory: [ !service { class: Foo }, createDummy ]

@@ -129,7 +129,7 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($content['parameters'] as $key => $value) {
-                $this->container->setParameter($key, $this->resolveServices($value, $resource, true));
+                $this->container->setParameter($key, $this->resolveServices($value, $resource, array(), true));
             }
         }
 
@@ -143,6 +143,7 @@ class YamlFileLoader extends FileLoader
             $this->parseDefinitions($content, $resource);
         } finally {
             $this->instanceof = array();
+            $this->isLoadingInstanceof = false;
         }
     }
 
@@ -205,6 +206,8 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "services" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
+        $defaults = $this->parseDefaults($content, $file);
+
         if (isset($content['services']['_instanceof'])) {
             $instanceof = $content['services']['_instanceof'];
             unset($content['services']['_instanceof']);
@@ -221,12 +224,11 @@ class YamlFileLoader extends FileLoader
                 if (is_string($service) && 0 === strpos($service, '@')) {
                     throw new InvalidArgumentException(sprintf('Type definition "%s" cannot be an alias within "_instanceof" in %s. Check your YAML syntax.', $id, $file));
                 }
-                $this->parseDefinition($id, $service, $file, array());
+                $this->parseDefinition($id, $service, $file, $defaults);
             }
         }
 
         $this->isLoadingInstanceof = false;
-        $defaults = $this->parseDefaults($content, $file);
         foreach ($content['services'] as $id => $service) {
             $this->parseDefinition($id, $service, $file, $defaults);
         }
@@ -317,6 +319,11 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefinition($id, $service, $file, array $defaults)
     {
+        $anonymousDefaults = $defaults;
+        if ($this->isLoadingInstanceof) {
+            $defaults = array();
+        }
+
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
             @trigger_error(sprintf('Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "%s" service or define it in XML instead.', $id), E_USER_DEPRECATED);
         }
@@ -409,7 +416,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['factory'])) {
-            $definition->setFactory($this->parseCallable($service['factory'], 'factory', $id, $file));
+            $definition->setFactory($this->parseCallable($service['factory'], 'factory', $id, $file, $anonymousDefaults));
         }
 
         if (isset($service['file'])) {
@@ -417,15 +424,15 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['arguments'])) {
-            $definition->setArguments($this->resolveServices($service['arguments'], $file));
+            $definition->setArguments($this->resolveServices($service['arguments'], $file, $anonymousDefaults));
         }
 
         if (isset($service['properties'])) {
-            $definition->setProperties($this->resolveServices($service['properties'], $file));
+            $definition->setProperties($this->resolveServices($service['properties'], $file, $anonymousDefaults));
         }
 
         if (isset($service['configurator'])) {
-            $definition->setConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file));
+            $definition->setConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file, $anonymousDefaults));
         }
 
         if (isset($service['calls'])) {
@@ -436,10 +443,10 @@ class YamlFileLoader extends FileLoader
             foreach ($service['calls'] as $call) {
                 if (isset($call['method'])) {
                     $method = $call['method'];
-                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file) : array();
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file, $anonymousDefaults) : array();
                 } else {
                     $method = $call[0];
-                    $args = isset($call[1]) ? $this->resolveServices($call[1], $file) : array();
+                    $args = isset($call[1]) ? $this->resolveServices($call[1], $file, $anonymousDefaults) : array();
                 }
 
                 $definition->addMethodCall($method, $args);
@@ -538,12 +545,13 @@ class YamlFileLoader extends FileLoader
      * @param string       $parameter A parameter (e.g. 'factory' or 'configurator')
      * @param string       $id        A service identifier
      * @param string       $file      A parsed file
+     * @param array        $defaults
      *
      * @throws InvalidArgumentException When errors are occuried
      *
      * @return string|array A parsed callable
      */
-    private function parseCallable($callable, $parameter, $id, $file)
+    private function parseCallable($callable, $parameter, $id, $file, array $defaults)
     {
         if (is_string($callable)) {
             if ('' !== $callable && '@' === $callable[0]) {
@@ -553,7 +561,7 @@ class YamlFileLoader extends FileLoader
             if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
                 $parts = explode(':', $callable);
 
-                return array($this->resolveServices('@'.$parts[0], $file), $parts[1]);
+                return array($this->resolveServices('@'.$parts[0], $file, $defaults), $parts[1]);
             }
 
             return $callable;
@@ -561,7 +569,7 @@ class YamlFileLoader extends FileLoader
 
         if (is_array($callable)) {
             if (isset($callable[0]) && isset($callable[1])) {
-                return array($this->resolveServices($callable[0], $file), $callable[1]);
+                return array($this->resolveServices($callable[0], $file, $defaults), $callable[1]);
             }
 
             if ('factory' === $parameter && isset($callable[1]) && null === $callable[0]) {
@@ -655,11 +663,12 @@ class YamlFileLoader extends FileLoader
      *
      * @param mixed  $value
      * @param string $file
+     * @param array  $defaults
      * @param bool   $isParameter
      *
      * @return array|string|Reference|ArgumentInterface
      */
-    private function resolveServices($value, $file, $isParameter = false)
+    private function resolveServices($value, $file, array $defaults = array(), $isParameter = false)
     {
         if ($value instanceof TaggedValue) {
             $argument = $value->getValue();
@@ -668,7 +677,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException('"!iterator" tag only accepts sequences.');
                 }
 
-                return new IteratorArgument($this->resolveServices($argument, $file, $isParameter));
+                return new IteratorArgument($this->resolveServices($argument, $file, $defaults, $isParameter));
             }
             if ('closure_proxy' === $value->getTag()) {
                 if (!is_array($argument) || array(0, 1) !== array_keys($argument) || !is_string($argument[0]) || !is_string($argument[1]) || 0 !== strpos($argument[0], '@') || 0 === strpos($argument[0], '@@')) {
@@ -693,10 +702,14 @@ class YamlFileLoader extends FileLoader
                 $isLoadingInstanceof = $this->isLoadingInstanceof;
                 $this->isLoadingInstanceof = false;
                 $instanceof = $this->instanceof;
-                $this->instanceof = array();
+                if ($isLoadingInstanceof) {
+                    // Don't add instanceof conditionals to anonymous services
+                    // inside conditionals
+                    $this->instanceof = array();
+                }
 
                 $id = sprintf('%d_%s', ++$this->anonymousServicesCount, hash('sha256', $file));
-                $this->parseDefinition($id, $argument, $file, array());
+                $this->parseDefinition($id, $argument, $file, $defaults);
 
                 if (!$this->container->hasDefinition($id)) {
                     throw new InvalidArgumentException(sprintf('Creating an alias using the tag "!service" is not allowed in "%s".', $file));
@@ -715,7 +728,7 @@ class YamlFileLoader extends FileLoader
 
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                $value[$k] = $this->resolveServices($v, $file, $isParameter);
+                $value[$k] = $this->resolveServices($v, $file, $defaults, $isParameter);
             }
         } elseif (is_string($value) && 0 === strpos($value, '@=')) {
             return new Expression(substr($value, 2));

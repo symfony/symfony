@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -228,6 +229,56 @@ class XmlFileLoaderTest extends TestCase
         $fooArgs = $services['foo']->getArguments();
         $barArgs = $services['bar']->getArguments();
         $this->assertSame($fooArgs[0], $barArgs[0]);
+    }
+
+    public function testDefaultsInAnonymousServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('anonymous_services.xml');
+
+        $this->assertTrue($container->has('Bar'));
+        $definition = $container->getDefinition('Bar');
+
+        $args = $definition->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertInstanceof(Reference::class, $args[0]);
+        $this->assertTrue($container->has((string) $args[0]));
+        $this->assertStringStartsWith('1', (string) $args[0]);
+
+        $anonymous = $container->getDefinition((string) $args[0]);
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertTrue($anonymous->isAutowired());
+        $this->assertCount(1, $anonymous->getInstanceofConditionals());
+
+        $instanceof = $definition->getInstanceofConditionals();
+        $this->assertCount(1, $instanceof);
+        $this->assertArrayHasKey('BarInterface', $instanceof);
+
+        $interface = $instanceof['BarInterface'];
+        $this->assertFalse($interface->isAutowired());
+
+        $args = $interface->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertInstanceof(Reference::class, $args[0]);
+        $this->assertTrue($container->has((string) $args[0]));
+        $this->assertStringStartsWith('1_i', (string) $args[0]);
+
+        $anonymous = $container->getDefinition((string) $args[0]);
+        $this->assertEquals('Anonymous', $anonymous->getClass());
+        $this->assertFalse($anonymous->isPublic());
+        $this->assertTrue($anonymous->isAutowired());
+        $this->assertEmpty($anonymous->getInstanceofConditionals());
+
+        $factory = $interface->getFactory();
+        $this->assertInternalType('array', $factory);
+        $this->assertInstanceOf(Reference::class, $factory[0]);
+        $this->assertTrue($container->has((string) $factory[0]));
+        $this->assertEquals('createBar', $factory[1]);
+
+        $factoryService = $container->getDefinition((string) $factory[0]);
+        $this->assertTrue($factoryService->isAutowired());
+        $this->assertEmpty($factoryService->getInstanceofConditionals());
     }
 
     public function testLoadServices()

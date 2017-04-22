@@ -43,9 +43,6 @@ class XmlFileLoader extends FileLoader
 
         $this->container->fileExists($path);
 
-        // anonymous services
-        $this->processAnonymousServices($xml, $path);
-
         // imports
         $this->parseImports($xml, $path);
 
@@ -59,6 +56,7 @@ class XmlFileLoader extends FileLoader
         try {
             $this->parseDefinitions($xml, $path);
         } finally {
+            $this->isLoadingInstanceof = false;
             $this->instanceof = array();
         }
     }
@@ -129,15 +127,20 @@ class XmlFileLoader extends FileLoader
         }
         $this->setCurrentDir(dirname($file));
 
+        // anonymous services
+        $defaults = $this->getServiceDefaults($xml, $file);
+        $this->processInstanceofConditionalsAnonymousServices($xml, $file, $defaults);
+
         $this->instanceof = array();
         $this->isLoadingInstanceof = true;
         $instanceof = $xpath->query('//container:services/container:instanceof');
         foreach ($instanceof as $service) {
-            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, array()));
+            $this->setDefinition((string) $service->getAttribute('id'), $this->parseDefinition($service, $file, $defaults));
         }
 
         $this->isLoadingInstanceof = false;
-        $defaults = $this->getServiceDefaults($xml, $file);
+        $this->processAnonymousServices($xml, $file, $defaults);
+
         foreach ($services as $service) {
             if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
                 if ('prototype' === $service->tagName) {
@@ -196,7 +199,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return Definition|null
      */
-    private function parseDefinition(\DOMElement $service, $file, array $defaults = array())
+    private function parseDefinition(\DOMElement $service, $file, array $defaults)
     {
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
@@ -212,7 +215,9 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
+        $anonymousDefaults = $defaults;
         if ($this->isLoadingInstanceof) {
+            $defaults = array();
             $definition = new ChildDefinition('');
         } elseif ($parent = $service->getAttribute('parent')) {
             $definition = new ChildDefinition($parent);
@@ -371,13 +376,45 @@ class XmlFileLoader extends FileLoader
         return $dom;
     }
 
+    private function processInstanceofConditionalsAnonymousServices(\DOMDocument $xml, $file, array $defaults)
+    {
+        $definitions = array();
+        $count = 0;
+
+        $xpath = new \DOMXPath($xml);
+        $xpath->registerNamespace('container', self::NS);
+
+        // anonymous services as arguments/properties
+        if (false !== $nodes = $xpath->query('//container:services/container:instanceof//container:argument[@type="service"][not(@id)]|//container:services/container:instanceof//container:property[@type="service"][not(@id)]|//container:services/container:instanceof//container:getter[@type="service"][not(@id)]|//container:services/container:instanceof//container:factory[not(@service)]|//container:services/container:instanceof//container:configurator[not(@service)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $id = sprintf('%d_i_%s', ++$count, hash('sha256', $file));
+                $node->setAttribute('id', $id);
+                $node->setAttribute('service', $id);
+
+                if ($services = $this->getChildren($node, 'service')) {
+                    $services[0]->setAttribute('id', $id);
+
+                    // anonymous services are always private
+                    // we could not use the constant false here, because of XML parsing
+                    $services[0]->setAttribute('public', 'false');
+
+                    if (null !== $definition = $this->parseDefinition($services[0], $file, $defaults)) {
+                        $this->setDefinition($id, $definition);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Processes anonymous services.
      *
      * @param \DOMDocument $xml
      * @param string       $file
+     * @param array        $defaults
      */
-    private function processAnonymousServices(\DOMDocument $xml, $file)
+    private function processAnonymousServices(\DOMDocument $xml, $file, array $defaults)
     {
         $definitions = array();
         $count = 0;
@@ -417,7 +454,7 @@ class XmlFileLoader extends FileLoader
         // resolve definitions
         uksort($definitions, 'strnatcmp');
         foreach (array_reverse($definitions) as $id => list($domElement, $file, $wild)) {
-            if (null !== $definition = $this->parseDefinition($domElement, $file)) {
+            if (null !== $definition = $this->parseDefinition($domElement, $file, $defaults)) {
                 $this->setDefinition($id, $definition);
             }
 

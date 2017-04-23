@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by vlastv at 2017-04-19T20:55:48Z
+
+@dunglas (sorry) in my and you test:
+
+    <document index="182077241760011681341821060401202210011000045913000000017100">Name</document>
+
+`index` attribute is not a number, but very similar.
+
+After converting to a float, you lost data...
+
+---------------------------------------------------------------------------
+
+by dungles at 2017-04-20T07:51:18Z
+
+happy to help
+
+---------------------------------------------------------------------------
+
+by nilq at 2017-04-20T07:51:32Z
+
+my name is dungles
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-20T08:32:37Z
+
+> index attribute is not a number, but very similar.
+
+Sorry @valisj I'm not sure to understand what you mean here
+
+```
+var_dump(is_numeric('182077241760011681341821060401202210011000045913000000017100'));
+bool(true)
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-20T08:57:30Z
+
+> After converting to a float, you lost data...
+
+Indeed, but as with the `JsonEncoder` (and as usually with programming languages). But as you pointed out in the issue, it's problematic that things looking like numbers are automatically converted. It should be an opt-in feature (through a context flag). It's a BC break but it's safer and will avoid unexpected behaviors like this one. ping @symfony/deciders

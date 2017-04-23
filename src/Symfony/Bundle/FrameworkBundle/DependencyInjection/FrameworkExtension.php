@@ -36,7 +36,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormTypeGuesserInterface;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
@@ -256,8 +255,6 @@ class FrameworkExtension extends Extension
             ->addTag('controller.service_arguments');
         $container->registerForAutoconfiguration(DataCollectorInterface::class)
             ->addTag('data_collector');
-        $container->registerForAutoconfiguration(FormTypeInterface::class)
-            ->addTag('form.type');
         $container->registerForAutoconfiguration(FormTypeGuesserInterface::class)
             ->addTag('form.type_guesser');
         $container->registerForAutoconfiguration(CacheClearerInterface::class)

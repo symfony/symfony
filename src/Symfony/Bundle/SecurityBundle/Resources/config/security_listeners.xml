@@ -149,8 +149,8 @@
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.http_utils" />
             <argument /> <!-- Provider-shared Key -->
-            <argument type="service" id="security.authentication.success_handler" />
-            <argument type="service" id="security.authentication.failure_handler" />
+            <argument /> <!-- Failure handler -->
+            <argument /> <!-- Success Handler -->
             <argument type="collection" /> <!-- Options -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null" />

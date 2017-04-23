@@ -490,7 +490,12 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, false);
                     break;
                 case 'iterator':
-                    $arguments[$key] = new IteratorArgument($this->getArgumentsAsPhp($arg, $name, false));
+                    $arg = $this->getArgumentsAsPhp($arg, $name, false);
+                    try {
+                        $arguments[$key] = new IteratorArgument($arg);
+                    } catch (InvalidArgumentException $e) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="iterator" only accepts collections of type="service" references.', $name));
+                    }
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;

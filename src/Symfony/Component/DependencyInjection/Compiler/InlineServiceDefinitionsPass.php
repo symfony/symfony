@@ -38,8 +38,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
     protected function processValue($value, $isRoot = false)
     {
         if ($value instanceof ArgumentInterface) {
-            $this->processValue($value->getValues());
-
+            // Reference found in ArgumentInterface::getValues() are not inlineable
             return $value;
         }
         if ($value instanceof Reference && $this->container->hasDefinition($id = (string) $value)) {

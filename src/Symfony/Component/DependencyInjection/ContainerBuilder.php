@@ -1135,8 +1135,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $this->resolveServices($reference);
             };
         } elseif ($value instanceof IteratorArgument) {
-            $parameterBag = $this->getParameterBag();
-            $value = new RewindableGenerator(function () use ($value, $parameterBag) {
+            $value = new RewindableGenerator(function () use ($value) {
                 foreach ($value->getValues() as $k => $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
                         if (!$this->has($s)) {
@@ -1144,7 +1143,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         }
                     }
 
-                    yield $k => $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($v)));
+                    yield $k => $this->resolveServices($v);
                 }
             }, function () use ($value) {
                 $count = 0;
@@ -1444,7 +1443,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Shares a given service in the container.
      *
      * @param Definition  $definition
-     * @param mixed       $service
+     * @param object      $service
      * @param string|null $id
      */
     private function shareService(Definition $definition, $service, $id)

@@ -134,7 +134,7 @@ $container
 ;
 $container
     ->register('lazy_context', 'LazyContext')
-    ->setArguments(array(new IteratorArgument(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))))
+    ->setArguments(array(new IteratorArgument(array('k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')))))
 ;
 $container
     ->register('lazy_context_ignore_invalid_ref', 'LazyContext')

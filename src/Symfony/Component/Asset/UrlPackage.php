@@ -36,14 +36,14 @@ use Symfony\Component\Asset\Exception\LogicException;
 class UrlPackage extends Package
 {
     private $baseUrls = array();
-    private $sslPackage;
 
     /**
      * @param string|string[]          $baseUrls        Base asset URLs
      * @param VersionStrategyInterface $versionStrategy The version strategy
      * @param ContextInterface|null    $context         Context
+     * @param bool                     $isStrictHttp    Is http strict, or does it allow https on http pages
      */
-    public function __construct($baseUrls, VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
+    public function __construct($baseUrls, VersionStrategyInterface $versionStrategy, ContextInterface $context = null, $isStrictHttp = false)
     {
         parent::__construct($versionStrategy, $context);
 
@@ -59,10 +59,11 @@ class UrlPackage extends Package
             $this->baseUrls[] = rtrim($baseUrl, '/');
         }
 
-        $sslUrls = $this->getSslUrls($baseUrls);
-
-        if ($sslUrls && $baseUrls !== $sslUrls) {
-            $this->sslPackage = new self($sslUrls, $versionStrategy);
+        $urlList = $this->splitBaseUrl($this->baseUrls, $isStrictHttp);
+        if (!empty($urlList['httpsUrl']) && $this->getContext()->isSecure()) {
+            $this->baseUrls = $urlList['httpsUrl'];
+        } else {
+            $this->baseUrls = $urlList['httpUrl'];
         }
     }
 
@@ -73,10 +74,6 @@ class UrlPackage extends Package
     {
         if ($this->isAbsoluteUrl($path)) {
             return $path;
-        }
-
-        if (null !== $this->sslPackage && $this->getContext()->isSecure()) {
-            return $this->sslPackage->getUrl($path);
         }
 
         $url = $this->getVersionStrategy()->applyVersion($path);
@@ -123,17 +120,35 @@ class UrlPackage extends Package
         return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
     }
 
-    private function getSslUrls($urls)
+    /**
+     * Split urls in two categories: http & https urls
+     * Some url can be found in both categories (// & https depending on $isStrictHttp option).
+     *
+     * @param array $urls
+     * @param bool  $isStrictHttp
+     *
+     * @return array
+     */
+    protected function splitBaseUrl(array $urls, $isStrictHttp)
     {
-        $sslUrls = array();
+        $urlList = array('httpUrl' => array(), 'httpsUrl' => array());
+
         foreach ($urls as $url) {
-            if ('https://' === substr($url, 0, 8) || '//' === substr($url, 0, 2)) {
-                $sslUrls[] = $url;
-            } elseif ('http://' !== substr($url, 0, 7)) {
+            if ('https://' === substr($url, 0, 8)) {
+                $urlList['httpsUrl'][] = $url;
+                if ($isStrictHttp === false) {
+                    $urlList['httpUrl'][] = $url;
+                }
+            } elseif ('http://' === substr($url, 0, 7)) {
+                $urlList['httpUrl'][] = $url;
+            } elseif ('//' === substr($url, 0, 2)) {
+                $urlList['httpUrl'][] = $url;
+                $urlList['httpsUrl'][] = $url;
+            } else {
                 throw new InvalidArgumentException(sprintf('"%s" is not a valid URL', $url));
             }
         }
 
-        return $sslUrls;
+        return $urlList;
     }
 }

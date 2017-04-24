@@ -74,6 +74,29 @@ class UrlPackageTest extends TestCase
 
             array(true, array('http://example.com'), '', 'foo', 'http://example.com/foo?v1'),
             array(true, array('http://example.com', 'https://example.com'), '', 'foo', 'https://example.com/foo?v1'),
+            array(true, array('https://example.com', 'https://example.net'), '', 'foo', 'https://example.com/foo?v1'),
+            array(true, array('https://example.com', 'https://example.net'), '', 'fooa', 'https://example.net/fooa?v1'),
+        );
+    }
+
+    /**
+     * @dataProvider getStrictUrlConfigs
+     */
+    public function testGetUrlWithStrictUrl($secure, $baseUrls, $format, $path, $expected)
+    {
+        $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure), true);
+
+        $this->assertEquals($expected, $package->getUrl($path));
+    }
+
+    public function getStrictUrlConfigs()
+    {
+        return array(
+            array(false, array('http://example.com', 'http://example.net', 'https://example.com', 'https://example.net'), '', 'foo', 'http://example.com/foo?v1'),
+            array(false, array('http://example.com', 'http://example.net', 'https://example.com', 'https://example.net'), '', 'fooa', 'http://example.net/fooa?v1'),
+
+            array(true, array('http://example.com', 'http://example.net', 'https://example.com', 'https://example.net'), '', 'foo', 'https://example.com/foo?v1'),
+            array(true, array('http://example.com', 'http://example.net', 'https://example.com', 'https://example.net'), '', 'fooa', 'https://example.net/fooa?v1'),
         );
     }
 

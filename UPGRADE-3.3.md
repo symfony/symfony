@@ -165,7 +165,7 @@ FrameworkBundle
 
  * The `cache:clear` command should always be called with the `--no-warmup` option.
    Warmup should be done via the `cache:warmup` command.
-   
+
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies"
    parameter have been removed. Use the Request::setTrustedProxies() method in your front controller instead.
 

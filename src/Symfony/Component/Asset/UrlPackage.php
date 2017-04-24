@@ -35,7 +35,12 @@ use Symfony\Component\Asset\Exception\LogicException;
  */
 class UrlPackage extends Package
 {
+    /** @var array $baseUrls */
     private $baseUrls = array();
+    /** @var array $urlList */
+    private $urlList = array();
+    /** @var bool $isStrictHttp */
+    private $isStrictHttp;
 
     /**
      * @param string|string[]          $baseUrls        Base asset URLs
@@ -59,12 +64,9 @@ class UrlPackage extends Package
             $this->baseUrls[] = rtrim($baseUrl, '/');
         }
 
-        $urlList = $this->splitBaseUrl($this->baseUrls, $isStrictHttp);
-        if (!empty($urlList['httpsUrl']) && $this->getContext()->isSecure()) {
-            $this->baseUrls = $urlList['httpsUrl'];
-        } else {
-            $this->baseUrls = $urlList['httpUrl'];
-        }
+        $this->isStrictHttp = $isStrictHttp;
+
+        $this->urlList = $this->splitBaseUrl($this->baseUrls, $isStrictHttp);
     }
 
     /**
@@ -102,6 +104,8 @@ class UrlPackage extends Package
             return $this->baseUrls[0];
         }
 
+        $this->setCurrentBaseUrls();
+
         return $this->baseUrls[$this->chooseBaseUrl($path)];
     }
 
@@ -121,6 +125,20 @@ class UrlPackage extends Package
     }
 
     /**
+     * Set the baseUrls var depending on the context.
+     */
+    private function setCurrentBaseUrls()
+    {
+        if (!empty($this->urlList['httpsUrl']) && $this->getContext()->isSecure()) {
+            $this->baseUrls = $this->urlList['httpsUrl'];
+        } elseif ($this->isStrictHttp) {
+            $this->baseUrls = $this->urlList['httpUrl'];
+        } else {
+            $this->baseUrls = $this->urlList['fullUrl'];
+        }
+    }
+
+    /**
      * Split urls in two categories: http & https urls
      * Some url can be found in both categories (// & https depending on $isStrictHttp option).
      *
@@ -129,11 +147,12 @@ class UrlPackage extends Package
      *
      * @return array
      */
-    protected function splitBaseUrl(array $urls, $isStrictHttp)
+    private function splitBaseUrl(array $urls, $isStrictHttp)
     {
-        $urlList = array('httpUrl' => array(), 'httpsUrl' => array());
+        $urlList = array('httpUrl' => array(), 'httpsUrl' => array(), 'fullUrl' => array());
 
         foreach ($urls as $url) {
+            $urlList['fullUrl'][] = $url;
             if ('https://' === substr($url, 0, 8)) {
                 $urlList['httpsUrl'][] = $url;
                 if ($isStrictHttp === false) {

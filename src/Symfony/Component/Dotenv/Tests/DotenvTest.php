@@ -160,7 +160,7 @@ class DotenvTest extends TestCase
         $originalValue = $_SERVER['argc'];
 
         $dotenv = new DotEnv();
-        $dotenv->populate(array('argc' => 'newValue'));
+        $dotenv->populate(array('argc' => 'new_value'));
 
         $this->assertSame($originalValue, $_SERVER['argc']);
     }

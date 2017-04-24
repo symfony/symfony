@@ -1415,12 +1415,17 @@ EOF;
             $code = $this->dumpValue($value, $interpolate);
 
             if ($value instanceof TypedReference) {
-                $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
+                $return = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
             } else {
-                $code = sprintf('return %s;', $code);
+                $return = sprintf('return %s;', $code);
             }
 
-            return sprintf("function () {\n            %s\n        }", $code);
+            // dealing with a reference that needs to be imported into the callable scope
+            if (preg_match('/^\$[a-z]+$/', $code)) {
+                return sprintf("function () use (%s) {\n            %s\n        }", $code, $return);
+            }
+
+            return sprintf("function () {\n            %s\n        }", $return);
         } elseif ($value instanceof IteratorArgument) {
             $countCode = array();
             $countCode[] = 'function () {';

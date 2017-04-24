@@ -31,6 +31,9 @@ class ProjectServiceContainer extends Container
             'bar_service' => 'getBarServiceService',
             'baz_service' => 'getBazServiceService',
             'foo_service' => 'getFooServiceService',
+            'method_call_class' => 'getMethodCallClassService',
+            'service_locator_with_inline_reference_1' => 'getServiceLocatorWithInlineReference1Service',
+            'service_locator_with_inline_reference_2' => 'getServiceLocatorWithInlineReference2Service',
         );
         $this->privates = array(
             'baz_service' => true,
@@ -95,6 +98,60 @@ class ProjectServiceContainer extends Container
         }, 'nil' => function () {
             return NULL;
         }));
+    }
+
+    /**
+     * Gets the 'method_call_class' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\MethodCallClass A Symfony\Component\DependencyInjection\Tests\Fixtures\MethodCallClass instance
+     */
+    protected function getMethodCallClassService()
+    {
+        return $this->services['method_call_class'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\MethodCallClass();
+    }
+
+    /**
+     * Gets the 'service_locator_with_inline_reference_1' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Symfony\Component\DependencyInjection\ServiceLocator A Symfony\Component\DependencyInjection\ServiceLocator instance
+     */
+    protected function getServiceLocatorWithInlineReference1Service()
+    {
+        $this->services['service_locator_with_inline_reference_1'] = $instance = new \Symfony\Component\DependencyInjection\ServiceLocator(array('method_call_class' => function () {
+            return ${($_ = isset($this->services['method_call_class']) ? $this->services['method_call_class'] : $this->get('method_call_class')) && false ?: '_'};
+        }));
+
+        $instance->callableMethod('a', ${($_ = isset($this->services['method_call_class']) ? $this->services['method_call_class'] : $this->get('method_call_class')) && false ?: '_'});
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'service_locator_with_inline_reference_2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Symfony\Component\DependencyInjection\ServiceLocator A Symfony\Component\DependencyInjection\ServiceLocator instance
+     */
+    protected function getServiceLocatorWithInlineReference2Service()
+    {
+        $a = ${($_ = isset($this->services['method_call_class']) ? $this->services['method_call_class'] : $this->get('method_call_class')) && false ?: '_'};
+
+        $this->services['service_locator_with_inline_reference_2'] = $instance = new \Symfony\Component\DependencyInjection\ServiceLocator(array('method_call_class' => function () use ($a) {
+            return $a;
+        }));
+
+        $instance->callableMethod('a', $a);
+        $instance->callableMethod('b', $a);
+
+        return $instance;
     }
 
     /**

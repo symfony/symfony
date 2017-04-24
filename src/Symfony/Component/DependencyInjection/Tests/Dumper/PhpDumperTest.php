@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\MethodCallClass;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -533,6 +534,20 @@ class PhpDumperTest extends TestCase
                 'nil' => $nil = new ServiceClosureArgument(new Reference('nil')),
             ))
         ;
+
+        $container->register('method_call_class', MethodCallClass::class);
+
+        // 1 callable method
+        $container->register('service_locator_with_inline_reference_1', ServiceLocator::class)
+            ->addArgument(array('method_call_class' => new ServiceClosureArgument(new Reference('method_call_class'))))
+            ->addMethodCall('callableMethod', array('a', new Reference('method_call_class')));
+
+        // 2 callable methods
+        $container->register('service_locator_with_inline_reference_2', ServiceLocator::class)
+            ->addArgument(array('method_call_class' => new ServiceClosureArgument(new Reference('method_call_class'))))
+            ->addMethodCall('callableMethod', array('a', new Reference('method_call_class')))
+            ->addMethodCall('callableMethod', array('b', new Reference('method_call_class')));
+
         $nil->setValues(array(null));
         $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
         $container->register('baz_service', 'stdClass')->setPublic(false);

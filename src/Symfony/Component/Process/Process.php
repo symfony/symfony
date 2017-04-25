@@ -151,7 +151,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
-        $this->setCommandLine($commandline);
+        $this->commandline = $commandline;
         $this->cwd = $cwd;
 
         // on Windows, if the cwd changed via chdir(), proc_open defaults to the dir where PHP was started
@@ -289,7 +289,15 @@ class Process implements \IteratorAggregate
         $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
         $inheritEnv = $this->inheritEnv;
-        $commandline = $this->commandline;
+
+        if (is_array($commandline = $this->commandline)) {
+            $commandline = implode(' ', array_map(array($this, 'escapeArgument'), $commandline));
+
+            if ('\\' !== DIRECTORY_SEPARATOR) {
+                // exec is mandatory to deal with sending a signal to the process
+                $commandline = 'exec '.$commandline;
+            }
+        }
 
         if (null === $env) {
             $env = $this->env;
@@ -318,7 +326,7 @@ class Process implements \IteratorAggregate
             $descriptors[3] = array('pipe', 'w');
 
             // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
-            $commandline = '{ ('.$this->commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
+            $commandline = '{ ('.$commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
             $commandline .= 'pid=$!; echo $pid >&3; wait $pid; code=$?; echo $code >&3; exit $code';
 
             // Workaround for the bug, when PTS functionality is enabled.
@@ -928,7 +936,7 @@ class Process implements \IteratorAggregate
      */
     public function getCommandLine()
     {
-        return $this->commandline;
+        return is_array($this->commandline) ? implode(' ', array_map(array($this, 'escapeArgument'), $this->commandline)) : $this->commandline;
     }
 
     /**
@@ -940,14 +948,6 @@ class Process implements \IteratorAggregate
      */
     public function setCommandLine($commandline)
     {
-        if (is_array($commandline)) {
-            $commandline = implode(' ', array_map(array($this, 'escapeArgument'), $commandline));
-
-            if ('\\' !== DIRECTORY_SEPARATOR) {
-                // exec is mandatory to deal with sending a signal to the process
-                $commandline = 'exec '.$commandline;
-            }
-        }
         $this->commandline = $commandline;
 
         return $this;

@@ -95,14 +95,21 @@ class RedirectResponseTest extends TestCase
         $this->assertTrue($response->headers->hasCacheControlDirective('no-cache'));
     }
 
-    public function testRedirectUrlAsObject()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTargetUrlObject()
     {
-        $response = RedirectResponse::create(new MockIndexUrl());
-        $this->assertSame('http://test.com/index#menu', $response->headers->get('Location'));
-        $this->assertSame('http://test.com/index#menu', $response->getTargetUrl());
-        $this->assertEquals(1, preg_match(
-            '!<meta http-equiv="refresh" content="\d+;url=http://test\.com/index#menu" />!',
-            preg_replace(array('/\s+/', '/\'/'), array(' ', '"'), $response->getContent())
-        ));
+        $response = new RedirectResponse('foo.bar');
+        $response->setTargetUrl(new \stdClass());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTargetUrlToEmptyString()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setTargetUrl('');
     }
 }

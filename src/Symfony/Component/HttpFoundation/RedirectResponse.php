@@ -36,7 +36,7 @@ class RedirectResponse extends Response
     {
         parent::__construct('', $status, $headers);
 
-        $this->setTargetUrl((string) $url);
+        $this->setTargetUrl($url);
 
         if (!$this->isRedirect()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
@@ -83,6 +83,10 @@ class RedirectResponse extends Response
      */
     public function setTargetUrl($url)
     {
+        if (!is_string($url)) {
+            throw new \InvalidArgumentException(sprintf('The redirect url must be a string, "%s" given.', gettype($url)));
+        }
+
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }

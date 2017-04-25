@@ -36,7 +36,7 @@ class RedirectResponse extends Response
     {
         parent::__construct('', $status, $headers);
 
-        $this->setTargetUrl($url);
+        $this->setTargetUrl((string) $url);
 
         if (!$this->isRedirect()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));

@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-20T14:19:50Z
+
+this still does not fix the BC break when the executed code already used `exec`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-20T14:22:27Z
+
+accepting an array is new since 3.3, so this cannot happen
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-20T14:30:12Z
+
+oh, it is indeed only for arrays
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-20T15:30:13Z
+
+@nicolas-grekas it can happen when using ProcessBuilder, as this one uses the new API under the hood, which is precisely why melody was impacted btw
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-20T16:54:49Z
+
+I don't see what you mean, can you post a reproducer that fails with the current patch?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-21T09:21:24Z
+
+ProcessBuilder can be used to create processes using `exec` already today.
+And in 3.3, a second exec will be added on them, due to using an array.
+
+Btw, I think you also broke the `setPrefix` feature of the ProcessBuilder, as adding it in the array will then make Process escape it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-21T12:22:09Z
+
+I'm really sorry, but either you're wrong, or I totally miss the point.
+the prefix in 2.7/3.2 *is* escaped. See
+https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Process/ProcessBuilder.php#L270
+
+Please provide me some code sample to help me get your point if it's still valid...
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-25T13:34:59Z
+
+ah indeed, I forgot it is.

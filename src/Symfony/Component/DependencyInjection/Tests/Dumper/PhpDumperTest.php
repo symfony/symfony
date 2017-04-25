@@ -17,7 +17,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -568,8 +567,6 @@ class PhpDumperTest extends TestCase
             ->addArgument(new Reference('translator.loader_3_locator'))
             ->addMethodCall('addResource', array('db', new Reference('translator.loader_3'), 'nl'))
             ->addMethodCall('addResource', array('db', new Reference('translator.loader_3'), 'en'));
-
-
 
         $nil->setValues(array(null));
         $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));

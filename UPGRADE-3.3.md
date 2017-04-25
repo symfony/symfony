@@ -166,7 +166,8 @@ FrameworkBundle
  * The `cache:clear` command should always be called with the `--no-warmup` option.
    Warmup should be done via the `cache:warmup` command.
 
- * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been deprecated and will be removed in 4.0. Use the Request::setTrustedProxies() method in your front controller instead.
+ * [BC BREAK] The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies"
+   parameter have been removed. Use the Request::setTrustedProxies() method in your front controller instead.
 
  * Not defining the `type` option of the `framework.workflows.*` configuration entries is deprecated.
    The default value will be `state_machine` in Symfony 4.0.

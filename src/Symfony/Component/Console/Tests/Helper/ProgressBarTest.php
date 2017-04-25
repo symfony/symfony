@@ -754,4 +754,22 @@ class ProgressBarTest extends TestCase
 
         return "\x0D\x1B[2K".($count ? str_repeat("\x1B[1A\x1B[2K", $count) : '').$expected;
     }
+
+    public function testBarWidthWithMultilineFormat()
+    {
+        putenv('COLUMNS=10');
+
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat("%bar%\n0123456789");
+
+        // before starting
+        $bar->setBarWidth(5);
+        $this->assertEquals(5, $bar->getBarWidth());
+
+        // after starting
+        $bar->start();
+        rewind($output->getStream());
+        $this->assertEquals(5, $bar->getBarWidth(), stream_get_contents($output->getStream()));
+        putenv('COLUMNS=120');
+    }
 }

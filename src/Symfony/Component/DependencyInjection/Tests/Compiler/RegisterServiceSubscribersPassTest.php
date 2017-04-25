@@ -12,8 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -38,8 +40,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
             ->addTag('container.service_subscriber')
         ;
 
-        $pass = new RegisterServiceSubscribersPass();
-        $pass->process($container);
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
     }
 
     /**
@@ -54,8 +56,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
             ->addTag('container.service_subscriber', array('bar' => '123'))
         ;
 
-        $pass = new RegisterServiceSubscribersPass();
-        $pass->process($container);
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
     }
 
     public function testNoAttributes()
@@ -63,12 +65,12 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', TestServiceSubscriber::class)
-            ->addArgument(new Reference('container'))
+            ->addArgument(new Reference(PsrContainerInterface::class))
             ->addTag('container.service_subscriber')
         ;
 
-        $pass = new RegisterServiceSubscribersPass();
-        $pass->process($container);
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
 
         $foo = $container->getDefinition('foo');
         $locator = $container->getDefinition((string) $foo->getArgument(0));
@@ -92,13 +94,13 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
         $container->register('foo', TestServiceSubscriber::class)
             ->setAutowired(true)
-            ->addArgument(new Reference('container'))
+            ->addArgument(new Reference(PsrContainerInterface::class))
             ->addTag('container.service_subscriber', array('key' => 'bar', 'id' => 'bar'))
             ->addTag('container.service_subscriber', array('key' => 'bar', 'id' => 'baz')) // should be ignored: the first wins
         ;
 
-        $pass = new RegisterServiceSubscribersPass();
-        $pass->process($container);
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
 
         $foo = $container->getDefinition('foo');
         $locator = $container->getDefinition((string) $foo->getArgument(0));
@@ -125,7 +127,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo_service', TestServiceSubscriber::class)
             ->setAutowired(true)
-            ->addArgument(new Reference('container'))
+            ->addArgument(new Reference(PsrContainerInterface::class))
             ->addTag('container.service_subscriber', array(
                 'key' => 'test',
                 'id' => TestServiceSubscriber::class,

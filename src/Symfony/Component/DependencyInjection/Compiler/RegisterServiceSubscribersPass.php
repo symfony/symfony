@@ -25,14 +25,8 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class RegisterServiceSubscribersPass extends AbstractRecursivePass
 {
-    private $serviceLocator;
-
     protected function processValue($value, $isRoot = false)
     {
-        if ($value instanceof Reference && $this->serviceLocator && 'container' === (string) $value) {
-            return new Reference($this->serviceLocator);
-        }
-
         if (!$value instanceof Definition || $value->isAbstract() || $value->isSynthetic() || !$value->hasTag('container.service_subscriber')) {
             return parent::processValue($value, $isRoot);
         }
@@ -100,13 +94,8 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $serviceLocator = $this->serviceLocator;
-        $this->serviceLocator = (string) ServiceLocatorTagPass::register($this->container, $subscriberMap);
+        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap)));
 
-        try {
-            return parent::processValue($value);
-        } finally {
-            $this->serviceLocator = $serviceLocator;
-        }
+        return parent::processValue($value);
     }
 }

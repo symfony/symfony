@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use DummyProxyDumper;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -548,7 +549,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo_service', TestServiceSubscriber::class)
             ->setAutowired(true)
-            ->addArgument(new Reference('container'))
+            ->addArgument(new Reference(ContainerInterface::class))
             ->addTag('container.service_subscriber', array(
                 'key' => 'bar',
                 'id' => TestServiceSubscriber::class,

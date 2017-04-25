@@ -59,6 +59,7 @@ class PassConfig
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
             new AutowirePass(),
+            new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),

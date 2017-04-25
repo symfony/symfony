@@ -11,12 +11,19 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
+use Psr\Container\ContainerInterface;
+
 /**
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-class MethodCallClass
+class StubbedTranslator
 {
-    public function callableMethod()
+    public function __construct(ContainerInterface $container)
+    {
+
+    }
+
+    public function addResource($format, $resource, $locale, $domain = null)
     {
     }
 }

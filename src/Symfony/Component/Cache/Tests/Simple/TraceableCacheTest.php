@@ -24,7 +24,7 @@ class TraceableCacheTest extends CacheTestCase
         return new TraceableCache(new FilesystemCache('', $defaultLifetime));
     }
 
-    public function testGetMiss()
+    public function testGetMissTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->get('k');
@@ -33,15 +33,14 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[0];
         $this->assertSame('get', $call->name);
-        $this->assertSame(array('key' => 'k', 'default' => null), $call->arguments);
+        $this->assertSame(array('k' => false), $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(1, $call->misses);
-        $this->assertNull($call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testGetHit()
+    public function testGetHitTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->set('k', 'foo');
@@ -54,25 +53,25 @@ class TraceableCacheTest extends CacheTestCase
         $this->assertSame(0, $call->misses);
     }
 
-    public function testGetMultipleMiss()
+    public function testGetMultipleMissTrace()
     {
         $pool = $this->createSimpleCache();
-        $arg = array('k0', 'k1');
-        $values = $pool->getMultiple($arg);
+        $pool->set('k1', 123);
+        $values = $pool->getMultiple(array('k0', 'k1'));
         foreach ($values as $value) {
         }
         $calls = $pool->getCalls();
-        $this->assertCount(1, $calls);
+        $this->assertCount(2, $calls);
 
-        $call = $calls[0];
+        $call = $calls[1];
         $this->assertSame('getMultiple', $call->name);
-        $this->assertSame(array('keys' => $arg, 'default' => null), $call->arguments);
-        $this->assertSame(2, $call->misses);
+        $this->assertSame(array('k1' => true, 'k0' => false), $call->result);
+        $this->assertSame(1, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testHasMiss()
+    public function testHasMissTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->has('k');
@@ -81,13 +80,12 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[0];
         $this->assertSame('has', $call->name);
-        $this->assertSame(array('key' => 'k'), $call->arguments);
-        $this->assertFalse($call->result);
+        $this->assertSame(array('k' => false), $call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testHasHit()
+    public function testHasHitTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->set('k', 'foo');
@@ -97,13 +95,12 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[1];
         $this->assertSame('has', $call->name);
-        $this->assertSame(array('key' => 'k'), $call->arguments);
-        $this->assertTrue($call->result);
+        $this->assertSame(array('k' => true), $call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testDelete()
+    public function testDeleteTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->delete('k');
@@ -112,14 +109,14 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[0];
         $this->assertSame('delete', $call->name);
-        $this->assertSame(array('key' => 'k'), $call->arguments);
+        $this->assertSame(array('k' => true), $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testDeleteMultiple()
+    public function testDeleteMultipleTrace()
     {
         $pool = $this->createSimpleCache();
         $arg = array('k0', 'k1');
@@ -129,14 +126,14 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[0];
         $this->assertSame('deleteMultiple', $call->name);
-        $this->assertSame(array('keys' => $arg), $call->arguments);
+        $this->assertSame(array('keys' => $arg, 'result' => true), $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testSet()
+    public function testTraceSetTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->set('k', 'foo');
@@ -145,14 +142,14 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[0];
         $this->assertSame('set', $call->name);
-        $this->assertSame(array('key' => 'k', 'value' => 'foo', 'ttl' => null), $call->arguments);
+        $this->assertSame(array('k' => true), $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
 
-    public function testSetMultiple()
+    public function testSetMultipleTrace()
     {
         $pool = $this->createSimpleCache();
         $pool->setMultiple(array('k' => 'foo'));
@@ -161,7 +158,7 @@ class TraceableCacheTest extends CacheTestCase
 
         $call = $calls[0];
         $this->assertSame('setMultiple', $call->name);
-        $this->assertSame(array('values' => array('k' => 'foo'), 'ttl' => null), $call->arguments);
+        $this->assertSame(array('keys' => array('k'), 'result' => true), $call->result);
         $this->assertSame(0, $call->hits);
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Input\InputDecorator;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -224,6 +225,10 @@ class Command
             if (!$this->ignoreValidationErrors) {
                 throw $e;
             }
+        }
+
+        if ($input instanceof InputDecorator) {
+            $input = $input->getInner();
         }
 
         $this->initialize($input, $output);

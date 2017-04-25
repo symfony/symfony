@@ -16,6 +16,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputDecorator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -881,13 +882,13 @@ class Application
             // ignore invalid options/arguments for now, to allow the event listeners to customize the InputDefinition
         }
 
-        $event = new ConsoleCommandEvent($command, $input, $output);
+        $event = new ConsoleCommandEvent($command, $eventInput = new InputDecorator($input), $output);
         $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
 
         if ($event->commandShouldRun()) {
             try {
                 $e = null;
-                $exitCode = $command->run($input, $output);
+                $exitCode = $command->run($eventInput, $output);
             } catch (\Exception $x) {
                 $e = $x;
             } catch (\Throwable $x) {

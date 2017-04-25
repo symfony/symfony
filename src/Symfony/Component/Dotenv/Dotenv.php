@@ -67,7 +67,7 @@ final class Dotenv
     public function populate($values)
     {
         foreach ($values as $name => $value) {
-            if (isset($_ENV[$name]) || false !== getenv($name)) {
+            if (isset($_ENV[$name]) || isset($_SERVER[$name]) || false !== getenv($name)) {
                 continue;
             }
 

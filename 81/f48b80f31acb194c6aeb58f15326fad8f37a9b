@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2017-04-14T09:44:18Z
+
+I don't think it should. Symfony 3.3 introduces a new `ConsoleEvents::ERROR`, deprecating the old `ConsoleEvents::EXCEPTION` (https://github.com/symfony/symfony/pull/18140). The new event has some advantages and supports Throwables.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-14T09:49:55Z
+
+I think it should. That's the expected lifecycle of dispatched events to me, thus just a bug fix.
+About throwable, they are already handled since 2.7.0, via this cast to FatalThrowableError.

@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-22T11:36:19Z
+
+👍 Documentation states "Symfony Dotenv never overwrites existing environment variables."
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-04-22T17:58:27Z
+
+IMO, `$_SERVER` shouldn't even be tempered with to begin with
+
+---------------------------------------------------------------------------
+
+by EneasVVA at 2017-04-23T09:29:26Z
+
+I use an auxiliar var where I save the original value of $_SERVER, then, in the tearDown I recover the value for $_SERVER
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-23T09:33:52Z
+
+@EneasVVA that's about testing ;) and *we* all do this to make testing possible.
+
+This is about changing the values for actual production runtime.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2017-04-23T10:34:11Z
+
+> This is about changing the values for actual production runtime.
+
+Even then, DotEnv shouldn't be used for production, unless you are specifying an environment file configurable only by the sysadmins
+
+---------------------------------------------------------------------------
+
+by sh4ka at 2017-04-24T08:06:17Z
+
+I think that a warning should be logged if a $_SERVER or $_ENV is found while parsing.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2017-04-24T08:12:33Z
+
+@sh4ka I don't think so. PHP isn't doing it internally for `$_SERVER`, and Dotenv component shouldn't do it IMO because it's a tool used in development, and the dev may certainly find out that his env var is not working.
+
+And as the Dotenv component is executed most often before the Kernel is instantiated, we often cannot throw errors because they wouldn't be handled by Symfony and therefore may expose sensitive issues to the client.
+
+---------------------------------------------------------------------------
+
+by sh4ka at 2017-04-24T08:17:08Z
+
+Didn't know about the internal functionality. Just checked and it works the way you say. Thank you for letting me know.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-04-24T15:42:54Z
+
+Before merging, I think we should address the comments about `$_SERVER` and stop overriding it (cf https://github.com/symfony/symfony/issues/22493#issuecomment-296402724, https://github.com/symfony/symfony/pull/22500#issuecomment-296390529, https://github.com/symfony/symfony/issues/22493#issuecomment-296403550 and https://github.com/symfony/symfony/issues/22493#issuecomment-296429102)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-24T16:01:52Z
+
+My 2cts: not adding the values to `$_SERVER` would make the component useless for all the code that just checks env values in `$_SERVER`. This is common practice so we have to support that.
+Thus my +1 here, nothing more to do for me.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-04-24T16:04:48Z
+
+Then it would be strange if a key (let's say a `HTTP_HOST` env variable, which is not the same as in the `$_SERVER` key BUT is not in `$_ENV`). I would expect to have it in the `$_ENV`, but not in `$_SERVER` (as php erases this with the correct value)
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-04-24T16:06:00Z
+
+Especially as anyway, I think using this component is subject to "using `$_ENV` and not `$_SERVER`", but that may be a bit radical...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-24T16:06:03Z
+
+For reference, the popular `vlucas/phpdotenv` library (used by Laravel) does the same: https://github.com/vlucas/phpdotenv/blob/master/src/Loader.php#L353
+
+```php
+public function setEnvironmentVariable($name, $value = null)
+{
+    // ...
+
+    $_ENV[$name] = $value;
+    $_SERVER[$name] = $value;
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-24T16:16:01Z
+
+@Taluu this is the edge case of an edge case, and this is just matching php's existing behavior. Just don't call/use any env vars named `HTTP_*`. Of course, we need to behave correctly if any crazy fool does so. This is what this PR provides.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2017-04-25T08:09:09Z
+
+Think this can be merged then 👍
+
+Thanks for everyone's support on this 🙂 A so simple issue created a big debate 😆

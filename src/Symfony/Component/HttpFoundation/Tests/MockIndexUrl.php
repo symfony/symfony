@@ -17,6 +17,6 @@ class MockIndexUrl
 
     public function __toString()
     {
-        return 'http://test.com/index#' . $this->hash;
+        return 'http://test.com/index#'.$this->hash;
     }
 }

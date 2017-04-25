@@ -74,35 +74,25 @@ EOF
         if ($input->getOption('no-warmup')) {
             $filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
-            // the warmup cache dir name must have the same length than the real one
-            // to avoid the many problems in serialized resources files
-            $realCacheDir = realpath($realCacheDir);
-            $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
-
-            if ($filesystem->exists($warmupDir)) {
-                if ($output->isVerbose()) {
-                    $output->writeln('  Clearing outdated warmup directory');
-                }
-                $filesystem->remove($warmupDir);
-            }
-
             if ($output->isVerbose()) {
                 $output->writeln('  Warming up cache');
             }
-            $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
-            $filesystem->rename($realCacheDir, $oldCacheDir);
-            if ('\\' === DIRECTORY_SEPARATOR) {
-                sleep(1);  // workaround for Windows PHP rename bug
+            $warmer = $this->getContainer()->get('cache_warmer');
+
+            if (!$input->getOption('no-optional-warmers')) {
+                $warmer->enableOptionalWarmers();
             }
-            $filesystem->rename($warmupDir, $realCacheDir);
+
+            $warmer->warmup($realCacheDir);
         }
 
-        if ($output->isVerbose()) {
-            $output->writeln('  Removing old cache directory');
+        if ($filesystem->exists($oldCacheDir)) {
+            if ($output->isVerbose()) {
+                $output->writeln('  Removing old cache directory');
+            }
+            $filesystem->remove($oldCacheDir);
         }
-
-        $filesystem->remove($oldCacheDir);
 
         if ($output->isVerbose()) {
             $output->writeln('  Done');

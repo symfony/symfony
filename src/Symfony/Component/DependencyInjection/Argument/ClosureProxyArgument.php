@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Argument;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -41,6 +42,9 @@ class ClosureProxyArgument implements ArgumentInterface
      */
     public function setValues(array $values)
     {
+        if (!$values[0] instanceof Reference) {
+            throw new InvalidArgumentException(sprintf('A ClosureProxyArgument must hold a Reference, "%s" given.', is_object($values[0]) ? get_class($values[0]) : gettype($values[0])));
+        }
         list($this->reference, $this->method) = $values;
     }
 }

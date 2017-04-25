@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-19T06:48:16Z
+
+IMHO, the profiler is not a debugging tool. E.g. the Doctrine panel doesn't collect all created entities or all DB query results.
+On SF Demo, I easily get more than 200 cache calls related to annotations. On serious apps, this can quickly explode to me.
+Even listing all the keys might be too much.
+
+Anyone else on this topic?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-19T06:54:33Z
+
+I don't have much experience with this Cache component, but I think the same as Nicolas: on a real app with tens/hundreds of cache calls and complex objects, storing everything would be crazy.
+
+By the way, to prevent the word break in the `Result` column, please add `class="nowrap"` to the last `<td>` of the table too. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-19T10:02:13Z
+
+Report updated to better use horizontal space, see screenshot above.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-19T10:12:50Z
+
+I'm totally in favor of removing the storage of values themselves. This will also reduce the memory usage in some cases as it will not force keeping a reference to the result just for the profiler (it may not always reduce it, as your own code may also keep a reference).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-04-20T07:32:29Z
+
+I am also in favor of removing the cache values itself. However, I wonder if the table wouldn't be more readable if we split the "Hit" column in two columns: "Cache Key" and "Hit" (with "yes"/"no") values
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-20T07:35:43Z
+
+That's how it was previously but triggered issue with horizontal space use.
+There can be several keys, and for eg "clear" there is no key at all.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-20T07:36:54Z
+
+But we can remove the max width on this table instead!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-20T07:40:31Z
+
+@nicolas-grekas we can't increase the max-width of this table because it would destroy the overall design of the profiler.
+
+@xabbuh I agree with you that the current proposal is worse than before. My proposal would be:
+
+| # | Time | Call | Key | Result
+| --- | --- | --- | --- | ---
+| 1 | 0.02 ms | `getItem()` | ... | Miss
+| 2 | 0.01 ms | `getItem()` | ... | Hit
+| 3 | 0.08 ms | `getItem()` | ... | Hit
+| 4 | 0.66 ms | `getItem()` | ... | Miss
+| ... | ... | ... | ... | ...
+
+It doesn't matter that the `key` is very long because it should be wrapped in the table cell.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-20T07:46:27Z
+
+I'm sorry but as stated just before, that proposal does not fit all possibilities. Eg getItems and deleteItems have each different result format that don't go into these two columns :(
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-04-20T07:48:35Z
+
+What if the results for `getItems()` and `deleteItems()` calls used more than one row (one per item)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-25T15:35:40Z
+
+I won't be able to improve things here soon, so I'd suggest to merge as is, then improve later if still worth it.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-25T16:04:57Z
+
+👍  I agree. Merging this will improve the profiler panel and it'll let us easily test it. After that, we can tweak some things if needed.

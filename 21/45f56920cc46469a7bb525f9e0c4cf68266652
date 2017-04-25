@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-15T13:50:26Z
+
+I guess needs to merged in a lower branch thought
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-03-15T15:38:57Z
+
+Should I rebase the PR @nicolas-grekas?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-15T15:46:28Z
+
+If you don't mind, please do, and change the base branch here yes.
+Otherwise, we can do that while merging (and target 2.7 isn'it?)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-03-15T17:40:05Z
+
+Rebase onto 2.7 has some conflicts. Create a new PR on 2.7 seems a better idea.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-15T17:49:14Z
+
+OK for me
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-03-15T19:55:55Z
+
+Fix this onto 2.7 takes more time than expected. Could you merge this PR and later I will create new PR for 2.7?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-15T20:06:55Z
+
+We only merge fixes in the lowest maintained branch (we don't backport fixes).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-03-15T20:30:00Z
+
+Ok, so I will create new PR on 2.7 an other time.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-03-18T23:04:54Z
+
+In fact, the resizing of ProgressBar appears [from 3.2](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Component/Console/Helper/ProgressBar.php#L612) and not before. So, I propose to rebase on 3.2.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-20T11:55:25Z
+
+Let's go for 3.2.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T16:41:49Z
+
+Apparently, tests are still broken on Windows
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-03-23T14:16:00Z
+
+Need some help to fix tests please.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-12T11:45:40Z
+
+Tests are now green :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-25T14:10:46Z
+
+PR ready.

@@ -60,9 +60,11 @@
                         <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Last 10</a>
                         <a class="btn btn-sm" href="{{ path('_profiler', { token: 'latest' }|merge(request.query.all)) }}">Latest</a>
 
-                        <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
-                            {{ include('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
-                        </a>
+                        {% if tokens is not defined and about is not defined %}
+                            <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" data-toggle-initial="hidden">
+                                {{ include('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
+                            </a>
+                        {% endif %}
 
                         {{ render(path('_profiler_search_bar', request.query.all)) }}
                     </div>

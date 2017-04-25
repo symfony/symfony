@@ -56,6 +56,23 @@ class ExceptionListenerTest extends TestCase
         $listener->onConsoleError($this->getConsoleErrorEvent($exception, new NonStringInput(), 1));
     }
 
+    public function testOnConsoleErrorWithoutCommand()
+    {
+        $exception = new \RuntimeException('An error occurred');
+
+        $logger = $this->getLogger();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with('Error thrown while running command "{command}". Message: "{message}"', array('error' => $exception, 'command' => '', 'message' => 'An error occurred'))
+        ;
+
+        $listener = new ExceptionListener($logger);
+
+        $event = new ConsoleErrorEvent(new ArgvInput(array('console.php', 'test:run', '--foo=baz', 'buzz')), $this->getOutput(), $exception, 1);
+        $listener->onConsoleError($event);
+    }
+
     public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
     {
         $logger = $this->getLogger();

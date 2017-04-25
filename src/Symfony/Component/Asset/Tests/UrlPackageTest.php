@@ -97,6 +97,14 @@ class UrlPackageTest extends TestCase
 
             array(true, array('http://example.com', 'http://example.net', 'https://example.com', 'https://example.net'), '', 'foo', 'https://example.com/foo?v1'),
             array(true, array('http://example.com', 'http://example.net', 'https://example.com', 'https://example.net'), '', 'fooa', 'https://example.net/fooa?v1'),
+
+            array(false, array('//example.com', 'http://example.com', 'https://example.com'), '', 'foo', '//example.com/foo?v1'),
+            array(false, array('//example.com', 'http://example.com', 'https://example.com'), '', 'fooa', 'http://example.com/fooa?v1'),
+
+            array(true, array('//example.com', 'http://example.com', 'https://example.com'), '', 'foo', '//example.com/foo?v1'),
+            array(true, array('//example.com', 'http://example.com', 'https://example.com'), '', 'fooa', 'https://example.com/fooa?v1'),
+
+            array(false, array('https://example.com', 'https://example.net'), '', 'foo', 'https://example.com/foo?v1'),
         );
     }
 

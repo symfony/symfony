@@ -27,7 +27,10 @@ use Symfony\Component\Asset\Exception\LogicException;
  * When the request context is available, this package can choose the
  * best base URL to use based on the current request scheme:
  *
- *  * For HTTP request, it chooses between all base URLs;
+ *  * For HTTP request:
+ *    * if $isStrictHttp is set to false, it chooses between all base URLs
+ *    * if $isStrictHttp is set to true, it will only use HTTP base URLs and relative protocol URLs
+ *      or falls back to any base URL if no secure ones are available;
  *  * For HTTPs requests, it chooses between HTTPs base URLs and relative protocol URLs
  *    or falls back to any base URL if no secure ones are available.
  *
@@ -37,8 +40,12 @@ class UrlPackage extends Package
 {
     /** @var array $baseUrls */
     private $baseUrls = array();
-    /** @var array $urlList */
-    private $urlList = array();
+    /** @var string[] $baseSecureUrls */
+    private $baseSecureUrls = array();
+    /** @var string[] $baseUnsecureUrls */
+    private $baseUnsecureUrls = array();
+    /** @var string[] $baseFullUrls */
+    private $baseFullUrls = array();
     /** @var bool $isStrictHttp */
     private $isStrictHttp;
 
@@ -66,7 +73,7 @@ class UrlPackage extends Package
 
         $this->isStrictHttp = $isStrictHttp;
 
-        $this->urlList = $this->splitBaseUrl($this->baseUrls, $isStrictHttp);
+        $this->prepareBaseUrl($this->baseUrls, $isStrictHttp);
     }
 
     /**
@@ -129,45 +136,40 @@ class UrlPackage extends Package
      */
     private function setCurrentBaseUrls()
     {
-        if (!empty($this->urlList['httpsUrl']) && $this->getContext()->isSecure()) {
-            $this->baseUrls = $this->urlList['httpsUrl'];
-        } elseif ($this->isStrictHttp) {
-            $this->baseUrls = $this->urlList['httpUrl'];
+        if (!empty($this->baseSecureUrls) && $this->getContext()->isSecure()) {
+            $this->baseUrls = $this->baseSecureUrls;
+        } elseif (!empty($this->baseUnsecureUrls) && $this->isStrictHttp) {
+            $this->baseUrls = $this->baseUnsecureUrls;
         } else {
-            $this->baseUrls = $this->urlList['fullUrl'];
+            $this->baseUrls = $this->baseFullUrls;
         }
     }
 
     /**
-     * Split urls in two categories: http & https urls
+     * Split urls in three categories: secure urls, unsecure urls and all urls
      * Some url can be found in both categories (// & https depending on $isStrictHttp option).
      *
      * @param array $urls
      * @param bool  $isStrictHttp
-     *
-     * @return array
      */
-    private function splitBaseUrl(array $urls, $isStrictHttp)
+    private function prepareBaseUrl(array $urls, $isStrictHttp)
     {
-        $urlList = array('httpUrl' => array(), 'httpsUrl' => array(), 'fullUrl' => array());
+        $this->baseFullUrls = $urls;
 
         foreach ($urls as $url) {
-            $urlList['fullUrl'][] = $url;
             if ('https://' === substr($url, 0, 8)) {
-                $urlList['httpsUrl'][] = $url;
+                $this->baseSecureUrls[] = $url;
                 if ($isStrictHttp === false) {
-                    $urlList['httpUrl'][] = $url;
+                    $this->baseUnsecureUrls[] = $url;
                 }
             } elseif ('http://' === substr($url, 0, 7)) {
-                $urlList['httpUrl'][] = $url;
+                $this->baseUnsecureUrls[] = $url;
             } elseif ('//' === substr($url, 0, 2)) {
-                $urlList['httpUrl'][] = $url;
-                $urlList['httpsUrl'][] = $url;
+                $this->baseUnsecureUrls[] = $url;
+                $this->baseSecureUrls[] = $url;
             } else {
                 throw new InvalidArgumentException(sprintf('"%s" is not a valid URL', $url));
             }
         }
-
-        return $urlList;
     }
 }

@@ -1,6 +1,12 @@
 UPGRADE FROM 3.2 to 3.3
 =======================
 
+Asset
+----------
+
+ * Add a parameter $isStrictHttp to choose to use only HTTP,
+   instead of HTTP+HTTPS on an insecure context.
+
 BrowserKit
 ----------
 

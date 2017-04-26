@@ -556,6 +556,8 @@ class XmlFileLoader extends FileLoader
 
                     if (!is_file($path)) {
                         throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
+                    } elseif (0 !== stripos($path, 'phar://')) {
+                        $path = realpath($path);
                     }
 
                     $schemaLocations[$items[$i]] = $path;

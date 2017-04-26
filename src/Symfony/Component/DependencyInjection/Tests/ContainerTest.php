@@ -554,6 +554,51 @@ class ProjectServiceContainer extends Container
 
         throw new \Exception('Something was terribly wrong while trying to configure the service!');
     }
+    
+    public function underscorCase()
+    {
+        return array(
+            array(
+              "VendornameBundlename",
+              "vendorname_bundlename",
+            ),
+            array(
+              "VENDORNAMEBundlename",
+              "vendorname_bundlename",
+            ),
+            array(
+              "VENDORI18n",
+              "vendori18n",
+            ),
+            array(
+              "VendorI18n",
+              "vendor_i18n",
+            ),
+            array(
+              "VENDOR18n",
+              "vendor18n",
+            ),
+            array(
+              "Vendor18n",
+              "vendor18n",
+            ),
+            array(
+              "vendori18n",
+              "vendori18n",
+            )
+        );
+    }
+    
+    /**
+     * @dataProvider underscorCase
+     */
+    public function testUnderscore($id, $expected)
+    {
+        $sc     = new Container();
+        $result = $sc->underscore($id);
+        
+        $this->assertEquals($expected, $result, "test for " . $id);
+    }
 }
 
 class LegacyProjectServiceContainer extends Container

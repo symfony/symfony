@@ -100,4 +100,48 @@ class RequestStack
 
         return $this->requests[$pos];
     }
+
+    /**
+     * Executes callback if there is a current request available
+     *
+     * @param callable $callback
+     * @return mixed
+     */
+    public function withCurrentRequest($callback)
+    {
+        return $this->invokeCallbackIfRequestPresent($callback, $this->getCurrentRequest());
+    }
+
+    /**
+     * Executes callback if there is a master request available
+     *
+     * @param callable $callback
+     * @return mixed
+     */
+    public function withMasterRequest($callback)
+    {
+        return $this->invokeCallbackIfRequestPresent($callback, $this->getMasterRequest());
+    }
+
+    /**
+     * Executes callback if there is a parent request available
+     *
+     * @param callable $callback
+     * @return mixed
+     */
+    public function withParentRequest($callback)
+    {
+        return $this->invokeCallbackIfRequestPresent($callback, $this->getParentRequest());
+    }
+
+    private static function invokeCallbackIfRequestPresent($callback, Request $request = null)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('Invalid callback given');
+        }
+
+        if ($request) {
+            return $callback($request);
+        }
+    }
 }

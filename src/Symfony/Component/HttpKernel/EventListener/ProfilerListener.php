@@ -103,7 +103,7 @@ class ProfilerListener implements EventSubscriberInterface
         $this->parents[$request] = $this->requestStack->getParentRequest();
     }
 
-    public function onKernelTerminate(PostResponseEvent $event)
+    public function onKernelFinishRequest()
     {
         // attach children to parents
         foreach ($this->profiles as $request) {
@@ -129,7 +129,7 @@ class ProfilerListener implements EventSubscriberInterface
         return array(
             KernelEvents::RESPONSE => array('onKernelResponse', -100),
             KernelEvents::EXCEPTION => 'onKernelException',
-            KernelEvents::TERMINATE => array('onKernelTerminate', -1024),
+            KernelEvents::FINISH_REQUEST => array('onKernelFinishRequest', -1024),
         );
     }
 }

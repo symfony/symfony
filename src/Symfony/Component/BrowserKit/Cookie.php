@@ -157,8 +157,9 @@ class Cookie
 
         foreach ($parts as $part) {
             $part = trim($part);
+            $lowercasePart = strtolower($part);
 
-            if ('secure' === strtolower($part)) {
+            if ('secure' === $lowercasePart) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
                 if (!$url || !isset($urlParts['scheme']) || 'https' != $urlParts['scheme']) {
                     continue;
@@ -169,18 +170,17 @@ class Cookie
                 continue;
             }
 
-            if ('httponly' === strtolower($part)) {
+            if ('httponly' === $lowercasePart) {
                 $values['httponly'] = true;
 
                 continue;
             }
 
             if (2 === count($elements = explode('=', $part, 2))) {
-                if ('expires' === strtolower($elements[0])) {
-                    $elements[1] = self::parseDate($elements[1]);
-                }
-
-                $values[strtolower($elements[0])] = $elements[1];
+                $lowercaseFirstElement = strtolower($elements[0]);
+                $values[$lowercaseFirstElement] = 'expires' === $lowercaseFirstElement
+                    ? self::parseDate($elements[1])
+                    : $elements[1];
             }
         }
 

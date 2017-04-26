@@ -156,7 +156,7 @@ class ClassLoader
      */
     public function loadClass($class)
     {
-        if ($file = $this->findFile($class)) {
+        if (false != $file = $this->findFile($class)) {
             require $file;
 
             return true;

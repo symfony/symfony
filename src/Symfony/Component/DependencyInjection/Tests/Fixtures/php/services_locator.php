@@ -186,14 +186,12 @@ class ProjectServiceContainer extends Container
      */
     protected function getTranslator3Service()
     {
-        $a = ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->get('translator.loader_3')) && false ?: '_'};
-
-        $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () use ($a) {
-            return $a;
+        $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () {
+            return ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->get('translator.loader_3')) && false ?: '_'};
         })));
 
-        $instance->addResource('db', $a, 'nl');
-        $instance->addResource('db', $a, 'en');
+        $instance->addResource('db', ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->get('translator.loader_3')) && false ?: '_'}, 'nl');
+        $instance->addResource('db', ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->get('translator.loader_3')) && false ?: '_'}, 'en');
 
         return $instance;
     }

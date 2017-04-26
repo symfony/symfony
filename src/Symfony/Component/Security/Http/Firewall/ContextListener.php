@@ -115,6 +115,10 @@ class ContextListener implements ListenerInterface
         if (!$event->isMasterRequest()) {
             return;
         }
+        
+        if (!$event->getRequest()->hasSession()) {
+            return;
+        }
 
         if (!$event->getRequest()->hasSession()) {
             return;

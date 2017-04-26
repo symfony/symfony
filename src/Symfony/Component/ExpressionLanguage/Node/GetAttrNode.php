@@ -74,6 +74,11 @@ class GetAttrNode extends Node
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
+                $method   = 'get' . preg_replace('/(?:^|_)(.?)/e', "strtoupper('$1')", $property);
+
+                if (method_exists($obj, $method)) {
+                    return $obj->{$method}();
+                }
 
                 return $obj->$property;
 

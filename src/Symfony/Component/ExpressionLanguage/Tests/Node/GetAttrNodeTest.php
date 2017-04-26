@@ -25,6 +25,7 @@ class GetAttrNodeTest extends AbstractNodeTest
             array('a', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), array('foo' => array('b' => 'a', 'b'))),
 
             array('bar', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+            array('foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('qux'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
 
             array('baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
             array('a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), array('foo' => array('b' => 'a', 'b'), 'index' => 'b')),
@@ -71,8 +72,15 @@ class Obj
 {
     public $foo = 'bar';
 
+    protected $qux = 'foo';
+
     public function foo()
     {
         return 'baz';
+    }
+
+    public function getQux()
+    {
+        return $this->qux;
     }
 }

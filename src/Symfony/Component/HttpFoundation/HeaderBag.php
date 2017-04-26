@@ -206,8 +206,12 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function getDate($key, \DateTime $default = null)
     {
-        if (null === $value = $this->get($key)) {
+        if (!$this->has($key) && $default instanceof \DateTime) {
             return $default;
+        }
+
+        if (null === $value = $this->get($key, $default)) {
+            return new \DateTime();
         }
 
         if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {

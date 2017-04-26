@@ -41,11 +41,27 @@ class HeaderBagTest extends TestCase
         $this->assertEquals('foo', $keys[0]);
     }
 
-    public function testGetDate()
+    /**
+     * @dataProvider getHeaders
+     * @param $headers
+     */
+    public function testGetDate($headers)
     {
-        $bag = new HeaderBag(array('foo' => 'Tue, 4 Sep 2012 20:00:00 +0200'));
+        $bag = new HeaderBag($headers);
         $headerDate = $bag->getDate('foo');
         $this->assertInstanceOf('DateTime', $headerDate);
+    }
+
+    public function getHeaders()
+    {
+        return array(
+            array(
+                array()
+            ),
+            array(
+                array('foo' => 'Tue, 4 Sep 2012 20:00:00 +0200')
+            ),
+        );
     }
 
     /**

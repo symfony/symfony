@@ -63,6 +63,8 @@ class BinaryNodeTest extends AbstractNodeTest
             array(array(1, 2, 3), new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))),
 
             array(1, new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))),
+            array(true, new BinaryNode('contains', new ConstantNode('foo abc bar'), new ConstantNode('abc'))),
+            array(false, new BinaryNode('contains', new ConstantNode('foobar'), new ConstantNode('abc'))),
         );
     }
 
@@ -112,6 +114,7 @@ class BinaryNodeTest extends AbstractNodeTest
             array('range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))),
 
             array('preg_match("/^[a-z]+/i\$/", "abc")', new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+/i$/'))),
+            array('false !== strpos("abcdefg", "abc")', new BinaryNode('contains', new ConstantNode('abcdefg'), new ConstantNode('abc'))),
         );
     }
 }

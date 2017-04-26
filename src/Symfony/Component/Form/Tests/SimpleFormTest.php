@@ -119,8 +119,10 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     // https://github.com/symfony/symfony/pull/7789
-    public function testFalseIsConvertedToNull()
+    public function testLegacyFalseIsConvertedToNull()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $mock = $this->getMockBuilder('\stdClass')
             ->setMethods(array('preSubmit'))
             ->getMock();

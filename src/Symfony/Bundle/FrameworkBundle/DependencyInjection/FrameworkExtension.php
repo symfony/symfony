@@ -474,6 +474,13 @@ class FrameworkExtension extends Extension
         if (!$config['collect']) {
             $container->getDefinition('profiler')->addMethodCall('disable', array());
         }
+
+        if ($container->hasDefinition('debug.event_dispatcher')) {
+            $container
+                ->getDefinition('data_collector.events')
+                ->replaceArgument(0, new Reference('debug.event_dispatcher'))
+            ;
+        }
     }
 
     /**

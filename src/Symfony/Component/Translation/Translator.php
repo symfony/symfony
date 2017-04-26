@@ -256,7 +256,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     protected function loadCatalogue($locale)
     {
-        if (null === $this->cacheDir) {
+        if ($this->debug || null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
         } else {
             $this->initializeCacheCatalogue($locale);

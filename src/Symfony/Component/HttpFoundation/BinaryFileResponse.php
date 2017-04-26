@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  * @author Igor Wiedler <igor@wiedler.ch>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
  * @author Sergey Linnik <linniksa@gmail.com>
+ * @author Povilas Skruibis <puovils@gmail.com>
  */
 class BinaryFileResponse extends Response
 {
@@ -141,9 +142,21 @@ class BinaryFileResponse extends Response
      */
     public function setAutoEtag()
     {
-        $this->setEtag(sha1_file($this->file->getPathname()));
+        $this->setEtag($this->calculateFileHash($this->file->getPathname()));
 
         return $this;
+    }
+
+    /**
+     * Calculate file hash
+     *
+     * @param string $filename The path to the file
+     * 
+     * @return string
+     */
+    protected function calculateFileHash($filename)
+    {
+        return sha1_file($filename);
     }
 
     /**

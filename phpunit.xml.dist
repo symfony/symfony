@@ -30,6 +30,10 @@
         </testsuite>
     </testsuites>
 
+    <php>
+        <const name="SYMFONY_TESTSUITE" value="true"/>
+    </php>
+
     <groups>
         <exclude>
             <group>benchmark</group>

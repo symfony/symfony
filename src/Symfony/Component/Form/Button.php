@@ -176,7 +176,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function &all()
     {
         return array();
     }

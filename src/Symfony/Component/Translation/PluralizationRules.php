@@ -138,6 +138,7 @@ class PluralizationRules
             case 'xbr':
             case 'ti':
             case 'wa':
+            case 'xbr':
                 return (($number == 0) || ($number == 1)) ? 0 : 1;
 
             case 'be':

@@ -68,9 +68,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
             $dateTime->setTimestamp($value);
 
-            if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
-            }
+            $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }

@@ -19,11 +19,31 @@ namespace Symfony\Component\Process;
  */
 class PhpExecutableFinder
 {
+    /**
+     * @var ExecutableFinder
+     */
     private $executableFinder;
+
+    /**
+     * @var PhpExecutableFinder
+     */
+    private static $finder;
 
     public function __construct()
     {
         $this->executableFinder = new ExecutableFinder();
+    }
+
+    /**
+     * @return PhpExecutableFinder An instance of the PhpExecutableFinder
+     */
+    public static function create()
+    {
+        if (!self::$finder) {
+            self::$finder = new self();
+        }
+
+        return self::$finder;
     }
 
     /**

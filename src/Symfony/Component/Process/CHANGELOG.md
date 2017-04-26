@@ -37,6 +37,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added PhpExecutableFinder::create() to ease usage of the class
  * added ProcessBuilder::setArguments() to reset the arguments on a builder
  * added a way to retrieve the standard and error output incrementally
  * added Process:restart()

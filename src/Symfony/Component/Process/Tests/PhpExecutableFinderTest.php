@@ -69,4 +69,13 @@ class PhpExecutableFinderTest extends TestCase
             $this->assertEquals($f->findArguments(), array(), '::findArguments() returns no arguments');
         }
     }
+
+    public function testCreateAlwaysReturnsTheSameInstance()
+    {
+        $finder = PhpExecutableFinder::create();
+
+        $this->assertInstanceOf('Symfony\Component\Process\PhpExecutableFinder', $finder);
+
+        $this->assertSame($finder, PhpExecutableFinder::create());
+    }
 }

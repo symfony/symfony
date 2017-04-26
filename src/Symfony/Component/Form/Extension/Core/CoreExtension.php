@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core;
 
+use Doctrine\Tests\ORM\Functional\Type;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
@@ -67,6 +68,7 @@ class CoreExtension extends AbstractExtension
             new Type\RangeType(),
             new Type\RepeatedType(),
             new Type\SearchType(),
+            new Type\TelType(),
             new Type\TextareaType(),
             new Type\TextType(),
             new Type\TimeType(),

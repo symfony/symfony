@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
@@ -102,10 +103,17 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
         $successCount = 0;
         $failureCount = 0;
         $storesCount = count($this->stores);
+        $expireAt = microtime(true) + $ttl;
 
         foreach ($this->stores as $store) {
             try {
-                $store->putOffExpiration($key, $ttl);
+                if (0.0 >= $adjustedTtl = $expireAt - microtime(true)) {
+                    $this->logger->warning('Stores took to long to put off the expiration of the "{resource}" lock.', array('resource' => $key, 'store' => $store, 'ttl' => $ttl));
+                    $key->reduceLifetime(0);
+                    break;
+                }
+
+                $store->putOffExpiration($key, $adjustedTtl);
                 ++$successCount;
             } catch (\Exception $e) {
                 $this->logger->warning('One store failed to put off the expiration of the "{resource}" lock.', array('resource' => $key, 'store' => $store, 'exception' => $e));
@@ -115,6 +123,10 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             if (!$this->strategy->canBeMet($failureCount, $storesCount)) {
                 break;
             }
+        }
+
+        if ($key->isExpired()) {
+            throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
         }
 
         if ($this->strategy->isMet($successCount, $storesCount)) {

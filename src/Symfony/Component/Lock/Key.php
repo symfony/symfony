@@ -19,7 +19,7 @@ namespace Symfony\Component\Lock;
 final class Key
 {
     private $resource;
-    private $expiringDate;
+    private $expiringTime;
     private $state = array();
 
     /**
@@ -77,16 +77,16 @@ final class Key
      */
     public function reduceLifetime($ttl)
     {
-        $newExpiringDate = \DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $ttl));
+        $newTime = microtime(true) + $ttl;
 
-        if (null === $this->expiringDate || $newExpiringDate < $this->expiringDate) {
-            $this->expiringDate = $newExpiringDate;
+        if (null === $this->expiringTime || $this->expiringTime > $newTime) {
+            $this->expiringTime = $newTime;
         }
     }
 
     public function resetExpiringDate()
     {
-        $this->expiringDate = null;
+        $this->expiringTime = null;
     }
 
     /**
@@ -94,6 +94,14 @@ final class Key
      */
     public function getExpiringDate()
     {
-        return $this->expiringDate;
+        return \DateTimeImmutable::createFromFormat('U.u', (string) $this->expiringTime);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExpired()
+    {
+        return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }
 }

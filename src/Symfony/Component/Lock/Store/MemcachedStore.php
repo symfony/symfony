@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Store;
 
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
@@ -57,14 +58,15 @@ class MemcachedStore implements StoreInterface
     public function save(Key $key)
     {
         $token = $this->getToken($key);
-
         $key->reduceLifetime($this->initialTtl);
-        if ($this->memcached->add((string) $key, $token, (int) ceil($this->initialTtl))) {
-            return;
+        if (!$this->memcached->add((string) $key, $token, (int) ceil($this->initialTtl))) {
+            // the lock is already acquired. It could be us. Let's try to put off.
+            $this->putOffExpiration($key, $this->initialTtl);
         }
 
-        // the lock is already acquire. It could be us. Let's try to put off.
-        $this->putOffExpiration($key, $this->initialTtl);
+        if ($key->isExpired()) {
+            throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $key));
+        }
     }
 
     public function waitAndSave(Key $key)
@@ -106,6 +108,10 @@ class MemcachedStore implements StoreInterface
 
         if (!$this->memcached->cas($cas, (string) $key, $token, $ttl)) {
             throw new LockConflictedException();
+        }
+
+        if ($key->isExpired()) {
+            throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
         }
     }
 

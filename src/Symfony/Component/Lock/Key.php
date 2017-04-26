@@ -19,6 +19,7 @@ namespace Symfony\Component\Lock;
 final class Key
 {
     private $resource;
+    private $expiringDate;
     private $state = array();
 
     /**
@@ -69,5 +70,28 @@ final class Key
     public function getState($stateKey)
     {
         return $this->state[$stateKey];
+    }
+
+    public function resetExpiringDate()
+    {
+        $this->expiringDate = null;
+    }
+
+    /**
+     * @param \DateTimeImmutable $expiringDate
+     */
+    public function reduceExpiringDate(\DateTimeImmutable $expiringDate)
+    {
+        if (null === $this->expiringDate || $this->expiringDate > $expiringDate) {
+            $this->expiringDate = $expiringDate;
+        }
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getExpiringDate()
+    {
+        return $this->expiringDate;
     }
 }

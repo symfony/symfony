@@ -75,6 +75,17 @@ class PathPackageTest extends TestCase
         );
     }
 
+    public function testVersionStrategyGivesAbsoluteURL()
+    {
+        $versionStrategy = $this->getMockBuilder('Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface')->getMock();
+        $versionStrategy->expects($this->any())
+            ->method('applyVersion')
+            ->willReturn('https://cdn.com/bar/main.css');
+        $package = new PathPackage('/subdirectory', $versionStrategy, $this->getContext('/bar'));
+
+        $this->assertEquals('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
+    }
+
     private function getContext($basePath)
     {
         $context = $this->getMockBuilder('Symfony\Component\Asset\Context\ContextInterface')->getMock();

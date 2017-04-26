@@ -51,6 +51,21 @@ class FilesystemLoaderTest extends TestCase
         $this->assertTrue($loader->exists($template));
     }
 
+    public function testExists()
+    {
+        // should return true for templates that Twig does not find, but Symfony does
+        $parser = $this->getMock('Symfony\Component\Templating\TemplateNameParserInterface');
+        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $locator
+            ->expects($this->once())
+            ->method('locate')
+            ->will($this->returnValue($template = __DIR__.'/../DependencyInjection/Fixtures/Resources/views/layout.html.twig'))
+        ;
+        $loader = new FilesystemLoader($locator, $parser);
+
+        return $this->assertTrue($loader->exists($template));
+    }
+
     /**
      * @expectedException \Twig_Error_Loader
      */

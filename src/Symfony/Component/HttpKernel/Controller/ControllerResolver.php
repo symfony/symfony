@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ControllerResolver implements ArgumentResolverInterface, ControllerResolverInterface
 {
-    private $logger;
+    protected $logger;
 
     /**
      * If the ...$arg functionality is available.

@@ -52,11 +52,7 @@ abstract class AbstractExtension implements FormExtensionInterface
      */
     public function getType($name)
     {
-        if (null === $this->types) {
-            $this->initTypes();
-        }
-
-        if (!isset($this->types[$name])) {
+        if (!$this->hasType($name)) {
             throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension', $name));
         }
 

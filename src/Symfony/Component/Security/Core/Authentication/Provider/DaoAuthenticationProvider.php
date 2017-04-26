@@ -34,8 +34,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     /**
      * Constructor.
      *
-     * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
-     * @param UserCheckerInterface    $userChecker                An UserCheckerInterface instance
+     * @param UserProviderInterface   $userProvider               A UserProviderInterface instance
+     * @param UserCheckerInterface    $userChecker                A UserCheckerInterface instance
      * @param string                  $providerKey                The provider key
      * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
      * @param bool                    $hideUserNotFoundExceptions Whether to hide user not found exception or not

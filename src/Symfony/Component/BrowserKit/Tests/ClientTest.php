@@ -345,6 +345,12 @@ class ClientTest extends TestCase
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
 
         $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com:8080/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $this->assertEquals('http://www.example.com:8080/redirected', $client->getRequest()->getUri(), '->followRedirect() does not forget the port of the redirect URL');
+
+        $client = new TestClient();
         $client->setNextResponse(new Response('', 201, array('Location' => 'http://www.example.com/redirected')));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 

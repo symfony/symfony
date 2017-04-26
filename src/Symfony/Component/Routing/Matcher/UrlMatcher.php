@@ -85,8 +85,12 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function match($pathinfo)
+    public function match($pathinfo = null)
     {
+        if (null === $pathinfo) {
+            $pathinfo = $this->context->getPathInfo();
+        }
+        
         $this->allow = array();
 
         if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {

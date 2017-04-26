@@ -1,0 +1,87 @@
+{
+    "absolute":
+    {
+        "name":"calculator:abs",
+        "description":"Absolute value.",
+        "operator":"abs",
+        "parameters":
+        {
+            "value1":{
+                "description":"first value"
+            }
+        }
+    },
+    "maximum":
+    {
+        "name":"calculator:max",
+        "description":"Maximum of params.",
+        "operator":"max",
+        "parameters":
+        {
+            "value1":
+            {
+                "description":"first value"
+            },
+            "value2":
+            {
+                "description":"second value"
+            }
+        }
+    },
+    "minimum":
+    {
+        "name":"calculator:min",
+        "description":"Minimum of params.",
+        "operator":"min",
+        "parameters":
+        {
+            "value1":
+            {
+                "description":"first value"
+            },
+            "value2":
+            {
+                "description":"second value"
+            }
+        }
+    },
+    "Cosine":
+    {
+        "name":"calculator:cos",
+        "description":"Cosine calculator.",
+        "operator":"cos",
+        "parameters":
+        {
+            "value1":
+            {
+                "description":"first value"
+            }
+        }
+    },
+    "Sin":
+    {
+        "name":"calculator:sin",
+        "description":"Sine of params.",
+        "operator":"sin",
+        "parameters":
+        {
+            "value1":
+            {
+                "description":"first value"
+            }
+        }
+    },
+    "Tan":
+    {
+        "name":"calculator:tan",
+        "description":"Tangent calculator.",
+        "operator":"tan",
+        "parameters":
+        {
+            "value1":
+            {
+                "description":"first value"
+            }
+        }
+    }
+}

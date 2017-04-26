@@ -168,15 +168,15 @@ class DateTimeType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['view_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts)
             ));
         }
     }

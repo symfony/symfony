@@ -19,6 +19,11 @@
         </service>
         <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" />
 
+        <service id="security.role_checker" class="Symfony\Component\Security\Core\Authorization\RoleChecker">
+            <argument type="service" id="security.authorization_checker" />
+            <argument type="service" id="security.role_hierarchy" />
+        </service>
+
         <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
         <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" public="false" />
 

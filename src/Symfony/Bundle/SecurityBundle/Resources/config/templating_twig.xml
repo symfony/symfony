@@ -13,6 +13,7 @@
         <service id="twig.extension.security" class="Symfony\Bridge\Twig\Extension\SecurityExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
+            <argument type="service" id="security.role_checker" on-invalid="ignore" />
         </service>
     </services>
 </container>

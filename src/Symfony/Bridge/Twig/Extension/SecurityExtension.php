@@ -13,7 +13,9 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\RoleCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * SecurityExtension exposes security context features.
@@ -23,10 +25,12 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 class SecurityExtension extends \Twig_Extension
 {
     private $securityChecker;
+    private $roleChecker;
 
-    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker = null, RoleCheckerInterface $roleChecker = null)
     {
         $this->securityChecker = $securityChecker;
+        $this->roleChecker = $roleChecker;
     }
 
     public function isGranted($role, $object = null, $field = null)
@@ -46,6 +50,15 @@ class SecurityExtension extends \Twig_Extension
         }
     }
 
+    public function hasRole($role, UserInterface $user)
+    {
+        if (null === $this->roleChecker) {
+            return false;
+        }
+
+        return $this->roleChecker->hasRole($role, $user);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -53,6 +66,7 @@ class SecurityExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('is_granted', array($this, 'isGranted')),
+            new \Twig_SimpleFunction('has_role', array($this, 'hasRole')),
         );
     }
 

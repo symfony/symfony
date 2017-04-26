@@ -51,7 +51,6 @@ class YamlFileLoader extends FileLoader
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
-        'inherit_tags' => 'inherit_tags',
         'decorates' => 'decorates',
         'decoration_inner_name' => 'decoration_inner_name',
         'decoration_priority' => 'decoration_priority',
@@ -74,7 +73,6 @@ class YamlFileLoader extends FileLoader
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
-        'inherit_tags' => 'inherit_tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
     );
@@ -93,7 +91,6 @@ class YamlFileLoader extends FileLoader
     private static $defaultsKeywords = array(
         'public' => 'public',
         'tags' => 'tags',
-        'inherit_tags' => 'inherit_tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
     );
@@ -365,12 +362,6 @@ class YamlFileLoader extends FileLoader
             }
 
             $definition = new ChildDefinition($service['parent']);
-
-            $inheritTag = isset($service['inherit_tags']) ? $service['inherit_tags'] : (isset($defaults['inherit_tags']) ? $defaults['inherit_tags'] : null);
-            if (null !== $inheritTag) {
-                $definition->setInheritTags($inheritTag);
-            }
-            $defaults = array();
         } else {
             $definition = new Definition();
 
@@ -458,13 +449,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
         }
 
-        if (!isset($defaults['tags'])) {
-            // no-op
-        } elseif (!isset($service['inherit_tags'])) {
-            if (!isset($service['tags'])) {
-                $tags = $defaults['tags'];
-            }
-        } elseif ($service['inherit_tags']) {
+        if (isset($defaults['tags'])) {
             $tags = array_merge($tags, $defaults['tags']);
         }
 

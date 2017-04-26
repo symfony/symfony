@@ -655,7 +655,7 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
 
-        $this->assertSame(array(), $container->getDefinition('no_defaults')->getTags());
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('no_defaults')->getTags());
 
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
     }

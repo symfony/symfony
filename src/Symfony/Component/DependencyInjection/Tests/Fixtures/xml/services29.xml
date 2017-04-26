@@ -6,7 +6,7 @@
         </defaults>
 
         <service id="with_defaults" class="Foo" />
-        <service id="no_defaults" class="Foo" public="true" autowire="false" inherit-tags="false">
+        <service id="no_defaults" class="Foo" public="true" autowire="false">
         </service>
     </services>
 </container>

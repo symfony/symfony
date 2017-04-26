@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 class ChildDefinition extends Definition
 {
     private $parent;
-    private $inheritTags = false;
 
     /**
      * @param string $parent The id of Definition instance to decorate
@@ -55,30 +54,6 @@ class ChildDefinition extends Definition
         $this->parent = $parent;
 
         return $this;
-    }
-
-    /**
-     * Sets whether tags should be inherited from the parent or not.
-     *
-     * @param bool $boolean
-     *
-     * @return $this
-     */
-    public function setInheritTags($boolean)
-    {
-        $this->inheritTags = (bool) $boolean;
-
-        return $this;
-    }
-
-    /**
-     * Returns whether tags should be inherited from the parent or not.
-     *
-     * @return bool
-     */
-    public function getInheritTags()
-    {
-        return $this->inheritTags;
     }
 
     /**

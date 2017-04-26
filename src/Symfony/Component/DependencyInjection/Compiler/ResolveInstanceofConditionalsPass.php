@@ -77,7 +77,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             foreach ($instanceofDefs as $key => $instanceofDef) {
                 /** @var ChildDefinition $instanceofDef */
                 $instanceofDef = clone $instanceofDef;
-                $instanceofDef->setAbstract(true)->setInheritTags(false)->setParent($parent ?: 'abstract.instanceof.'.$id);
+                $instanceofDef->setAbstract(true)->setParent($parent ?: 'abstract.instanceof.'.$id);
                 $parent = 'instanceof.'.$interface.'.'.$key.'.'.$id;
                 $container->setDefinition($parent, $instanceofDef);
                 $instanceofTags[] = $instanceofDef->getTags();

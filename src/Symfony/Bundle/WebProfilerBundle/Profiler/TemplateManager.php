@@ -124,8 +124,8 @@ class TemplateManager
     protected function templateExists($template)
     {
         $loader = $this->twig->getLoader();
-        if ($loader instanceof \Twig_ExistsLoaderInterface) {
-            return $loader->exists($template);
+        if ($loader instanceof \Twig_ExistsLoaderInterface && $loader->exists($template)) {
+            return true;
         }
 
         try {

@@ -52,6 +52,25 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function exists($name)
+    {
+        // for BC
+        if ($this->doFindTemplate($name)) {
+            return true;
+        }
+
+        try {
+            $this->findTemplate($name);
+
+            return true;
+        } catch (\Twig_Error_Loader $e) {
+            return false;
+        }
+    }
+
+    /**
      * Returns the path to the template file.
      *
      * The file locator is used to locate the template when the naming convention

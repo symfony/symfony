@@ -153,4 +153,24 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         return count($this->children);
     }
+
+    /**
+     * Checks if the form and all
+     * of its children are valid.
+     *
+     * @return boolean
+     */
+    public function isValid()
+    {
+        if (isset($this->vars['errors']) && count($this->vars['errors'])) {
+            return false;
+        }
+
+        foreach ($this->children as $child) {
+            if (!$child->isValid()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

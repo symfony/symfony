@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Tato hodnota nesmí být null.</target>
+                <target>Tato hodnota nesmí být prázdná.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>Tato hodnota musí být null.</target>
+                <target>Tato hodnota musí být prázdná.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>

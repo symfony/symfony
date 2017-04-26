@@ -66,4 +66,13 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @param int $offset The offset to remove
      */
     public function remove($offset);
+
+    /**
+     * Returns whether the violation list is empty.
+     *
+     * @return Boolean True if violation list is empty otherwise false.
+     *
+     * @api
+     */
+    public function isEmpty();
 }

@@ -403,9 +403,11 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                          * Produces <xml><item>0</item><item>1</item></xml>
                          * From array("item" => array(0,1));.
                          */
-                        foreach ($data as $subData) {
-                            $append = $this->appendNode($parentNode, $subData, $key);
+                        $node = $this->dom->createElement($key);
+                        foreach ($data as $key => $subData) {
+                            $append = $this->appendNode($node, $subData, "item", $key);
                         }
+    					$parentNode->appendChild($node);
                     } else {
                         $append = $this->appendNode($parentNode, $data, $key);
                     }

@@ -84,13 +84,6 @@
 
     <div id="content" class="container">
         <div id="main">
-            <div id="collector-wrapper">
-                <div id="collector-content">
-                    {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
-                    {% block panel '' %}
-                </div>
-            </div>
-
             <div id="sidebar">
                 <div id="sidebar-shortcuts">
                     <div class="shortcuts">
@@ -127,6 +120,13 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+            </div>
+
+            <div id="collector-wrapper">
+                <div id="collector-content">
+                    {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
+                    {% block panel '' %}
+                </div>
             </div>
         </div>
     </div>

@@ -756,10 +756,6 @@ class YamlFileLoader extends FileLoader
     private function loadFromExtensions(array $content)
     {
         foreach ($content as $namespace => $values) {
-            if (in_array($namespace, array('imports', 'parameters', 'services'))) {
-                continue;
-            }
-
             if (!is_array($values)) {
                 $values = array();
             }

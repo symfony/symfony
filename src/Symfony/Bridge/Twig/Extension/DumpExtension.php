@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class DumpExtension extends \Twig_Extension
+class DumpExtension extends \Twig_Extension_Debug
 {
     private $cloner;
     private $dumper;
@@ -33,6 +33,11 @@ class DumpExtension extends \Twig_Extension
 
     public function getFunctions()
     {
+        if (!$this->cloner) {
+            // use native dump function, as the DebugBundle is not registered
+            return parent::getFunctions();
+        }
+
         return array(
             new \Twig_SimpleFunction('dump', array($this, 'dump'), array('is_safe' => array('html'), 'needs_context' => true, 'needs_environment' => true)),
         );

@@ -87,6 +87,10 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
         if (FileinfoMimeTypeGuesser::isSupported()) {
             $this->register(new FileinfoMimeTypeGuesser());
         }
+
+        if (ContentTypeMimeTypeGuesser::isSupported()) {
+            $this->register(new ContentTypeMimeTypeGuesser());
+        }
     }
 
     /**

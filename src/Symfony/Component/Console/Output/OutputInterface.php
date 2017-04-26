@@ -116,4 +116,15 @@ interface OutputInterface
      * @return OutputFormatterInterface
      */
     public function getFormatter();
+
+    public function isQuiet();
+
+    public function isVerbose();
+
+    public function isVeryVerbose();
+
+    public function isDebug();
+
+    
+
 }

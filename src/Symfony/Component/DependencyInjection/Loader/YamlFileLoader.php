@@ -637,12 +637,26 @@ class YamlFileLoader extends FileLoader
 
             if (!$this->container->hasExtension($namespace)) {
                 $extensionNamespaces = array_filter(array_map(function ($ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
+
+                list($vendor, $bundle) = explode('_', $namespace, 2);
+
+                $relatedExtensionNamespaces = array_filter($extensionNamespaces, function ($ns) use ($vendor, $bundle) {
+                    if (0 === strpos($ns, $vendor)) {
+                        return true;
+                    }
+
+                    return 1 === preg_match('{'.preg_quote($bundle).'}', $ns);
+                });
+                if (0 === count($relatedExtensionNamespaces)) {
+                    $relatedExtensionNamespaces = $extensionNamespaces;
+                }
+
                 throw new InvalidArgumentException(sprintf(
-                    'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
+                    'There is no extension able to load the configuration for "%s" (in %s). Did you mean one of these %s?',
                     $namespace,
                     $file,
                     $namespace,
-                    $extensionNamespaces ? sprintf('"%s"', implode('", "', $extensionNamespaces)) : 'none'
+                    $extensionNamespaces ? sprintf('"%s"', implode('", "', $relatedExtensionNamespaces)) : 'none'
                 ));
             }
         }

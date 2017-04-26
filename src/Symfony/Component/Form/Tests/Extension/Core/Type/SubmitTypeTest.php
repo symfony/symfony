@@ -62,4 +62,24 @@ class SubmitTypeTest extends ButtonTypeTest
 
         $this->assertSame($form, $form->add('send', static::TESTED_TYPE));
     }
+
+    public function testSubmitWithValidationGroupsOptionCanBeAddedToForm()
+    {
+        $form = $this->factory
+            ->createBuilder('form')
+            ->getForm();
+
+        $exception = false;
+
+        try {
+            $this->assertSame($form, $form->add('send', 'submit', array(
+                'validation_groups' => false,
+            )));
+        }
+        catch (\Exception $e) {
+            $exception = true;
+        }
+
+        $this->assertFalse($exception);
+    }
 }

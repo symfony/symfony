@@ -17,6 +17,49 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 /**
  * Definition represents a service definition.
  *
+ * Scopes
+ *
+ * - ContainerInterface::SCOPE_CONTAINER: For the container scope (the default)
+ *   the same instance is used each time you get the service.
+ * - ContainerInterface::SCOPE_PROTOTYPE: For the prototype scope a new instance
+ *   is created each time you get the service.
+ * - Any string identifier: Whenever the specified scope name is entered, a new
+ *   instance is created for the scope, and all instances of the scope are
+ *   destroyed as soon as the scope is left.
+ *   For instance, if you need to inject the request into your service, you need
+ *   to define the scope of your service as 'request', so a new instance is
+ *   created for each sub-request.
+ *
+ * Notes:
+ * - A service cannot have a dependency of a narrower scope, as the dependency
+ *   would need to be changed otherwise.
+ * - A service can have a single scope only.
+ *
+ * @see Definition::setScope()
+ * @see Definition::getScope()
+ *
+ * Synthetic services
+ *
+ * A synthetic service is a service that is injected into the container instead
+ * of being created by the container.
+ *
+ * For instance, the request is injected by the HttpKernel in the handle()
+ * method when entering the 'request' scope. The purpose of the 'request' scope
+ * is to handle the fact that every subrequest is actually an entirely new
+ * request; i.e., any service that relies on the request needs to be re-created
+ * for every subrequest, because if the service would be re-used it would point
+ * to an outdated request. The purpose of scopes is to ensure that
+ * request-dependent services are not carried over to another (sub-)request.
+ *
+ * As a result, by default there is a synthetic 'request' service, which only
+ * exists to yield a better error message if the request service is retrieved
+ * outside of a 'request' scope. Before entering a 'request' scope, the kernel
+ * must be supplied with a Request service instance. Once the (sub-)request is
+ * complete, the scope is exited.
+ *
+ * @see Definition::setSynthetic()
+ * @see Definition::isSynthetic()
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Definition

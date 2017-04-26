@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-19T18:20:27Z
+
+OK.. im getting some root issues here; ie. the `FirewallMapInterface::getListeners()` actually documents this return type; and now tests are mysteriously broken. `FirewallContext` doesnt implement it.. but this change seems to have effect elsewere;
+
+```
+Call to undefined method Symfony\Component\Security\Http\Firewall\ContextListener::register() in /var/www/html/symfony/vendor/symfony/symfony/src/Symfony/Component/Security/Http/Firewall.php on line 64
+```
+
+Looking at it.. @chalasr any headsup? Should we still do this PR?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-19T18:28:34Z
+
+@ro0NL
+
+```diff
+diff --git a/src/Symfony/Bundle/SecurityBundle/Security/FirewallMap.php b/src/Symfony/Bundle/SecurityBundle/Security/FirewallMap.php
+index a511193..55272ec 100644
+--- a/src/Symfony/Bundle/SecurityBundle/Security/FirewallMap.php
++++ b/src/Symfony/Bundle/SecurityBundle/Security/FirewallMap.php
+@@ -124,7 +124,7 @@ class _FirewallMap
+             return array(array(), null);
+         }
+
+-        return $context->getListeners();
++        return array($context->getListeners(), $context->getExceptionListener());
+     }
+
+     /**
+```
+
+should make this green.
+Having `FirewallMap::getListeners()` returning the current return value of `Firewall::getListeners()` (both exception and normal listeners) cannot be changed as the security component provides an array oriented FirewallMap, and its imposed by FirewallMapInterface anyway. This change is still fine to me :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-19T18:33:35Z
+
+Of course.... thanks :)

@@ -306,6 +306,12 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             'event' => $eventName,
             'priority' => $this->getListenerPriority($eventName, $listener),
         );
+
+        // unwrap for correct listener info
+        if ($listener instanceof WrappedListener) {
+            $listener = $listener->getWrappedListener();
+        }
+
         if ($listener instanceof \Closure) {
             $info += array(
                 'type' => 'Closure',

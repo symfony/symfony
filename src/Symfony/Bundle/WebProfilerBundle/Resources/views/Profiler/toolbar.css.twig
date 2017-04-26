@@ -417,6 +417,126 @@
         bottom: auto;
         top: 36px;
     }
+{% elseif position == 'right' %}
+
+    .sf-toolbarreset {
+        background-image: -moz-linear-gradient(225deg, #e4e4e4, #ffffff);
+        background-image: -webkit-gradient(linear, 100% 0%, 0% 0%, from(#e4e4e4), to(#ffffff));
+        background-image: -o-linear-gradient(135deg, #e4e4e4, #ffffff);
+        background: linear-gradient(225deg, #e4e4e4, #ffffff);
+
+        top: 0;
+        right: 0;
+        left: auto;
+        height: 100%;
+        bottom: auto;
+        border-right: none;
+        border-left: 1px solid #BBBBBB;
+        padding: 0;
+        width: 110px;
+        max-width: 110px;
+    }
+
+    .sf-toolbar-block {
+        clear: both;
+        float: left;
+        border-top: 1px solid #E4E4E4;
+        border-right: none;
+        width: 100%;
+    }
+
+    .sf-toolbar-block .sf-toolbar-info {
+        right: 110px;
+        bottom: auto;
+        top: auto;
+        border-bottom: 1px solid #bbb;
+        border-top: 1px solid #bbb;
+        border-right: none;
+        min-height: 16px;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon {
+        float: left;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon > a, .sf-toolbar-block .sf-toolbar-icon > span {
+        text-align: left;
+        width: 110px;
+    }
+
+    .sf-toolbar-info-piece-additional, .sf-toolbar-info-piece-additional-detail {
+        display: none !important;
+    }
+
+    .sf-toolbarreset .hide-button {
+        top: auto;
+        bottom: 10px;
+    }
+
+{% elseif position == 'left' %}
+
+    .sf-minitoolbar {
+        left: 0;
+        right: auto;
+
+        border-radius: 0 16px 0 0;
+    }
+
+    .sf-toolbarreset {
+        background-image: -moz-linear-gradient(225deg, #e4e4e4, #ffffff);
+        background-image: -webkit-gradient(linear, 100% 0%, 0% 0%, from(#e4e4e4), to(#ffffff));
+        background-image: -o-linear-gradient(135deg, #e4e4e4, #ffffff);
+        background: linear-gradient(225deg, #e4e4e4, #ffffff);
+
+        top: 0;
+        left: 0;
+        right: auto;
+        height: 100%;
+        bottom: auto;
+        border-left: none;
+        border-right: 1px solid #BBBBBB;
+        padding: 0;
+        width: 110px;
+        max-width: 110px;
+    }
+
+    .sf-toolbar-block {
+        clear: both;
+        float: right;
+        border-top: 1px solid #E4E4E4;
+        border-left: none;
+        width: 100%;
+    }
+
+    .sf-toolbar-block .sf-toolbar-info {
+        left: 110px;
+        bottom: auto;
+        top: auto;
+        border-bottom: 1px solid #bbb;
+        border-top: 1px solid #bbb;
+        border-left: none;
+        min-height: 16px;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon {
+        float: left;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon > a, .sf-toolbar-block .sf-toolbar-icon > span {
+        text-align: left;
+        width: 110px;
+    }
+
+    .sf-toolbar-info-piece-additional, .sf-toolbar-info-piece-additional-detail {
+        display: none !important;
+    }
+
+    .sf-toolbarreset .hide-button {
+        top: auto;
+        bottom: 10px;
+        left: 10px;
+    }
+
 {% endif %}
 
 {% if not floatable %}

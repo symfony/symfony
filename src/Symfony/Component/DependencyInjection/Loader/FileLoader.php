@@ -103,8 +103,9 @@ abstract class FileLoader extends BaseFileLoader
             if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $class)) {
                 continue;
             }
-            if (!$r = $this->container->getReflectionClass($class, true)) {
-                continue;
+            // check to make sure the expected class exists
+            if (!$r = $this->container->getReflectionClass($class)) {
+                throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $resource));
             }
             if (!$r->isInterface() && !$r->isTrait()) {
                 $classes[] = $class;

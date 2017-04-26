@@ -77,6 +77,17 @@ class UrlPackageTest extends TestCase
         );
     }
 
+    public function testVersionStrategyGivesAbsoluteURL()
+    {
+        $versionStrategy = $this->getMockBuilder('Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface')->getMock();
+        $versionStrategy->expects($this->any())
+            ->method('applyVersion')
+            ->willReturn('https://cdn.com/bar/main.css');
+        $package = new UrlPackage('https://example.com', $versionStrategy);
+
+        $this->assertEquals('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Asset\Exception\LogicException
      */

@@ -50,6 +50,9 @@ class FormPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition($this->formExtensionService);
+        if (new IteratorArgument(array()) != $definition->getArgument(2)) {
+            return;
+        }
         $definition->replaceArgument(0, $this->processFormTypes($container, $definition));
         $definition->replaceArgument(1, $this->processFormTypeExtensions($container));
         $definition->replaceArgument(2, $this->processFormTypeGuessers($container));

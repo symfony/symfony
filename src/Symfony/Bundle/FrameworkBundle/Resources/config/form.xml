@@ -36,6 +36,7 @@
             <argument /><!-- All services with tag "form.type" are stored in a service locator by FormPass -->
             <argument type="collection" /><!-- All services with tag "form.type_extension" are stored here by FormPass -->
             <argument type="iterator" /><!-- All services with tag "form.type_guesser" are stored here by FormPass -->
+            <argument>null</argument><!-- @deprecated argument in 3.3, to be removed in 4.0 -->
         </service>
 
         <!-- ValidatorTypeGuesser -->

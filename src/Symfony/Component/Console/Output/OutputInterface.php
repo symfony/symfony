@@ -116,4 +116,40 @@ interface OutputInterface
      * @return OutputFormatterInterface
      */
     public function getFormatter();
+
+    /**
+     * Do not output any messages.
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isQuiet();
+
+    /**
+     * Increased verbosity of messages.
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isVerbose();
+
+    /**
+     * Informative non essential messages.
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isVeryVerbose();
+
+    /**
+     * Debug messages.
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isDebug();
 }

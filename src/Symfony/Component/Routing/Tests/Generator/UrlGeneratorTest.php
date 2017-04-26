@@ -68,6 +68,14 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/app.php/testing/bar', $url);
     }
 
+    public function testRelativeUrlWithParametersWhichContainsDash()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing-{foo}'));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar-baz'));
+
+        $this->assertEquals('/app.php/testing-bar-baz', $url);
+    }
+
     public function testRelativeUrlWithNullParameter()
     {
         $routes = $this->getRoutes('test', new Route('/testing.{format}', array('format' => null)));

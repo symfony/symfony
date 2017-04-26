@@ -76,6 +76,17 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function has($name);
 
     /**
+     * Returns the child with the given name.
+     *
+     * @param string $name
+     *
+     * @return FormInterface
+     *
+     * @throws \InvalidArgumentException if the child does not exist
+     */
+    function get($name);
+
+    /**
      * Removes a child from the form.
      *
      * @param string $name The name of the child to remove

@@ -37,11 +37,21 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
             }
 
             if ($guesser instanceof self) {
-                $this->guessers = array_merge($this->guessers, $guesser->guessers);
+                $this->guessers = array_merge($this->guessers, $guesser->getGuessers());
             } else {
                 $this->guessers[] = $guesser;
             }
         }
+    }
+    
+    /**
+     * Gets the form type guessers.
+     * 
+     * @return FormTypeGuesserInterface[] Guessers
+     **/
+    public function getGuessers()
+    {
+        return $this->guessers;
     }
 
     /**

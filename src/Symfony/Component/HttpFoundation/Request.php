@@ -256,7 +256,77 @@ class Request
     {
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
+    
+    /**
+     * Get attributes.
+     * 
+     * @return \Symfony\Component\HttpFoundation\ParameterBag 
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
 
+    /**
+     * Get attributes.
+     * 
+     * @return \Symfony\Component\HttpFoundation\ParameterBag 
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * Get attributes.
+     * 
+     * @return \Symfony\Component\HttpFoundation\ParameterBag 
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * Get attributes.
+     * 
+     * @return \Symfony\Component\HttpFoundation\ParameterBag 
+     */
+    public function getServer()
+    {
+        return $this->server;
+    }
+
+    /**
+     * Get attributes.
+     * 
+     * @return \Symfony\Component\HttpFoundation\ParameterBag 
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * Get attributes.
+     * 
+     * @return \Symfony\Component\HttpFoundation\ParameterBag 
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
+    }
+
+    /**
+     * Get headers.
+     * 
+     * @return \Symfony\Component\HttpFoundation\HeaderBag 
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+    
     /**
      * Sets the parameters for this request.
      *

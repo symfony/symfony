@@ -548,6 +548,15 @@ class Filesystem
             $this->mkdir($targetDir);
         }
 
+        if (!is_dir($targetDir)) {
+            if (file_exists($targetDir)) {
+                throw new \RuntimeException(sprintf('Target directory "%s" is not a directory.', $targetDir));
+            }
+            if (!mkdir($targetDir)) {
+                throw new \RuntimeException(sprintf('Target directory "%s" could not be created.', $targetDir));
+            }
+        }
+
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 

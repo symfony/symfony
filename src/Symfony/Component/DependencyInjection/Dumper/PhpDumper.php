@@ -1351,8 +1351,11 @@ EOF;
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables->offsetGet($value), $interpolate);
             }
-            if (count($value->getMethodCalls()) > 0) {
+            if ($value->getMethodCalls()) {
                 throw new RuntimeException('Cannot dump definitions which have method calls.');
+            }
+            if ($value->getProperties()) {
+                throw new RuntimeException('Cannot dump definitions which have properties.');
             }
             if (null !== $value->getConfigurator()) {
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');

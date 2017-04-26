@@ -58,7 +58,7 @@ class PathPackage extends Package
 
         $versionedPath = $this->getVersionStrategy()->applyVersion($path);
 
-        if ($this->isAbsoluteUrl($versionedPath)) {
+        if ($this->isAbsoluteUrl($versionedPath) || '/' === substr($versionedPath, 0, 1)) {
             return $versionedPath;
         }
 

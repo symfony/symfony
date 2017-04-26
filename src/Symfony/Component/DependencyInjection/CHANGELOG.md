@@ -90,6 +90,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * made the ContainerAware class abstract
  * added IntrospectableContainerInterface (to be able to check if a service
    has been initialized or not)
  * added ConfigurationExtensionInterface

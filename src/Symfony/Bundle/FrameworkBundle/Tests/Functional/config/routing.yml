@@ -1,0 +1,2 @@
+_food_risc_account_admin:
+    resource: "@FileUploadBundle/Resources/config/routing.yml"

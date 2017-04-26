@@ -60,6 +60,12 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
             return $response;
         }
 
+        if ($request->isXmlHttpRequest()) {
+            $http401Response = new Response('', 401);
+
+            return $http401Response;
+        }
+
         return $this->httpUtils->createRedirectResponse($request, $this->loginPath);
     }
 }

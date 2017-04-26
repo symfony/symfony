@@ -434,7 +434,7 @@ Security
 SecurityBundle
 --------------
 
- * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` method instead.
+ * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` and/or `getExceptionListener()` method instead.
 
  * The `FirewallMap::$map` and `$container` properties have been removed.
 

@@ -32,18 +32,21 @@ class FirewallContextTest extends TestCase
 
         $context = new FirewallContext($listeners, $exceptionListener, $config);
 
-        $this->assertEquals(array($listeners, $exceptionListener), $context->getListeners());
+        $this->assertEquals($listeners, $context->getListeners());
+        $this->assertEquals($exceptionListener, $context->getExceptionListener());
         $this->assertEquals($config, $context->getConfig());
     }
 
     /**
-     * @expectedDeprecation Method Symfony\Bundle\SecurityBundle\Security\FirewallContext::getContext() is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Bundle\SecurityBundle\Security\FirewallContext::getListeners() instead.
+     * @expectedDeprecation Method Symfony\Bundle\SecurityBundle\Security\FirewallContext::getContext() is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Bundle\SecurityBundle\Security\FirewallContext::getListeners/getExceptionListener() instead.
      * @group legacy
      */
-    public function testGetContextTriggersDeprecation()
+    public function testGetContext()
     {
-        (new FirewallContext(array(), $this->getExceptionListenerMock(), new FirewallConfig('main', 'request_matcher', 'user_checker')))
+        $context = (new FirewallContext($listeners = array(), $exceptionListener = $this->getExceptionListenerMock(), new FirewallConfig('main', 'request_matcher', 'user_checker')))
             ->getContext();
+
+        $this->assertEquals(array($listeners, $exceptionListener), $context);
     }
 
     private function getExceptionListenerMock()

@@ -33,7 +33,7 @@ class ArrayInput extends Input
      * @param array                $parameters An array of parameters
      * @param InputDefinition|null $definition A InputDefinition instance
      */
-    public function __construct(array $parameters, InputDefinition $definition = null)
+    public function __construct(array $parameters = array(), InputDefinition $definition = null)
     {
         $this->parameters = $parameters;
 

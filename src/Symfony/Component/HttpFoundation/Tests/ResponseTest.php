@@ -735,6 +735,18 @@ class ResponseTest extends ResponseTestCase
         $response = new Response('', 301, array('Location' => '/good-uri'));
         $this->assertFalse($response->isRedirect('/bad-uri'));
         $this->assertTrue($response->isRedirect('/good-uri'));
+
+        $response = new Response('', 301, array('Location' => '/a-uri/another-uri'));
+        $this->assertTrue($response->isRedirect(array($this, 'isRedirectCallback')));
+        $this->assertTrue($response->isRedirect(function($location) { return preg_match('/^\/a-uri\//', $location); }));
+    }
+
+    /**
+     * Callback used to test HttpFoundation\Response::isRedirect() few lines above
+     */
+    public function isRedirectCallback($location)
+    {
+        return preg_match('/^\/a-uri\//', $location);
     }
 
     public function testIsNotFound()

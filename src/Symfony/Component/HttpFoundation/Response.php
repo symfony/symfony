@@ -1229,7 +1229,19 @@ class Response
      */
     public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        if (!in_array($this->statusCode, array(201, 301, 302, 303, 307, 308))) {
+            return false;
+        }
+
+        if (null === $location) {
+            return true;
+        }
+
+        if (!is_string($location) && is_callable($location)) {
+            return (Boolean) call_user_func($location, $this->headers->get('Location'));
+        }
+
+        return $location == $this->headers->get('Location');
     }
 
     /**

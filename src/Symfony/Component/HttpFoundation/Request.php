@@ -341,7 +341,7 @@ class Request
      *
      * @return static
      */
-    public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
+    public static function create($uri, $method = 'GET', array $parameters = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
         $server = array_replace(array(
             'SERVER_NAME' => 'localhost',

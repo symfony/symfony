@@ -49,14 +49,17 @@ abstract class AbstractStoreTest extends TestCase
         $store->save($key1);
         $this->assertTrue($store->exists($key1));
         $this->assertFalse($store->exists($key2));
-        $store->save($key2);
 
+        $store->save($key2);
         $this->assertTrue($store->exists($key1));
         $this->assertTrue($store->exists($key2));
 
         $store->delete($key1);
         $this->assertFalse($store->exists($key1));
+        $this->assertTrue($store->exists($key2));
+
         $store->delete($key2);
+        $this->assertFalse($store->exists($key1));
         $this->assertFalse($store->exists($key2));
     }
 
@@ -74,7 +77,7 @@ abstract class AbstractStoreTest extends TestCase
 
         try {
             $store->save($key2);
-            throw new \Exception('The store shouldn\'t save the second key');
+            $this->fail('The store shouldn\'t save the second key');
         } catch (LockConflictedException $e) {
         }
 

@@ -75,4 +75,16 @@ trait ExpiringStoreTestTrait
         usleep(2.1 * $clockDelay);
         $this->assertFalse($store->exists($key));
     }
+
+    public function testSetExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+
+        /** @var StoreInterface $store */
+        $store = $this->getStore();
+
+        $store->save($key);
+        $store->putOffExpiration($key, 1);
+        $this->assertNotNull($key->getExpiringDate());
+    }
 }

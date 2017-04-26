@@ -89,6 +89,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
         }
 
         try {
+            $this->key->resetExpiringDate();
             $this->store->putOffExpiration($this->key, $this->ttl);
             $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $this->ttl));
         } catch (LockConflictedException $e) {
@@ -119,5 +120,22 @@ final class Lock implements LockInterface, LoggerAwareInterface
             $this->logger->warning('Failed to release the "{resource}" lock.', array('resource' => $this->key));
             throw new LockReleasingException(sprintf('Failed to release the "%s" lock.', $this->key));
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExpired()
+    {
+        if (null === $expireDate = $this->key->getExpiringDate()) {
+            return false;
+        }
+
+        return $expireDate <= new \DateTime();
+    }
+
+    public function getExpiringDate()
+    {
+        return $this->key->getExpiringDate();
     }
 }

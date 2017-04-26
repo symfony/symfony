@@ -524,6 +524,25 @@ class ProcessTest extends TestCase
         $process->mustRun();
     }
 
+    public function testProcessOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));
+        ob_start();
+        $p->run();
+        $output = ob_get_clean();
+
+        $this->assertEquals('foo', $output);
+    }
+
+    public function testProcessWriting()
+    {
+        $stdin = str_repeat('*', 4096);
+        $p = new Process(sprintf('php -r %s', escapeshellarg('echo file_get_contents(\'php://stdin\');')), null, null, $stdin);
+        $p->run();
+
+        $this->assertEquals($stdin, $p->getOutput());
+    }
+
     public function testExitCodeText()
     {
         $this->skipIfNotEnhancedSigchild();

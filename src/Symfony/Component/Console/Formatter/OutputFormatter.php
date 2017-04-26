@@ -143,7 +143,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
 
             // add the text up to the next tag
-            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
+            $output .= $this->applyCurrentStyle(mb_substr($message, $offset, $pos - $offset, '8bit'));
             $offset = $pos + strlen($text);
 
             // opening tag?
@@ -165,7 +165,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle(substr($message, $offset));
+        $output .= $this->applyCurrentStyle(mb_substr($message, $offset, null, '8bit'));
 
         if (false !== strpos($output, '<<')) {
             return strtr($output, array('\\<' => '<', '<<' => '\\'));

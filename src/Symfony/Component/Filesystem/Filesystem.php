@@ -22,6 +22,18 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 class Filesystem
 {
     /**
+     * Checks whether a file or directory exists.
+     *
+     * @param string $file The filename
+     *
+     * @return Boolean true if the file or directory exists, false otherwise
+     */
+    public function exists($file)
+    {
+        return file_exists($file);
+    }
+
+    /**
      * Copies a file.
      *
      * If the target file is older than the origin file, it's always overwritten.

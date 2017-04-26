@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\DivisionByZero;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -147,6 +148,9 @@ class BinaryNode extends Node
             case '*':
                 return $left * $right;
             case '/':
+                if($right == 0) {
+                    throw new DivisionByZero();
+                }
                 return $left / $right;
             case '%':
                 return $left % $right;

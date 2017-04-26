@@ -50,7 +50,7 @@ class XmlFileLoader extends FileLoader
         $this->parseImports($xml, $path);
 
         // parameters
-        $this->parseParameters($xml);
+        $this->parseParameters($xml, $path);
 
         // extensions
         $this->loadFromExtensions($xml);
@@ -83,11 +83,12 @@ class XmlFileLoader extends FileLoader
      * Parses parameters.
      *
      * @param \DOMDocument $xml
+     * @param string       $file
      */
-    private function parseParameters(\DOMDocument $xml)
+    private function parseParameters(\DOMDocument $xml, $file)
     {
         if ($parameters = $this->getChildren($xml->documentElement, 'parameters')) {
-            $this->container->getParameterBag()->add($this->getArgumentsAsPhp($parameters[0], 'parameter'));
+            $this->container->getParameterBag()->add($this->getArgumentsAsPhp($parameters[0], 'parameter', $file));
         }
     }
 
@@ -266,8 +267,8 @@ class XmlFileLoader extends FileLoader
             $definition->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
         }
 
-        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', false, $definition instanceof ChildDefinition));
-        $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
+        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', $file, false, $definition instanceof ChildDefinition));
+        $definition->setProperties($this->getArgumentsAsPhp($service, 'property', $file));
 
         if ($factories = $this->getChildren($service, 'factory')) {
             $factory = $factories[0];
@@ -300,7 +301,7 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($this->getChildren($service, 'call') as $call) {
-            $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument'));
+            $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument', $file));
         }
 
         $tags = $this->getChildren($service, 'tag');
@@ -434,11 +435,12 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMElement $node
      * @param string      $name
+     * @param string      $file
      * @param bool        $lowercase
      *
      * @return mixed
      */
-    private function getArgumentsAsPhp(\DOMElement $node, $name, $lowercase = true, $isChildDefinition = false)
+    private function getArgumentsAsPhp(\DOMElement $node, $name, $file, $lowercase = true, $isChildDefinition = false)
     {
         $arguments = array();
         foreach ($this->getChildren($node, $name) as $arg) {
@@ -474,6 +476,9 @@ class XmlFileLoader extends FileLoader
 
             switch ($arg->getAttribute('type')) {
                 case 'service':
+                    if (!$arg->getAttribute('id')) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service" has no or empty "id" attribute in "%s".', $name, $file));
+                    }
                     if ($arg->hasAttribute('strict')) {
                         @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since version 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), E_USER_DEPRECATED);
                     }
@@ -484,17 +489,23 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = new Expression($arg->nodeValue);
                     break;
                 case 'closure-proxy':
+                    if (!$arg->getAttribute('id')) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="closure-proxy" has no or empty "id" attribute in "%s".', $name, $file));
+                    }
+                    if (!$arg->getAttribute('method')) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="closure-proxy" has no or empty "method" attribute in "%s".', $name, $file));
+                    }
                     $arguments[$key] = new ClosureProxyArgument($arg->getAttribute('id'), $arg->getAttribute('method'), $invalidBehavior);
                     break;
                 case 'collection':
-                    $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, false);
+                    $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, $file, false);
                     break;
                 case 'iterator':
-                    $arg = $this->getArgumentsAsPhp($arg, $name, false);
+                    $arg = $this->getArgumentsAsPhp($arg, $name, $file, false);
                     try {
                         $arguments[$key] = new IteratorArgument($arg);
                     } catch (InvalidArgumentException $e) {
-                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="iterator" only accepts collections of type="service" references.', $name));
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="iterator" only accepts collections of type="service" references in "%s".', $name, $file));
                     }
                     break;
                 case 'string':

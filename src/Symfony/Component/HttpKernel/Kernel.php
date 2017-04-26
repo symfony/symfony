@@ -524,7 +524,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function getContainerBaseClass()
     {
-        return 'Container';
+        return 'Symfony\\Component\\DependencyInjection\\AnnotationContainer';
     }
 
     /**

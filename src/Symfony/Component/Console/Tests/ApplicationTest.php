@@ -1045,7 +1045,7 @@ class ApplicationTest extends TestCase
         $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
             $event->getOutput()->write('silenced.');
 
-            $event->markErrorAsHandled();
+            $event->setExitCode(0);
         });
 
         $dispatcher->addListener('console.command', function () {
@@ -1063,7 +1063,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
         $this->assertContains('before.error.silenced.after.', $tester->getDisplay());
-        $this->assertEquals(0, $tester->getStatusCode());
+        $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $tester->getStatusCode());
     }
 
     public function testConsoleErrorEventIsTriggeredOnCommandNotFound()
@@ -1073,7 +1073,6 @@ class ApplicationTest extends TestCase
             $this->assertNull($event->getCommand());
             $this->assertInstanceOf(CommandNotFoundException::class, $event->getError());
             $event->getOutput()->write('silenced command not found');
-            $event->markErrorAsHandled();
         });
 
         $application = new Application();
@@ -1083,12 +1082,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'unknown'));
         $this->assertContains('silenced command not found', $tester->getDisplay());
-        $this->assertEquals(0, $tester->getStatusCode());
+        $this->assertEquals(1, $tester->getStatusCode());
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation The "console.exception" event is deprecated since version 3.3 and will be removed in 4.0. Use the "console.error" event instead.
+     * @expectedDeprecation The "ConsoleEvents::EXCEPTION" event is deprecated since Symfony 3.3 and will be removed in 4.0. Listen to the "ConsoleEvents::ERROR" event instead.
      */
     public function testLegacyExceptionListenersAreStillTriggered()
     {
@@ -1115,13 +1114,6 @@ class ApplicationTest extends TestCase
 
     public function testRunWithError()
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('Exception');
-            $this->expectExceptionMessage('dymerr');
-        } else {
-            $this->setExpectedException('Exception', 'dymerr');
-        }
-
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
@@ -1133,7 +1125,13 @@ class ApplicationTest extends TestCase
         });
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'dym'));
+
+        try {
+            $tester->run(array('command' => 'dym'));
+            $this->fail('Error expected.');
+        } catch (\Error $e) {
+            $this->assertSame('dymerr', $e->getMessage());
+        }
     }
 
     /**
@@ -1143,6 +1141,7 @@ class ApplicationTest extends TestCase
     {
         $application = new Application();
         $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
         $application->setDispatcher(new EventDispatcher());
 
         $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
@@ -1154,8 +1153,7 @@ class ApplicationTest extends TestCase
         try {
             $tester->run(array('command' => 'dym'));
             $this->fail('->run() should rethrow PHP errors if not handled via ConsoleErrorEvent.');
-        } catch (\Throwable $e) {
-            $this->assertInstanceOf('Error', $e);
+        } catch (\Error $e) {
             $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
         }
     }
@@ -1378,7 +1376,7 @@ class ApplicationTest extends TestCase
             $event->getOutput()->writeln('after.');
 
             if (!$skipCommand) {
-                $event->setExitCode(113);
+                $event->setExitCode(ConsoleCommandEvent::RETURN_CODE_DISABLED);
             }
         });
         $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Event;
 
+@trigger_error(sprintf('The "%s" class is deprecated since version 3.3 and will be removed in 4.0. Use the ConsoleErrorEvent instead.', ConsoleExceptionEvent::class), E_USER_DEPRECATED);
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,22 +22,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated ConsoleExceptionEvent is deprecated since version 3.3 and will be removed in 4.0. Use ConsoleErrorEvent instead.
+ * @deprecated since version 3.3, to be removed in 4.0. Use ConsoleErrorEvent instead.
  */
 class ConsoleExceptionEvent extends ConsoleEvent
 {
     private $exception;
     private $exitCode;
 
-    public function __construct(Command $command = null, InputInterface $input, OutputInterface $output, \Exception $exception, $exitCode, $deprecation = true)
+    public function __construct(Command $command, InputInterface $input, OutputInterface $output, \Exception $exception, $exitCode)
     {
-        if ($deprecation) {
-            @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use the ConsoleErrorEvent instead.', __CLASS__), E_USER_DEPRECATED);
-        }
-
         parent::__construct($command, $input, $output);
 
-        $this->exception = $exception;
+        $this->setException($exception);
         $this->exitCode = (int) $exitCode;
     }
 

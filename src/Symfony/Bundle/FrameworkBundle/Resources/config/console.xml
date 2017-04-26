@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="console.exception_listener" class="Symfony\Component\Console\EventListener\ExceptionListener" public="false">
+        <service id="console.error_listener" class="Symfony\Component\Console\EventListener\ErrorListener" public="false">
             <argument type="service" id="logger" on-invalid="null" />
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="console" />

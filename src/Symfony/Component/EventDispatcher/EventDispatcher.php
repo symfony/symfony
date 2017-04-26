@@ -101,6 +101,9 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
+        if (!$this->hasListeners($eventName)) {
+            $this->dispatch('eventdispatcher.event_used.'. $eventName);
+        }
         $this->listeners[$eventName][$priority][] = $listener;
         unset($this->sorted[$eventName]);
     }

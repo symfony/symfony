@@ -568,6 +568,34 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setOption($name, $value)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->options[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setOptions(array $options)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setDataMapper(DataMapperInterface $dataMapper = null)
     {
         if ($this->locked) {

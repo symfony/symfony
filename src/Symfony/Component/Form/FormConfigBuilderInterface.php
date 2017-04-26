@@ -105,6 +105,25 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setAttributes(array $attributes);
 
     /**
+     * Sets the value for an option.
+     *
+     * @param string $name  The name of the option
+     * @param string $value The value of the option
+     *
+     * @return self The configuration object.
+     */
+    public function setOption($name, $value);
+
+    /**
+     * Sets the options.
+     *
+     * @param array $options The options
+     *
+     * @return self The configuration object.
+     */
+    public function setOptions(array $options);
+
+    /**
      * Sets the data mapper used by the form.
      *
      * @param DataMapperInterface $dataMapper

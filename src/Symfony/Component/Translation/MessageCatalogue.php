@@ -103,14 +103,14 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function get($id, $domain = 'messages')
+    public function get($id, $domain = 'messages', $fallbackChecked = false)
     {
         if (isset($this->messages[$domain][$id])) {
             return $this->messages[$domain][$id];
         }
 
-        if (null !== $this->fallbackCatalogue) {
-            return $this->fallbackCatalogue->get($id, $domain);
+        if (null !== $this->fallbackCatalogue && !$fallbackChecked) {
+            return $this->fallbackCatalogue->get($id, $domain, true);
         }
 
         return $id;

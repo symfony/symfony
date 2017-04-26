@@ -1039,6 +1039,28 @@ class ApplicationTest extends TestCase
         $this->assertContains('before.error.after.', $tester->getDisplay());
     }
 
+    public function testRunWithError()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('dym.');
+
+            throw new \Error('dymerr');
+        });
+
+        $tester = new ApplicationTester($application);
+
+        try {
+            $tester->run(array('command' => 'dym'));
+            $this->fail('Error expected.');
+        } catch (\Error $e) {
+            $this->assertSame('dymerr', $e->getMessage());
+        }
+    }
+
     public function testRunAllowsErrorListenersToSilenceTheException()
     {
         $dispatcher = $this->getDispatcher();
@@ -1110,28 +1132,6 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
         $this->assertContains('before.caught.error.after.', $tester->getDisplay());
         $this->assertContains('replaced in caught.', $tester->getDisplay());
-    }
-
-    public function testRunWithError()
-    {
-        $application = new Application();
-        $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
-
-        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
-            $output->write('dym.');
-
-            throw new \Error('dymerr');
-        });
-
-        $tester = new ApplicationTester($application);
-
-        try {
-            $tester->run(array('command' => 'dym'));
-            $this->fail('Error expected.');
-        } catch (\Error $e) {
-            $this->assertSame('dymerr', $e->getMessage());
-        }
     }
 
     /**

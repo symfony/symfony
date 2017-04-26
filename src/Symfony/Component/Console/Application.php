@@ -878,9 +878,9 @@ class Application
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);
+        $e = null;
 
         try {
-            $e = null;
             $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
 
             if ($event->commandShouldRun()) {

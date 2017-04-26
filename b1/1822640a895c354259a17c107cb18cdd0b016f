@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-21T11:05:58Z
+
+your proposal looks weird. Your PR on SonataCoreBundle would still alter the definition of `form.extension` service, meaning that the service would not receive the locator anymore, which may cause issues (as supporting private form type services depends on the new feature)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-21T11:08:10Z
+
+About "private", that's the reason why the pass now calls `setPublic(true)`.
+I don't plan to rewrite Sonata, just doing the bare minimum to make it work with 3.3 (and 3.3 with Sonata).
+This PR just reverts to 3.2 state - it's more BC friendly than making the legacy FormPass extend from the new FormPass, which changes its behavior.
+Any better idea?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-25T15:03:34Z
+
+Still :+1: here

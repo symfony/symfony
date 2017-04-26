@@ -116,6 +116,7 @@ class DoctrineDataCollector extends DataCollector
 
     private function sanitizeQuery($connectionName, $query)
     {
+        $query['connectionName'] = $connectionName;
         $query['explainable'] = true;
         if (null === $query['params']) {
             $query['params'] = array();

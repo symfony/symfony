@@ -51,7 +51,7 @@ class RouteCompiler implements RouteCompilerInterface
         $hostRegex = null;
         $hostTokens = array();
 
-        if ('' !== $host = $route->getHost()) {
+        if ('' != $host = $route->getHost()) {
             $result = self::compilePattern($route, $host, true);
 
             $hostVariables = $result['variables'];

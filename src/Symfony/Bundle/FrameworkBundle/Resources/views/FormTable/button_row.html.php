@@ -1,6 +1,5 @@
 <tr>
-    <td></td>
-    <td>
+    <td colspan="2">
         <?php echo $view['form']->widget($form) ?>
     </td>
 </tr>

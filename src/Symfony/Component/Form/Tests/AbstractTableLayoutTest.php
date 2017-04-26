@@ -136,8 +136,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 '/tr
     [
         ./td
-            [.=""]
-        /following-sibling::td
+            [@colspan="2"]
             [./button[@type="button"][@name="name"]]
     ]
     [count(//label)=0]

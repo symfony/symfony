@@ -79,7 +79,7 @@ abstract class FileLoader extends BaseFileLoader
             }
             $this->instanceof[$id] = $definition;
         } else {
-            $this->container->setDefinition($id, $definition->setInstanceofConditionals($this->instanceof));
+            $this->container->setDefinition($id, $definition instanceof ChildDefinition ? $definition : $definition->setInstanceofConditionals($this->instanceof));
         }
     }
 

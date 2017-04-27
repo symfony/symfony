@@ -1,0 +1,30 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+        tags: [from_defaults]
+
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStubParent:
+            autowire: false
+            shared: false
+            public: false
+            tags:
+                - { name: foo_tag, tag_option: from_instanceof }
+            calls:
+                - [setSunshine, [bright]]
+
+        Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub:
+            tags:
+                - { name: bar_tag }
+
+    main_service:
+        class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        public: true
+        tags:
+            - { name: foo_tag, tag_option: from_service }
+        # calls from instanceof are kept, but this comes later
+        calls:
+            - [enableSummer, [true]]
+            - [setSunshine, [warm]]

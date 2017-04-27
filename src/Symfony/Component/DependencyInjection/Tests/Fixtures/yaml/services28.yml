@@ -22,19 +22,6 @@ services:
         autowire: false
         tags: []
 
-    no_defaults_child:
-        parent: no_defaults
-        autowire: ~
-        tags:
-            - name: bar
-
-    with_defaults_child:
-        parent: with_defaults
-        public: true
-        inherit_tags: true
-        tags:
-            - name: baz
-
     with_defaults_aliased:
         alias: with_defaults
 

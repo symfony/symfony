@@ -118,7 +118,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $vendors;
 
-    private $automaticInstanceofDefinitions = array();
+    private $autoconfiguredInstanceof = array();
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -641,12 +641,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        foreach ($container->getAutomaticInstanceofDefinitions() as $interface => $childDefinition) {
-            if (isset($this->automaticInstanceofDefinitions[$interface])) {
+        foreach ($container->getAutoconfiguredInstanceof() as $interface => $childDefinition) {
+            if (isset($this->autoconfiguredInstanceof[$interface])) {
                 throw new InvalidArgumentException(sprintf('"%s" has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.', $interface));
             }
 
-            $this->automaticInstanceofDefinitions[$interface] = $childDefinition;
+            $this->autoconfiguredInstanceof[$interface] = $childDefinition;
         }
     }
 
@@ -1272,15 +1272,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Returns a ChildDefinition that will be used for autoconfiguring the interface/class.
      *
      * @param string $interface The class or interface to match
+     *
      * @return ChildDefinition
      */
     public function registerForAutoconfiguration($interface)
     {
-        if (!isset($this->automaticInstanceofDefinitions[$interface])) {
-            $this->automaticInstanceofDefinitions[$interface] = new ChildDefinition('');
+        if (!isset($this->autoconfiguredInstanceof[$interface])) {
+            $this->autoconfiguredInstanceof[$interface] = new ChildDefinition('');
         }
 
-        return $this->automaticInstanceofDefinitions[$interface];
+        return $this->autoconfiguredInstanceof[$interface];
     }
 
     /**
@@ -1288,9 +1289,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ChildDefinition[]
      */
-    public function getAutomaticInstanceofDefinitions()
+    public function getAutoconfiguredInstanceof()
     {
-        return $this->automaticInstanceofDefinitions;
+        return $this->autoconfiguredInstanceof;
     }
 
     /**

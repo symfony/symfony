@@ -1,0 +1,5 @@
+services:
+    child_service_expected:
+        class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        # autoconfigure is set on the parent, but not on the child
+        autoconfigure: false

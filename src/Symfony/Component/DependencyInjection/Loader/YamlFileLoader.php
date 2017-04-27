@@ -88,7 +88,6 @@ class YamlFileLoader extends FileLoader
         'calls' => 'calls',
         'tags' => 'tags',
         'autowire' => 'autowire',
-        'autoconfigure' => 'autoconfigure',
     );
 
     private static $defaultsKeywords = array(
@@ -357,6 +356,14 @@ class YamlFileLoader extends FileLoader
         if ($this->isLoadingInstanceof) {
             $definition = new ChildDefinition('');
         } elseif (isset($service['parent'])) {
+            if (!empty($this->instanceof)) {
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Try moving your child definitions to a different file.', $id));
+            }
+
+            if (!empty($defaults)) {
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "_defaults" configuration is defined as using both is not supported. Try moving your child definitions to a different file.', $id));
+            }
+
             $definition = new ChildDefinition($service['parent']);
 
             $inheritTag = isset($service['inherit_tags']) ? $service['inherit_tags'] : (isset($defaults['inherit_tags']) ? $defaults['inherit_tags'] : null);
@@ -518,7 +525,11 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['autoconfigure'])) {
-            $definition->setAutoconfigured($service['autoconfigure']);
+            if (!$definition instanceof ChildDefinition) {
+                $definition->setAutoconfigured($service['autoconfigure']);
+            } elseif ($service['autoconfigure']) {
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also have "autoconfigure". Try setting "autoconfigure: false" for the service.', $id));
+            }
         }
 
         if (array_key_exists('resource', $service)) {

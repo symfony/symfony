@@ -1,0 +1,9 @@
+imports:
+    - { resource: _child.yml }
+
+services:
+    _defaults:
+        autoconfigure: true
+
+    parent_service:
+        class: stdClass

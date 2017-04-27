@@ -1446,6 +1446,14 @@ class ProcessTest extends TestCase
         $this->assertSame($expected, $env);
     }
 
+    public function testGetCommandLine()
+    {
+        $p = new Process(array('/usr/bin/php'));
+
+        $expected = '\\' === DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : '/usr/bin/php';
+        $this->assertSame($expected, $p->getCommandLine());
+    }
+
     /**
      * @dataProvider provideEscapeArgument
      */

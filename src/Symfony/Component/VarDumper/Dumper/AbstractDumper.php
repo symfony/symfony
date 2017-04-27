@@ -167,6 +167,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     protected function utf8Encode($s)
     {
+        if (!function_exists('iconv')) {
+            throw new \RuntimeException('Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.');
+        }
         if (false !== $c = @iconv($this->charset, 'UTF-8', $s)) {
             return $c;
         }

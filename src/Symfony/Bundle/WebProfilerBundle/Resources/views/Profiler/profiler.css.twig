@@ -880,6 +880,31 @@ table.logs .metadata {
     white-space: pre-wrap;
 }
 
+{# Validator panel
+   ========================================================================= #}
+
+#collector-content .sf-validator {
+    margin-bottom: 2em;
+}
+
+#collector-content .sf-validator .sf-validator-context,
+#collector-content .sf-validator .trace {
+    border: 1px solid #DDD;
+    background: #FFF;
+    padding: 10px;
+    margin: 0.5em 0;
+}
+#collector-content .sf-validator .trace {
+    font-size: 12px;
+}
+#collector-content .sf-validator .trace li {
+    margin-bottom: 0;
+    padding: 0;
+}
+#collector-content .sf-validator .trace li.selected {
+    background: rgba(255, 255, 153, 0.5);
+}
+
 {# Dump panel
    ========================================================================= #}
 #collector-content .sf-dump {

@@ -81,6 +81,7 @@ class FrameworkExtension extends Extension
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
     private $annotationsConfigEnabled = false;
+    private $validatorConfigEnabled = false;
 
     /**
      * @var string|null
@@ -454,6 +455,10 @@ class FrameworkExtension extends Extension
 
         if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');
+        }
+
+        if ($this->validatorConfigEnabled) {
+            $loader->load('validator_debug.xml');
         }
 
         if ($this->translationConfigEnabled) {
@@ -1107,7 +1112,7 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
             return;
         }
 

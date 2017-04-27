@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-26T14:03:02Z
+
+oups, tests are failing
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-26T21:24:22Z
+
+Tests should be happy now. There is one other behavior change that caused the failure: if a class that we try to load extends a non-existent class, then:
+
+* Before, we silently skipped loading that service
+* After, we allow the normal, fatal, class not found error
+
+I think this is perfectly in spirit with this change, which is: fail if something is wrong :). If someone comes up with a use-case later to NOT fail, we can update the behavior without any BC issues.

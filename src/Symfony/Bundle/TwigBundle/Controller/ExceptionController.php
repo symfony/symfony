@@ -70,7 +70,7 @@ class ExceptionController
                 'logger' => $logger,
                 'currentContent' => $currentContent,
             )
-        ), $code, ['Content-Type' => $request->getMimeType($format)]);
+        ), $code, array('Content-Type' => $request->getMimeType($format)));
     }
 
     /**

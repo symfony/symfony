@@ -30,6 +30,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
     const OBJECT_TO_POPULATE = 'object_to_populate';
     const GROUPS = 'groups';
+    const ATTRIBUTES = 'attributes';
 
     /**
      * @var int
@@ -240,13 +241,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return false;
         }
 
-        if (isset($context['attributes'][$attribute])) {
+        if (isset($context[self::ATTRIBUTES][$attribute])) {
             // Nested attributes
             return true;
         }
 
-        if (isset($context['attributes']) && is_array($context['attributes'])) {
-            return in_array($attribute, $context['attributes'], true);
+        if (isset($context[self::ATTRIBUTES]) && is_array($context[self::ATTRIBUTES])) {
+            return in_array($attribute, $context[self::ATTRIBUTES], true);
         }
 
         return true;
@@ -396,8 +397,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function createChildContext(array $parentContext, $attribute)
     {
-        if (isset($parentContext['attributes'][$attribute])) {
-            $parentContext['attributes'] = $parentContext['attributes'][$attribute];
+        if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
+            $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
         }
 
         return $parentContext;

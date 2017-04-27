@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -54,6 +55,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -1689,69 +1692,75 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('lock.store.flock')->replaceArgument(0, sys_get_temp_dir());
 
-        // configure connectable stores
-        foreach (array('redis', 'memcached') as $store) {
-            if ($this->isConfigEnabled($container, $config[$store]) && count($config[$store]['hosts']) > 0) {
-                /** @var Reference[] $hostsDefinitions */
-                $hostsDefinitions = array();
-                foreach ($config[$store]['hosts'] as $host) {
-                    $definition = new ChildDefinition('lock.store.'.$store.'.abstract');
+        foreach ($config['resources'] as $resourceName => $resourceStores) {
+            if (0 === count($resourceStores)) {
+                continue;
+            }
 
-                    // generate a service connection for the host
-                    $container->resolveEnvPlaceholders($host, null, $usedEnvs);
-                    if ($usedEnvs || preg_match('#^[a-z]++://#', $host)) {
-                        $dsn = $host;
-
-                        if (!$container->hasDefinition($host = 'lock.connection.'.$store.'.'.md5($dsn))) {
+            // Generate stores
+            $storeDefinitions = array();
+            foreach ($resourceStores as $storeDsn) {
+                $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
+                switch (true) {
+                    case 'flock' === $storeDsn:
+                        $storeDefinition = new Reference('lock.store.flock');
+                        break;
+                    case 'semaphore' === $storeDsn:
+                        $storeDefinition = new Reference('lock.store.semaphore');
+                        break;
+                    case $usedEnvs || preg_match('#^[a-z]++://#', $storeDsn):
+                        if (!$container->hasDefinition($connectionDefinitionId = md5($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
-                            $connectionDefinition->setFactory(array($container->getDefinition($definition->getParent())->getClass(), 'createConnection'));
-                            $connectionDefinition->setArguments(array($dsn));
-                            $container->setDefinition($host, $connectionDefinition);
+                            $connectionDefinition->setFactory(array(StoreFactory::class, 'createConnection'));
+                            $connectionDefinition->setArguments(array($storeDsn));
+                            $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
-                    }
 
-                    $definition->replaceArgument(0, new Reference($host));
-                    $container->setDefinition($name = 'lock.store.'.$store.'.'.md5($host), $definition);
+                        $storeDefinition = new Definition(\stdClass::class);
+                        $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
+                        $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
 
-                    $hostsDefinitions[] = new Reference($name);
+                        $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.md5($storeDsn), $storeDefinition);
+
+                        $storeDefinition = new Reference($storeDefinitionId);
+                        break;
+                    case $usedEnvs:
+
+                        break;
+                    default:
+                        throw new InvalidArgumentException(sprintf('Lock store DSN "%s" is not valid in resource "%s"', $storeDsn, $resourceName));
                 }
 
-                if (count($hostsDefinitions) > 1) {
-                    $definition = new ChildDefinition('lock.store.combined.abstract');
-                    $definition->replaceArgument(0, $hostsDefinitions);
-                    $container->setDefinition('lock.store.'.$store, $definition);
-                } else {
-                    $container->setAlias('lock.store.'.$store, new Alias((string) $hostsDefinitions[0]));
-                }
+                $storeDefinitions[] = $storeDefinition;
             }
-        }
 
-        // wrap non blocking store with retry mechanism
-        foreach (array('redis', 'memcached') as $store) {
-            if ($container->has($name = 'lock.store.'.$store)) {
-                $container->register($name.'.retry', 'Symfony\\Component\\Lock\\Store\\RetryTillSaveStore')
-                    ->setDecoratedService($name)
-                    ->addArgument(new Reference($name.'.retry.inner'))
-                    ->setPublic(false)
-                ;
+            // Wrap array of stores with CombinedStore
+            if (count($storeDefinitions) > 1) {
+                $combinedDefinition = new ChildDefinition('lock.store.combined.abstract');
+                $combinedDefinition->replaceArgument(0, $storeDefinitions);
+                $container->setDefinition('lock.'.$resourceName.'.store', $combinedDefinition);
+            } else {
+                $container->setAlias('lock.'.$resourceName.'.store', new Alias((string) $storeDefinitions[0]));
             }
-        }
 
-        // generate factory for activated stores
-        $hasAlias = false;
-        // Order of stores matters: First enabled will be used in the default "lock.factory"
-        foreach (array('redis', 'memcached', 'semaphore', 'flock') as $store) {
-            if ($this->isConfigEnabled($container, $config[$store]) && $container->has('lock.store.'.$store)) {
-                $definition = new ChildDefinition('lock.factory.abstract');
-                $definition->replaceArgument(0, new Reference('lock.store.'.$store));
-                $definition->setPublic(true);
-                $container->setDefinition('lock.factory.'.$store, $definition);
+            // Generate factories for each resource
+            $factoryDefinition = new ChildDefinition('lock.factory.abstract');
+            $factoryDefinition->replaceArgument(0, new Reference('lock.'.$resourceName.'.store'));
+            $factoryDefinition->setPublic(true);
+            $container->setDefinition('lock.'.$resourceName.'.factory', $factoryDefinition);
 
-                if (!$hasAlias) {
-                    $container->setAlias('lock.factory', new Alias('lock.factory.'.$store));
-                    $hasAlias = true;
-                }
+            // Generate services for lock instances
+            $lockDefinition = new Definition(Lock::class);
+            $lockDefinition->setFactory(array(new Reference('lock.'.$resourceName.'.factory'), 'createLock'));
+            $lockDefinition->setArguments(array($resourceName));
+            $container->setDefinition('lock.'.$resourceName, $lockDefinition);
+
+            // provide alias for default resource
+            if ('default' === $resourceName) {
+                $container->setAlias('lock.store', new Alias('lock.'.$resourceName.'.store'));
+                $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory'));
+                $container->setAlias('lock', new Alias('lock.'.$resourceName));
             }
         }
     }

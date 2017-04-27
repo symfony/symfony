@@ -1,0 +1,9 @@
+parameters:
+    env(REDIS_DSN): redis://paas.com
+
+framework:
+    lock:
+        foo: semaphore
+        bar: flock
+        baz: [semaphore, flock]
+        qux: "%env(REDIS_DSN)%"

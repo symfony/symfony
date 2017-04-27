@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 
 class ConfigurationTest extends TestCase
 {
@@ -342,6 +343,14 @@ class ConfigurationTest extends TestCase
             ),
             'web_link' => array(
                 'enabled' => !class_exists(FullStack::class),
+            ),
+            'lock' => array(
+                'enabled' => !class_exists(FullStack::class),
+                'resources' => array(
+                    'default' => array(
+                        class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
+                    ),
+                ),
             ),
         );
     }

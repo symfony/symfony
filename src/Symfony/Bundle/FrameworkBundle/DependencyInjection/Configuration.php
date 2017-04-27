@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -883,36 +884,35 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('lock')
                     ->info('Lock configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(Lock::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->beforeNormalization()
+                        ->ifString()->then(function ($v) { return array('enabled' => true, 'resources' => $v); })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return is_array($v) && !isset($v['resources']); })
+                        ->then(function ($v) {
+                            $e = $v['enabled'];
+                            unset($v['enabled']);
+
+                            return array('enabled' => $e, 'resources' => $v);
+                        })
+                    ->end()
+                    ->addDefaultsIfNotSet()
+                    ->fixXmlConfig('resource')
                     ->children()
-                        ->arrayNode('flock')
-                            ->canBeDisabled()
-                        ->end()
-                        ->arrayNode('semaphore')
-                            ->{class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'canBeDisabled' : 'canBeEnabled'}()
-                        ->end()
-                        ->arrayNode('memcached')
-                            ->canBeEnabled()
-                            ->children()
-                                ->arrayNode('hosts')
-                                    ->beforeNormalization()
-                                        ->ifTrue(function ($v) { return !is_array($v) && null !== $v; })
-                                        ->then(function ($v) { return is_bool($v) ? array() : preg_split('/\s*,\s*/', $v); })
-                                    ->end()
-                                    ->prototype('scalar')->end()
-                                ->end()
+                        ->arrayNode('resources')
+                            ->requiresAtLeastOneElement()
+                            ->defaultValue(array('default' => array(class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock')))
+                            ->beforeNormalization()
+                                ->ifString()->then(function ($v) { return array('default' => $v); })
                             ->end()
-                        ->end()
-                        ->arrayNode('redis')
-                            ->canBeEnabled()
-                            ->children()
-                                ->arrayNode('hosts')
-                                    ->beforeNormalization()
-                                        ->ifTrue(function ($v) { return !is_array($v) && null !== $v; })
-                                        ->then(function ($v) { return is_bool($v) ? array() : preg_split('/\s*,\s*/', $v); })
-                                    ->end()
-                                    ->prototype('scalar')->end()
-                                ->end()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return is_array($v) && array_keys($v) === range(0, count($v) - 1); })
+                                ->then(function ($v) { return array('default' => $v); })
+                            ->end()
+                            ->prototype('array')
+                                ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
+                                ->prototype('scalar')->end()
                             ->end()
                         ->end()
                     ->end()

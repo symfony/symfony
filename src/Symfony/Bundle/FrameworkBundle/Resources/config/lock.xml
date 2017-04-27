@@ -25,7 +25,7 @@
             <argument type="service" id="lock.strategy.majority" /> <!-- Strategy -->
         </service>
 
-        <service id="lock.strategy.majority" class="Symfony\Component\Lock\Strategy\MajorityStrategy" public="false" />
+        <service id="lock.strategy.majority" class="Symfony\Component\Lock\Strategy\ConsensusStrategy" public="false" />
 
         <service id="lock.factory.abstract" class="Symfony\Component\Lock\Factory" abstract="true" public="false">
             <tag name="monolog.logger" channel="lock" />

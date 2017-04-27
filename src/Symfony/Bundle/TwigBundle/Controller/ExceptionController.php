@@ -59,9 +59,10 @@ class ExceptionController
         $showException = $request->attributes->get('showException', $this->debug); // As opposed to an additional parameter, this maintains BC
 
         $code = $exception->getStatusCode();
+        $format = $request->getRequestFormat();
 
         return new Response($this->twig->render(
-            (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
+            (string) $this->findTemplate($request, $format, $code, $showException),
             array(
                 'status_code' => $code,
                 'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
@@ -69,7 +70,7 @@ class ExceptionController
                 'logger' => $logger,
                 'currentContent' => $currentContent,
             )
-        ));
+        ), $code, ['Content-Type' => $request->getMimeType($format)]);
     }
 
     /**

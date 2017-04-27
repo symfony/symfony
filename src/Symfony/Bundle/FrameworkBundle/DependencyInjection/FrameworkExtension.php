@@ -721,7 +721,7 @@ class FrameworkExtension extends Extension
 
         if (PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
-                'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
+                'Symfony\\Component\\HttpKernel\\EventListener\\SessionListener',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler',

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\LogoutException;
@@ -36,6 +37,7 @@ class LogoutListener implements ListenerInterface
     private $successHandler;
     private $httpUtils;
     private $csrfTokenManager;
+    private $requestMatcher;
 
     /**
      * Constructor.
@@ -45,8 +47,9 @@ class LogoutListener implements ListenerInterface
      * @param LogoutSuccessHandlerInterface $successHandler   A LogoutSuccessHandlerInterface instance
      * @param array                         $options          An array of options to process a logout attempt
      * @param CsrfTokenManagerInterface     $csrfTokenManager A CsrfTokenManagerInterface instance
+     * @param RequestMatcherInterface|null  $requestMatcher   A RequestMatcherInterface instance
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), CsrfTokenManagerInterface $csrfTokenManager = null, RequestMatcherInterface $requestMatcher = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
@@ -57,6 +60,7 @@ class LogoutListener implements ListenerInterface
         ), $options);
         $this->successHandler = $successHandler;
         $this->csrfTokenManager = $csrfTokenManager;
+        $this->requestMatcher = $requestMatcher;
         $this->handlers = array();
     }
 
@@ -127,6 +131,18 @@ class LogoutListener implements ListenerInterface
      */
     protected function requiresLogout(Request $request)
     {
-        return $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
+        if (!isset($this->options['logout_path']) && null === $this->requestMatcher) {
+            return false;
+        }
+
+        if (isset($this->options['logout_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['logout_path'])) {
+            return false;
+        }
+
+        if (null !== $this->requestMatcher && !$this->requestMatcher->matches($request)) {
+            return false;
+        }
+
+        return true;
     }
 }

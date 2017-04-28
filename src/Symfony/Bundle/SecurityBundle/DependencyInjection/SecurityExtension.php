@@ -370,9 +370,10 @@ class SecurityExtension extends Extension
             $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
-            if (isset($firewall['logout']['csrf_token_generator'])) {
-                $listener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
-            }
+            $listener->replaceArgument(4, isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null);
+
+            // add request matcher
+            $listener->replaceArgument(5, isset($firewall['logout']['request_matcher']) ? new Reference($firewall['logout']['request_matcher']) : null);
 
             // add session logout handler
             if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {

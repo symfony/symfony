@@ -50,6 +50,8 @@
             <argument type="service" id="security.http_utils" />
             <argument type="service" id="security.logout.success_handler" />
             <argument /> <!-- Options -->
+            <argument /> <!-- CSRF token manager -->
+            <argument /> <!-- Request matcher -->
         </service>
 
         <service id="security.logout.handler.session" class="Symfony\Component\Security\Http\Logout\SessionLogoutHandler" public="false" />

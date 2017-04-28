@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {
@@ -62,6 +63,11 @@ class LazyLoadingMetadataFactoryTest extends TestCase
             ))),
             new ConstraintA(array('groups' => array(
                 'Default',
+                'EntityInterfaceA',
+                'Entity',
+            ))),
+            new ConstraintA(array('groups' => array(
+                'Default',
                 'EntityInterfaceB',
                 'Entity',
             ))),
@@ -69,6 +75,11 @@ class LazyLoadingMetadataFactoryTest extends TestCase
                 'Default',
                 'EntityParentInterface',
                 'EntityInterfaceB',
+                'Entity',
+            ))),
+            new ConstraintA(array('groups' => array(
+                'Default',
+                'EntityParentInterface',
                 'Entity',
             ))),
         );
@@ -171,7 +182,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
 
-        $this->assertCount(6, $metadata->getConstraints());
+        $this->assertCount(8, $metadata->getConstraints());
     }
 
     public function testGroupsFromParent()

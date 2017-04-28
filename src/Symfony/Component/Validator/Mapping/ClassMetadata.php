@@ -387,6 +387,14 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
 
         foreach ($source->getConstrainedProperties() as $property) {
             foreach ($source->getPropertyMetadata($property) as $member) {
+                if (isset($this->members[$property])) {
+                    foreach ($this->getPropertyMetadata($property) as $memberMetadata) {
+                        if ($memberMetadata->getClassName() === $member->getClassName()) {
+                            continue 2;
+                        }
+                    }
+                }
+
                 $member = clone $member;
 
                 foreach ($member->getConstraints() as $constraint) {

@@ -24,6 +24,7 @@ class ClassMetadataTest extends TestCase
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
     const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
+    const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
 
     protected $metadata;
 
@@ -307,6 +308,19 @@ class ClassMetadataTest extends TestCase
     public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
+    }
+
+    public function testClassMetadataMembersAreUniqueByPropertyAndByClassAfterMergingConstraints()
+    {
+        $metadata = new ClassMetadata(self::INTERFACE_A_CLASS);
+        $metadata->addGetterConstraint('data', new ConstraintA());
+
+        $otherMetadata = new ClassMetadata(self::INTERFACE_A_CLASS);
+        $otherMetadata->addGetterConstraint('data', new ConstraintB());
+
+        $metadata->mergeConstraints($otherMetadata);
+
+        $this->assertCount(1, $metadata->getPropertyMetadata('data'));
     }
 }
 

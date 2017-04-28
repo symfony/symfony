@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T11:20:15Z
+
+Hum. I do need to fix tests. I obviously ran the wrong tests the first time.
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T11:23:47Z
+
+@stof how would you fix it for 3.2 and 3.0 since that the `kernel.project_dir` variable does not exist in there ? I was think in trying to read it anyway (ie. `if ($container->hasParameter('kernel.project_dir')) {`) is that a bad idea?
+
+The question is not innocent, we do really experience this bug on production apps, and it needs fixing in current stable, I'm not fond in backporting a variable in stable, but it would help us fixing our env by just setting it.
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T11:29:10Z
+
+Only PHP 7.1 fails, but for a very deep unknown reason.
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T11:29:58Z
+
+```
+[pounard@guinevere] /var/www/symfony
+ >  uname -a
+Linux guinevere 4.10.11-1-ARCH #1 SMP PREEMPT Tue Apr 18 08:39:42 CEST 2017 x86_64 GNU/Linux
+[pounard@guinevere] /var/www/symfony
+ >  php -v
+PHP 7.1.4 (cli) (built: Apr 11 2017 18:45:29) ( NTS )
+Copyright (c) 1997-2017 The PHP Group
+Zend Engine v3.1.0, Copyright (c) 1998-2017 Zend Technologies
+    with Zend OPcache v7.1.4, Copyright (c) 1999-2017, by Zend Technologies
+    with Xdebug v2.5.3, Copyright (c) 2002-2017, by Derick Rethans
+[pounard@guinevere] /var/www/symfony
+ >  phpunit -vvv --filter TwigBundle
+PHPUnit 5.7.19 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 7.1.4 with Xdebug 2.5.3
+Configuration: /var/www/symfony/phpunit.xml.dist
+
+Testing Symfony Test Suite
+........................................                          40 / 40 (100%)
+
+Time: 7.5 seconds, Memory: 96.00MB
+
+OK (40 tests, 143 assertions)
+
+Legacy deprecation notices (1)
+```
+
+Test OK locally.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-28T11:42:22Z
+
+You need to bump the http-kernel dep in the twig bundle;
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/TwigBundle/composer.json#L23
+
+This parameter exists as of 3.3
+
+> how would you fix it for 3.2 and 3.0 since that the kernel.project_dir variable does not exist in there
+
+Maybe keep the current implementation, and consider it "improved" as of 3.3
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T12:10:27Z
+
+@ro0NL
+
+> Maybe keep the current implementation, and consider it "improved" as of 3.3
+
+The current implementation in 3.0 -> 3.2 is subject to the original bug I experienced: when the project root dir is under open_basedir restriction, TwigBundle skips the folder because it can't read the composer.json file, then the loop goes until it reaches the filesystem root and uses that instead. It needs fixing.
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T12:12:13Z
+
+@ro0NL in your opinion, should I get the getComposerDir() function back into the master and just conditionally use the kernel.project_root if exists ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-28T12:23:02Z
+
+In master `%kernel.project_dir%` just exists.. so this PR is fine for master/3.3 i guess :)
+
+> The current implementation in 3.0 -> 3.2 is subject to the original bug I experienced
+
+Thing is we cant backport a new feature (the project_dir param).. so we need a different approach on lower branches... ie. the current one.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-28T12:26:52Z
+
+> The current implementation in 3.0 -> 3.2 is subject to the original bug I experienced: when the project root dir is under open_basedir restriction, TwigBundle skips the folder because it can't read the composer.json file, then the loop goes until it reaches the filesystem root and uses that instead. It needs fixing.
+
+Doesn't the same situation occur with `kernel.project_dir`? The default implementation of `Kenrel::getProjectRootDir()` looks similar
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-28T12:28:02Z
+
+True.. but you can override the param way more easily :) and if overriden, we need to use that variant as well :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-28T12:28:52Z
+
+sure :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-28T12:35:49Z
+
+Using the project dir is the right approach for 3.3+. So to fix the build for deps=low, you just need to bump the min required version in TwigBundle
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T12:39:57Z
+
+Ok, I bumped the version, now the real tricky question arise: how do I fix it for 3.0 -> 3.2 versions knowing I have real sites in real productions buggy because of this ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-28T12:43:06Z
+
+you need to bump to 3.3 ;-) the param does not exists in 3.2.2.
+
+Maybe for lower branches we should start checking for `open_basedir`, and if we traversed to the filesystem root, but without a composer.json return the current dir as well :thinking:
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T12:44:39Z
+
+Oh sorry, just stupidly ran the test locally and pushed...
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-04-28T13:31:03Z
+
+w00t, sorry for the noise, it should be OK now.

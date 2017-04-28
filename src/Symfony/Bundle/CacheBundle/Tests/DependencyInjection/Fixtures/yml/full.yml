@@ -1,0 +1,10 @@
+cache:
+    debug: %kernel.debug%
+    backends:
+        memcached_be:
+            memcached:
+                servers:
+                    memcached_server:
+                        host:   127.0.0.1
+                        port:   11211
+                        weight: 0

@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\WebProfilerBundle;
 
+use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -20,4 +22,13 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class WebProfilerBundle extends Bundle
 {
+    public function build(ContainerBuilder $container)
+    {
+        $container->registerExtension(new WebProfilerExtension());
+    }
+
+    public function getContainerExtension()
+    {
+        // this extension must be explicitly loaded
+    }
 }

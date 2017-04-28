@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-28T09:58:16Z
+
+:+1:
+I think we shouldn't​ validate global "instanceof".
+I would just suggest to add double quotes around the      instanceof word in the exception message.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-28T17:58:18Z
+
+done

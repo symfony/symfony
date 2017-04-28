@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-28T10:48:18Z
+
+I think a better solution is to fix the implementation of `getListenerPriority` in the TraceableEventDispatcher, to fix the issue for any code reading the priority.
+The actual fix would be similar to what is done when removing listeners, as I explained in the issue
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-04-28T11:42:20Z
+
+@stof you are right :+1: I pushed a new version.

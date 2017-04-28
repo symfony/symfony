@@ -154,4 +154,32 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         // no automatic_tag, it was not enabled on the Definition
         $this->assertFalse($def->isAutowired());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage "App\FakeInterface" is set as an "instanceof" conditional, but it does not exist.
+     */
+    public function testBadInterfaceThrowsException()
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('normal_service', self::class);
+        $def->setInstanceofConditionals(array(
+            'App\\FakeInterface' => (new ChildDefinition(''))
+                ->addTag('foo_tag'),
+        ));
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+    }
+
+    public function testBadInterfaceForAutomaticInstanceofIsOkException()
+    {
+        $container = new ContainerBuilder();
+        $container->register('normal_service', self::class)
+            ->setAutoconfigured(true);
+        $container->registerForAutoconfiguration('App\\FakeInterface')
+            ->setAutowired(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        $this->assertTrue($container->hasDefinition('normal_service'));
+    }
 }

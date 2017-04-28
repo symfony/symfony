@@ -883,7 +883,7 @@ class FrameworkExtension extends Extension
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], $config['json_manifest_path'], '_default');
         }
 
-        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
+        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion, false);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
         $namedPackages = array();
@@ -900,7 +900,7 @@ class FrameworkExtension extends Extension
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
             }
 
-            $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
+            $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version, $package['is_strict_protocol']));
             $namedPackages[$name] = new Reference('assets._package_'.$name);
         }
 
@@ -913,7 +913,7 @@ class FrameworkExtension extends Extension
     /**
      * Returns a definition for an asset package.
      */
-    private function createPackageDefinition($basePath, array $baseUrls, Reference $version)
+    private function createPackageDefinition($basePath, array $baseUrls, Reference $version, $isStrictProtocol)
     {
         if ($basePath && $baseUrls) {
             throw new \LogicException('An asset package cannot have base URLs and base paths.');
@@ -925,6 +925,10 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $baseUrls ?: $basePath)
             ->replaceArgument(1, $version)
         ;
+
+        if ($baseUrls) {
+            $package->replaceArgument(2, $isStrictProtocol);
+        }
 
         return $package;
     }

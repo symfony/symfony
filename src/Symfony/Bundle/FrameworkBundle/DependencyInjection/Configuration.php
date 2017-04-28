@@ -573,6 +573,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                         ->prototype('scalar')->end()
                                     ->end()
+                                    ->scalarNode('is_strict_protocol')->defaultValue(false)->end()
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {

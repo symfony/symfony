@@ -380,23 +380,23 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // default package
         $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
-        $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+        $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s', false);
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount(6, $packages);
+        $this->assertCount(7, $packages);
 
         $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
 
         $package = $container->getDefinition((string) $packages['images']);
-        $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', '%%s?version=%%s');
+        $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', '%%s?version=%%s', false);
 
         $package = $container->getDefinition((string) $packages['foo']);
         $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
 
         $package = $container->getDefinition((string) $packages['bar']);
-        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), 'SomeVersionScheme', '%%s?version=%%s', false);
 
         $package = $container->getDefinition((string) $packages['bar_version_strategy']);
         $this->assertEquals('assets.custom_version_strategy', (string) $package->getArgument(1));
@@ -405,6 +405,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
         $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
+
+        $package = $container->getDefinition((string) $packages['strict_protocol']);
+        $this->assertUrlPackage($container, $package, array('http://www.example.com', 'https://www.example.net'), 'SomeVersionScheme', '%%s?version=%%s', true);
     }
 
     public function testAssetsDefaultVersionStrategyAsService()
@@ -994,10 +997,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
     }
 
-    private function assertUrlPackage(ContainerBuilder $container, ChildDefinition $package, $baseUrls, $version, $format)
+    private function assertUrlPackage(ContainerBuilder $container, ChildDefinition $package, $baseUrls, $version, $format, $isStrictProtocol)
     {
         $this->assertEquals('assets.url_package', $package->getParent());
         $this->assertEquals($baseUrls, $package->getArgument(0));
+        $this->assertEquals($isStrictProtocol, $package->getArgument(2));
         $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
     }
 

@@ -150,6 +150,7 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
+        <xsd:attribute name="is-strict-protocol" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

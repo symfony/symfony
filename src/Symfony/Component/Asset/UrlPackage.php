@@ -28,8 +28,8 @@ use Symfony\Component\Asset\Exception\LogicException;
  * best base URL to use based on the current request scheme:
  *
  *  * For HTTP request:
- *    * if $isStrictHttp is set to false, it chooses between all base URLs
- *    * if $isStrictHttp is set to true, it will only use HTTP base URLs and relative protocol URLs
+ *    * if $isStrictProtocol is set to false, it chooses between all base URLs
+ *    * if $isStrictProtocol is set to true, it will only use HTTP base URLs and relative protocol URLs
  *      or falls back to any base URL if no secure ones are available;
  *  * For HTTPs requests, it chooses between HTTPs base URLs and relative protocol URLs
  *    or falls back to any base URL if no secure ones are available.
@@ -40,22 +40,26 @@ class UrlPackage extends Package
 {
     /** @var array $baseUrls */
     private $baseUrls = array();
+
     /** @var string[] $baseSecureUrls */
     private $baseSecureUrls = array();
+
     /** @var string[] $baseUnsecureUrls */
-    private $baseUnsecureUrls = array();
+    private $baseInsecureUrls = array();
+
     /** @var string[] $baseFullUrls */
     private $baseFullUrls = array();
-    /** @var bool $isStrictHttp */
-    private $isStrictHttp;
+
+    /** @var bool $isStrictProtocol */
+    private $isStrictProtocol;
 
     /**
-     * @param string|string[]          $baseUrls        Base asset URLs
-     * @param VersionStrategyInterface $versionStrategy The version strategy
-     * @param ContextInterface|null    $context         Context
-     * @param bool                     $isStrictHttp    Is http strict, or does it allow https on http pages
+     * @param string|string[]          $baseUrls         Base asset URLs
+     * @param VersionStrategyInterface $versionStrategy  The version strategy
+     * @param ContextInterface|null    $context          Context
+     * @param bool                     $isStrictProtocol Is http strict, or does it allow https on http pages
      */
-    public function __construct($baseUrls, VersionStrategyInterface $versionStrategy, ContextInterface $context = null, $isStrictHttp = false)
+    public function __construct($baseUrls, VersionStrategyInterface $versionStrategy, ContextInterface $context = null, $isStrictProtocol = false)
     {
         parent::__construct($versionStrategy, $context);
 
@@ -71,9 +75,9 @@ class UrlPackage extends Package
             $this->baseUrls[] = rtrim($baseUrl, '/');
         }
 
-        $this->isStrictHttp = $isStrictHttp;
+        $this->isStrictProtocol = $isStrictProtocol;
 
-        $this->prepareBaseUrl($this->baseUrls, $isStrictHttp);
+        $this->prepareBaseUrl($this->baseUrls);
     }
 
     /**
@@ -138,8 +142,8 @@ class UrlPackage extends Package
     {
         if (!empty($this->baseSecureUrls) && $this->getContext()->isSecure()) {
             $this->baseUrls = $this->baseSecureUrls;
-        } elseif (!empty($this->baseUnsecureUrls) && $this->isStrictHttp) {
-            $this->baseUrls = $this->baseUnsecureUrls;
+        } elseif (!empty($this->baseInsecureUrls) && $this->isStrictProtocol) {
+            $this->baseUrls = $this->baseInsecureUrls;
         } else {
             $this->baseUrls = $this->baseFullUrls;
         }
@@ -147,25 +151,24 @@ class UrlPackage extends Package
 
     /**
      * Split urls in three categories: secure urls, unsecure urls and all urls
-     * Some url can be found in both categories (// & https depending on $isStrictHttp option).
+     * Some url can be found in both secure & insecure categories (// & https depending on $isStrictProtocol option).
      *
      * @param array $urls
-     * @param bool  $isStrictHttp
      */
-    private function prepareBaseUrl(array $urls, $isStrictHttp)
+    private function prepareBaseUrl(array $urls)
     {
         $this->baseFullUrls = $urls;
 
         foreach ($urls as $url) {
             if ('https://' === substr($url, 0, 8)) {
                 $this->baseSecureUrls[] = $url;
-                if ($isStrictHttp === false) {
-                    $this->baseUnsecureUrls[] = $url;
+                if ($this->isStrictProtocol === false) {
+                    $this->baseInsecureUrls[] = $url;
                 }
             } elseif ('http://' === substr($url, 0, 7)) {
-                $this->baseUnsecureUrls[] = $url;
+                $this->baseInsecureUrls[] = $url;
             } elseif ('//' === substr($url, 0, 2)) {
-                $this->baseUnsecureUrls[] = $url;
+                $this->baseInsecureUrls[] = $url;
                 $this->baseSecureUrls[] = $url;
             } else {
                 throw new InvalidArgumentException(sprintf('"%s" is not a valid URL', $url));

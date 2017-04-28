@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.28.79",
+    "Version": "2.1.32.60",
     "Names": {
         "AC": "Isola Ascensione",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Isola Christmas",
         "CY": "Cipro",
-        "CZ": "Repubblica Ceca",
+        "CZ": "Cèchia",
         "DE": "Germania",
         "DG": "Diego Garcia",
         "DJ": "Gibuti",
@@ -224,7 +224,7 @@
         "TH": "Thailandia",
         "TJ": "Tagikistan",
         "TK": "Tokelau",
-        "TL": "Timor Leste",
+        "TL": "Timor Est",
         "TM": "Turkmenistan",
         "TN": "Tunisia",
         "TO": "Tonga",

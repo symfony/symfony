@@ -80,16 +80,13 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
         }
 
-        $projectDir = $container->getParameter('kernel.project_dir');
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
         if ($container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.filesystem');
             $loader->setMethodCalls(array_merge($twigLoader->getMethodCalls(), $loader->getMethodCalls()));
-            $loader->replaceArgument(2, $projectDir);
 
             $twigLoader->clearTag('twig.loader');
         } else {
-            $twigLoader->replaceArgument(1, $projectDir);
             $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
         }
 

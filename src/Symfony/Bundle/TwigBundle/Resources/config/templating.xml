@@ -7,7 +7,7 @@
         <service id="twig.loader.filesystem" class="Symfony\Bundle\TwigBundle\Loader\FilesystemLoader" public="false">
             <argument type="service" id="templating.locator" />
             <argument type="service" id="templating.name_parser" />
-            <argument /> <!-- project's root dir -->
+            <argument>%kernel.project_dir%</argument>
             <tag name="twig.loader"/>
         </service>
 

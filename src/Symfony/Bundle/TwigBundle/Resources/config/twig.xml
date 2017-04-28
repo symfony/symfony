@@ -48,7 +48,7 @@
 
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
             <argument type="collection" /> <!-- paths -->
-            <argument /> <!-- project's root dir -->
+            <argument>%kernel.project_dir%</argument>
             <tag name="twig.loader"/>
         </service>
 

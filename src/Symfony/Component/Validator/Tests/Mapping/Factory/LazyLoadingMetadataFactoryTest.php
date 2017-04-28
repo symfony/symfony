@@ -63,11 +63,6 @@ class LazyLoadingMetadataFactoryTest extends TestCase
             ))),
             new ConstraintA(array('groups' => array(
                 'Default',
-                'EntityInterfaceA',
-                'Entity',
-            ))),
-            new ConstraintA(array('groups' => array(
-                'Default',
                 'EntityInterfaceB',
                 'Entity',
             ))),
@@ -75,11 +70,6 @@ class LazyLoadingMetadataFactoryTest extends TestCase
                 'Default',
                 'EntityParentInterface',
                 'EntityInterfaceB',
-                'Entity',
-            ))),
-            new ConstraintA(array('groups' => array(
-                'Default',
-                'EntityParentInterface',
                 'Entity',
             ))),
         );
@@ -182,7 +172,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
 
-        $this->assertCount(8, $metadata->getConstraints());
+        $this->assertCount(6, $metadata->getConstraints());
     }
 
     public function testGroupsFromParent()

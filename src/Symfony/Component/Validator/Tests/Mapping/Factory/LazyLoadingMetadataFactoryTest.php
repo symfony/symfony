@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {

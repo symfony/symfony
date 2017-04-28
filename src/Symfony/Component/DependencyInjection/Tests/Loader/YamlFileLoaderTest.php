@@ -577,6 +577,28 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
         $this->assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Service "_defaults" key must be an array, "NULL" given in "bad_empty_defaults.yml".
+     */
+    public function testEmptyDefaultsThrowsClearException()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_empty_defaults.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Service "_instanceof" key must be an array, "NULL" given in "bad_empty_instanceof.yml".
+     */
+    public function testEmptyInstanceofThrowsClearException()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_empty_instanceof.yml');
+    }
 }
 
 interface FooInterface

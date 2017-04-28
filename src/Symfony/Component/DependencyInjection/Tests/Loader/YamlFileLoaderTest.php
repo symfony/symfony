@@ -588,6 +588,17 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_defaults.yml');
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Service "_instanceof" key must be an array, "NULL" given in "bad_empty_instanceof.yml".
+     */
+    public function testEmptyInstanceofThrowsClearException()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_empty_instanceof.yml');
+    }
 }
 
 interface FooInterface

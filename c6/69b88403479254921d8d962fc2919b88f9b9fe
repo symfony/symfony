@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-26T06:00:49Z
+
+thus, it only affects users deploying in a subdirectory *and* using leading slashes. And the recommendation was to avoid leading slashes precisely to allow deploying in subdirectories easily.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-26T14:06:47Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-26T20:54:56Z
+
+@weaverryan Can you rebase?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-26T21:12:18Z
+
+Rebased!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-27T22:28:13Z
+
+@stof I should have your implementation in there now :)

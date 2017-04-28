@@ -242,7 +242,7 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefaults(array &$content, $file)
     {
-        if (!isset($content['services']['_defaults'])) {
+        if (!array_key_exists('_defaults', $content['services'])) {
             return array();
         }
         $defaults = $content['services']['_defaults'];

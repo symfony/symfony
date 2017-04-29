@@ -93,6 +93,23 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertEquals('ok', $event->getResponse()->getContent());
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @expectedExceptionMessage Invalid JSON
+     */
+    public function testAttemptAuthenticationNoJson()
+    {
+        $this->createListener();
+        $request = new Request();
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @expectedExceptionMessage The key "username" must be provided
+     */
     public function testAttemptAuthenticationNoUsername()
     {
         $this->createListener();
@@ -100,9 +117,12 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
-        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @expectedExceptionMessage The key "password" must be provided
+     */
     public function testAttemptAuthenticationNoPassword()
     {
         $this->createListener();
@@ -110,9 +130,12 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
-        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @expectedExceptionMessage The key "username" must be a string.
+     */
     public function testAttemptAuthenticationUsernameNotAString()
     {
         $this->createListener();
@@ -120,9 +143,12 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
-        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @expectedExceptionMessage The key "password" must be a string.
+     */
     public function testAttemptAuthenticationPasswordNotAString()
     {
         $this->createListener();
@@ -130,7 +156,6 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
-        $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
     public function testAttemptAuthenticationUsernameTooLong()

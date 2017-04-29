@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -83,23 +84,23 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
 
         try {
             if (!$data instanceof \stdClass) {
-                throw new BadCredentialsException('Invalid JSON.');
+                throw new BadRequestHttpException('Invalid JSON.');
             }
 
             try {
                 $username = $this->propertyAccessor->getValue($data, $this->options['username_path']);
             } catch (AccessException $e) {
-                throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['username_path']));
+                throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
             }
 
             try {
                 $password = $this->propertyAccessor->getValue($data, $this->options['password_path']);
             } catch (AccessException $e) {
-                throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['password_path']));
+                throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
             }
 
             if (!is_string($username)) {
-                throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
+                throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
             }
 
             if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
@@ -107,7 +108,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
             }
 
             if (!is_string($password)) {
-                throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
+                throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
             }
 
             $token = new UsernamePasswordToken($username, $password, $this->providerKey);

@@ -75,6 +75,11 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+        if (false === strpos($request->getRequestFormat(), 'json')
+            && false === strpos($request->getContentType(), 'json')
+        ) {
+            return;
+        }
 
         if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
             return;

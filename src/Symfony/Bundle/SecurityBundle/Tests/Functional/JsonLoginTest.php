@@ -21,7 +21,7 @@ class JsonLoginTest extends WebTestCase
     public function testDefaultJsonLoginSuccess()
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
-        $client->request('POST', '/chk', array(), array(), array(), '{"user": {"login": "dunglas", "password": "foo"}}');
+        $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "foo"}}');
         $response = $client->getResponse();
 
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -32,7 +32,7 @@ class JsonLoginTest extends WebTestCase
     public function testDefaultJsonLoginFailure()
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
-        $client->request('POST', '/chk', array(), array(), array(), '{"user": {"login": "dunglas", "password": "bad"}}');
+        $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "bad"}}');
         $response = $client->getResponse();
 
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -43,7 +43,7 @@ class JsonLoginTest extends WebTestCase
     public function testCustomJsonLoginSuccess()
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml'));
-        $client->request('POST', '/chk', array(), array(), array(), '{"user": {"login": "dunglas", "password": "foo"}}');
+        $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "foo"}}');
         $response = $client->getResponse();
 
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -54,7 +54,7 @@ class JsonLoginTest extends WebTestCase
     public function testCustomJsonLoginFailure()
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml'));
-        $client->request('POST', '/chk', array(), array(), array(), '{"user": {"login": "dunglas", "password": "bad"}}');
+        $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "bad"}}');
         $response = $client->getResponse();
 
         $this->assertInstanceOf(JsonResponse::class, $response);

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-28T15:57:26Z
+
+This should be finished now.
+
+It highlights a clear philosophy: basically, when you set a `parent` key, you are opting out of the `autoconfigure`, `instanceof` functionality. And we try to warn you with exceptions where possible.
+
+Your *parent* class *can* still take advantage of these... and most of those settings will cascade onto the child (notably, not tags, consistent with child/parent functionality). So, your parent's Definition is configured... and *then* that's applied to the child.
+
+Also in this PR (but a bit related): we *prevent* `calls` and `arguments` from being applied to the `autoconfigure` instanceof. This is because you can't override / opt out of these. And by throwing an exception, we still leave it open to allow these for 3.4, without breaking BC.
+
+Again, please check the test cases in the `integration/` directory!
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by simensen at 2017-04-28T20:35:35Z
+
+In talking about this with @weaverryan today, I asked under what circumstances might people want to use `parent` in which they couldn't solve the problem with `_defaults`, `_instanceof` or `autoconfigure`? Neither of us could think of a concrete example.
+
+Personally, I've only used `parent` a few times. All (I think?) of those cases were to cut down on manually wiring the same thing across several similar objects. If `_defaults` and `_instanceof`/`autoconfigure` had been available I think I would have been able to avoid `parent` altogether.
+
+Said another way, it feels like `_defaults`, `_instanceof` and `autoconfigure` eliminate the usual need for `parent` altogether. So it seems like disallowing their use together ( `parent` plus the new features ) for children seems fair. At the same time, we could consider marking `parent` for deprecation to get people to use the new features.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-28T21:16:51Z
+
+👍  for that PR.
+
+You could still need a parent to extend a definition of a library, so I don't think parent should be deprecated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-28T22:59:51Z
+
+@simensen we had this discussion during DrupalCon with @weaverryan and @nicolas-grekas and we came to the same conclusion. We should deprecate `parent` in 3.4 and remove it in 4.0. I like when new features allows to remove some other ones.

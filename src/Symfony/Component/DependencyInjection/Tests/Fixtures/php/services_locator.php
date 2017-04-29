@@ -31,6 +31,12 @@ class ProjectServiceContainer extends Container
             'bar_service' => 'getBarServiceService',
             'baz_service' => 'getBazServiceService',
             'foo_service' => 'getFooServiceService',
+            'translator.loader_1' => 'getTranslator_Loader1Service',
+            'translator.loader_2' => 'getTranslator_Loader2Service',
+            'translator.loader_3' => 'getTranslator_Loader3Service',
+            'translator_1' => 'getTranslator1Service',
+            'translator_2' => 'getTranslator2Service',
+            'translator_3' => 'getTranslator3Service',
         );
         $this->privates = array(
             'baz_service' => true,
@@ -95,6 +101,101 @@ class ProjectServiceContainer extends Container
         }, 'nil' => function () {
             return NULL;
         }));
+    }
+
+    /**
+     * Gets the 'translator.loader_1' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getTranslator_Loader1Service()
+    {
+        return $this->services['translator.loader_1'] = new \stdClass();
+    }
+
+    /**
+     * Gets the 'translator.loader_2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getTranslator_Loader2Service()
+    {
+        return $this->services['translator.loader_2'] = new \stdClass();
+    }
+
+    /**
+     * Gets the 'translator.loader_3' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getTranslator_Loader3Service()
+    {
+        return $this->services['translator.loader_3'] = new \stdClass();
+    }
+
+    /**
+     * Gets the 'translator_1' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator A Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator instance
+     */
+    protected function getTranslator1Service()
+    {
+        return $this->services['translator_1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_1' => function () {
+            return ${($_ = isset($this->services['translator.loader_1']) ? $this->services['translator.loader_1'] : $this->get('translator.loader_1')) && false ?: '_'};
+        })));
+    }
+
+    /**
+     * Gets the 'translator_2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator A Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator instance
+     */
+    protected function getTranslator2Service()
+    {
+        $this->services['translator_2'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_2' => function () {
+            return ${($_ = isset($this->services['translator.loader_2']) ? $this->services['translator.loader_2'] : $this->get('translator.loader_2')) && false ?: '_'};
+        })));
+
+        $instance->addResource('db', ${($_ = isset($this->services['translator.loader_2']) ? $this->services['translator.loader_2'] : $this->get('translator.loader_2')) && false ?: '_'}, 'nl');
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'translator_3' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator A Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator instance
+     */
+    protected function getTranslator3Service()
+    {
+        $a = ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->get('translator.loader_3')) && false ?: '_'};
+
+        $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () {
+            return ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->get('translator.loader_3')) && false ?: '_'};
+        })));
+
+        $instance->addResource('db', $a, 'nl');
+        $instance->addResource('db', $a, 'en');
+
+        return $instance;
     }
 
     /**

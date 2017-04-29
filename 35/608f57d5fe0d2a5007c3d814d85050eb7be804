@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-20T06:30:08Z
+
+hmm .. will have to investigate why tests are partially passing with some configurations. any hints welcome.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-20T10:34:58Z
+
+@lsmith77 some jobs are just skipping all tests for PRs (to limit the number of queued jobs due to the activity on the repo), which is why they cannot fail
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-20T11:23:55Z
+
+ok .. tests are fixed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-20T20:31:07Z
+
+For next reviewers, [here](https://github.com/symfony/symfony/pull/22425#issuecomment-293983480) is the main reason for this PR:
+
+> my point above regarding checking the content type is so that one could use form_login and json_login in parallel on the same routes and within the same firewall
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-24T06:51:35Z
+
+rebased on master
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-04-25T12:10:08Z
+
+@dunglas ok for you?

@@ -122,6 +122,10 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
             $response = $this->onSuccess($request, $authenticatedToken);
         } catch (AuthenticationException $e) {
             $response = $this->onFailure($request, $e);
+        } catch (BadRequestHttpException $e) {
+            $request->setRequestFormat('json');
+
+            throw $e;
         }
 
         if (null === $response) {

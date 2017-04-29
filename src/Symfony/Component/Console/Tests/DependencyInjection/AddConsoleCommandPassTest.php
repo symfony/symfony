@@ -50,7 +50,7 @@ class AddConsoleCommandPassTest extends TestCase
         }
 
         $this->assertTrue($container->hasParameter('console.command.ids'));
-        $this->assertSame(array($id), $container->getParameter('console.command.ids'));
+        $this->assertSame(array($alias => $id), $container->getParameter('console.command.ids'));
     }
 
     public function visibilityProvider()

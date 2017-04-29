@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-27T14:20:37Z
+
+Can you open a separate issue for the failure you have? We run tests on php 5.5 only right now on Windows, maybe we should add 7.1 also.
+Can you take care of the failings tests please? (travis & fabbot)
+
+---------------------------------------------------------------------------
+
+by maryo at 2017-04-27T16:19:27Z
+
+@nicolas-grekas Done. Not sure why ClassLoader tests on AppVeyor are KO. It passed before.

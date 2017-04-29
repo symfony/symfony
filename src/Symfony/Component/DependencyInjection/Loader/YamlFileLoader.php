@@ -205,7 +205,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "services" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
-        if (isset($content['services']['_instanceof'])) {
+        if (array_key_exists('_instanceof', $content['services'])) {
             $instanceof = $content['services']['_instanceof'];
             unset($content['services']['_instanceof']);
 
@@ -242,7 +242,7 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefaults(array &$content, $file)
     {
-        if (!isset($content['services']['_defaults'])) {
+        if (!array_key_exists('_defaults', $content['services'])) {
             return array();
         }
         $defaults = $content['services']['_defaults'];

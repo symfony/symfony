@@ -651,20 +651,13 @@ class XmlFileLoaderTest extends TestCase
         $this->assertArrayNotHasKey('public', $container->getDefinition('with_defaults')->getChanges());
         $this->assertArrayNotHasKey('autowire', $container->getDefinition('with_defaults')->getChanges());
 
-        $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
-        $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());
-
         $container->compile();
 
         $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
-        $this->assertTrue($container->getDefinition('no_defaults_child')->isPublic());
 
         $this->assertSame(array(), $container->getDefinition('no_defaults')->getTags());
-        $this->assertSame(array('bar' => array(array())), $container->getDefinition('no_defaults_child')->getTags());
-        $this->assertSame(array('baz' => array(array()), 'foo' => array(array())), $container->getDefinition('with_defaults_child')->getTags());
 
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
-        $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
     public function testNamedArguments()
@@ -692,6 +685,42 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "instanceof" configuration is defined as using both is not supported. Try moving your child definitions to a different file.
+     */
+    public function testInstanceOfAndChildDefinitionNotAllowed()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_instanceof_with_parent.xml');
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot have a "parent" and also have "autoconfigure". Try setting autoconfigure="false" for the service.
+     */
+    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_autoconfigure_with_parent.xml');
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "defaults" configuration is defined as using both is not supported. Try moving your child definitions to a different file.
+     */
+    public function testDefaultsAndChildDefinitionNotAllowed()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_defaults_with_parent.xml');
+        $container->compile();
     }
 
     public function testAutoConfigureInstanceof()

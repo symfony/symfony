@@ -573,7 +573,7 @@ class ContainerBuilderTest extends TestCase
         $childDefA = $container->registerForAutoconfiguration('AInterface');
         $childDefB = $config->registerForAutoconfiguration('BInterface');
         $container->merge($config);
-        $this->assertSame(array('AInterface' => $childDefA, 'BInterface' => $childDefB), $container->getAutomaticInstanceofDefinitions());
+        $this->assertSame(array('AInterface' => $childDefA, 'BInterface' => $childDefB), $container->getAutoconfiguredInstanceof());
     }
 
     /**
@@ -1123,7 +1123,7 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $childDefA = $container->registerForAutoconfiguration('AInterface');
         $childDefB = $container->registerForAutoconfiguration('BInterface');
-        $this->assertSame(array('AInterface' => $childDefA, 'BInterface' => $childDefB), $container->getAutomaticInstanceofDefinitions());
+        $this->assertSame(array('AInterface' => $childDefA, 'BInterface' => $childDefB), $container->getAutoconfiguredInstanceof());
 
         // when called multiple times, the same instance is returned
         $this->assertSame($childDefA, $container->registerForAutoconfiguration('AInterface'));

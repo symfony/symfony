@@ -101,7 +101,6 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setPublic($parentDef->isPublic());
         $def->setLazy($parentDef->isLazy());
         $def->setAutowired($parentDef->isAutowired());
-        $def->setAutoconfigured($parentDef->isAutoconfigured());
         $def->setChanges($parentDef->getChanges());
 
         // overwrite with values specified in the decorator
@@ -129,9 +128,6 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());
-        }
-        if (isset($changes['autoconfigured'])) {
-            $def->setAutoconfigured($definition->isAutoconfigured());
         }
         if (isset($changes['shared'])) {
             $def->setShared($definition->isShared());
@@ -174,6 +170,9 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
         $def->setTags($definition->getTags());
+        // autoconfigure is never taken from parent (on purpose)
+        // and it's not legal on an instanceof
+        $def->setAutoconfigured($definition->isAutoconfigured());
 
         return $def;
     }

@@ -56,9 +56,6 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         ));
 
         $def = (new ChildDefinition('parent'))->setClass(self::class);
-        $def->setInstanceofConditionals(array(
-            parent::class => (new ChildDefinition(''))->addMethodCall('foo', array('baz')),
-        ));
         $container->setDefinition('child', $def);
 
         (new ResolveInstanceofConditionalsPass())->process($container);
@@ -108,7 +105,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertTrue($def->isShared());
     }
 
-    public function testProcessUsesAutomaticInstanceofDefinitions()
+    public function testProcessUsesAutoconfiguredInstanceof()
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -119,24 +116,24 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         ));
         $def->setAutoconfigured(true);
         $container->registerForAutoconfiguration(parent::class)
-            ->addTag('automatic_instanceof_tag')
+            ->addTag('autoconfigured_tag')
             ->setAutowired(true)
-            ->setFactory('automatically_set_factory');
+            ->setFactory('autoconfigured_factory');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
         (new ResolveTagsInheritancePass())->process($container);
         (new ResolveDefinitionTemplatesPass())->process($container);
 
         $def = $container->getDefinition('normal_service');
-        // autowired thanks to the automatic instanceof
+        // autowired thanks to the autoconfigured instanceof
         $this->assertTrue($def->isAutowired());
         // factory from the specific instanceof overrides global one
         $this->assertEquals('locally_set_factory', $def->getFactory());
         // tags are merged, the locally set one is first
-        $this->assertSame(array('local_instanceof_tag' => array(array()), 'automatic_instanceof_tag' => array(array())), $def->getTags());
+        $this->assertSame(array('local_instanceof_tag' => array(array()), 'autoconfigured_tag' => array(array())), $def->getTags());
     }
 
-    public function testProcessDoesNotUseAutomaticInstanceofDefinitionsIfNotEnabled()
+    public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled()
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -151,7 +148,6 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveDefinitionTemplatesPass())->process($container);
 
         $def = $container->getDefinition('normal_service');
-        // no automatic_tag, it was not enabled on the Definition
         $this->assertFalse($def->isAutowired());
     }
 
@@ -171,7 +167,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
     }
 
-    public function testBadInterfaceForAutomaticInstanceofIsOkException()
+    public function testBadInterfaceForAutomaticInstanceofIsOk()
     {
         $container = new ContainerBuilder();
         $container->register('normal_service', self::class)
@@ -181,5 +177,31 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         (new ResolveInstanceofConditionalsPass())->process($container);
         $this->assertTrue($container->hasDefinition('normal_service'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Autoconfigured instanceof for type "PHPUnit\Framework\TestCase" defines method calls but these are not supported and should be removed.
+     */
+    public function testProcessThrowsExceptionForAutoconfiguredCalls()
+    {
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(parent::class)
+            ->addMethodCall('setFoo');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Autoconfigured instanceof for type "PHPUnit\Framework\TestCase" defines arguments but these are not supported and should be removed.
+     */
+    public function testProcessThrowsExceptionForArguments()
+    {
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(parent::class)
+            ->addArgument('bar');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
     }
 }

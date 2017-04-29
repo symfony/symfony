@@ -381,23 +381,6 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertSame(array(2, 1, 'foo' => 3), $def->getArguments());
     }
 
-    public function testSetAutoconfiguredOnServiceHasParent()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('parent', 'stdClass')
-            ->setAutoconfigured(true)
-        ;
-
-        $container->setDefinition('child1', new ChildDefinition('parent'))
-            ->setAutoconfigured(false)
-        ;
-
-        $this->process($container);
-
-        $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
-    }
-
     public function testSetAutoconfiguredOnServiceIsParent()
     {
         $container = new ContainerBuilder();
@@ -410,7 +393,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertTrue($container->getDefinition('child1')->isAutoconfigured());
+        $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
     }
 
     protected function process(ContainerBuilder $container)

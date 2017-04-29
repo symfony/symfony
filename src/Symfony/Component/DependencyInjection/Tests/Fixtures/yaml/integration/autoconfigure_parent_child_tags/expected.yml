@@ -1,0 +1,6 @@
+services:
+    child_service_expected:
+        class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        # from an autoconfigured "instanceof" applied to parent class
+        # but NOT inherited down to child
+        # tags: [from_autoconfigure]

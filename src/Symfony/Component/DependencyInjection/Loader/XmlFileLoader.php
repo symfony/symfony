@@ -215,6 +215,14 @@ class XmlFileLoader extends FileLoader
         if ($this->isLoadingInstanceof) {
             $definition = new ChildDefinition('');
         } elseif ($parent = $service->getAttribute('parent')) {
+            if (!empty($this->instanceof)) {
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "instanceof" configuration is defined as using both is not supported. Try moving your child definitions to a different file.', $service->getAttribute('id')));
+            }
+
+            if (!empty($defaults)) {
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "defaults" configuration is defined as using both is not supported. Try moving your child definitions to a different file.', $service->getAttribute('id')));
+            }
+
             $definition = new ChildDefinition($parent);
 
             if ($value = $service->getAttribute('inherit-tags')) {
@@ -255,7 +263,11 @@ class XmlFileLoader extends FileLoader
         }
 
         if ($value = $service->getAttribute('autoconfigure')) {
-            $definition->setAutoconfigured(XmlUtils::phpize($value));
+            if (!$definition instanceof ChildDefinition) {
+                $definition->setAutoconfigured(XmlUtils::phpize($value));
+            } elseif ($value = XmlUtils::phpize($value)) {
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also have "autoconfigure". Try setting autoconfigure="false" for the service.', $service->getAttribute('id')));
+            }
         }
 
         if ($files = $this->getChildren($service, 'file')) {

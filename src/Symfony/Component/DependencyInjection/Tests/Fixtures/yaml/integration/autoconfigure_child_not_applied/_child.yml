@@ -1,0 +1,4 @@
+services:
+    child_service:
+        class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        parent: parent_service

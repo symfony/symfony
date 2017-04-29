@@ -117,64 +117,86 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 
-    public function testInstanceofDefaultsAndParentDefinitionResolution()
+    /**
+     * @dataProvider getYamlCompileTests
+     */
+    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
     {
+        // allow a container to be passed in, which might have autoconfigure settings
+        $container = $mainContainer ? $mainContainer : new ContainerBuilder();
+        $container->setResourceTracking(false);
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
+        $loader->load('main.yml');
+        $container->compile();
+        $actualService = $container->getDefinition($actualServiceId);
+
+        // create a fresh ContainerBuilder, to avoid autoconfigure stuff
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-
-        // loading YAML with an expressive test-case in that file
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml'));
-        $loader->load('services_defaults_instanceof_parent.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
+        $loader->load('expected.yml');
         $container->compile();
+        $expectedService = $container->getDefinition($expectedServiceId);
 
-        // instanceof overrides defaults
-        $simpleService = $container->getDefinition('service_simple');
-        $this->assertFalse($simpleService->isAutowired());
-        $this->assertFalse($simpleService->isAutoconfigured());
-        $this->assertFalse($simpleService->isShared());
+        // reset changes, we don't care if these differ
+        $actualService->setChanges(array());
+        $expectedService->setChanges(array());
 
-        // all tags are kept
-        $this->assertEquals(
-            array(
-                'foo_tag' => array(array('tag_option' => 'from_service'), array('tag_option' => 'from_instanceof')),
-                'bar_tag' => array(array()),
-            ),
-            $simpleService->getTags()
+        $this->assertEquals($expectedService, $actualService);
+    }
+
+    public function getYamlCompileTests()
+    {
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class);
+        yield array(
+            'autoconfigure_child_not_applied',
+            'child_service',
+            'child_service_expected',
+            $container,
         );
 
-        // calls are all kept, but service-level calls are last
-        $this->assertEquals(
-            array(
-                // from instanceof
-                array('setSunshine', array('bright')),
-                // from service
-                array('enableSummer', array(true)),
-                array('setSunshine', array('warm')),
-            ),
-            $simpleService->getMethodCalls()
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class);
+        yield array(
+            'autoconfigure_parent_child',
+            'child_service',
+            'child_service_expected',
+            $container,
         );
 
-        // service override instanceof
-        $overrideService = $container->getDefinition('service_override_instanceof');
-        $this->assertTrue($overrideService->isAutowired());
-        $this->assertTrue($overrideService->isAutoconfigured());
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class)
+            ->addTag('from_autoconfigure');
+        yield array(
+            'autoconfigure_parent_child_tags',
+            'child_service',
+            'child_service_expected',
+            $container,
+        );
 
-        // children definitions get no instanceof
-        $childDef = $container->getDefinition('child_service');
-        $this->assertEmpty($childDef->getTags());
+        yield array(
+            'child_parent',
+            'child_service',
+            'child_service_expected',
+        );
 
-        $childDef2 = $container->getDefinition('child_service_with_parent_instanceof');
-        // taken from instanceof applied to parent
-        $this->assertFalse($childDef2->isAutowired());
-        // override the instanceof
-        $this->assertTrue($childDef2->isShared());
-        // tags inherit like normal
-        $this->assertEquals(
-            array(
-                'foo_tag' => array(array('tag_option' => 'from_child_def'), array('tag_option' => 'from_parent_def'), array('tag_option' => 'from_instanceof')),
-                'bar_tag' => array(array()),
-            ),
-            $childDef2->getTags()
+        yield array(
+            'defaults_instanceof_importance',
+            'main_service',
+            'main_service_expected',
+        );
+
+        yield array(
+            'defaults_parent_child',
+            'child_service',
+            'child_service_expected',
+        );
+
+        yield array(
+            'instanceof_parent_child',
+            'child_service',
+            'child_service_expected',
         );
     }
 }

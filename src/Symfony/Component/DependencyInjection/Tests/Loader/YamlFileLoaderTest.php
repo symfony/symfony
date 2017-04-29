@@ -403,9 +403,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($container->getAlias('with_defaults_aliased')->isPublic());
         $this->assertFalse($container->getAlias('with_defaults_aliased_short')->isPublic());
 
-        $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
-        $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());
-
         $this->assertFalse($container->getDefinition('Acme\WithShortCutArgs')->isPublic());
         $this->assertSame(array('foo' => array(array())), $container->getDefinition('Acme\WithShortCutArgs')->getTags());
         $this->assertTrue($container->getDefinition('Acme\WithShortCutArgs')->isAutowired());
@@ -414,16 +411,12 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('with_null')->isPublic());
         $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
-        $this->assertTrue($container->getDefinition('no_defaults_child')->isPublic());
 
         $this->assertSame(array(), $container->getDefinition('with_null')->getTags());
         $this->assertSame(array(), $container->getDefinition('no_defaults')->getTags());
-        $this->assertSame(array('bar' => array(array())), $container->getDefinition('no_defaults_child')->getTags());
-        $this->assertSame(array('baz' => array(array()), 'foo' => array(array())), $container->getDefinition('with_defaults_child')->getTags());
 
         $this->assertTrue($container->getDefinition('with_null')->isAutowired());
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
-        $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
     public function testNamedArguments()
@@ -453,6 +446,42 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Try moving your child definitions to a different file.
+     */
+    public function testInstanceOfAndChildDefinitionNotAllowed()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_instanceof_with_parent.yml');
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot have a "parent" and also have "autoconfigure". Try setting "autoconfigure: false" for the service.
+     */
+    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_autoconfigure_with_parent.yml');
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "_defaults" configuration is defined as using both is not supported. Try moving your child definitions to a different file.
+     */
+    public function testDefaultsAndChildDefinitionNotAllowed()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_defaults_with_parent.yml');
+        $container->compile();
     }
 
     /**

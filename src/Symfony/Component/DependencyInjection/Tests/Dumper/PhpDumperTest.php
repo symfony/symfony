@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -534,6 +535,40 @@ class PhpDumperTest extends TestCase
                 'nil' => $nil = new ServiceClosureArgument(new Reference('nil')),
             ))
         ;
+
+        // no method calls
+        $container->register('translator.loader_1', 'stdClass');
+        $container->register('translator.loader_1_locator', ServiceLocator::class)
+            ->setPublic(false)
+            ->addArgument(array(
+                'translator.loader_1' => new ServiceClosureArgument(new Reference('translator.loader_1')),
+            ));
+        $container->register('translator_1', StubbedTranslator::class)
+            ->addArgument(new Reference('translator.loader_1_locator'));
+
+        // one method calls
+        $container->register('translator.loader_2', 'stdClass');
+        $container->register('translator.loader_2_locator', ServiceLocator::class)
+            ->setPublic(false)
+            ->addArgument(array(
+                'translator.loader_2' => new ServiceClosureArgument(new Reference('translator.loader_2')),
+            ));
+        $container->register('translator_2', StubbedTranslator::class)
+            ->addArgument(new Reference('translator.loader_2_locator'))
+            ->addMethodCall('addResource', array('db', new Reference('translator.loader_2'), 'nl'));
+
+        // two method calls
+        $container->register('translator.loader_3', 'stdClass');
+        $container->register('translator.loader_3_locator', ServiceLocator::class)
+            ->setPublic(false)
+            ->addArgument(array(
+                'translator.loader_3' => new ServiceClosureArgument(new Reference('translator.loader_3')),
+            ));
+        $container->register('translator_3', StubbedTranslator::class)
+            ->addArgument(new Reference('translator.loader_3_locator'))
+            ->addMethodCall('addResource', array('db', new Reference('translator.loader_3'), 'nl'))
+            ->addMethodCall('addResource', array('db', new Reference('translator.loader_3'), 'en'));
+
         $nil->setValues(array(null));
         $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
         $container->register('baz_service', 'stdClass')->setPublic(false);

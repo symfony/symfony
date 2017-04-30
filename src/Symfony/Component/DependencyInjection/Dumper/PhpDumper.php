@@ -58,7 +58,6 @@ class PhpDumper extends Dumper
 
     private $inlinedDefinitions;
     private $definitionVariables;
-    private $referenceVariables;
     private $variableCount;
     private $reservedVariables = array('instance', 'class');
     private $expressionLanguage;
@@ -197,55 +196,6 @@ class PhpDumper extends Dumper
         }
 
         return $this->proxyDumper;
-    }
-
-    /**
-     * Generates Service local temp variables.
-     *
-     * @param string     $cId
-     * @param Definition $definition
-     * @param array      $inlinedDefinitions
-     *
-     * @return string
-     */
-    private function addServiceLocalTempVariables($cId, Definition $definition, array $inlinedDefinitions)
-    {
-        static $template = "        \$%s = %s;\n";
-
-        array_unshift($inlinedDefinitions, $definition);
-
-        $calls = $behavior = array();
-        foreach ($inlinedDefinitions as $iDefinition) {
-            $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior);
-            $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior);
-            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior);
-            $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior);
-            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior);
-        }
-
-        $code = '';
-        foreach ($calls as $id => $callCount) {
-            if ('service_container' === $id || $id === $cId) {
-                continue;
-            }
-
-            if ($callCount > 1) {
-                $name = $this->getNextVariableName();
-                $this->referenceVariables[$id] = new Variable($name);
-
-                if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $behavior[$id]) {
-                    $code .= sprintf($template, $name, $this->getServiceCall($id));
-                } else {
-                    $code .= sprintf($template, $name, $this->getServiceCall($id, new Reference($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)));
-                }
-            }
-        }
-
-        if ('' !== $code) {
-            $code .= "\n";
-        }
-
-        return $code;
     }
 
     /**
@@ -508,8 +458,6 @@ class PhpDumper extends Dumper
      */
     private function addServiceInlinedDefinitionsSetup($id, array $inlinedDefinitions, $isSimpleInstance)
     {
-        $this->referenceVariables[$id] = new Variable('instance');
-
         $code = '';
         $processed = new \SplObjectStorage();
         foreach ($inlinedDefinitions as $iDefinition) {
@@ -592,7 +540,6 @@ class PhpDumper extends Dumper
             return '';
         }
         $this->definitionVariables = new \SplObjectStorage();
-        $this->referenceVariables = array();
         $this->variableCount = 0;
 
         $return = array();
@@ -687,7 +634,6 @@ EOF;
 
         $code .=
             $this->addServiceInclude($id, $definition, $inlinedDefinitions).
-            $this->addServiceLocalTempVariables($id, $definition, $inlinedDefinitions).
             $this->addServiceInlinedDefinitions($id, $inlinedDefinitions).
             $this->addServiceInstance($id, $definition, $isSimpleInstance).
             $this->addServiceInlinedDefinitionsSetup($id, $inlinedDefinitions, $isSimpleInstance).
@@ -698,7 +644,6 @@ EOF;
         ;
 
         $this->definitionVariables = null;
-        $this->referenceVariables = null;
 
         return $code;
     }
@@ -1526,10 +1471,6 @@ EOF;
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
-            if (null !== $this->referenceVariables && isset($this->referenceVariables[$id = (string) $value])) {
-                return $this->dumpValue($this->referenceVariables[$id], $interpolate);
-            }
-
             return $this->getServiceCall((string) $value, $value);
         } elseif ($value instanceof Expression) {
             return $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));

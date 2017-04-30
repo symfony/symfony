@@ -93,11 +93,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+        $this->services['bar'] = $instance = new \Bar\FooClass('foo', ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}, $this->getParameter('foo_bar'));
 
-        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
-
-        $a->configure($instance);
+        ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}->configure($instance);
 
         return $instance;
     }
@@ -250,12 +248,10 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
-
-        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->foo = 'bar';
-        $instance->moo = $a;
+        $instance->moo = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
         $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
         $instance->setBar(${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->get('bar')) && false ?: '_'});
         $instance->initialize();

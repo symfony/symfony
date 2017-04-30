@@ -1410,40 +1410,79 @@ EOF;
             }
 
             return sprintf('array(%s)', implode(', ', $code));
-        } elseif ($value instanceof ServiceClosureArgument) {
-            $value = $value->getValues()[0];
-            $code = $this->dumpValue($value, $interpolate);
+        } elseif ($value instanceof ArgumentInterface) {
+            $scope = array($this->definitionVariables, $this->referenceVariables, $this->variableCount);
+            $this->definitionVariables = $this->referenceVariables = null;
 
-            if ($value instanceof TypedReference) {
-                $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
-            } else {
-                $code = sprintf('return %s;', $code);
-            }
+            try {
+                if ($value instanceof ServiceClosureArgument) {
+                    $value = $value->getValues()[0];
+                    $code = $this->dumpValue($value, $interpolate);
 
-            return sprintf("function () {\n            %s\n        }", $code);
-        } elseif ($value instanceof IteratorArgument) {
-            $countCode = array();
-            $countCode[] = 'function () {';
-            $operands = array(0);
-
-            $code = array();
-            $code[] = 'new RewindableGenerator(function () {';
-            foreach ($value->getValues() as $k => $v) {
-                ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
-                $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
-                foreach (explode("\n", $v) as $v) {
-                    if ($v) {
-                        $code[] = '    '.$v;
+                    if ($value instanceof TypedReference) {
+                        $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
+                    } else {
+                        $code = sprintf('return %s;', $code);
                     }
+
+                    return sprintf("function () {\n            %s\n        }", $code);
                 }
+
+                if ($value instanceof IteratorArgument) {
+                    $countCode = array();
+                    $countCode[] = 'function () {';
+                    $operands = array(0);
+
+                    $code = array();
+                    $code[] = 'new RewindableGenerator(function () {';
+                    foreach ($value->getValues() as $k => $v) {
+                        ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
+                        $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
+                        foreach (explode("\n", $v) as $v) {
+                            if ($v) {
+                                $code[] = '    '.$v;
+                            }
+                        }
+                    }
+
+                    $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
+                    $countCode[] = '        }';
+
+                    $code[] = sprintf('        }, %s)', count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
+
+                    return implode("\n", $code);
+                }
+
+                if ($value instanceof ClosureProxyArgument) {
+                    list($reference, $method) = $value->getValues();
+                    $method = substr($this->dumpLiteralClass($this->dumpValue($method)), 1);
+
+                    if ('service_container' === (string) $reference) {
+                        $class = $this->baseClass;
+                    } elseif (!$this->container->hasDefinition((string) $reference) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+                        return 'null';
+                    } else {
+                        $class = substr($this->dumpLiteralClass($this->dumpValue($this->container->findDefinition((string) $reference)->getClass())), 1);
+                    }
+                    if (false !== strpos($class, '$') || false !== strpos($method, '$')) {
+                        throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names or methods, and closure-proxies are incompatible with each other.', $reference));
+                    }
+                    if (!method_exists($class, $method)) {
+                        throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" does not exist.', $reference, $class, $method));
+                    }
+                    $r = $this->container->getReflectionClass($class)->getMethod($method);
+                    if (!$r->isPublic()) {
+                        throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $reference, $class, $method));
+                    }
+                    $signature = preg_replace('/^(&?)[^(]*/', '$1', ProxyHelper::getSignature($r, $call));
+
+                    $return = 'void' !== ProxyHelper::getTypeHint($r);
+
+                    return sprintf("/** @closure-proxy %s::%s */ function %s {\n            %s%s->%s;\n        }", $class, $method, $signature, $return ? 'return ' : '', $this->dumpValue($reference), $call);
+                }
+            } finally {
+                list($this->definitionVariables, $this->referenceVariables, $this->variableCount) = $scope;
             }
-
-            $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
-            $countCode[] = '        }';
-
-            $code[] = sprintf('        }, %s)', count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
-
-            return implode("\n", $code);
         } elseif ($value instanceof Definition) {
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables->offsetGet($value), $interpolate);
@@ -1497,32 +1536,6 @@ EOF;
             }
 
             return sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments));
-        } elseif ($value instanceof ClosureProxyArgument) {
-            list($reference, $method) = $value->getValues();
-            $method = substr($this->dumpLiteralClass($this->dumpValue($method)), 1);
-
-            if ('service_container' === (string) $reference) {
-                $class = $this->baseClass;
-            } elseif (!$this->container->hasDefinition((string) $reference) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-                return 'null';
-            } else {
-                $class = substr($this->dumpLiteralClass($this->dumpValue($this->container->findDefinition((string) $reference)->getClass())), 1);
-            }
-            if (false !== strpos($class, '$') || false !== strpos($method, '$')) {
-                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names or methods, and closure-proxies are incompatible with each other.', $reference));
-            }
-            if (!method_exists($class, $method)) {
-                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" does not exist.', $reference, $class, $method));
-            }
-            $r = $this->container->getReflectionClass($class)->getMethod($method);
-            if (!$r->isPublic()) {
-                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $reference, $class, $method));
-            }
-            $signature = preg_replace('/^(&?)[^(]*/', '$1', ProxyHelper::getSignature($r, $call));
-
-            $return = 'void' !== ProxyHelper::getTypeHint($r);
-
-            return sprintf("/** @closure-proxy %s::%s */ function %s {\n            %s%s->%s;\n        }", $class, $method, $signature, $return ? 'return ' : '', $this->dumpValue($reference), $call);
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {

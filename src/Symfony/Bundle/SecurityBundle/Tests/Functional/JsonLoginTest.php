@@ -61,4 +61,15 @@ class JsonLoginTest extends WebTestCase
         $this->assertSame(500, $response->getStatusCode());
         $this->assertSame(array('message' => 'Something went wrong'), json_decode($response->getContent(), true));
     }
+
+    public function testDefaultJsonLoginBadRequest()
+    {
+        $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
+        $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), 'Not a json content');
+        $response = $client->getResponse();
+
+        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertArraySubset(array('error' => array('code' => 400, 'message' => 'Bad Request')), json_decode($response->getContent(), true));
+    }
 }

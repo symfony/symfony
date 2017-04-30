@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added support for `Event::getWorkflowName()` for "announce" events.
+ * Added `workflow.completed` events which are fired after a transition is completed.
 
 3.3.0
 -----

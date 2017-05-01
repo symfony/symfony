@@ -509,6 +509,11 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals(array('foo' => 'K'), $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
     }
 
+    public function testNormalizeUpperCaseAttributes()
+    {
+        $this->assertEquals(array('Foo' => 'Foo', 'Bar' => 'BarBar'), $this->normalizer->normalize(new ObjectWithUpperCaseAttributeNames()));
+    }
+
     public function testNormalizeNotSerializableContext()
     {
         $objectDummy = new ObjectDummy();
@@ -997,5 +1002,16 @@ class DummyWithConstructorObjectAndDefaultValue
     public function getInner()
     {
         return $this->inner;
+    }
+}
+
+class ObjectWithUpperCaseAttributeNames
+{
+    private $Foo = 'Foo';
+    public $Bar = 'BarBar';
+
+    public function getFoo()
+    {
+        return $this->Foo;
     }
 }

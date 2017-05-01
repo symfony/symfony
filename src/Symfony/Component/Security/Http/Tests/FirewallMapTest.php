@@ -120,20 +120,20 @@ class FirewallMapTest extends TestCase
     {
         $map = new FirewallMap();
 
-        $request1 = new Request(['id' => 1]);
+        $request1 = new Request(array('id' => 1));
         $matchingMatcher1 = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcher')->getMock();
         $matchingMatcher1
             ->method('matches')
-            ->will($this->returnCallback(function(Request $request) {
+            ->will($this->returnCallback(function (Request $request) {
                 return $request->query->get('id') === 1;
             }))
         ;
 
-        $request2 = new Request(['id' => 2]);
+        $request2 = new Request(array('id' => 2));
         $matchingMatcher2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcher')->getMock();
         $matchingMatcher2
             ->method('matches')
-            ->will($this->returnCallback(function(Request $request) {
+            ->will($this->returnCallback(function (Request $request) {
                 return $request->query->get('id') === 2;
             }))
         ;

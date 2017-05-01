@@ -40,7 +40,6 @@ interface FirewallMapInterface
      * Cleans up the internal state of the firewall map.
      *
      * @param Request $request
-     * @return void
      */
     public function detachListeners(Request $request);
 }

@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-26T13:22:46Z
+
+As discussed together, I think this is the right thing to do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-26T13:22:49Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-26T14:05:17Z
+
+:+1: also
+I think we need to remove the "inherit-tag" feature now. I introduced it to allow configuring this behavior. But now that tags are always inherited, the remaining use case (inherit tags from parents) looks like something I'd prefer to remove and drop some complexity from the core.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-26T14:08:00Z
+
+👍 for removing `inherit-tag`. @weaverryan Can you do that?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-26T14:16:00Z
+
+👍 for removing it too
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-04-26T20:47:40Z
+
+Linked issue should be https://github.com/symfony/symfony/issues/22497 I suppose 😉
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-27T15:15:12Z
+
+Boom! `inherit_tags` removed!
+
+* Like in 3.2, child definitions *never* inherit parent tags
+* **important** After this change, tags from `_instanceof` are NEVER applied to child definitions. But this is because it's complicated to merge. In another PR, I'm going to propose an exception related to this.
+
+@curry684 you're right! Updated with the issue number - your issue is what pushed me to corner Fabien and Nicolas about this ;).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-27T16:13:46Z
+
+There are a few other issues still with this PR - specifically that while `tags` are applied from `_defaults`, the other values (`autowire`, `autoconfigure` and `public`) are not. I've just fixed this in the last commit, but there's an issue related to parent definitions that @nicolas-grekas will try to solve in another PR (and the tests fail currently due to this).
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-27T16:45:39Z
+
+> important After this change, tags from _instanceof are NEVER applied to child definitions. But this is because it's complicated to merge. In another PR, I'm going to propose an exception related to this.
+
+this looks weird to me, as a common use case is to tag event subscribers or twig extensions for instance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-27T18:09:54Z
+
+Parent/child definitions, mixed with defaults, instanceof or autoconfig create conflicting expectations. They do not play well with each other.
+After spending too much time trying to resolve these, Ryan and I are now confident that we should make parent/child definitions incompatible with these new 3.3 features​, by throwing an exception when used together.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-28T02:27:49Z
+
+See #22563: Almost all of the complexity of handling `_defaults`, `_instanceof` and service definition config is coming from children services... which is silly because that's an edge case. In that PR, I propose not supporting them. Then, in this PR, we can apply `tags` from `_defaults` (which will close #22497), remove `inherit-tags`, but not have any weird functionality left.
+
+> weaverryan:
+> important After this change, tags from _instanceof are NEVER applied to child definitions. But this is because it's complicated to merge. In another PR, I'm going to propose an exception related to this.
+
+> stof:
+> this looks weird to me, as a common use case is to tag event subscribers or twig extensions for instance.
+
+Yep, I agree. It's very complex. I just added some test cases to #22563, which include a few I highlighted as potential problems (like this situation).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-29T15:47:52Z
+
+Rebase unlocked :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-01T13:23:52Z
+
+Rebased! This PR is now simple: `tags` under `_defaults` always apply (like the other things under `_defaults`) and `inherit_tags` was removed, which means that parent-child services have the 3.2 functionality (i.e. tags do not inherit).

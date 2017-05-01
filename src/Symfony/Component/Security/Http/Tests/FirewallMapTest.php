@@ -115,4 +115,43 @@ class FirewallMapTest extends TestCase
         $this->assertEquals(array(), $listeners);
         $this->assertNull($exception);
     }
+
+    public function testDetachListeners()
+    {
+        $map = new FirewallMap();
+
+        $request1 = new Request();
+        $matchingMatcher1 = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcher')->getMock();
+        $matchingMatcher1
+            ->expects($this->once())
+            ->method('matches')
+            ->with($this->equalTo($request1))
+            ->will($this->returnValue(true))
+        ;
+
+        $request2 = new Request();
+        $matchingMatcher2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcher')->getMock();
+        $matchingMatcher2
+            ->expects($this->once())
+            ->method('matches')
+            ->with($this->equalTo($request2))
+            ->will($this->returnValue(true))
+        ;
+
+        $theListener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock();
+        $theException = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ExceptionListener')->disableOriginalConstructor()->getMock();
+
+        $map->add($matchingMatcher1, array($theListener), $theException);
+        $map->add($matchingMatcher2, array($theListener), $theException);
+
+        $map->detachListeners($request1);
+
+        list($listeners, $exception) = $map->getListeners($request1);
+        $this->assertEquals(array(), $listeners);
+        $this->assertNull($exception);
+
+        list($listeners, $exception) = $map->getListeners($request2);
+        $this->assertEquals(array($theListener), $listeners);
+        $this->assertEquals($theException, $exception);
+    }
 }

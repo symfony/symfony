@@ -50,6 +50,14 @@ class FirewallMap implements FirewallMapInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function detachListeners(Request $request)
+    {
+        unset($this->contexts[$request]);
+    }
+
+    /**
      * @return FirewallConfig|null
      */
     public function getFirewallConfig(Request $request)

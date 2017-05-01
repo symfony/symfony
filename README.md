@@ -46,7 +46,7 @@ If you discover a security vulnerability within Symfony, please follow our
 About Us
 --------
 
-Symfony development is sponsored by [SensioLabs][21], lead by the
+Symfony development is sponsored by [SensioLabs][21], led by the
 [Symfony Core Team][22] and supported by [Symfony contributors][19].
 
 [1]: https://symfony.com

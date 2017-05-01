@@ -7,6 +7,29 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.20 (2017-05-01)
+
+ * bug #22550 Allow Upper Case property names in ObjectNormalizer (insekticid)
+ * bug #22528 [Asset] Starting slash should indicate no basePath wanted (weaverryan)
+ * bug #22541 [EventDispatcher] fix: unwrap listeners for correct info (dmaicher)
+ * bug #22526 [Asset] Preventing the base path or absolute URL from being prefixed incorrectly (weaverryan)
+ * bug #22523 [WebProfilerBundle] Fixed the flickering when loading complex profiler panels (javiereguiluz)
+ * bug #22435 [Console] Fix dispatching throwables from ConsoleEvents::COMMAND (nicolas-grekas)
+ * bug #22478 [Serializer] XmlEncoder: fix negative int and large numbers handling (dunglas)
+ * bug #22424 [Debug] Set exit status to 255 on error (nicolas-grekas)
+ * bug #22426 [PropertyInfo] Prevent returning int values in some cases (dunglas)
+ * bug #22399  Prevent double registrations related to tag priorities (nicolas-grekas)
+ * bug #22396 Prevent double registrations related to tag priorities (nicolas-grekas)
+ * bug #22352 [HttpFoundation] Add `use_strict_mode` in validOptions for session (sstok)
+ * bug #22351 [Yaml] don't keep internal state between parser runs (xabbuh)
+ * bug #22307 [Debug] Fix php notice (enumag)
+ * bug #22311 [DI] Fix second auto-registration (nicolas-grekas)
+ * bug #22109 [Validator] check for empty host when calling checkdnsrr() (apetitpa)
+ * bug #22280 [DI] Fix the xml schema (GuilhemN)
+ * bug #22282 [DI] Prevent AutowirePass from triggering irrelevant deprecations (chalasr)
+ * bug #22255 [Translation] avoid creating cache files for fallback locales. (aitboudad)
+ * bug #22292 Fixes #22264 - add support for Chrome headless (redthor)
+
 * 2.8.19 (2017-04-05)
 
  * bug #22265 Allow Upper Case property names (insekticid)

@@ -117,9 +117,6 @@ class TraceableEventDispatcherTest extends TestCase
         $tdispatcher = new TraceableEventDispatcher($dispatcher, $stopWatch);
 
         $listener = function () {};
-        if ($isWrapped) {
-            $listener = new WrappedListener($listener, 'foo', $stopWatch, $dispatcher);
-        }
 
         $tdispatcher->addListener('foo', $listener, 5);
 

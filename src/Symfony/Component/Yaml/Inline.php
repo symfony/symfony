@@ -273,13 +273,13 @@ class Inline
     /**
      * Parses a YAML scalar.
      *
-     * @param string $scalar
-     * @param int    $flags
-     * @param string $delimiters
-     * @param array  $stringDelimiters
-     * @param int    &$i
-     * @param bool   $evaluate
-     * @param array  $references
+     * @param string   $scalar
+     * @param int      $flags
+     * @param string[] $delimiters
+     * @param string[] $stringDelimiters
+     * @param int      &$i
+     * @param bool     $evaluate
+     * @param array    $references
      *
      * @return string
      *
@@ -533,7 +533,7 @@ class Inline
      * @param int    $flags
      * @param array  $references
      *
-     * @return string A YAML string
+     * @return mixed The evaluated YAML string
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */

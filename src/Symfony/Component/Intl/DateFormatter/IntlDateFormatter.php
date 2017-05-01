@@ -346,7 +346,7 @@ class IntlDateFormatter
     /**
      * Returns the formatter's time type.
      *
-     * @return string The time type used by the formatter
+     * @return int The time type used by the formatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.gettimetype.php
      */
@@ -428,7 +428,7 @@ class IntlDateFormatter
      *                         contain -1 otherwise it will contain the position at which parsing
      *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
-     * @return string Parsed value as a timestamp
+     * @return int Parsed value as a timestamp
      *
      * @see http://www.php.net/manual/en/intldateformatter.parse.php
      *

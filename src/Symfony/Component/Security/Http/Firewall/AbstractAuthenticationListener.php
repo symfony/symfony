@@ -69,14 +69,14 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param TokenStorageInterface                  $tokenStorage          A TokenStorageInterface instance
      * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
      * @param SessionAuthenticationStrategyInterface $sessionStrategy
-     * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
+     * @param HttpUtils                              $httpUtils             An HttpUtils instance
      * @param string                                 $providerKey
      * @param AuthenticationSuccessHandlerInterface  $successHandler
      * @param AuthenticationFailureHandlerInterface  $failureHandler
      * @param array                                  $options               An array of options for the processing of a
      *                                                                      successful, or failed authentication attempt
-     * @param LoggerInterface                        $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
+     * @param LoggerInterface|null                   $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface|null          $dispatcher            An EventDispatcherInterface instance
      *
      * @throws \InvalidArgumentException
      */

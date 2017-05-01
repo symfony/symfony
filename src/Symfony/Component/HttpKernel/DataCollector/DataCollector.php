@@ -39,8 +39,6 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     private static $cloner;
 
-    private static $stubsCache = array();
-
     public function serialize()
     {
         return serialize($this->data);

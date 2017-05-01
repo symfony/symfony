@@ -14,7 +14,6 @@ services:
         class: Foo
         public: true
         autowire: ~
-        inherit_tags: false
 
     no_defaults:
         class: Foo

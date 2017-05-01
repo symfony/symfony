@@ -412,8 +412,9 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($container->getDefinition('with_null')->isPublic());
         $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
 
-        $this->assertSame(array(), $container->getDefinition('with_null')->getTags());
-        $this->assertSame(array(), $container->getDefinition('no_defaults')->getTags());
+        // foo tag is inherited from defaults
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_null')->getTags());
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('no_defaults')->getTags());
 
         $this->assertTrue($container->getDefinition('with_null')->isAutowired());
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());

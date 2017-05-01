@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveTagsInheritancePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveInstanceofConditionalsPassTest extends TestCase
@@ -35,7 +34,6 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertEmpty($def->getInstanceofConditionals());
         $this->assertInstanceof(ChildDefinition::class, $def);
         $this->assertTrue($def->isAutowired());
-        $this->assertFalse($def->getInheritTags());
         $this->assertSame($parent, $def->getParent());
         $this->assertSame(array('tag' => array(array()), 'baz' => array(array('attr' => 123))), $def->getTags());
 
@@ -121,7 +119,6 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
             ->setFactory('autoconfigured_factory');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
-        (new ResolveTagsInheritancePass())->process($container);
         (new ResolveDefinitionTemplatesPass())->process($container);
 
         $def = $container->getDefinition('normal_service');

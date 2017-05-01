@@ -178,9 +178,6 @@ class XmlFileLoader extends FileLoader
         if ($defaultsNode->hasAttribute('public')) {
             $defaults['public'] = XmlUtils::phpize($defaultsNode->getAttribute('public'));
         }
-        if ($defaultsNode->hasAttribute('inherit-tags')) {
-            $defaults['inherit-tags'] = XmlUtils::phpize($defaultsNode->getAttribute('inherit-tags'));
-        }
         if ($defaultsNode->hasAttribute('autoconfigure')) {
             $defaults['autoconfigure'] = XmlUtils::phpize($defaultsNode->getAttribute('autoconfigure'));
         }
@@ -225,13 +222,6 @@ class XmlFileLoader extends FileLoader
             }
 
             $definition = new ChildDefinition($parent);
-
-            if ($value = $service->getAttribute('inherit-tags')) {
-                $definition->setInheritTags(XmlUtils::phpize($value));
-            } elseif (isset($defaults['inherit-tags'])) {
-                $definition->setInheritTags($defaults['inherit-tags']);
-            }
-            $defaults = array();
         } else {
             $definition = new Definition();
 
@@ -318,13 +308,7 @@ class XmlFileLoader extends FileLoader
 
         $tags = $this->getChildren($service, 'tag');
 
-        if (empty($defaults['tags'])) {
-            // no-op
-        } elseif (!$value = $service->getAttribute('inherit-tags')) {
-            if (!$tags) {
-                $tags = $defaults['tags'];
-            }
-        } elseif (XmlUtils::phpize($value)) {
+        if (!empty($defaults['tags'])) {
             $tags = array_merge($tags, $defaults['tags']);
         }
 

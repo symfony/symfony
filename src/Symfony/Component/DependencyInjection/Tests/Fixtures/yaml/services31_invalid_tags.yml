@@ -4,4 +4,3 @@ services:
 
     Foo\Bar:
         tags: invalid
-        inherit_tags: true

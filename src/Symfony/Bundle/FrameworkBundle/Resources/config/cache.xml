@@ -99,11 +99,11 @@
             </call>
         </service>
 
-        <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
+        <service id="cache.global_clearer" parent="cache.default_clearer">
             <tag name="kernel.cache_clearer" />
         </service>
 
-        <service id="cache.global_clearer" parent="cache.default_clearer" />
+        <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" />
         <service id="cache.app_clearer" alias="cache.default_clearer" />
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" public="false" />
 

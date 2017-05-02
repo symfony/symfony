@@ -47,15 +47,21 @@ class ServerRunCommand extends ServerCommand
         $this
             ->setDefinition(array(
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
             ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> runs a local web server:
+<info>%command.name%</info> runs a local web server: By default, the server
+listens on <comment>127.0.0.1</> address and the port number is automatically selected
+as the first free port starting from <comment>8000</>:
 
   <info>%command.full_name%</info>
+
+This command blocks the console. If you want to run other commands, stop it by
+pressing <comment>Control+C</> or use the non-blocking <comment>server:start</>
+command instead.
 
 Change the default address and port by passing them as an argument:
 

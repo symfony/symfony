@@ -38,6 +38,20 @@ class ServerStatusCommand extends ServerCommand
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'The value to display (one of port, host, or address)'),
             ))
             ->setDescription('Outputs the status of the local web server for the given address')
+            ->setHelp(<<<'EOF'
+<info>%command.name%</info> shows the details of the given local web
+server, such as the address and port where it is listening to:
+
+  <info>php %command.full_name%</info>
+
+To get the information as a machine readable format, use the
+<comment>--filter</> option:
+
+<info>php %command.full_name% --filter=port</info>
+
+Supported values are <comment>port</>, <comment>host</>, and <comment>address</>.
+EOF
+            )
         ;
     }
 

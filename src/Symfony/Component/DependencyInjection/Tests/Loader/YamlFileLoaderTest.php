@@ -418,6 +418,10 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('with_null')->isAutowired());
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
+
+        $this->assertTrue($container->getDefinition('child_def')->isPublic());
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('child_def')->getTags());
+        $this->assertFalse($container->getDefinition('child_def')->isAutowired());
     }
 
     public function testNamedArguments()
@@ -451,7 +455,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Try moving your child definitions to a different file.
+     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Move your child definitions to a separate file.
      */
     public function testInstanceOfAndChildDefinitionNotAllowed()
     {
@@ -475,7 +479,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The service "child_service" cannot use the "parent" option in the same file where "_defaults" configuration is defined as using both is not supported. Try moving your child definitions to a different file.
+     * @expectedExceptionMessage Attribute "autowire" on service "child_service" cannot be inherited from "_defaults" when a "parent" is set. Move your child definitions to a separate file or define this attribute explicitly.
      */
     public function testDefaultsAndChildDefinitionNotAllowed()
     {

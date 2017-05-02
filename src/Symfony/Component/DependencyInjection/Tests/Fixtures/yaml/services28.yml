@@ -27,3 +27,8 @@ services:
     with_defaults_aliased_short: '@with_defaults'
 
     Acme\WithShortCutArgs: [foo]
+
+    child_def:
+        parent: with_defaults
+        public: true
+        autowire: false

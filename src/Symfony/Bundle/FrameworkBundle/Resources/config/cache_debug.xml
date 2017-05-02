@@ -5,6 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
+
         <!-- DataCollector -->
         <service id="data_collector.cache" class="Symfony\Component\Cache\DataCollector\CacheDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/cache.html.twig" id="cache" priority="275" />

@@ -5,7 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="debug.templating.engine.php" class="Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine" public="false">
+        <defaults public="false" />
+
+        <service id="debug.templating.engine.php" class="Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine">
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />

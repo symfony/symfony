@@ -182,6 +182,12 @@ class IntegrationTest extends TestCase
         );
 
         yield array(
+            'defaults_child_tags',
+            'child_service',
+            'child_service_expected',
+        );
+
+        yield array(
             'defaults_instanceof_importance',
             'main_service',
             'main_service_expected',

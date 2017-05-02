@@ -1465,6 +1465,19 @@ class ProcessTest extends TestCase
         $this->assertSame($arg, $p->getOutput());
     }
 
+    /**
+     * @dataProvider provideEscapeArgument
+     * @group legacy
+     */
+    public function testEscapeArgumentWhenInheritEnvDisabled($arg)
+    {
+        $p = new Process(array(self::$phpBin, '-r', 'echo $argv[1];', $arg), null, array('BAR' => 'BAZ'));
+        $p->inheritEnvironmentVariables(false);
+        $p->run();
+
+        $this->assertSame($arg, $p->getOutput());
+    }
+
     public function provideEscapeArgument()
     {
         yield array('a"b%c%');

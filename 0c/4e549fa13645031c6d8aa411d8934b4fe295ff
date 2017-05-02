@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-28T00:16:17Z
+
+Strange failure on a previously (missconfigured) build:
+https://ci.appveyor.com/project/fabpot/symfony/build/1.0.21534
+
+---------------------------------------------------------------------------
+
+by ChadSikorra at 2017-04-28T14:32:39Z
+
+FYI, I wrote a Powershell script to automate the install of PHP on AppVeyor (as chocolatey was super buggy/inconsistent for me). I put the script out here:
+
+https://github.com/ChadSikorra/ps-install-php
+
+Example usage here:
+
+https://github.com/ldaptools/ldaptools-bundle/blob/master/appveyor.yml
+
+Feel free to copy the script if you feel like incorporating it. It's not the cleanest Powershell script, but it does the job.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T08:00:38Z
+
+now green
+@ChadSikorra thanks for the link, but installing php on windows for the purpose of testing here is really easy, so we don't need any other script IMHO.

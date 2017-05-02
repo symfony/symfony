@@ -36,10 +36,10 @@ class PhpProcess extends Process
     public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = null)
     {
         $executableFinder = new PhpExecutableFinder();
-        if (false === $php = $executableFinder->find()) {
+        if (false === $php = $executableFinder->find(false)) {
             $php = null;
         } else {
-            $php = explode(' ', $php);
+            $php = array_merge(array($php), $executableFinder->findArguments());
         }
         if ('phpdbg' === PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');

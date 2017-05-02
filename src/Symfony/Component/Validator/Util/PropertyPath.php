@@ -41,6 +41,10 @@ class PropertyPath
                 return $basePath.$subPath;
             }
 
+            if (preg_match('/^(children\[.*\])(\.data)$/', $basePath, $match)) {
+                $basePath = $match[1];
+            }
+
             return '' !== (string) $basePath ? $basePath.'.'.$subPath : $subPath;
         }
 

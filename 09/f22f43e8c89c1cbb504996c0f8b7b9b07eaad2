@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-12T09:36:03Z
+
+Change documented and functionally tested.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-13T15:05:51Z
+
+I can't imagine any existing feature impacted by this change. Also, the fixed ticket is 2 years old and it seems everyone agree this would be useful, it makes things simpler.
+
+That said , I would love to get this in 3.3.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-14T09:07:03Z
+
+Added some screenshots to the PR body.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-14T14:49:45Z
+
+I may have read too quickly, but doesn't this remove an XML file that maybe of use to some tier tools? Eg the phpstorm SF plugin and the likes?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-14T15:36:33Z
+
+@nicolas-grekas You're right, the phpstorm plugin relies on.
+I managed to make this work using the container dumped by the `ContainerBuilderDebugDumpPass`, this does not deprecate it anymore. It should even improve the features of the phpstorm plugin.
+
+---------------------------------------------------------------------------
+
+by Haehnchen at 2017-04-14T16:03:36Z
+
+PhpStorm Plugin point of view. as i see this PR just extends the xml files, so i am able to resolve https://github.com/Haehnchen/idea-php-symfony2-plugin/issues/618 on my side
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-14T17:48:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-18T16:08:57Z
+
+ping @symfony/deciders
+OK to merge this one for 3.3 as requested?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-21T14:11:52Z
+
+PR rebased.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-04-21T16:47:17Z
+
+👍 (and 👍 for 3.3 for me, it's really a bug fix)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-25T16:44:27Z
+
+I think we are good here.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-28T11:46:59Z
+
+Can we reconsider the milestone here? A lot of services can be made private in 3.3, it would be too bad to miss them.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-03T19:04:57Z
+
+I also think we should reconsider this a bug fix for 3.3. "Types" are much more important in 3.3... but there's no way to get a list of them. And currently we can't even use `debug:container` because almost all of the types aliases are private and don't show up currently.
+
+When I run `debug:container --show-private` and filter for ids that are class names, I get exactly **4**. With this PR I get 36.
+
+Would it be possible to bump this to 3.3 as a bug fix?

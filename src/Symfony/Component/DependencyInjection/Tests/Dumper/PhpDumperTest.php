@@ -299,19 +299,6 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
-     * @expectedExceptionMessage Incompatible use of dynamic environment variables "FOO" found in parameters.
-     */
-    public function testUnusedEnvParameter()
-    {
-        $container = new ContainerBuilder();
-        $container->getParameter('env(FOO)');
-        $container->compile();
-        $dumper = new PhpDumper($container);
-        $dumper->dump();
-    }
-
     public function testInlinedDefinitionReferencingServiceContainer()
     {
         $container = new ContainerBuilder();

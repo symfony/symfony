@@ -79,7 +79,7 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
-        $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_private']) && $options['show_private'], isset($options['show_arguments']) && $options['show_arguments']));
+        $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_private']) && $options['show_private'], isset($options['show_arguments']) && $options['show_arguments'], isset($options['filter']) ? $options['filter'] : null));
     }
 
     /**
@@ -307,15 +307,20 @@ class XmlDescriptor extends Descriptor
      * @param string|null      $tag
      * @param bool             $showPrivate
      * @param bool             $showArguments
+     * @param callable         $filter
      *
      * @return \DOMDocument
      */
-    private function getContainerServicesDocument(ContainerBuilder $builder, $tag = null, $showPrivate = false, $showArguments = false)
+    private function getContainerServicesDocument(ContainerBuilder $builder, $tag = null, $showPrivate = false, $showArguments = false, $filter = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($containerXML = $dom->createElement('container'));
 
         $serviceIds = $tag ? array_keys($builder->findTaggedServiceIds($tag)) : $builder->getServiceIds();
+
+        if ($filter) {
+            $serviceIds = array_filter($serviceIds, $filter);
+        }
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);

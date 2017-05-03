@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-03T16:11:00Z
+
+PR ready, comments addressed :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-03T17:50:39Z
+
+I just tested: this DOES fix the underlying issue. PhpStorm is one of the editors that updates the modified time of the *directory* on each file save (probably due to a tmp file). With this fix, it's not *always* rebuilding the cache whenever I make *any* change. Vim is another editor that this affects.

@@ -43,6 +43,7 @@ CHANGELOG
 
  * added a Process helper
  * added a DebugFormatter helper
+ * Private properties and methods now protected to reflect the OCP
 
 2.5.0
 -----

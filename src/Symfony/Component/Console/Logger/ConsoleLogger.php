@@ -32,11 +32,12 @@ class ConsoleLogger extends AbstractLogger
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
+
     /**
      * @var array
      */
-    private $verbosityLevelMap = array(
+    protected $verbosityLevelMap = array(
         LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
@@ -46,10 +47,11 @@ class ConsoleLogger extends AbstractLogger
         LogLevel::INFO => OutputInterface::VERBOSITY_VERY_VERBOSE,
         LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
     );
+
     /**
      * @var array
      */
-    private $formatLevelMap = array(
+    protected $formatLevelMap = array(
         LogLevel::EMERGENCY => self::ERROR,
         LogLevel::ALERT => self::ERROR,
         LogLevel::CRITICAL => self::ERROR,
@@ -117,7 +119,7 @@ class ConsoleLogger extends AbstractLogger
      *
      * @return string
      */
-    private function interpolate($message, array $context)
+    protected function interpolate($message, array $context)
     {
         // build a replacement array with braces around the context keys
         $replace = array();

@@ -63,6 +63,7 @@ To get the information as a machine readable format, use the
 
 <info>php %command.full_name% --filter=port</info>
 EOF
+            )
         ;
     }
 

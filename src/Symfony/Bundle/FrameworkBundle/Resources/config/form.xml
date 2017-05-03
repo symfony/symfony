@@ -5,12 +5,14 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
+
         <!-- ResolvedFormTypeFactory -->
-        <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" />
-        <service id="Symfony\Component\Form\ResolvedFormTypeFactoryInterface" alias="form.resolved_type_factory" public="false" />
+        <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" public="true" />
+        <service id="Symfony\Component\Form\ResolvedFormTypeFactoryInterface" alias="form.resolved_type_factory" />
 
         <!-- FormRegistry -->
-        <service id="form.registry" class="Symfony\Component\Form\FormRegistry">
+        <service id="form.registry" class="Symfony\Component\Form\FormRegistry" public="true">
             <argument type="collection">
                 <!--
                 We don't need to be able to add more extensions.
@@ -22,17 +24,17 @@
             </argument>
             <argument type="service" id="form.resolved_type_factory" />
         </service>
-        <service id="Symfony\Component\Form\FormRegistryInterface" alias="form.registry" public="false" />
+        <service id="Symfony\Component\Form\FormRegistryInterface" alias="form.registry" />
 
         <!-- FormFactory -->
-        <service id="form.factory" class="Symfony\Component\Form\FormFactory">
+        <service id="form.factory" class="Symfony\Component\Form\FormFactory" public="true">
             <argument type="service" id="form.registry" />
             <argument type="service" id="form.resolved_type_factory" />
         </service>
-        <service id="Symfony\Component\Form\FormFactoryInterface" alias="form.factory" public="false" />
+        <service id="Symfony\Component\Form\FormFactoryInterface" alias="form.factory" />
 
         <!-- DependencyInjectionExtension -->
-        <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension" public="false">
+        <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
             <argument /><!-- All services with tag "form.type" are stored in a service locator by FormPass -->
             <argument type="collection" /><!-- All services with tag "form.type_extension" are stored here by FormPass -->
             <argument type="iterator" /><!-- All services with tag "form.type_guesser" are stored here by FormPass -->
@@ -40,156 +42,156 @@
         </service>
 
         <!-- ValidatorTypeGuesser -->
-        <service id="form.type_guesser.validator" class="Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser" public="false">
+        <service id="form.type_guesser.validator" class="Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser">
             <tag name="form.type_guesser" />
             <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
 
         <!-- CoreExtension -->
-        <service id="form.property_accessor" alias="property_accessor" public="false" />
+        <service id="form.property_accessor" alias="property_accessor" />
 
-        <service id="form.choice_list_factory.default" class="Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory" public="false"/>
+        <service id="form.choice_list_factory.default" class="Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory" />
 
-        <service id="form.choice_list_factory.property_access" class="Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator" public="false">
+        <service id="form.choice_list_factory.property_access" class="Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator">
             <argument type="service" id="form.choice_list_factory.default"/>
             <argument type="service" id="form.property_accessor"/>
         </service>
 
-        <service id="form.choice_list_factory.cached" class="Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator" public="false">
+        <service id="form.choice_list_factory.cached" class="Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator">
             <argument type="service" id="form.choice_list_factory.property_access"/>
         </service>
 
-        <service id="form.choice_list_factory" alias="form.choice_list_factory.cached" public="false"/>
+        <service id="form.choice_list_factory" alias="form.choice_list_factory.cached" />
 
-        <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType" public="false">
+        <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <argument type="service" id="form.property_accessor" />
             <tag name="form.type" />
         </service>
-        <service id="form.type.birthday" class="Symfony\Component\Form\Extension\Core\Type\BirthdayType">
+        <service id="form.type.birthday" class="Symfony\Component\Form\Extension\Core\Type\BirthdayType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.checkbox" class="Symfony\Component\Form\Extension\Core\Type\CheckboxType">
+        <service id="form.type.checkbox" class="Symfony\Component\Form\Extension\Core\Type\CheckboxType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType" public="false">
+        <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
             <tag name="form.type" />
             <argument type="service" id="form.choice_list_factory"/>
         </service>
-        <service id="form.type.collection" class="Symfony\Component\Form\Extension\Core\Type\CollectionType">
+        <service id="form.type.collection" class="Symfony\Component\Form\Extension\Core\Type\CollectionType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.country" class="Symfony\Component\Form\Extension\Core\Type\CountryType">
+        <service id="form.type.country" class="Symfony\Component\Form\Extension\Core\Type\CountryType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.date" class="Symfony\Component\Form\Extension\Core\Type\DateType">
+        <service id="form.type.date" class="Symfony\Component\Form\Extension\Core\Type\DateType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.datetime" class="Symfony\Component\Form\Extension\Core\Type\DateTimeType">
+        <service id="form.type.datetime" class="Symfony\Component\Form\Extension\Core\Type\DateTimeType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.email" class="Symfony\Component\Form\Extension\Core\Type\EmailType">
+        <service id="form.type.email" class="Symfony\Component\Form\Extension\Core\Type\EmailType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType">
+        <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.hidden" class="Symfony\Component\Form\Extension\Core\Type\HiddenType">
+        <service id="form.type.hidden" class="Symfony\Component\Form\Extension\Core\Type\HiddenType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.integer" class="Symfony\Component\Form\Extension\Core\Type\IntegerType">
+        <service id="form.type.integer" class="Symfony\Component\Form\Extension\Core\Type\IntegerType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.language" class="Symfony\Component\Form\Extension\Core\Type\LanguageType">
+        <service id="form.type.language" class="Symfony\Component\Form\Extension\Core\Type\LanguageType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.locale" class="Symfony\Component\Form\Extension\Core\Type\LocaleType">
+        <service id="form.type.locale" class="Symfony\Component\Form\Extension\Core\Type\LocaleType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.money" class="Symfony\Component\Form\Extension\Core\Type\MoneyType">
+        <service id="form.type.money" class="Symfony\Component\Form\Extension\Core\Type\MoneyType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.number" class="Symfony\Component\Form\Extension\Core\Type\NumberType">
+        <service id="form.type.number" class="Symfony\Component\Form\Extension\Core\Type\NumberType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.password" class="Symfony\Component\Form\Extension\Core\Type\PasswordType">
+        <service id="form.type.password" class="Symfony\Component\Form\Extension\Core\Type\PasswordType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.percent" class="Symfony\Component\Form\Extension\Core\Type\PercentType">
+        <service id="form.type.percent" class="Symfony\Component\Form\Extension\Core\Type\PercentType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.radio" class="Symfony\Component\Form\Extension\Core\Type\RadioType">
+        <service id="form.type.radio" class="Symfony\Component\Form\Extension\Core\Type\RadioType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.range" class="Symfony\Component\Form\Extension\Core\Type\RangeType">
+        <service id="form.type.range" class="Symfony\Component\Form\Extension\Core\Type\RangeType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.repeated" class="Symfony\Component\Form\Extension\Core\Type\RepeatedType">
+        <service id="form.type.repeated" class="Symfony\Component\Form\Extension\Core\Type\RepeatedType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.search" class="Symfony\Component\Form\Extension\Core\Type\SearchType">
+        <service id="form.type.search" class="Symfony\Component\Form\Extension\Core\Type\SearchType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.textarea" class="Symfony\Component\Form\Extension\Core\Type\TextareaType">
+        <service id="form.type.textarea" class="Symfony\Component\Form\Extension\Core\Type\TextareaType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.text" class="Symfony\Component\Form\Extension\Core\Type\TextType">
+        <service id="form.type.text" class="Symfony\Component\Form\Extension\Core\Type\TextType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.time" class="Symfony\Component\Form\Extension\Core\Type\TimeType">
+        <service id="form.type.time" class="Symfony\Component\Form\Extension\Core\Type\TimeType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.timezone" class="Symfony\Component\Form\Extension\Core\Type\TimezoneType">
+        <service id="form.type.timezone" class="Symfony\Component\Form\Extension\Core\Type\TimezoneType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType">
+        <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.button" class="Symfony\Component\Form\Extension\Core\Type\ButtonType">
+        <service id="form.type.button" class="Symfony\Component\Form\Extension\Core\Type\ButtonType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.submit" class="Symfony\Component\Form\Extension\Core\Type\SubmitType">
+        <service id="form.type.submit" class="Symfony\Component\Form\Extension\Core\Type\SubmitType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.reset" class="Symfony\Component\Form\Extension\Core\Type\ResetType">
+        <service id="form.type.reset" class="Symfony\Component\Form\Extension\Core\Type\ResetType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
-        <service id="form.type.currency" class="Symfony\Component\Form\Extension\Core\Type\CurrencyType">
+        <service id="form.type.currency" class="Symfony\Component\Form\Extension\Core\Type\CurrencyType" public="true">
             <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0.</deprecated>
         </service>
 
         <!-- FormTypeHttpFoundationExtension -->
-        <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension" public="false">
+        <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
             <argument type="service" id="form.type_extension.form.request_handler" />
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>
 
         <!-- HttpFoundationRequestHandler -->
-        <service id="form.type_extension.form.request_handler" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler" public="false">
+        <service id="form.type_extension.form.request_handler" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler">
             <argument type="service" id="form.server_params" />
         </service>
 
-        <service id="form.server_params" class="Symfony\Component\Form\Util\ServerParams" public="false">
+        <service id="form.server_params" class="Symfony\Component\Form\Util\ServerParams">
             <argument type="service" id="request_stack" />
         </service>
 
         <!-- FormTypeValidatorExtension -->
-        <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension" public="false">
+        <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
             <argument type="service" id="validator" />
         </service>
-        <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension" public="false">
+        <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\RepeatedType" />
         </service>
-        <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension" public="false">
+        <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\SubmitType" />
         </service>
-        <service id="form.type_extension.upload.validator" class="Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension" public="false">
+        <service id="form.type_extension.upload.validator" class="Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
             <argument type="service" id="translator"/>
             <argument type="string">%validator.translation_domain%</argument>
         </service>
 
-        <service id="deprecated.form.registry" class="stdClass">
+        <service id="deprecated.form.registry" class="stdClass" public="true">
             <property name="registry" type="collection">
                 <property type="service" id="form.type_guesser.validator" />
                 <property type="service" id="form.type.choice" />

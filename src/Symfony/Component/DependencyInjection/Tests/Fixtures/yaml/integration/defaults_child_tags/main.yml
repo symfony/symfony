@@ -1,0 +1,18 @@
+services:
+    _defaults:
+        autoconfigure: true
+        autowire: true
+        tags: [from_defaults]
+
+    parent_service:
+        class: stdClass
+        # will not override child
+        autoconfigure: true
+        # parent definitions are not applied to children
+        tags: [from_parent]
+
+    child_service:
+        parent: parent_service
+        # _defaults is ok because these are explicitly set
+        autoconfigure: false
+        autowire: true

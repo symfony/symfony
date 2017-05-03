@@ -354,11 +354,18 @@ class YamlFileLoader extends FileLoader
             $definition = new ChildDefinition('');
         } elseif (isset($service['parent'])) {
             if (!empty($this->instanceof)) {
-                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Try moving your child definitions to a different file.', $id));
+                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "_instanceof" configuration is defined as using both is not supported. Move your child definitions to a separate file.', $id));
             }
 
-            if (!empty($defaults)) {
-                throw new InvalidArgumentException(sprintf('The service "%s" cannot use the "parent" option in the same file where "_defaults" configuration is defined as using both is not supported. Try moving your child definitions to a different file.', $id));
+            foreach ($defaults as $k => $v) {
+                if ('tags' === $k) {
+                    // since tags are never inherited from parents, there is no confusion
+                    // thus we can safely add them as defaults to ChildDefinition
+                    continue;
+                }
+                if (!isset($service[$k])) {
+                    throw new InvalidArgumentException(sprintf('Attribute "%s" on service "%s" cannot be inherited from "_defaults" when a "parent" is set. Move your child definitions to a separate file or define this attribute explicitly.', $k, $id));
+                }
             }
 
             $definition = new ChildDefinition($service['parent']);

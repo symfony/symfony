@@ -84,7 +84,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def = new Definition();
 
         // merge in parent definition
-        // purposely ignored attributes: abstract, shared, tags
+        // purposely ignored attributes: abstract, shared, tags, autoconfigured
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());

@@ -5,22 +5,24 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="security.acl.object_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy" public="false" />
+        <defaults public="false" />
 
-        <service id="security.acl.security_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy" public="false">
+        <service id="security.acl.object_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy" />
+
+        <service id="security.acl.security_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy">
             <argument type="service" id="security.role_hierarchy" />
             <argument type="service" id="security.authentication.trust_resolver" />
         </service>
 
-        <service id="security.acl.permission_granting_strategy" class="Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy" public="false">
+        <service id="security.acl.permission_granting_strategy" class="Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy">
             <call method="setAuditLogger">
                 <argument type="service" id="security.acl.audit_logger" on-invalid="ignore" />
             </call>
         </service>
 
-        <service id="security.acl.permission.map" class="Symfony\Component\Security\Acl\Permission\BasicPermissionMap" public="false" />
+        <service id="security.acl.permission.map" class="Symfony\Component\Security\Acl\Permission\BasicPermissionMap" />
 
-        <service id="security.acl.voter.basic_permissions" class="Symfony\Component\Security\Acl\Voter\AclVoter" public="false">
+        <service id="security.acl.voter.basic_permissions" class="Symfony\Component\Security\Acl\Voter\AclVoter">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.acl.provider" />
             <argument type="service" id="security.acl.object_identity_retrieval_strategy" />

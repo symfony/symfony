@@ -5,12 +5,14 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="templating.helper.logout_url" class="Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper">
+        <defaults public="false" />
+
+        <service id="templating.helper.logout_url" class="Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper" public="true">
             <tag name="templating.helper" alias="logout_url" />
             <argument type="service" id="security.logout_url_generator" />
         </service>
 
-        <service id="templating.helper.security" class="Symfony\Bundle\SecurityBundle\Templating\Helper\SecurityHelper">
+        <service id="templating.helper.security" class="Symfony\Bundle\SecurityBundle\Templating\Helper\SecurityHelper" public="true">
             <tag name="templating.helper" alias="security" />
             <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
         </service>

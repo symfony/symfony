@@ -19,44 +19,46 @@
     </parameters>
 
     <services>
-        <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver" public="false" />
+        <defaults public="false" />
 
-        <service id="routing.loader.xml" class="Symfony\Component\Routing\Loader\XmlFileLoader" public="false">
+        <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver" />
+
+        <service id="routing.loader.xml" class="Symfony\Component\Routing\Loader\XmlFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.yml" class="Symfony\Component\Routing\Loader\YamlFileLoader" public="false">
+        <service id="routing.loader.yml" class="Symfony\Component\Routing\Loader\YamlFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.php" class="Symfony\Component\Routing\Loader\PhpFileLoader" public="false">
+        <service id="routing.loader.php" class="Symfony\Component\Routing\Loader\PhpFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.glob" class="Symfony\Component\Config\Loader\GlobFileLoader" public="false">
+        <service id="routing.loader.glob" class="Symfony\Component\Config\Loader\GlobFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.directory" class="Symfony\Component\Routing\Loader\DirectoryLoader" public="false">
+        <service id="routing.loader.directory" class="Symfony\Component\Routing\Loader\DirectoryLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.service" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader" public="false">
+        <service id="routing.loader.service" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader">
             <tag name="routing.loader" />
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader">
+        <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader" public="true">
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="routing.resolver" />
         </service>
 
-        <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router" public="false">
+        <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
             <tag name="monolog.logger" channel="router" />
             <argument type="service" id="service_container" />
             <argument>%router.resource%</argument>
@@ -79,12 +81,12 @@
             </call>
         </service>
 
-        <service id="router" alias="router.default" />
-        <service id="Symfony\Component\Routing\RouterInterface" alias="router" public="false" />
-        <service id="Symfony\Component\Routing\Generator\UrlGeneratorInterface" alias="router" public="false" />
-        <service id="Symfony\Component\Routing\Matcher\UrlMatcherInterface" alias="router" public="false" />
+        <service id="router" alias="router.default" public="true" />
+        <service id="Symfony\Component\Routing\RouterInterface" alias="router" />
+        <service id="Symfony\Component\Routing\Generator\UrlGeneratorInterface" alias="router" />
+        <service id="Symfony\Component\Routing\Matcher\UrlMatcherInterface" alias="router" />
 
-        <service id="router.request_context" class="Symfony\Component\Routing\RequestContext" public="false">
+        <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
             <argument>%router.request_context.base_url%</argument>
             <argument>GET</argument>
             <argument>%router.request_context.host%</argument>
@@ -92,14 +94,14 @@
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
         </service>
-        <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" public="false" />
+        <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" />
 
-        <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer" public="false">
+        <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer">
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="router" />
         </service>
 
-        <service id="router_listener" class="Symfony\Component\HttpKernel\EventListener\RouterListener">
+        <service id="router_listener" class="Symfony\Component\HttpKernel\EventListener\RouterListener" public="true">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="router" />

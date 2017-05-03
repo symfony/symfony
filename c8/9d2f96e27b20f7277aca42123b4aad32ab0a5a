@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-03T15:57:11Z
+
+PR should be ready: comments addressed, and integration test case from Ryan added.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-03T17:43:24Z
+
+I LOVE the idea of eating our own dog food.
+
+👍 for the minor ChildDefinition -> `_defaults` behavior change. You can see the new behavior by comparing `main.yml` to `expected.yml` in the integration test: https://github.com/symfony/symfony/pull/22615/files#diff-e36b91c9d48d3617ee8a401577fcc603. Having a child definition in the same file as `_defaults` wasn't allowed at ALL anymore. Now it is, but only if you explicitly set any keys from `_defaults` on the child (i.e. we force you to override `_defaults` values (other than tags) so that there is no ambiguity).
+
+And 👍 for the changes in general. I compiled an XML of the container on `master` versus this branch. They are identical, other than `data_collector.cache`, which was purposefully changed from `public` to `private`: https://gist.github.com/weaverryan/353a79c0e310b59d5eca9c922bc5cf5f

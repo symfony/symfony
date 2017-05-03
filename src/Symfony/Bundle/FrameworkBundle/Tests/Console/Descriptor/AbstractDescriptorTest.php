@@ -183,6 +183,7 @@ abstract class AbstractDescriptorTest extends TestCase
     private function assertDescription($expectedDescription, $describedObject, array $options = array())
     {
         $options['raw_output'] = true;
+        $options['raw_text'] = true;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
         if ('txt' === $this->getFormat()) {

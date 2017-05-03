@@ -69,6 +69,8 @@ class DiactorosFactoryTest extends TestCase
                 'REQUEST_METHOD' => 'POST',
                 'HTTP_HOST' => 'dunglas.fr',
                 'HTTP_X_SYMFONY' => '2.8',
+                'REQUEST_URI' => '/testCreateRequest?foo=1&bar[baz]=42',
+                'QUERY_STRING' => 'foo=1&bar[baz]=42',
             ),
             'Content'
         );
@@ -80,6 +82,9 @@ class DiactorosFactoryTest extends TestCase
         $queryParams = $psrRequest->getQueryParams();
         $this->assertEquals('1', $queryParams['foo']);
         $this->assertEquals('42', $queryParams['bar']['baz']);
+
+        $requestTarget = $psrRequest->getRequestTarget();
+        $this->assertEquals('/testCreateRequest?foo=1&bar[baz]=42', $requestTarget);
 
         $parsedBody = $psrRequest->getParsedBody();
         $this->assertEquals('Kévin Dunglas', $parsedBody['twitter']['@dunglas']);

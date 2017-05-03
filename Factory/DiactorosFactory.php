@@ -55,7 +55,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
         $request = new ServerRequest(
             $server,
             DiactorosRequestFactory::normalizeFiles($this->getFiles($symfonyRequest->files->all())),
-            $symfonyRequest->getUri(),
+            $symfonyRequest->getSchemeAndHttpHost().$symfonyRequest->getRequestUri(),
             $symfonyRequest->getMethod(),
             $body,
             $headers
@@ -65,6 +65,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
             ->withCookieParams($symfonyRequest->cookies->all())
             ->withQueryParams($symfonyRequest->query->all())
             ->withParsedBody($symfonyRequest->request->all())
+            ->withRequestTarget($symfonyRequest->getRequestUri())
         ;
 
         foreach ($symfonyRequest->attributes->all() as $key => $value) {

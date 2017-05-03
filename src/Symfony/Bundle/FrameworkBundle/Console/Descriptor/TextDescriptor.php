@@ -224,8 +224,10 @@ class TextDescriptor extends Descriptor
 
         $tableHeaders = array_merge(array('Service ID'), $tagsNames, array('Class name'));
         $tableRows = array();
+        $rawOutput = isset($options['raw_text']) && $options['raw_text'];
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
+            $styledServiceId = $rawOutput ? $serviceId : sprintf('<fg=cyan>%s</fg=cyan>', $serviceId);
             if ($definition instanceof Definition) {
                 if ($showTag) {
                     foreach ($definition->getTag($showTag) as $key => $tag) {
@@ -240,13 +242,13 @@ class TextDescriptor extends Descriptor
                         }
                     }
                 } else {
-                    $tableRows[] = array($serviceId, $definition->getClass());
+                    $tableRows[] = array($styledServiceId, $definition->getClass());
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $tableRows[] = array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
+                $tableRows[] = array_merge(array($styledServiceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
             } else {
-                $tableRows[] = array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
+                $tableRows[] = array_merge(array($styledServiceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
             }
         }
 

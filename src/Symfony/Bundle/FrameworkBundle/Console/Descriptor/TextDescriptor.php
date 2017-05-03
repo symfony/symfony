@@ -207,6 +207,11 @@ class TextDescriptor extends Descriptor
                         }
                     }
                 }
+            } elseif ($definition instanceof Alias) {
+                if (!$showPrivate && !$definition->isPublic()) {
+                    unset($serviceIds[$key]);
+                    continue;
+                }
             }
         }
 

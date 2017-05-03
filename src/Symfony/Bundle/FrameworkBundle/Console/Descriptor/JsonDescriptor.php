@@ -109,7 +109,9 @@ class JsonDescriptor extends Descriptor
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
             if ($service instanceof Alias) {
-                $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
+                if ($showPrivate || $service->isPublic()) {
+                    $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
+                }
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
                     $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments);

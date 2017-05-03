@@ -1,0 +1,9 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    public:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
+    private_alias:
+        alias: public
+        public: false

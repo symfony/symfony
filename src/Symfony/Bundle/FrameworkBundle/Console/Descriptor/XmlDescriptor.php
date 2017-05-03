@@ -320,7 +320,7 @@ class XmlDescriptor extends Descriptor
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
-            if ($service instanceof Definition && !($showPrivate || $service->isPublic())) {
+            if (($service instanceof Definition || $service instanceof Alias) && !($showPrivate || $service->isPublic())) {
                 continue;
             }
 

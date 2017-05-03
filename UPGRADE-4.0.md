@@ -348,6 +348,12 @@ FrameworkBundle
  * The `--no-prefix` option of the `translation:update` command has
    been removed.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed. 
+   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed. 
+   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+
 HttpFoundation
 --------------
 

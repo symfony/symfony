@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `AddCacheClearerPass`
+ * added `AddCacheWarmerPass`
+
 3.3.0
 -----
 

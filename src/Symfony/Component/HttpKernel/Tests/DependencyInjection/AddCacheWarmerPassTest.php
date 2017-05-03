@@ -9,16 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
+use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass;
 
-/**
- * @group legacy
- */
 class AddCacheWarmerPassTest extends TestCase
 {
     public function testThatCacheWarmersAreProcessedInPriorityOrder()

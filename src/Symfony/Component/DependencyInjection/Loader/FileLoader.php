@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Config\Resource\GlobResource;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -83,16 +84,16 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses($namespace, $resource)
+    private function findClasses($namespace, $pattern)
     {
         $parameterBag = $this->container->getParameterBag();
-        $resource = $parameterBag->unescapeValue($parameterBag->resolveValue($resource));
+        $pattern = $parameterBag->unescapeValue($parameterBag->resolveValue($pattern));
         $classes = array();
         $extRegexp = defined('HHVM_VERSION') ? '/\\.(?:php|hh)$/' : '/\\.php$/';
         $prefixLen = null;
-        foreach ($this->glob($resource, true, $prefix) as $path => $info) {
+        foreach ($this->glob($pattern, true, $resource) as $path => $info) {
             if (null === $prefixLen) {
-                $prefixLen = strlen($prefix);
+                $prefixLen = strlen($resource->getPrefix());
             }
 
             if (!preg_match($extRegexp, $path, $m) || !$info->isReadable()) {
@@ -105,16 +106,20 @@ abstract class FileLoader extends BaseFileLoader
             }
             // check to make sure the expected class exists
             if (!$r = $this->container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $resource));
+                throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
             }
             if (!$r->isInterface() && !$r->isTrait()) {
                 $classes[] = $class;
             }
         }
 
-        if (null !== $prefix) {
-            // track directories only for new & removed files
-            $this->container->fileExists($prefix, '/^$/');
+        // track only for new & removed files
+        if ($resource instanceof GlobResource) {
+            $this->container->addResource($resource);
+        } else {
+            foreach ($resource as $path) {
+                $this->container->fileExists($path, false);
+            }
         }
 
         return $classes;

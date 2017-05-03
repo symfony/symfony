@@ -15,8 +15,8 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\Glob;
+use Symfony\Component\Config\Resource\FileExistenceResource;
+use Symfony\Component\Config\Resource\GlobResource;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -85,9 +85,13 @@ abstract class FileLoader extends Loader
     {
         $ret = array();
         $ct = 0;
-        foreach ($this->glob($resource, false, $_, $ignoreErrors) as $resource => $info) {
-            ++$ct;
+        if (!is_string($resource) || false === strpbrk($resource, '*?{[')) {
             $ret[] = $this->doImport($resource, $type, $ignoreErrors, $sourceResource);
+        } else {
+            foreach ($this->glob($resource, false, $_, $ignoreErrors) as $path => $info) {
+                ++$ct;
+                $ret[] = $this->doImport($path, $type, $ignoreErrors, $sourceResource);
+            }
         }
 
         return $ct > 1 ? $ret : (isset($ret[0]) ? $ret[0] : null);
@@ -96,24 +100,17 @@ abstract class FileLoader extends Loader
     /**
      * @internal
      */
-    protected function glob($resource, $recursive, &$prefix = null, $ignoreErrors = false)
+    protected function glob($pattern, $recursive, &$resource = null, $ignoreErrors = false)
     {
-        if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
-            if (!$recursive) {
-                $prefix = null;
-
-                yield $resource => new \SplFileInfo($resource);
-
-                return;
-            }
-            $prefix = $resource;
-            $resource = '';
+        if (strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
+            $prefix = $pattern;
+            $pattern = '';
         } elseif (0 === $i) {
             $prefix = '.';
-            $resource = '/'.$resource;
+            $pattern = '/'.$pattern;
         } else {
-            $prefix = dirname(substr($resource, 0, 1 + $i));
-            $resource = substr($resource, strlen($prefix));
+            $prefix = dirname(substr($pattern, 0, 1 + $i));
+            $pattern = substr($pattern, strlen($prefix));
         }
 
         try {
@@ -123,52 +120,17 @@ abstract class FileLoader extends Loader
                 throw $e;
             }
 
-            return;
-        }
-        $prefix = realpath($prefix) ?: $prefix;
-
-        if (false === strpos($resource, '/**/') && (defined('GLOB_BRACE') || false === strpos($resource, '{'))) {
-            foreach (glob($prefix.$resource, defined('GLOB_BRACE') ? GLOB_BRACE : 0) as $path) {
-                if ($recursive && is_dir($path)) {
-                    $files = iterator_to_array(new \RecursiveIteratorIterator(
-                        new \RecursiveCallbackFilterIterator(
-                            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                            function (\SplFileInfo $file) { return '.' !== $file->getBasename()[0]; }
-                        ),
-                        \RecursiveIteratorIterator::LEAVES_ONLY
-                    ));
-                    uasort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
-                        return (string) $a > (string) $b ? 1 : -1;
-                    });
-
-                    foreach ($files as $path => $info) {
-                        if ($info->isFile()) {
-                            yield $path => $info;
-                        }
-                    }
-                } elseif (is_file($path)) {
-                    yield $path => new \SplFileInfo($path);
-                }
+            $resource = array();
+            foreach ($e->getPaths() as $path) {
+                $resource[] = new FileExistenceResource($path);
             }
 
             return;
         }
+        $resource = new GlobResource($prefix, $pattern, $recursive);
 
-        if (!class_exists(Finder::class)) {
-            throw new \LogicException(sprintf('Extended glob pattern "%s" cannot be used as the Finder component is not installed.', $resource));
-        }
-
-        $finder = new Finder();
-        $regex = Glob::toRegex($resource);
-        if ($recursive) {
-            $regex = substr_replace($regex, '(/|$)', -2, 1);
-        }
-
-        $prefixLen = strlen($prefix);
-        foreach ($finder->followLinks()->sortByName()->in($prefix) as $path => $info) {
-            if (preg_match($regex, substr($path, $prefixLen)) && $info->isFile()) {
-                yield $path => $info;
-            }
+        foreach ($resource as $path => $info) {
+            yield $path => $info;
         }
     }
 

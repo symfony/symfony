@@ -33,6 +33,7 @@ use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
@@ -246,6 +247,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addResource(ResourceInterface $resource)
     {
         if (!$this->trackResources) {
+            return $this;
+        }
+
+        if ($resource instanceof GlobResource && $this->inVendors($resource->getPrefix())) {
             return $this;
         }
 

@@ -55,6 +55,7 @@ class TwigExtension extends Extension
             $definition = $container->register('twig.extension.weblink', WebLinkExtension::class);
             $definition->setPublic(false);
             $definition->addArgument(new Reference('request_stack'));
+            $definition->addTag('twig.extension');
         }
 
         foreach ($configs as $key => $config) {

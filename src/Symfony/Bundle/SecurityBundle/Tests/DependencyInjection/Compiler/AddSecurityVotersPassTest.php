@@ -101,8 +101,15 @@ class AddSecurityVotersPassTest extends TestCase
      */
     public function testVoterMissingInterfaceAndMethod()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface class when used as voter.');
+        $exception = LogicException::class;
+        $message = 'stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface class when used as voter.';
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception);
+            $this->expectExceptionMessage($message);
+        } else {
+            $this->setExpectedException($exception, $message);
+        }
 
         $container = new ContainerBuilder();
         $container

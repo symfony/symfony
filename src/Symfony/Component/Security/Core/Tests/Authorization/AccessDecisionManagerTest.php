@@ -143,8 +143,15 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testVotingWrongTypeNoVoteMethod()
     {
-        $this->expectException(\BadMethodCallException::class);
-        $this->expectExceptionMessage(sprintf('stdClass should implement the %s class when used as voter.', VoterInterface::class));
+        $exception = \BadMethodCallException::class;
+        $message = sprintf('stdClass should implement the %s class when used as voter.', VoterInterface::class);
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException($exception);
+            $this->expectExceptionMessage($message);
+        } else {
+            $this->setExpectedException($exception, $message);
+        }
 
         $adm = new AccessDecisionManager(array(new \stdClass()));
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();

@@ -37,7 +37,7 @@ class Query extends AbstractQuery
         $con = $this->connection->getResource();
         $this->connection = null;
 
-        if (null === $this->search || false === $this->search) {
+        if (null === $this->search || false === $this->search || 0 === $this->search) {
             return;
         }
 

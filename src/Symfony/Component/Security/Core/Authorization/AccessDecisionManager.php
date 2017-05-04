@@ -209,6 +209,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return $voter->vote($token, $subject, $attributes);
         }
 
-        throw new \BadMethodCallException(sprintf('%s should implement the %s class when used as voter.', get_class($voter), VoterInterface::class));
+        throw new \BadMethodCallException(sprintf('%s should implement the %s interface when used as voter.', get_class($voter), VoterInterface::class));
     }
 }

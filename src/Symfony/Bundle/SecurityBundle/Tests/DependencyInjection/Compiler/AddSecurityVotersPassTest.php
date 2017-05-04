@@ -92,8 +92,6 @@ class AddSecurityVotersPassTest extends TestCase
         $refs = $argument->getValues();
         $this->assertEquals(new Reference('without_interface'), $refs[0]);
         $this->assertCount(1, $refs);
-
-        $this->assertSame($container->getCompiler()->getLog()[0], 'Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass: Detected usage of security.voter for class "Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface" without implementing the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface.');
     }
 
     /**
@@ -102,7 +100,7 @@ class AddSecurityVotersPassTest extends TestCase
     public function testVoterMissingInterfaceAndMethod()
     {
         $exception = LogicException::class;
-        $message = 'stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface class when used as voter.';
+        $message = 'stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface interface when used as voter.';
 
         if (method_exists($this, 'expectException')) {
             $this->expectException($exception);

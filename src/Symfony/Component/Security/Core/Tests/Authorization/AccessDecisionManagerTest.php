@@ -144,7 +144,7 @@ class AccessDecisionManagerTest extends TestCase
     public function testVotingWrongTypeNoVoteMethod()
     {
         $exception = \BadMethodCallException::class;
-        $message = sprintf('stdClass should implement the %s class when used as voter.', VoterInterface::class);
+        $message = sprintf('stdClass should implement the %s interface when used as voter.', VoterInterface::class);
 
         if (method_exists($this, 'expectException')) {
             $this->expectException($exception);

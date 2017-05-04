@@ -12,8 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface;
 
 class AccessDecisionManagerTest extends TestCase
 {
@@ -137,5 +139,28 @@ class AccessDecisionManagerTest extends TestCase
               ->will($this->returnValue($vote));
 
         return $voter;
+    }
+
+    public function testVotingWrongTypeNoVoteMethod()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage(sprintf('stdClass should implement the %s class when used as voter.', VoterInterface::class));
+
+        $adm = new AccessDecisionManager(array(new \stdClass()));
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+
+        $adm->decide($token, array('TEST'));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling vote() on an voter without Symfony\Component\Security\Core\Authorization\Voter\VoterInterface is deprecated as of 3.4 and will be removed in 4.0. Implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface on your voter.
+     */
+    public function testVotingWrongTypeWithVote()
+    {
+        $adm = new AccessDecisionManager(array(new VoterWithoutInterface()));
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+
+        $adm->decide($token, array('TEST'));
     }
 }

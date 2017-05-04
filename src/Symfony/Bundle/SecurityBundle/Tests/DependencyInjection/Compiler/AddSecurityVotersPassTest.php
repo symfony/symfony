@@ -14,7 +14,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface;
 
 class AddSecurityVotersPassTest extends TestCase
 {
@@ -25,7 +29,7 @@ class AddSecurityVotersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container
-            ->register('security.access.decision_manager', 'Symfony\Component\Security\Core\Authorization\AccessDecisionManager')
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
             ->addArgument(array())
         ;
 
@@ -37,23 +41,23 @@ class AddSecurityVotersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container
-            ->register('security.access.decision_manager', 'Symfony\Component\Security\Core\Authorization\AccessDecisionManager')
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
             ->addArgument(array())
         ;
         $container
-            ->register('no_prio_service')
+            ->register('no_prio_service', Voter::class)
             ->addTag('security.voter')
         ;
         $container
-            ->register('lowest_prio_service')
+            ->register('lowest_prio_service', Voter::class)
             ->addTag('security.voter', array('priority' => 100))
         ;
         $container
-            ->register('highest_prio_service')
+            ->register('highest_prio_service', Voter::class)
             ->addTag('security.voter', array('priority' => 200))
         ;
         $container
-            ->register('zero_prio_service')
+            ->register('zero_prio_service', Voter::class)
             ->addTag('security.voter', array('priority' => 0))
         ;
         $compilerPass = new AddSecurityVotersPass();
@@ -64,5 +68,52 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertEquals(new Reference('highest_prio_service'), $refs[0]);
         $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
         $this->assertCount(4, $refs);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using a security.voter tag on a class without implementing the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface is deprecated as of 3.4 and will be removed in 4.0. Implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface instead.
+     */
+    public function testVoterMissingInterface()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
+            ->addArgument(array())
+        ;
+        $container
+            ->register('without_interface', VoterWithoutInterface::class)
+            ->addTag('security.voter')
+        ;
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
+
+        $argument = $container->getDefinition('security.access.decision_manager')->getArgument(0);
+        $refs = $argument->getValues();
+        $this->assertEquals(new Reference('without_interface'), $refs[0]);
+        $this->assertCount(1, $refs);
+
+        $this->assertSame($container->getCompiler()->getLog()[0], 'Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass: Detected usage of security.voter for class "Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface" without implementing the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface.');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testVoterMissingInterfaceAndMethod()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface class when used as voter.');
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
+            ->addArgument(array())
+        ;
+        $container
+            ->register('without_method', 'stdClass')
+            ->addTag('security.voter')
+        ;
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
     }
 }

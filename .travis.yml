@@ -5,6 +5,7 @@ sudo: false
 cache:
     directories:
         - $HOME/.composer/cache/files
+        - $HOME/symfony-bridge/.phpunit
 
 matrix:
     include:
@@ -13,9 +14,9 @@ matrix:
         - php: 5.5
         - php: 5.6
         - php: 5.3
-          env: deps=low
+          env: COMPOSER_OPTIONS="--prefer-lowest --prefer-stable" SYMFONY_DEPRECATIONS_HELPER=weak
         - php: 5.6
-          env: deps=high
+          env: COMPOSER_OPTIONS="" SYMFONY_DEPRECATIONS_HELPER=weak
         - php: 7.0
         - php: hhvm
     allow_failures:
@@ -25,7 +26,9 @@ matrix:
 env:
     global:
         - deps=no
-        - SYMFONY_DEPRECATIONS_HELPER=weak
+        - SYMFONY_DEPRECATIONS_HELPER=strict
+        - SYMFONY_PHPUNIT_DIR="$HOME/symfony-bridge/.phpunit"
+        - COMPOSER_OPTIONS="--prefer-stable"
 
 before_install:
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
@@ -37,10 +40,8 @@ before_install:
 
 install:
     - if [ "$TRAVIS_PHP_VERSION" != "5.3" ]; then composer require --no-update zendframework/zend-diactoros; fi;
-    - if [ "$deps" = "no" ]; then export SYMFONY_DEPRECATIONS_HELPER=strict; fi;
-    - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
-    - if [ "$deps" = "high" ]; then composer --prefer-source update; fi;
-    - if [ "$deps" = "low" ]; then composer --prefer-source --prefer-lowest --prefer-stable update; fi;
+    - composer update --prefer-source $COMPOSER_OPTIONS
+    - vendor/bin/simple-phpunit install
 
 script:
-    - phpunit
+    - vendor/bin/simple-phpunit

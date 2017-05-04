@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DiactorosFactoryTest extends \PHPUnit_Framework_TestCase
+class DiactorosFactoryTest extends TestCase
 {
     private $factory;
     private $tmpDir;
@@ -143,7 +144,11 @@ class DiactorosFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Response content.', $psrResponse->getBody()->__toString());
         $this->assertEquals(202, $psrResponse->getStatusCode());
         $this->assertEquals(array('2.8'), $psrResponse->getHeader('X-Symfony'));
-        $this->assertEquals(array('city=Lille; expires=Wed, 13-Jan-2021 22:23:01 GMT; path=/; httponly'), $psrResponse->getHeader('Set-Cookie'));
+
+        $cookieHeader = $psrResponse->getHeader('Set-Cookie');
+        $this->assertInternalType('array', $cookieHeader);
+        $this->assertCount(1, $cookieHeader);
+        $this->assertRegExp('{city=Lille; expires=Wed, 13-Jan-2021 22:23:01 GMT;( max-age=\d+;)? path=/; httponly}', $cookieHeader[0]);
     }
 
     public function testCreateResponseFromStreamed()

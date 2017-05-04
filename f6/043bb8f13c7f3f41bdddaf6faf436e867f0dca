@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-03T21:34:53Z
+
+The fact we have `debug:config` and `debug:router` makes that `debug:types` feels a bit unclear to me. Given that types are only about the container, couldn't this be an option of `debug:container`? `--types` would be consistent with the existing `--parameters` (and reduce the diff).
+
+Also the main title says `Symfony Container Public and Private Services` in the screenshot, I think having `Types` instead of `Services` would be nice as a bonus.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-03T21:49:45Z
+
+@chalasr Great suggestion! This is now simply `debug:container --types`... which makes for a very simple diff indeed!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-04T10:52:52Z
+
+Updated!

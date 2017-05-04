@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2017-05-04T07:48:12Z
+
+I don't think that the deprecationMessage is really relevant for the deprecated status (while the property `deprecated` is more important imo).
+
+To remove some complexity, if you absolutely have to get a `null` on the `getDeprecationMessage` if `deprecated` is `false`, you could have a simple condition here instead. But IMO this is not really worth it...
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-04T07:55:22Z
+
+this indeed looks overkill to me
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-04T09:36:21Z
+
+the strange thing with the default template as is now is when you `dump($definition)`: this shows garbage
+
+---------------------------------------------------------------------------
+
+by fortis at 2017-05-04T10:43:01Z
+
+there was strange thing in `resolveDefinition` with passing `getDeprecationMessage()` as `$template` parameter so I have added getDeprecationTemplate()
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-04T11:08:25Z
+
+As soon as you add something new on the interface of a class (eg a public method), this qualifies as a new feature, thus should be on master.
+In this case, the new feature doesn't look worth it to me, neither the const (which would create something public also). I stick to my previous suggestion :)
+
+---------------------------------------------------------------------------
+
+by fortis at 2017-05-04T17:33:06Z
+
+@nicolas-grekas now it looks better
+```
+Symfony\Component\DependencyInjection\Definition {#33596
+  -class: "stdClass"
+  -file: null
+  -factory: null
+  -factoryClass: null
+  -factoryMethod: null
+  -factoryService: null
+  -shared: true
+  -deprecated: false
+  -deprecationTemplate: null
+  -scope: "container"
+  -properties: []
+  -calls: []
+  -configurator: null
+  -tags: []
+  -public: true
+  -synthetic: false
+  -abstract: false
+  -synchronized: false
+  -lazy: false
+  -decoratedService: null
+  -autowired: false
+  -autowiringTypes: []
+  #arguments: []
+}
+```

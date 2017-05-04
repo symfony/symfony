@@ -4,8 +4,8 @@ CHANGELOG
 3.4.0
 -----
 
- * Using voters in the `AccessDecisionManager` without `VoterInterface` is now
-   deprecated and this functionality will be removed in 4.0.
+ * Using voters that do not implement the `VoterInterface`is now deprecated in
+   the `AccessDecisionManager` and this functionality will be removed in 4.0.
 
 3.3.0
 -----

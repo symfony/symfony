@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Tests\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Response;
@@ -22,7 +23,7 @@ use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Uri;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class HttpFoundationFactoryTest extends \PHPUnit_Framework_TestCase
+class HttpFoundationFactoryTest extends TestCase
 {
     /** @var HttpFoundationFactory */
     private $factory;
@@ -198,7 +199,6 @@ class HttpFoundationFactoryTest extends \PHPUnit_Framework_TestCase
                     'theme=light',
                     'test',
                     'ABC=AeD; Domain=dunglas.fr; Path=/kevin; Expires=Wed, 13 Jan 2021 22:23:01 GMT; Secure; HttpOnly',
-
                 ),
             ),
             new Stream('The response body'),

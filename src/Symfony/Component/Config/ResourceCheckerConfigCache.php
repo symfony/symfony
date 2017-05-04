@@ -168,9 +168,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         if (null !== $e && $e !== $signalingException) {
             throw $e;
         }
-        if (false === $meta) {
-            return false;
-        }
 
         return $meta;
     }

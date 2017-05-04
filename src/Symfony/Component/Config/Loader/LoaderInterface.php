@@ -51,4 +51,14 @@ interface LoaderInterface
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
     public function setResolver(LoaderResolverInterface $resolver);
+
+    /**
+     * Imports a resource.
+     *
+     * @param mixed       $resource A resource
+     * @param string|null $type     The resource type or null if unknown
+     *
+     * @return mixed
+     */
+    public function import($resource, $type = null);
 }

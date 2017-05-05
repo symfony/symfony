@@ -20,6 +20,7 @@ final class BoundArgument implements ArgumentInterface
 
     private $value;
     private $identifier;
+    private $used;
 
     public function __construct($value)
     {
@@ -32,7 +33,7 @@ final class BoundArgument implements ArgumentInterface
      */
     public function getValues()
     {
-        return array($this->value, $this->identifier);
+        return array($this->value, $this->identifier, $this->used);
     }
 
     /**
@@ -40,6 +41,6 @@ final class BoundArgument implements ArgumentInterface
      */
     public function setValues(array $values)
     {
-        list($this->value, $this->identifier) = $values;
+        list($this->value, $this->identifier, $this->used) = $values;
     }
 }

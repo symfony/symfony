@@ -360,8 +360,9 @@ class XmlFileLoader extends FileLoader
         if (isset($defaults['bind'])) {
             $bindings = array_merge(unserialize(serialize($defaults['bind'])), $bindings);
         }
-
-        $definition->setBindings($bindings);
+        if ($bindings) {
+            $definition->setBindings($bindings);
+        }
 
         if ($value = $service->getAttribute('decorates')) {
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;

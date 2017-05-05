@@ -64,7 +64,24 @@ class ResolveBindingsPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $this->checkBindings($value);
+        foreach ($value->getBindings() as $key => $binding) {
+            list($bindingValue, $bindingId, $used) = $binding->getValues();
+            if ($used) {
+                $this->usedBindings[$bindingId] = true;
+                unset($this->unusedBindings[$bindingId]);
+            } elseif (!isset($this->usedBindings[$bindingId])) {
+                $this->unusedBindings[$bindingId] = array($key, $this->currentId);
+            }
+
+            if (isset($key[0]) && '$' === $key[0]) {
+                continue;
+            }
+
+            if (null !== $bindingValue && !$bindingValue instanceof Reference && !$bindingValue instanceof Definition) {
+                throw new InvalidArgumentException(sprintf('Invalid value for binding key "%s" for service "%s": expected null, an instance of %s or an instance of %s, %s given.', $key, $this->currentId, Reference::class, Definition::class, gettype($bindingValue)));
+            }
+        }
+
         if ($value->isAbstract()) {
             return parent::processValue($value, $isRoot);
         }
@@ -123,24 +140,6 @@ class ResolveBindingsPass extends AbstractRecursivePass
         }
 
         return parent::processValue($value, $isRoot);
-    }
-
-    private function checkBindings(Definition $definition)
-    {
-        foreach ($definition->getBindings() as $key => $binding) {
-            list($bindingValue, $bindingId) = $binding->getValues();
-            if (!isset($this->usedBindings[$bindingId])) {
-                $this->unusedBindings[$bindingId] = array($key, $this->currentId);
-            }
-
-            if (isset($key[0]) && '$' === $key[0]) {
-                continue;
-            }
-
-            if (null !== $bindingValue && !$bindingValue instanceof Reference && !$bindingValue instanceof Definition) {
-                throw new InvalidArgumentException(sprintf('Invalid value for binding key "%s" for service "%s": expected null, an instance of %s or an instance of %s, %s given.', $key, $this->currentId, Reference::class, Definition::class, gettype($bindingValue)));
-            }
-        }
     }
 
     private function getBindingValue(BoundArgument $binding)

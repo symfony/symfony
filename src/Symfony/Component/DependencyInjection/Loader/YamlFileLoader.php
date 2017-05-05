@@ -536,16 +536,18 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : array();
-        if (isset($service['bind'])) {
-            if (!is_array($service['bind'])) {
-                throw new InvalidArgumentException(sprintf('Parameter "bind" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+        if (isset($defaults['bind']) || isset($service['bind'])) {
+            $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : array();
+            if (isset($service['bind'])) {
+                if (!is_array($service['bind'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "bind" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                }
+
+                $bindings = array_merge($bindings, $this->resolveServices($service['bind'], $file));
             }
 
-            $bindings = array_merge($bindings, $this->resolveServices($service['bind'], $file));
+            $definition->setBindings($bindings);
         }
-
-        $definition->setBindings($bindings);
 
         if (isset($service['autoconfigure'])) {
             if (!$definition instanceof ChildDefinition) {

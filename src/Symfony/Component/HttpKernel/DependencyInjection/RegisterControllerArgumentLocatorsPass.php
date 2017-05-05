@@ -110,9 +110,12 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             }
 
             foreach ($methods as list($r, $parameters)) {
+                /** @var \ReflectionMethod $r */
+
                 // create a per-method map of argument-names to service/type-references
                 $args = array();
                 foreach ($parameters as $p) {
+                    /** @var \ReflectionParameter $p */
                     $type = $target = ProxyHelper::getTypeHint($r, $p, true);
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
 
@@ -127,6 +130,17 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         }
                     } elseif (!$type || !$autowire) {
                         continue;
+                    }
+
+                    if ($type && !$p->isOptional() && !$p->allowsNull() && !class_exists($type) && !interface_exists($type, false)) {
+                        $message = sprintf('Cannot determine controller argument for "%s::%s()": the $%s argument is type-hinted with the non-existent class or interface: "%s".', $class, $r->name, $p->name, $type);
+
+                        // see if the type-hint lives in the same namespace as the controller
+                        if (0 === strncmp($type, $class, strrpos($class, '\\'))) {
+                            $message .= ' Did you forget to add a use statement?';
+                        }
+
+                        throw new InvalidArgumentException($message);
                     }
 
                     $args[$p->name] = $type ? new TypedReference($target, $type, $r->class, $invalidBehavior) : new Reference($target, $invalidBehavior);

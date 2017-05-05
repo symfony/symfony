@@ -120,7 +120,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
 class RemoveTestController1
 {
-    public function fooAction(\stdClass $bar, NotFound $baz)
+    public function fooAction(\stdClass $bar, ClassNotInContainer $baz)
     {
     }
 }
@@ -131,7 +131,7 @@ class RemoveTestController2
     {
     }
 
-    public function fooAction(NotFound $bar)
+    public function fooAction(ClassNotInContainer $bar)
     {
     }
 }
@@ -141,4 +141,8 @@ class InvokableRegisterTestController
     public function __invoke(\stdClass $bar)
     {
     }
+}
+
+class ClassNotInContainer
+{
 }

@@ -445,7 +445,28 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeAlternatives(TypedReference $reference)
     {
-        if (isset($this->ambiguousServiceTypes[$type = $reference->getType()])) {
+        $type = $reference->getType();
+        $aliases = array();
+        foreach (class_parents($type) + class_implements($type) as $parent) {
+            if ($this->container->has($parent) && !$this->container->findDefinition($parent)->isAbstract()) {
+                $aliases[] = $parent;
+            }
+        }
+
+        if (1 < $len = count($aliases)) {
+            $message = ' Try changing the type-hint to one of its parents: ';
+            for ($i = 0, --$len; $i < $len; ++$i) {
+                $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
+            }
+            $message .= sprintf('or %s "%s".', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
+
+            return $message;
+        }
+        if ($aliases) {
+            return sprintf(' Try changing the type-hint to "%s" instead.', $aliases[0]);
+        }
+
+        if (isset($this->ambiguousServiceTypes[$type])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);
@@ -454,26 +475,8 @@ class AutowirePass extends AbstractRecursivePass
         } else {
             return;
         }
-        $message = sprintf(' You should maybe alias this %s to %s', class_exists($type, false) ? 'class' : 'interface', $message);
-        $aliases = array();
 
-        foreach (class_parents($type) + class_implements($type) as $parent) {
-            if ($this->container->has($parent) && !$this->container->findDefinition($parent)->isAbstract()) {
-                $aliases[] = $parent;
-            }
-        }
-
-        if (1 < $len = count($aliases)) {
-            $message .= '; or type-hint against one of its parents: ';
-            for ($i = 0, --$len; $i < $len; ++$i) {
-                $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
-            }
-            $message .= sprintf('or %s "%s"', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
-        } elseif ($aliases) {
-            $message .= sprintf('; or type-hint against %s "%s" instead', class_exists($aliases[0], false) ? 'class' : 'interface', $aliases[0]);
-        }
-
-        return $message.'.';
+        return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
     }
 
     /**

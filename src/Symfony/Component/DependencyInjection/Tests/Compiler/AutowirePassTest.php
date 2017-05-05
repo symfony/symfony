@@ -703,7 +703,7 @@ class AutowirePassTest extends TestCase
      * @group legacy
      * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. You should rename (or alias) the "i" service to "Symfony\Component\DependencyInjection\Tests\Compiler\I" instead.
      * @expectedExceptionInSymfony4 \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessageInSymfony4 Cannot autowire service "j": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. You should maybe alias this class to the existing "i" service; or type-hint against interface "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" instead.
+     * @expectedExceptionMessageInSymfony4 Cannot autowire service "j": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. Try changing the type-hint to "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" instead.
      */
     public function testByIdAlternative()
     {
@@ -711,6 +711,45 @@ class AutowirePassTest extends TestCase
 
         $container->setAlias(IInterface::class, 'i');
         $container->register('i', I::class);
+        $container->register('j', J::class)
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot autowire service "j": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. Try changing the type-hint to "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" instead.
+     */
+    public function testExceptionWhenAliasExists()
+    {
+        $container = new ContainerBuilder();
+
+        // multiple I services... but there *is* IInterface available
+        $container->setAlias(IInterface::class, 'i');
+        $container->register('i', I::class);
+        $container->register('i2', I::class);
+        // J type-hints against I concretely
+        $container->register('j', J::class)
+            ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot autowire service "j": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. You should maybe alias this class to one of these existing services: "i", "i2".
+     */
+    public function testExceptionWhenAliasDoesNotExist()
+    {
+        $container = new ContainerBuilder();
+
+        // multiple I instances... but no IInterface alias
+        $container->register('i', I::class);
+        $container->register('i2', I::class);
+        // J type-hints against I concretely
         $container->register('j', J::class)
             ->setAutowired(true);
 

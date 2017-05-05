@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +34,8 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @property ContainerInterface $container
  */
 trait ControllerTrait
 {

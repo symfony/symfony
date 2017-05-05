@@ -196,6 +196,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * TokenInterface vote proxy method.
      *
      * Acts as a BC layer when the VoterInterface is not implemented on the voter.
+     *
+     * @deprecated as of 3.4 and will be removed in 4.0. Call the voter directly as the instance will always be a VoterInterface
      */
     private function vote($voter, TokenInterface $token, $subject, $attributes)
     {

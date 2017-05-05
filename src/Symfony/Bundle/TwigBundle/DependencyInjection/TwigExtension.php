@@ -13,7 +13,6 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;

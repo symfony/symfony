@@ -11,25 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass instead.', TranslationDumperPass::class), E_USER_DEPRECATED);
+
+use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass as BaseTranslationDumperPass;
 
 /**
  * Adds tagged translation.formatter services to translation writer.
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use {@link BaseTranslationDumperPass instead}.
  */
-class TranslationDumperPass implements CompilerPassInterface
+class TranslationDumperPass extends BaseTranslationDumperPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('translation.writer')) {
-            return;
-        }
-
-        $definition = $container->getDefinition('translation.writer');
-
-        foreach ($container->findTaggedServiceIds('translation.dumper', true) as $id => $attributes) {
-            $definition->addMethodCall('addDumper', array($attributes[0]['alias'], new Reference($id)));
-        }
-    }
 }

@@ -38,6 +38,18 @@ FrameworkBundle
    will be removed in 4.0. Use the `--prefix` option with an empty string as value
    instead (e.g. `--prefix=""`)
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
+
 Process
 -------
 

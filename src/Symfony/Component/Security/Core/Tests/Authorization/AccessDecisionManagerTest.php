@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface;
 
 class AccessDecisionManagerTest extends TestCase
@@ -143,7 +144,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testVotingWrongTypeNoVoteMethod()
     {
-        $exception = \BadMethodCallException::class;
+        $exception = LogicException::class;
         $message = sprintf('stdClass should implement the %s interface when used as voter.', VoterInterface::class);
 
         if (method_exists($this, 'expectException')) {

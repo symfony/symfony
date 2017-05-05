@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\LogicException;
 
 /**
  * AccessDecisionManager is the base class for all access decision managers
@@ -209,6 +210,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return $voter->vote($token, $subject, $attributes);
         }
 
-        throw new \BadMethodCallException(sprintf('%s should implement the %s interface when used as voter.', get_class($voter), VoterInterface::class));
+        throw new LogicException(sprintf('%s should implement the %s interface when used as voter.', get_class($voter), VoterInterface::class));
     }
 }

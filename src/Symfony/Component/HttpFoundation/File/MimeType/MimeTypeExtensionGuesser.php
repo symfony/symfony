@@ -521,6 +521,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'application/x-dgc-compressed' => 'dgc',
         'application/x-director' => 'dir',
         'application/x-doom' => 'wad',
+        'application/x-dosexec' => 'exe',
         'application/x-dtbncx+xml' => 'ncx',
         'application/x-dtbook+xml' => 'dtb',
         'application/x-dtbresource+xml' => 'res',

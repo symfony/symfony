@@ -106,6 +106,10 @@
 
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
 
+        <service id="workflow.twig_extension" class="Symfony\Bridge\Twig\Extension\WorkflowExtension">
+            <argument type="service" id="workflow.registry" />
+        </service>
+
         <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
             <argument type="service" id="twig" />
             <tag name="translation.extractor" alias="twig" />

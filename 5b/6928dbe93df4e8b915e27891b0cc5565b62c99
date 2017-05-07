@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-07T10:27:39Z
+
+Here is the fixed reproducer build on Travis: https://travis-ci.org/ogizanagi/symfony-21369/builds/229639096

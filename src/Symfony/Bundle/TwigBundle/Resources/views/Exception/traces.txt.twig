@@ -6,7 +6,7 @@
 {% endif %}
 
 {% for trace in exception.trace %}
-  at {{ include('@Twig/Exception/trace.txt.twig', { trace: trace }, with_context = false) }}
+  {{ include('@Twig/Exception/trace.txt.twig', { trace: trace }, with_context = false) }}
 {% endfor %}
 </pre>
 {% endif %}

@@ -1008,7 +1008,7 @@ class RequestTest extends TestCase
         $req = new Request(array(), array(), array(), array(), array(), array(), 'MyContent');
         $resource = $req->getContent(true);
 
-        $this->assertTrue(is_resource($resource));
+        $this->assertInternalType('resource', $resource);
         $this->assertEquals('MyContent', stream_get_contents($resource));
     }
 

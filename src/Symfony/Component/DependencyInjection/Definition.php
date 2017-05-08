@@ -26,7 +26,7 @@ class Definition
     private $factory;
     private $shared = true;
     private $deprecated = false;
-    private $deprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
+    private $deprecationTemplate;
     private $properties = array();
     private $calls = array();
     private $configurator;
@@ -38,6 +38,8 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
+
+    private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
 
     protected $arguments;
 
@@ -610,7 +612,7 @@ class Definition
      */
     public function getDeprecationMessage($id)
     {
-        return str_replace('%service_id%', $id, $this->deprecationTemplate);
+        return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
     }
 
     /**

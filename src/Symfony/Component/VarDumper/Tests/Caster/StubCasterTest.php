@@ -14,6 +14,7 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Caster\ConstStub;
 use Symfony\Component\VarDumper\Caster\LinkStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
@@ -167,5 +168,33 @@ EODUMP;
 EODUMP;
 
         $this->assertStringMatchesFormat($expectedDump, $dump);
+    }
+
+    /**
+     * @dataProvider provideFlags
+     */
+    public function testContStubFromFlag($value, $prefix, $expected)
+    {
+        $var = array(ConstStub::fromFlag($value, $prefix));
+
+        $expectedDump = <<<EODUMP
+array:1 [
+  0 => $expected
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $var);
+    }
+
+    public function provideFlags()
+    {
+        return array(
+            array(0, 'E_', '0'),
+            array(E_ERROR, 'E_', 'E_ERROR'),
+            array(E_ERROR | E_WARNING, 'E_', 'E_ERROR | E_WARNING'),
+            array(E_ERROR | E_WARNING | E_NOTICE, 'E_', 'E_ERROR | E_WARNING | E_NOTICE'),
+            array(E_ALL, 'E_', 'E_ERROR | E_WARNING | E_PARSE | E_NOTICE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING | E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE | E_STRICT | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED'),
+            array(E_DEPRECATED | E_USER_DEPRECATED | E_USER_DEPRECATED * 2 | E_USER_DEPRECATED * 4, 'E_', 'E_DEPRECATED | E_USER_DEPRECATED | 32768 | 65536'),
+        );
     }
 }

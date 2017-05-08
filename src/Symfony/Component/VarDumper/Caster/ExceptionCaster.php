@@ -24,6 +24,9 @@ class ExceptionCaster
 {
     public static $srcContext = 1;
     public static $traceArgs = true;
+    /**
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
     public static $errorTypes = array(
         E_DEPRECATED => 'E_DEPRECATED',
         E_USER_DEPRECATED => 'E_USER_DEPRECATED',
@@ -56,9 +59,8 @@ class ExceptionCaster
 
     public static function castErrorException(\ErrorException $e, array $a, Stub $stub, $isNested)
     {
-        if (isset($a[$s = Caster::PREFIX_PROTECTED.'severity'], self::$errorTypes[$a[$s]])) {
-            $a[$s] = new ConstStub(self::$errorTypes[$a[$s]], $a[$s]);
-        }
+        $s = Caster::PREFIX_PROTECTED.'severity';
+        $a[$s] = ConstStub::fromFlag($a[$s], 'E_');
 
         return $a;
     }
@@ -88,9 +90,7 @@ class ExceptionCaster
             return $a;
         }
 
-        if (isset(self::$errorTypes[$a[$s]])) {
-            $a[$s] = new ConstStub(self::$errorTypes[$a[$s]], $a[$s]);
-        }
+        $a[$s] = ConstStub::fromFlag($a[$s], 'E_');
 
         $trace = array(array(
             'file' => $a[$sPrefix.'file'],

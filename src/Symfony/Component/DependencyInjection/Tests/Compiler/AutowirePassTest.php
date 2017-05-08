@@ -135,6 +135,21 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(DInterface::class, (string) $container->getDefinition('h')->getArgument(1));
     }
 
+    public function testExceptionsAreStored()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('c1', __NAMESPACE__.'\CollisionA');
+        $container->register('c2', __NAMESPACE__.'\CollisionB');
+        $container->register('c3', __NAMESPACE__.'\CollisionB');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass(false);
+        $pass->process($container);
+        $this->assertCount(1, $pass->getAutowiringExceptions());
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\CannotBeAutowired::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "c1", "c2", "c3".

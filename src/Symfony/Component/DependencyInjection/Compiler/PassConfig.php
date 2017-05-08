@@ -57,7 +57,7 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
-            new AutowirePass(),
+            $autowirePass = new AutowirePass(false),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
@@ -77,6 +77,7 @@ class PassConfig
                 new AnalyzeServiceReferencesPass(),
                 new RemoveUnusedDefinitionsPass(),
             )),
+            new AutowireExceptionPass($autowirePass),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
         ));
     }

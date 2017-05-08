@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\Transition;
 
 /**
  * WorkflowExtension.

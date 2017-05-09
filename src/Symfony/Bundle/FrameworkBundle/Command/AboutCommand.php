@@ -70,7 +70,7 @@ class AboutCommand extends ContainerAwareCommand
             new TableSeparator(),
             array('Version', PHP_VERSION),
             array('Architecture', (PHP_INT_SIZE * 8).' bits'),
-            array('Intl locale', \Locale::getDefault() ?: 'n/a'),
+            array('Intl locale', class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a'),
             array('Timezone', date_default_timezone_get().' (<comment>'.(new \DateTime())->format(\DateTime::W3C).'</>)'),
             array('OPcache', extension_loaded('Zend OPcache') && ini_get('opcache.enable') ? 'true' : 'false'),
             array('APCu', extension_loaded('apcu') && ini_get('apc.enabled') ? 'true' : 'false'),

@@ -440,6 +440,33 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(array(array('setApiKey', array('123'))), $container->getDefinition('another_one')->getMethodCalls());
     }
 
+    public function testNamedArgumentsInPrototypes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('prototype_named_args.yml');
+
+        $fooDefinition = $container->getDefinition('Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo');
+        $this->assertEquals(array('$bar' => 'foo'), $fooDefinition->getArguments());
+
+        $this->assertEmpty($container->getDefinition('Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar')->getArguments());
+
+        $container->compile();
+
+        $this->assertEquals(array('foo'), $fooDefinition->getArguments());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unused named arguments in a prototype: "$invalid", "$invalid2".
+     */
+    public function testUnusedNamedArgumentsInPrototypes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('prototype_unused_named_args.yml');
+    }
+
     public function testInstanceof()
     {
         $container = new ContainerBuilder();

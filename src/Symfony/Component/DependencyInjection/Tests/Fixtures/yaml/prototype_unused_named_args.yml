@@ -1,0 +1,6 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        arguments:
+            $invalid: foo
+            $invalid2: quz

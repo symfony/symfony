@@ -1,0 +1,5 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        arguments:
+            $bar: foo

@@ -333,6 +333,15 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass` class
    has been removed. Use the `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass`
    class instead.
+   
+ * Using the `KERNEL_DIR` environment variable and the automatic guessing based
+   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()` 
+   method implementation. Set the `KERNEL_CLASS` environment variable to the
+   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()` 
+   or `KernelTestCase::getKernelClass()` method instead.
+   
+ * The methods `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
+   have been removed.
 
 HttpFoundation
 --------------

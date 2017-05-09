@@ -77,7 +77,7 @@ class CoreExtension extends AbstractExtension
             new Type\SubmitType(),
             new Type\ResetType(),
             new Type\CurrencyType(),
-            new Type\TelType(),
+            new Type\TelephoneType(),
             new Type\ColorType(),
         );
     }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 
-class TelType extends AbstractType
+class TelephoneType extends AbstractType
 {
     /**
      * {@inheritdoc}

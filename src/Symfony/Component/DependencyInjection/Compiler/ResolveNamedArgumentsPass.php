@@ -40,7 +40,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
             foreach ($arguments as $key => $argument) {
                 if (is_int($key)) {
-                    $resolvedArguments[] = $argument;
+                    $resolvedArguments[$key] = $argument;
                     continue;
                 }
                 if ('' === $key || '$' !== $key[0]) {

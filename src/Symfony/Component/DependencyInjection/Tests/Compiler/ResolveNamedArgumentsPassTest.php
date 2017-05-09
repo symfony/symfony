@@ -27,13 +27,17 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
-        $definition->setArguments(array(0 => new Reference('foo'), '$apiKey' => '123'));
+        $definition->setArguments(array(
+            2 => 'http://api.example.com',
+            '$apiKey' => '123',
+            0 => new Reference('foo'),
+        ));
         $definition->addMethodCall('setApiKey', array('$apiKey' => '123'));
 
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);
 
-        $this->assertEquals(array(0 => new Reference('foo'), 1 => '123'), $definition->getArguments());
+        $this->assertEquals(array(0 => new Reference('foo'), 1 => '123', 2 => 'http://api.example.com'), $definition->getArguments());
         $this->assertEquals(array(array('setApiKey', array('123'))), $definition->getMethodCalls());
     }
 

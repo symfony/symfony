@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-09T14:11:00Z
+
+I can confirm this error when Intl extension is disabled:
+
+![locale-error](https://cloud.githubusercontent.com/assets/73419/25854931/031c5910-34d2-11e7-8d97-70637d241ec4.png)
+
+The proposed change fixes it:
+
+![locale-na](https://cloud.githubusercontent.com/assets/73419/25854946/09e47afc-34d2-11e7-8c35-b0ad3202312d.png)
+
+and the locale is still displayed when available:
+
+![locale-valid](https://cloud.githubusercontent.com/assets/73419/25854949/1107147a-34d2-11e7-8e6a-5bc5d347381f.png)

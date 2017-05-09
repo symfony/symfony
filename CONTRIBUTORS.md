@@ -186,9 +186,8 @@ Symfony is the result of the work of many people who made the code better
  - sun (sun)
  - Larry Garfield (crell)
  - Martin Schuhfuß (usefulthink)
- - apetitpa
+ - Arnaud Petitpas (apetitpa)
  - Matthieu Bontemps (mbontemps)
- - apetitpa
  - Pierre Minnieur (pminnieur)
  - fivestar
  - Dominique Bongiraud

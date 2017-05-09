@@ -162,7 +162,7 @@ class ChoiceType extends AbstractType
         }
 
         // To avoid issues when the submitted choices are arrays (i.e. array to string conversions),
-        // we have to ensure that all elements of the submitted choice data are strings or null.
+        // we have to ensure that all elements of the submitted choice data are NULL, strings or ints.
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
 

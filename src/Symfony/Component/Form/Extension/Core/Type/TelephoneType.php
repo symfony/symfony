@@ -28,6 +28,6 @@ class TelephoneType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'tel';
+        return 'telephone';
     }
 }

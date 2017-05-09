@@ -7,7 +7,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
  */
 class NamedArgumentsDummy
 {
-    public function __construct(CaseSensitiveClass $c, $apiKey)
+    public function __construct(CaseSensitiveClass $c, $apiKey, $hostName)
     {
     }
 

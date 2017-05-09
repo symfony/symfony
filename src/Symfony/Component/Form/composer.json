@@ -39,9 +39,9 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.3",
         "symfony/doctrine-bridge": "<2.7",
-        "symfony/framework-bundle": "<2.7",
+        "symfony/framework-bundle": "<3.4",
         "symfony/http-kernel": "<3.3.5",
-        "symfony/twig-bridge": "<2.7"
+        "symfony/twig-bridge": "<3.4"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

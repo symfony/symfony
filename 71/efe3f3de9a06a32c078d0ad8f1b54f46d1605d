@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Pierstoval at 2017-05-09T08:48:53Z
+
+PR name should be prepended with [FrameworkBundle], for the rest I'm 👍
+
+---------------------------------------------------------------------------
+
+by flug at 2017-05-09T09:07:48Z
+
+Oh right, I redid this pull request on FrameworkBundle  https://github.com/symfony/framework-bundle/pull/15
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2017-05-09T09:24:38Z
+
+Don't make PR on symfony/framework-bundle#15, this is a read-only split of the full-stack repo.
+
+This #22676 PR is good, you just have to rename the PR and add [FrameworkBundle] at the beginning of it so it can be tagged properly and fabbot.io doesn't complain 🙂

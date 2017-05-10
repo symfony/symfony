@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\ChoiceList\Factory;
 
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
-use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
@@ -39,7 +38,13 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        return new LazyChoiceList($loader, $value);
+        $choiceList = $loader->loadChoiceList($value);
+
+        if (!$choiceList instanceof ChoiceListInterface) {
+            throw new \UnexpectedValueException(get_class($loader).'::loadChoiceList method should return a ChoiceListInterface');
+        }
+
+        return $choiceList;
     }
 
     /**

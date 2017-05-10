@@ -254,7 +254,7 @@ EOF
                         if ($trace['function']) {
                             $content .= sprintf('at %s%s%s(%s)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                         }
-                        if (isset($trace['file']) && isset($trace['line'])) {
+                        if (isset($trace['file'], $trace['line'])) {
                             $content .= $this->formatPath($trace['file'], $trace['line']);
                         }
                         $content .= "</li>\n";

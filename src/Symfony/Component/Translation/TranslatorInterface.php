@@ -38,7 +38,7 @@ interface TranslatorInterface
      * Translates the given choice message by choosing a translation according to a number.
      *
      * @param string      $id         The message id (may also be an object that can be cast to string)
-     * @param int         $number     The number to use to find the indice of the message
+     * @param int         $number     The number to use to find the indice of the message, defaults to 1
      * @param array       $parameters An array of parameters for the message
      * @param string|null $domain     The domain for the message or null to use the default
      * @param string|null $locale     The locale or null to use the default
@@ -47,7 +47,7 @@ interface TranslatorInterface
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null);
+    public function transChoice($id, $number = 1, array $parameters = array(), $domain = null, $locale = null);
 
     /**
      * Sets the current locale.

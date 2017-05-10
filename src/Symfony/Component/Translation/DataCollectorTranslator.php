@@ -58,7 +58,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number = 1, array $parameters = array(), $domain = null, $locale = null)
     {
         $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters, $number);

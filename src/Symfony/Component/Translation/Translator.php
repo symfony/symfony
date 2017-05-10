@@ -198,7 +198,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number = 1, array $parameters = array(), $domain = null, $locale = null)
     {
         $parameters = array_merge(array(
             '%count%' => $number,

@@ -31,7 +31,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * The parent view.
      *
-     * @var FormView
+     * @var FormView|null
      */
     public $parent;
 
@@ -152,5 +152,15 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function count()
     {
         return count($this->children);
+    }
+
+    /**
+     * Has the view a parent?
+     *
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return $this->parent !== null;
     }
 }

@@ -20,7 +20,7 @@ class TelephoneType extends AbstractType
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\TextType';
+        return TextType::class;
     }
 
     /**

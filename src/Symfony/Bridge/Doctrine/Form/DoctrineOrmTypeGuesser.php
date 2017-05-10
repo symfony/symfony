@@ -21,6 +21,16 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Doctrine\Common\Util\ClassUtils;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bridge\Doctrine\Form\Type\CollectionType;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
@@ -39,7 +49,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessType($class, $property)
     {
         if (!$ret = $this->getMetadata($class)) {
-            return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', array(), Guess::LOW_CONFIDENCE);
+            return new TypeGuess(TextType::class, array(), Guess::LOW_CONFIDENCE);
         }
 
         list($metadata, $name) = $ret;
@@ -48,35 +58,35 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             $multiple = $metadata->isCollectionValuedAssociation($property);
             $mapping = $metadata->getAssociationMapping($property);
 
-            return new TypeGuess('Symfony\Bridge\Doctrine\Form\Type\EntityType', array('em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple), Guess::HIGH_CONFIDENCE);
+            return new TypeGuess(EntityType::class, array('em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple), Guess::HIGH_CONFIDENCE);
         }
 
         switch ($metadata->getTypeOfField($property)) {
             case Type::TARRAY:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), Guess::MEDIUM_CONFIDENCE);
+                return new TypeGuess(CollectionType::class, array(), Guess::MEDIUM_CONFIDENCE);
             case Type::BOOLEAN:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CheckboxType', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess(CheckboxType::class, array(), Guess::HIGH_CONFIDENCE);
             case Type::DATETIME:
             case Type::DATETIMETZ:
             case 'vardatetime':
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess(DateTimeType::class, array(), Guess::HIGH_CONFIDENCE);
             case Type::DATE:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess(DateType::class, array(), Guess::HIGH_CONFIDENCE);
             case Type::TIME:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array(), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess(TimeType::class, array(), Guess::HIGH_CONFIDENCE);
             case Type::DECIMAL:
             case Type::FLOAT:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\NumberType', array(), Guess::MEDIUM_CONFIDENCE);
+                return new TypeGuess(NumberType::class, array(), Guess::MEDIUM_CONFIDENCE);
             case Type::INTEGER:
             case Type::BIGINT:
             case Type::SMALLINT:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\IntegerType', array(), Guess::MEDIUM_CONFIDENCE);
+                return new TypeGuess(IntegerType::class, array(), Guess::MEDIUM_CONFIDENCE);
             case Type::STRING:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', array(), Guess::MEDIUM_CONFIDENCE);
+                return new TypeGuess(TextType::class, array(), Guess::MEDIUM_CONFIDENCE);
             case Type::TEXT:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextareaType', array(), Guess::MEDIUM_CONFIDENCE);
+                return new TypeGuess(TextareaType::class, array(), Guess::MEDIUM_CONFIDENCE);
             default:
-                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', array(), Guess::LOW_CONFIDENCE);
+                return new TypeGuess(TextType::class, array(), Guess::LOW_CONFIDENCE);
         }
     }
 

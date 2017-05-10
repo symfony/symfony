@@ -183,7 +183,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    protected function getLoginUrl()
+    protected function getLoginUrl(Request $request)
     {
         return $this->loginUrl;
     }

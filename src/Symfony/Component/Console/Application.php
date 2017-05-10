@@ -1076,8 +1076,6 @@ class Application
 
             $this->singleCommand = true;
         }
-
-        return $this;
     }
 
     private function stringWidth($string)

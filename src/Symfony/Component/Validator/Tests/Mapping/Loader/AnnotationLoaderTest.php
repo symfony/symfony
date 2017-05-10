@@ -155,6 +155,9 @@ class AnnotationLoaderTest extends TestCase
 
     public function testLoadGroupSequenceProviderAnnotation()
     {
+        // Autoload GroupSequenceProvider annotation
+        $this->assertTrue(class_exists('Symfony\Component\Validator\Constraints\GroupSequenceProvider'));
+
         $loader = new AnnotationLoader(new AnnotationReader());
 
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity');

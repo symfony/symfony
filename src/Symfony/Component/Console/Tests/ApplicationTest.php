@@ -772,6 +772,20 @@ class ApplicationTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testVerboseLongValueInArgv()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add(new \FooCommand());
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
+        $input = new ArgvInput(array('cli.php', '--verbose=3', 'foo:bar'));
+        $application->run($input, $output);
+        $this->assertEquals(Output::VERBOSITY_VERY_VERBOSE, $output->getVerbosity());
+    }
+
     public function testRunReturnsIntegerExitCode()
     {
         $exception = new \Exception('', 4);

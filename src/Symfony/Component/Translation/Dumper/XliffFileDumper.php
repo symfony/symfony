@@ -55,7 +55,15 @@ class XliffFileDumper extends FileDumper
         return 'xlf';
     }
 
-    private function dumpXliff1($defaultLocale, MessageCatalogue $messages, $domain, array $options = array())
+    /**
+     * @param string           $defaultLocale
+     * @param MessageCatalogue $messages
+     * @param string           $domain
+     * @param array            $options
+     *
+     * @return string
+     */
+    protected function dumpXliff1($defaultLocale, MessageCatalogue $messages, $domain, array $options = array())
     {
         $toolInfo = array('tool-id' => 'symfony', 'tool-name' => 'Symfony');
         if (array_key_exists('tool_info', $options)) {
@@ -88,8 +96,7 @@ class XliffFileDumper extends FileDumper
             $translation->setAttribute('id', md5($source));
             $translation->setAttribute('resname', $source);
 
-            $s = $translation->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
+            $this->addSource($dom, $translation, $source, $target);
 
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
@@ -129,7 +136,15 @@ class XliffFileDumper extends FileDumper
         return $dom->saveXML();
     }
 
-    private function dumpXliff2($defaultLocale, MessageCatalogue $messages, $domain, array $options = array())
+    /**
+     * @param string           $defaultLocale
+     * @param MessageCatalogue $messages
+     * @param string           $domain
+     * @param array            $options
+     *
+     * @return string
+     */
+    protected function dumpXliff2($defaultLocale, MessageCatalogue $messages, $domain, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
@@ -149,8 +164,7 @@ class XliffFileDumper extends FileDumper
 
             $segment = $translation->appendChild($dom->createElement('segment'));
 
-            $s = $segment->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
+            $this->addSource($dom, $segment, $source, $target);
 
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
@@ -172,12 +186,26 @@ class XliffFileDumper extends FileDumper
     }
 
     /**
+     * Add the source tag.
+     *
+     * @param DOMDocument $dom
+     * @param DOMElement  $node
+     * @param string      $source
+     * @param string      $target
+     */
+    protected function addSource(\DOMDocument $dom, \DOMElement $node, $source, $target)
+    {
+        $sourceDomElement = $node->appendChild($dom->createElement('source'));
+        $sourceDomElement->appendChild($dom->createTextNode($source));
+    }
+
+    /**
      * @param string     $key
      * @param array|null $metadata
      *
      * @return bool
      */
-    private function hasMetadataArrayInfo($key, $metadata = null)
+    protected function hasMetadataArrayInfo($key, $metadata = null)
     {
         return null !== $metadata && array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || is_array($metadata[$key]));
     }

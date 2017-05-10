@@ -261,7 +261,7 @@ class PhpDumper extends Dumper
             array($this->getProxyDumper(), 'isProxyCandidate')
         );
         $code = '';
-        $strip = '' === $this->docStar && method_exists('Symfony\Component\HttpKernel\Kernel', 'stripComments');
+        $strip = '' === $this->docStar && method_exists(Kernel::class, 'stripComments');
 
         foreach ($definitions as $definition) {
             $proxyCode = "\n".$this->getProxyDumper()->getProxyCode($definition);

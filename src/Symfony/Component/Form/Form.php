@@ -286,6 +286,16 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Returns whether the form has a parent.
+     *
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return null !== $this->parent;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getRoot()

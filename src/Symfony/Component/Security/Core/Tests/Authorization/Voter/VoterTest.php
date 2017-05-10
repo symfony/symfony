@@ -59,7 +59,7 @@ class VoterTest extends TestCase
 
 class VoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+    protected function shouldAllowAccess($attribute, $object, TokenInterface $token)
     {
         return 'EDIT' === $attribute;
     }

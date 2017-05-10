@@ -197,6 +197,7 @@ abstract class AbstractEventDispatcherTest extends TestCase
         $this->dispatcher->addSubscriber($eventSubscriber);
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
+        $this->assertTrue($this->dispatcher->hasListeners(self::postBar));
     }
 
     public function testAddSubscriberWithPriorities()
@@ -209,6 +210,9 @@ abstract class AbstractEventDispatcherTest extends TestCase
 
         $listeners = $this->dispatcher->getListeners('pre.foo');
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
+        $this->assertCount(2, $listeners);
+        $listeners = $this->dispatcher->getListeners('post.bar');
+        $this->assertTrue($this->dispatcher->hasListeners(self::postBar));
         $this->assertCount(2, $listeners);
         $this->assertInstanceOf('Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithPriorities', $listeners[0][0]);
     }
@@ -347,7 +351,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array('pre.foo' => 'preFoo', 'post.foo' => 'postFoo');
+        return array('pre.foo' => 'preFoo', 'post.foo' => 'postFoo', 'post.bar');
     }
 }
 
@@ -358,6 +362,7 @@ class TestEventSubscriberWithPriorities implements EventSubscriberInterface
         return array(
             'pre.foo' => array('preFoo', 10),
             'post.foo' => array('postFoo'),
+            'post.bar' => 10,
             );
     }
 }

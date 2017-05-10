@@ -193,6 +193,8 @@ class SubscriberService implements EventSubscriberInterface
             'onEvent' => 'onEvent',
             'onEventWithPriority' => array('onEventWithPriority', 10),
             'onEventNested' => array(array('onEventNested')),
+            'app.event',
+            'app.event.with.priority' => 10,
         );
     }
 
@@ -205,6 +207,14 @@ class SubscriberService implements EventSubscriberInterface
     }
 
     public function onEventNested(Event $e)
+    {
+    }
+
+    public function onAppEvent(Event $e)
+    {
+    }
+
+    public function onAppEventWithPriority(Event $e)
     {
     }
 }

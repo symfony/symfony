@@ -32,6 +32,7 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Event\ConsoleCommandAddEvent;
 
 class ApplicationTest extends TestCase
 {
@@ -132,6 +133,17 @@ class ApplicationTest extends TestCase
         $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
         $commands = $application->all();
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
+    }
+
+    public function testAddWithDispatcher()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($this->getDispatcher());
+        $application->add(new \FooCommand());
+        $commands = $application->all();
+        $this->assertArrayHasKey('foo:bar', $commands, 'Command has been registered');
+        $this->assertEquals('Description set by command add listener', $commands['foo:bar']->getDescription());
     }
 
     /**
@@ -1118,6 +1130,10 @@ class ApplicationTest extends TestCase
             $event->getOutput()->write('caught.');
 
             $event->setException(new \RuntimeException('replaced in caught.'));
+        });
+        $dispatcher->addListener('console.command-add', function (ConsoleCommandAddEvent $event) {
+            $command = $event->getCommand();
+            $command->setDescription('Description set by command add listener');
         });
 
         $application = new Application();

@@ -41,6 +41,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Event\ConsoleCommandAddEvent;
 
 /**
  * An Application is the container for a collection of commands.
@@ -420,6 +421,11 @@ class Application
     public function add(Command $command)
     {
         $command->setApplication($this);
+
+        if (null !== $this->dispatcher) {
+            $event = new ConsoleCommandAddEvent($command);
+            $this->dispatcher->dispatch(ConsoleEvents::COMMAND_ADD, $event);
+        }
 
         if (!$command->isEnabled()) {
             $command->setApplication(null);

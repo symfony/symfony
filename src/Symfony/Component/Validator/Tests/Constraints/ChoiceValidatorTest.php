@@ -149,6 +149,18 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testValidChoiceCallbackContextObjectMethod()
+    {
+        // search $this for "objectMethodCallback"
+        $this->setObject($this);
+
+        $constraint = new Choice(array('callback' => 'objectMethodCallback'));
+
+        $this->validator->validate('bar', $constraint);
+
+        $this->assertNoViolation();
+    }
+
     public function testMultipleChoices()
     {
         $constraint = new Choice(array(

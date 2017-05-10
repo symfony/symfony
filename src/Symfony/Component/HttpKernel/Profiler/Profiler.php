@@ -111,10 +111,16 @@ class Profiler
     public function saveProfile(Profile $profile)
     {
         // late collect
-        foreach ($profile->getCollectors() as $collector) {
-            if ($collector instanceof LateDataCollectorInterface) {
-                $collector->lateCollect();
+        try {
+            foreach ($profile->getCollectors() as $collector) {
+                if ($collector instanceof LateDataCollectorInterface) {
+                    $collector->lateCollect();
+                }
             }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Some exceptions thrown while saving profile, with message: "%s"', $e->getMessage())
+            );
         }
 
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {

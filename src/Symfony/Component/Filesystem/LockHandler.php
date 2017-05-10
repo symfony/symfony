@@ -18,9 +18,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
  * a file lock.
  *
  * A locked file is created based on the lock name when calling lock(). Other
- * lock handlers will not be able to lock the same name until it is released
- * (explicitly by calling release() or implicitly when the instance holding the
- * lock is destroyed).
+ * lock handlers will not be able to lock the same name until it is released (explicitly by calling release() or
+ * implicitly when the instance holding the lock is destroyed) or the time to live for the lock has expired.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Romain Neutron <imprec@gmail.com>
@@ -58,11 +57,13 @@ class LockHandler
      *
      * @param bool $blocking wait until the lock is released
      *
+     * @param int $ttl The maximum lifetime of the lock.
+     *
      * @return bool Returns true if the lock was acquired, false otherwise
      *
      * @throws IOException If the lock file could not be created or opened
      */
-    public function lock($blocking = false)
+    public function lock($blocking = false, $ttl = null)
     {
         if ($this->handle) {
             return true;
@@ -70,6 +71,11 @@ class LockHandler
 
         // Silence error reporting
         set_error_handler(function () {});
+
+        if (null !== $ttl && filemtime($this->file) < (time() - $ttl)) {
+            // Remove lock file when ttl has expired
+            unlink($this->file);
+        }
 
         if (!$this->handle = fopen($this->file, 'r')) {
             if ($this->handle = fopen($this->file, 'x')) {

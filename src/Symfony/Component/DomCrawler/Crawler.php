@@ -1171,4 +1171,14 @@ class Crawler implements \Countable, \IteratorAggregate
 
         return $crawler;
     }
+
+    /**
+     * Returns the base href value.
+     *
+     * @return string
+     */
+    public function getBaseHref()
+    {
+        return $this->baseHref;
+    }
 }

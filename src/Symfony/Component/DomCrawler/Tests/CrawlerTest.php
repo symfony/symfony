@@ -1168,6 +1168,13 @@ HTML;
         return new Crawler($dom, $uri);
     }
 
+    public function testGetBaseHref()
+    {
+        $baseHref = 'http://example.com/english';
+        $crawler = new Crawler(null, 'http://example.com/english/welcome', $baseHref);
+        $this->assertEquals($baseHref, $crawler->getBaseHref());
+    }
+
     protected function createTestXmlCrawler($uri = null)
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>

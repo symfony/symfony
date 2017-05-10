@@ -279,7 +279,7 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
         ;
 
-        $abstractFactoryKeys = array();
+        $abstractFactories = array();
         foreach ($factories as $factoriesAtPosition) {
             foreach ($factoriesAtPosition as $factory) {
                 $name = str_replace('-', '_', $factory->getKey());
@@ -288,7 +288,7 @@ class MainConfiguration implements ConfigurationInterface
                 ;
 
                 if ($factory instanceof AbstractFactory) {
-                    $abstractFactoryKeys[] = $name;
+                    $abstractFactories[$name] = $factory;
                 }
 
                 $factory->addConfiguration($factoryNode);
@@ -302,14 +302,16 @@ class MainConfiguration implements ConfigurationInterface
                 ->ifTrue(function ($v) {
                     return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
                 })
-                ->then(function ($firewall) use ($abstractFactoryKeys) {
-                    foreach ($abstractFactoryKeys as $k) {
-                        if (!isset($firewall[$k]['check_path'])) {
-                            continue;
-                        }
+                ->then(function ($firewall) use ($abstractFactories) {
+                    foreach ($abstractFactories as $k => $factory) {
+                        foreach ($factory->getPathOptions() as $pathOption) {
+                            if (!isset($firewall[$k][$pathOption])) {
+                                continue;
+                            }
 
-                        if (false !== strpos($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
-                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
+                            if (false !== strpos($firewall[$k][$pathOption], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k][$pathOption])) {
+                                throw new \LogicException(sprintf('The %s "%s" for login method "%s" is not matched by the firewall pattern "%s".', $pathOption, $firewall[$k][$pathOption], $k, $firewall['pattern']));
+                            }
                         }
                     }
 

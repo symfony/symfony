@@ -19,14 +19,18 @@ class FileLocatorTest extends TestCase
     /**
      * @dataProvider getIsAbsolutePathTests
      */
-    public function testIsAbsolutePath($path)
+    public function testIsAbsolutePath($path, $absolute = true)
     {
         $loader = new FileLocator(array());
         $r = new \ReflectionObject($loader);
         $m = $r->getMethod('isAbsolutePath');
         $m->setAccessible(true);
 
-        $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
+        if (true === $absolute) {
+            $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
+        } else {
+            $this->assertFalse($m->invoke($loader, $path), '->isAbsolutePath() returns false for anything that is not an absolute path');
+        }
     }
 
     public function getIsAbsolutePathTests()
@@ -38,6 +42,8 @@ class FileLocatorTest extends TestCase
             array('\\server\\foo.xml'),
             array('https://server/foo.xml'),
             array('phar://server/foo.xml'),
+            array('', false),
+            array(array('/', 'foo.xml'), false),
         );
     }
 

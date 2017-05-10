@@ -48,4 +48,12 @@ class ValueExporterTest extends TestCase
         $array['__PHP_Incomplete_Class_Name'] = 'AppBundle/Foo';
         $this->assertSame('__PHP_Incomplete_Class(AppBundle/Foo)', $this->valueExporter->exportValue($foo));
     }
+
+    public function testIncompleteClass()
+    {
+        $foo = new \__PHP_Incomplete_Class();
+        $array = new \ArrayObject($foo);
+        $array['__PHP_Incomplete_Class_Name'] = 'AppBundle/Foo';
+        $this->assertSame('__PHP_Incomplete_Class(AppBundle/Foo)', $this->valueExporter->exportValue($foo));
+    }
 }

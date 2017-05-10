@@ -144,6 +144,15 @@ interface InputInterface
     public function hasOption($name);
 
     /**
+     * Returns true if the option value was set by name.
+     *
+     * @param string $name The option name
+     *
+     * @return bool true if the option is set (not a default value)
+     */
+    public function hasOptionSet($name);
+
+    /**
      * Is this input means interactive?
      *
      * @return bool

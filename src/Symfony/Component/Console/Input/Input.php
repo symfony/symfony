@@ -182,6 +182,18 @@ abstract class Input implements InputInterface, StreamableInputInterface
     }
 
     /**
+     * Returns true if the option value was set by name.
+     *
+     * @param string $name The option name
+     *
+     * @return bool true if the option is set (not a default value)
+     */
+    public function hasOptionSet($name)
+    {
+        return isset($this->options[$name]);
+    }
+
+    /**
      * Escapes a token through escapeshellarg if it contains unsafe chars.
      *
      * @param string $token

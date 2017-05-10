@@ -349,6 +349,11 @@ class FrameworkExtension extends Extension
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }
 
+        if (array_key_exists('auto_label', $config['form'])) {
+            $loader->load('form_auto_label.xml');
+            $container->setParameter('form.type_extension.auto_label.auto_label', $config['form']['auto_label']);
+        }
+
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
 

@@ -125,6 +125,7 @@ class Configuration implements ConfigurationInterface
                     ->info('form configuration')
                     ->{!class_exists(FullStack::class) && class_exists(Form::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
+                        ->scalarNode('auto_label')->end()
                         ->arrayNode('csrf_protection')
                             ->treatFalseLike(array('enabled' => false))
                             ->treatTrueLike(array('enabled' => true))

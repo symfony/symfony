@@ -367,7 +367,7 @@ class OptionsResolver implements Options
     }
 
     /**
-     * Sets the normalizer for an option.
+     * Sets the normalizer for one or more option.
      *
      * The normalizer should be a closure with the following signature:
      *
@@ -386,32 +386,34 @@ class OptionsResolver implements Options
      *
      * The resolved option value is set to the return value of the closure.
      *
-     * @param string   $option     The option name
-     * @param \Closure $normalizer The normalizer
+     * @param string|string[] $optionNames One or more option names
+     * @param \Closure        $normalizer  The normalizer
      *
      * @return $this
      *
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function setNormalizer($option, \Closure $normalizer)
+    public function setNormalizer($optionNames, \Closure $normalizer)
     {
         if ($this->locked) {
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+        foreach ((array) $optionNames as $option) {
+            if (!isset($this->defined[$option])) {
+                throw new UndefinedOptionsException(sprintf(
+                    'The option "%s" does not exist. Defined options are: "%s".',
+                    $option,
+                    implode('", "', array_keys($this->defined))
+                ));
+            }
+
+            $this->normalizers[$option] = $normalizer;
+
+            // Make sure the option is processed
+            unset($this->resolved[$option]);
         }
-
-        $this->normalizers[$option] = $normalizer;
-
-        // Make sure the option is processed
-        unset($this->resolved[$option]);
 
         return $this;
     }

@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Yaml\Command\LintCommand;
+
+if (!class_exists(Application::class)) {
+    fwrite(STDERR, 'The "symfony/console" package must be installed.'.PHP_EOL);
+
+    exit(1);
+}
+
+(new Application('symfony/yaml'))
+    ->add(new LintCommand())
+    ->getApplication()
+    ->setDefaultCommand('lint:yaml', true)
+    ->run();

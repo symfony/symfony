@@ -82,14 +82,15 @@ class File extends \SplFileInfo
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory The destination folder
-     * @param string $name      The new file name
+     * @param string $directory   The destination folder
+     * @param string $name        The new file name
+     * @param int    $permissions The desired file permissions
      *
      * @return self A File object representing the new file
      *
      * @throws FileException if the target file could not be created
      */
-    public function move($directory, $name = null)
+    public function move($directory, $name = null, $permissions = 0666)
     {
         $target = $this->getTargetFile($directory, $name);
 
@@ -98,7 +99,7 @@ class File extends \SplFileInfo
             throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
         }
 
-        @chmod($target, 0666 & ~umask());
+        @chmod($target, $permissions & ~umask());
 
         return $target;
     }

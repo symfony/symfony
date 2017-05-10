@@ -206,14 +206,15 @@ class UploadedFile extends File
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory The destination folder
-     * @param string $name      The new file name
+     * @param string $directory   The destination folder
+     * @param string $name        The new file name
+     * @param int    $permissions The desired file permissions
      *
      * @return File A File object representing the new file
      *
      * @throws FileException if, for any reason, the file could not have been moved
      */
-    public function move($directory, $name = null)
+    public function move($directory, $name = null, $permissions = 0666)
     {
         if ($this->isValid()) {
             if ($this->test) {
@@ -227,7 +228,7 @@ class UploadedFile extends File
                 throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
             }
 
-            @chmod($target, 0666 & ~umask());
+            @chmod($target, $permissions & ~umask());
 
             return $target;
         }

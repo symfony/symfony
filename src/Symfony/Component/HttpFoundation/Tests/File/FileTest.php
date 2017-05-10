@@ -108,6 +108,34 @@ class FileTest extends TestCase
         @unlink($targetPath);
     }
 
+    public function testMoveWithPermissions()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Can not verify chmod operations on Windows');
+        }
+
+        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $targetDir = __DIR__.'/Fixtures/directory';
+        $targetPath = $targetDir.'/test.copy.gif';
+        @unlink($path);
+        @unlink($targetPath);
+        copy(__DIR__.'/Fixtures/test.gif', $path);
+
+        $file = new File($path);
+        $movedFile = $file->move($targetDir, null, 0660);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
+
+        $this->assertFileExists($targetPath);
+        $this->assertFileNotExists($path);
+        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+        $this->assertEquals(
+            substr(sprintf('%o', 0660 & ~umask()), -3),
+            substr(sprintf('%o', fileperms($targetPath)), -3)
+        );
+
+        @unlink($targetPath);
+    }
+
     public function getFilenameFixtures()
     {
         return array(

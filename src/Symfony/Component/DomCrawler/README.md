@@ -3,6 +3,11 @@ DomCrawler Component
 
 The DomCrawler component eases DOM navigation for HTML and XML documents.
 
+Documentation
+---------
+
+http://symfony.com/doc/current/components/dom_crawler.html
+
 Resources
 ---------
 

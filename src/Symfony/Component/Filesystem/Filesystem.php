@@ -78,6 +78,22 @@ class Filesystem
     }
 
     /**
+     * Moves a file.
+     *
+     * @param string $originFile          The original filename
+     * @param string $targetFile          The target filename
+     * @param bool   $overwriteNewerFiles If true, target files newer than origin files are overwritten
+     *
+     * @throws FileNotFoundException When originFile doesn't exist
+     * @throws IOException           When copy or remove fails
+     */
+    public function move($originFile, $targetFile, $overwriteNewerFiles = false)
+    {
+        $this->copy($originFile, $targetFile, $overwriteNewerFiles);
+        $this->remove($originFile);
+    }
+
+    /**
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path

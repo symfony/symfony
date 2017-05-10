@@ -661,7 +661,7 @@ class Application
      * @param \Exception      $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
-    public function renderException(\Exception $e, OutputInterface $output)
+    public function renderException($e, $output)
     {
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 

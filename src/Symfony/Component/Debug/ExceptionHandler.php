@@ -224,12 +224,17 @@ class ExceptionHandler
                             <span class="exception_counter">%d/%d</span>
                             <span class="exception_title">%s%s:</span>
                             <span class="exception_message">%s</span>
+                            <div class="exception_file">
+                                <pre class="exception_file_content">%s</pre>
+                            </div>
                         </h2>
                         <div class="block">
                             <ol class="traces list_exception">
 
 EOF
-                        , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
+                        , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message,
+                        htmlentities($this->getFewStringFromFile(($e['trace'][0]['file']), $e['trace'][0]['line'])), ENT_QUOTES);
+
                     foreach ($e['trace'] as $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
@@ -262,6 +267,32 @@ EOF;
     }
 
     /**
+     * Get few strings from file.
+     **/
+    public function getFewStringFromFile($fileName, $desiredLine, $width = 15) {
+        $line_counter = 0;
+        $resultStr = '';
+
+        $fh = fopen($fileName,'r');
+        while (!feof($fh)) {
+            if ($s = fgets($fh,1048576)) {
+
+                ++$line_counter;
+
+                if ($line_counter >= ($desiredLine - $width) and $line_counter <= ($desiredLine + $width)) {
+                    $resultStr .= $line_counter === $desiredLine ? '!' : ' ';
+                    $resultStr .= $line_counter.' '.$s;
+                }
+
+            }
+        }
+
+        fclose($fh);
+
+        return $resultStr;
+    }
+
+    /**
      * Gets the stylesheet associated with the given exception.
      *
      * @param FlattenException $exception A FlattenException instance
@@ -289,6 +320,8 @@ EOF;
             .sf-reset .exception_counter { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; float: left; display: block; }
             .sf-reset .exception_title { margin-left: 3em; margin-bottom: 0.7em; display: block; }
             .sf-reset .exception_message { margin-left: 3em; display: block; }
+            .sf-reset .exception_file { margin: 1em 0 0 3em; display: block; }
+            .sf-reset .exception_file .exception_file_content { font-size: 10px; }
             .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
             .sf-reset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
                 border-bottom-right-radius: 16px;

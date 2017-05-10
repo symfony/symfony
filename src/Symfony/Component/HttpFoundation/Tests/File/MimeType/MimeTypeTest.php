@@ -79,6 +79,20 @@ class MimeTypeTest extends TestCase
         }
     }
 
+    public function testGuessWithCustomMagicFile()
+    {
+        $magicFile = __DIR__ . '/../../../Resources/magic';
+        $class     = "\Symfony\Component\HttpFoundation\File\MimeType\FileinfoMagicFileMimeTypeGuesser";
+        $guesser   = new $class($magicFile);
+
+        if (!$class::isSupported()) {
+            $this->markTestSkipped('Using custom magic file is not supported.');
+        }
+
+        $this->assertEquals('image/gif', $guesser->guess(__DIR__ . '/../Fixtures/test.gif'));
+        $this->assertEquals('image/gif', $guesser->guess(__DIR__ . '/../Fixtures/test'));
+    }
+
     public static function tearDownAfterClass()
     {
         $path = __DIR__.'/../Fixtures/to_delete';

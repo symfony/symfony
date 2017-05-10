@@ -26,11 +26,13 @@ interface LdapClientInterface extends LdapInterface
     /**
      * Find a username into ldap connection.
      *
-     * @param string $dn
-     * @param string $query
-     * @param mixed  $filter
+     * @param string  $dn
+     * @param string  $query
+     * @param mixed   $filter
+     * @param integer $maxItems
+     * @param integer $timeout
      *
      * @return array|null
      */
-    public function find($dn, $query, $filter = '*');
+    public function find($dn, $query, $filter = '*', $maxItems = 0, $timeout = 0);
 }

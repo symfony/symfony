@@ -92,7 +92,11 @@ class LdapClientTest extends LdapTestCase
         $this->ldap
             ->expects($this->once())
             ->method('query')
-            ->with('dc=foo,dc=com', 'bar', array('filter' => 'baz'))
+            ->with('dc=foo,dc=com', 'bar', array(
+                'filter' => 'baz',
+                'maxItems' => 0,
+                'timeout' => 0,
+            ))
             ->willReturn($query)
         ;
 

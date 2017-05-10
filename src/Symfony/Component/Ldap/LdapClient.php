@@ -58,11 +58,15 @@ final class LdapClient implements LdapClientInterface
     /**
      * {@inheritdoc}
      */
-    public function find($dn, $query, $filter = '*')
+    public function find($dn, $query, $filter = '*', $maxItems = 0, $timeout = 0)
     {
         @trigger_error('The "find" method is deprecated since version 3.1 and will be removed in 4.0. Use the "query" method instead.', E_USER_DEPRECATED);
 
-        $query = $this->ldap->query($dn, $query, array('filter' => $filter));
+        $query = $this->ldap->query($dn, $query, array(
+            'filter' => $filter,
+            'maxItems' => $maxItems,
+            'timeout' => $timeout,
+        ));
         $entries = $query->execute();
         $result = array(
             'count' => 0,

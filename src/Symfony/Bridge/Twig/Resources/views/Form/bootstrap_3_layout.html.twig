@@ -212,9 +212,18 @@
                 {% set label = name|humanize %}
             {%- endif -%}
         {% endif %}
-        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-            {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
-        </label>
+        {%- if label_attr.class is defined and ('checkbox-inline' in label_attr.class or 'radio-inline' in label_attr.class) -%}
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+                {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
+            </label>
+        {%- else -%}
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+                {{- label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
+            </label>
+            <div class="form-control" style="border: medium none; box-shadow: none;">
+                {{- widget|raw -}}
+            </div>
+        {%- endif -%}
     {% endif %}
 {% endblock checkbox_radio_label %}
 

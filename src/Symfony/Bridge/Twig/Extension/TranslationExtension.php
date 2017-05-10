@@ -14,9 +14,11 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransNamespaceTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationNamespaceNodeVisitor;
 
 /**
  * Provides integration of the Translation component with Twig.
@@ -72,6 +74,9 @@ class TranslationExtension extends \Twig_Extension
 
             // {% trans_default_domain "foobar" %}
             new TransDefaultDomainTokenParser(),
+
+            // {% trans_namespace "foo" %}
+            new TransNamespaceTokenParser(),
         );
     }
 
@@ -80,7 +85,7 @@ class TranslationExtension extends \Twig_Extension
      */
     public function getNodeVisitors()
     {
-        return array($this->translationNodeVisitor, new TranslationDefaultDomainNodeVisitor());
+        return array($this->translationNodeVisitor, new TranslationDefaultDomainNodeVisitor(), new TranslationNamespaceNodeVisitor());
     }
 
     public function getTranslationNodeVisitor()

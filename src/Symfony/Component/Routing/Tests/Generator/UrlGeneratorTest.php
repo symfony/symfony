@@ -252,6 +252,12 @@ class UrlGeneratorTest extends TestCase
         $this->getGenerator($routes)->generate('test', array('slug' => ''));
     }
 
+    public function testLookAroundInRequirements()
+    {
+        $routes = $this->getRoutes('test', new Route('/{foo}/bar/{baz}', array(), array('foo' => '.+(?=/bar/)', 'baz' => '.+?')));
+        $this->assertSame('/app.php/a/b/bar/c/d/e', $this->getGenerator($routes)->generate('test', array('foo' => 'a/b', 'baz' => 'c/d/e')));
+    }
+
     public function testSchemeRequirementDoesNothingIfSameCurrentScheme()
     {
         $routes = $this->getRoutes('test', new Route('/', array(), array(), array(), '', array('http')));

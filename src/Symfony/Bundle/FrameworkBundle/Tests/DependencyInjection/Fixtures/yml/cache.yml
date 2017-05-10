@@ -4,6 +4,7 @@ framework:
             cache.foo:
                 adapter: cache.adapter.apcu
                 default_lifetime: 30
+                namespace: 'foo_'
             cache.bar:
                 adapter: cache.adapter.doctrine
                 default_lifetime: 5
@@ -14,6 +15,7 @@ framework:
             cache.foobar:
                 adapter: cache.adapter.psr6
                 default_lifetime: 10
+                namespace: 'foobar_'
                 provider: app.cache_pool
             cache.def:
                 default_lifetime: 11

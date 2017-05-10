@@ -377,7 +377,8 @@ class Form extends Link implements \ArrayAccess
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
-                $form = $node->ownerDocument->getElementById($formId);
+                $xp = new \DOMXPath($node->ownerDocument);
+                $form = $xp->query("//*[@id='{$formId}']")->item(0);
                 if (null === $form) {
                     throw new \LogicException(sprintf('The selected node has an invalid form attribute (%s).', $formId));
                 }

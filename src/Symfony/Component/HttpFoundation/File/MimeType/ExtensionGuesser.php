@@ -30,7 +30,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      *
      * @var ExtensionGuesser
      */
-    private static $instance = null;
+    protected static $instance = null;
 
     /**
      * All registered ExtensionGuesserInterface instances.
@@ -46,17 +46,17 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      */
     public static function getInstance()
     {
-        if (null === self::$instance) {
-            self::$instance = new self();
+        if (null === static::$instance) {
+            static::$instance = new static();
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 
     /**
      * Registers all natively provided extension guessers.
      */
-    private function __construct()
+    protected function __construct()
     {
         $this->register(new MimeTypeExtensionGuesser());
     }

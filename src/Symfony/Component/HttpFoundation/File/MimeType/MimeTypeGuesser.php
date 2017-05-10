@@ -44,7 +44,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @var MimeTypeGuesser
      */
-    private static $instance = null;
+    protected static $instance = null;
 
     /**
      * All registered MimeTypeGuesserInterface instances.
@@ -60,11 +60,11 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      */
     public static function getInstance()
     {
-        if (null === self::$instance) {
-            self::$instance = new self();
+        if (null === static::$instance) {
+            static::$instance = new static();
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 
     /**
@@ -78,7 +78,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * Registers all natively provided mime type guessers.
      */
-    private function __construct()
+    protected function __construct()
     {
         if (FileBinaryMimeTypeGuesser::isSupported()) {
             $this->register(new FileBinaryMimeTypeGuesser());

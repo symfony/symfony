@@ -68,4 +68,30 @@ class BooleanToStringTransformerTest extends TestCase
         $this->assertTrue($this->transformer->reverseTransform(''));
         $this->assertFalse($this->transformer->reverseTransform(null));
     }
+
+    /**
+     * @return array
+     */
+    public function falsyValues()
+    {
+        return array(
+            array(false, 'false'),
+            array(false, 'no'),
+            array(false, '0'),
+            array(false, 'off'),
+
+            array(true, 'true'),
+            array(true, 'on'),
+            array(true, ''), // must be true for BC
+            array(true, 'symfony'),
+        );
+    }
+
+    /**
+     * @dataProvider falsyValues
+     */
+    public function testReverseTransformOnFalsyValues($expected, $value)
+    {
+        $this->assertEquals($expected, $this->transformer->reverseTransform($value));
+    }
 }

@@ -197,6 +197,12 @@ class FlattenException
             'args' => array(),
         );
         foreach ($trace as $entry) {
+            // Let's ignore traces from the vendor folder; they're usually not relevant.
+            if ((isset($entry['file']) && strpos($entry['file'],
+                    '/vendor/') !== false || isset($entry['type']) && $entry['type'] == '->')
+            ) {
+                continue;
+            }
             $class = '';
             $namespace = '';
             if (isset($entry['class'])) {

@@ -215,7 +215,14 @@ class ExceptionHandler
             try {
                 $count = count($exception->getAllPrevious());
                 $total = $count + 1;
-                foreach ($exception->toArray() as $position => $e) {
+                $exceptionArray = $exception->toArray();
+                $skipVendorTraces = true;
+
+                if (strpos($exceptionArray[0]['trace'][0]['file'], '/vendor/') > -1) {
+                    $skipVendorTraces = false;
+                }
+
+                foreach ($exceptionArray as $position => $e) {
                     $ind = $count - $position + 1;
                     $class = $this->formatClass($e['class']);
                     $message = nl2br($this->escapeHtml($e['message']));
@@ -231,6 +238,9 @@ class ExceptionHandler
 EOF
                         , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
                     foreach ($e['trace'] as $trace) {
+                        if ($skipVendorTraces === true && strpos($trace['file'], '/vendor/') > -1) {
+                            continue;
+                        }
                         $content .= '       <li>';
                         if ($trace['function']) {
                             $content .= sprintf('at %s%s%s(%s)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));

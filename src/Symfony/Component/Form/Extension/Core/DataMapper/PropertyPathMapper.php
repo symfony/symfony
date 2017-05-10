@@ -89,8 +89,9 @@ class PropertyPathMapper implements DataMapperInterface
 
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
-                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {
-                    $this->propertyAccessor->setValue($data, $propertyPath, $form->getData());
+                $formData = $form->getData();
+                if (null !== $formData && (!is_object($formData) || !$config->getByReference() || $formData !== $this->propertyAccessor->getValue($data, $propertyPath))) {
+                    $this->propertyAccessor->setValue($data, $propertyPath, $formData);
                 }
             }
         }

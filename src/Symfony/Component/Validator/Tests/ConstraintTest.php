@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintAValidator;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintC;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithValue;
@@ -118,6 +119,15 @@ class ConstraintTest extends TestCase
         $constraint = new ConstraintC(array('option1' => 'default'));
 
         $this->assertSame('default', $constraint->option1);
+    }
+
+    public function testSetValidatedByPropertyAsOption()
+    {
+        $validatorClass = get_class(new ConstraintAValidator());
+
+        $constraint = new ConstraintB(array('validatedBy' => $validatorClass));
+
+        $this->assertEquals($validatorClass, $constraint->validatedBy());
     }
 
     public function testGroupsAreConvertedToArray()

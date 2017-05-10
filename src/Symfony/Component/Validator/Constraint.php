@@ -89,6 +89,12 @@ abstract class Constraint
     }
 
     /**
+     * The class that validates this constraint
+     * @var string
+     */
+    protected $validatedBy;
+
+    /**
      * Initializes the constraint with options.
      *
      * You should pass an associative array. The keys should be the names of
@@ -265,14 +271,14 @@ abstract class Constraint
      * Returns the name of the class that validates this constraint.
      *
      * By default, this is the fully qualified name of the constraint class
-     * suffixed with "Validator". You can override this method to change that
-     * behaviour.
+     * suffixed with "Validator". You can pass the "validatedBy" option or
+     * override this method to change that behaviour.
      *
      * @return string
      */
     public function validatedBy()
     {
-        return get_class($this).'Validator';
+        return $this->validatedBy !== null ? $this->validatedBy : get_class($this).'Validator';
     }
 
     /**

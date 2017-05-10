@@ -25,6 +25,14 @@ use Symfony\Component\Console\Question\Question;
  */
 class QuestionHelperTest extends AbstractQuestionHelperTest
 {
+    protected static $fixturesPath;
+
+    public static function setUpBeforeClass()
+    {
+        self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
+        require_once self::$fixturesPath.'/ChoiceObject.php';
+    }
+
     public function testAskChoice()
     {
         $questionHelper = new QuestionHelper();
@@ -354,6 +362,27 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
             array('env_3', 'env_3'),
             array('My environment 1', 'env_1'),
         );
+    }
+
+    public function testSelectObjectFromChoiceList()
+    {
+        $possibleChoices = array(
+            0 => new \ChoiceObject('No Environment'),
+            1 => new \ChoiceObject('My Environment 1'),
+            2 => new \ChoiceObject('My Environment 2'),
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("1\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
+
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($possibleChoices[1], $answer);
     }
 
     public function testNoInteraction()

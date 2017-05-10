@@ -57,6 +57,7 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
+            new ResolveArrayIterablesPass(),
             new AutowirePass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),

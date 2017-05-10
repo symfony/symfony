@@ -133,9 +133,29 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Unregisters the exception handler.
+     *
+     * @param Event|null $event The triggering event
+     */
+    public function terminate(Event $event = null)
+    {
+        if ($event instanceof KernelEvent) {
+            $handler = set_exception_handler('var_dump');
+            $handler = is_array($handler) ? $handler[0] : null;
+            restore_exception_handler();
+            if ($handler instanceof ErrorHandler) {
+                $handler->setExceptionHandler(null);
+            }
+        }
+    }
+
     public static function getSubscribedEvents()
     {
-        $events = array(KernelEvents::REQUEST => array('configure', 2048));
+        $events = array(
+            KernelEvents::REQUEST => array('configure', 2048),
+            KernelEvents::TERMINATE => array('terminate', 2048),
+        );
 
         if ('cli' === PHP_SAPI && defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
             $events[ConsoleEvents::COMMAND] = array('configure', 2048);

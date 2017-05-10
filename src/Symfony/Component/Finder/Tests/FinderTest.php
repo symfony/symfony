@@ -677,6 +677,38 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
+    public function testFirst()
+    {
+        $finder = $this->buildFinder();
+        $finder->files()->in(self::$tmpDir);
+
+        $firstFile = $finder->first();
+        $this->assertInstanceOf(\SplFileInfo::class, $firstFile);
+        $firstPath = str_replace('/', DIRECTORY_SEPARATOR, $finder->first()->getPathname());
+
+        $path = $this->toAbsolute(array('foo/bar.tmp'))[0];
+        str_replace('/', DIRECTORY_SEPARATOR, $path);
+
+        $this->assertEquals($path, $firstPath);
+
+        // call a second time to make sure we still get the first result
+        $firstFile = $finder->first();
+        $this->assertInstanceOf(\SplFileInfo::class, $firstFile);
+        $firstPath = str_replace('/', DIRECTORY_SEPARATOR, $finder->first()->getPathname());
+
+        $this->assertEquals($path, $firstPath);
+    }
+
+    public function testFirstReturnsNull()
+    {
+        $finder = $this->buildFinder();
+        $finder->files()->in(self::$tmpDir);
+        $finder->name('nosuchfile.php');
+
+        $firstFile = $finder->first();
+        $this->assertNull($firstFile);
+    }
+
     protected function buildFinder()
     {
         return Finder::create();

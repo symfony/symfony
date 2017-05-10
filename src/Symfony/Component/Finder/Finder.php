@@ -624,6 +624,18 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the first file matched by this finder.
+     *
+     * @return SplFileInfo|null
+     */
+    public function first()
+    {
+        foreach ($this as $file) {
+            return $file;
+        }
+    }
+
+    /**
      * @param $dir
      *
      * @return \Iterator

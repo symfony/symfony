@@ -18,7 +18,14 @@ namespace Symfony\Component\BrowserKit;
  */
 class History
 {
+    /**
+     * @var array
+     */
     protected $stack = array();
+
+    /**
+     * @var int
+     */
     protected $position = -1;
 
     /**

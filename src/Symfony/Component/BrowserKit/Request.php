@@ -18,12 +18,39 @@ namespace Symfony\Component\BrowserKit;
  */
 class Request
 {
+    /**
+     * @var string
+     */
     protected $uri;
+
+    /**
+     * @var string
+     */
     protected $method;
+
+    /**
+     * @var array
+     */
     protected $parameters;
+
+    /**
+     * @var array
+     */
     protected $files;
+
+    /**
+     * @var array
+     */
     protected $cookies;
+
+    /**
+     * @var array
+     */
     protected $server;
+
+    /**
+     * @var string
+     */
     protected $content;
 
     /**

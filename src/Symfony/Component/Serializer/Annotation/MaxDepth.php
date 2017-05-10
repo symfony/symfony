@@ -41,6 +41,9 @@ class MaxDepth
         $this->maxDepth = $data['value'];
     }
 
+    /**
+     * @return int
+     */
     public function getMaxDepth()
     {
         return $this->maxDepth;

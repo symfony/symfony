@@ -146,7 +146,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         // this was tested on, no exception was thrown for such invalid
         // statements, consequently no test fails when this code is removed.
         // https://github.com/symfony/symfony/pull/8981#issuecomment-24230557
-        if (empty($values)) {
+        if (empty($values) || $values === array('')) {
             return array();
         }
 

@@ -56,6 +56,16 @@ class DoctrineDummy
     private $time;
 
     /**
+     * @Column(type="time_immutable")
+     */
+    private $timeImmutable;
+
+    /**
+     * @Column(type="dateinterval")
+     */
+    private $dateInterval;
+
+    /**
      * @Column(type="json_array")
      */
     private $json;

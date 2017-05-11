@@ -108,7 +108,8 @@ abstract class FileLoader extends BaseFileLoader
             if (!$r = $this->container->getReflectionClass($class)) {
                 throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
             }
-            if (!$r->isInterface() && !$r->isTrait()) {
+
+            if (!$r->isInterface() && !$r->isTrait() && !$r->isAbstract()) {
                 $classes[] = $class;
             }
         }

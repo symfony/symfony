@@ -92,7 +92,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         // Re-build bundle manually to initialize DI extensions that can be extended by other bundles in their build() method
         // as this method is not called when the container is loaded from the cache.
         $container = $this->getContainerBuilder();
-        $bundles = $this->getContainer()->get('kernel')->registerBundles();
+        $bundles = $this->getContainer()->get('kernel')->getBundles();
         foreach ($bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);

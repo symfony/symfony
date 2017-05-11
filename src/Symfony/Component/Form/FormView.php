@@ -153,4 +153,28 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         return count($this->children);
     }
+
+    /**
+     * Gets the displayed data in its simplest format.
+     *
+     * @return array|string The displayed data
+     */
+    public function getDisplayedData()
+    {
+        return self::mapDisplayedData($this);
+    }
+
+    static private function mapDisplayedData(FormView $view)
+    {
+        if (!$view->hasChildren()) {
+            return $view->get('value');
+        }
+
+        $data = array();
+        foreach ($view as $key => $value) {
+            $data[$key] = self::mapDisplayedData($value);
+        }
+
+        return $data;
+    }
 }

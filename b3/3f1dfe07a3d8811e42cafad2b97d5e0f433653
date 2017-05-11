@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-11T09:46:11Z
+
+I just changed away from `->isInstantiable()` to allow for private constructors. Interfaces, traits and abstract classes can *never* be instantiated - it would *never* make sense for those to be services on their own. However, a class with a private constructor *is* still a class that could be instantiated. In theory, I could load a directory full of these, then use `_instanceof` to configure all of them to use a factory. Qualitatively, they're different than interfaces, traits, abstract classes. I think this way is the "proper", not-too-clever solution.

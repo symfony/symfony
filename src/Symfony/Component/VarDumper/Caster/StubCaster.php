@@ -29,8 +29,10 @@ class StubCaster
             $stub->handle = $c->handle;
             $stub->cut = $c->cut;
 
-            return array();
+            $a = array();
         }
+
+        return $a;
     }
 
     public static function cutInternals($obj, array $a, Stub $stub, $isNested)

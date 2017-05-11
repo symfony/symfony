@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-09T10:19:11Z
+
+Ping @GuilhemN (I'm AFK, can't review myself)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-09T16:17:04Z
+
+Same thought about the class exists check that makes things context sensitive. Yet, since this throws, it looks like a good balance for DX, yelling at compile time is nice.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-10T13:18:45Z
+
+Code and test updated for nullable!

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -31,12 +32,33 @@ class AutowirePass extends AbstractRecursivePass
     private $ambiguousServiceTypes = array();
     private $autowired = array();
     private $lastFailure;
+    private $throwOnAutowiringException;
+    private $autowiringExceptions = array();
+
+    /**
+     * @param bool $throwOnAutowireException If false, retrieved errors via getAutowiringExceptions
+     */
+    public function __construct($throwOnAutowireException = true)
+    {
+        $this->throwOnAutowiringException = $throwOnAutowireException;
+    }
+
+    /**
+     * @return AutowiringFailedException[]
+     */
+    public function getAutowiringExceptions()
+    {
+        return $this->autowiringExceptions;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
+        // clear out any possibly stored exceptions from before
+        $this->autowiringExceptions = array();
+
         try {
             parent::process($container);
         } finally {
@@ -75,6 +97,21 @@ class AutowirePass extends AbstractRecursivePass
      * {@inheritdoc}
      */
     protected function processValue($value, $isRoot = false)
+    {
+        try {
+            return $this->doProcessValue($value, $isRoot);
+        } catch (AutowiringFailedException $e) {
+            if ($this->throwOnAutowiringException) {
+                throw $e;
+            }
+
+            $this->autowiringExceptions[] = $e;
+
+            return parent::processValue($value, $isRoot);
+        }
+    }
+
+    private function doProcessValue($value, $isRoot = false)
     {
         if ($value instanceof TypedReference) {
             if ($ref = $this->getAutowiredReference($value)) {
@@ -190,7 +227,7 @@ class AutowirePass extends AbstractRecursivePass
 
             if (!$reflectionMethod->isPublic()) {
                 $class = $reflectionClass->name;
-                throw new RuntimeException(sprintf('Cannot autowire service "%s": method "%s()" must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
+                throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": method "%s()" must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
             }
             $methodCalls[] = array($method, $this->autowireMethod($reflectionMethod, array()));
         }
@@ -231,7 +268,7 @@ class AutowirePass extends AbstractRecursivePass
 
                 // no default value? Then fail
                 if (!$parameter->isDefaultValueAvailable()) {
-                    throw new RuntimeException(sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
+                    throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
                 }
 
                 // specifically pass the default value
@@ -246,7 +283,7 @@ class AutowirePass extends AbstractRecursivePass
                 if ($parameter->isDefaultValueAvailable()) {
                     $value = $parameter->getDefaultValue();
                 } elseif (!$parameter->allowsNull()) {
-                    throw new RuntimeException($failureMessage);
+                    throw new AutowiringFailedException($this->currentId, $failureMessage);
                 }
                 $this->container->log($this, $failureMessage);
             }
@@ -407,15 +444,18 @@ class AutowirePass extends AbstractRecursivePass
         $argumentDefinition->setAutowired(true);
 
         try {
+            $originalThrowSetting = $this->throwOnAutowiringException;
+            $this->throwOnAutowiringException = true;
             $this->processValue($argumentDefinition, true);
             $this->container->setDefinition($argumentId, $argumentDefinition);
-        } catch (RuntimeException $e) {
+        } catch (AutowiringFailedException $e) {
             $this->autowired[$type] = false;
             $this->lastFailure = $e->getMessage();
             $this->container->log($this, $this->lastFailure);
 
             return;
         } finally {
+            $this->throwOnAutowiringException = $originalThrowSetting;
             $this->currentId = $currentId;
         }
 

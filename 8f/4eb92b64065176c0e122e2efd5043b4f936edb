@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-04-13T08:27:35Z
+
+Please also add a test with an empty ArrayObject or stdClass, to ensure it keeps being dumped as `{}` and not `[]`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-04-13T08:47:56Z
+
+done
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T09:13:07Z
+
+Hi, I'm not sure is the best approach to solve the issue.
+The following test will fail:
+
+```php
+// currently fails
+public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
+{
+    $deep = new \ArrayObject(array('d', 'e'));
+    $inner = new \ArrayObject(array('b', 'c', $deep));
+    $outer = new \ArrayObject(array('a', $inner));
+
+    $yaml = $this->dumper->dump($outer, 2, 0, Yaml::DUMP_OBJECT_AS_MAP);
+    $expected = <<<YAML
+0: a
+1:
+    0: b
+    1: c
+    2: { 0: d, 1: e }
+
+YAML;
+    $this->assertEquals($expected, $yaml);
+}
+// This works with 3.1 branch
+public function testDumpingArrayObjectInstancesWithNumericKeysInlined()
+{
+    $deep = new \ArrayObject(array('d', 'e'));
+    $inner = new \ArrayObject(array('b', 'c', $deep));
+    $outer = new \ArrayObject(array('a', $inner));
+
+    $yaml = $this->dumper->dump($outer, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
+    $expected = <<<YAML
+{ 0: a, 1: { 0: b, 1: c, 2: { 0: d, 1: e } } }
+
+YAML;
+    $this->assertEquals($expected, $yaml);
+}
+```
+
+and the strategy  (casting array object ot array) will make really hard (if not impossible) to solve this case
+
+and with the current strategy, https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Yaml/Inline.php#L176 is never reached since `castObjectToArray` removes all the `ArrarObject` instances
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T09:22:31Z
+
+I will also try to find a solution
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-04-13T09:33:37Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T11:23:10Z
+
+Here is my version of the fix https://github.com/symfony/symfony/pull/22419
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T11:45:22Z
+
+Question: why https://github.com/symfony/symfony/pull/21471 is considered  as a new feature? IMO should be a bugfix and included in the 3.2 branch.
+Empty arrays should be serialized as `[ ]`, and empty arrayobject instances should be serialized as `{ }`. The same behavior is used with `json_encode`.
+
+The only feature in #21471 should be [this](https://github.com/symfony/symfony/pull/21471#discussion_r98668770) that allows to dump an empty arrayobject (or a stdclass) as `[ ]` instead of `{ }`
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-13T13:23:52Z
+
+> Question: why #21471 is considered as a new feature?
+
+This relies on adding a new constant for the configuration flag => this is a new feature for the component
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T13:26:31Z
+
+@xabbuh  did you check my work at https://github.com/symfony/symfony/issues/22419
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T13:26:46Z
+
+@stof  i see, thanks
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T13:31:44Z
+
+@xabbuh if this is the candidate PR to be merged, do you mind adding:
+
+```php
+    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
+    {
+        $deep = new \ArrayObject(array('d', 'e'));
+        $inner = new \ArrayObject(array('b', 'c', $deep));
+        $outer = new \ArrayObject(array('a', $inner));
+        $yaml = $this->dumper->dump($outer, 2, 0, Yaml::DUMP_OBJECT_AS_MAP);
+        $expected = <<<YAML
+0: a
+1:
+    0: b
+    1: c
+    2: { 0: d, 1: e }
+YAML;
+        $this->assertEquals($expected, $yaml);
+    }
+```
+?
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T15:55:58Z
+
+Did not know `stdClass` can be used in a `foreach` loop. Looks to be "iterable" even if `is_iterable` says is not https://3v4l.org/bY9IC
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-13T15:59:49Z
+
+@goetas it does not pass the `iterable` typehint either. but iterating over a non-iterable object iterates over public properties in PHP.
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-13T16:01:13Z
+
+@stof Is so beautiful to learn things about PHP every day after so many years :relaxed:
+
+---------------------------------------------------------------------------
+
+by stof at 2017-04-13T16:01:48Z
+
+See https://3v4l.org/tu1Z0 for the proof btw
+
+---------------------------------------------------------------------------
+
+by goetas at 2017-04-17T21:05:16Z
+
+Do this PR need still work?
+
+For me is :+1:

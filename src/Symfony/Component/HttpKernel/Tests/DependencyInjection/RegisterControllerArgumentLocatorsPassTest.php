@@ -204,6 +204,68 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $this->assertSame(array('foo:fooAction'), array_keys($locator));
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClass". Did you forget to add a use statement?
+     */
+    public function testExceptionOnNonExistentTypeHint()
+    {
+        $container = new ContainerBuilder();
+        $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', NonExistentClassController::class)
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".
+     */
+    public function testExceptionOnNonExistentTypeHintDifferentNamespace()
+    {
+        $container = new ContainerBuilder();
+        $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', NonExistentClassDifferentNamespaceController::class)
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+    }
+
+    public function testNoExceptionOnNonExistentTypeHintOptionalArg()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', NonExistentClassOptionalController::class)
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertSame(array('foo:barAction', 'foo:fooAction'), array_keys($locator));
+    }
+
+    public function testArgumentWithNoTypeHintIsOk()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', ArgumentWithoutTypeController::class)
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertEmpty(array_keys($locator));
+    }
 }
 
 class RegisterTestController
@@ -232,4 +294,36 @@ class ContainerAwareRegisterTestController implements ContainerAwareInterface
 
 class ControllerDummy
 {
+}
+
+class NonExistentClassController
+{
+    public function fooAction(NonExistentClass $nonExistent)
+    {
+    }
+}
+
+class NonExistentClassDifferentNamespaceController
+{
+    public function fooAction(\Acme\NonExistentClass $nonExistent)
+    {
+    }
+}
+
+class NonExistentClassOptionalController
+{
+    public function fooAction(NonExistentClass $nonExistent = null)
+    {
+    }
+
+    public function barAction(NonExistentClass $nonExistent = null, $bar)
+    {
+    }
+}
+
+class ArgumentWithoutTypeController
+{
+    public function fooAction($someArg)
+    {
+    }
 }

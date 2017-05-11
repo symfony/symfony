@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -104,6 +105,13 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->hasDefinition('twig.extension.expression')) {
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
+        }
+
+        $container->addResource(new ClassExistenceResource(Workflow::class));
+        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
+            $container->removeDefinition('workflow.twig_extension');
+        } else {
+            $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
         }
     }
 }

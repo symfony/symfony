@@ -156,7 +156,7 @@ class Table
      */
     public function setColumnStyle($columnIndex, $name)
     {
-        $columnIndex = intval($columnIndex);
+        $columnIndex = (int) $columnIndex;
 
         $this->columnStyles[$columnIndex] = $this->resolveStyle($name);
 
@@ -191,7 +191,7 @@ class Table
      */
     public function setColumnWidth($columnIndex, $width)
     {
-        $this->columnWidths[intval($columnIndex)] = intval($width);
+        $this->columnWidths[(int) $columnIndex] = (int) $width;
 
         return $this;
     }

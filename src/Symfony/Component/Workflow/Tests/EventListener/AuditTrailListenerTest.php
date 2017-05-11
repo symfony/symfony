@@ -8,8 +8,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\EventListener\AuditTrailListener;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
-use Symfony\Component\Workflow\Tests\createSimpleWorkflowDefinition;
-use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
 class AuditTrailListenerTest extends TestCase

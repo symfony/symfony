@@ -115,6 +115,10 @@
             <tag name="translation.extractor" alias="twig" />
         </service>
 
+        <service id="workflow.twig_extension" class="Symfony\Bridge\Twig\Extension\WorkflowExtension">
+            <argument type="service" id="workflow.registry" />
+        </service>
+
         <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener" public="true">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />

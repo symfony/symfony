@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/console": "~2.8.8|~3.0.8|~3.1.2|~3.2",
+        "symfony/http-kernel": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0"
     },
     "autoload": {
@@ -25,6 +26,9 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<3.3"
     },
     "minimum-stability": "dev",
     "extra": {

@@ -79,28 +79,13 @@ class FirewallMap implements FirewallMapInterface, EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FinishRequestEvent $event
-     */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        $this->detachListeners($event->getRequest());
+        unset($this->contexts[$event->getRequest()]);
     }
 
     /**
-     * Cleans up the internal state of the firewall map.
-     *
-     * @param Request $request
-     */
-    private function detachListeners(Request $request)
-    {
-        unset($this->contexts[$request]);
-    }
-
-    /**
-     * Get subscribed events.
-     *
-     * @return array Subscribed events
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

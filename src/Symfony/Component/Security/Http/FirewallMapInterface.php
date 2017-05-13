@@ -35,11 +35,4 @@ interface FirewallMapInterface
      * @return array of the format array(array(AuthenticationListener), ExceptionListener)
      */
     public function getListeners(Request $request);
-
-    /**
-     * Cleans up the internal state of the firewall map.
-     *
-     * @param Request $request
-     */
-    public function detachListeners(Request $request);
 }

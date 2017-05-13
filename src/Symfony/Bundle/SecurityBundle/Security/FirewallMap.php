@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -50,14 +51,6 @@ class FirewallMap implements FirewallMapInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function detachListeners(Request $request)
-    {
-        unset($this->contexts[$request]);
-    }
-
-    /**
      * @return FirewallConfig|null
      */
     public function getFirewallConfig(Request $request)
@@ -82,5 +75,23 @@ class FirewallMap implements FirewallMapInterface
                 return $this->contexts[$request] = $this->container->get($contextId);
             }
         }
+    }
+
+    /**
+     * @param FinishRequestEvent $event
+     */
+    public function onKernelFinishRequest(FinishRequestEvent $event)
+    {
+        $this->detachListeners($event->getRequest());
+    }
+
+    /**
+     * Cleans up the internal state of the firewall map.
+     *
+     * @param Request $request
+     */
+    private function detachListeners(Request $request)
+    {
+        unset($this->contexts[$request]);
     }
 }

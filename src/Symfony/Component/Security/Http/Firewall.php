@@ -78,8 +78,6 @@ class Firewall implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $this->map->detachListeners($event->getRequest());
-
         if (isset($this->exceptionListeners[$request])) {
             $this->exceptionListeners[$request]->unregister($this->dispatcher);
             unset($this->exceptionListeners[$request]);

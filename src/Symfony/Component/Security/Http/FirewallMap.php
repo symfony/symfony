@@ -48,16 +48,4 @@ class FirewallMap implements FirewallMapInterface
 
         return array(array(), null);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detachListeners(Request $request)
-    {
-        foreach ($this->map as $key => $elements) {
-            if (null === $elements[0] || $elements[0]->matches($request)) {
-                unset($this->map[$key]);
-            }
-        }
-    }
 }

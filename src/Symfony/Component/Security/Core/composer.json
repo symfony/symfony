@@ -17,8 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/polyfill-php56": "~1.0",
-        "symfony/polyfill-util": "~1.0"
+        "symfony/polyfill-php56": "~1.0"
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.8|~3.0",

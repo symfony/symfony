@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -89,6 +90,9 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             return $user;
         } catch (UsernameNotFoundException $e) {
             $e->setUsername($username);
+            throw $e;
+        } catch (AccountStatusException $e) {
+            $e->setToken($token);
             throw $e;
         } catch (\Exception $e) {
             $e = new AuthenticationServiceException($e->getMessage(), 0, $e);

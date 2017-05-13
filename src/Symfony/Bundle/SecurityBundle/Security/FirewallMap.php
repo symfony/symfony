@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -93,5 +94,17 @@ class FirewallMap implements FirewallMapInterface
     private function detachListeners(Request $request)
     {
         unset($this->contexts[$request]);
+    }
+
+    /**
+     * Get subscribed events.
+     *
+     * @return array Subscribed events
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
+        );
     }
 }

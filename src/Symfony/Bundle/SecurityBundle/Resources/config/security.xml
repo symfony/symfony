@@ -68,6 +68,7 @@
         <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" public="true">
             <argument type="service" id="request_stack" />
         </service>
+        <service id="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" alias="security.authentication_utils" />
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager">

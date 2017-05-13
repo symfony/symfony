@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-13T10:33:25Z
+
+Ah, so it was introduced in 3.2 (without any `public` attribute), then when it merged up, it naturally became private.
+
+👍

@@ -143,7 +143,7 @@ class XmlFileLoader extends FileLoader
         foreach ($services as $service) {
             if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
                 if ('prototype' === $service->tagName) {
-                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'));
+                    $this->registerClasses($definition, (string) $service->getAttribute('namespace'), (string) $service->getAttribute('resource'), (string) $service->getAttribute('exclude'));
                 } else {
                     $this->setDefinition((string) $service->getAttribute('id'), $definition);
                 }

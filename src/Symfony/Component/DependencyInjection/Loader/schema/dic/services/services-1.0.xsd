@@ -161,6 +161,7 @@
     </xsd:choice>
     <xsd:attribute name="namespace" type="xsd:string" use="required" />
     <xsd:attribute name="resource" type="xsd:string" use="required" />
+    <xsd:attribute name="exclude" type="xsd:string" />
     <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="lazy" type="boolean" />

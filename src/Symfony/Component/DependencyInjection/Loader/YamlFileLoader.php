@@ -61,6 +61,7 @@ class YamlFileLoader extends FileLoader
 
     private static $prototypeKeywords = array(
         'resource' => 'resource',
+        'exclude' => 'exclude',
         'parent' => 'parent',
         'shared' => 'shared',
         'lazy' => 'lazy',
@@ -528,7 +529,8 @@ class YamlFileLoader extends FileLoader
             if (!is_string($service['resource'])) {
                 throw new InvalidArgumentException(sprintf('A "resource" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
             }
-            $this->registerClasses($definition, $id, $service['resource']);
+            $exclude = isset($service['exclude']) ? $service['exclude'] : null;
+            $this->registerClasses($definition, $id, $service['resource'], $exclude);
         } else {
             $this->setDefinition($id, $definition);
         }

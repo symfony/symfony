@@ -1,0 +1,143 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-09T16:21:13Z
+
+You don't have to use a single psr4 block. You can have several, one per sub namespace, no? This would still be less config lines than 3.2-style config, no? Thus, not sure about the "bug fix" part. Registering everything as a service by default looks strange.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-10T11:32:56Z
+
+@nicolas-grekas if you create lots of different subnamespaces to organize your code, most of these subnamespaces will be about services (as you will keep the entities grouped somewhere to avoid making your Doctrine ORM config totally crazy).
+So this looks like a sensible case IMO.
+
+Adding 1 PSR-4 rule per subnamespace still requires listing them all one-by-one (and remembering to add the new subnamespace in the list when adding one)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-10T11:55:53Z
+
+Looking at https://github.com/symfony/symfony-standard/issues/1070, I think like it. I'm mostly challenging the bug fix nature of the PR. Maybe I shouldn't :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-10T11:57:51Z
+
+Should the pattern be matched against the path or the class? That's not obvious to me.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-10T12:52:27Z
+
+> Should the pattern be matched against the path or the class? That's not obvious to me.
+
+The `exclude` is against the file path (not the class) to be consistent with `resource` (and to allow you to skip a random `functions.php` file that may not include any classes). Hopefully the default example in symfony/symfony-standard#1070 will make this obvious. Or we could rename to `exclude_paths` (or some other idea?).
+
+> I'm mostly challenging the bug fix nature of the PR. Maybe I shouldn't :)
+
+I chose bug in part because I think this is important for 3.3 :). Well, specifically, I think symfony/symfony-standard#1070 is important for 3.3, and this is needed. But also, if you have 40 directories, listing them all one-by-one *just* to avoid `Entity` really sucks :).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-11T13:37:10Z
+
+Nice feature ... but the proposed syntax looks confusing:
+
+```
+AppBundle\:
+    resource: '../../src/*'
+    exclude: '^Entity'
+```
+
+The `^Entity` config means *"not Entity/"*, so *"exclude ^Entity/"* looks like a double negation and I understand it as "exclude not Entity/" ... so "exclude everything except Entity/".
+
+If the option name is already "exclude", why can't we use positive glob expressions for it?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-11T14:00:04Z
+
+@javiereguiluz The exclude option is a regex, not a glob so `^` means start of the string.
+
+Maybe the proposition should be updated to use a glob for the exclude part to, it's strange to use a glob for the resource key and a regex for the exclude key.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-11T14:02:03Z
+
+@jvasseur thanks! So I was confused ... but for the wrong reasons 😵   I agree that this should be a glob, just like the resource key.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-11T15:48:25Z
+
+You're lacking `|` using glob, which is used in https://github.com/symfony/symfony-standard/issues/1070.
+Allowing an array could be a solution but would not be consistent in XML (`resource` an attribute, `exclude` a tag...).
+We could also extend the glob syntax and support `|` but I'm not sure this would be accepted...
+
+Do you have another idea?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-11T15:54:48Z
+
+@GuilhemN glob syntax has an equivalent to `|`: `{,}`.
+
+symfony/symfony-standard#1070 would become `{AppBundle.php,Entity,Repository}` using a glob. (or maybe `../../src/{AppBundle.php,Entity,Repository}` to have a path relative  to the current file).
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-11T15:56:25Z
+
+Right, I didn't think about this possibility!
+:+1: for using glob then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-11T17:51:35Z
+
+@weaverryan For consistency, I'm also for using globs instead of regexes.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-12T17:53:07Z
+
+Updated to use glob! Great idea (seems obvious in hindsight). PR example updated to show its usage. Tests are passing - the one failure is also failing on master.
+
+I used the full path for the `exclude`, but if we like it better, we should be able to make it relative:
+
+```yml
+resource: '../../src/AppBundle/*'
+
+# current
+exclude: '../../src/AppBundle/{AppBundle.php,Entity}'
+
+# but we could possibly shorten if we want
+exclude: {AppBundle.php,Entity}`
+```
+
+What we have now is a bit longer... but it also looks really clear.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-12T17:58:43Z
+
+100% agree with the long version. We should throw an exception when "exclude" does not share the same prefix  than with "resource"
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-13T01:00:56Z
+
+Ok, long version it is then! I added a 2nd commit that throws an exception if the `exclude` prefix is not a sub-set of the `resource` prefix.
+
+Anything else? Also, this PR will fix a "bug" / "bad error" caused by autowiring in some cases (https://github.com/symfony/symfony-standard/pull/1070#issuecomment-301138507).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-13T10:39:50Z
+
+I've removed `realpath` entirely and simply replaced windows `\` with `/`.
+
+The `resource` paths and `exclude` paths simply need to be consistent, so we can match them up. They should already be consistent in most cases, but based on where you put your wildcard, you could have paths in `exclude` whose slashes don't *quite* match up with the `resource` slashes. Flipping all the slashes for purposes of matching should work beautifully.
+
+So, things should be good now!

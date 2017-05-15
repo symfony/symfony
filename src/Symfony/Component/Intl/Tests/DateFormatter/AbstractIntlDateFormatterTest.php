@@ -228,15 +228,8 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array('s', 43200, '0'), // 12 hours
 
             // general
-            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT'),
-            array('K:mm a, z', 0, '0:00 AM, GMT'),
-
-            // timezone
-            array('z', 0, 'GMT'),
-            array('zz', 0, 'GMT'),
-            array('zzz', 0, 'GMT'),
-            array('zzzz', 0, 'GMT'),
-            array('zzzzz', 0, 'GMT'),
+            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 UTC'),
+            array('K:mm a, z', 0, '0:00 AM, UTC'),
 
             // general, DateTime
             array('y-M-d', $dateTime, '1970-1-1'),

@@ -32,7 +32,6 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     /**
      * @dataProvider formatTimezoneProvider
-     * @requires PHP 5.5
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {

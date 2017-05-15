@@ -135,7 +135,7 @@ class ChoiceQuestion extends Question
 
             if ($multiselect) {
                 // Check for a separated comma values
-                if (!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
+                if (!preg_match('/^[^,]+(?:,[^,]+)*$/', $selectedChoices, $matches)) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $selected));
                 }
                 $selectedChoices = explode(',', $selectedChoices);

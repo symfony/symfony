@@ -249,6 +249,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         return $this->expressionLanguage;
     }
 
+    /**
+     * @internal
+     */
     protected function createRequest($pathinfo)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {

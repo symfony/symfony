@@ -299,8 +299,8 @@ class QuestionHelperTest extends TestCase
     public function specialCharacterInMultipleChoice()
     {
         return array(
-            array('.', ['.']),
-            array('., src', ['.', 'src']),
+            array('.', array('.')),
+            array('., src', array('.', 'src')),
         );
     }
 

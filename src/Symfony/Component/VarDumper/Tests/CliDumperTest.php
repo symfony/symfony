@@ -258,7 +258,6 @@ EOTXT
                 }
             };'),
         ));
-        $line = __LINE__ - 2;
         $ref = (int) $out;
 
         $data = $cloner->cloneVar($out);
@@ -292,7 +291,7 @@ stream resource {@{$ref}
         :     \$this->display(\$context);
         : } catch (%s \$e) {
       }
-      %sCliDumperTest.php:{$line}: {
+      %sCliDumperTest.php:%d: {
 %A
       }
     }

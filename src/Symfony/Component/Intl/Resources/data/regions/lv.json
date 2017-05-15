@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.28.79",
+    "Version": "2.1.32.59",
     "Names": {
         "AC": "Debesbraukšanas sala",
         "AD": "Andora",
@@ -56,7 +56,7 @@
         "CW": "Kirasao",
         "CX": "Ziemsvētku sala",
         "CY": "Kipra",
-        "CZ": "Čehijas Republika",
+        "CZ": "Čehija",
         "DE": "Vācija",
         "DG": "Djego Garsijas atols",
         "DJ": "Džibutija",
@@ -111,7 +111,7 @@
         "IO": "Indijas okeāna Britu teritorija",
         "IQ": "Irāka",
         "IR": "Irāna",
-        "IS": "Īslande",
+        "IS": "Islande",
         "IT": "Itālija",
         "JE": "Džērsija",
         "JM": "Jamaika",

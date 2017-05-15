@@ -228,26 +228,32 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array('s', 43200, '0'), // 12 hours
 
             // general
-            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT'),
-            array('K:mm a, z', 0, '0:00 AM, GMT'),
-
-            // timezone
-            array('z', 0, 'GMT'),
-            array('zz', 0, 'GMT'),
-            array('zzz', 0, 'GMT'),
-            array('zzzz', 0, 'GMT'),
-            array('zzzzz', 0, 'GMT'),
+            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 UTC'),
+            array('K:mm a, z', 0, '0:00 AM, UTC'),
 
             // general, DateTime
             array('y-M-d', $dateTime, '1970-1-1'),
             array("EEE, MMM d, ''yy", $dateTime, "Thu, Jan 1, '70"),
             array('h:mm a', $dateTime, '12:00 AM'),
             array('yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM'),
-            array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT'),
-            array('K:mm a, z', $dateTime, '0:00 AM, GMT'),
+            array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 UTC'),
+            array('K:mm a, z', $dateTime, '0:00 AM, UTC'),
         );
 
         return $formatData;
+    }
+
+    /**
+     * @requires PHP 5.5.10
+     */
+    public function testFormatUtcAndGmtAreSplit()
+    {
+        $pattern = "yyyy.MM.dd 'at' HH:mm:ss zzz";
+        $gmtFormatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'GMT', IntlDateFormatter::GREGORIAN, $pattern);
+        $utcFormatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
+
+        $this->assertSame('1970.01.01 at 00:00:00 GMT', $gmtFormatter->format(new \DateTime('@0')));
+        $this->assertSame('1970.01.01 at 00:00:00 UTC', $utcFormatter->format(new \DateTime('@0')));
     }
 
     /**
@@ -310,6 +316,75 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         return $data;
     }
 
+    /**
+     * @dataProvider formatTimezoneProvider
+     * @requires PHP 5.5
+     */
+    public function testFormatTimezone($pattern, $timezone, $expected)
+    {
+        $formatter = $this->getDefaultDateFormatter($pattern);
+        $formatter->setTimeZone(new \DateTimeZone($timezone));
+
+        $this->assertEquals($expected, $formatter->format(0));
+    }
+
+    public function formatTimezoneProvider()
+    {
+        $cases = array(
+            array('z', 'GMT', 'GMT'),
+            array('zz', 'GMT', 'GMT'),
+            array('zzz', 'GMT', 'GMT'),
+            array('zzzz', 'GMT', 'Greenwich Mean Time'),
+            array('zzzzz', 'GMT', 'Greenwich Mean Time'),
+
+            array('z', 'Etc/GMT', 'GMT'),
+            array('zz', 'Etc/GMT', 'GMT'),
+            array('zzz', 'Etc/GMT', 'GMT'),
+            array('zzzz', 'Etc/GMT', 'Greenwich Mean Time'),
+            array('zzzzz', 'Etc/GMT', 'Greenwich Mean Time'),
+
+            array('z', 'Etc/GMT+3', 'GMT-3'),
+            array('zz', 'Etc/GMT+3', 'GMT-3'),
+            array('zzz', 'Etc/GMT+3', 'GMT-3'),
+            array('zzzz', 'Etc/GMT+3', 'GMT-03:00'),
+            array('zzzzz', 'Etc/GMT+3', 'GMT-03:00'),
+
+            array('z', 'UTC', 'UTC'),
+            array('zz', 'UTC', 'UTC'),
+            array('zzz', 'UTC', 'UTC'),
+            array('zzzz', 'UTC', 'Coordinated Universal Time'),
+            array('zzzzz', 'UTC', 'Coordinated Universal Time'),
+
+            array('z', 'Etc/UTC', 'UTC'),
+            array('zz', 'Etc/UTC', 'UTC'),
+            array('zzz', 'Etc/UTC', 'UTC'),
+            array('zzzz', 'Etc/UTC', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/UTC', 'Coordinated Universal Time'),
+
+            array('z', 'Etc/Universal', 'UTC'),
+            array('z', 'Etc/Zulu', 'UTC'),
+            array('z', 'Etc/UCT', 'UTC'),
+            array('z', 'Etc/Greenwich', 'GMT'),
+            array('zzzzz', 'Etc/Universal', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/Zulu', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/UCT', 'Coordinated Universal Time'),
+            array('zzzzz', 'Etc/Greenwich', 'Greenwich Mean Time'),
+        );
+
+        if (!defined('HHVM_VERSION')) {
+            // these timezones are not considered valid in HHVM
+            $cases = array_merge($cases, array(
+                array('z', 'GMT+03:00', 'GMT+3'),
+                array('zz', 'GMT+03:00', 'GMT+3'),
+                array('zzz', 'GMT+03:00', 'GMT+3'),
+                array('zzzz', 'GMT+03:00', 'GMT+03:00'),
+                array('zzzzz', 'GMT+03:00', 'GMT+03:00'),
+            ));
+        }
+
+        return $cases;
+    }
+
     public function testFormatWithGmtTimezone()
     {
         $formatter = $this->getDefaultDateFormatter('zzzz');
@@ -350,7 +425,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithDateTimeZoneGmt()
     {
-        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzzz');
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzz');
 
         $this->assertEquals('GMT', $formatter->format(0));
     }
@@ -412,8 +487,8 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array(0, IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'January 1, 1970'),
             array(0, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Jan 1, 1970'),
             array(0, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, '1/1/70'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM GMT'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM GMT'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM Coordinated Universal Time'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM UTC'),
             array(0, IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, '12:00:00 AM'),
             array(0, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, '12:00 AM'),
         );

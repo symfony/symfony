@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.28.79",
+    "Version": "2.1.32.59",
     "Names": {
         "aa": "afar",
         "ab": "abház",
@@ -329,7 +329,7 @@
         "nan": "min nan kínai",
         "nap": "nápolyi",
         "naq": "nama",
-        "nb": "norvég (bokmál)",
+        "nb": "norvég (bokmål)",
         "nd": "északi ndebele",
         "nds": "alsónémet",
         "nds_NL": "alsószász",
@@ -341,7 +341,7 @@
         "nl": "holland",
         "nl_BE": "flamand",
         "nmg": "ngumba",
-        "nn": "norvég (nynrosk)",
+        "nn": "norvég (nynorsk)",
         "nnh": "ngiemboon",
         "no": "norvég",
         "nog": "nogaj",

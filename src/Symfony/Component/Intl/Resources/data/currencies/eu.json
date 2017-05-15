@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.29.20",
+    "Version": "2.1.32.59",
     "Names": {
         "AED": [
             "AED",
@@ -440,7 +440,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruko sol berria"
+            "Peruko sol"
         ],
         "PGK": [
             "PGK",

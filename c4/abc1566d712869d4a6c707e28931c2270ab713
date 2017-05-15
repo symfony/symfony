@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-03T22:34:52Z
+
+By the way, this PR is a perfect example of why the tests were used to run against a specific Intl version. ICU data changes way too often and it's hard to maintain tests that would run across versions.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-10T09:42:16Z
+
+[This is interesting.](https://3v4l.org/sT7ia)
+
+```php
+foreach (array('UTC', 'GMT') as $timeZoneId) {
+    $tz = new \DateTimeZone($timeZoneId);
+    var_dump($timeZoneId.': '.$tz->getName());
+}
+```
+
+Output for 5.5.10 - 5.6.30, hhvm-3.10.1 - 3.19.0, 7.0.0 - 7.1.5:
+```
+string(8) "UTC: UTC"
+string(8) "GMT: GMT"
+```
+
+Output for 5.3.0 - 5.5.9:
+
+```
+string(8) "UTC: UTC"
+string(8) "GMT: UTC"
+```
+
+Edit: indeed, this behaviour was changed in PHP 5.5.10: https://evertpot.com/php-5-5-10-timezone-changes/
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-15T14:34:54Z
+
+This is ready for review.
+
+To make my life easier [I prepared docker images](https://hub.docker.com/r/jakzal/php-intl) with various ICU releases and PHP versions compiled. Might be useful for others too.
+
+Usage is very simple:
+
+```
+docker run -it --rm \
+  -v `pwd`:/symfony -w /symfony \
+  jakzal/php-intl:7.1-59.1 \
+  ./phpunit /symfony/src/Symfony/Component/Intl/Tests/
+```
+
+Where 7.1 is the chosen PHP version and 59.1 is the chosen ICU release.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-15T14:36:48Z
+
+@jakzal Great for the Docker images! Can you add the URL and usage somewhere in the component itself so that we don't forget that these images exist?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-15T14:48:09Z
+
+Added the link to docker hub to the Resources section in the readme. As usage is documented on docker hub I didn't want to duplicate it here.

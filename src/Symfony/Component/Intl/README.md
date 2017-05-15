@@ -15,5 +15,7 @@ Resources
   * [Report issues](https://github.com/symfony/symfony/issues) and
     [send Pull Requests](https://github.com/symfony/symfony/pulls)
     in the [main Symfony repository](https://github.com/symfony/symfony)
+  * [Docker images with intl support](https://hub.docker.com/r/jakzal/php-intl)
+    (for the Intl component development)
 
 [0]: http://www.php.net/manual/en/intl.setup.php

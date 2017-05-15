@@ -43,6 +43,34 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         parent::testFormatWithTimezoneFromEnvironmentVariable();
     }
 
+    /**
+     * @dataProvider formatTimezoneProvider
+     * @requires PHP 5.5
+     */
+    public function testFormatTimezone($pattern, $timezone, $expected)
+    {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        parent::testFormatTimezone($pattern, $timezone, $expected);
+    }
+
+    public function testFormatUtcAndGmtAreSplit()
+    {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        parent::testFormatUtcAndGmtAreSplit();
+    }
+
+    /**
+     * @dataProvider dateAndTimeTypeProvider
+     */
+    public function testDateAndTimeType($timestamp, $datetype, $timetype, $expected)
+    {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        parent::testDateAndTimeType($timestamp, $datetype, $timetype, $expected);
+    }
+
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
         IntlTestHelper::requireFullIntl($this, '55.1');

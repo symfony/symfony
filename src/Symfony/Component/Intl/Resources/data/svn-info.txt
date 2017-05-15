@@ -1,7 +1,7 @@
 SVN information
 ===============
 
-URL: http://source.icu-project.org/repos/icu/tags/release-58-2/icu4c/source
-Revision: 39531
+URL: http://source.icu-project.org/repos/icu/tags/release-59-1/icu4c/source
+Revision: 40047
 Author: yoshito
-Date: 2016-12-08T17:34:49.505743Z
+Date: 2017-04-13T09:55:03.829717Z

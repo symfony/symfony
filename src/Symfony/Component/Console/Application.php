@@ -132,7 +132,7 @@ class Application
         }
 
         if (null !== $e) {
-            if (!$this->catchExceptions) {
+            if (!$this->catchExceptions || !$x instanceof \Exception) {
                 throw $x;
             }
 

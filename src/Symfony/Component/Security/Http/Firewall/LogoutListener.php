@@ -146,6 +146,6 @@ class LogoutListener implements ListenerInterface
      */
     protected function requiresLogout(Request $request)
     {
-        return $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
+        return isset($this->options['logout_path']) && $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
     }
 }

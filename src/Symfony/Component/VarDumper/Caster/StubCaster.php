@@ -29,8 +29,10 @@ class StubCaster
             $stub->handle = $c->handle;
             $stub->cut = $c->cut;
 
-            return array();
+            $a = array();
         }
+
+        return $a;
     }
 
     public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, $isNested)

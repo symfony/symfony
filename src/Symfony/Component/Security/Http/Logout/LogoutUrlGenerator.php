@@ -111,6 +111,10 @@ class LogoutUrlGenerator
     {
         list($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager) = $this->getListener($key);
 
+        if (null === $logoutPath) {
+            throw new \LogicException('Unable to generate the logout URL without a path.');
+        }
+
         $parameters = null !== $csrfTokenManager ? array($csrfParameter => (string) $csrfTokenManager->getToken($csrfTokenId)) : array();
 
         if ('/' === $logoutPath[0]) {

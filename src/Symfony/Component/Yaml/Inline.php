@@ -174,7 +174,7 @@ class Inline
                 }
 
                 if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \stdClass || $value instanceof \ArrayObject)) {
-                    return self::dumpArray((array) $value, $flags & ~Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
+                    return self::dumpArray($value, $flags & ~Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
                 }
 
                 if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
@@ -234,12 +234,16 @@ class Inline
      *
      * @internal
      *
-     * @param array $value The PHP array to check
+     * @param array|\ArrayObject|\stdClass $value The PHP array or array-like object to check
      *
      * @return bool true if value is hash array, false otherwise
      */
-    public static function isHash(array $value)
+    public static function isHash($value)
     {
+        if ($value instanceof \stdClass || $value instanceof \ArrayObject) {
+            return true;
+        }
+
         $expectedKey = 0;
 
         foreach ($value as $key => $val) {

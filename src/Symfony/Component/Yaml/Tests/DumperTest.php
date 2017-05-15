@@ -351,6 +351,93 @@ EOF;
         return $tests;
     }
 
+    public function testDumpingArrayObjectInstancesRespectsInlineLevel()
+    {
+        $deep = new \ArrayObject(array('deep1' => 'd', 'deep2' => 'e'));
+        $inner = new \ArrayObject(array('inner1' => 'b', 'inner2' => 'c', 'inner3' => $deep));
+        $outer = new \ArrayObject(array('outer1' => 'a', 'outer2' => $inner));
+
+        $yaml = $this->dumper->dump($outer, 2, 0, Yaml::DUMP_OBJECT_AS_MAP);
+
+        $expected = <<<YAML
+outer1: a
+outer2:
+    inner1: b
+    inner2: c
+    inner3: { deep1: d, deep2: e }
+
+YAML;
+        $this->assertSame($expected, $yaml);
+    }
+
+    public function testDumpingArrayObjectInstancesWithNumericKeysInlined()
+    {
+        $deep = new \ArrayObject(array('d', 'e'));
+        $inner = new \ArrayObject(array('b', 'c', $deep));
+        $outer = new \ArrayObject(array('a', $inner));
+
+        $yaml = $this->dumper->dump($outer, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
+        $expected = <<<YAML
+{ 0: a, 1: { 0: b, 1: c, 2: { 0: d, 1: e } } }
+YAML;
+        $this->assertSame($expected, $yaml);
+    }
+
+    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
+    {
+        $deep = new \ArrayObject(array('d', 'e'));
+        $inner = new \ArrayObject(array('b', 'c', $deep));
+        $outer = new \ArrayObject(array('a', $inner));
+        $yaml = $this->dumper->dump($outer, 2, 0, Yaml::DUMP_OBJECT_AS_MAP);
+        $expected = <<<YAML
+0: a
+1:
+    0: b
+    1: c
+    2: { 0: d, 1: e }
+
+YAML;
+        $this->assertEquals($expected, $yaml);
+    }
+
+    public function testDumpEmptyArrayObjectInstanceAsMap()
+    {
+        $this->assertSame('{  }', $this->dumper->dump(new \ArrayObject(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
+    }
+
+    public function testDumpEmptyStdClassInstanceAsMap()
+    {
+        $this->assertSame('{  }', $this->dumper->dump(new \stdClass(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
+    }
+
+    public function testDumpingStdClassInstancesRespectsInlineLevel()
+    {
+        $deep = new \stdClass();
+        $deep->deep1 = 'd';
+        $deep->deep2 = 'e';
+
+        $inner = new \stdClass();
+        $inner->inner1 = 'b';
+        $inner->inner2 = 'c';
+        $inner->inner3 = $deep;
+
+        $outer = new \stdClass();
+        $outer->outer1 = 'a';
+        $outer->outer2 = $inner;
+
+        $yaml = $this->dumper->dump($outer, 2, 0, Yaml::DUMP_OBJECT_AS_MAP);
+
+        $expected = <<<YAML
+outer1: a
+outer2:
+    inner1: b
+    inner2: c
+    inner3: { deep1: d, deep2: e }
+
+YAML;
+        $this->assertSame($expected, $yaml);
+    }
+
     public function testDumpMultiLineStringAsScalarBlock()
     {
         $data = array(

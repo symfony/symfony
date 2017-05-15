@@ -1015,6 +1015,9 @@ HTML;
         $nodes = $this->createTestCrawler()->filterXPath('//html')->parents();
         $this->assertEquals(0, $nodes->count());
 
+        $nodes = $this->createTestCrawler()->filterXPath('//html//body//a[1] | //input[1]')->parents();
+        $this->assertEquals(3, $nodes->count());
+
         try {
             $this->createTestCrawler()->filterXPath('//ol')->parents();
             $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');

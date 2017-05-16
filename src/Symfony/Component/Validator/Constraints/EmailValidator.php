@@ -63,14 +63,14 @@ class EmailValidator extends ConstraintValidator
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();
 
-            if (interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, new NoRFCWarningsValidation())) {
+            if (interface_exists('\Egulias\EmailValidator\Validation\EmailValidation') && !$strictValidator->isValid($value, new NoRFCWarningsValidation())) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)
                     ->addViolation();
 
                 return;
-            } elseif (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
+            } elseif (!interface_exists('\Egulias\EmailValidator\Validation\EmailValidation') && !$strictValidator->isValid($value, false, true)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)

@@ -1001,7 +1001,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $this->assertEquals('assets.url_package', $package->getParent());
         $this->assertEquals($baseUrls, $package->getArgument(0));
-        $this->assertEquals($isStrictProtocol, $package->getArgument(2));
+        $this->assertEquals($isStrictProtocol, $package->getArgument(3));
         $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
     }
 

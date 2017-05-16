@@ -927,7 +927,7 @@ class FrameworkExtension extends Extension
         ;
 
         if ($baseUrls) {
-            $package->replaceArgument(2, $isStrictProtocol);
+            $package->replaceArgument(3, $isStrictProtocol);
         }
 
         return $package;

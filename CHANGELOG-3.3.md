@@ -7,6 +7,37 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.0-RC1 (2017-05-17)
+
+ * bug #22715 [FrameworkBundle] remove Security deps from the require section (xabbuh)
+ * bug #22613 [Process] Fix incorrectly calling PHP process when path contains space (maryo)
+ * feature #22680 [DI] Fixing missing "exclude" functionality from PSR4 loader (weaverryan)
+ * bug #22699 [TwigBundle] service workflow.twig_extension should stay public (ogizanagi)
+ * feature #22708 Adding autowire alias for AuthenticationUtils (weaverryan)
+ * bug #22695 [WebServerBundle] fix dependencies (xabbuh)
+ * bug #22647 [VarDumper] Fix dumping of non-nested stubs (nicolas-grekas)
+ * bug #22409 [Yaml] respect inline level when dumping objects as maps (goetas, xabbuh)
+ * bug #22584 [Security] Avoid unnecessary route lookup for empty logout path (ro0NL)
+ * bug #22642 [DX] Making the RegisterControllerArgumentLocatorsPass throw exception on bad types (weaverryan)
+ * bug #22664 [Security] Fix TraceableAccessDecisionManager / DebugAccessDecisionManager BC layer (ogizanagi)
+ * bug #22690 [Console] Fix errors not rethrown even if not handled by console.error listeners (chalasr)
+ * bug #22681 Fixing a bug where abstract classes were wired with the prototype loader (weaverryan)
+ * feature #22665 [DI] Do not throw autowiring exceptions for a service that will be removed (weaverryan)
+ * bug #22669 [FrameworkBundle] AbstractConfigCommand: do not try registering bundles twice (ogizanagi)
+ * bug #22676 [FrameworkBundle] Adding the extension XML (flug)
+ * bug #22611 [FrameworkBundle] Fix "Locale class not found" in AboutCommand (rubenrua)
+ * bug #22677 [DI] Fixed index args bug with ResolveNamedArgumentsPass (weaverryan)
+ * bug #22652 [Workflow] Move twig extension registration to twig bundle (ogizanagi)
+ * feature #22668 [FrameworkBundle] KernelTestCase: allow to provide the kernel class with a var (ogizanagi)
+ * bug #22639 [WebLink][TwigBundle] Fix registration of the twig extension (ogizanagi)
+ * bug #22658 Make the exception pages work when the WebProfilerBundle is not installed (javiereguiluz)
+ * bug #22657 [DI] Fix Cannot declare class ...\DefinitionDecorator, because the name is already in use (ogizanagi)
+ * feature #22624 debug:container --types (classes/interfaces) (weaverryan)
+ * bug #22626 Fix missing parenthesis (yceruto)
+ * bug #22621 [Config] Fix resource tracking with new GlobResource (nicolas-grekas)
+ * feature #22385 [DX][FrameworkBundle] Show private aliases in debug:container (chalasr)
+ * bug #22615 [DI] Defaults to public=false in all service config files (nicolas-grekas)
+
 * 3.3.0-BETA1 (2017-05-01)
 
  * feature #22530 Making tags under _defaults always apply (weaverryan)

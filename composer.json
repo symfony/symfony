@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^7.1.0",
         "doctrine/common": "~2.4",
         "fig/link-util": "^1.0",
         "twig/twig": "~1.32|~2.2",

@@ -82,7 +82,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->environment = $environment;
         $this->debug = (bool) $debug;
         $this->rootDir = $this->getRootDir();
-        $this->projectDir = $this->getProjectDir();
         $this->name = $this->getName();
 
         if ($this->debug) {
@@ -604,7 +603,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return array_merge(
             array(
                 'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
-                'kernel.project_dir' => realpath($this->projectDir) ?: $this->projectDir,
+                'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
                 'kernel.environment' => $this->environment,
                 'kernel.debug' => $this->debug,
                 'kernel.name' => $this->name,

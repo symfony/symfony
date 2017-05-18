@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed `Container::isFrozen`
+ * removed support for dumping an ucompiled container in `PhpDumper`
 
 3.3.0
 -----

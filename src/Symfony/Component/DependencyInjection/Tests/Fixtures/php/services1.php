@@ -46,14 +46,4 @@ class ProjectServiceContainer extends Container
     {
         return true;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return true;
-    }
 }

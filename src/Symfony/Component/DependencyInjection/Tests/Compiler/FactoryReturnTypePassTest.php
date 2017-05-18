@@ -44,13 +44,8 @@ class FactoryReturnTypePassTest extends TestCase
         $pass = new FactoryReturnTypePass();
         $pass->process($container);
 
-        if (method_exists(\ReflectionMethod::class, 'getReturnType')) {
-            $this->assertEquals(FactoryDummy::class, $factory->getClass());
-            $this->assertEquals(\stdClass::class, $foo->getClass());
-        } else {
-            $this->assertNull($factory->getClass());
-            $this->assertNull($foo->getClass());
-        }
+        $this->assertEquals(FactoryDummy::class, $factory->getClass());
+        $this->assertEquals(\stdClass::class, $foo->getClass());
         $this->assertEquals(__CLASS__, $bar->getClass());
     }
 
@@ -71,11 +66,7 @@ class FactoryReturnTypePassTest extends TestCase
         $pass = new FactoryReturnTypePass();
         $pass->process($container);
 
-        if (method_exists(\ReflectionMethod::class, 'getReturnType')) {
-            $this->assertEquals($returnType, $service->getClass());
-        } else {
-            $this->assertNull($service->getClass());
-        }
+        $this->assertEquals($returnType, $service->getClass());
     }
 
     public function returnTypesProvider()

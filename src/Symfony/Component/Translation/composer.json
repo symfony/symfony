@@ -20,9 +20,9 @@
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/config": "~2.8|~3.0",
-        "symfony/intl": "^2.8.18|^3.2.5",
-        "symfony/yaml": "~3.3",
+        "symfony/config": "~2.8|~3.0|~4.0",
+        "symfony/intl": "^2.8.18|^3.2.5|~4.0",
+        "symfony/yaml": "~3.3|~4.0",
         "psr/log": "~1.0"
     },
     "conflict": {

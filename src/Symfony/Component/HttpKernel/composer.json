@@ -38,6 +38,7 @@
         "symfony/templating": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",
         "symfony/var-dumper": "~3.3",
+        "phpdocumentor/reflection-docblock": "^3.0",
         "psr/cache": "~1.0"
     },
     "conflict": {

@@ -24,6 +24,7 @@ class ArgumentMetadata
     private $hasDefaultValue;
     private $defaultValue;
     private $isNullable;
+    private $isArray;
 
     /**
      * @param string $name
@@ -33,7 +34,7 @@ class ArgumentMetadata
      * @param mixed  $defaultValue
      * @param bool   $isNullable
      */
-    public function __construct($name, $type, $isVariadic, $hasDefaultValue, $defaultValue, $isNullable = false)
+    public function __construct($name, $type, $isVariadic, $hasDefaultValue, $defaultValue, $isNullable = false, $isArray = false)
     {
         $this->name = $name;
         $this->type = $type;
@@ -41,6 +42,7 @@ class ArgumentMetadata
         $this->hasDefaultValue = $hasDefaultValue;
         $this->defaultValue = $defaultValue;
         $this->isNullable = $isNullable || null === $type || ($hasDefaultValue && null === $defaultValue);
+        $this->isArray = (bool) $isArray;
     }
 
     /**
@@ -95,6 +97,16 @@ class ArgumentMetadata
     public function isNullable()
     {
         return $this->isNullable;
+    }
+
+    /**
+     * Returns whether the argument is an array.
+     *
+     * @return bool
+     */
+    public function isArray()
+    {
+        return $this->isArray;
     }
 
     /**

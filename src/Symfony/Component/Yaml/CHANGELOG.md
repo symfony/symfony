@@ -23,6 +23,12 @@ CHANGELOG
    the parser and dumper is no longer supported, pass bitmask flags instead
  * the constructor arguments of the `Parser` class have been removed
  * the `Inline` class is internal and no longer part of the BC promise
+ * added support for tagged scalars.
+
+   ```yml
+   Yaml::parse('!foo bar', Yaml::PARSE_CUSTOM_TAGS);
+   // returns TaggedValue('foo', 'bar');
+   ```
 
 3.4.0
 -----

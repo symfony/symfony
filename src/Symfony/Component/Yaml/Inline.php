@@ -77,7 +77,7 @@ class Inline
                 $result = self::parseScalar($value, $flags, null, $i, null === $tag, $references);
         }
 
-        if (null !== $tag) {
+        if (null !== $tag && '' !== $tag) {
             return new TaggedValue($tag, $result);
         }
 
@@ -379,7 +379,7 @@ class Inline
                     --$i;
             }
 
-            if (null !== $tag) {
+            if (null !== $tag && '' !== $tag) {
                 $value = new TaggedValue($tag, $value);
             }
 
@@ -489,7 +489,7 @@ class Inline
                         --$i;
                 }
 
-                if (null !== $tag) {
+                if (null !== $tag && '' !== $tag) {
                     $output[$key] = new TaggedValue($tag, $value);
                 } else {
                     $output[$key] = $value;
@@ -582,7 +582,7 @@ class Inline
                     case 0 === strpos($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                     default:
-                        @trigger_error(sprintf('Using the unquoted scalar value "%s" is deprecated since version 3.3 and will be considered as a tagged value in 4.0. You must quote it.', $scalar), E_USER_DEPRECATED);
+                        throw new ParseException(sprintf('The string "%s" could not be parsed as it uses an unsupported built-in tag.', $scalar));
                 }
 
             // Optimize for returning strings.
@@ -650,20 +650,20 @@ class Inline
         $nextOffset = $i + $tagLength + 1;
         $nextOffset += strspn($value, ' ', $nextOffset);
 
-        // Is followed by a scalar
-        if (!isset($value[$nextOffset]) || !in_array($value[$nextOffset], array('[', '{'), true)) {
-            // Manage scalars in {@link self::evaluateScalar()}
+        // Is followed by a scalar and is a built-in tag
+        if ($tag && (!isset($value[$nextOffset]) || !in_array($value[$nextOffset], array('[', '{'), true)) && ('!' === $tag[0] || 'str' === $tag || 0 === strpos($tag, 'php/const:') || 0 === strpos($tag, 'php/object:'))) {
+            // Manage in {@link self::evaluateScalar()}
             return;
         }
+
+        $i = $nextOffset;
 
         // Built-in tags
         if ($tag && '!' === $tag[0]) {
             throw new ParseException(sprintf('The built-in tag "!%s" is not implemented.', $tag));
         }
 
-        if (Yaml::PARSE_CUSTOM_TAGS & $flags) {
-            $i = $nextOffset;
-
+        if ('' === $tag || Yaml::PARSE_CUSTOM_TAGS & $flags) {
             return $tag;
         }
 

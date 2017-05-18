@@ -18,10 +18,10 @@
     "require": {
         "php": ">=5.3.3",
         "psr/http-message": "~1.0",
-        "symfony/http-foundation": "~2.3|~3.0"
+        "symfony/http-foundation": "~2.3|~3.0|~4.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~3.2"
+        "symfony/phpunit-bridge": "~3.2|4.0"
     },
     "suggest": {
         "psr/http-message-implementation": "To use the HttpFoundation factory",

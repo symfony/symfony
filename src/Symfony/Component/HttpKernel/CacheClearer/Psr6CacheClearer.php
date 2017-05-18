@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
-use Psr\Cache\CacheItemPoolInterface;
-
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -23,13 +21,6 @@ class Psr6CacheClearer implements CacheClearerInterface
     public function __construct(array $pools = array())
     {
         $this->pools = $pools;
-    }
-
-    public function addPool(CacheItemPoolInterface $pool)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Pass an array of pools indexed by name to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->pools[] = $pool;
     }
 
     public function hasPool($name)

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `FirewallContext::getContext()`
+ * made `FirewallMap::$container` and `::$map` private
+
 3.3.0
 -----
 

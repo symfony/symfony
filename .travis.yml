@@ -76,8 +76,12 @@ before_install:
       echo hhvm.jit = 0 >> $INI
       echo apc.enable_cli = 1 >> $INI
       echo extension = ldap.so >> $INI
-      [[ $PHP = 5.* ]] && echo extension = mongo.so >> $INI
       [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI
+      if [[ $PHP = 5.* ]]; then
+          echo extension = mongo.so >> $INI
+      elif [[ $PHP = 7.* ]]; then
+          echo extension = mongodb.so >> $INI
+      fi
 
       # Matrix lines for intermediate PHP versions are skipped for pull requests
       if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then
@@ -135,6 +139,10 @@ install:
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
+
+      if [[ ! $skip && $PHP = 7.* ]]; then
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+      fi
 
     - if [[ ! $skip ]]; then $COMPOSER_UP; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi

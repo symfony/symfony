@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T08:20:00Z
+
+On 3.4, we should allow only 4.0.0
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-18T11:16:57Z
+
+Done, to do the merge in 4.0:
+
+```
+find src -name "composer.json" -exec sed -i '' 's/\|\~4\.0\.0"/\|\~4\.0"/g' {} \;
+find src -name "composer.json" -exec sed -i '' 's/\|\^4\.0\.0"/\|\^4\.0"/g' {} \;
+```
+
+(I can handle the merge if can help)

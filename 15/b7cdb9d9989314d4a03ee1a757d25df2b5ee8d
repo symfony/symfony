@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-05-17T19:05:42Z
+
+@fabpot when bumping the version to 4.0, you forgot to update all inter-component requirements to allow them to use the 4.0 version of other components in their own 4.0 versions
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-17T19:13:15Z
+
+Looks like this requires us to drop HHVM, impossible to make it run on the CI. I'm fine with that personally.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-18T05:44:47Z
+
+Poll here: https://twitter.com/fabpot/status/865080534669635584
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-18T06:20:07Z
+
+In addition to the poll, [according to the latest global PHP stats](https://seld.be/notes/php-versions-stats-2017-1-edition), HHVM is used by 0.36% of PHP developers. The number is practically zero ... but maybe there are some high-profile clients there (Facebook is using it, Slack was thinking about using it, ...)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2017-05-18T06:44:12Z
+
+@javiereguiluz please don't forget that the stats are about number of composer installs.. That doesn't translate 1:1 to users, as some may do more installs than others. I think it's mostly interesting to see trends over time as exact point-in-time numbers can't be fully trusted.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-18T07:27:30Z
+
+@nicolas-grekas HHVM has 2 modes: PHP 5 mode and PHP 7 mode. IIRC, it runs in PHP 5 mode by default. We should add `hhvm.php7.all = 1` in the HHVM INI file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T07:29:18Z
+
+I just tried again this mode, same failure. We'd need a php *7.1* mode. There is just no way currently to make hhvm run on a 7.1 code base. HHVM advertises itself as 70099 so even Composer cant.
+Just dropping for now.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-18T07:45:44Z
+
+Have you tried using the latest HHVM rather than 3.18 ? they may have updated their PHP 7 mode to expose it as 7.1 later
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T07:47:46Z
+
+Yep, 3.19 locally, same result
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T13:31:25Z
+
+Now with all lowest deps updated to `~3.4`, same process we did for 3.0
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-18T13:32:36Z
+
+👍 even if I would be to use `>=7.1.3` instead of `^7.1.3` because:
+
+* It will prevent people to upgrade to PHP 8 because of old Symfony apps
+* PHP is almost always backward compatible
+* PHP doesn't respect strictly semver
+* Laravel and most other projects use this notation

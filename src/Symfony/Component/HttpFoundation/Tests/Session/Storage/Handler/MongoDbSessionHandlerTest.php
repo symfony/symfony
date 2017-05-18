@@ -31,7 +31,11 @@ class MongoDbSessionHandlerTest extends TestCase
     {
         parent::setUp();
 
-        if (!extension_loaded('mongo') && !extension_loaded('mongodb')) {
+        if (extension_loaded('mongodb')) {
+            if (!class_exists('MongoDB\Client')) {
+                $this->markTestSkipped('The mongodb/mongodb package is required.');
+            }
+        } elseif (!extension_loaded('mongo')) {
             $this->markTestSkipped('The Mongo or MongoDB extension is required.');
         }
 
@@ -109,7 +113,7 @@ class MongoDbSessionHandlerTest extends TestCase
 
                 if (phpversion('mongodb')) {
                     $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $criteria[$that->options['expiry_field']]['$gte']);
-                    $that->assertGreaterThanOrEqual(round(((int) $criteria[$that->options['expiry_field']]['$gte']) / 1000), $testTimeout);
+                    $that->assertGreaterThanOrEqual(round((string) $criteria[$that->options['expiry_field']]['$gte'] / 1000), $testTimeout);
                 } else {
                     $that->assertInstanceOf('MongoDate', $criteria[$that->options['expiry_field']]['$gte']);
                     $that->assertGreaterThanOrEqual($criteria[$that->options['expiry_field']]['$gte']->sec, $testTimeout);
@@ -168,7 +172,7 @@ class MongoDbSessionHandlerTest extends TestCase
             $that->assertEquals('bar', $data[$that->options['data_field']]->getData());
             $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$that->options['time_field']]);
             $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$that->options['expiry_field']]);
-            $that->assertGreaterThanOrEqual($expectedExpiry, round(((int) $data[$that->options['expiry_field']]) / 1000));
+            $that->assertGreaterThanOrEqual($expectedExpiry, round((string) $data[$that->options['expiry_field']] / 1000));
         } else {
             $that->assertEquals('bar', $data[$that->options['data_field']]->bin);
             $that->assertInstanceOf('MongoDate', $data[$that->options['time_field']]);
@@ -294,7 +298,7 @@ class MongoDbSessionHandlerTest extends TestCase
             ->will($this->returnCallback(function ($criteria) use ($that) {
                 if (phpversion('mongodb')) {
                     $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $criteria[$that->options['expiry_field']]['$lt']);
-                    $that->assertGreaterThanOrEqual(time() - 1, round(((int) $criteria[$that->options['expiry_field']]['$lt']) / 1000));
+                    $that->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$that->options['expiry_field']]['$lt'] / 1000));
                 } else {
                     $that->assertInstanceOf('MongoDate', $criteria[$that->options['expiry_field']]['$lt']);
                     $that->assertGreaterThanOrEqual(time() - 1, $criteria[$that->options['expiry_field']]['$lt']->sec);

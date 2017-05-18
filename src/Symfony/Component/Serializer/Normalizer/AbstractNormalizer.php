@@ -339,7 +339,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
                 $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
-                if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
+                if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                         if (!is_array($data[$paramName])) {
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));

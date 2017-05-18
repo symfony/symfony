@@ -62,17 +62,12 @@ before_install:
       export -f tfold
 
       # php.ini configuration
-      if [[ $PHP = hhvm* ]]; then
-          INI=/etc/hhvm/php.ini
-      else
-          INI=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-          phpenv config-rm xdebug.ini || echo "xdebug not available"
-      fi
+      INI=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+      phpenv config-rm xdebug.ini || echo "xdebug not available"
       echo date.timezone = Europe/Paris >> $INI
       echo memory_limit = -1 >> $INI
       echo session.gc_probability = 0 >> $INI
       echo opcache.enable_cli = 1 >> $INI
-      echo hhvm.jit = 0 >> $INI
       echo apc.enable_cli = 1 >> $INI
       echo extension = ldap.so >> $INI
       echo extension = redis.so >> $INI
@@ -80,7 +75,7 @@ before_install:
       echo extension = mongodb.so >> $INI
 
       # Matrix lines for intermediate PHP versions are skipped for pull requests
-      if [[ ! $deps && ! $PHP = $MIN_PHP && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then
+      if [[ ! $deps && ! $PHP = $MIN_PHP && $TRAVIS_PULL_REQUEST != false ]]; then
           deps=skip
           skip=1
       else
@@ -145,9 +140,7 @@ install:
 
     - if [[ ! $skip ]]; then $COMPOSER_UP; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
-    - |
-      # phpinfo
-      if [[ ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+    - php -i
 
     - |
       run_tests () {
@@ -161,8 +154,6 @@ install:
               # Test the PhpUnit bridge on PHP 5.3, using the original phpunit script
               tfold src/Symfony/Bridge/PhpUnit \
               "cd src/Symfony/Bridge/PhpUnit && wget https://phar.phpunit.de/phpunit-4.8.phar && phpenv global 5.3 && composer update --no-progress --ansi && php phpunit-4.8.phar"
-          elif [[ $PHP = hhvm* ]]; then
-              $PHPUNIT --exclude-group benchmark,intl-data
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold tty-group $PHPUNIT --group tty

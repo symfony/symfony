@@ -22,11 +22,4 @@ use Symfony\Component\Console\Command\Command;
  */
 abstract class ServerCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        return !defined('HHVM_VERSION') && parent::isEnabled();
-    }
 }

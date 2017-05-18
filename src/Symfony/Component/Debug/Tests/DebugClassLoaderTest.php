@@ -66,9 +66,6 @@ class DebugClassLoaderTest extends TestCase
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
             $this->markTestSkipped('The ContextErrorException class is already loaded.');
         }
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM is not handled in this test case.');
-        }
 
         ErrorHandler::register();
 

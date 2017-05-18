@@ -133,49 +133,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             }
         }
 
-        if (defined('HHVM_VERSION')) {
-            foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-                // workaround HHVM bug with variadics, see https://github.com/facebook/hhvm/issues/5762
-                yield preg_replace('/^  @@.*/m', '', new ReflectionMethodHhvmWrapper($m->class, $m->name));
+        foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
+            yield preg_replace('/^  @@.*/m', '', $m);
+
+            $defaults = array();
+            foreach ($m->getParameters() as $p) {
+                $defaults[$p->name] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
             }
-        } else {
-            foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-                yield preg_replace('/^  @@.*/m', '', $m);
-
-                $defaults = array();
-                foreach ($m->getParameters() as $p) {
-                    $defaults[$p->name] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
-                }
-                yield print_r($defaults, true);
-            }
+            yield print_r($defaults, true);
         }
-    }
-}
-
-/**
- * @internal
- */
-class ReflectionMethodHhvmWrapper extends \ReflectionMethod
-{
-    public function getParameters()
-    {
-        $params = array();
-
-        foreach (parent::getParameters() as $i => $p) {
-            $params[] = new ReflectionParameterHhvmWrapper(array($this->class, $this->name), $i);
-        }
-
-        return $params;
-    }
-}
-
-/**
- * @internal
- */
-class ReflectionParameterHhvmWrapper extends \ReflectionParameter
-{
-    public function getDefaultValue()
-    {
-        return array($this->isVariadic(), $this->isDefaultValueAvailable() ? parent::getDefaultValue() : null);
     }
 }

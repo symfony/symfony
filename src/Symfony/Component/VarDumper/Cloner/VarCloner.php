@@ -282,22 +282,18 @@ class VarCloner extends AbstractCloner
         self::$hashOffset = 16 - PHP_INT_SIZE;
         self::$hashMask = -1;
 
-        if (defined('HHVM_VERSION')) {
-            self::$hashOffset += 16;
-        } else {
-            // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
-            $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
-            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
-                if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
-                    $frame['line'] = 0;
-                    break;
-                }
+        // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
+        $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+            if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
+                $frame['line'] = 0;
+                break;
             }
-            if (!empty($frame['line'])) {
-                ob_start();
-                debug_zval_dump($obj);
-                self::$hashMask = (int) substr(ob_get_clean(), 17);
-            }
+        }
+        if (!empty($frame['line'])) {
+            ob_start();
+            debug_zval_dump($obj);
+            self::$hashMask = (int) substr(ob_get_clean(), 17);
         }
 
         self::$hashMask ^= hexdec(substr(spl_object_hash($obj), self::$hashOffset, PHP_INT_SIZE));

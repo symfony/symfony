@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * added a sixth `string $context` argument to`LogoutUrlGenerator::registerListener()`
+
 3.3.0
 -----
 

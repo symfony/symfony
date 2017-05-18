@@ -32,7 +32,7 @@
         "predis/predis": "~1.0"
     },
     "conflict": {
-        "symfony/var-dumper": "<3.3"
+        "symfony/var-dumper": "<3.4"
     },
     "suggest": {
         "symfony/polyfill-apcu": "For using ApcuAdapter on HHVM"

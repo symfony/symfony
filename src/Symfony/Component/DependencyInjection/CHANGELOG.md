@@ -4,6 +4,8 @@ CHANGELOG
 4.0.0
 -----
 
+ * added a third `$methodName` argument to the `getProxyFactoryCode()` method
+   of the `DumperInterface`
  * removed support for autowiring types
  * removed `Container::isFrozen`
  * removed support for dumping an ucompiled container in `PhpDumper`

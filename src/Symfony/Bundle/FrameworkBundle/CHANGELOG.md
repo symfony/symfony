@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+* Removed `ValidateWorkflowsPass`
+
 3.3.0
 -----
 
@@ -47,7 +52,7 @@ CHANGELOG
    `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass` instead
  * Deprecated `AddConstraintValidatorsPass`, use
    `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` instead
- * Deprecated `ValidateWorkflowsPass`, use 
+ * Deprecated `ValidateWorkflowsPass`, use
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` instead
 
 3.2.0

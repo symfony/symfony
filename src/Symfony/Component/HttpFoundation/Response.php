@@ -504,6 +504,16 @@ class Response
     }
 
     /**
+     * Retrieves the status text for the current web response.
+     *
+     * @return string Status text
+     */
+    public function getStatusText()
+    {
+        return $this->statusText;
+    }
+
+    /**
      * Sets the response charset.
      *
      * @param string $charset Character set

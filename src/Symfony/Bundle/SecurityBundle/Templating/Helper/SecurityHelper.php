@@ -49,4 +49,14 @@ class SecurityHelper extends Helper
     {
         return 'security';
     }
+
+    /**
+     * Returns the currently authenticated token.
+     *
+     * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+     */
+    public function getToken()
+    {
+        return $this->context->getToken();
+    }
 }

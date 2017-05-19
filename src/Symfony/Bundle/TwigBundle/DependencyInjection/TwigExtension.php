@@ -148,19 +148,6 @@ class TwigExtension extends Extension
             ->addTag('twig.extension');
         $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)
             ->addTag('twig.loader');
-
-        if (PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
-                'Twig_Environment',
-                'Twig_Extension',
-                'Twig_Extension_Core',
-                'Twig_Extension_Escaper',
-                'Twig_Extension_Optimizer',
-                'Twig_LoaderInterface',
-                'Twig_Markup',
-                'Twig_Template',
-            ));
-        }
     }
 
     private function getBundleHierarchy(ContainerBuilder $container)

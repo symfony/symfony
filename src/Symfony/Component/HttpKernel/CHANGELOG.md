@@ -10,6 +10,8 @@ CHANGELOG
  * removed the `argument_resolver` service dependency from the `debug.controller_resolver`
  * removed `LazyLoadingFragmentHandler::addRendererService()`
  * removed `Psr6CacheClearer::addPool()`
+ * removed `Extension::addClassesToCompile()` and `Extension::getClassesToCompile()`
+ * removed `Kernel::loadClassCache()`, `Kernel::doLoadClassCache()` and `Kernel::setClassCache()`
 
 3.3.0
 -----

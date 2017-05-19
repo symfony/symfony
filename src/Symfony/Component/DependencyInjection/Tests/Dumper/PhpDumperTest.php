@@ -436,7 +436,10 @@ class PhpDumperTest extends TestCase
         $container->register('lazy_referenced', 'stdClass');
         $container
             ->register('lazy_context', 'LazyContext')
-            ->setArguments(array(new IteratorArgument(array('k1' => new Reference('lazy_referenced'), 'k2' => new Reference('service_container')))))
+            ->setArguments(array(
+                new IteratorArgument(array('k1' => new Reference('lazy_referenced'), 'k2' => new Reference('service_container'))),
+                new IteratorArgument(array()),
+            ))
         ;
         $container->compile();
 
@@ -447,6 +450,9 @@ class PhpDumperTest extends TestCase
         $lazyContext = $container->get('lazy_context');
 
         $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyValues);
+        $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyEmptyValues);
+        $this->assertCount(2, $lazyContext->lazyValues);
+        $this->assertCount(0, $lazyContext->lazyEmptyValues);
 
         $i = -1;
         foreach ($lazyContext->lazyValues as $k => $v) {
@@ -461,6 +467,8 @@ class PhpDumperTest extends TestCase
                     break;
             }
         }
+
+        $this->assertEmpty(iterator_to_array($lazyContext->lazyEmptyValues));
     }
 
     public function testClosureProxy()

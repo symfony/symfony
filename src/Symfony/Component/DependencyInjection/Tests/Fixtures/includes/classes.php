@@ -102,9 +102,11 @@ class DummyProxyDumper implements ProxyDumper
 class LazyContext
 {
     public $lazyValues;
+    public $lazyEmptyValues;
 
-    public function __construct($lazyValues)
+    public function __construct($lazyValues, $lazyEmptyValues)
     {
         $this->lazyValues = $lazyValues;
+        $this->lazyEmptyValues = $lazyEmptyValues;
     }
 }

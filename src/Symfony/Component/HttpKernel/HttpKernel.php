@@ -51,9 +51,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->argumentResolver = $argumentResolver;
 
         if (null === $this->argumentResolver) {
-            @trigger_error(sprintf('As of 3.1 an %s is used to resolve arguments. In 4.0 the $argumentResolver becomes the %s if no other is provided instead of using the $resolver argument.', ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
-            // fallback in case of deprecations
-            $this->argumentResolver = $resolver;
+            $this->argumentResolver = new ArgumentResolver();
         }
     }
 

@@ -285,7 +285,7 @@ class HttpKernelTest extends TestCase
         $kernel = new HttpKernel($dispatcher, $this->getResolver());
 
         $request = new Request();
-        $request->setTrustedProxies(array('1.1.1.1'));
+        $request->setTrustedProxies(array('1.1.1.1'), -1);
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $request->headers->set('FORWARDED', 'for=2.2.2.2');
         $request->headers->set('X_FORWARDED_FOR', '3.3.3.3');

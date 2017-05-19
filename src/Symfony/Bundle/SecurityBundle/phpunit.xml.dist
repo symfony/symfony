@@ -10,6 +10,7 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <env name="COLUMNS" value="120" />
     </php>
 
     <testsuites>

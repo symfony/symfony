@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/filesystem": "~2.3|~3.0.0"
+        "symfony/filesystem": "~2.3|~3.0"
     },
     "require-dev": {
-        "symfony/yaml": "~2.7|~3.0.0"
+        "symfony/yaml": "~2.7|~3.0"
     },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"

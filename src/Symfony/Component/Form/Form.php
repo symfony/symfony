@@ -800,6 +800,27 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Returns an array representation of all form errors (including children errors).
+     *
+     * @return array An array representation of all errors in a tree structure with field names as array keys
+     */
+    public function getErrorsAsArray()
+    {
+        $errors = array();
+        foreach ($this->errors as $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        foreach ($this->children as $key => $child) {
+            if ($err = $child->getErrorsAsArray()) {
+                $errors[$key] = $err;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function all()

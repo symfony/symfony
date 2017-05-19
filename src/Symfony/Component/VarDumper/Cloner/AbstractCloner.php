@@ -127,7 +127,6 @@ abstract class AbstractCloner implements ClonerInterface
 
     protected $maxItems = 2500;
     protected $maxString = -1;
-    protected $useExt;
 
     private $casters = array();
     private $prevErrorHandler;
@@ -145,7 +144,6 @@ abstract class AbstractCloner implements ClonerInterface
             $casters = static::$defaultCasters;
         }
         $this->addCasters($casters);
-        $this->useExt = extension_loaded('symfony_debug');
     }
 
     /**

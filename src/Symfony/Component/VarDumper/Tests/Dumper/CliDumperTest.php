@@ -432,7 +432,7 @@ EOTXT
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testGlobalsNoExt()
+    public function testGlobals()
     {
         $var = $this->getSpecialVars();
         unset($var[0]);
@@ -445,10 +445,6 @@ EOTXT
         });
         $dumper->setColors(false);
         $cloner = new VarCloner();
-
-        $refl = new \ReflectionProperty($cloner, 'useExt');
-        $refl->setAccessible(true);
-        $refl->setValue($cloner, false);
 
         $data = $cloner->cloneVar($var);
         $dumper->dump($data);

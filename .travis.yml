@@ -77,7 +77,7 @@ before_install:
       echo extension = ldap.so >> $INI
       echo extension = redis.so >> $INI
       echo extension = memcached.so >> $INI
-      #echo extension = mongodb.so >> $INI
+      echo extension = mongodb.so >> $INI
 
       # Matrix lines for intermediate PHP versions are skipped for pull requests
       if [[ ! $deps && ! $PHP = $MIN_PHP && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then
@@ -138,6 +138,10 @@ install:
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
+
+      if [[ ! $skip ]]; then
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
+      fi
 
     - if [[ ! $skip ]]; then $COMPOSER_UP; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi

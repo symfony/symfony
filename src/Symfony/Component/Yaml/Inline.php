@@ -46,38 +46,6 @@ class Inline
      */
     public static function parse($value, $flags = 0, $references = array())
     {
-        if (is_bool($flags)) {
-            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
-
-            if ($flags) {
-                $flags = Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE;
-            } else {
-                $flags = 0;
-            }
-        }
-
-        if (func_num_args() >= 3 && !is_array($references)) {
-            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
-
-            if ($references) {
-                $flags |= Yaml::PARSE_OBJECT;
-            }
-
-            if (func_num_args() >= 4) {
-                @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
-
-                if (func_get_arg(3)) {
-                    $flags |= Yaml::PARSE_OBJECT_FOR_MAP;
-                }
-            }
-
-            if (func_num_args() >= 5) {
-                $references = func_get_arg(4);
-            } else {
-                $references = array();
-            }
-        }
-
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
         self::$objectForMap = (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags);
@@ -137,24 +105,6 @@ class Inline
      */
     public static function dump($value, $flags = 0)
     {
-        if (is_bool($flags)) {
-            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
-
-            if ($flags) {
-                $flags = Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE;
-            } else {
-                $flags = 0;
-            }
-        }
-
-        if (func_num_args() >= 3) {
-            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
-
-            if (func_get_arg(2)) {
-                $flags |= Yaml::DUMP_OBJECT;
-            }
-        }
-
         switch (true) {
             case is_resource($value):
                 if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
@@ -300,7 +250,7 @@ class Inline
      *
      * @internal
      */
-    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = array(), $legacyOmittedKeySupport = false)
+    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = array())
     {
         if (in_array($scalar[$i], array('"', "'"))) {
             // quoted scalar
@@ -322,7 +272,7 @@ class Inline
                 if (Parser::preg_match('/[ \t]+#/', $output, $match, PREG_OFFSET_CAPTURE)) {
                     $output = substr($output, 0, $match[0][1]);
                 }
-            } elseif (Parser::preg_match('/^(.'.($legacyOmittedKeySupport ? '+' : '*').'?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
+            } elseif (Parser::preg_match('/^(.*?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
                 $output = $match[1];
                 $i += strlen($output);
             } else {
@@ -330,12 +280,8 @@ class Inline
             }
 
             // a non-quoted string cannot start with @ or ` (reserved) nor with a scalar indicator (| or >)
-            if ($output && ('@' === $output[0] || '`' === $output[0] || '|' === $output[0] || '>' === $output[0])) {
+            if ($output && ('@' === $output[0] || '`' === $output[0] || '|' === $output[0] || '>' === $output[0] || '%' === $output[0])) {
                 throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]));
-            }
-
-            if ($output && '%' === $output[0]) {
-                @trigger_error(sprintf('Not quoting the scalar "%s" starting with the "%%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', $output), E_USER_DEPRECATED);
             }
 
             if ($evaluate) {
@@ -479,26 +425,27 @@ class Inline
             }
 
             // key
-            $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false, array(), true);
+            $offsetBeforeKeyParsing = $i;
+            $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false, array());
 
-            if (':' !== $key && false === $i = strpos($mapping, ':', $i)) {
-                break;
+            if ($offsetBeforeKeyParsing === $i) {
+                throw new ParseException('Missing mapping key.', self::$parsedLineNumber + 1, $mapping);
             }
 
-            if (':' === $key) {
-                @trigger_error('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
+            if (false === $i = strpos($mapping, ':', $i)) {
+                break;
             }
 
             if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags)) {
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey)) {
-                    @trigger_error('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.', E_USER_DEPRECATED);
+                    throw new ParseException('Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings.', self::$parsedLineNumber + 1, $mapping);
                 }
             }
 
-            if (':' !== $key && (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
-                @trigger_error('Using a colon that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}" is deprecated since version 3.2 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
+            if (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true)) {
+                throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
             }
 
             while ($i < $len) {
@@ -509,7 +456,6 @@ class Inline
                 }
 
                 $tag = self::parseTag($mapping, $i, $flags);
-                $duplicate = false;
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
@@ -518,8 +464,7 @@ class Inline
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
                         if (isset($output[$key])) {
-                            @trigger_error(sprintf('Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
-                            $duplicate = true;
+                            throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), self::$parsedLineNumber + 1, $mapping);
                         }
                         break;
                     case '{':
@@ -529,8 +474,7 @@ class Inline
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
                         if (isset($output[$key])) {
-                            @trigger_error(sprintf('Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
-                            $duplicate = true;
+                            throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), self::$parsedLineNumber + 1, $mapping);
                         }
                         break;
                     default:
@@ -539,19 +483,17 @@ class Inline
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
                         if (isset($output[$key])) {
-                            @trigger_error(sprintf('Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
-                            $duplicate = true;
+                            throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), self::$parsedLineNumber + 1, $mapping);
                         }
                         --$i;
                 }
 
-                if (!$duplicate) {
-                    if (null !== $tag) {
-                        $output[$key] = new TaggedValue($tag, $value);
-                    } else {
-                        $output[$key] = $value;
-                    }
+                if (null !== $tag) {
+                    $output[$key] = new TaggedValue($tag, $value);
+                } else {
+                    $output[$key] = $value;
                 }
+
                 ++$i;
 
                 continue 2;
@@ -621,18 +563,6 @@ class Inline
                         }
 
                         return;
-                    case 0 === strpos($scalar, '!!php/object:'):
-                        if (self::$objectSupport) {
-                            @trigger_error('The !!php/object tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object tag instead.', E_USER_DEPRECATED);
-
-                            return unserialize(substr($scalar, 13));
-                        }
-
-                        if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
-                        }
-
-                        return;
                     case 0 === strpos($scalar, '!php/const:'):
                         if (self::$constantSupport) {
                             if (defined($const = substr($scalar, 11))) {
@@ -680,13 +610,8 @@ class Inline
                         return -log(0);
                     case '-.inf' === $scalarLower:
                         return log(0);
-                    case Parser::preg_match('/^(-|\+)?[0-9][0-9,]*(\.[0-9_]+)?$/', $scalar):
                     case Parser::preg_match('/^(-|\+)?[0-9][0-9_]*(\.[0-9_]+)?$/', $scalar):
-                        if (false !== strpos($scalar, ',')) {
-                            @trigger_error('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
-                        }
-
-                        return (float) str_replace(array(',', '_'), '', $scalar);
+                        return (float) str_replace('_', '', $scalar);
                     case Parser::preg_match(self::getTimestampRegex(), $scalar):
                         if (Yaml::PARSE_DATETIME & $flags) {
                             // When no timezone is provided in the parsed date, YAML spec says we must assume UTC.

@@ -35,34 +35,9 @@ class ParserTest extends TestCase
     /**
      * @dataProvider getDataFormSpecifications
      */
-    public function testSpecifications($expected, $yaml, $comment, $deprecated)
+    public function testSpecifications($expected, $yaml, $comment)
     {
-        $deprecations = array();
-
-        if ($deprecated) {
-            set_error_handler(function ($type, $msg) use (&$deprecations) {
-                if (E_USER_DEPRECATED !== $type) {
-                    restore_error_handler();
-
-                    if (class_exists('PHPUnit_Util_ErrorHandler')) {
-                        return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
-                    }
-
-                    return call_user_func_array('PHPUnit\Util\ErrorHandler::handleError', func_get_args());
-                }
-
-                $deprecations[] = $msg;
-            });
-        }
-
         $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
-
-        if ($deprecated) {
-            restore_error_handler();
-
-            $this->assertCount(1, $deprecations);
-            $this->assertContains('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', $deprecations[0]);
-        }
     }
 
     public function getDataFormSpecifications()
@@ -81,20 +56,6 @@ class ParserTest extends TestCase
     public function getNonStringMappingKeysData()
     {
         return $this->loadTestsFromFixtureFiles('nonStringKeys.yml');
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getLegacyNonStringMappingKeysData
-     */
-    public function testLegacyNonStringMappingKeys($expected, $yaml, $comment)
-    {
-        $this->assertSame($expected, var_export($this->parser->parse($yaml), true), $comment);
-    }
-
-    public function getLegacyNonStringMappingKeysData()
-    {
-        return $this->loadTestsFromFixtureFiles('legacyNonStringKeys.yml');
     }
 
     public function testTabsInYaml()
@@ -475,35 +436,13 @@ EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testObjectSupportEnabledPassingTrue()
+    public function testObjectSupportDisabledButNoExceptions()
     {
         $input = <<<'EOF'
-foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
-    }
 
-    /**
-     * @group legacy
-     */
-    public function testObjectSupportEnabledWithDeprecatedTag()
-    {
-        $input = <<<'EOF'
-foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
-bar: 1
-EOF;
-        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
-    }
-
-    /**
-     * @dataProvider invalidDumpedObjectProvider
-     */
-    public function testObjectSupportDisabledButNoExceptions($input)
-    {
         $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
     }
 
@@ -519,15 +458,6 @@ EOF;
         }
 
         $this->assertEquals($expected, $this->parser->parse($yaml, $flags));
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getObjectForMapTests
-     */
-    public function testObjectForMapEnabledWithMappingUsingBooleanToggles($yaml, $expected)
-    {
-        $this->assertEquals($expected, $this->parser->parse($yaml, false, false, true));
     }
 
     public function getObjectForMapTests()
@@ -594,11 +524,15 @@ YAML;
     }
 
     /**
-     * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
-    public function testObjectsSupportDisabledWithExceptions($yaml)
+    public function testObjectsSupportDisabledWithExceptions()
     {
+        $yaml = <<<'EOF'
+foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+
         $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -611,33 +545,6 @@ YAML;
         );
 
         $this->assertSame($expected, $this->parser->parse($yaml));
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider invalidDumpedObjectProvider
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     */
-    public function testObjectsSupportDisabledWithExceptionsUsingBooleanToggles($yaml)
-    {
-        $this->parser->parse($yaml, true);
-    }
-
-    public function invalidDumpedObjectProvider()
-    {
-        $yamlTag = <<<'EOF'
-foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
-bar: 1
-EOF;
-        $localTag = <<<'EOF'
-foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
-bar: 1
-EOF;
-
-        return array(
-            'yaml-tag' => array($yamlTag),
-            'local-tag' => array($localTag),
-        );
     }
 
     /**
@@ -805,6 +712,9 @@ EOF
     }
 
     /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Duplicate key "child" detected
+     *
      * > It is an error for two equal keys to appear in the same mapping node.
      * > In such a case the YAML processor may continue, ignoring the second
      * > `key: value` pair and issuing an appropriate warning. This strategy
@@ -813,7 +723,6 @@ EOF
      *
      * @see http://yaml.org/spec/1.2/spec.html#id2759572
      * @see http://yaml.org/spec/1.1/#id932806
-     * @group legacy
      */
     public function testMappingDuplicateKeyBlock()
     {
@@ -834,7 +743,8 @@ EOD;
     }
 
     /**
-     * @group legacy
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Duplicate key "child" detected
      */
     public function testMappingDuplicateKeyFlow()
     {
@@ -851,13 +761,13 @@ EOD;
     }
 
     /**
-     * @group legacy
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @dataProvider getParseExceptionOnDuplicateData
-     * @expectedDeprecation Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated %s.
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
      */
     public function testParseExceptionOnDuplicate($input, $duplicateKey, $lineNumber)
     {
+        $this->expectExceptionMessage(sprintf('Duplicate key "%s" detected at line %d', $duplicateKey, $lineNumber));
+
         Yaml::parse($input);
     }
 
@@ -1080,8 +990,8 @@ EOF;
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
      */
     public function testFloatKeys()
     {
@@ -1091,19 +1001,12 @@ foo:
     1.3: "baz"
 EOF;
 
-        $expected = array(
-            'foo' => array(
-                '1.2' => 'bar',
-                '1.3' => 'baz',
-            ),
-        );
-
-        $this->assertEquals($expected, $this->parser->parse($yaml));
+        $this->parser->parse($yaml);
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
      */
     public function testBooleanKeys()
     {
@@ -1112,12 +1015,7 @@ true: foo
 false: bar
 EOF;
 
-        $expected = array(
-            1 => 'foo',
-            0 => 'bar',
-        );
-
-        $this->assertEquals($expected, $this->parser->parse($yaml));
+        $this->parser->parse($yaml);
     }
 
     public function testExplicitStringCastingOfFloatKeys()
@@ -1653,8 +1551,8 @@ YAML
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Complex mappings are not supported at line 1 (near "? "1"").
      */
     public function testComplexMappingThrowsParseException()
     {
@@ -1668,8 +1566,8 @@ YAML;
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Complex mappings are not supported at line 2 (near "? "1"").
      */
     public function testComplexMappingNestedInMappingThrowsParseException()
     {
@@ -1684,8 +1582,8 @@ YAML;
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Complex mappings are not supported at line 1 (near "- ? "1"").
      */
     public function testComplexMappingNestedInSequenceThrowsParseException()
     {
@@ -1734,7 +1632,7 @@ INI;
                 } else {
                     eval('$expected = '.trim($test['php']).';');
 
-                    $tests[] = array(var_export($expected, true), $test['yaml'], $test['test'], isset($test['deprecated']) ? $test['deprecated'] : false);
+                    $tests[] = array(var_export($expected, true), $test['yaml'], $test['test']);
                 }
             }
         }

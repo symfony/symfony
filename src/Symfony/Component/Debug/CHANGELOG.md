@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+* removed the symfony_debug extension
+
 3.3.0
 -----
 

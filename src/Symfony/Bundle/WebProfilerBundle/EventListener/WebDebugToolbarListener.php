@@ -54,11 +54,6 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->cspHandler = $cspHandler;
     }
 
-    public function isEnabled()
-    {
-        return self::DISABLED !== $this->mode;
-    }
-
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $response = $event->getResponse();

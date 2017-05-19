@@ -131,7 +131,7 @@ class AcceptHeaderItem
      */
     public function setQuality($quality)
     {
-        $this->quality = $quality;
+        $this->quality = (float) $quality;
 
         return $this;
     }
@@ -155,7 +155,7 @@ class AcceptHeaderItem
      */
     public function setIndex($index)
     {
-        $this->index = $index;
+        $this->index = (int) $index;
 
         return $this;
     }

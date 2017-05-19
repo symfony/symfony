@@ -21,6 +21,9 @@ class AcceptHeaderTest extends TestCase
     {
         $header = AcceptHeader::fromString('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c');
         $this->assertSame('text/html', $header->first()->getValue());
+
+        $header = new AcceptHeader($header->all());
+        $this->assertSame('text/html', $header->first()->getValue());
     }
 
     /**

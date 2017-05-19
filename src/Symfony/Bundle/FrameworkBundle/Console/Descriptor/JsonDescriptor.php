@@ -231,8 +231,11 @@ class JsonDescriptor extends Descriptor
             'autoconfigure' => $definition->isAutoconfigured(),
         );
 
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $data['autowiring_types'][] = $autowiringType;
+        // forward compatibility with DependencyInjection component in version 4.0
+        if (method_exists($definition, 'getAutowiringTypes')) {
+            foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
+                $data['autowiring_types'][] = $autowiringType;
+            }
         }
 
         if ($showArguments) {

@@ -18,24 +18,18 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class TableCell
 {
-    /**
-     * @var string
-     */
     private $value;
-
-    /**
-     * @var array
-     */
-    private $options = array(
-        'rowspan' => 1,
-        'colspan' => 1,
-    );
+    private $rowspan;
+    private $colspan;
 
     /**
      * @param string $value
-     * @param array  $options
+     * @param int    $rowspan
+     * @param int    $colspan
+     *
+     * @throws InvalidArgumentException If unsupported options are given (deprecated)
      */
-    public function __construct($value = '', array $options = array())
+    public function __construct($value = '', $rowspan = 1, $colspan = 1)
     {
         if (is_numeric($value) && !is_string($value)) {
             $value = (string) $value;
@@ -43,12 +37,20 @@ class TableCell
 
         $this->value = $value;
 
-        // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new InvalidArgumentException(sprintf('The TableCell does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        // deprecated options
+        if (is_array($rowspan)) {
+            @trigger_error('Passing an array to TableCell is deprecated since version 3.2 and will be removed in 4.0. Use the specific arguments instead.', E_USER_DEPRECATED);
+
+            // check option names
+            if ($diff = array_diff(array_keys($rowspan), array('rowspan', 'colspan'))) {
+                throw new InvalidArgumentException(sprintf('The TableCell does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+            }
+            $colspan = isset($rowspan['colspan']) ? (int) $rowspan['colspan'] : 1;
+            $rowspan = isset($rowspan['rowspan']) ? (int) $rowspan['rowspan'] : 1;
         }
 
-        $this->options = array_merge($this->options, $options);
+        $this->rowspan = abs($rowspan) ?: 1;
+        $this->colspan = abs($colspan) ?: 1;
     }
 
     /**
@@ -68,7 +70,7 @@ class TableCell
      */
     public function getColspan()
     {
-        return (int) $this->options['colspan'];
+        return $this->colspan;
     }
 
     /**
@@ -78,6 +80,6 @@ class TableCell
      */
     public function getRowspan()
     {
-        return (int) $this->options['rowspan'];
+        return $this->rowspan;
     }
 }

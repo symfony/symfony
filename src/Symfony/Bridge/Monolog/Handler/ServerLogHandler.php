@@ -55,7 +55,7 @@ class ServerLogHandler extends AbstractHandler
             $recordFormatted = $this->formatRecord($record);
 
             if (-1 === stream_socket_sendto($this->socket, $recordFormatted)) {
-                fclose($this->socket);
+                stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
 
                 // Let's retry: the persistent connection might just be stale
                 if ($this->socket = $this->createSocket()) {

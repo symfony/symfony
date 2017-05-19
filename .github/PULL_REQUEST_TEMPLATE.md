@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | master / 2.7, 2.8 or 3.2 <!-- see comment below -->
+| Branch?       | 3.4 or master / 2.7, 2.8, 3.2 or 3.3 <!-- see comment below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- don't forget updating src/**/CHANGELOG.md files -->
 | BC breaks?    | yes/no
@@ -13,7 +13,8 @@
 <!--
 - Bug fixes must be submitted against the lowest branch where they apply
   (lowest branches are regularly merged to upper ones so they get the fixes too).
-- Features and deprecations must be submitted against the master branch.
+- Features and deprecations must be submitted against the 3.4,
+  legacy code removals go to the master branch.
 - Please fill in this template according to the PR you're about to submit.
 - Replace this comment by a description of what your PR is solving.
 -->

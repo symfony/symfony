@@ -68,10 +68,9 @@ function get_icu_version_from_genrb($genrb)
     return $matches[1];
 }
 
-set_exception_handler(function ($exception) {
+set_exception_handler(function (\Throwable $exception) {
     echo "\n";
 
-    /** @var \Exception|\Throwable $exception */
     $cause = $exception;
     $root = true;
 

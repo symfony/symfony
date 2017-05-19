@@ -58,7 +58,7 @@ install:
     - php phpunit install
 
 test_script:
-    - cd c:\projects\symfony
+    - SET X=0
     - cd c:\php && 7z x php-7.1.3-Win32-VC14-x86.zip -y >nul && copy /Y php.ini-min php.ini
     - cd c:\projects\symfony
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!

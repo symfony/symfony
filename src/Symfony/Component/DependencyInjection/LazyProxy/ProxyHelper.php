@@ -28,7 +28,7 @@ class ProxyHelper
 
         foreach ($r->getParameters() as $i => $p) {
             $k = '$'.$p->name;
-            if (method_exists($p, 'isVariadic') && $p->isVariadic()) {
+            if ($p->isVariadic()) {
                 $k = '...'.$k;
             }
             $call[] = $k;
@@ -72,17 +72,9 @@ class ProxyHelper
     public static function getTypeHint(\ReflectionFunctionAbstract $r, \ReflectionParameter $p = null, $noBuiltin = false)
     {
         if ($p instanceof \ReflectionParameter) {
-            if (method_exists($p, 'getType')) {
-                $type = $p->getType();
-            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $p, $type)) {
-                $name = $type = $type[1];
-
-                if ('callable' === $name || 'array' === $name) {
-                    return $noBuiltin ? null : $name;
-                }
-            }
+            $type = $p->getType();
         } else {
-            $type = method_exists($r, 'getReturnType') ? $r->getReturnType() : null;
+            $type = $r->getReturnType();
         }
         if (!$type) {
             return;

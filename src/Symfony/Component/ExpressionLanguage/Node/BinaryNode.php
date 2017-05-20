@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class BinaryNode extends Node
 {
     private static $operators = array(
@@ -148,5 +153,10 @@ class BinaryNode extends Node
             case 'matches':
                 return preg_match($right, $left);
         }
+    }
+
+    public function toArray()
+    {
+        return array('(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')');
     }
 }

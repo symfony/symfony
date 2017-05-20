@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class TextTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'text';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
@@ -27,8 +27,9 @@ class TextTypeTest extends BaseTypeTest
         ));
 
         $form->submit(null);
-
-        $this->assertNull($form->getData());
+        $this->assertSame('', $form->getData());
+        $this->assertSame('', $form->getNormData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function provideZeros()

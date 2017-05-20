@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -21,22 +22,19 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface ContainerInterface
+interface ContainerInterface extends PsrContainerInterface
 {
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
     const NULL_ON_INVALID_REFERENCE = 2;
     const IGNORE_ON_INVALID_REFERENCE = 3;
-    const SCOPE_CONTAINER = 'container';
-    const SCOPE_PROTOTYPE = 'prototype';
 
     /**
      * Sets a service.
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
-     * @param string $scope   The scope of the service
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER);
+    public function set($id, $service);
 
     /**
      * Gets a service.
@@ -61,6 +59,15 @@ interface ContainerInterface
      * @return bool true if the service is defined, false otherwise
      */
     public function has($id);
+
+    /**
+     * Check for whether or not a service has been initialized.
+     *
+     * @param string $id
+     *
+     * @return bool true if the service has been initialized, false otherwise
+     */
+    public function initialized($id);
 
     /**
      * Gets a parameter.
@@ -89,45 +96,4 @@ interface ContainerInterface
      * @param mixed  $value The parameter value
      */
     public function setParameter($name, $value);
-
-    /**
-     * Enters the given scope.
-     *
-     * @param string $name
-     */
-    public function enterScope($name);
-
-    /**
-     * Leaves the current scope, and re-enters the parent scope.
-     *
-     * @param string $name
-     */
-    public function leaveScope($name);
-
-    /**
-     * Adds a scope to the container.
-     *
-     * @param ScopeInterface $scope
-     */
-    public function addScope(ScopeInterface $scope);
-
-    /**
-     * Whether this container has the given scope.
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasScope($name);
-
-    /**
-     * Determines whether the given scope is currently active.
-     *
-     * It does however not check if the scope actually exists.
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function isScopeActive($name);
 }

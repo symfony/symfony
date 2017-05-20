@@ -70,6 +70,20 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
+    public function testTargetPathIsPassedAsNestedParameterWithRequest()
+    {
+        $this->request->expects($this->once())
+            ->method('get')->with('_target_path')
+            ->will($this->returnValue(array('value' => '/dashboard')));
+
+        $response = $this->expectRedirectResponse('/dashboard');
+
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array('target_path_parameter' => '_target_path[value]'));
+        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
+
+        $this->assertSame($response, $result);
+    }
+
     public function testTargetPathParameterIsCustomised()
     {
         $options = array('target_path_parameter' => '_my_target_path');
@@ -125,7 +139,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function testRefererHasToBeDifferentThatLoginUrl()
+    public function testRefererHasToBeDifferentThanLoginUrl()
     {
         $options = array('use_referer' => true);
 
@@ -136,6 +150,26 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->httpUtils->expects($this->once())
             ->method('generateUri')->with($this->request, '/login')
             ->will($this->returnValue('/login'));
+
+        $response = $this->expectRedirectResponse('/');
+
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testRefererWithoutParametersHasToBeDifferentThanLoginUrl()
+    {
+        $options = array('use_referer' => true);
+
+        $this->request->headers->expects($this->any())
+            ->method('get')->with('Referer')
+            ->will($this->returnValue('/subfolder/login?t=1&p=2'));
+
+        $this->httpUtils->expects($this->once())
+            ->method('generateUri')->with($this->request, '/login')
+            ->will($this->returnValue('/subfolder/login'));
 
         $response = $this->expectRedirectResponse('/');
 

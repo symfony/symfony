@@ -279,10 +279,78 @@ class PhpMatcherDumperTest extends TestCase
         $route->setCondition('context.getMethod() == "GET"');
         $rootprefixCollection->add('with-condition', $route);
 
+        /* test case 4 */
+        $headMatchCasesCollection = new RouteCollection();
+        $headMatchCasesCollection->add('just_head', new Route(
+            '/just_head',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('HEAD')
+        ));
+        $headMatchCasesCollection->add('head_and_get', new Route(
+            '/head_and_get',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('GET', 'HEAD')
+        ));
+        $headMatchCasesCollection->add('post_and_head', new Route(
+            '/post_and_get',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('POST', 'HEAD')
+        ));
+        $headMatchCasesCollection->add('put_and_post', new Route(
+            '/put_and_post',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('PUT', 'POST')
+        ));
+        $headMatchCasesCollection->add('put_and_get_and_head', new Route(
+            '/put_and_post',
+            array(),
+            array(),
+            array(),
+            '',
+            array(),
+            array('PUT', 'GET', 'HEAD')
+        ));
+
+        /* test case 5 */
+        $groupOptimisedCollection = new RouteCollection();
+        $groupOptimisedCollection->add('a_first', new Route('/a/11'));
+        $groupOptimisedCollection->add('a_second', new Route('/a/22'));
+        $groupOptimisedCollection->add('a_third', new Route('/a/333'));
+        $groupOptimisedCollection->add('a_wildcard', new Route('/{param}'));
+        $groupOptimisedCollection->add('a_fourth', new Route('/a/44/'));
+        $groupOptimisedCollection->add('a_fifth', new Route('/a/55/'));
+        $groupOptimisedCollection->add('a_sixth', new Route('/a/66/'));
+        $groupOptimisedCollection->add('nested_wildcard', new Route('/nested/{param}'));
+        $groupOptimisedCollection->add('nested_a', new Route('/nested/group/a/'));
+        $groupOptimisedCollection->add('nested_b', new Route('/nested/group/b/'));
+        $groupOptimisedCollection->add('nested_c', new Route('/nested/group/c/'));
+
+        $groupOptimisedCollection->add('slashed_a', new Route('/slashed/group/'));
+        $groupOptimisedCollection->add('slashed_b', new Route('/slashed/group/b/'));
+        $groupOptimisedCollection->add('slashed_c', new Route('/slashed/group/c/'));
+
         return array(
            array($collection, 'url_matcher1.php', array()),
            array($redirectCollection, 'url_matcher2.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($rootprefixCollection, 'url_matcher3.php', array()),
+           array($headMatchCasesCollection, 'url_matcher4.php', array()),
+           array($groupOptimisedCollection, 'url_matcher5.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
         );
     }
 }

@@ -1,0 +1,6 @@
+services:
+    child_service_expected:
+        class: stdClass
+        # _defaults is applied to the parent, but autoconfigure: true
+        # does not cascade to the child
+        autoconfigure: false

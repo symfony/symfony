@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
-use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -79,22 +78,29 @@ class Client extends BaseClient
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
-
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
-        $requirePath = str_replace("'", "\\'", $r->getFileName());
-        $symfonyPath = str_replace("'", "\\'", dirname(dirname(dirname(__DIR__))));
         $errorReporting = error_reporting();
+
+        $requires = '';
+        foreach (get_declared_classes() as $class) {
+            if (0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $file = dirname(dirname($r->getFileName())).'/autoload.php';
+                if (file_exists($file)) {
+                    $requires .= "require_once '".str_replace("'", "\\'", $file)."';\n";
+                }
+            }
+        }
+
+        if (!$requires) {
+            throw new \RuntimeException('Composer autoloader not found.');
+        }
 
         $code = <<<EOF
 <?php
 
 error_reporting($errorReporting);
 
-require_once '$requirePath';
-
-\$loader = new Symfony\Component\ClassLoader\ClassLoader();
-\$loader->addPrefix('Symfony', '$symfonyPath');
-\$loader->register();
+$requires
 
 \$kernel = unserialize('$kernel');
 \$request = unserialize('$request');
@@ -190,20 +196,11 @@ EOF;
      */
     protected function filterResponse($response)
     {
-        $headers = $response->headers->all();
-        if ($response->headers->getCookies()) {
-            $cookies = array();
-            foreach ($response->headers->getCookies() as $cookie) {
-                $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-            }
-            $headers['Set-Cookie'] = $cookies;
-        }
-
         // this is needed to support StreamedResponse
         ob_start();
         $response->sendContent();
         $content = ob_get_clean();
 
-        return new DomResponse($content, $response->getStatusCode(), $headers);
+        return new DomResponse($content, $response->getStatusCode(), $response->headers->all());
     }
 }

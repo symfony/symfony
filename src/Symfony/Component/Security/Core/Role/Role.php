@@ -12,8 +12,7 @@
 namespace Symfony\Component\Security\Core\Role;
 
 /**
- * Role is a simple implementation of a RoleInterface where the role is a
- * string.
+ * Role is a simple implementation representing a role identified by a string.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

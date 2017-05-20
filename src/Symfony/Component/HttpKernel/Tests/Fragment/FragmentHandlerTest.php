@@ -41,7 +41,7 @@ class FragmentHandlerTest extends TestCase
      */
     public function testRenderWhenRendererDoesNotExist()
     {
-        $handler = new FragmentHandler(array(), null, $this->requestStack);
+        $handler = new FragmentHandler($this->requestStack);
         $handler->render('/', 'foo');
     }
 
@@ -91,7 +91,7 @@ class FragmentHandlerTest extends TestCase
             call_user_func_array(array($e, 'with'), $arguments);
         }
 
-        $handler = new FragmentHandler(array(), null, $this->requestStack);
+        $handler = new FragmentHandler($this->requestStack);
         $handler->addRenderer($renderer);
 
         return $handler;

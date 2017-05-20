@@ -5,38 +5,43 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
 
-        <service id="assets.packages" class="Symfony\Component\Asset\Packages">
+        <service id="assets.packages" class="Symfony\Component\Asset\Packages" public="true">
             <argument type="service" id="assets.empty_package" /> <!-- default package -->
             <argument type="collection" /> <!-- named packages -->
         </service>
+        <service id="Symfony\Component\Asset\Packages" alias="assets.packages" />
 
-        <service id="assets.empty_package" class="Symfony\Component\Asset\Package" public="false">
+        <service id="assets.empty_package" class="Symfony\Component\Asset\Package">
             <argument type="service" id="assets.empty_version_strategy" />
         </service>
 
-        <service id="assets.context" class="Symfony\Component\Asset\Context\RequestStackContext">
+        <service id="assets.context" class="Symfony\Component\Asset\Context\RequestStackContext" public="true">
             <argument type="service" id="request_stack" />
         </service>
 
-        <service id="assets.path_package" class="Symfony\Component\Asset\PathPackage" abstract="true">
+        <service id="assets.path_package" class="Symfony\Component\Asset\PathPackage" abstract="true" public="true">
             <argument /> <!-- base path -->
-            <argument type="service" /> <!-- version strategy -->
+            <argument /> <!-- version strategy -->
             <argument type="service" id="assets.context" />
         </service>
 
-        <service id="assets.url_package" class="Symfony\Component\Asset\UrlPackage" abstract="true">
+        <service id="assets.url_package" class="Symfony\Component\Asset\UrlPackage" abstract="true" public="true">
             <argument /> <!-- base URLs -->
-            <argument type="service" /> <!-- version strategy -->
+            <argument /> <!-- version strategy -->
             <argument type="service" id="assets.context" />
         </service>
 
-        <service id="assets.static_version_strategy" class="Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy" abstract="true">
+        <service id="assets.static_version_strategy" class="Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy" abstract="true" public="true">
             <argument /> <!-- version -->
             <argument /> <!-- format -->
         </service>
 
-        <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" public="false" />
+        <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" />
 
+        <service id="assets.json_manifest_version_strategy" class="Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy" abstract="true">
+            <argument /> <!-- manifest path -->
+        </service>
     </services>
 </container>

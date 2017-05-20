@@ -44,6 +44,8 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
         $this->data = $this->computeCount($messages);
         $this->data['messages'] = $messages;
+
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**
@@ -101,9 +103,14 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
             if (!isset($result[$messageId])) {
                 $message['count'] = 1;
+                $message['parameters'] = !empty($message['parameters']) ? array($message['parameters']) : array();
                 $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
                 $result[$messageId] = $message;
             } else {
+                if (!empty($message['parameters'])) {
+                    $result[$messageId]['parameters'][] = $message['parameters'];
+                }
+
                 ++$result[$messageId]['count'];
             }
 
@@ -132,7 +139,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
-        if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($string)) {
+        if (false !== $encoding = mb_detect_encoding($string, null, true)) {
             if (mb_strlen($string, $encoding) > $length) {
                 return mb_substr($string, 0, $length - 3, $encoding).'...';
             }

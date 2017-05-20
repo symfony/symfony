@@ -24,17 +24,6 @@ class LoaderTest extends TestCase
         $loader->setLogger($logger);
         $this->assertSame($logger, $loader->getLogger(), '->setLogger() sets the logger instance');
     }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetSetDebugger()
-    {
-        $loader = new ProjectTemplateLoader4();
-        $debugger = $this->getMockBuilder('Symfony\Component\Templating\DebuggerInterface')->getMock();
-        $loader->setDebugger($debugger);
-        $this->assertSame($debugger, $loader->getDebugger(), '->setDebugger() sets the debugger instance');
-    }
 }
 
 class ProjectTemplateLoader4 extends Loader

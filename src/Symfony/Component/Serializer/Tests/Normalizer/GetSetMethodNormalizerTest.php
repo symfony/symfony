@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -101,81 +102,9 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyDenormalizeOnCamelCaseFormat()
-    {
-        $this->normalizer->setCamelizedAttributes(array('camel_case'));
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\GetSetDummy'
-        );
-
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
-    public function testNameConverterSupport()
-    {
-        $this->normalizer = new GetSetMethodNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\GetSetDummy'
-        );
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
     public function testDenormalizeNull()
     {
         $this->assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\GetSetDummy'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyCamelizedAttributesNormalize()
-    {
-        $obj = new GetCamelizedDummy('dunglas.fr');
-        $obj->setFooBar('les-tilleuls.coop');
-        $obj->setBar_foo('lostinthesupermarket.fr');
-
-        $this->normalizer->setCamelizedAttributes(array('kevin_dunglas'));
-        $this->assertEquals($this->normalizer->normalize($obj), array(
-            'kevin_dunglas' => 'dunglas.fr',
-            'fooBar' => 'les-tilleuls.coop',
-            'bar_foo' => 'lostinthesupermarket.fr',
-        ));
-
-        $this->normalizer->setCamelizedAttributes(array('foo_bar'));
-        $this->assertEquals($this->normalizer->normalize($obj), array(
-            'kevinDunglas' => 'dunglas.fr',
-            'foo_bar' => 'les-tilleuls.coop',
-            'bar_foo' => 'lostinthesupermarket.fr',
-        ));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyCamelizedAttributesDenormalize()
-    {
-        $obj = new GetCamelizedDummy('dunglas.fr');
-        $obj->setFooBar('les-tilleuls.coop');
-        $obj->setBar_foo('lostinthesupermarket.fr');
-
-        $this->normalizer->setCamelizedAttributes(array('kevin_dunglas'));
-        $this->assertEquals($this->normalizer->denormalize(array(
-            'kevin_dunglas' => 'dunglas.fr',
-            'fooBar' => 'les-tilleuls.coop',
-            'bar_foo' => 'lostinthesupermarket.fr',
-        ), __NAMESPACE__.'\GetCamelizedDummy'), $obj);
-
-        $this->normalizer->setCamelizedAttributes(array('foo_bar'));
-        $this->assertEquals($this->normalizer->denormalize(array(
-            'kevinDunglas' => 'dunglas.fr',
-            'foo_bar' => 'les-tilleuls.coop',
-            'bar_foo' => 'lostinthesupermarket.fr',
-        ), __NAMESPACE__.'\GetCamelizedDummy'), $obj);
     }
 
     public function testConstructorDenormalize()
@@ -208,11 +137,6 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals(array(1, 2, 3), $obj->getBaz());
     }
 
-    /**
-     * @see https://bugs.php.net/62715
-     *
-     * @requires PHP 5.3.17
-     */
     public function testConstructorDenormalizeWithOptionalDefaultArgument()
     {
         $obj = $this->normalizer->denormalize(
@@ -467,7 +391,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\LogicException
-     * @expectedExceptionMessage Cannot normalize attribute "object" because injected serializer is not a normalizer
+     * @expectedExceptionMessage Cannot normalize attribute "object" because the injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
     {
@@ -571,6 +495,46 @@ class GetSetMethodNormalizerTest extends TestCase
     {
         $obj = $this->normalizer->denormalize(array('foo' => 'foobar'), __NAMESPACE__.'\ObjectWithPrivateSetterDummy');
         $this->assertEquals('bar', $obj->getFoo());
+    }
+
+    public function testMaxDepth()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory);
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
+
+        $level1 = new MaxDepthDummy();
+        $level1->bar = 'level1';
+
+        $level2 = new MaxDepthDummy();
+        $level2->bar = 'level2';
+        $level1->child = $level2;
+
+        $level3 = new MaxDepthDummy();
+        $level3->bar = 'level3';
+        $level2->child = $level3;
+
+        $level4 = new MaxDepthDummy();
+        $level4->bar = 'level4';
+        $level3->child = $level4;
+
+        $result = $serializer->normalize($level1, null, array(GetSetMethodNormalizer::ENABLE_MAX_DEPTH => true));
+
+        $expected = array(
+            'bar' => 'level1',
+            'child' => array(
+                    'bar' => 'level2',
+                    'child' => array(
+                            'bar' => 'level3',
+                            'child' => array(
+                                    'child' => null,
+                                ),
+                        ),
+                ),
+            );
+
+        $this->assertEquals($expected, $result);
     }
 }
 

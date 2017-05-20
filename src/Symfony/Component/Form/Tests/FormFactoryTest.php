@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Form\Tests\Fixtures\FooType;
-use Symfony\Component\Form\Tests\Fixtures\FooSubType;
-use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -44,11 +41,6 @@ class FormFactoryTest extends TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $resolvedTypeFactory;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     private $builder;
 
     /**
@@ -58,12 +50,11 @@ class FormFactoryTest extends TestCase
 
     protected function setUp()
     {
-        $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')->getMock();
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
-        $this->factory = new FormFactory($this->registry, $this->resolvedTypeFactory);
+        $this->factory = new FormFactory($this->registry);
 
         $this->registry->expects($this->any())
             ->method('getTypeGuesser')
@@ -98,124 +89,6 @@ class FormFactoryTest extends TestCase
             ->with($this->builder, $resolvedOptions);
 
         $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', null, $options));
-    }
-
-    public function testCreateNamedBuilderWithTypeInstance()
-    {
-        $options = array('a' => '1', 'b' => '2');
-        $resolvedOptions = array('a' => '2', 'b' => '3');
-        $type = new FooType();
-        $resolvedType = $this->getMockResolvedType();
-
-        $this->resolvedTypeFactory->expects($this->once())
-            ->method('createResolvedType')
-            ->with($type)
-            ->will($this->returnValue($resolvedType));
-
-        $resolvedType->expects($this->once())
-            ->method('createBuilder')
-            ->with($this->factory, 'name', $options)
-            ->will($this->returnValue($this->builder));
-
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
-
-        $resolvedType->expects($this->once())
-            ->method('buildForm')
-            ->with($this->builder, $resolvedOptions);
-
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, null, $options));
-    }
-
-    public function testCreateNamedBuilderWithTypeInstanceWithParentType()
-    {
-        $options = array('a' => '1', 'b' => '2');
-        $resolvedOptions = array('a' => '2', 'b' => '3');
-        $type = new FooSubType();
-        $resolvedType = $this->getMockResolvedType();
-        $parentResolvedType = $this->getMockResolvedType();
-
-        $this->registry->expects($this->once())
-            ->method('getType')
-            ->with('foo')
-            ->will($this->returnValue($parentResolvedType));
-
-        $this->resolvedTypeFactory->expects($this->once())
-            ->method('createResolvedType')
-            ->with($type, array(), $parentResolvedType)
-            ->will($this->returnValue($resolvedType));
-
-        $resolvedType->expects($this->once())
-            ->method('createBuilder')
-            ->with($this->factory, 'name', $options)
-            ->will($this->returnValue($this->builder));
-
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
-
-        $resolvedType->expects($this->once())
-            ->method('buildForm')
-            ->with($this->builder, $resolvedOptions);
-
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, null, $options));
-    }
-
-    public function testCreateNamedBuilderWithTypeInstanceWithParentTypeInstance()
-    {
-        $options = array('a' => '1', 'b' => '2');
-        $resolvedOptions = array('a' => '2', 'b' => '3');
-        $type = new FooSubTypeWithParentInstance();
-        $resolvedType = $this->getMockResolvedType();
-        $parentResolvedType = $this->getMockResolvedType();
-
-        $this->resolvedTypeFactory->expects($this->at(0))
-            ->method('createResolvedType')
-            ->with($type->getParent())
-            ->will($this->returnValue($parentResolvedType));
-
-        $this->resolvedTypeFactory->expects($this->at(1))
-            ->method('createResolvedType')
-            ->with($type, array(), $parentResolvedType)
-            ->will($this->returnValue($resolvedType));
-
-        $resolvedType->expects($this->once())
-            ->method('createBuilder')
-            ->with($this->factory, 'name', $options)
-            ->will($this->returnValue($this->builder));
-
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
-
-        $resolvedType->expects($this->once())
-            ->method('buildForm')
-            ->with($this->builder, $resolvedOptions);
-
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, null, $options));
-    }
-
-    public function testCreateNamedBuilderWithResolvedTypeInstance()
-    {
-        $options = array('a' => '1', 'b' => '2');
-        $resolvedOptions = array('a' => '2', 'b' => '3');
-        $resolvedType = $this->getMockResolvedType();
-
-        $resolvedType->expects($this->once())
-            ->method('createBuilder')
-            ->with($this->factory, 'name', $options)
-            ->will($this->returnValue($this->builder));
-
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
-
-        $resolvedType->expects($this->once())
-            ->method('buildForm')
-            ->with($this->builder, $resolvedOptions);
-
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $resolvedType, null, $options));
     }
 
     public function testCreateNamedBuilderFillsDataOption()
@@ -275,27 +148,44 @@ class FormFactoryTest extends TestCase
 
     /**
      * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface", "stdClass" given
+     * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
      */
     public function testCreateNamedBuilderThrowsUnderstandableException()
     {
         $this->factory->createNamedBuilder('name', new \stdClass());
     }
 
-    public function testCreateUsesTypeNameIfTypeGivenAsString()
+    /**
+     * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
+     */
+    public function testCreateThrowsUnderstandableException()
+    {
+        $this->factory->create(new \stdClass());
+    }
+
+    public function testCreateUsesBlockPrefixIfTypeGivenAsString()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
-        $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        // the interface does not have the method, so use the real class
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $resolvedType->expects($this->any())
+            ->method('getBlockPrefix')
+            ->willReturn('TYPE_PREFIX');
+
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('TYPE')
             ->will($this->returnValue($resolvedType));
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
-            ->with($this->factory, 'TYPE', $options)
+            ->with($this->factory, 'TYPE_PREFIX', $options)
             ->will($this->returnValue($this->builder));
 
         $this->builder->expects($this->any())
@@ -311,36 +201,6 @@ class FormFactoryTest extends TestCase
             ->will($this->returnValue('FORM'));
 
         $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
-    }
-
-    public function testCreateUsesTypeNameIfTypeGivenAsObject()
-    {
-        $options = array('a' => '1', 'b' => '2');
-        $resolvedOptions = array('a' => '2', 'b' => '3');
-        $resolvedType = $this->getMockResolvedType();
-
-        $resolvedType->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('TYPE'));
-
-        $resolvedType->expects($this->once())
-            ->method('createBuilder')
-            ->with($this->factory, 'TYPE', $options)
-            ->will($this->returnValue($this->builder));
-
-        $this->builder->expects($this->any())
-            ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
-
-        $resolvedType->expects($this->once())
-            ->method('buildForm')
-            ->with($this->builder, $resolvedOptions);
-
-        $this->builder->expects($this->once())
-            ->method('getForm')
-            ->will($this->returnValue('FORM'));
-
-        $this->assertSame('FORM', $this->factory->create($resolvedType, null, $options));
     }
 
     public function testCreateNamed()
@@ -379,12 +239,12 @@ class FormFactoryTest extends TestCase
         $registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
         $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods(array('createNamedBuilder'))
-            ->setConstructorArgs(array($registry, $this->resolvedTypeFactory))
+            ->setConstructorArgs(array($registry))
             ->getMock();
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array())
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array())
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -398,7 +258,7 @@ class FormFactoryTest extends TestCase
             ->method('guessType')
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
-                'text',
+                'Symfony\Component\Form\Extension\Core\Type\TextType',
                 array('attr' => array('maxlength' => 10)),
                 Guess::MEDIUM_CONFIDENCE
             )));
@@ -407,7 +267,7 @@ class FormFactoryTest extends TestCase
             ->method('guessType')
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
-                'password',
+                'Symfony\Component\Form\Extension\Core\Type\PasswordType',
                 array('attr' => array('maxlength' => 7)),
                 Guess::HIGH_CONFIDENCE
             )));
@@ -416,7 +276,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'password', null, array('attr' => array('maxlength' => 7)))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', null, array('attr' => array('maxlength' => 7)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -435,7 +295,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text')
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -449,7 +309,7 @@ class FormFactoryTest extends TestCase
                 ->method('guessType')
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new TypeGuess(
-                    'text',
+                    'Symfony\Component\Form\Extension\Core\Type\TextType',
                     array('attr' => array('maxlength' => 10)),
                     Guess::MEDIUM_CONFIDENCE
                 )));
@@ -458,7 +318,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 11)))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('attr' => array('maxlength' => 11)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -493,7 +353,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 20)))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('attr' => array('maxlength' => 20)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -526,7 +386,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce')))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('attr' => array('maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce')))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -561,7 +421,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('required' => false))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('required' => false))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -594,7 +454,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('pattern' => '[a-zA-Z]')))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('attr' => array('pattern' => '[a-zA-Z]')))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -609,7 +469,7 @@ class FormFactoryTest extends TestCase
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->registry, $this->resolvedTypeFactory))
+            ->setConstructorArgs(array($this->registry))
             ->getMock();
     }
 

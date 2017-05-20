@@ -12,35 +12,39 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TranslatorPassTest extends TestCase
 {
     public function testValidCollector()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $definition->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with('addLoader', array('xliff', new Reference('xliff')));
-        $definition->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with('addLoader', array('xlf', new Reference('xliff')));
+        $loader = (new Definition())
+            ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'));
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'getDefinition', 'findTaggedServiceIds', 'findDefinition'))->getMock();
-        $container->expects($this->any())
-            ->method('hasDefinition')
-            ->will($this->returnValue(true));
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
-        $container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue(array('xliff' => array(array('alias' => 'xliff', 'legacy-alias' => 'xlf')))));
-        $container->expects($this->once())
-            ->method('findDefinition')
-            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock()));
+        $translator = (new Definition())
+            ->setArguments(array(null, null, null, null));
+
+        $container = new ContainerBuilder();
+        $container->setDefinition('translator.default', $translator);
+        $container->setDefinition('translation.loader', $loader);
+
         $pass = new TranslatorPass();
         $pass->process($container);
+
+        $expected = (new Definition())
+            ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'))
+            ->addMethodCall('addLoader', array('xliff', new Reference('translation.loader')))
+            ->addMethodCall('addLoader', array('xlf', new Reference('translation.loader')))
+        ;
+        $this->assertEquals($expected, $loader);
+
+        $this->assertSame(array('translation.loader' => array('xliff', 'xlf')), $translator->getArgument(3));
+
+        $expected = array('translation.loader' => new ServiceClosureArgument(new Reference('translation.loader')));
+        $this->assertEquals($expected, $container->getDefinition((string) $translator->getArgument(0))->getArgument(0));
     }
 }

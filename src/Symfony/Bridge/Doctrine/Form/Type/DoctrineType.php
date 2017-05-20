@@ -20,14 +20,10 @@ use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
-use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
-use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 abstract class DoctrineType extends AbstractType
 {
@@ -35,11 +31,6 @@ abstract class DoctrineType extends AbstractType
      * @var ManagerRegistry
      */
     protected $registry;
-
-    /**
-     * @var ChoiceListFactoryInterface
-     */
-    private $choiceListFactory;
 
     /**
      * @var IdReader[]
@@ -108,15 +99,9 @@ abstract class DoctrineType extends AbstractType
         return false;
     }
 
-    public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
-        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(
-            new PropertyAccessDecorator(
-                new DefaultChoiceListFactory(),
-                $propertyAccessor
-            )
-        );
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -131,13 +116,7 @@ abstract class DoctrineType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $registry = $this->registry;
-        $choiceListFactory = $this->choiceListFactory;
-        $idReaders = &$this->idReaders;
-        $choiceLoaders = &$this->choiceLoaders;
-        $type = $this;
-
-        $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
+        $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
                 $hash = null;
@@ -146,30 +125,26 @@ abstract class DoctrineType extends AbstractType
                 // If there is no QueryBuilder we can safely cache DoctrineChoiceLoader,
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
-                if (!$options['query_builder'] || false !== ($qbParts = $type->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
+                if (!$options['query_builder'] || false !== ($qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
                     $hash = CachingFactoryDecorator::generateHash(array(
                         $options['em'],
                         $options['class'],
                         $qbParts,
-                        $options['loader'],
                     ));
 
-                    if (isset($choiceLoaders[$hash])) {
-                        return $choiceLoaders[$hash];
+                    if (isset($this->choiceLoaders[$hash])) {
+                        return $this->choiceLoaders[$hash];
                     }
                 }
 
-                if ($options['loader']) {
-                    $entityLoader = $options['loader'];
-                } elseif (null !== $options['query_builder']) {
-                    $entityLoader = $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                if (null !== $options['query_builder']) {
+                    $entityLoader = $this->getLoader($options['em'], $options['query_builder'], $options['class']);
                 } else {
                     $queryBuilder = $options['em']->getRepository($options['class'])->createQueryBuilder('e');
-                    $entityLoader = $type->getLoader($options['em'], $queryBuilder, $options['class']);
+                    $entityLoader = $this->getLoader($options['em'], $queryBuilder, $options['class']);
                 }
 
                 $doctrineChoiceLoader = new DoctrineChoiceLoader(
-                    $choiceListFactory,
                     $options['em'],
                     $options['class'],
                     $options['id_reader'],
@@ -177,21 +152,11 @@ abstract class DoctrineType extends AbstractType
                 );
 
                 if ($hash !== null) {
-                    $choiceLoaders[$hash] = $doctrineChoiceLoader;
+                    $this->choiceLoaders[$hash] = $doctrineChoiceLoader;
                 }
 
                 return $doctrineChoiceLoader;
             }
-        };
-
-        $choiceLabel = function (Options $options) {
-            // BC with the "property" option
-            if ($options['property']) {
-                return $options['property'];
-            }
-
-            // BC: use __toString() by default
-            return array(__CLASS__, 'createChoiceLabel');
         };
 
         $choiceName = function (Options $options) {
@@ -224,17 +189,17 @@ abstract class DoctrineType extends AbstractType
             // Otherwise, an incrementing integer is used as value automatically
         };
 
-        $emNormalizer = function (Options $options, $em) use ($registry) {
+        $emNormalizer = function (Options $options, $em) {
             /* @var ManagerRegistry $registry */
             if (null !== $em) {
                 if ($em instanceof ObjectManager) {
                     return $em;
                 }
 
-                return $registry->getManager($em);
+                return $this->registry->getManager($em);
             }
 
-            $em = $registry->getManagerForClass($options['class']);
+            $em = $this->registry->getManagerForClass($options['class']);
 
             if (null === $em) {
                 throw new RuntimeException(sprintf(
@@ -247,15 +212,6 @@ abstract class DoctrineType extends AbstractType
             return $em;
         };
 
-        // deprecation note
-        $propertyNormalizer = function (Options $options, $propertyName) {
-            if ($propertyName) {
-                @trigger_error('The "property" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_label" instead.', E_USER_DEPRECATED);
-            }
-
-            return $propertyName;
-        };
-
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
@@ -266,18 +222,9 @@ abstract class DoctrineType extends AbstractType
             return $queryBuilder;
         };
 
-        // deprecation note
-        $loaderNormalizer = function (Options $options, $loader) {
-            if ($loader) {
-                @trigger_error('The "loader" option is deprecated since version 2.7 and will be removed in 3.0. Override getLoader() instead.', E_USER_DEPRECATED);
-            }
-
-            return $loader;
-        };
-
         // Set the "id_reader" option via the normalizer. This option is not
         // supposed to be set by the user.
-        $idReaderNormalizer = function (Options $options) use (&$idReaders) {
+        $idReaderNormalizer = function (Options $options) {
             $hash = CachingFactoryDecorator::generateHash(array(
                 $options['em'],
                 $options['class'],
@@ -289,23 +236,20 @@ abstract class DoctrineType extends AbstractType
             // of the field, so we store that information in the reader.
             // The reader is cached so that two choice lists for the same class
             // (and hence with the same reader) can successfully be cached.
-            if (!isset($idReaders[$hash])) {
+            if (!isset($this->idReaders[$hash])) {
                 $classMetadata = $options['em']->getClassMetadata($options['class']);
-                $idReaders[$hash] = new IdReader($options['em'], $classMetadata);
+                $this->idReaders[$hash] = new IdReader($options['em'], $classMetadata);
             }
 
-            return $idReaders[$hash];
+            return $this->idReaders[$hash];
         };
 
         $resolver->setDefaults(array(
             'em' => null,
-            'property' => null, // deprecated, use "choice_label"
             'query_builder' => null,
-            'loader' => null, // deprecated, use "choice_loader"
             'choices' => null,
-            'choices_as_values' => true,
             'choice_loader' => $choiceLoader,
-            'choice_label' => $choiceLabel,
+            'choice_label' => array(__CLASS__, 'createChoiceLabel'),
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
             'id_reader' => null, // internal
@@ -315,13 +259,10 @@ abstract class DoctrineType extends AbstractType
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizer('em', $emNormalizer);
-        $resolver->setNormalizer('property', $propertyNormalizer);
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
-        $resolver->setNormalizer('loader', $loaderNormalizer);
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
-        $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
     }
 
     /**
@@ -337,6 +278,6 @@ abstract class DoctrineType extends AbstractType
 
     public function getParent()
     {
-        return 'choice';
+        return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
     }
 }

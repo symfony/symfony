@@ -676,7 +676,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetFractionDigits($currency)
     {
-        $this->assertTrue(is_numeric($this->dataProvider->getFractionDigits($currency)));
+        $this->assertInternalType('numeric', $this->dataProvider->getFractionDigits($currency));
     }
 
     /**
@@ -684,7 +684,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetRoundingIncrement($currency)
     {
-        $this->assertTrue(is_numeric($this->dataProvider->getRoundingIncrement($currency)));
+        $this->assertInternalType('numeric', $this->dataProvider->getRoundingIncrement($currency));
     }
 
     public function provideCurrenciesWithNumericEquivalent()

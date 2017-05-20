@@ -11,27 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass as BaseRoutingResolverPass;
+
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', RoutingResolverPass::class, BaseRoutingResolverPass::class), E_USER_DEPRECATED);
 
 /**
  * Adds tagged routing.loader services to routing.resolver service.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseRoutingResolverPass}
  */
-class RoutingResolverPass implements CompilerPassInterface
+class RoutingResolverPass extends BaseRoutingResolverPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (false === $container->hasDefinition('routing.resolver')) {
-            return;
-        }
-
-        $definition = $container->getDefinition('routing.resolver');
-
-        foreach ($container->findTaggedServiceIds('routing.loader') as $id => $attributes) {
-            $definition->addMethodCall('addLoader', array(new Reference($id)));
-        }
-    }
 }

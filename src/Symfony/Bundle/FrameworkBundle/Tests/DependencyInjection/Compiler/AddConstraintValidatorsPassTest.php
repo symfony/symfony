@@ -13,53 +13,52 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
+/**
+ * @group legacy
+ */
 class AddConstraintValidatorsPassTest extends TestCase
 {
     public function testThatConstraintValidatorServicesAreProcessed()
     {
-        $services = array(
-            'my_constraint_validator_service1' => array(0 => array('alias' => 'my_constraint_validator_alias1')),
-            'my_constraint_validator_service2' => array(),
-        );
+        $container = new ContainerBuilder();
+        $validatorFactory = $container->register('validator.validator_factory')
+            ->addArgument(array());
 
-        $validatorFactoryDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getDefinition', 'hasDefinition'))->getMock();
+        $container->register('my_constraint_validator_service1', Validator1::class)
+            ->addTag('validator.constraint_validator', array('alias' => 'my_constraint_validator_alias1'));
+        $container->register('my_constraint_validator_service2', Validator2::class)
+            ->addTag('validator.constraint_validator');
 
-        $validatorDefinition1 = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->setMethods(array('getClass'))->getMock();
-        $validatorDefinition2 = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->setMethods(array('getClass'))->getMock();
+        $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
+        $addConstraintValidatorsPass->process($container);
 
-        $validatorDefinition1->expects($this->atLeastOnce())
-            ->method('getClass')
-            ->willReturn('My\Fully\Qualified\Class\Named\Validator1');
-        $validatorDefinition2->expects($this->atLeastOnce())
-            ->method('getClass')
-            ->willReturn('My\Fully\Qualified\Class\Named\Validator2');
+        $expected = (new Definition(ServiceLocator::class, array(array(
+            Validator1::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
+            'my_constraint_validator_alias1' => new ServiceClosureArgument(new Reference('my_constraint_validator_service1')),
+            Validator2::class => new ServiceClosureArgument(new Reference('my_constraint_validator_service2')),
+        ))))->addTag('container.service_locator')->setPublic(false);
+        $this->assertEquals($expected, $container->getDefinition((string) $validatorFactory->getArgument(0)));
+    }
 
-        $container->expects($this->any())
-            ->method('getDefinition')
-            ->with($this->anything())
-            ->will($this->returnValueMap(array(
-                array('my_constraint_validator_service1', $validatorDefinition1),
-                array('my_constraint_validator_service2', $validatorDefinition2),
-                array('validator.validator_factory', $validatorFactoryDefinition),
-            )));
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.
+     */
+    public function testAbstractConstraintValidator()
+    {
+        $container = new ContainerBuilder();
+        $validatorFactory = $container->register('validator.validator_factory')
+            ->addArgument(array());
 
-        $container->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
-        $container->expects($this->atLeastOnce())
-            ->method('hasDefinition')
-            ->with('validator.validator_factory')
-            ->will($this->returnValue(true));
-
-        $validatorFactoryDefinition->expects($this->once())
-            ->method('replaceArgument')
-            ->with(1, array(
-                'My\Fully\Qualified\Class\Named\Validator1' => 'my_constraint_validator_service1',
-                'my_constraint_validator_alias1' => 'my_constraint_validator_service1',
-                'My\Fully\Qualified\Class\Named\Validator2' => 'my_constraint_validator_service2',
-            ));
+        $container->register('my_abstract_constraint_validator')
+            ->setAbstract(true)
+            ->addTag('validator.constraint_validator');
 
         $addConstraintValidatorsPass = new AddConstraintValidatorsPass();
         $addConstraintValidatorsPass->process($container);

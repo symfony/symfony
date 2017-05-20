@@ -1,0 +1,15 @@
+services:
+    _instanceof:
+        # Ensure previous conditionals aren't applied on anonymous services
+        Quz:
+            autowire: true
+
+        DummyInterface:
+            properties:
+                foo: !service { class: Anonymous }
+
+        # Ensure next conditionals are not considered as services
+        Bar:
+            autowire: true
+
+    Dummy: ~

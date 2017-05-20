@@ -27,6 +27,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimeType extends AbstractType
 {
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -76,8 +81,8 @@ class TimeType extends AbstractType
 
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
-                $hourOptions['choices_as_values'] = true;
                 $hourOptions['placeholder'] = $options['placeholder']['hour'];
+                $hourOptions['choice_translation_domain'] = $options['choice_translation_domain']['hour'];
 
                 if ($options['with_minutes']) {
                     foreach ($options['minutes'] as $minute) {
@@ -85,8 +90,8 @@ class TimeType extends AbstractType
                     }
 
                     $minuteOptions['choices'] = $minutes;
-                    $minuteOptions['choices_as_values'] = true;
                     $minuteOptions['placeholder'] = $options['placeholder']['minute'];
+                    $minuteOptions['choice_translation_domain'] = $options['choice_translation_domain']['minute'];
                 }
 
                 if ($options['with_seconds']) {
@@ -97,8 +102,8 @@ class TimeType extends AbstractType
                     }
 
                     $secondOptions['choices'] = $seconds;
-                    $secondOptions['choices_as_values'] = true;
                     $secondOptions['placeholder'] = $options['placeholder']['second'];
+                    $secondOptions['choice_translation_domain'] = $options['choice_translation_domain']['second'];
                 }
 
                 // Append generic carry-along options
@@ -115,14 +120,14 @@ class TimeType extends AbstractType
                 }
             }
 
-            $builder->add('hour', $options['widget'], $hourOptions);
+            $builder->add('hour', self::$widgets[$options['widget']], $hourOptions);
 
             if ($options['with_minutes']) {
-                $builder->add('minute', $options['widget'], $minuteOptions);
+                $builder->add('minute', self::$widgets[$options['widget']], $minuteOptions);
             }
 
             if ($options['with_seconds']) {
-                $builder->add('second', $options['widget'], $secondOptions);
+                $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
             }
 
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
@@ -179,17 +184,11 @@ class TimeType extends AbstractType
             return 'single_text' !== $options['widget'];
         };
 
-        $placeholder = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (ChoiceType::DEPRECATED_EMPTY_VALUE !== $options['empty_value']) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
-
-                $placeholder = $options['empty_value'];
-            }
-
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -206,6 +205,23 @@ class TimeType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('hour' => $default, 'minute' => $default, 'second' => $default),
+                    $choiceTranslationDomain
+                );
+            }
+
+            return array(
+                'hour' => $choiceTranslationDomain,
+                'minute' => $choiceTranslationDomain,
+                'second' => $choiceTranslationDomain,
+            );
+        };
+
         $resolver->setDefaults(array(
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
@@ -216,8 +232,7 @@ class TimeType extends AbstractType
             'with_seconds' => false,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => ChoiceType::DEPRECATED_EMPTY_VALUE,
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -229,9 +244,11 @@ class TimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedValues('input', array(
             'datetime',
@@ -253,7 +270,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'time';
     }

@@ -12,6 +12,10 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
+use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * DataCollector.
@@ -30,6 +34,11 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     private $valueExporter;
 
+    /**
+     * @var ClonerInterface
+     */
+    private static $cloner;
+
     public function serialize()
     {
         return serialize($this->data);
@@ -41,14 +50,50 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
     }
 
     /**
+     * Converts the variable into a serializable Data instance.
+     *
+     * This array can be displayed in the template using
+     * the VarDumper component.
+     *
+     * @param mixed $var
+     *
+     * @return Data
+     */
+    protected function cloneVar($var)
+    {
+        if (null === self::$cloner) {
+            if (class_exists(ClassStub::class)) {
+                self::$cloner = new VarCloner();
+                self::$cloner->setMaxItems(-1);
+            } else {
+                @trigger_error(sprintf('Using the %s() method without the VarDumper component is deprecated since version 3.2 and won\'t be supported in 4.0. Install symfony/var-dumper version 3.2 or above.', __METHOD__), E_USER_DEPRECATED);
+                self::$cloner = false;
+            }
+        }
+        if (false === self::$cloner) {
+            if (null === $this->valueExporter) {
+                $this->valueExporter = new ValueExporter();
+            }
+
+            return $this->valueExporter->exportValue($var);
+        }
+
+        return self::$cloner->cloneVar($var);
+    }
+
+    /**
      * Converts a PHP variable to a string.
      *
      * @param mixed $var A PHP variable
      *
      * @return string The string representation of the variable
+     *
+     * @deprecated since version 3.2, to be removed in 4.0. Use cloneVar() instead.
      */
     protected function varToString($var)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use cloneVar() instead.', __METHOD__), E_USER_DEPRECATED);
+
         if (null === $this->valueExporter) {
             $this->valueExporter = new ValueExporter();
         }

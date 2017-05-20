@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class FunctionNode extends Node
 {
     public function __construct($name, Node $arguments)
@@ -43,5 +48,20 @@ class FunctionNode extends Node
         }
 
         return call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
+    }
+
+    public function toArray()
+    {
+        $array = array();
+        $array[] = $this->attributes['name'];
+
+        foreach ($this->nodes['arguments']->nodes as $node) {
+            $array[] = ', ';
+            $array[] = $node;
+        }
+        $array[1] = '(';
+        $array[] = ')';
+
+        return $array;
     }
 }

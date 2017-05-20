@@ -62,6 +62,7 @@ class NoTemplatingEntryKernel extends Kernel
         $loader->load(function ($container) {
             $container->loadFromExtension('framework', array(
                 'secret' => '$ecret',
+                'form' => array('enabled' => false),
             ));
         });
     }

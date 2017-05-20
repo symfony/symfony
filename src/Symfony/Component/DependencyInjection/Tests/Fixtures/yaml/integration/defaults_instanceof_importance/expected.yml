@@ -1,0 +1,26 @@
+services:
+    # main_service should look like this in the end
+    main_service_expected:
+        class: Symfony\Component\DependencyInjection\Tests\Compiler\IntegrationTestStub
+        # _instanceof overrides _defaults
+        autowire: false
+        # inherited from _defaults
+        autoconfigure: true
+        # from _instanceof
+        shared: false
+        # service definition overrides _instanceof
+        public: true
+
+        tags:
+            - { name: foo_tag, tag_option: from_service }
+            # these 2 are from instanceof
+            - { name: foo_tag, tag_option: from_instanceof }
+            - { name: bar_tag }
+            - { name: from_defaults }
+        # calls from instanceof are kept, but this comes later
+        calls:
+            # first call is from instanceof
+            - [setSunshine, [bright]]
+            #
+            - [enableSummer, [true]]
+            - [setSunshine, [warm]]

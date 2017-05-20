@@ -31,7 +31,7 @@ class EntityType extends DoctrineType
             if (is_callable($queryBuilder)) {
                 $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
 
-                if (!$queryBuilder instanceof QueryBuilder) {
+                if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                     throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
                 }
             }
@@ -54,10 +54,13 @@ class EntityType extends DoctrineType
      */
     public function getLoader(ObjectManager $manager, $queryBuilder, $class)
     {
-        return new ORMQueryBuilderLoader($queryBuilder, $manager, $class);
+        return new ORMQueryBuilderLoader($queryBuilder);
     }
 
-    public function getName()
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'entity';
     }

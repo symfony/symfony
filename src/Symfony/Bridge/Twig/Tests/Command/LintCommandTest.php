@@ -29,7 +29,7 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertRegExp('/^OK in /', $tester->getDisplay());
+        $this->assertContains('OK in', trim($tester->getDisplay()));
     }
 
     public function testLintIncorrectFile()
@@ -40,7 +40,7 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertRegExp('/^KO in /', $tester->getDisplay());
+        $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
     /**
@@ -63,7 +63,7 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertRegExp('/^KO in /', $tester->getDisplay());
+        $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
     /**

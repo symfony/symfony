@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LocaleTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'locale';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LocaleType';
 
     protected function setUp()
     {

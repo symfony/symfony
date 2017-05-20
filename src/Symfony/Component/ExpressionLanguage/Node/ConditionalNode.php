@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class ConditionalNode extends Node
 {
     public function __construct(Node $expr1, Node $expr2, Node $expr3)
@@ -42,5 +47,10 @@ class ConditionalNode extends Node
         }
 
         return $this->nodes['expr3']->evaluate($functions, $values);
+    }
+
+    public function toArray()
+    {
+        return array('(', $this->nodes['expr1'], ' ? ', $this->nodes['expr2'], ' : ', $this->nodes['expr3'], ')');
     }
 }

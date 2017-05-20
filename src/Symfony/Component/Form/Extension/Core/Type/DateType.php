@@ -37,6 +37,11 @@ class DateType extends AbstractType
         \IntlDateFormatter::SHORT,
     );
 
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -92,14 +97,14 @@ class DateType extends AbstractType
             if ('choice' === $options['widget']) {
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
-                $yearOptions['choices_as_values'] = true;
                 $yearOptions['placeholder'] = $options['placeholder']['year'];
+                $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
-                $monthOptions['choices_as_values'] = true;
                 $monthOptions['placeholder'] = $options['placeholder']['month'];
+                $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
-                $dayOptions['choices_as_values'] = true;
                 $dayOptions['placeholder'] = $options['placeholder']['day'];
+                $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }
 
             // Append generic carry-along options
@@ -108,9 +113,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', self::$widgets[$options['widget']], $yearOptions)
+                ->add('month', self::$widgets[$options['widget']], $monthOptions)
+                ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
@@ -182,17 +187,11 @@ class DateType extends AbstractType
             return 'single_text' !== $options['widget'];
         };
 
-        $placeholder = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (ChoiceType::DEPRECATED_EMPTY_VALUE !== $options['empty_value']) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
-
-                $placeholder = $options['empty_value'];
-            }
-
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -209,6 +208,23 @@ class DateType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('year' => $default, 'month' => $default, 'day' => $default),
+                    $choiceTranslationDomain
+                );
+            }
+
+            return array(
+                'year' => $choiceTranslationDomain,
+                'month' => $choiceTranslationDomain,
+                'day' => $choiceTranslationDomain,
+            );
+        };
+
         $format = function (Options $options) {
             return 'single_text' === $options['widget'] ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
@@ -222,8 +238,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => ChoiceType::DEPRECATED_EMPTY_VALUE,
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -235,9 +250,11 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedValues('input', array(
             'datetime',
@@ -260,7 +277,7 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'date';
     }
@@ -271,11 +288,7 @@ class DateType extends AbstractType
         $timezone = $formatter->getTimezoneId();
         $formattedTimestamps = array();
 
-        if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
-            $formatter->setTimeZone('UTC');
-        } else {
-            $formatter->setTimeZoneId('UTC');
-        }
+        $formatter->setTimeZone('UTC');
 
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
@@ -289,11 +302,7 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if ($setTimeZone) {
-            $formatter->setTimeZone($timezone);
-        } else {
-            $formatter->setTimeZoneId($timezone);
-        }
+        $formatter->setTimeZone($timezone);
 
         return $formattedTimestamps;
     }

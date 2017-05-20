@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alias id="alias_1" service="service_1" public="true"/>
+<definition id="service_1" class="Full\Qualified\Class1" public="true" synthetic="false" lazy="true" shared="true" abstract="true" autowired="false" autoconfigured="false" file="">
+  <factory class="Full\Qualified\FactoryClass" method="get"/>
+</definition>

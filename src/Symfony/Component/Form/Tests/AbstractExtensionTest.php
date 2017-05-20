@@ -20,25 +20,14 @@ class AbstractExtensionTest extends TestCase
     public function testHasType()
     {
         $loader = new ConcreteExtension();
-        $this->assertTrue($loader->hasType('foo'));
-        $this->assertFalse($loader->hasType('bar'));
+        $this->assertTrue($loader->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
+        $this->assertFalse($loader->hasType('foo'));
     }
 
     public function testGetType()
     {
         $loader = new ConcreteExtension();
-        $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('foo'));
-    }
-
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Custom resolver "Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver" must extend "Symfony\Component\OptionsResolver\OptionsResolver".
-     */
-    public function testCustomOptionsResolver()
-    {
-        $extension = new Fixtures\FooTypeBarExtension();
-        $resolver = new Fixtures\CustomOptionsResolver();
-        $extension->setDefaultOptions($resolver);
+        $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
 }
 

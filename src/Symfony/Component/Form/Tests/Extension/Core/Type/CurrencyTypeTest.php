@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CurrencyTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'currency';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CurrencyType';
 
     protected function setUp()
     {

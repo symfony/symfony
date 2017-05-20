@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -48,26 +47,19 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
                 // If $value is immutable, convert the compared value to a
                 // DateTimeImmutable too
                 $comparedValue = new \DatetimeImmutable($comparedValue);
-            } elseif ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+            } elseif ($value instanceof \DateTimeInterface) {
                 // Otherwise use DateTime
                 $comparedValue = new \DateTime($comparedValue);
             }
         }
 
         if (!$this->compareValues($value, $comparedValue)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))
-                    ->setParameter('{{ compared_value }}', $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE))
-                    ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($comparedValue))
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))
-                    ->setParameter('{{ compared_value }}', $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE))
-                    ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($comparedValue))
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))
+                ->setParameter('{{ compared_value }}', $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE))
+                ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($comparedValue))
+                ->setCode($this->getErrorCode())
+                ->addViolation();
         }
     }
 
@@ -80,4 +72,13 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      * @return bool true if the relationship is valid, false otherwise
      */
     abstract protected function compareValues($value1, $value2);
+
+    /**
+     * Returns the error code used if the comparison fails.
+     *
+     * @return string|null The error code or `null` if no code should be set
+     */
+    protected function getErrorCode()
+    {
+    }
 }

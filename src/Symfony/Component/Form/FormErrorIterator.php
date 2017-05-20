@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Iterates over the errors of a form.
@@ -263,6 +264,27 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
         while ($position !== key($this->errors)) {
             next($this->errors);
         }
+    }
+
+    /**
+     * Creates iterator for errors with specific codes.
+     *
+     * @param string|string[] $codes The codes to find
+     *
+     * @return static New instance which contains only specific errors.
+     */
+    public function findByCodes($codes)
+    {
+        $codes = (array) $codes;
+        $errors = array();
+        foreach ($this as $error) {
+            $cause = $error->getCause();
+            if ($cause instanceof ConstraintViolation && in_array($cause->getCode(), $codes, true)) {
+                $errors[] = $error;
+            }
+        }
+
+        return new static($this->form, $errors);
     }
 
     /**

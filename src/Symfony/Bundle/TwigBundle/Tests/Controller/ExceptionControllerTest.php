@@ -22,7 +22,7 @@ class ExceptionControllerTest extends TestCase
     {
         $twig = new \Twig_Environment(
             new \Twig_Loader_Array(array(
-                'TwigBundle:Exception:error404.html.twig' => 'ok',
+                '@Twig/Exception/error404.html.twig' => 'ok',
             ))
         );
 
@@ -42,7 +42,7 @@ class ExceptionControllerTest extends TestCase
     {
         $twig = new \Twig_Environment(
             new \Twig_Loader_Array(array(
-                'TwigBundle:Exception:error.html.twig' => 'html',
+                '@Twig/Exception/error.html.twig' => 'html',
             ))
         );
 

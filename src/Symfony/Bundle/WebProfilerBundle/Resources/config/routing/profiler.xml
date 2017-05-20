@@ -16,10 +16,6 @@
         <default key="_controller">web_profiler.controller.profiler:searchBarAction</default>
     </route>
 
-    <route id="_profiler_purge" path="/purge">
-        <default key="_controller">web_profiler.controller.profiler:purgeAction</default>
-    </route>
-
     <route id="_profiler_info" path="/info/{about}">
         <default key="_controller">web_profiler.controller.profiler:infoAction</default>
     </route>
@@ -30,6 +26,10 @@
 
     <route id="_profiler_search_results" path="/{token}/search/results">
         <default key="_controller">web_profiler.controller.profiler:searchResultsAction</default>
+    </route>
+
+    <route id="_profiler_open_file" path="/open">
+        <default key="_controller">web_profiler.controller.profiler:openAction</default>
     </route>
 
     <route id="_profiler" path="/{token}">

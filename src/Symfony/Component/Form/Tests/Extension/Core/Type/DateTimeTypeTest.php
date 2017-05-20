@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormError;
 
 class DateTimeTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'datetime';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
     protected function setUp()
     {
@@ -334,31 +334,6 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty', $view['time']['second']->vars['placeholder']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testPassEmptyValueBC()
-    {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
-            'empty_value' => 'Empty',
-            'with_seconds' => true,
-        ))
-            ->createView();
-
-        $this->assertSame('Empty', $view['date']['year']->vars['placeholder']);
-        $this->assertSame('Empty', $view['date']['month']->vars['placeholder']);
-        $this->assertSame('Empty', $view['date']['day']->vars['placeholder']);
-        $this->assertSame('Empty', $view['time']['hour']->vars['placeholder']);
-        $this->assertSame('Empty', $view['time']['minute']->vars['placeholder']);
-        $this->assertSame('Empty', $view['time']['second']->vars['placeholder']);
-        $this->assertSame('Empty', $view['date']['year']->vars['empty_value']);
-        $this->assertSame('Empty', $view['date']['month']->vars['empty_value']);
-        $this->assertSame('Empty', $view['date']['day']->vars['empty_value']);
-        $this->assertSame('Empty', $view['time']['hour']->vars['empty_value']);
-        $this->assertSame('Empty', $view['time']['minute']->vars['empty_value']);
-        $this->assertSame('Empty', $view['time']['second']->vars['empty_value']);
-    }
-
     public function testPassPlaceholderAsArray()
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -514,6 +489,59 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $this->assertSame(array(), iterator_to_array($form['time']->getErrors()));
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
+    }
+
+    public function testPassDefaultChoiceTranslationDomain()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'with_seconds' => true,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertFalse($view['date']['year']->vars['choice_translation_domain']);
+        $this->assertFalse($view['date']['month']->vars['choice_translation_domain']);
+        $this->assertFalse($view['date']['day']->vars['choice_translation_domain']);
+        $this->assertFalse($view['time']['hour']->vars['choice_translation_domain']);
+        $this->assertFalse($view['time']['minute']->vars['choice_translation_domain']);
+        $this->assertFalse($view['time']['second']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsString()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choice_translation_domain' => 'messages',
+            'with_seconds' => true,
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('messages', $view['date']['year']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['date']['month']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['date']['day']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['time']['hour']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['time']['minute']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['time']['second']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsArray()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choice_translation_domain' => array(
+                'year' => 'foo',
+                'month' => 'test',
+                'hour' => 'foo',
+                'second' => 'test',
+            ),
+            'with_seconds' => true,
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('foo', $view['date']['year']->vars['choice_translation_domain']);
+        $this->assertSame('test', $view['date']['month']->vars['choice_translation_domain']);
+        $this->assertFalse($view['date']['day']->vars['choice_translation_domain']);
+        $this->assertSame('foo', $view['time']['hour']->vars['choice_translation_domain']);
+        $this->assertFalse($view['time']['minute']->vars['choice_translation_domain']);
+        $this->assertSame('test', $view['time']['second']->vars['choice_translation_domain']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

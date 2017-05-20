@@ -31,7 +31,7 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'button';
     }

@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="security.authentication.guard_handler"
+                 class="Symfony\Component\Security\Guard\GuardAuthenticatorHandler"
+                 public="true"
+            >
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="event_dispatcher" on-invalid="null" />
+        </service>
+
+        <!-- See GuardAuthenticationFactory -->
+        <service id="security.authentication.provider.guard"
+                 class="Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider"
+                 abstract="true"
+            >
+            <argument /> <!-- Simple Authenticator -->
+            <argument /> <!-- User Provider -->
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- User Checker -->
+        </service>
+
+        <service id="security.authentication.listener.guard"
+                 class="Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener"
+                 abstract="true"
+            >
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="security.authentication.guard_handler" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- Authenticator -->
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+    </services>
+</container>

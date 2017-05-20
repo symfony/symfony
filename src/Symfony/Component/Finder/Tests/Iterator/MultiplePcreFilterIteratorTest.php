@@ -39,6 +39,9 @@ class MultiplePcreFilterIteratorTest extends TestCase
             array('/foo/imsxu', true, 'valid regex with multiple modifiers'),
             array('#foo#', true, '"#" is a valid delimiter'),
             array('{foo}', true, '"{,}" is a valid delimiter pair'),
+            array('[foo]', true, '"[,]" is a valid delimiter pair'),
+            array('(foo)', true, '"(,)" is a valid delimiter pair'),
+            array('<foo>', true, '"<,>" is a valid delimiter pair'),
             array('*foo.*', false, '"*" is not considered as a valid delimiter'),
             array('?foo.?', false, '"?" is not considered as a valid delimiter'),
         );

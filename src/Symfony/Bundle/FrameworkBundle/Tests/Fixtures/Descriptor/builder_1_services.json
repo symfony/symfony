@@ -2,12 +2,13 @@
     "definitions": {
         "definition_1": {
             "class": "Full\\Qualified\\Class1",
-            "scope": "container",
             "public": true,
             "synthetic": false,
             "lazy": true,
-            "synchronized": false,
+            "shared": true,
             "abstract": true,
+            "autowire": false,
+            "autoconfigure": false,
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
@@ -15,15 +16,19 @@
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
-            "scope": "container",
             "public": false,
             "synthetic": true,
             "lazy": false,
-            "synchronized": false,
+            "shared": true,
             "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
+            "calls": [
+                "setMailer"
+            ],
             "tags": [
                 {
                     "name": "tag1",

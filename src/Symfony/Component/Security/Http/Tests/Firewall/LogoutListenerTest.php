@@ -214,7 +214,7 @@ class LogoutListenerTest extends TestCase
             $successHandler ?: $this->getSuccessHandler(),
             $options = array(
                 'csrf_parameter' => '_csrf_token',
-                'intention' => 'logout',
+                'csrf_token_id' => 'logout',
                 'logout_path' => '/logout',
                 'target_url' => '/',
             ),

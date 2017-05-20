@@ -13,15 +13,10 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class TimeValidatorTest extends AbstractConstraintValidatorTest
+class TimeValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new TimeValidator();
@@ -103,5 +98,12 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
             array('00:60:00', Time::INVALID_TIME_ERROR),
             array('00:00:60', Time::INVALID_TIME_ERROR),
         );
+    }
+
+    public function testDateTimeImmutableIsValid()
+    {
+        $this->validator->validate(new \DateTimeImmutable(), new Time());
+
+        $this->assertNoViolation();
     }
 }

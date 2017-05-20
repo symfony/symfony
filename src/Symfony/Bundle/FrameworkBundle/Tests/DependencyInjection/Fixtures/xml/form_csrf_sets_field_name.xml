@@ -8,7 +8,7 @@
 
     <framework:config>
         <framework:csrf-protection field-name="_custom" />
-        <framework:form />
         <framework:session />
+        <framework:form />
     </framework:config>
 </container>

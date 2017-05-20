@@ -2,6 +2,7 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 function sc_configure($instance)
 {
@@ -95,5 +96,15 @@ class DummyProxyDumper implements ProxyDumper
     public function getProxyCode(Definition $definition)
     {
         return '';
+    }
+}
+
+class LazyContext
+{
+    public $lazyValues;
+
+    public function __construct($lazyValues)
+    {
+        $this->lazyValues = $lazyValues;
     }
 }

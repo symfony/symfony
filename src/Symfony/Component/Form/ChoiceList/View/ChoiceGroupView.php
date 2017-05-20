@@ -48,7 +48,7 @@ class ChoiceGroupView implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return ChoiceGroupView[]|ChoiceView[]
+     * @return self[]|ChoiceView[]
      */
     public function getIterator()
     {

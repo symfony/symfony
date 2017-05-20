@@ -1,6 +1,48 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+  * [DEPRECATION] Class parameters have been deprecated and will be removed in 4.0.
+    * router.options.generator_class
+    * router.options.generator_base_class
+    * router.options.generator_dumper_class
+    * router.options.matcher_class
+    * router.options.matcher_base_class
+    * router.options.matcher_dumper_class
+    * router.options.matcher.cache_class
+    * router.options.generator.cache_class
+
+3.2.0
+-----
+
+ * Added support for `bool`, `int`, `float`, `string`, `list` and `map` defaults in XML configurations.
+ * Added support for UTF-8 requirements
+  
+2.8.0
+-----
+
+ * allowed specifying a directory to recursively load all routing configuration files it contains
+ * Added ObjectRouteLoader and ServiceRouteLoader that allow routes to be loaded
+   by calling a method on an object/service.
+ * [DEPRECATION] Deprecated the hardcoded value for the `$referenceType` argument of the `UrlGeneratorInterface::generate` method.
+   Use the constants defined in the `UrlGeneratorInterface` instead.
+
+   Before:
+
+   ```php
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), true);
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), UrlGeneratorInterface::ABSOLUTE_URL);
+   ```
+
 2.5.0
 -----
 

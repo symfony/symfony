@@ -23,7 +23,7 @@ class RememberMeTokenTest extends TestCase
         $token = new RememberMeToken($user, 'fookey', 'foo');
 
         $this->assertEquals('fookey', $token->getProviderKey());
-        $this->assertEquals('foo', $token->getKey());
+        $this->assertEquals('foo', $token->getSecret());
         $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
         $this->assertSame($user, $token->getUser());
         $this->assertTrue($token->isAuthenticated());
@@ -32,7 +32,7 @@ class RememberMeTokenTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testConstructorKeyCannotBeNull()
+    public function testConstructorSecretCannotBeNull()
     {
         new RememberMeToken(
             $this->getUser(),
@@ -44,7 +44,7 @@ class RememberMeTokenTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testConstructorKeyCannotBeEmptyString()
+    public function testConstructorSecretCannotBeEmptyString()
     {
         new RememberMeToken(
             $this->getUser(),

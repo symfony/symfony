@@ -38,7 +38,7 @@ class DumperCollection implements \IteratorAggregate
     /**
      * Returns the children routes and collections.
      *
-     * @return DumperCollection[]|DumperRoute[] Array of DumperCollection|DumperRoute
+     * @return self[]|DumperRoute[]
      */
     public function all()
     {
@@ -96,7 +96,7 @@ class DumperCollection implements \IteratorAggregate
     /**
      * Returns the parent collection.
      *
-     * @return DumperCollection|null The parent collection or null if the collection has no parent
+     * @return self|null The parent collection or null if the collection has no parent
      */
     protected function getParent()
     {

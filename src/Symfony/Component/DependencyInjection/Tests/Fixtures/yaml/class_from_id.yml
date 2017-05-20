@@ -1,0 +1,3 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass:
+      autowire: true

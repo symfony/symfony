@@ -24,7 +24,6 @@ class VarCloner extends AbstractCloner
      */
     protected function doClone($var)
     {
-        $useExt = $this->useExt;
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
         $refsCounter = 0;               // Hard references counter
@@ -71,20 +70,16 @@ class VarCloner extends AbstractCloner
                 if ($fromObjCast) {
                     $k = $j;
                 }
-                if ($useExt) {
-                    $zval = symfony_zval_info($k, $refs);
-                } else {
-                    $refs[$k] = $cookie;
-                    if ($zval['zval_isref'] = $vals[$k] === $cookie) {
-                        $zval['zval_hash'] = $v instanceof Stub ? spl_object_hash($v) : null;
-                    }
-                    $zval['type'] = gettype($v);
+                $refs[$k] = $cookie;
+                if ($zval['zval_isref'] = $vals[$k] === $cookie) {
+                    $zval['zval_hash'] = $v instanceof Stub ? spl_object_hash($v) : null;
                 }
+                $zval['type'] = gettype($v);
                 if ($zval['zval_isref']) {
                     $vals[$k] = &$stub;         // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
                     if (isset($hardRefs[$zval['zval_hash']])) {
-                        $vals[$k] = $useExt ? ($v = $hardRefs[$zval['zval_hash']]) : ($refs[$k] = $v);
+                        $vals[$k] = $refs[$k] = $v;
                         if ($v->value instanceof Stub && (Stub::TYPE_OBJECT === $v->value->type || Stub::TYPE_RESOURCE === $v->value->type)) {
                             ++$v->value->refCount;
                         }
@@ -106,12 +101,12 @@ class VarCloner extends AbstractCloner
                             } else {
                                 $stub->value = $v;
                             }
-                        } elseif (0 <= $maxString && isset($v[1 + ($maxString >> 2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
+                        } elseif (0 <= $maxString && isset($v[1 + ($maxString >> 2)]) && 0 < $cut = mb_strlen($v, 'UTF-8') - $maxString) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
                             $stub->class = Stub::STRING_UTF8;
                             $stub->cut = $cut;
-                            $stub->value = iconv_substr($v, 0, $maxString, 'UTF-8');
+                            $stub->value = mb_substr($v, 0, $maxString, 'UTF-8');
                         }
                         break;
 
@@ -153,16 +148,10 @@ class VarCloner extends AbstractCloner
                             $stub->handle = $h;
                             $a = $this->castObject($stub, 0 < $i);
                             if ($v !== $stub->value) {
-                                if (Stub::TYPE_OBJECT !== $stub->type) {
+                                if (Stub::TYPE_OBJECT !== $stub->type || null === $stub->value) {
                                     break;
                                 }
-                                if ($useExt) {
-                                    $zval['type'] = $stub->value;
-                                    $zval = symfony_zval_info('type', $zval);
-                                    $h = $zval['object_handle'];
-                                } else {
-                                    $h = $hashMask ^ hexdec(substr(spl_object_hash($stub->value), $hashOffset, PHP_INT_SIZE));
-                                }
+                                $h = $hashMask ^ hexdec(substr(spl_object_hash($stub->value), $hashOffset, PHP_INT_SIZE));
                                 $stub->handle = $h;
                             }
                             $stub->value = null;
@@ -210,16 +199,11 @@ class VarCloner extends AbstractCloner
 
                 if (isset($stub)) {
                     if ($zval['zval_isref']) {
-                        if ($useExt) {
-                            $vals[$k] = $hardRefs[$zval['zval_hash']] = $v = new Stub();
-                            $v->value = $stub;
-                        } else {
-                            $refs[$k] = new Stub();
-                            $refs[$k]->value = $stub;
-                            $h = spl_object_hash($refs[$k]);
-                            $vals[$k] = $hardRefs[$h] = &$refs[$k];
-                            $values[$h] = $v;
-                        }
+                        $refs[$k] = new Stub();
+                        $refs[$k]->value = $stub;
+                        $h = spl_object_hash($refs[$k]);
+                        $vals[$k] = $hardRefs[$h] = &$refs[$k];
+                        $values[$h] = $v;
                         $vals[$k]->handle = ++$refsCounter;
                     } else {
                         $vals[$k] = $stub;
@@ -249,16 +233,11 @@ class VarCloner extends AbstractCloner
                     }
                     $stub = $a = null;
                 } elseif ($zval['zval_isref']) {
-                    if ($useExt) {
-                        $vals[$k] = $hardRefs[$zval['zval_hash']] = new Stub();
-                        $vals[$k]->value = $v;
-                    } else {
-                        $refs[$k] = $vals[$k] = new Stub();
-                        $refs[$k]->value = $v;
-                        $h = spl_object_hash($refs[$k]);
-                        $hardRefs[$h] = &$refs[$k];
-                        $values[$h] = $v;
-                    }
+                    $refs[$k] = $vals[$k] = new Stub();
+                    $refs[$k]->value = $v;
+                    $h = spl_object_hash($refs[$k]);
+                    $hardRefs[$h] = &$refs[$k];
+                    $values[$h] = $v;
                     $vals[$k]->handle = ++$refsCounter;
                 }
             }
@@ -308,7 +287,7 @@ class VarCloner extends AbstractCloner
         } else {
             // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
             $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
-            foreach (debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
                 if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
                     $frame['line'] = 0;
                     break;

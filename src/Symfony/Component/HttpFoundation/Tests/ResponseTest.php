@@ -33,7 +33,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response = explode("\r\n", $response);
         $this->assertEquals('HTTP/1.0 200 OK', $response[0]);
-        $this->assertEquals('Cache-Control: no-cache', $response[1]);
+        $this->assertEquals('Cache-Control: no-cache, private', $response[1]);
     }
 
     public function testClone()
@@ -276,8 +276,10 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the date when the header has been modified');
 
         $response = new Response('', 200);
+        $now = $this->createDateTimeNow();
         $response->headers->remove('Date');
-        $this->assertInstanceOf('\DateTime', $response->getDate());
+        $date = $response->getDate();
+        $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the current Date when the header has previously been removed');
     }
 
     public function testGetMaxAge()
@@ -843,6 +845,16 @@ class ResponseTest extends ResponseTestCase
         }
     }
 
+    public function testNoDeprecationsAreTriggered()
+    {
+        new DefaultResponse();
+        $this->getMockBuilder(Response::class)->getMock();
+
+        // we just need to ensure that subclasses of Response can be created without any deprecations
+        // being triggered if the subclass does not override any final methods
+        $this->addToAssertionCount(1);
+    }
+
     public function validContentProvider()
     {
         return array(
@@ -950,5 +962,20 @@ class StringableObject
     public function __toString()
     {
         return 'Foo';
+    }
+}
+
+class DefaultResponse extends Response
+{
+}
+
+class ExtendedResponse extends Response
+{
+    public function setLastModified(\DateTime $date = null)
+    {
+    }
+
+    public function getDate()
+    {
     }
 }

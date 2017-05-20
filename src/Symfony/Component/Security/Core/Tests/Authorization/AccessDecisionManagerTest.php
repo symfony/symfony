@@ -17,44 +17,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
 {
-    public function testSupportsClass()
-    {
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsClass(true),
-            $this->getVoterSupportsClass(false),
-        ));
-        $this->assertTrue($manager->supportsClass('FooClass'));
-
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsClass(false),
-            $this->getVoterSupportsClass(false),
-        ));
-        $this->assertFalse($manager->supportsClass('FooClass'));
-    }
-
-    public function testSupportsAttribute()
-    {
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsAttribute(true),
-            $this->getVoterSupportsAttribute(false),
-        ));
-        $this->assertTrue($manager->supportsAttribute('foo'));
-
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsAttribute(false),
-            $this->getVoterSupportsAttribute(false),
-        ));
-        $this->assertFalse($manager->supportsAttribute('foo'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testSetVotersEmpty()
-    {
-        $manager = new AccessDecisionManager(array());
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -173,26 +135,6 @@ class AccessDecisionManagerTest extends TestCase
         $voter->expects($this->any())
               ->method('vote')
               ->will($this->returnValue($vote));
-
-        return $voter;
-    }
-
-    protected function getVoterSupportsClass($ret)
-    {
-        $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
-        $voter->expects($this->any())
-              ->method('supportsClass')
-              ->will($this->returnValue($ret));
-
-        return $voter;
-    }
-
-    protected function getVoterSupportsAttribute($ret)
-    {
-        $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
-        $voter->expects($this->any())
-              ->method('supportsAttribute')
-              ->will($this->returnValue($ret));
 
         return $voter;
     }

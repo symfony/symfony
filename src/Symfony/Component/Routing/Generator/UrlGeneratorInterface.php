@@ -34,25 +34,25 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
     /**
      * Generates an absolute URL, e.g. "http://example.com/dir/file".
      */
-    const ABSOLUTE_URL = true;
+    const ABSOLUTE_URL = 0;
 
     /**
      * Generates an absolute path, e.g. "/dir/file".
      */
-    const ABSOLUTE_PATH = false;
+    const ABSOLUTE_PATH = 1;
 
     /**
      * Generates a relative path based on the current request path, e.g. "../parent-file".
      *
      * @see UrlGenerator::getRelativePath()
      */
-    const RELATIVE_PATH = 'relative';
+    const RELATIVE_PATH = 2;
 
     /**
      * Generates a network path, e.g. "//example.com/dir/file".
      * Such reference reuses the current scheme but specifies the host.
      */
-    const NETWORK_PATH = 'network';
+    const NETWORK_PATH = 3;
 
     /**
      * Generates a URL or path for a specific route based on the given parameters.
@@ -69,9 +69,11 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      *
      * If there is no route with the given name, the generator must throw the RouteNotFoundException.
      *
-     * @param string      $name          The name of the route
-     * @param mixed       $parameters    An array of parameters
-     * @param bool|string $referenceType The type of reference to be generated (one of the constants)
+     * The special parameter _fragment will be used as the document fragment suffixed to the final URL.
+     *
+     * @param string $name          The name of the route
+     * @param mixed  $parameters    An array of parameters
+     * @param int    $referenceType The type of reference to be generated (one of the constants)
      *
      * @return string The generated URL
      *

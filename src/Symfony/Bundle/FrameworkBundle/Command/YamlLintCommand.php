@@ -13,151 +13,67 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
 
 /**
  * Validates YAML files syntax and outputs encountered errors.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Robin Chalas <robin.chalas@gmail.com>
  */
 class YamlLintCommand extends Command
 {
+    private $command;
+
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
+        $this->setName('lint:yaml');
+
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        $directoryIteratorProvider = function ($directory, $default) {
+            if (!is_dir($directory)) {
+                $directory = $this->getApplication()->getKernel()->locateResource($directory);
+            }
+
+            return $default($directory);
+        };
+
+        $isReadableProvider = function ($fileOrDirectory, $default) {
+            return 0 === strpos($fileOrDirectory, '@') || $default($fileOrDirectory);
+        };
+
+        $this->command = new BaseLintCommand(null, $directoryIteratorProvider, $isReadableProvider);
+
         $this
-            ->setName('lint:yaml')
-            ->setAliases(array('yaml:lint'))
-            ->setDescription('Lints a file and outputs encountered errors')
-            ->addArgument('filename', null, 'A file or a directory or STDIN')
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
-            ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
-the first encountered syntax error.
+            ->setDescription($this->command->getDescription())
+            ->setDefinition($this->command->getDefinition())
+            ->setHelp($this->command->getHelp().<<<'EOF'
 
-You can validate the syntax of a file:
-
-  <info>php %command.full_name% filename</info>
-
-Or of a whole directory:
-
-  <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
-
-Or all YAML files in a bundle:
+Or find all files in a bundle:
 
   <info>php %command.full_name% @AcmeDemoBundle</info>
 
-You can also pass the YAML contents from STDIN:
-
-  <info>cat filename | php %command.full_name%</info>
-
 EOF
-            )
-        ;
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled()
+    {
+        return class_exists(BaseLintCommand::class) && parent::isEnabled();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getFirstArgument(), ':l')) {
-            $output->writeln('<comment>The use of "yaml:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:yaml" instead.</comment>');
-        }
-
-        $filename = $input->getArgument('filename');
-
-        if (!$filename) {
-            if (0 !== ftell(STDIN)) {
-                throw new \RuntimeException('Please provide a filename or pipe file content to STDIN.');
-            }
-
-            $content = '';
-            while (!feof(STDIN)) {
-                $content .= fread(STDIN, 1024);
-            }
-
-            return $this->display($input, $output, array($this->validate($content)));
-        }
-
-        if (0 !== strpos($filename, '@') && !is_readable($filename)) {
-            throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
-        }
-
-        if (is_file($filename)) {
-            $files = array($filename);
-        } elseif (is_dir($filename)) {
-            $files = Finder::create()->files()->in($filename)->name('*.yml');
-        } else {
-            $dir = $this->getApplication()->getKernel()->locateResource($filename);
-            $files = Finder::create()->files()->in($dir)->name('*.yml');
-        }
-
-        $filesInfo = array();
-        foreach ($files as $file) {
-            $filesInfo[] = $this->validate(file_get_contents($file), $file);
-        }
-
-        return $this->display($input, $output, $filesInfo);
-    }
-
-    private function validate($content, $file = null)
-    {
-        $parser = new Parser();
-        try {
-            $parser->parse($content);
-        } catch (ParseException $e) {
-            return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
-        }
-
-        return array('file' => $file, 'valid' => true);
-    }
-
-    private function display(InputInterface $input, OutputInterface $output, $files)
-    {
-        switch ($input->getOption('format')) {
-            case 'txt':
-                return $this->displayTxt($output, $files);
-            case 'json':
-                return $this->displayJson($output, $files);
-            default:
-                throw new \InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
-        }
-    }
-
-    private function displayTxt(OutputInterface $output, $filesInfo)
-    {
-        $errors = 0;
-
-        foreach ($filesInfo as $info) {
-            if ($info['valid'] && $output->isVerbose()) {
-                $output->writeln('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
-            } elseif (!$info['valid']) {
-                ++$errors;
-                $output->writeln(sprintf('<error>KO</error> in %s', $info['file']));
-                $output->writeln(sprintf('<error>>> %s</error>', $info['message']));
-            }
-        }
-
-        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', count($filesInfo) - $errors, count($filesInfo)));
-
-        return min($errors, 1);
-    }
-
-    private function displayJson(OutputInterface $output, $filesInfo)
-    {
-        $errors = 0;
-
-        array_walk($filesInfo, function (&$v) use (&$errors) {
-            $v['file'] = (string) $v['file'];
-            if (!$v['valid']) {
-                ++$errors;
-            }
-        });
-
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
-
-        return min($errors, 1);
+        return $this->command->execute($input, $output);
     }
 }

@@ -1,33 +1,29 @@
-descriptor:command2
--------------------
+`descriptor:command2`
+---------------------
 
-* Description: command 2 description
-* Usage:
+command 2 description
 
-  * `descriptor:command2 [-o|--option_name] [--] <argument_name>`
-  * `descriptor:command2 -o|--option_name <argument_name>`
-  * `descriptor:command2 <argument_name>`
+### Usage
+
+* `descriptor:command2 [-o|--option_name] [--] <argument_name>`
+* `descriptor:command2 -o|--option_name <argument_name>`
+* `descriptor:command2 <argument_name>`
 
 command 2 help
 
-### Arguments:
+### Arguments
 
-**argument_name:**
+#### `argument_name`
 
-* Name: argument_name
 * Is required: yes
 * Is array: no
-* Description: <none>
 * Default: `NULL`
 
-### Options:
+### Options
 
-**option_name:**
+#### `--option_name|-o`
 
-* Name: `--option_name`
-* Shortcut: `-o`
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: <none>
 * Default: `false`

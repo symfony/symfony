@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
 class LoggerDataCollectorTest extends TestCase
@@ -28,69 +29,77 @@ class LoggerDataCollectorTest extends TestCase
         $c = new LoggerDataCollector($logger);
         $c->lateCollect();
 
-        $this->assertSame('logger', $c->getName());
-        $this->assertSame($nb, $c->countErrors());
-        $this->assertSame($expectedLogs ?: $logs, $c->getLogs());
-        $this->assertSame($expectedDeprecationCount, $c->countDeprecations());
-        $this->assertSame($expectedScreamCount, $c->countScreams());
+        $this->assertEquals('logger', $c->getName());
+        $this->assertEquals($nb, $c->countErrors());
+
+        $logs = array_map(function ($v) {
+            if (isset($v['context']['exception'])) {
+                $e = &$v['context']['exception'];
+                $e = isset($e["\0*\0message"]) ? array($e["\0*\0message"], $e["\0*\0severity"]) : array($e["\0Symfony\Component\Debug\Exception\SilencedErrorContext\0severity"]);
+            }
+
+            return $v;
+        }, $c->getLogs()->getValue(true));
+        $this->assertEquals($expectedLogs, $logs);
+        $this->assertEquals($expectedDeprecationCount, $c->countDeprecations());
+        $this->assertEquals($expectedScreamCount, $c->countScreams());
 
         if (isset($expectedPriorities)) {
-            $this->assertSame($expectedPriorities, $c->getPriorities());
+            $this->assertSame($expectedPriorities, $c->getPriorities()->getValue(true));
         }
     }
 
     public function getCollectTestData()
     {
-        return array(
+        yield 'simple log' => array(
+            1,
+            array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            0,
+            0,
+        );
+
+        yield 'log with a context' => array(
+            1,
+            array(array('message' => 'foo', 'context' => array('foo' => 'bar'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            array(array('message' => 'foo', 'context' => array('foo' => 'bar'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            0,
+            0,
+        );
+
+        if (!class_exists(SilencedErrorContext::class)) {
+            return;
+        }
+
+        yield 'logs with some deprecations' => array(
+            1,
             array(
-                1,
-                array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                null,
-                0,
-                0,
+                array('message' => 'foo3', 'context' => array('exception' => new \ErrorException('warning', 0, E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo', 'context' => array('exception' => new \ErrorException('deprecated', 0, E_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo2', 'context' => array('exception' => new \ErrorException('deprecated', 0, E_USER_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG'),
             ),
             array(
-                1,
-                array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                0,
-                0,
+                array('message' => 'foo3', 'context' => array('exception' => array('warning', E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo', 'context' => array('exception' => array('deprecated', E_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false),
+                array('message' => 'foo2', 'context' => array('exception' => array('deprecated', E_USER_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false),
+            ),
+            2,
+            0,
+            array(100 => array('count' => 3, 'name' => 'DEBUG')),
+        );
+
+        yield 'logs with some silent errors' => array(
+            1,
+            array(
+                array('message' => 'foo3', 'context' => array('exception' => new \ErrorException('warning', 0, E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo3', 'context' => array('exception' => new SilencedErrorContext(E_USER_WARNING, __FILE__, __LINE__)), 'priority' => 100, 'priorityName' => 'DEBUG'),
             ),
             array(
-                1,
-                array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                0,
-                0,
+                array('message' => 'foo3', 'context' => array('exception' => array('warning', E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo3', 'context' => array('exception' => array(E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => true),
             ),
-            array(
-                1,
-                array(
-                    array('message' => 'foo', 'context' => array('type' => E_DEPRECATED, 'level' => E_ALL), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                    array('message' => 'foo2', 'context' => array('type' => E_USER_DEPRECATED, 'level' => E_ALL), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                ),
-                null,
-                2,
-                0,
-                array(100 => array('count' => 2, 'name' => 'DEBUG')),
-            ),
-            array(
-                1,
-                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'file' => __FILE__, 'line' => 123), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'file' => __FILE__, 'line' => 123, 'scream' => true), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                0,
-                1,
-            ),
-            array(
-                1,
-                array(
-                    array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'file' => __FILE__, 'line' => 123), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                    array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => -1, 'file' => __FILE__, 'line' => 123), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                ),
-                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => -1, 'file' => __FILE__, 'line' => 123, 'errorCount' => 2), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                0,
-                1,
-            ),
+            0,
+            1,
         );
     }
 }

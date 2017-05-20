@@ -1,0 +1,20 @@
+[
+    {
+        "service": "service_1",
+        "public": true
+    },
+    {
+        "class": "Full\\Qualified\\Class1",
+        "public": true,
+        "synthetic": false,
+        "lazy": true,
+        "shared": true,
+        "abstract": true,
+        "autowire": false,
+        "autoconfigure": false,
+        "file": null,
+        "factory_class": "Full\\Qualified\\FactoryClass",
+        "factory_method": "get",
+        "tags": []
+    }
+]

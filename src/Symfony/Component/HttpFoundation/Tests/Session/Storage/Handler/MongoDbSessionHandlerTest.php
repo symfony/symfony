@@ -96,39 +96,37 @@ class MongoDbSessionHandlerTest extends TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
-
         // defining the timeout before the actual method call
         // allows to test for "greater than" values in the $criteria
         $testTimeout = time() + 1;
 
         $collection->expects($this->once())
             ->method('findOne')
-            ->will($this->returnCallback(function ($criteria) use ($that, $testTimeout) {
-                $that->assertArrayHasKey($that->options['id_field'], $criteria);
-                $that->assertEquals($criteria[$that->options['id_field']], 'foo');
+            ->will($this->returnCallback(function ($criteria) use ($testTimeout) {
+                $this->assertArrayHasKey($this->options['id_field'], $criteria);
+                $this->assertEquals($criteria[$this->options['id_field']], 'foo');
 
-                $that->assertArrayHasKey($that->options['expiry_field'], $criteria);
-                $that->assertArrayHasKey('$gte', $criteria[$that->options['expiry_field']]);
+                $this->assertArrayHasKey($this->options['expiry_field'], $criteria);
+                $this->assertArrayHasKey('$gte', $criteria[$this->options['expiry_field']]);
 
                 if (phpversion('mongodb')) {
-                    $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $criteria[$that->options['expiry_field']]['$gte']);
-                    $that->assertGreaterThanOrEqual(round((string) $criteria[$that->options['expiry_field']]['$gte'] / 1000), $testTimeout);
+                    $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $criteria[$this->options['expiry_field']]['$gte']);
+                    $this->assertGreaterThanOrEqual(round((string) $criteria[$this->options['expiry_field']]['$gte'] / 1000), $testTimeout);
                 } else {
-                    $that->assertInstanceOf('MongoDate', $criteria[$that->options['expiry_field']]['$gte']);
-                    $that->assertGreaterThanOrEqual($criteria[$that->options['expiry_field']]['$gte']->sec, $testTimeout);
+                    $this->assertInstanceOf('MongoDate', $criteria[$this->options['expiry_field']]['$gte']);
+                    $this->assertGreaterThanOrEqual($criteria[$this->options['expiry_field']]['$gte']->sec, $testTimeout);
                 }
 
                 $fields = array(
-                    $that->options['id_field'] => 'foo',
+                    $this->options['id_field'] => 'foo',
                 );
 
                 if (phpversion('mongodb')) {
-                    $fields[$that->options['data_field']] = new \MongoDB\BSON\Binary('bar', \MongoDB\BSON\Binary::TYPE_OLD_BINARY);
-                    $fields[$that->options['id_field']] = new \MongoDB\BSON\UTCDateTime(time() * 1000);
+                    $fields[$this->options['data_field']] = new \MongoDB\BSON\Binary('bar', \MongoDB\BSON\Binary::TYPE_OLD_BINARY);
+                    $fields[$this->options['id_field']] = new \MongoDB\BSON\UTCDateTime(time() * 1000);
                 } else {
-                    $fields[$that->options['data_field']] = new \MongoBinData('bar', \MongoBinData::BYTE_ARRAY);
-                    $fields[$that->options['id_field']] = new \MongoDate();
+                    $fields[$this->options['data_field']] = new \MongoBinData('bar', \MongoBinData::BYTE_ARRAY);
+                    $fields[$this->options['id_field']] = new \MongoDate();
                 }
 
                 return $fields;
@@ -146,20 +144,19 @@ class MongoDbSessionHandlerTest extends TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
         $data = array();
 
         $methodName = phpversion('mongodb') ? 'updateOne' : 'update';
 
         $collection->expects($this->once())
             ->method($methodName)
-            ->will($this->returnCallback(function ($criteria, $updateData, $options) use ($that, &$data) {
-                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
+            ->will($this->returnCallback(function ($criteria, $updateData, $options) use (&$data) {
+                $this->assertEquals(array($this->options['id_field'] => 'foo'), $criteria);
 
                 if (phpversion('mongodb')) {
-                    $that->assertEquals(array('upsert' => true), $options);
+                    $this->assertEquals(array('upsert' => true), $options);
                 } else {
-                    $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
+                    $this->assertEquals(array('upsert' => true, 'multiple' => false), $options);
                 }
 
                 $data = $updateData['$set'];
@@ -169,15 +166,15 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->write('foo', 'bar'));
 
         if (phpversion('mongodb')) {
-            $that->assertEquals('bar', $data[$that->options['data_field']]->getData());
-            $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$that->options['time_field']]);
-            $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$that->options['expiry_field']]);
-            $that->assertGreaterThanOrEqual($expectedExpiry, round((string) $data[$that->options['expiry_field']] / 1000));
+            $this->assertEquals('bar', $data[$this->options['data_field']]->getData());
+            $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$this->options['time_field']]);
+            $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$this->options['expiry_field']]);
+            $this->assertGreaterThanOrEqual($expectedExpiry, round((string) $data[$this->options['expiry_field']] / 1000));
         } else {
-            $that->assertEquals('bar', $data[$that->options['data_field']]->bin);
-            $that->assertInstanceOf('MongoDate', $data[$that->options['time_field']]);
-            $that->assertInstanceOf('MongoDate', $data[$that->options['expiry_field']]);
-            $that->assertGreaterThanOrEqual($expectedExpiry, $data[$that->options['expiry_field']]->sec);
+            $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
+            $this->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
+            $this->assertInstanceOf('MongoDate', $data[$this->options['expiry_field']]);
+            $this->assertGreaterThanOrEqual($expectedExpiry, $data[$this->options['expiry_field']]->sec);
         }
     }
 
@@ -201,20 +198,19 @@ class MongoDbSessionHandlerTest extends TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
         $data = array();
 
         $methodName = phpversion('mongodb') ? 'updateOne' : 'update';
 
         $collection->expects($this->once())
             ->method($methodName)
-            ->will($this->returnCallback(function ($criteria, $updateData, $options) use ($that, &$data) {
-                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
+            ->will($this->returnCallback(function ($criteria, $updateData, $options) use (&$data) {
+                $this->assertEquals(array($this->options['id_field'] => 'foo'), $criteria);
 
                 if (phpversion('mongodb')) {
-                    $that->assertEquals(array('upsert' => true), $options);
+                    $this->assertEquals(array('upsert' => true), $options);
                 } else {
-                    $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
+                    $this->assertEquals(array('upsert' => true, 'multiple' => false), $options);
                 }
 
                 $data = $updateData['$set'];
@@ -223,13 +219,13 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->write('foo', 'bar'));
 
         if (phpversion('mongodb')) {
-            $that->assertEquals('bar', $data[$that->options['data_field']]->getData());
-            $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$that->options['time_field']]);
-            $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$that->options['expiry_field']]);
+            $this->assertEquals('bar', $data[$this->options['data_field']]->getData());
+            $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$this->options['time_field']]);
+            $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $data[$this->options['expiry_field']]);
         } else {
-            $that->assertEquals('bar', $data[$that->options['data_field']]->bin);
-            $that->assertInstanceOf('MongoDate', $data[$that->options['time_field']]);
-            $that->assertInstanceOf('MongoDate', $data[$that->options['expiry_field']]);
+            $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
+            $this->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
+            $this->assertInstanceOf('MongoDate', $data[$this->options['expiry_field']]);
         }
     }
 
@@ -289,19 +285,17 @@ class MongoDbSessionHandlerTest extends TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
-
         $methodName = phpversion('mongodb') ? 'deleteOne' : 'remove';
 
         $collection->expects($this->once())
             ->method($methodName)
-            ->will($this->returnCallback(function ($criteria) use ($that) {
+            ->will($this->returnCallback(function ($criteria) {
                 if (phpversion('mongodb')) {
-                    $that->assertInstanceOf('MongoDB\BSON\UTCDateTime', $criteria[$that->options['expiry_field']]['$lt']);
-                    $that->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$that->options['expiry_field']]['$lt'] / 1000));
+                    $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $criteria[$this->options['expiry_field']]['$lt']);
+                    $this->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));
                 } else {
-                    $that->assertInstanceOf('MongoDate', $criteria[$that->options['expiry_field']]['$lt']);
-                    $that->assertGreaterThanOrEqual(time() - 1, $criteria[$that->options['expiry_field']]['$lt']->sec);
+                    $this->assertInstanceOf('MongoDate', $criteria[$this->options['expiry_field']]['$lt']);
+                    $this->assertGreaterThanOrEqual(time() - 1, $criteria[$this->options['expiry_field']]['$lt']->sec);
                 }
             }));
 

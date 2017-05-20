@@ -41,7 +41,7 @@ class ExpressionFunction
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      */
-    public function __construct($name, $compiler, $evaluator)
+    public function __construct($name, callable $compiler, callable $evaluator)
     {
         $this->name = $name;
         $this->compiler = $compiler;
@@ -61,5 +61,42 @@ class ExpressionFunction
     public function getEvaluator()
     {
         return $this->evaluator;
+    }
+
+    /**
+     * Creates an ExpressionFunction from a PHP function name.
+     *
+     * @param string      $phpFunctionName        The PHP function name
+     * @param string|null $expressionFunctionName The expression function name (default: same than the PHP function name)
+     *
+     * @return self
+     *
+     * @throws \InvalidArgumentException if given PHP function name does not exist
+     * @throws \InvalidArgumentException if given PHP function name is in namespace
+     *                                   and expression function name is not defined
+     */
+    public static function fromPhp($phpFunctionName, $expressionFunctionName = null)
+    {
+        $phpFunctionName = ltrim($phpFunctionName, '\\');
+        if (!function_exists($phpFunctionName)) {
+            throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $phpFunctionName));
+        }
+
+        $parts = explode('\\', $phpFunctionName);
+        if (!$expressionFunctionName && count($parts) > 1) {
+            throw new \InvalidArgumentException(sprintf('An expression function name must be defined when PHP function "%s" is namespaced.', $phpFunctionName));
+        }
+
+        $compiler = function () use ($phpFunctionName) {
+            return sprintf('\%s(%s)', $phpFunctionName, implode(', ', func_get_args()));
+        };
+
+        $evaluator = function () use ($phpFunctionName) {
+            $args = func_get_args();
+
+            return call_user_func_array($phpFunctionName, array_splice($args, 1));
+        };
+
+        return new self($expressionFunctionName ?: end($parts), $compiler, $evaluator);
     }
 }

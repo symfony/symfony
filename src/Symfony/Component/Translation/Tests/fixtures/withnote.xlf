@@ -11,7 +11,7 @@
         <source>extra</source>
         <note from="foo">bar</note>
       </trans-unit>
-      <trans-unit id="3">
+      <trans-unit id="123">
         <source>key</source>
         <target></target>
         <note>baz</note>

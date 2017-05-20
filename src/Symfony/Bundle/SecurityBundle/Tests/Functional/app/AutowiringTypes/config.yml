@@ -1,0 +1,14 @@
+imports:
+    - { resource: ../config/framework.yml }
+
+services:
+    test.autowiring_types.autowired_services:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AutowiringBundle\AutowiredServices
+        autowire: true
+security:
+    providers:
+        dummy:
+            memory: ~
+    firewalls:
+        dummy:
+            security: false

@@ -80,10 +80,15 @@ class FormRegistry implements FormRegistryInterface
             }
 
             if (!$type) {
-                throw new InvalidArgumentException(sprintf('Could not load type "%s"', $name));
+                // Support fully-qualified class names
+                if (class_exists($name) && in_array('Symfony\Component\Form\FormTypeInterface', class_implements($name))) {
+                    $type = new $name();
+                } else {
+                    throw new InvalidArgumentException(sprintf('Could not load type "%s"', $name));
+                }
             }
 
-            $this->resolveAndAddType($type);
+            $this->types[$name] = $this->resolveType($type);
         }
 
         return $this->types[$name];
@@ -97,25 +102,20 @@ class FormRegistry implements FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The resolved type
      */
-    private function resolveAndAddType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type)
     {
-        $parentType = $type->getParent();
-
-        if ($parentType instanceof FormTypeInterface) {
-            $this->resolveAndAddType($parentType);
-            $parentType = $parentType->getName();
-        }
-
         $typeExtensions = array();
+        $parentType = $type->getParent();
+        $fqcn = get_class($type);
 
         foreach ($this->extensions as $extension) {
             $typeExtensions = array_merge(
                 $typeExtensions,
-                $extension->getTypeExtensions($type->getName())
+                $extension->getTypeExtensions($fqcn)
             );
         }
 
-        $this->types[$type->getName()] = $this->resolvedTypeFactory->createResolvedType(
+        return $this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null

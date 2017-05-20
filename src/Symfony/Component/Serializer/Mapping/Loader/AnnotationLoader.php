@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
@@ -55,11 +56,13 @@ class AnnotationLoader implements LoaderInterface
             }
 
             if ($property->getDeclaringClass()->name === $className) {
-                foreach ($this->reader->getPropertyAnnotations($property) as $groups) {
-                    if ($groups instanceof Groups) {
-                        foreach ($groups->getGroups() as $group) {
+                foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
+                    if ($annotation instanceof Groups) {
+                        foreach ($annotation->getGroups() as $group) {
                             $attributesMetadata[$property->name]->addGroup($group);
                         }
+                    } elseif ($annotation instanceof MaxDepth) {
+                        $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     }
 
                     $loaded = true;
@@ -68,29 +71,40 @@ class AnnotationLoader implements LoaderInterface
         }
 
         foreach ($reflectionClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->name === $className) {
-                foreach ($this->reader->getMethodAnnotations($method) as $groups) {
-                    if ($groups instanceof Groups) {
-                        if (preg_match('/^(get|is|has|set)(.+)$/i', $method->name, $matches)) {
-                            $attributeName = lcfirst($matches[2]);
+            if ($method->getDeclaringClass()->name !== $className) {
+                continue;
+            }
 
-                            if (isset($attributesMetadata[$attributeName])) {
-                                $attributeMetadata = $attributesMetadata[$attributeName];
-                            } else {
-                                $attributesMetadata[$attributeName] = $attributeMetadata = new AttributeMetadata($attributeName);
-                                $classMetadata->addAttributeMetadata($attributeMetadata);
-                            }
+            $accessorOrMutator = preg_match('/^(get|is|has|set)(.+)$/i', $method->name, $matches);
+            if ($accessorOrMutator) {
+                $attributeName = lcfirst($matches[2]);
 
-                            foreach ($groups->getGroups() as $group) {
-                                $attributeMetadata->addGroup($group);
-                            }
-                        } else {
-                            throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
-                        }
+                if (isset($attributesMetadata[$attributeName])) {
+                    $attributeMetadata = $attributesMetadata[$attributeName];
+                } else {
+                    $attributesMetadata[$attributeName] = $attributeMetadata = new AttributeMetadata($attributeName);
+                    $classMetadata->addAttributeMetadata($attributeMetadata);
+                }
+            }
+
+            foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
+                if ($annotation instanceof Groups) {
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
-                    $loaded = true;
+                    foreach ($annotation->getGroups() as $group) {
+                        $attributeMetadata->addGroup($group);
+                    }
+                } elseif ($annotation instanceof MaxDepth) {
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('MaxDepth on "%s::%s" cannot be added. MaxDepth can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    $attributeMetadata->setMaxDepth($annotation->getMaxDepth());
                 }
+
+                $loaded = true;
             }
         }
 

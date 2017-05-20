@@ -46,7 +46,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                '$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -58,7 +58,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->setTheme(%s, "tpl1");',
+                '$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->setTheme(%s, "tpl1");',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -71,10 +71,6 @@ class FormThemeTest extends TestCase
             return sprintf('($context["%s"] ?? null)', $name, $name);
         }
 
-        if (PHP_VERSION_ID >= 50400) {
-            return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
-        }
-
-        return sprintf('$this->getContext($context, "%s")', $name);
+        return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
     }
 }

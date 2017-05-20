@@ -321,7 +321,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
             ->will($this->returnValue($iniMax));
 
         $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->factory->createNamed('name', 'text', null, $options);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
         $this->setRequestData('POST', array(), array());
 
         $this->requestHandler->handleRequest($form, $this->request);

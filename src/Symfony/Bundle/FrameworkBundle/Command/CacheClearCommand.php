@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -53,6 +54,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
@@ -68,51 +71,65 @@ EOF
         }
 
         $kernel = $this->getContainer()->get('kernel');
-        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
         if ($input->getOption('no-warmup')) {
             $filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
-            // the warmup cache dir name must have the same length than the real one
-            // to avoid the many problems in serialized resources files
-            $realCacheDir = realpath($realCacheDir);
-            $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
+            @trigger_error('Calling cache:clear without the --no-warmup option is deprecated since version 3.3. Cache warmup should be done with the cache:warmup command instead.', E_USER_DEPRECATED);
 
-            if ($filesystem->exists($warmupDir)) {
-                if ($output->isVerbose()) {
-                    $output->writeln('  Clearing outdated warmup directory');
-                }
-                $filesystem->remove($warmupDir);
-            }
-
-            if ($output->isVerbose()) {
-                $output->writeln('  Warming up cache');
-            }
-            $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
-
-            $filesystem->rename($realCacheDir, $oldCacheDir);
-            if ('\\' === DIRECTORY_SEPARATOR) {
-                sleep(1);  // workaround for Windows PHP rename bug
-            }
-            $filesystem->rename($warmupDir, $realCacheDir);
+            $this->warmupCache($input, $output, $realCacheDir, $oldCacheDir);
         }
 
         if ($output->isVerbose()) {
-            $output->writeln('  Removing old cache directory');
+            $io->comment('Removing old cache directory...');
         }
 
         $filesystem->remove($oldCacheDir);
 
         if ($output->isVerbose()) {
-            $output->writeln('  Done');
+            $io->comment('Finished');
         }
+
+        $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+    }
+
+    private function warmupCache(InputInterface $input, OutputInterface $output, $realCacheDir, $oldCacheDir)
+    {
+        $filesystem = $this->getContainer()->get('filesystem');
+        $io = new SymfonyStyle($input, $output);
+
+        // the warmup cache dir name must have the same length than the real one
+        // to avoid the many problems in serialized resources files
+        $realCacheDir = realpath($realCacheDir);
+        $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
+
+        if ($filesystem->exists($warmupDir)) {
+            if ($output->isVerbose()) {
+                $io->comment('Clearing outdated warmup directory...');
+            }
+            $filesystem->remove($warmupDir);
+        }
+
+        if ($output->isVerbose()) {
+            $io->comment('Warming up cache...');
+        }
+        $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
+
+        $filesystem->rename($realCacheDir, $oldCacheDir);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            sleep(1);  // workaround for Windows PHP rename bug
+        }
+        $filesystem->rename($warmupDir, $realCacheDir);
     }
 
     /**
      * @param string $warmupDir
      * @param string $realCacheDir
      * @param bool   $enableOptionalWarmers
+     *
+     * @internal to be removed in 4.0
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
@@ -177,6 +194,8 @@ EOF
      * @param string          $warmupDir
      *
      * @return KernelInterface
+     *
+     * @internal to be removed in 4.0
      */
     protected function getTempKernel(KernelInterface $parent, $namespace, $parentClass, $warmupDir)
     {

@@ -1,6 +1,97 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * Removed `ValidateWorkflowsPass`
+ * The default `type` option of the `framework.workflows.*` configuration entries is `state_machine`
+
+3.3.0
+-----
+
+ * Not defining the `type` option of the `framework.workflows.*` configuration entries is deprecated.
+   The default value will be `state_machine` in Symfony 4.0.
+ * Deprecated the `CompilerDebugDumpPass` class
+ * [BC BREAK] Removed the "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter
+ * Added a new new version strategy option called json_manifest_path
+   that allows you to use the `JsonManifestVersionStrategy`.
+ * Added `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`. It provides
+   the same helpers as the `Controller` class, but does not allow accessing the dependency
+   injection container, in order to encourage explicit dependency declarations.
+ * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
+ * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
+ * Changed default configuration for
+   assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
+   `canBeDisabled()` when Flex is used
+ * The server:* commands and their associated router files were moved to WebServerBundle
+ * Translation related services are not loaded anymore when the `framework.translator` option
+   is disabled.
+ * Added `GlobalVariables::getToken()`
+ * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass`. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ * Added configurable paths for validation files
+ * Deprecated `SerializerPass`, use `Symfony\Component\Serializer\DependencyInjection\SerializerPass` instead
+ * Deprecated `FormPass`, use `Symfony\Component\Form\DependencyInjection\FormPass` instead
+ * Deprecated `SessionListener`
+ * Deprecated `TestSessionListener`
+ * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`.
+   Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
+ * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
+ * Deprecated extending `ConstraintValidatorFactory`
+ * Deprecated `ControllerArgumentValueResolverPass`. Use
+   `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
+ * Deprecated `RoutingResolverPass`, use `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` instead
+ * [BC BREAK] The `server:run`, `server:start`, `server:stop` and
+   `server:status` console commands have been moved to a dedicated bundle.
+   Require `symfony/web-server-bundle` in your composer.json and register
+   `Symfony\Bundle\WebServerBundle\WebServerBundle` in your AppKernel to use them.
+ * Added `$defaultLocale` as 3rd argument of `Translator::__construct()`
+   making `Translator` works with any PSR-11 container
+ * Added `framework.serializer.mapping` config option allowing to define custom
+   serialization mapping files and directories
+ * Deprecated `AddValidatorInitializersPass`, use
+   `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass` instead
+ * Deprecated `AddConstraintValidatorsPass`, use
+   `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` instead
+ * Deprecated `ValidateWorkflowsPass`, use
+   `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` instead
+
+3.2.0
+-----
+
+ * Removed `doctrine/annotations` from the list of required dependencies in `composer.json`
+ * Removed `symfony/security-core` and `symfony/security-csrf` from the list of required dependencies in `composer.json`
+ * Removed `symfony/templating` from the list of required dependencies in `composer.json`
+ * Removed `symfony/translation` from the list of required dependencies in `composer.json`
+ * Removed `symfony/asset` from the list of required dependencies in `composer.json`
+ * The `Resources/public/images/*` files have been removed.
+ * The `Resources/public/css/*.css` files have been removed (they are now inlined in TwigBundle).
+ * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension`
+
+3.1.0
+-----
+
+ * Added `Controller::json` to simplify creating JSON responses when using the Serializer component
+ * Deprecated absolute template paths support in the template name parser
+ * Deprecated using core form types without dependencies as services
+ * Added `Symfony\Component\HttpHernel\DataCollector\RequestDataCollector::onKernelResponse()`
+ * Added `Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector`
+ * Deprecated service `serializer.mapping.cache.apc` (use `serializer.mapping.cache.doctrine.apc` instead)
+
+3.0.0
+-----
+
+ * removed `validator.api` parameter
+ * removed `alias` option of the `form.type` tag
+
+2.8.0
+-----
+
+ * Deprecated the `alias` option of the `form.type_extension` tag in favor of the
+   `extended_type`/`extended-type` option
+ * Deprecated the `alias` option of the `form.type` tag
+ * Deprecated the Shell
+
 2.7.0
 -----
 

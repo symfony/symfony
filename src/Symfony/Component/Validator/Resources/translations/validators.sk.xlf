@@ -310,6 +310,10 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Táto hodnota nezodpovedá očakávanej znakovej sade {{ charset }}.</target>
             </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Táto hodnota nie je platný identifikačný kód podniku (BIC).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -54,28 +54,28 @@ class ResponseHeaderBag extends HeaderBag
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function __toString()
-    {
-        $cookies = '';
-        foreach ($this->getCookies() as $cookie) {
-            $cookies .= 'Set-Cookie: '.$cookie."\r\n";
-        }
-
-        ksort($this->headerNames);
-
-        return parent::__toString().$cookies;
-    }
-
-    /**
      * Returns the headers, with original capitalizations.
      *
      * @return array An array of headers
      */
     public function allPreserveCase()
     {
-        return array_combine($this->headerNames, $this->headers);
+        $headers = array();
+        foreach ($this->all() as $name => $value) {
+            $headers[isset($this->headerNames[$name]) ? $this->headerNames[$name] : $name] = $value;
+        }
+
+        return $headers;
+    }
+
+    public function allPreserveCaseWithoutCookies()
+    {
+        $headers = $this->allPreserveCase();
+        if (isset($this->headerNames['set-cookie'])) {
+            unset($headers[$this->headerNames['set-cookie']]);
+        }
+
+        return $headers;
     }
 
     /**
@@ -95,12 +95,38 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
+    public function all()
+    {
+        $headers = parent::all();
+        foreach ($this->getCookies() as $cookie) {
+            $headers['set-cookie'][] = (string) $cookie;
+        }
+
+        return $headers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function set($key, $values, $replace = true)
     {
-        parent::set($key, $values, $replace);
-
         $uniqueKey = str_replace('_', '-', strtolower($key));
+
+        if ('set-cookie' === $uniqueKey) {
+            if ($replace) {
+                $this->cookies = array();
+            }
+            foreach ((array) $values as $cookie) {
+                $this->setCookie(Cookie::fromString($cookie));
+            }
+            $this->headerNames[$uniqueKey] = $key;
+
+            return;
+        }
+
         $this->headerNames[$uniqueKey] = $key;
+
+        parent::set($key, $values, $replace);
 
         // ensure the cache-control header has sensible defaults
         if (in_array($uniqueKey, array('cache-control', 'etag', 'last-modified', 'expires'))) {
@@ -116,10 +142,16 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function remove($key)
     {
-        parent::remove($key);
-
         $uniqueKey = str_replace('_', '-', strtolower($key));
         unset($this->headerNames[$uniqueKey]);
+
+        if ('set-cookie' === $uniqueKey) {
+            $this->cookies = array();
+
+            return;
+        }
+
+        parent::remove($key);
 
         if ('cache-control' === $uniqueKey) {
             $this->computedCacheControl = array();
@@ -150,6 +182,7 @@ class ResponseHeaderBag extends HeaderBag
     public function setCookie(Cookie $cookie)
     {
         $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        $this->headerNames['set-cookie'] = 'Set-Cookie';
     }
 
     /**
@@ -173,6 +206,10 @@ class ResponseHeaderBag extends HeaderBag
             if (empty($this->cookies[$domain])) {
                 unset($this->cookies[$domain]);
             }
+        }
+
+        if (empty($this->cookies)) {
+            unset($this->headerNames['set-cookie']);
         }
     }
 
@@ -281,7 +318,7 @@ class ResponseHeaderBag extends HeaderBag
     protected function computeCacheControlValue()
     {
         if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
-            return 'no-cache';
+            return 'no-cache, private';
         }
 
         if (!$this->cacheControl) {

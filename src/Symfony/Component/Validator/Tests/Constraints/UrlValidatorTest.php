@@ -14,18 +14,13 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\UrlValidator;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @group dns-sensitive
  */
-class UrlValidatorTest extends AbstractConstraintValidatorTest
+class UrlValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new UrlValidator();
@@ -145,6 +140,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$url.'"')
+            ->setCode(Url::INVALID_URL_ERROR)
             ->assertRaised();
     }
 
@@ -218,6 +214,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
         } else {
             $this->buildViolation('myMessage')
                 ->setParameter('{{ value }}', '"example.com"')
+                ->setCode(Url::INVALID_URL_ERROR)
                 ->assertRaised();
         }
     }

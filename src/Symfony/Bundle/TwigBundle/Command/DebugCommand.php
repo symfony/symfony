@@ -12,30 +12,17 @@
 namespace Symfony\Bundle\TwigBundle\Command;
 
 use Symfony\Bridge\Twig\Command\DebugCommand as BaseDebugCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
+final class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface|null
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -43,24 +30,5 @@ class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
     protected function getTwigEnvironment()
     {
         return $this->container->get('twig');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        parent::configure();
-
-        $this->setAliases(array('twig:debug'));
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "twig:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:twig" instead.</comment>');
-        }
-
-        parent::execute($input, $output);
     }
 }

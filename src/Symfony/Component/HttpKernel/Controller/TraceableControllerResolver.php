@@ -27,8 +27,8 @@ class TraceableControllerResolver implements ControllerResolverInterface
     /**
      * Constructor.
      *
-     * @param ControllerResolverInterface $resolver         A ControllerResolverInterface instance
-     * @param Stopwatch                   $stopwatch        A Stopwatch instance
+     * @param ControllerResolverInterface $resolver  A ControllerResolverInterface instance
+     * @param Stopwatch                   $stopwatch A Stopwatch instance
      */
     public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
     {

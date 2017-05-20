@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by ondrejfuhrer at 2017-05-18T08:10:00Z
+
+First I created one into master branch (https://github.com/symfony/symfony/pull/22737), probably should be closed.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-18T14:31:57Z
+
+What's the problem you're trying to fix? Last time I tried these scripts on PHP 7 everything was working fine.
+
+---------------------------------------------------------------------------
+
+by ondrejfuhrer at 2017-05-18T14:44:58Z
+
+@jakzal If any PHP error is thrown in the code, it is actually an `\Error` class which implements `\Throwable` as well as `\Exception` and will be passed to that error handling function => causing an issue. For compatibility with PHP5 and PHP7 there needs to be no type hint.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-18T14:50:54Z
+
+Could you give me steps to reproduce such a scenario please?
+
+---------------------------------------------------------------------------
+
+by ondrejfuhrer at 2017-05-19T09:05:41Z
+
+@jakzal Well, I didn't have any real scenario ATM, but this is the example:
+```php
+<?php
+require('src/Symfony/Component/Intl/Resources/bin/common.php');
+
+throw new AssertionError('Uncaught Error');
+echo "Not Executed\n";
+?>
+```
+
+That will without the fix cause : `TypeError: Argument 1 passed to {closure}() must be an instance of Exception, instance of AssertionError given in /symfony/src/Symfony/Component/Intl/Resources/bin/common.php on line 71`
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-19T09:15:21Z
+
+Real scenario is what I was after as I don't see how this could happen. I was just curious if you found one.
+
+Anyway, I'd follow stof's advice and use the Throwable typehint.
+
+---------------------------------------------------------------------------
+
+by ondrejfuhrer at 2017-05-19T09:17:34Z
+
+@stof @jakzal Of course `\Throwable` is possible to use, but that would cause compatibility break with PHP5 and since I think Symfony 2.7 is mainly used on PHP5, I would rather go with no type hint.
+
+But if you guys want `\Throwable`, I can update that, what @chalasr thinks?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-19T09:19:02Z
+
+@ondrejfuhrer it's fine in this case as this script is only run by maintainers, mainly me, and I run it on the latest PHP version most of the time. The output of this script, as stof said, doesn't depend on PHP version so it's fine to rely on PHP 7 here.
+
+---------------------------------------------------------------------------
+
+by ondrejfuhrer at 2017-05-19T11:42:13Z
+
+@jakzal @stof Updated 😄

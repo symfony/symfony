@@ -288,7 +288,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #19118 [Process] Fix pipes cleaning on Windows (nicolas-grekas)
  * bug #19128 Avoid phpunit 5.4 warnings on getMock (2.7+) (iltar)
  * bug #19120 [FrameworkBundle] templating can be fully disabled (xabbuh)
- * bug #19114 [HttpKernel] Dont close the reponse stream in debug (nicolas-grekas)
+ * bug #19114 [HttpKernel] Dont close the response stream in debug (nicolas-grekas)
  * bug #19101 [Session] fix PDO transaction aborted under PostgreSQL (Tobion)
  * bug #18501 [HttpFoundation] changed MERGE queries (hjkl)
  * bug #19081 [YAML] Fixed parsing problem with nested DateTime lists (jkphl, xabbuh)

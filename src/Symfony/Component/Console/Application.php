@@ -734,70 +734,6 @@ class Application
     }
 
     /**
-     * Tries to figure out the terminal width in which this application runs.
-     *
-     * @return int|null
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
-     */
-    protected function getTerminalWidth()
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->terminal->getWidth();
-    }
-
-    /**
-     * Tries to figure out the terminal height in which this application runs.
-     *
-     * @return int|null
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
-     */
-    protected function getTerminalHeight()
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->terminal->getHeight();
-    }
-
-    /**
-     * Tries to figure out the terminal dimensions based on the current environment.
-     *
-     * @return array Array containing width and height
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
-     */
-    public function getTerminalDimensions()
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return array($this->terminal->getWidth(), $this->terminal->getHeight());
-    }
-
-    /**
-     * Sets terminal dimensions.
-     *
-     * Can be useful to force terminal dimensions for functional tests.
-     *
-     * @param int $width  The width
-     * @param int $height The height
-     *
-     * @return $this
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Set the COLUMNS and LINES env vars instead.
-     */
-    public function setTerminalDimensions($width, $height)
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Set the COLUMNS and LINES env vars instead.', __METHOD__), E_USER_DEPRECATED);
-
-        putenv('COLUMNS='.$width);
-        putenv('LINES='.$height);
-
-        return $this;
-    }
-
-    /**
      * Configures the input and output instances based on the user arguments and options.
      *
      * @param InputInterface  $input  An InputInterface instance
@@ -818,12 +754,6 @@ class Application
 
             if ($input instanceof StreamableInputInterface) {
                 $inputStream = $input->getStream();
-            }
-
-            // This check ensures that calling QuestionHelper::setInputStream() works
-            // To be removed in 4.0 (in the same time as QuestionHelper::setInputStream)
-            if (!$inputStream && $this->getHelperSet()->has('question')) {
-                $inputStream = $this->getHelperSet()->get('question')->getInputStream(false);
             }
 
             if (!@posix_isatty($inputStream) && false === getenv('SHELL_INTERACTIVE')) {

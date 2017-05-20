@@ -788,21 +788,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "framework.serializer.cache" option is deprecated %s.
-     */
-    public function testDeprecatedSerializerCacheOption()
-    {
-        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
-
-        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-        $this->assertTrue($container->hasDefinition('serializer.mapping.class_metadata_factory'));
-
-        $cache = $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1);
-        $this->assertEquals(new Reference('foo'), $cache);
-    }
-
     public function testSerializerMapping()
     {
         $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle', 'parent' => null))));

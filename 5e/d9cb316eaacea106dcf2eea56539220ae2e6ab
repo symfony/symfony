@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-05-19T14:05:50Z
+
+The argument is not meant to become mandatory, but to instantiate an `ArgumentResolver` if none is provided, according to the deprecation message
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-05-19T14:08:50Z
+
+@stof you're right.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-05-19T14:13:42Z
+
+Minor addition, @nicolas-grekas has added the service resolver, but this one isn't added to the default set.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-19T15:16:02Z
+
+@iltar that's expected, as this ServiceResolver requires some wiring, it is not standalone. So using it requires configuring the resolver externally and passing it to the kernel (which is what FrameworkBundle does for instance)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-05-19T15:46:54Z
+
+@stof fair enough, I see that the dependency is optional as well. I got confused because it's between the other resolvers here: https://github.com/symfony/symfony/tree/master/src/Symfony/Component/HttpKernel/Controller/ArgumentResolver
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:35:30Z
+
+fabbot failure looks legit
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-05-20T09:43:24Z
+
+@nicolas-grekas indeed, should be fixed now!

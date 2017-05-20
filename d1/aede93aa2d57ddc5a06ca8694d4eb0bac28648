@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T14:07:04Z
+
+please do bigger PRs, doing them line by line will take ages otherwise...
+rebase needed to see tests green
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-18T14:13:41Z
+
+@nicolas-grekas it's the only one like this for this component ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-18T18:12:52Z
+
+@dunglas There is a big overhead for a PR. So, in this case, this should be about all components, not just one of them.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-18T18:20:35Z
+
+I agree with @fabpot and @nicolas-grekas  here. either you work by component, and then you clean *all* deprecations of the component at once, or you work by deprecation type on the whole codebase. But splitting both by component and deprecation type adds lots of review overhead (it only makes you move higher in the stats about the number of PRs opened by each dev, but this is not a worthy goal)

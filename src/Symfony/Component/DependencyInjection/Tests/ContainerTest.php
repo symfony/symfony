@@ -137,18 +137,6 @@ class ContainerTest extends TestCase
         $this->assertEquals(array('service_container', 'internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     */
-    public function testGetLegacyServiceIds()
-    {
-        $sc = new LegacyProjectServiceContainer();
-        $sc->set('foo', $obj = new \stdClass());
-
-        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
-    }
-
     public function testSet()
     {
         $sc = new Container();
@@ -227,38 +215,6 @@ class ContainerTest extends TestCase
         $this->assertSame('Foo', $sc->normalizeId('foo'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.3.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     */
-    public function testLegacyGet()
-    {
-        $sc = new LegacyProjectServiceContainer();
-        $sc->set('foo', $foo = new \stdClass());
-
-        $this->assertSame($foo, $sc->get('foo'), '->get() returns the service for the given id');
-        $this->assertSame($foo, $sc->get('Foo'), '->get() returns the service for the given id, and converts id to lowercase');
-        $this->assertSame($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
-        $this->assertSame($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
-        $this->assertSame($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
-        $this->assertSame($sc->__foo_baz, $sc->get('foo\\baz'), '->get() returns the service if a get*Method() is defined');
-
-        $sc->set('bar', $bar = new \stdClass());
-        $this->assertSame($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
-
-        try {
-            $sc->get('');
-            $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
-        }
-        $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
-    }
-
     public function testGetThrowServiceNotFoundException()
     {
         $sc = new ProjectServiceContainer();
@@ -315,26 +271,6 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
-     */
-    public function testLegacyHas()
-    {
-        $sc = new LegacyProjectServiceContainer();
-        $sc->set('foo', new \stdClass());
-
-        $this->assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
-        $this->assertTrue($sc->has('foo'), '->has() returns true if the service exists');
-        $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
-        $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
-        $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
-        $this->assertTrue($sc->has('foo\\baz'), '->has() returns true if a get*Method() is defined');
     }
 
     public function testInitialized()
@@ -513,63 +449,6 @@ class ProjectServiceContainer extends Container
     protected function getBarService()
     {
         return $this->services['bar'] = $this->__bar;
-    }
-
-    protected function getFooBarService()
-    {
-        return $this->__foo_bar;
-    }
-
-    protected function getFoo_BazService()
-    {
-        return $this->__foo_baz;
-    }
-
-    protected function getCircularService()
-    {
-        return $this->get('circular');
-    }
-
-    protected function getThrowExceptionService()
-    {
-        throw new \Exception('Something went terribly wrong!');
-    }
-
-    protected function getThrowsExceptionOnServiceConfigurationService()
-    {
-        $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
-
-        throw new \Exception('Something was terribly wrong while trying to configure the service!');
-    }
-}
-
-class LegacyProjectServiceContainer extends Container
-{
-    public $__bar;
-    public $__foo_bar;
-    public $__foo_baz;
-    public $__internal;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->__bar = new \stdClass();
-        $this->__foo_bar = new \stdClass();
-        $this->__foo_baz = new \stdClass();
-        $this->__internal = new \stdClass();
-        $this->privates = array('internal' => true);
-        $this->aliases = array('alias' => 'bar');
-    }
-
-    protected function getInternalService()
-    {
-        return $this->__internal;
-    }
-
-    protected function getBarService()
-    {
-        return $this->__bar;
     }
 
     protected function getFooBarService()

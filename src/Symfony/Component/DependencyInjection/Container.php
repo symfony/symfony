@@ -237,14 +237,6 @@ class Container implements ResettableContainerInterface
                 continue;
             }
 
-            // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-            // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-            if (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service')) {
-                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-
-                return true;
-            }
-
             return false;
         }
     }
@@ -293,11 +285,6 @@ class Container implements ResettableContainerInterface
             } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
                 $id = $normalizedId;
                 continue;
-            } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
-                // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-                // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-                // $method is set to the right value, proceed
             } else {
                 if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
                     if (!$id) {
@@ -374,22 +361,7 @@ class Container implements ResettableContainerInterface
      */
     public function getServiceIds()
     {
-        $ids = array();
-
-        if (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class) {
-            // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-            // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-            @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-
-            foreach (get_class_methods($this) as $method) {
-                if (preg_match('/^get(.+)Service$/', $method, $match)) {
-                    $ids[] = self::underscore($match[1]);
-                }
-            }
-        }
-        $ids[] = 'service_container';
-
-        return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->services)));
+        return array_unique(array_merge(array('service_container'), array_keys($this->methodMap), array_keys($this->services)));
     }
 
     /**

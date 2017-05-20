@@ -299,6 +299,10 @@ FrameworkBundle
 
  * Extending `ConstraintValidatorFactory` is not supported anymore.
 
+ * Passing an array of validators or validator aliases as the second argument of 
+   `ConstraintValidatorFactory::__construct()` has been removed.
+   Use the service locator instead.
+
  * Class parameters related to routing have been removed
     * router.options.generator_class
     * router.options.generator_base_class

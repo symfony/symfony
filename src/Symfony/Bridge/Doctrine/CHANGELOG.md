@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `DoctrineParserCache` class
+
 3.1.0
 -----
 

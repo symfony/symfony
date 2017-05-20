@@ -130,6 +130,11 @@
       </argument>
       <argument type="iterator"/>
     </service>
+    <service id="BAR" class="stdClass">
+      <property name="bar" type="service" id="bar"/>
+    </service>
+    <service id="bar2" class="stdClass"/>
+    <service id="BAR2" class="stdClass"/>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
     <service id="alias_for_foo" alias="foo"/>

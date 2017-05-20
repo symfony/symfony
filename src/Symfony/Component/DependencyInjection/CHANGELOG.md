@@ -10,6 +10,7 @@ CHANGELOG
  * removed `Container::isFrozen`
  * removed support for dumping an ucompiled container in `PhpDumper`
  * removed support for generating a dumped `Container` without populating the method map
+ * removed support for case insensitive service identifiers
 
 3.4.0
 -----

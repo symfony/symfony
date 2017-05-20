@@ -1082,6 +1082,21 @@ class ContainerBuilderTest extends TestCase
         // when called multiple times, the same instance is returned
         $this->assertSame($childDefA, $container->registerForAutoconfiguration('AInterface'));
     }
+
+    public function testCaseSensitivity()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass');
+        $container->register('Foo', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(false);
+        $container->register('fOO', 'stdClass')->setProperty('Foo', new Reference('Foo'));
+
+        $this->assertSame(array('service_container', 'foo', 'Foo', 'fOO', 'Psr\Container\ContainerInterface', 'Symfony\Component\DependencyInjection\ContainerInterface'), $container->getServiceIds());
+
+        $container->compile();
+
+        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case sensitively');
+    }
 }
 
 class FooClass

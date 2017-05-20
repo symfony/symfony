@@ -27,9 +27,6 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         $this->services = array();
-        $this->normalizedIds = array(
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\container33\\foo' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo',
-        );
         $this->methodMap = array(
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo' => 'getSymfony_Component_DependencyInjection_Tests_Fixtures_Container33_FooService',
         );

@@ -151,30 +151,25 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
+        if (isset($this->privates[$id])) {
+            throw new InvalidArgumentException(sprintf('You cannot set the private service "%s".', $id));
+        }
+
+        if (isset($this->methodMap[$id])) {
+            throw new InvalidArgumentException(sprintf('You cannot set the pre-defined service "%s".', $id));
+        }
+
         if (isset($this->aliases[$id])) {
             unset($this->aliases[$id]);
         }
 
-        $this->services[$id] = $service;
-
         if (null === $service) {
             unset($this->services[$id]);
+
+            return;
         }
 
-        if (isset($this->privates[$id])) {
-            if (null === $service) {
-                @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-                unset($this->privates[$id]);
-            } else {
-                @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-            }
-        } elseif (isset($this->methodMap[$id])) {
-            if (null === $service) {
-                @trigger_error(sprintf('Unsetting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-            } else {
-                @trigger_error(sprintf('Setting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-            }
-        }
+        $this->services[$id] = $service;
     }
 
     /**
@@ -187,7 +182,7 @@ class Container implements ResettableContainerInterface
     public function has($id)
     {
         if (isset($this->privates[$id])) {
-            @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            return false;
         }
         if ('service_container' === $id) {
             return true;
@@ -226,7 +221,11 @@ class Container implements ResettableContainerInterface
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
         if (isset($this->privates[$id])) {
-            @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                throw new ServiceNotFoundException($id);
+            }
+
+            return;
         }
         if ('service_container' === $id) {
             return $this;
@@ -295,7 +294,7 @@ class Container implements ResettableContainerInterface
         }
 
         if (isset($this->privates[$id])) {
-            @trigger_error(sprintf('Checking for the initialization of the "%s" private service is deprecated since Symfony 3.4 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            return false;
         }
 
         if (isset($this->aliases[$id])) {

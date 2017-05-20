@@ -193,26 +193,15 @@ class ContainerTest extends TestCase
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.3.
-     */
-    public function testGetInsensitivity()
+    public function testCaseSensitivity()
     {
-        $sc = new ProjectServiceContainer();
-        $sc->set('foo', $foo = new \stdClass());
-        $this->assertSame($foo, $sc->get('Foo'), '->get() returns the service for the given id, and converts id to lowercase');
-    }
+        $sc = new Container();
+        $sc->set('foo', $foo1 = new \stdClass());
+        $sc->set('Foo', $foo2 = new \stdClass());
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "foo" instead of "Foo" is deprecated since version 3.3.
-     */
-    public function testNormalizeIdKeepsCase()
-    {
-        $sc = new ProjectServiceContainer();
-        $sc->normalizeId('Foo', true);
-        $this->assertSame('Foo', $sc->normalizeId('foo'));
+        $this->assertSame(array('service_container', 'foo', 'Foo'), $sc->getServiceIds());
+        $this->assertSame($foo1, $sc->get('foo'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
     }
 
     public function testGetThrowServiceNotFoundException()

@@ -28,4 +28,9 @@
     </parameter>
     <parameter key="constant" type="constant">PHP_EOL</parameter>
   </parameters>
+  <services>
+    <service class="Symfony\Component\DependencyInjection\ContainerInterface" id="service_container" public="false" synthetic="true"/>
+    <service alias="service_container" id="Psr\Container\ContainerInterface" public="false"/>
+    <service alias="service_container" id="Symfony\Component\DependencyInjection\ContainerInterface" public="false"/>
+  </services>
 </container>

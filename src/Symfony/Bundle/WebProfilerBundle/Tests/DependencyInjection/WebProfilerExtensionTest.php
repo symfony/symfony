@@ -31,6 +31,9 @@ class WebProfilerExtensionTest extends TestCase
     {
         $errors = array();
         foreach ($container->getServiceIds() as $id) {
+            if ('service_container' === $id) { // to be removed in 4.0
+                continue;
+            }
             try {
                 $container->get($id);
             } catch (\Exception $e) {

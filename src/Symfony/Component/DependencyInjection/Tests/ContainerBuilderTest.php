@@ -54,6 +54,7 @@ class ContainerBuilderTest extends TestCase
         $definition = $builder->getDefinition('service_container');
         $this->assertInstanceOf(Definition::class, $definition);
         $this->assertTrue($definition->isSynthetic());
+        $this->assertFalse($definition->isPublic());
         $this->assertSame(ContainerInterface::class, $definition->getClass());
         $this->assertTrue($builder->hasAlias(PsrContainerInterface::class));
         $this->assertTrue($builder->hasAlias(ContainerInterface::class));

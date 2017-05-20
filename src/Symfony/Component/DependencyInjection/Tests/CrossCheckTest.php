@@ -72,8 +72,6 @@ class CrossCheckTest extends TestCase
             $services2[$id] = serialize($service);
         }
 
-        unset($services1['service_container'], $services2['service_container']);
-
         $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
     }
 

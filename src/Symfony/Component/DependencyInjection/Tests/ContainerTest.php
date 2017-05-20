@@ -20,11 +20,18 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class ContainerTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Requesting the "service_container" private service is deprecated since Symfony 3.4 and won't be supported anymore in Symfony 4.0.
+     */
     public function testConstructor()
     {
         $sc = new Container();
         $this->assertSame($sc, $sc->get('service_container'), '__construct() automatically registers itself as a service');
+    }
 
+    public function testConstructorWithParameters()
+    {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }

@@ -50,6 +50,9 @@ class ProjectServiceContainer extends Container
             'new_factory_service' => 'getNewFactoryServiceService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
         );
+        $this->privates = array(
+            'service_container' => true,
+        );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',

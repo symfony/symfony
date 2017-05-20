@@ -64,6 +64,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      */
     private function isInlineableDefinition($id, Definition $definition, ServiceReferenceGraph $graph)
     {
+        if ('service_container' === $id) {
+            return false;
+        }
+
         if (!$definition->isShared()) {
             return true;
         }

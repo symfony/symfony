@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * Removed `ContainerAwareRuntimeLoader`
+
 3.3.0
 -----
 

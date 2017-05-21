@@ -10,6 +10,7 @@ CHANGELOG
   `ContainerAwareInterface` interface for this command.
  * Deprecated the `FirewallMap::$map` and `$container` properties.
  * [BC BREAK] Keys of the `users` node for `in_memory` user provider are no longer normalized.
+ * deprecated `FirewallContext::getListeners()`
 
 3.2.0
 -----

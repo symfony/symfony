@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `StringUtil` class, use `Symfony\Component\Inflector\Inflector`
+   instead
+
 2.7.0
 ------
 

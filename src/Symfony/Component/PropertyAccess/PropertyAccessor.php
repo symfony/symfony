@@ -195,10 +195,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         $overwrite = true;
 
         try {
-            if (PHP_VERSION_ID < 70000 && false === self::$previousErrorHandler) {
-                self::$previousErrorHandler = set_error_handler(self::$errorHandler);
-            }
-
             for ($i = count($propertyValues) - 1; 0 <= $i; --$i) {
                 $zval = $propertyValues[$i];
                 unset($propertyValues[$i]);

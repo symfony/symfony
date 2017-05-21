@@ -1051,21 +1051,6 @@ class RequestTest extends TestCase
         $this->assertEquals('My other content', $req->getContent());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
-     */
-    public function testGetContentCantBeCalledTwiceWithResources($first, $second)
-    {
-        if (PHP_VERSION_ID >= 50600) {
-            $this->markTestSkipped('PHP >= 5.6 allows to open php://input several times.');
-        }
-
-        $req = new Request();
-        $req->getContent($first);
-        $req->getContent($second);
-    }
-
     public function getContentCantBeCalledTwiceWithResourcesProvider()
     {
         return array(
@@ -1076,7 +1061,6 @@ class RequestTest extends TestCase
 
     /**
      * @dataProvider getContentCanBeCalledTwiceWithResourcesProvider
-     * @requires PHP 5.6
      */
     public function testGetContentCanBeCalledTwiceWithResources($first, $second)
     {

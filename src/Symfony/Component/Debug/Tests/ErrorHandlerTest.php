@@ -475,9 +475,6 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testHandleErrorException()
     {
         $exception = new \Error("Class 'Foo' not found");

@@ -138,9 +138,6 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(array($flattened2), $flattened->getAllPrevious());
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testPreviousError()
     {
         $exception = new \Exception('test', 123, new \ParseError('Oh noes!', 42));

@@ -73,11 +73,7 @@ class CompiledRoute implements \Serializable
      */
     public function unserialize($serialized)
     {
-        if (PHP_VERSION_ID >= 70000) {
-            $data = unserialize($serialized, array('allowed_classes' => false));
-        } else {
-            $data = unserialize($serialized);
-        }
+        $data = unserialize($serialized, array('allowed_classes' => false));
 
         $this->variables = $data['vars'];
         $this->staticPrefix = $data['path_prefix'];

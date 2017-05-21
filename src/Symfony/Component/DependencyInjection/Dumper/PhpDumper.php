@@ -1628,9 +1628,7 @@ EOF;
         }
 
         if ($this->container->hasDefinition($id) && (!$this->container->getDefinition($id)->isPublic() || $this->container->getDefinition($id)->isShared())) {
-            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? $code)" on PHP>=7.0
-
-            $code = "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : $code) && false ?: '_'}";
+            $code = "(\$this->services['$id'] ?? $code)";
         }
 
         return $code;

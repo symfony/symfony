@@ -243,9 +243,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         return $formatData;
     }
 
-    /**
-     * @requires PHP 5.5.10
-     */
     public function testFormatUtcAndGmtAreSplit()
     {
         $pattern = "yyyy.MM.dd 'at' HH:mm:ss zzz";
@@ -318,7 +315,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     /**
      * @dataProvider formatTimezoneProvider
-     * @requires PHP 5.5
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
@@ -432,8 +428,8 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithDateTimeZoneGmtOffset()
     {
-        if (defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) {
-            $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
+        if (defined('HHVM_VERSION_ID')) {
+            $this->markTestSkipped('See https://github.com/facebook/hhvm/issues/5875');
         }
 
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');

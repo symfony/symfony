@@ -31,15 +31,13 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @todo use ConstraintValidatorTestCase when symfony/validator ~3.2 is required.
  */
-class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
+class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
     const EM_NAME = 'foo';
 

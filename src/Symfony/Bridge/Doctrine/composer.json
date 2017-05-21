@@ -30,7 +30,7 @@
         "symfony/proxy-manager-bridge": "~2.8|~3.0|~4.0.0",
         "symfony/security": "~2.8|~3.0|~4.0.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0.0",
-        "symfony/validator": "^2.8.18|^3.2.5|~4.0.0",
+        "symfony/validator": "^3.2.5|~4.0.0",
         "symfony/translation": "~2.8|~3.0|~4.0.0",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",

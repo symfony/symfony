@@ -507,6 +507,9 @@ TwigBridge
 Validator
 ---------
 
+ * The default value of the `strict` option of the `Choice` constraint was changed
+   to `true`. Using any other value will throw an exception.
+
  * The `DateTimeValidator::PATTERN` constant was removed.
 
  * `Tests\Constraints\AbstractConstraintValidatorTest` has been removed in

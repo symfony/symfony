@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-05-19T18:24:03Z
+
+I :heart: this part, when we remove stuff and everything continues working fine. Let's go, cleanup, bye to BC layers :smile:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-20T08:14:39Z
+
+@xabbuh : I see you opened #22793. Here I did only remove the `ClassCollectionLoader` for the `Kernel::loadClassCache` removal (and its usages), but I think it makes sense to remove everything at once actually. So I cherry-picked your commit here. Is it okay to you ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:30:38Z
+
+missing CHANGELOG updates in components (please check any your other PRs also if any)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-20T09:47:13Z
+
+Added one in HttpKernel: https://github.com/symfony/symfony/pull/22786/files#diff-776debe25c0a772039d45b8d692c9dbfR7. Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T10:01:31Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-21T10:05:08Z
+
+Rebased.

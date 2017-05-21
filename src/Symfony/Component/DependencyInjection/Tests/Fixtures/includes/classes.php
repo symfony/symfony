@@ -88,7 +88,7 @@ class DummyProxyDumper implements ProxyDumper
         return false;
     }
 
-    public function getProxyFactoryCode(Definition $definition, $id)
+    public function getProxyFactoryCode(Definition $definition, $id, $methodName = null)
     {
         return '';
     }

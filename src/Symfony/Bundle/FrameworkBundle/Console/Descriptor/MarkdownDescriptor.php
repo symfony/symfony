@@ -191,8 +191,11 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Autoconfigured: '.($definition->isAutoconfigured() ? 'yes' : 'no')
         ;
 
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
+        // forward compatibility with DependencyInjection component in version 4.0
+        if (method_exists($definition, 'getAutowiringTypes')) {
+            foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
+                $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
+            }
         }
 
         if (isset($options['show_arguments']) && $options['show_arguments']) {

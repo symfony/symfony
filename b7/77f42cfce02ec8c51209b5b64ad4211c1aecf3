@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:17:40Z
+
+The CHANGELOG file needs an update (same for all the other PR I guess?)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-20T13:49:51Z
+
+changelog entries added (and I opened #22802 to actually create one for the component in the `3.2` branch)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T14:13:58Z
+
+FC layer missing in 3.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-21T07:40:50Z
+
+see #22813
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-21T09:21:03Z
+
+Tests are green. Ready to be reviewed.

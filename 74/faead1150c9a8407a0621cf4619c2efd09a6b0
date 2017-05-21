@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2017-05-19T09:55:57Z
+
+This PR also depends on #22773.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-19T10:13:50Z
+
+@hhamon technically, the dependency is the opposite one. The removal is the one depending on this one
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:38:21Z
+
+I guess a rebase is need to make tests green

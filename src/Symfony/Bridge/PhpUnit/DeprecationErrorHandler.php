@@ -67,7 +67,7 @@ class DeprecationErrorHandler
             'legacy' => array(),
             'other' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $getMode) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode) {
             $mode = $getMode();
             if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode) {
                 return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);

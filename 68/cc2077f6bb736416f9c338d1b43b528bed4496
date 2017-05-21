@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T14:07:36Z
+
+rebase needed to see tests green
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-18T14:41:22Z
+
+Aaaand, green it is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:55:26Z
+
+could the commit message be made more explicit? any CHANGELOG missing an update?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-20T10:05:03Z
+
+I changed the commit message and description and added CHANGELOG entries.

@@ -401,7 +401,6 @@ EOTXT
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
-     * @requires PHP 5.6
      */
     public function testSpecialVars56()
     {
@@ -458,47 +457,6 @@ array:2 [
     ]
   ]
   2 => &1 array:1 [&1]
-]
-
-EOTXT
-            ,
-            $out
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testBuggyRefs()
-    {
-        if (PHP_VERSION_ID >= 50600) {
-            $this->markTestSkipped('PHP 5.6 fixed refs counting');
-        }
-
-        $var = $this->getSpecialVars();
-        $var = $var[0];
-
-        $dumper = new CliDumper();
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var)->withMaxDepth(3);
-        $out = '';
-        $dumper->dump($data, function ($line, $depth) use (&$out) {
-            if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
-
-        $this->assertSame(
-            <<<'EOTXT'
-array:1 [
-  0 => array:1 [
-    0 => array:1 [
-      0 => array:1 [ …1]
-    ]
-  ]
 ]
 
 EOTXT

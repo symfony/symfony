@@ -64,7 +64,7 @@ class ProjectServiceContainer extends Container
         $this->services['bar'] = $instance = new \stdClass();
 
         $instance->foo = array(0 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo::withVoid */ function (): void {
-            ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withVoid();
+            ($this->services['foo'] ?? $this->get('foo'))->withVoid();
         });
 
         return $instance;

@@ -482,9 +482,6 @@ class PhpDumperTest extends TestCase
         $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo', (string) array_pop($res));
     }
 
-    /**
-     * @requires PHP 7.1
-     */
     public function testClosureProxyWithVoidReturnType()
     {
         $container = include self::$fixturesPath.'/containers/container_dump_proxy_with_void_return_type.php';
@@ -497,9 +494,6 @@ class PhpDumperTest extends TestCase
         $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo', (string) array_pop($res));
     }
 
-    /**
-     * @requires PHP 7.1
-     */
     public function testClosureProxyPhp71()
     {
         $container = include self::$fixturesPath.'/containers/container32.php';

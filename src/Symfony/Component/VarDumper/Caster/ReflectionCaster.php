@@ -186,7 +186,7 @@ class ReflectionCaster
 
         foreach ($c->getParameters() as $v) {
             $k = '$'.$v->name;
-            if (method_exists($v, 'isVariadic') && $v->isVariadic()) {
+            if ($v->isVariadic()) {
                 $k = '...'.$k;
             }
             if ($v->isPassedByReference()) {
@@ -241,12 +241,8 @@ class ReflectionCaster
             'allowsNull' => 'allowsNull',
         ));
 
-        if (method_exists($c, 'getType')) {
-            if ($v = $c->getType()) {
-                $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
-            }
-        } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $c, $v)) {
-            $a[$prefix.'typeHint'] = $v[1];
+        if ($v = $c->getType()) {
+            $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
         }
 
         if (isset($a[$prefix.'typeHint'])) {
@@ -258,17 +254,13 @@ class ReflectionCaster
 
         try {
             $a[$prefix.'default'] = $v = $c->getDefaultValue();
-            if (method_exists($c, 'isDefaultValueConstant') && $c->isDefaultValueConstant()) {
+            if ($c->isDefaultValueConstant()) {
                 $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
             }
             if (null === $v) {
                 unset($a[$prefix.'allowsNull']);
             }
         } catch (\ReflectionException $e) {
-            if (isset($a[$prefix.'typeHint']) && $c->allowsNull() && !class_exists('ReflectionNamedType', false)) {
-                $a[$prefix.'default'] = null;
-                unset($a[$prefix.'allowsNull']);
-            }
         }
 
         return $a;

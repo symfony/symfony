@@ -19,30 +19,6 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
 final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 {
     /**
-     * If the ...$arg functionality is available.
-     *
-     * Requires at least PHP 5.6.0 or HHVM 3.9.1
-     *
-     * @var bool
-     */
-    private $supportsVariadic;
-
-    /**
-     * If the reflection supports the getType() method to resolve types.
-     *
-     * Requires at least PHP 7.0.0 or HHVM 3.11.0
-     *
-     * @var bool
-     */
-    private $supportsParameterType;
-
-    public function __construct()
-    {
-        $this->supportsVariadic = method_exists('ReflectionParameter', 'isVariadic');
-        $this->supportsParameterType = method_exists('ReflectionParameter', 'getType');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function createArgumentMetadata($controller)
@@ -73,7 +49,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      */
     private function isVariadic(\ReflectionParameter $parameter)
     {
-        return $this->supportsVariadic && $parameter->isVariadic();
+        return $parameter->isVariadic();
     }
 
     /**
@@ -109,21 +85,15 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      */
     private function getType(\ReflectionParameter $parameter)
     {
-        if ($this->supportsParameterType) {
-            if (!$type = $parameter->getType()) {
-                return;
-            }
-            $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
-            if ('array' === $typeName && !$type->isBuiltin()) {
-                // Special case for HHVM with variadics
-                return;
-            }
-
-            return $typeName;
+        if (!$type = $parameter->getType()) {
+            return;
+        }
+        $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+        if ('array' === $typeName && !$type->isBuiltin()) {
+            // Special case for HHVM with variadics
+            return;
         }
 
-        if (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $info)) {
-            return $info[1];
-        }
+        return $typeName;
     }
 }

@@ -39,7 +39,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -1076,11 +1075,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $r = new \ReflectionClass($class = $parameterBag->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
-            // don't trigger deprecations for internal uses
-            // @deprecated since version 3.3, to be removed in 4.0 along with the deprecated class
-            $deprecationWhitelist = array('event_dispatcher' => ContainerAwareEventDispatcher::class);
 
-            if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ") && (!isset($deprecationWhitelist[$id]) || $deprecationWhitelist[$id] !== $class)) {
+            if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
                 @trigger_error(sprintf('The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name), E_USER_DEPRECATED);
             }
         }

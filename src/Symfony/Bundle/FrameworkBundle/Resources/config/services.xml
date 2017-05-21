@@ -7,9 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher" public="true">
-            <argument type="service" id="service_container" />
-        </service>
+        <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true" />
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" />
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel" public="true">

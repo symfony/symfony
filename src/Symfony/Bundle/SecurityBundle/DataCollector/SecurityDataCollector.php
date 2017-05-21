@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
@@ -111,14 +110,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 // fail silently when the logout URL cannot be generated
             }
 
-            $extractRoles = function ($role) {
-                if (!$role instanceof RoleInterface && !$role instanceof Role) {
-                    throw new \InvalidArgumentException(sprintf('Roles must be instances of %s or %s (%s given).', RoleInterface::class, Role::class, is_object($role) ? get_class($role) : gettype($role)));
-                }
-
-                return $role->getRole();
-            };
-
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
@@ -126,8 +117,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'token_class' => $this->hasVarDumper ? new ClassStub(get_class($token)) : get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
-                'roles' => array_map($extractRoles, $assignedRoles),
-                'inherited_roles' => array_map($extractRoles, $inheritedRoles),
+                'roles' => array_map(function (Role $role) { return $role->getRole(); }, $assignedRoles),
+                'inherited_roles' => array_map(function (Role $role) { return $role->getRole(); }, $inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }

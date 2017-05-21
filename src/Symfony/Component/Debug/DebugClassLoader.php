@@ -136,7 +136,7 @@ class DebugClassLoader
      */
     public function loadClass($class)
     {
-        ErrorHandler::stackErrors();
+        $e = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
 
         try {
             if ($this->isFinder) {
@@ -148,7 +148,7 @@ class DebugClassLoader
                 $file = false;
             }
         } finally {
-            ErrorHandler::unstackErrors();
+            error_reporting($e);
         }
 
         $exists = class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);

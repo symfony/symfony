@@ -342,6 +342,9 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function testErrorStacking()
     {
         try {

@@ -648,17 +648,25 @@ class ErrorHandler
      *
      * The most important feature of this is to prevent
      * autoloading until unstackErrors() is called.
+     *
+     * @deprecated since version 3.4, to be removed in 4.0.
      */
     public static function stackErrors()
     {
+        @trigger_error('Support for stacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+
         self::$stackedErrorLevels[] = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
     }
 
     /**
      * Unstacks stacked errors and forwards to the logger.
+     *
+     * @deprecated since version 3.4, to be removed in 4.0.
      */
     public static function unstackErrors()
     {
+        @trigger_error('Support for unstacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+
         $level = array_pop(self::$stackedErrorLevels);
 
         if (null !== $level) {

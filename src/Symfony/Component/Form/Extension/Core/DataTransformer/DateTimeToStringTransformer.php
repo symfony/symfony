@@ -86,7 +86,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * Transforms a DateTime object into a date string with the configured format
      * and timezone.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTime|\DateTimeInterface $value A DateTime object
      *
      * @return string A value as produced by PHP's date() function
      *

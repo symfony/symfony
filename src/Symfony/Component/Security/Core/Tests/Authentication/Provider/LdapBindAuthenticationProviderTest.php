@@ -32,7 +32,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
     public function testEmptyPasswordShouldThrowAnException()
     {
         $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
-        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapClientInterface')->getMock();
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
 
         $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);

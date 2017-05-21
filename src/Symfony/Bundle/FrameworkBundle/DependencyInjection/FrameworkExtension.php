@@ -32,6 +32,8 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
@@ -93,6 +95,13 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
+
+        // forward compatibility with Symfony 4.0 where the ContainerAwareEventDispatcher class is removed
+        if (!class_exists(ContainerAwareEventDispatcher::class)) {
+            $definition = $container->getDefinition('event_dispatcher');
+            $definition->setClass(EventDispatcher::class);
+            $definition->setArguments(array());
+        }
 
         if (PHP_VERSION_ID < 70000) {
             $definition = $container->getDefinition('kernel.class_cache.cache_warmer');

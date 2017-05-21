@@ -1409,13 +1409,14 @@ EOF;
                     $value = $value->getValues()[0];
                     $code = $this->dumpValue($value, $interpolate);
 
+                    $returnedType = '';
                     if ($value instanceof TypedReference) {
-                        $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
-                    } else {
-                        $code = sprintf('return %s;', $code);
+                        $returnedType = sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior() ? '' : '?', $value->getType());
                     }
 
-                    return sprintf("function () {\n            %s\n        }", $code);
+                    $code = sprintf('return %s;', $code);
+
+                    return sprintf("function ()%s {\n            %s\n        }", $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {

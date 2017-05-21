@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `Container::isFrozen`
+
 3.3.0
 -----
 

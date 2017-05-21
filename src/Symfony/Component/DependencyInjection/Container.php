@@ -115,20 +115,6 @@ class Container implements ResettableContainerInterface
     }
 
     /**
-     * Returns true if the container parameter bag are frozen.
-     *
-     * Deprecated since 3.3, to be removed in 4.0.
-     *
-     * @return bool true if the container parameter bag are frozen, false otherwise
-     */
-    public function isFrozen()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->parameterBag instanceof FrozenParameterBag;
-    }
-
-    /**
      * Gets the service container parameter bag.
      *
      * @return ParameterBagInterface A ParameterBagInterface instance

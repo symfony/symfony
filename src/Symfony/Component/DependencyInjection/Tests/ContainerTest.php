@@ -83,19 +83,6 @@ class ContainerTest extends TestCase
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The Symfony\Component\DependencyInjection\Container::isFrozen() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.
-     * @expectedDeprecation The Symfony\Component\DependencyInjection\Container::isFrozen() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.
-     */
-    public function testIsFrozen()
-    {
-        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
-        $this->assertFalse($sc->isFrozen(), '->isFrozen() returns false if the parameters are not frozen');
-        $sc->compile();
-        $this->assertTrue($sc->isFrozen(), '->isFrozen() returns true if the parameters are frozen');
-    }
-
     public function testIsCompiled()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));

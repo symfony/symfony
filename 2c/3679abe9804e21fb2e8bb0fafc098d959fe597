@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T14:13:32Z
+
+FC layer missing in 3.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-20T15:23:10Z
+
+~~I don't think so. You just have to always set the option to `true`. We can deprecate it in 4.1. Similar to what we did with the `choices_as_values` option in the Form component.~~
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-21T07:59:59Z
+
+see #22815
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-21T09:47:25Z
+
+tests are green, ready to be reviewed

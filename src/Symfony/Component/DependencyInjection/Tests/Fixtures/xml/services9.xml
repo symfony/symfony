@@ -121,12 +121,14 @@
         <argument key="k1" type="service" id="foo.baz"/>
         <argument key="k2" type="service" id="service_container"/>
       </argument>
+      <argument type="iterator"/>
     </service>
     <service id="lazy_context_ignore_invalid_ref" class="LazyContext">
       <argument type="iterator">
         <argument type="service" id="foo.baz"/>
         <argument type="service" id="invalid" on-invalid="ignore"/>
       </argument>
+      <argument type="iterator"/>
     </service>
     <service id="closure_proxy" class="BarClass">
       <argument type="closure-proxy" id="closure_proxy" method="getBaz"/>

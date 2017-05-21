@@ -134,11 +134,11 @@ $container
 ;
 $container
     ->register('lazy_context', 'LazyContext')
-    ->setArguments(array(new IteratorArgument(array('k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')))))
+    ->setArguments(array(new IteratorArgument(array('k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container'))), new IteratorArgument(array())))
 ;
 $container
     ->register('lazy_context_ignore_invalid_ref', 'LazyContext')
-    ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
+    ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))), new IteratorArgument(array())))
 ;
 $container
     ->register('closure_proxy', 'BarClass')

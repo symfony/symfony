@@ -1429,24 +1429,29 @@ EOF;
                 }
 
                 if ($value instanceof IteratorArgument) {
-                    $countCode = array();
-                    $countCode[] = 'function () {';
                     $operands = array(0);
-
                     $code = array();
                     $code[] = 'new RewindableGenerator(function () {';
-                    foreach ($value->getValues() as $k => $v) {
-                        ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
-                        $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
-                        foreach (explode("\n", $v) as $v) {
-                            if ($v) {
-                                $code[] = '    '.$v;
+
+                    if (!$values = $value->getValues()) {
+                        $code[] = '            return new \EmptyIterator();';
+                    } else {
+                        $countCode = array();
+                        $countCode[] = 'function () {';
+
+                        foreach ($values as $k => $v) {
+                            ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
+                            $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
+                            foreach (explode("\n", $v) as $v) {
+                                if ($v) {
+                                    $code[] = '    '.$v;
+                                }
                             }
                         }
-                    }
 
-                    $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
-                    $countCode[] = '        }';
+                        $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
+                        $countCode[] = '        }';
+                    }
 
                     $code[] = sprintf('        }, %s)', count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
 

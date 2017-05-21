@@ -7,6 +7,8 @@ CHANGELOG
  * removed `QuestionHelper::setInputStream()/getInputStream()`
  * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
   `Application::setTerminalDimensions()/getTerminalDimensions()`
+* removed `ConsoleExceptionEvent`
+* removed `ConsoleEvents::EXCEPTION`
 
 3.3.0
 -----

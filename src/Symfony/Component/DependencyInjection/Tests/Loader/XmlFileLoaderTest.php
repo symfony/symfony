@@ -273,7 +273,7 @@ class XmlFileLoaderTest extends TestCase
 
         $lazyDefinition = $container->getDefinition('lazy_context');
 
-        $this->assertEquals(array(new IteratorArgument(array('k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')))), $lazyDefinition->getArguments(), '->load() parses lazy arguments');
+        $this->assertEquals(array(new IteratorArgument(array('k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container'))), new IteratorArgument(array())), $lazyDefinition->getArguments(), '->load() parses lazy arguments');
     }
 
     public function testParsesTags()
@@ -658,7 +658,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(array('foo' => array(array())), $container->getDefinition('no_defaults')->getTags());
 
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
-
 
         $this->assertTrue($container->getDefinition('child_def')->isPublic());
         $this->assertSame(array('foo' => array(array())), $container->getDefinition('child_def')->getTags());

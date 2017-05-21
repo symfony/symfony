@@ -326,7 +326,9 @@ class ProjectServiceContainer extends Container
         return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
             yield 'k1' => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
             yield 'k2' => $this;
-        }, 2));
+        }, 2), new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
     }
 
     /**
@@ -341,7 +343,9 @@ class ProjectServiceContainer extends Container
     {
         return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
             yield 0 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
-        }, 1));
+        }, 1), new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
     }
 
     /**

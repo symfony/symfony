@@ -510,8 +510,8 @@ class YamlFileLoaderTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "_foo" service or define it in XML instead.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Service names that start with an underscore are reserved. Rename the "_foo" service or define it in XML instead.
      */
     public function testUnderscoreServiceId()
     {
@@ -632,6 +632,28 @@ class YamlFileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_instanceof.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /^The configuration key "private" is unsupported for definition "bar"/
+     */
+    public function testUnsupportedKeywordThrowsException()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_keyword.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /^The configuration key "calls" is unsupported for the service "bar" which is defined as an alias/
+     */
+    public function testUnsupportedKeywordInServiceAliasThrowsException()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_alias.yml');
     }
 }
 

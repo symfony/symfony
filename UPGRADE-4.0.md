@@ -145,6 +145,8 @@ Finder
 ------
 
  * The `ExceptionInterface` has been removed.
+ * The `Symfony\Component\Finder\Iterator\FilterIterator` class has been
+   removed as it used to fix a bug which existed before version 5.5.23/5.6.7
 
 Form
 ----

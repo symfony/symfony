@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 /**
  * @author Alex Bogomazov
+ *
+ * @group legacy
  */
 class FilterIteratorTest extends RealIteratorTestCase
 {

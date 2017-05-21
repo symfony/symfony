@@ -6,6 +6,11 @@ CHANGELOG
 
  * removed `ExceptionInterface`
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Component\Finder\Iterator\FilterIterator`
+
 3.3.0
 -----
 

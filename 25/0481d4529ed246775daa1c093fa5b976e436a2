@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T14:05:09Z
+
+rebase needed to see tests green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T16:10:48Z
+
+WIP or not WIP? (personally I'd prefer not using WIP in the title of PRs, that's only noise :P )
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-05-18T19:29:57Z
+
+@nicolas-grekas it's WIP. I can close it and reopen when it's ready if you prefer.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-05-18T20:32:10Z
+
+@nicolas-grekas no more WIP :)

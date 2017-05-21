@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-18T14:05:25Z
+
+rebase needed to see tests green
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-18T15:00:06Z
+
+done, thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:39:52Z
+
+missing CHANGELOG updates in components (please check any your other PRs also if any)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-20T10:05:10Z
+
+CHANGELOG entries added
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-21T09:47:55Z
+
+@nicolas-grekas comments addressed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T09:54:31Z
+
+@chalasr would you mind opening a PR to fix that doc block in 3.3 (I guess)?

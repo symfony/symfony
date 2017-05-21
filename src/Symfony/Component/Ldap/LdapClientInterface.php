@@ -19,7 +19,7 @@ namespace Symfony\Component\Ldap;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Charles Sarrazin <charles@sarraz.in>
  *
- * @deprecated You should use LdapInterface instead
+ * @deprecated since version 3.1, to be removed in 4.0. Use the LdapInterface instead.
  */
 interface LdapClientInterface extends LdapInterface
 {

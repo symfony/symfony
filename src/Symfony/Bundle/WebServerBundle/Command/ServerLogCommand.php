@@ -47,7 +47,7 @@ class ServerLogCommand extends Command
         }
 
         $this
-            ->addOption('host', null, InputOption::VALUE_REQUIRED, 'The server host', '0:9911')
+            ->addOption('host', null, InputOption::VALUE_REQUIRED, 'The server host', '0.0.0.0:9911')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The line format', ConsoleFormatter::SIMPLE_FORMAT)
             ->addOption('date-format', null, InputOption::VALUE_REQUIRED, 'The date format', ConsoleFormatter::SIMPLE_DATE)
             ->addOption('filter', null, InputOption::VALUE_REQUIRED, 'An expression to filter log. Example: "level > 200 or channel in [\'app\', \'doctrine\']"')

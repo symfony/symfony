@@ -449,12 +449,17 @@ class ContainerBuilderTest extends TestCase
         $builder->register('bar', 'stdClass');
         $builder
             ->register('lazy_context', 'LazyContext')
-            ->setArguments(array(new IteratorArgument(array('k1' => new Reference('bar'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
+            ->setArguments(array(
+                new IteratorArgument(array('k1' => new Reference('bar'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))),
+                new IteratorArgument(array()),
+            ))
         ;
 
         $lazyContext = $builder->get('lazy_context');
         $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyValues);
+        $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyEmptyValues);
         $this->assertCount(1, $lazyContext->lazyValues);
+        $this->assertCount(0, $lazyContext->lazyEmptyValues);
 
         $i = 0;
         foreach ($lazyContext->lazyValues as $k => $v) {
@@ -465,6 +470,13 @@ class ContainerBuilderTest extends TestCase
 
         // The second argument should have been ignored.
         $this->assertEquals(1, $i);
+
+        $i = 0;
+        foreach ($lazyContext->lazyEmptyValues as $k => $v) {
+            ++$i;
+        }
+
+        $this->assertEquals(0, $i);
     }
 
     /**

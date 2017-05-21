@@ -302,7 +302,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, $format = null*/)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, string $format = null*/)
     {
         if (func_num_args() >= 6) {
             $format = func_get_arg(5);
@@ -310,7 +310,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             if (__CLASS__ !== get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s::%s() will have a 6th `$format = null` argument in version 4.0. Not defining it is deprecated since 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Method %s::%s() will have a 6th `string $format = null` argument in version 4.0. Not defining it is deprecated since 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
                 }
             }
 

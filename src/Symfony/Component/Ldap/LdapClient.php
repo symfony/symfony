@@ -18,7 +18,7 @@ namespace Symfony\Component\Ldap;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Charles Sarrazin <charles@sarraz.in>
  *
- * @deprecated The LdapClient class will be removed in Symfony 4.0. You should use the Ldap class instead.
+ * @deprecated since version 3.1, to be removed in 4.0. Use the Ldap class instead.
  */
 final class LdapClient implements LdapClientInterface
 {

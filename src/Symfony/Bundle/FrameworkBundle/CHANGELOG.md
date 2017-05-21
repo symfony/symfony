@@ -4,8 +4,13 @@ CHANGELOG
 4.0.0
 -----
 
- * Removed `ValidateWorkflowsPass`
  * The default `type` option of the `framework.workflows.*` configuration entries is `state_machine`
+ * removed `AddConsoleCommandPass`, `AddConstraintValidatorsPass`,
+   `AddValidatorInitializersPass`, `CompilerDebugDumpPass`,  `ConfigCachePass`,
+   `ControllerArgumentValueResolverPass`, `FormPass`, `PropertyInfoPass`,
+   `RoutingResolverPass`, `SerializerPass`, `ValidateWorkflowsPass`
+ * made  `Translator::__construct()` `$defaultLocale` argument required
+ * removed `SessionListener`, `TestSessionListener`
 
 3.3.0
 -----

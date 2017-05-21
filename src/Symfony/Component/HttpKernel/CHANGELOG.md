@@ -3,11 +3,13 @@ CHANGELOG
 
 4.0.0
 -----
- 
+
  * removed `ControllerResolverInterface::getArguments()`
  * removed `TraceableControllerResolver::getArguments()`
  * removed `ControllerResolver::getArguments()` and the ability to resolve arguments
  * removed the `argument_resolver` service dependency from the `debug.controller_resolver`
+ * removed `LazyLoadingFragmentHandler::addRendererService()`
+ * removed `Psr6CacheClearer::addPool()`
 
 3.3.0
 -----

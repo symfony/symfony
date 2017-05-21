@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `ExceptionInterface`
+
 3.3.0
 -----
 

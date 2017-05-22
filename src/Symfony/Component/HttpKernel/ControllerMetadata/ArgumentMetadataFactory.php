@@ -34,46 +34,10 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $param->allowsNull());
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull());
         }
 
         return $arguments;
-    }
-
-    /**
-     * Returns whether an argument is variadic.
-     *
-     * @param \ReflectionParameter $parameter
-     *
-     * @return bool
-     */
-    private function isVariadic(\ReflectionParameter $parameter)
-    {
-        return $parameter->isVariadic();
-    }
-
-    /**
-     * Determines whether an argument has a default value.
-     *
-     * @param \ReflectionParameter $parameter
-     *
-     * @return bool
-     */
-    private function hasDefaultValue(\ReflectionParameter $parameter)
-    {
-        return $parameter->isDefaultValueAvailable();
-    }
-
-    /**
-     * Returns a default value if available.
-     *
-     * @param \ReflectionParameter $parameter
-     *
-     * @return mixed|null
-     */
-    private function getDefaultValue(\ReflectionParameter $parameter)
-    {
-        return $this->hasDefaultValue($parameter) ? $parameter->getDefaultValue() : null;
     }
 
     /**
@@ -88,7 +52,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         if (!$type = $parameter->getType()) {
             return;
         }
-        $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+        $typeName = $type->getName();
         if ('array' === $typeName && !$type->isBuiltin()) {
             // Special case for HHVM with variadics
             return;

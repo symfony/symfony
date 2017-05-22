@@ -89,7 +89,7 @@ class FactoryReturnTypePass implements CompilerPassInterface
 
         $returnType = $m->getReturnType();
         if (null !== $returnType && !$returnType->isBuiltin()) {
-            $returnType = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : $returnType->__toString();
+            $returnType = $returnType->getName();
             if (null !== $class) {
                 $declaringClass = $m->getDeclaringClass()->getName();
                 if ('self' === strtolower($returnType)) {

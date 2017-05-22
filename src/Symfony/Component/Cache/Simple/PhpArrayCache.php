@@ -37,7 +37,7 @@ class PhpArrayCache implements CacheInterface
     }
 
     /**
-     * This adapter to take advantage of how PHP stores arrays in its latest versions.
+     * This adapter takes advantage of how PHP stores arrays in its latest versions.
      *
      * @param string $file The PHP file were values are cached
      *

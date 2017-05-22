@@ -76,7 +76,7 @@ class ProxyHelper
             return;
         }
         if (!is_string($type)) {
-            $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+            $name = $type->getName();
 
             if ($type->isBuiltin()) {
                 return $noBuiltin ? null : $name;

@@ -161,7 +161,6 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function getMethodsToAutowire(\ReflectionClass $reflectionClass)
     {
-        $found = array();
         $methodsToAutowire = array();
 
         foreach ($reflectionClass->getMethods() as $reflectionMethod) {

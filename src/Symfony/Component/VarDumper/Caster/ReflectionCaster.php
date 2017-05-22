@@ -51,7 +51,6 @@ class ReflectionCaster
                 unset($v->value['position'], $v->value['isVariadic'], $v->value['byReference'], $v);
             }
         }
-        ;
 
         if (!($filter & Caster::EXCLUDE_VERBOSE) && $f = $c->getFileName()) {
             $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());

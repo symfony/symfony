@@ -26,9 +26,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('baz', $normalizedData->baz);
     }
 
-    /**
-     * @group legacy
-     */
     public function testInstantiateObjectDenormalizer()
     {
         $data = array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz');

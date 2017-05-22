@@ -9,6 +9,11 @@ CHANGELOG
  * removed support for dumping an ucompiled container in `PhpDumper`
  * removed support for generating a dumped `Container` without populating the method map
 
+3.4.0
+-----
+
+ * deprecated the ability to check for the initialization of a private service with the `Container::initialized()` method
+
 3.3.0
 -----
 

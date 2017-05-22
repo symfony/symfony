@@ -21,8 +21,8 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
  */
 class Parser
 {
-    const TAG_PATTERN = '(?P<tag>![\w!.\/:-]+)';
-    const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+    public const TAG_PATTERN = '(?P<tag>![\w!.\/:-]+)';
+    public const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
 
     private $offset = 0;
     private $totalNumberOfLines;

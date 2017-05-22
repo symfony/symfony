@@ -33,7 +33,7 @@ interface RememberMeServicesInterface
      *
      * @var string
      */
-    const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
+    public const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
 
     /**
      * This method will be called whenever the TokenStorage does not contain

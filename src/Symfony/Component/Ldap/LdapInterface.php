@@ -22,8 +22,8 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
  */
 interface LdapInterface
 {
-    const ESCAPE_FILTER = 0x01;
-    const ESCAPE_DN = 0x02;
+    public const ESCAPE_FILTER = 0x01;
+    public const ESCAPE_DN = 0x02;
 
     /**
      * Return a connection bound to the ldap.

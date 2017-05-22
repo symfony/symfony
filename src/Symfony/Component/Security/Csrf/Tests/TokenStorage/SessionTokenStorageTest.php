@@ -19,7 +19,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
  */
 class SessionTokenStorageTest extends TestCase
 {
-    const SESSION_NAMESPACE = 'foobar';
+    public const SESSION_NAMESPACE = 'foobar';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

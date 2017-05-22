@@ -16,7 +16,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = array(
         'Bernhard' => 'a',

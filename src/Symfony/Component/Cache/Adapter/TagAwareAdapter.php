@@ -20,7 +20,7 @@ use Symfony\Component\Cache\CacheItem;
  */
 class TagAwareAdapter implements TagAwareAdapterInterface
 {
-    const TAGS_PREFIX = "\0tags\0";
+    public const TAGS_PREFIX = "\0tags\0";
 
     private $itemsAdapter;
     private $deferred = array();

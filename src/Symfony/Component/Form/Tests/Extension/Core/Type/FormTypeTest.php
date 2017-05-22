@@ -51,7 +51,7 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FormType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FormType';
 
     public function testCreateFormInstances()
     {

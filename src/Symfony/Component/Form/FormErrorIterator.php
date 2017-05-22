@@ -36,7 +36,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @var string
      */
-    const INDENTATION = '    ';
+    public const INDENTATION = '    ';
 
     /**
      * @var FormInterface

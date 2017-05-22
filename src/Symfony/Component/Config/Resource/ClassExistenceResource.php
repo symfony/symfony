@@ -21,9 +21,9 @@ namespace Symfony\Component\Config\Resource;
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializable
 {
-    const EXISTS_OK = 1;
-    const EXISTS_KO = 0;
-    const EXISTS_KO_WITH_THROWING_AUTOLOADER = -1;
+    public const EXISTS_OK = 1;
+    public const EXISTS_KO = 0;
+    public const EXISTS_KO_WITH_THROWING_AUTOLOADER = -1;
 
     private $resource;
     private $existsStatus;

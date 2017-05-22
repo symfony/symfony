@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Range extends Constraint
 {
-    const INVALID_CHARACTERS_ERROR = 'ad9a9798-7a99-4df7-8ce9-46e416a1e60b';
-    const TOO_HIGH_ERROR = '2d28afcb-e32e-45fb-a815-01c431a86a69';
-    const TOO_LOW_ERROR = '76454e69-502c-46c5-9643-f447d837c4d5';
+    public const INVALID_CHARACTERS_ERROR = 'ad9a9798-7a99-4df7-8ce9-46e416a1e60b';
+    public const TOO_HIGH_ERROR = '2d28afcb-e32e-45fb-a815-01c431a86a69';
+    public const TOO_LOW_ERROR = '76454e69-502c-46c5-9643-f447d837c4d5';
 
     protected static $errorNames = array(
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',

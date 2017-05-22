@@ -27,10 +27,10 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
-    const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
-    const OBJECT_TO_POPULATE = 'object_to_populate';
-    const GROUPS = 'groups';
-    const ATTRIBUTES = 'attributes';
+    public const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
+    public const OBJECT_TO_POPULATE = 'object_to_populate';
+    public const GROUPS = 'groups';
+    public const ATTRIBUTES = 'attributes';
 
     /**
      * @var int

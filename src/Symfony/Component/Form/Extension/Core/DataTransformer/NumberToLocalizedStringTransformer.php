@@ -28,49 +28,49 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * Rounds 1.4 to 2 and -1.4 to -1.
      */
-    const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
+    public const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
 
     /**
      * Rounds a number towards negative infinity.
      *
      * Rounds 1.4 to 1 and -1.4 to -2.
      */
-    const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
+    public const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
 
     /**
      * Rounds a number away from zero.
      *
      * Rounds 1.4 to 2 and -1.4 to -2.
      */
-    const ROUND_UP = \NumberFormatter::ROUND_UP;
+    public const ROUND_UP = \NumberFormatter::ROUND_UP;
 
     /**
      * Rounds a number towards zero.
      *
      * Rounds 1.4 to 1 and -1.4 to -1.
      */
-    const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
+    public const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
 
     /**
      * Rounds to the nearest number and halves to the next even number.
      *
      * Rounds 2.5, 1.6 and 1.5 to 2 and 1.4 to 1.
      */
-    const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
+    public const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
 
     /**
      * Rounds to the nearest number and halves away from zero.
      *
      * Rounds 2.5 to 3, 1.6 and 1.5 to 2 and 1.4 to 1.
      */
-    const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
+    public const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
 
     /**
      * Rounds to the nearest number and halves towards zero.
      *
      * Rounds 2.5 and 1.6 to 2, 1.5 and 1.4 to 1.
      */
-    const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
+    public const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
 
     protected $grouping;
 

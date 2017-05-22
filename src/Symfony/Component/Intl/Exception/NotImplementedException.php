@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\Exception;
  */
 class NotImplementedException extends RuntimeException
 {
-    const INTL_INSTALL_MESSAGE = 'Please install the "intl" extension for full localization capabilities.';
+    public const INTL_INSTALL_MESSAGE = 'Please install the "intl" extension for full localization capabilities.';
 
     /**
      * Constructor.

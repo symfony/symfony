@@ -23,8 +23,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class WebServer
 {
-    const STARTED = 0;
-    const STOPPED = 1;
+    public const STARTED = 0;
+    public const STOPPED = 1;
 
     public function run(WebServerConfig $config, $disableOutput = true, callable $callback = null)
     {

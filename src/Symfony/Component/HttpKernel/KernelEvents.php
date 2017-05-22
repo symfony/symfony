@@ -29,7 +29,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const REQUEST = 'kernel.request';
+    public const REQUEST = 'kernel.request';
 
     /**
      * The EXCEPTION event occurs when an uncaught exception appears.
@@ -41,7 +41,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const EXCEPTION = 'kernel.exception';
+    public const EXCEPTION = 'kernel.exception';
 
     /**
      * The VIEW event occurs when the return value of a controller
@@ -54,7 +54,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const VIEW = 'kernel.view';
+    public const VIEW = 'kernel.view';
 
     /**
      * The CONTROLLER event occurs once a controller was found for
@@ -67,7 +67,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const CONTROLLER = 'kernel.controller';
+    public const CONTROLLER = 'kernel.controller';
 
     /**
      * The CONTROLLER_ARGUMENTS event occurs once controller arguments have been resolved.
@@ -79,7 +79,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
+    public const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
 
     /**
      * The RESPONSE event occurs once a response was created for
@@ -92,7 +92,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const RESPONSE = 'kernel.response';
+    public const RESPONSE = 'kernel.response';
 
     /**
      * The TERMINATE event occurs once a response was sent.
@@ -103,7 +103,7 @@ final class KernelEvents
      *
      * @var string
      */
-    const TERMINATE = 'kernel.terminate';
+    public const TERMINATE = 'kernel.terminate';
 
     /**
      * The FINISH_REQUEST event occurs when a response was generated for a request.
@@ -115,5 +115,5 @@ final class KernelEvents
      *
      * @var string
      */
-    const FINISH_REQUEST = 'kernel.finish_request';
+    public const FINISH_REQUEST = 'kernel.finish_request';
 }

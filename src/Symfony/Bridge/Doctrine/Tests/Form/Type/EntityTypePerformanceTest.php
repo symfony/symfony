@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
  */
 class EntityTypePerformanceTest extends FormPerformanceTestCase
 {
-    const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
+    public const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
 
     /**
      * @var \Doctrine\ORM\EntityManager

@@ -32,9 +32,9 @@ use Symfony\Component\Translation\LoggingTranslator;
  */
 class TranslationDebugCommand extends ContainerAwareCommand
 {
-    const MESSAGE_MISSING = 0;
-    const MESSAGE_UNUSED = 1;
-    const MESSAGE_EQUALS_FALLBACK = 2;
+    public const MESSAGE_MISSING = 0;
+    public const MESSAGE_UNUSED = 1;
+    public const MESSAGE_EQUALS_FALLBACK = 2;
 
     /**
      * {@inheritdoc}

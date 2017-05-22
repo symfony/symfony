@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
  */
 class BundleEntryReaderTest extends TestCase
 {
-    const RES_DIR = '/res/dir';
+    public const RES_DIR = '/res/dir';
 
     /**
      * @var BundleEntryReader

@@ -29,9 +29,9 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  */
 class AssetsInstallCommand extends ContainerAwareCommand
 {
-    const METHOD_COPY = 'copy';
-    const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
-    const METHOD_RELATIVE_SYMLINK = 'relative symlink';
+    public const METHOD_COPY = 'copy';
+    public const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
+    public const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
     /**
      * @var Filesystem

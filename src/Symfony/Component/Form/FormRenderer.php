@@ -22,7 +22,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class FormRenderer implements FormRendererInterface
 {
-    const CACHE_KEY_VAR = 'unique_block_prefix';
+    public const CACHE_KEY_VAR = 'unique_block_prefix';
 
     /**
      * @var FormRendererEngineInterface

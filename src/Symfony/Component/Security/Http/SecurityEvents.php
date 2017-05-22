@@ -21,7 +21,7 @@ final class SecurityEvents
      *
      * @var string
      */
-    const INTERACTIVE_LOGIN = 'security.interactive_login';
+    public const INTERACTIVE_LOGIN = 'security.interactive_login';
 
     /**
      * The SWITCH_USER event occurs before switch to another user and
@@ -31,5 +31,5 @@ final class SecurityEvents
      *
      * @var string
      */
-    const SWITCH_USER = 'security.switch_user';
+    public const SWITCH_USER = 'security.switch_user';
 }

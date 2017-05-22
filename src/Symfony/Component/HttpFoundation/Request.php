@@ -30,32 +30,32 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
-    const HEADER_FORWARDED = 0b00001;
-    const HEADER_X_FORWARDED_ALL = 0b11110;
-    const HEADER_X_FORWARDED_FOR = 2;
-    const HEADER_X_FORWARDED_HOST = 4;
-    const HEADER_X_FORWARDED_PROTO = 8;
-    const HEADER_X_FORWARDED_PORT = 16;
+    public const HEADER_FORWARDED = 0b00001;
+    public const HEADER_X_FORWARDED_ALL = 0b11110;
+    public const HEADER_X_FORWARDED_FOR = 2;
+    public const HEADER_X_FORWARDED_HOST = 4;
+    public const HEADER_X_FORWARDED_PROTO = 8;
+    public const HEADER_X_FORWARDED_PORT = 16;
 
     /** @deprecated since version 3.3, to be removed in 4.0 */
-    const HEADER_CLIENT_IP = self::HEADER_X_FORWARDED_FOR;
+    public const HEADER_CLIENT_IP = self::HEADER_X_FORWARDED_FOR;
     /** @deprecated since version 3.3, to be removed in 4.0 */
-    const HEADER_CLIENT_HOST = self::HEADER_X_FORWARDED_HOST;
+    public const HEADER_CLIENT_HOST = self::HEADER_X_FORWARDED_HOST;
     /** @deprecated since version 3.3, to be removed in 4.0 */
-    const HEADER_CLIENT_PROTO = self::HEADER_X_FORWARDED_PROTO;
+    public const HEADER_CLIENT_PROTO = self::HEADER_X_FORWARDED_PROTO;
     /** @deprecated since version 3.3, to be removed in 4.0 */
-    const HEADER_CLIENT_PORT = self::HEADER_X_FORWARDED_PORT;
+    public const HEADER_CLIENT_PORT = self::HEADER_X_FORWARDED_PORT;
 
-    const METHOD_HEAD = 'HEAD';
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_PUT = 'PUT';
-    const METHOD_PATCH = 'PATCH';
-    const METHOD_DELETE = 'DELETE';
-    const METHOD_PURGE = 'PURGE';
-    const METHOD_OPTIONS = 'OPTIONS';
-    const METHOD_TRACE = 'TRACE';
-    const METHOD_CONNECT = 'CONNECT';
+    public const METHOD_HEAD = 'HEAD';
+    public const METHOD_GET = 'GET';
+    public const METHOD_POST = 'POST';
+    public const METHOD_PUT = 'PUT';
+    public const METHOD_PATCH = 'PATCH';
+    public const METHOD_DELETE = 'DELETE';
+    public const METHOD_PURGE = 'PURGE';
+    public const METHOD_OPTIONS = 'OPTIONS';
+    public const METHOD_TRACE = 'TRACE';
+    public const METHOD_CONNECT = 'CONNECT';
 
     /**
      * @var string[]

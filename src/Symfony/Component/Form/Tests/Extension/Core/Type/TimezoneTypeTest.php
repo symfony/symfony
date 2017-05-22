@@ -15,7 +15,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 class TimezoneTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimezoneType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimezoneType';
 
     public function testTimezonesAreSelectable()
     {

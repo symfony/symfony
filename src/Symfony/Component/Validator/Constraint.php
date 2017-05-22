@@ -36,21 +36,21 @@ abstract class Constraint
      *
      * @var string
      */
-    const DEFAULT_GROUP = 'Default';
+    public const DEFAULT_GROUP = 'Default';
 
     /**
      * Marks a constraint that can be put onto classes.
      *
      * @var string
      */
-    const CLASS_CONSTRAINT = 'class';
+    public const CLASS_CONSTRAINT = 'class';
 
     /**
      * Marks a constraint that can be put onto properties.
      *
      * @var string
      */
-    const PROPERTY_CONSTRAINT = 'property';
+    public const PROPERTY_CONSTRAINT = 'property';
 
     /**
      * Maps error codes to the names of their constants.

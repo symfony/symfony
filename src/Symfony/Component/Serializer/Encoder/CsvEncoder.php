@@ -20,11 +20,11 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class CsvEncoder implements EncoderInterface, DecoderInterface
 {
-    const FORMAT = 'csv';
-    const DELIMITER_KEY = 'csv_delimiter';
-    const ENCLOSURE_KEY = 'csv_enclosure';
-    const ESCAPE_CHAR_KEY = 'csv_escape_char';
-    const KEY_SEPARATOR_KEY = 'csv_key_separator';
+    public const FORMAT = 'csv';
+    public const DELIMITER_KEY = 'csv_delimiter';
+    public const ENCLOSURE_KEY = 'csv_enclosure';
+    public const ESCAPE_CHAR_KEY = 'csv_escape_char';
+    public const KEY_SEPARATOR_KEY = 'csv_key_separator';
 
     private $delimiter;
     private $enclosure;

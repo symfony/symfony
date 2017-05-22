@@ -258,10 +258,6 @@ abstract class Descriptor implements DescriptorInterface
             return $builder->getAlias($serviceId);
         }
 
-        if ('service_container' === $serviceId) {
-            return $builder;
-        }
-
         // the service has been injected in some special way, just return the service
         return $builder->get($serviceId);
     }

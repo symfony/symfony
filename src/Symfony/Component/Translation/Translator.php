@@ -74,11 +74,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * Constructor.
      *
-     * @param string               $locale        The locale
-     * @param MessageSelector|null $selector      The message selector for pluralization
-     * @param string               $defaultLocale
-     * @param string|null          $cacheDir      The directory to use for the cache
-     * @param bool                 $debug         Use cache in debug mode ?
+     * @param string               $locale   The locale
+     * @param MessageSelector|null $selector The message selector for pluralization
+     * @param string|null          $cacheDir The directory to use for the cache
+     * @param bool                 $debug    Use cache in debug mode ?
      *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */

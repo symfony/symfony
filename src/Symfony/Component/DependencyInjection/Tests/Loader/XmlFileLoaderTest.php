@@ -563,18 +563,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('configureBar', $barConfigurator[1]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testType()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services22.xml');
-
-        $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getAutowiringTypes());
-    }
-
     public function testAutowire()
     {
         $container = new ContainerBuilder();

@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class AutowirePass extends AbstractRecursivePass
 {
-    private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
     private $autowired = array();
@@ -62,7 +61,6 @@ class AutowirePass extends AbstractRecursivePass
         try {
             parent::process($container);
         } finally {
-            $this->definedTypes = array();
             $this->types = null;
             $this->ambiguousServiceTypes = array();
             $this->autowired = array();
@@ -324,10 +322,6 @@ class AutowirePass extends AbstractRecursivePass
             $this->populateAvailableTypes();
         }
 
-        if (isset($this->definedTypes[$type])) {
-            return new TypedReference($this->types[$type], $type);
-        }
-
         if (isset($this->types[$type])) {
             @trigger_error(sprintf('Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0. You should %s the "%s" service to "%s" instead.', isset($this->types[$this->types[$type]]) ? 'alias' : 'rename (or alias)', $this->types[$type], $type), E_USER_DEPRECATED);
 
@@ -370,12 +364,6 @@ class AutowirePass extends AbstractRecursivePass
             return;
         }
 
-        foreach ($definition->getAutowiringTypes(false) as $type) {
-            $this->definedTypes[$type] = true;
-            $this->types[$type] = $id;
-            unset($this->ambiguousServiceTypes[$type]);
-        }
-
         if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), true)) {
             return;
         }
@@ -397,10 +385,6 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function set($type, $id)
     {
-        if (isset($this->definedTypes[$type])) {
-            return;
-        }
-
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {
             $this->ambiguousServiceTypes[$type][] = $id;

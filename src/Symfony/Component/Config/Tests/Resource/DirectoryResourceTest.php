@@ -69,7 +69,7 @@ class DirectoryResourceTest extends TestCase
      */
     public function testResourceDoesNotExist()
     {
-        $resource = new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
+        $resource = new DirectoryResource('/____foo/foobar'.random_int(1, 999999));
     }
 
     public function testIsFresh()

@@ -37,7 +37,7 @@ class TextBundleWriterTest extends TestCase
     protected function setUp()
     {
         $this->writer = new TextBundleWriter();
-        $this->directory = sys_get_temp_dir().'/TextBundleWriterTest/'.mt_rand(1000, 9999);
+        $this->directory = sys_get_temp_dir().'/TextBundleWriterTest/'.random_int(1000, 9999);
         $this->filesystem = new Filesystem();
 
         $this->filesystem->mkdir($this->directory);

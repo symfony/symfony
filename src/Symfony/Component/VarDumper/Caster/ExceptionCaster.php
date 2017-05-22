@@ -130,10 +130,10 @@ class ExceptionCaster
 
             $frame = new FrameStub(
                 array(
-                    'object' => isset($f['object']) ? $f['object'] : null,
-                    'class' => isset($f['class']) ? $f['class'] : null,
-                    'type' => isset($f['type']) ? $f['type'] : null,
-                    'function' => isset($f['function']) ? $f['function'] : null,
+                    'object' => $f['object'] ?? null,
+                    'class' => $f['class'] ?? null,
+                    'type' => $f['type'] ?? null,
+                    'function' => $f['function'] ?? null,
                 ) + $frames[$i - 1],
                 false,
                 true
@@ -145,7 +145,7 @@ class ExceptionCaster
                 }
                 $f = $frames[$i - 1];
                 if ($trace->keepArgs && !empty($f['args']) && $frame instanceof EnumStub) {
-                    $frame->value['arguments'] = new ArgsStub($f['args'], isset($f['function']) ? $f['function'] : null, isset($f['class']) ? $f['class'] : null);
+                    $frame->value['arguments'] = new ArgsStub($f['args'], $f['function'] ?? null, $f['class'] ?? null);
                 }
             } elseif ('???' !== $lastCall) {
                 $label = new ClassStub($lastCall);
@@ -194,12 +194,12 @@ class ExceptionCaster
                 $src = $f['line'];
                 $srcKey = $f['file'];
                 $ellipsis = (new LinkStub($srcKey, 0))->attr;
-                $ellipsisTail = isset($ellipsis['ellipsis-tail']) ? $ellipsis['ellipsis-tail'] : 0;
-                $ellipsis = isset($ellipsis['ellipsis']) ? $ellipsis['ellipsis'] : 0;
+                $ellipsisTail = $ellipsis['ellipsis-tail'] ?? 0;
+                $ellipsis = $ellipsis['ellipsis'] ?? 0;
 
                 if (file_exists($f['file']) && 0 <= self::$srcContext) {
                     if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig_Template') && method_exists($f['class'], 'getDebugInfo')) {
-                        $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
+                        $template = $f['object'] ?? unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
 
                         $ellipsis = 0;
                         $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
@@ -288,7 +288,7 @@ class ExceptionCaster
         $src = array();
 
         for ($i = $line - 1 - $srcContext; $i <= $line - 1 + $srcContext; ++$i) {
-            $src[] = (isset($srcLines[$i]) ? $srcLines[$i] : '')."\n";
+            $src[] = ($srcLines[$i] ?? '')."\n";
         }
 
         $srcLines = array();

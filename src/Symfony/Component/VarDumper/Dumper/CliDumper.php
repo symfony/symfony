@@ -406,7 +406,7 @@ class CliDumper extends AbstractDumper
             $s = $startCchr;
             $c = $c[$i = 0];
             do {
-                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
+                $s .= $map[$c[$i]] ?? sprintf('\x%02X', ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.$endCchr;

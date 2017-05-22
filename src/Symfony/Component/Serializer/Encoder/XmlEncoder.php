@@ -522,9 +522,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     private function resolveXmlRootName(array $context = array())
     {
-        return isset($context['xml_root_node_name'])
-            ? $context['xml_root_node_name']
-            : $this->rootNodeName;
+        return $context['xml_root_node_name']
+            ?? $this->rootNodeName;
     }
 
     /**

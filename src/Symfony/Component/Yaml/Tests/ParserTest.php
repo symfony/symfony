@@ -1734,7 +1734,7 @@ INI;
                 } else {
                     eval('$expected = '.trim($test['php']).';');
 
-                    $tests[] = array(var_export($expected, true), $test['yaml'], $test['test'], isset($test['deprecated']) ? $test['deprecated'] : false);
+                    $tests[] = array(var_export($expected, true), $test['yaml'], $test['test'], $test['deprecated'] ?? false);
                 }
             }
         }

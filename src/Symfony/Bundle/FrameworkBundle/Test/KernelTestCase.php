@@ -178,8 +178,8 @@ abstract class KernelTestCase extends TestCase
         }
 
         return new static::$class(
-            isset($options['environment']) ? $options['environment'] : 'test',
-            isset($options['debug']) ? $options['debug'] : true
+            $options['environment'] ?? 'test',
+            $options['debug'] ?? true
         );
     }
 

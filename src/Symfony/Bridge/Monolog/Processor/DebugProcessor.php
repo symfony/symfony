@@ -27,7 +27,7 @@ class DebugProcessor implements DebugLoggerInterface
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],
             'context' => $record['context'],
-            'channel' => isset($record['channel']) ? $record['channel'] : '',
+            'channel' => $record['channel'] ?? '',
         );
         switch ($record['level']) {
             case Logger::ERROR:

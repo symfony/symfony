@@ -150,7 +150,7 @@ class OutputFormatter implements OutputFormatterInterface
             if ($open = '/' != $text[1]) {
                 $tag = $matches[1][$i][0];
             } else {
-                $tag = isset($matches[3][$i][0]) ? $matches[3][$i][0] : '';
+                $tag = $matches[3][$i][0] ?? '';
             }
 
             if (!$open && !$tag) {

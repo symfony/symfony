@@ -83,7 +83,7 @@ class TextDescriptor extends Descriptor
     {
         $tableHeaders = array('Property', 'Value');
         $tableRows = array(
-            array('Route Name', isset($options['name']) ? $options['name'] : ''),
+            array('Route Name', $options['name'] ?? ''),
             array('Path', $route->getPath()),
             array('Path Regex', $route->compile()->getRegex()),
             array('Host', ('' !== $route->getHost() ? $route->getHost() : 'ANY')),
@@ -157,7 +157,7 @@ class TextDescriptor extends Descriptor
             $options['output']->table(
                 array('Service ID', 'Class'),
                 array(
-                    array(isset($options['id']) ? $options['id'] : '-', get_class($service)),
+                    array($options['id'] ?? '-', get_class($service)),
                 )
             );
         }
@@ -169,7 +169,7 @@ class TextDescriptor extends Descriptor
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
-        $showTag = isset($options['tag']) ? $options['tag'] : null;
+        $showTag = $options['tag'] ?? null;
 
         if ($showPrivate) {
             $title = 'Symfony Container Public and Private Services';
@@ -233,7 +233,7 @@ class TextDescriptor extends Descriptor
                     foreach ($definition->getTag($showTag) as $key => $tag) {
                         $tagValues = array();
                         foreach ($tagsNames as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';
+                            $tagValues[] = $tag[$tagName] ?? '';
                         }
                         if (0 === $key) {
                             $tableRows[] = array_merge(array($serviceId), $tagValues, array($definition->getClass()));
@@ -266,7 +266,7 @@ class TextDescriptor extends Descriptor
 
         $tableHeaders = array('Option', 'Value');
 
-        $tableRows[] = array('Service ID', isset($options['id']) ? $options['id'] : '-');
+        $tableRows[] = array('Service ID', $options['id'] ?? '-');
         $tableRows[] = array('Class', $definition->getClass() ?: '-');
 
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];

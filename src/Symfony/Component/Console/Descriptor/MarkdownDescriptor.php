@@ -143,7 +143,7 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeApplication(Application $application, array $options = array())
     {
-        $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
+        $describedNamespace = $options['namespace'] ?? null;
         $description = new ApplicationDescription($application, $describedNamespace);
         $title = $this->getApplicationTitle($application);
 

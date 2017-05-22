@@ -635,7 +635,7 @@ class Parser
         }
 
         if (self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
-            $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
+            $modifiers = $matches['modifiers'] ?? '';
 
             $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
 

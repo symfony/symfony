@@ -43,7 +43,7 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $this->writeDocument($this->getRouteDocument($route, isset($options['name']) ? $options['name'] : null));
+        $this->writeDocument($this->getRouteDocument($route, $options['name'] ?? null));
     }
 
     /**
@@ -79,7 +79,7 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
-        $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_private']) && $options['show_private'], isset($options['show_arguments']) && $options['show_arguments'], isset($options['filter']) ? $options['filter'] : null));
+        $this->writeDocument($this->getContainerServicesDocument($builder, $options['tag'] ?? null, isset($options['show_private']) && $options['show_private'], isset($options['show_arguments']) && $options['show_arguments'], $options['filter'] ?? null));
     }
 
     /**
@@ -87,7 +87,7 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        $this->writeDocument($this->getContainerDefinitionDocument($definition, isset($options['id']) ? $options['id'] : null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']));
+        $this->writeDocument($this->getContainerDefinitionDocument($definition, $options['id'] ?? null, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']));
     }
 
     /**
@@ -96,7 +96,7 @@ class XmlDescriptor extends Descriptor
     protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, isset($options['id']) ? $options['id'] : null)->childNodes->item(0), true));
+        $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, $options['id'] ?? null)->childNodes->item(0), true));
 
         if (!$builder) {
             return $this->writeDocument($dom);

@@ -286,7 +286,7 @@ class UploadedFile extends File
 
         $errorCode = $this->error;
         $maxFilesize = $errorCode === UPLOAD_ERR_INI_SIZE ? self::getMaxFilesize() / 1024 : 0;
-        $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
+        $message = $errors[$errorCode] ?? 'The file "%s" was not uploaded due to an unknown error.';
 
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }

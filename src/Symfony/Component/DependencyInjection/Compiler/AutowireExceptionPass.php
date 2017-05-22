@@ -31,8 +31,19 @@ class AutowireExceptionPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
+        // the pass should only be run once
+        if (null === $this->autowirePass || null === $this->inlineServicePass) {
+            return;
+        }
+
         $inlinedIds = $this->inlineServicePass->getInlinedServiceIds();
-        foreach ($this->autowirePass->getAutowiringExceptions() as $exception) {
+        $exceptions = $this->autowirePass->getAutowiringExceptions();
+
+        // free up references
+        $this->autowirePass = null;
+        $this->inlineServicePass = null;
+
+        foreach ($exceptions as $exception) {
             if ($container->hasDefinition($exception->getServiceId()) || in_array($exception->getServiceId(), $inlinedIds)) {
                 throw $exception;
             }

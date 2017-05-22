@@ -1561,8 +1561,18 @@ EOT;
         $this->assertEquals("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));
     }
 
-    public function testParseMultiLineMappingValue()
+    /**
+     * @dataProvider multiLineDataProvider
+     */
+    public function testParseMultiLineMappingValue($yaml, $expected, $parseError)
     {
+        $this->assertEquals($expected, $this->parser->parse($yaml));
+    }
+
+    public function multiLineDataProvider()
+    {
+        $tests = array();
+
         $yaml = <<<'EOF'
 foo:
 - bar:
@@ -1579,7 +1589,43 @@ EOF;
             ),
         );
 
-        $this->assertEquals($expected, $this->parser->parse($yaml));
+        $tests[] = array($yaml, $expected, false);
+
+        $yaml = <<<'EOF'
+bar
+"foo"
+EOF;
+        $expected = 'bar "foo"';
+
+        $tests[] = array($yaml, $expected, false);
+
+        $yaml = <<<'EOF'
+bar
+"foo
+EOF;
+        $expected = 'bar "foo';
+
+        $tests[] = array($yaml, $expected, false);
+
+        $yaml = <<<'EOF'
+bar
+
+'foo'
+EOF;
+        $expected = "bar\n'foo'";
+
+        $tests[] = array($yaml, $expected, false);
+
+        $yaml = <<<'EOF'
+bar
+
+foo'
+EOF;
+        $expected = "bar\nfoo'";
+
+        $tests[] = array($yaml, $expected, false);
+
+        return $tests;
     }
 
     public function testTaggedInlineMapping()

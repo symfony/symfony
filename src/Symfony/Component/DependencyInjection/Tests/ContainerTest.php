@@ -147,7 +147,7 @@ class ContainerTest extends TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('service_container', 'internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
+        $this->assertEquals(array('service_container', 'internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
     /**
@@ -363,6 +363,17 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Checking for the initialization of the "internal" private service is deprecated since Symfony 3.4 and won't be supported anymore in Symfony 4.0.
+     */
+    public function testInitializedWithPrivateService()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->get('internal_dependency');
+        $this->assertTrue($sc->initialized('internal'));
+    }
+
     public function testReset()
     {
         $c = new Container();
@@ -504,6 +515,7 @@ class ProjectServiceContainer extends Container
         'circular' => 'getCircularService',
         'throw_exception' => 'getThrowExceptionService',
         'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
+        'internal_dependency' => 'getInternalDependencyService',
     );
 
     public function __construct()
@@ -520,7 +532,7 @@ class ProjectServiceContainer extends Container
 
     protected function getInternalService()
     {
-        return $this->__internal;
+        return $this->services['internal'] = $this->__internal;
     }
 
     protected function getBarService()
@@ -553,6 +565,15 @@ class ProjectServiceContainer extends Container
         $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
 
         throw new \Exception('Something was terribly wrong while trying to configure the service!');
+    }
+
+    protected function getInternalDependencyService()
+    {
+        $this->services['internal_dependency'] = $instance = new \stdClass();
+
+        $instance->internal = isset($this->services['internal']) ? $this->services['internal'] : $this->getInternalService();
+
+        return $instance;
     }
 }
 

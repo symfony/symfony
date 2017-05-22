@@ -1409,13 +1409,14 @@ EOF;
                     $value = $value->getValues()[0];
                     $code = $this->dumpValue($value, $interpolate);
 
+                    $returnedType = '';
                     if ($value instanceof TypedReference) {
-                        $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
-                    } else {
-                        $code = sprintf('return %s;', $code);
+                        $returnedType = sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior() ? '' : '?', $value->getType());
                     }
 
-                    return sprintf("function () {\n            %s\n        }", $code);
+                    $code = sprintf('return %s;', $code);
+
+                    return sprintf("function ()%s {\n            %s\n        }", $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {
@@ -1628,9 +1629,7 @@ EOF;
         }
 
         if ($this->container->hasDefinition($id) && (!$this->container->getDefinition($id)->isPublic() || $this->container->getDefinition($id)->isShared())) {
-            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? $code)" on PHP>=7.0
-
-            $code = "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : $code) && false ?: '_'}";
+            $code = "(\$this->services['$id'] ?? $code)";
         }
 
         return $code;

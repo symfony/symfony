@@ -43,8 +43,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
     /**
      * Whether to parse by appending a pipe "|" to the parse format.
      *
-     * This only works as of PHP 5.3.7.
-     *
      * @var bool
      */
     private $parseUsingPipe;

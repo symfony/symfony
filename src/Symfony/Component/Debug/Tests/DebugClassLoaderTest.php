@@ -59,29 +59,6 @@ class DebugClassLoaderTest extends TestCase
         $this->fail('DebugClassLoader did not register');
     }
 
-    public function testUnsilencing()
-    {
-        if (PHP_VERSION_ID >= 70000) {
-            $this->markTestSkipped('PHP7 throws exceptions, unsilencing is not required anymore.');
-        }
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM is not handled in this test case.');
-        }
-
-        ob_start();
-
-        $this->iniSet('log_errors', 0);
-        $this->iniSet('display_errors', 1);
-
-        // See below: this will fail with parse error
-        // but this should not be @-silenced.
-        @class_exists(__NAMESPACE__.'\TestingUnsilencing', true);
-
-        $output = ob_get_clean();
-
-        $this->assertStringMatchesFormat('%aParse error%a', $output);
-    }
-
     public function testStacking()
     {
         // the ContextErrorException must not be loaded to test the workaround
@@ -109,13 +86,8 @@ class DebugClassLoaderTest extends TestCase
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
-            if (PHP_VERSION_ID < 70000) {
-                $this->assertRegExp('/^Runtime Notice: Declaration/', $exception->getMessage());
-                $this->assertEquals(E_STRICT, $exception->getSeverity());
-            } else {
-                $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
-                $this->assertEquals(E_WARNING, $exception->getSeverity());
-            }
+            $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
+            $this->assertEquals(E_WARNING, $exception->getSeverity());
         } finally {
             restore_error_handler();
             restore_exception_handler();
@@ -238,32 +210,6 @@ class DebugClassLoaderTest extends TestCase
         $xError = array(
             'type' => E_USER_NOTICE,
             'message' => '',
-        );
-
-        $this->assertSame($xError, $lastError);
-    }
-
-    public function testReservedForPhp7()
-    {
-        if (PHP_VERSION_ID >= 70000) {
-            $this->markTestSkipped('PHP7 already prevents using reserved names.');
-        }
-
-        set_error_handler(function () { return false; });
-        $e = error_reporting(0);
-        trigger_error('', E_USER_NOTICE);
-
-        class_exists('Test\\'.__NAMESPACE__.'\\Float', true);
-
-        error_reporting($e);
-        restore_error_handler();
-
-        $lastError = error_get_last();
-        unset($lastError['file'], $lastError['line']);
-
-        $xError = array(
-            'type' => E_USER_DEPRECATED,
-            'message' => 'The "Test\Symfony\Component\Debug\Tests\Float" class uses the reserved name "Float", it will break on PHP 7 and higher',
         );
 
         $this->assertSame($xError, $lastError);

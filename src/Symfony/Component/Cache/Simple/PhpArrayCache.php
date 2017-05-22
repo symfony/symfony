@@ -37,9 +37,7 @@ class PhpArrayCache implements CacheInterface
     }
 
     /**
-     * This adapter should only be used on PHP 7.0+ to take advantage of how PHP
-     * stores arrays in its latest versions. This factory method decorates the given
-     * fallback pool with this adapter only if the current PHP version is supported.
+     * This adapter to take advantage of how PHP stores arrays in its latest versions.
      *
      * @param string $file The PHP file were values are cached
      *
@@ -48,7 +46,7 @@ class PhpArrayCache implements CacheInterface
     public static function create($file, CacheInterface $fallbackPool)
     {
         // Shared memory is available in PHP 7.0+ with OPCache enabled and in HHVM
-        if ((PHP_VERSION_ID >= 70000 && ini_get('opcache.enable')) || defined('HHVM_VERSION')) {
+        if (ini_get('opcache.enable') || defined('HHVM_VERSION')) {
             return new static($file, $fallbackPool);
         }
 

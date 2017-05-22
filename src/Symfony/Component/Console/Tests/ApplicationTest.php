@@ -1106,9 +1106,6 @@ class ApplicationTest extends TestCase
         $this->assertEquals(1, $tester->getStatusCode());
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testErrorIsRethrownIfNotHandledByConsoleErrorEvent()
     {
         $application = new Application();
@@ -1342,9 +1339,6 @@ class ApplicationTest extends TestCase
         return $dispatcher;
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testErrorIsRethrownIfNotHandledByConsoleErrorEventWithCatchingEnabled()
     {
         $application = new Application();

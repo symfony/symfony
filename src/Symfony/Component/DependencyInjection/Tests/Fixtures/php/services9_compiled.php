@@ -83,7 +83,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+        $a = ($this->services['foo.baz'] ?? $this->get('foo.baz'));
 
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
@@ -104,7 +104,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo(${($_ = isset($this->services['foo_with_inline']) ? $this->services['foo_with_inline'] : $this->get('foo_with_inline')) && false ?: '_'});
+        $instance->setFoo(($this->services['foo_with_inline'] ?? $this->get('foo_with_inline')));
 
         return $instance;
     }
@@ -120,7 +120,7 @@ class ProjectServiceContainer extends Container
     protected function getClosureProxyService()
     {
         return $this->services['closure_proxy'] = new \BarClass(/** @closure-proxy BarClass::getBaz */ function () {
-            return ${($_ = isset($this->services['closure_proxy']) ? $this->services['closure_proxy'] : $this->get('closure_proxy')) && false ?: '_'}->getBaz();
+            return ($this->services['closure_proxy'] ?? $this->get('closure_proxy'))->getBaz();
         });
     }
 
@@ -135,7 +135,7 @@ class ProjectServiceContainer extends Container
     protected function getConfiguredServiceService()
     {
         $a = new \ConfClass();
-        $a->setFoo(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
+        $a->setFoo(($this->services['baz'] ?? $this->get('baz')));
 
         $this->services['configured_service'] = $instance = new \stdClass();
 
@@ -214,7 +214,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceService()
     {
-        return $this->services['factory_service'] = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}->getInstance();
+        return $this->services['factory_service'] = ($this->services['foo.baz'] ?? $this->get('foo.baz'))->getInstance();
     }
 
     /**
@@ -240,14 +240,14 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+        $a = ($this->services['foo.baz'] ?? $this->get('foo.baz'));
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
-        $instance->setBar(${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->get('bar')) && false ?: '_'});
+        $instance->setBar(($this->services['bar'] ?? $this->get('bar')));
         $instance->initialize();
         sc_configure($instance);
 
@@ -296,7 +296,7 @@ class ProjectServiceContainer extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a->pub = 'pub';
-        $a->setBaz(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
+        $a->setBaz(($this->services['baz'] ?? $this->get('baz')));
 
         $instance->setBar($a);
 
@@ -314,7 +314,7 @@ class ProjectServiceContainer extends Container
     protected function getLazyContextService()
     {
         return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
-            yield 'k1' => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+            yield 'k1' => ($this->services['foo.baz'] ?? $this->get('foo.baz'));
             yield 'k2' => $this;
         }, 2), new RewindableGenerator(function () {
             return new \EmptyIterator();
@@ -332,7 +332,7 @@ class ProjectServiceContainer extends Container
     protected function getLazyContextIgnoreInvalidRefService()
     {
         return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
-            yield 0 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+            yield 0 => ($this->services['foo.baz'] ?? $this->get('foo.baz'));
         }, 1), new RewindableGenerator(function () {
             return new \EmptyIterator();
         }, 0));
@@ -352,7 +352,7 @@ class ProjectServiceContainer extends Container
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar(${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'});
+        $instance->setBar(($this->services['foo'] ?? $this->get('foo')));
         $instance->setBar(NULL);
         $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
 

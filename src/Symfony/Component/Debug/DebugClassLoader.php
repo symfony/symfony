@@ -30,7 +30,6 @@ class DebugClassLoader
     private static $final = array();
     private static $finalMethods = array();
     private static $deprecated = array();
-    private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
     private static $darwinCache = array('/' => array('/', array()));
 
     /**
@@ -201,9 +200,7 @@ class DebugClassLoader
                 }
             }
 
-            if (in_array(strtolower($refl->getShortName()), self::$php7Reserved)) {
-                @trigger_error(sprintf('The "%s" class uses the reserved name "%s", it will break on PHP 7 and higher', $name, $refl->getShortName()), E_USER_DEPRECATED);
-            } elseif (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+            if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {
                 // Don't trigger deprecations for classes in the same vendor

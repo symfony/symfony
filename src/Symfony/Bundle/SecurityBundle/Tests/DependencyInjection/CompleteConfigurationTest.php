@@ -345,6 +345,11 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
     }
 
+    public function testUserPasswordEncoderCommandIsRegistered()
+    {
+        $this->assertTrue($this->getContainer('remember_me_options')->has('security.console.user_password_encoder_command'));
+    }
+
     protected function getContainer($file)
     {
         $file = $file.'.'.$this->getFileExtension();

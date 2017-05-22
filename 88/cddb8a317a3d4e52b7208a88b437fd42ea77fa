@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2017-05-19T09:45:54Z
+
+Forward compatibility needed in FrameworkBundle in version 3.4 (see #22774).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:38:44Z
+
+missing CHANGELOG updates in components (please check any your other PRs also if any)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T09:25:10Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-05-21T19:22:20Z
+
+@nicolas-grekas rebased! Still need to update the `CHANGELOG` file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T19:49:05Z
+
+`grep autowiring.*type src/ -ri` raises a few more occurrences
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-05-22T09:31:08Z
+
+I think it's good to go now.
+
+The remaining files below only deal with the `autowire` option but not `autowiring_types`.
+
+```
+src//Symfony/Bundle/FrameworkBundle/Command/ContainerDebugCommand.php
+src//Symfony/Bundle/FrameworkBundle/Tests/Functional/AutowiringTypesTest.php
+src//Symfony/Bundle/FrameworkBundle/Tests/Functional/Bundle/TestBundle/AutowiringTypes/AutowiredServices.php
+src//Symfony/Bundle/FrameworkBundle/Tests/Functional/app/AutowiringTypes/config.yml
+src//Symfony/Bundle/SecurityBundle/Tests/Functional/AutowiringTypesTest.php
+src//Symfony/Bundle/SecurityBundle/Tests/Functional/app/AutowiringTypes/config.yml
+```
+
+Maybe they should be renamed at some point.

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T18:43:47Z
+
+Calling `inheritEnvironmentVariables(false)` is deprecated, which means you're mixing new features and deprecated ones. This should be avoided and is barely supported. Still, would you be able to provide a patch for this issue?
+
+---------------------------------------------------------------------------
+
+by maryo at 2017-05-07T19:28:57Z
+
+OK. I actually don't use this functionality :-). I just noticed it was not working when I was debugging the failing tests and considered it a BC break. I've updated the PR to fix this.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-22T07:19:37Z
+
+@maryo Can you rebase here? I have fixed the base branch given that master now is for Symfony 4.0, but the PR now contains unrelated commits.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T11:55:36Z
+
+please *rebase* on 3.3 (there should be no merge commit it the PR history)

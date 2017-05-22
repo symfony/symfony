@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * using the `choices` option in `CountryType`, `CurrencyType`, `LanguageType`,
+   `LocaleType`, and `TimezoneType` when the `choice_loader` option is not `null`
+   is not supported anymore and the configured choices will be ignored
+ * callable strings that are passed to the options of the `ChoiceType` are
+   treated as property paths
+ * the `choices_as_values` option of the `ChoiceType` has been removed
+ * removed the support for caching loaded choice lists in `LazyChoiceList`,
+   cache the choice list in the used `ChoiceLoaderInterface` implementation
+   instead
+
 3.3.0
 -----
 

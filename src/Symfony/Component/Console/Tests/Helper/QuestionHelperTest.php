@@ -435,18 +435,12 @@ class QuestionHelperTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value "irrelevant" is invalid
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Choice question must have at least 1 choice available.
      */
     public function testEmptyChoices()
     {
-        $dialog = new QuestionHelper();
-        $dialog->setInputStream($this->getInputStream("irrelevant\n"));
-
-        $question = new ChoiceQuestion('Question', array(), 'irrelevant');
-        $question->setMaxAttempts(1);
-
-        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+        new ChoiceQuestion('Question', array(), 'irrelevant');
     }
 
     protected function getInputStream($input)

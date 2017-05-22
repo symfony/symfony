@@ -194,13 +194,10 @@ class Application
         }
 
         try {
-            $e = $this->runningCommand = null;
+            $this->runningCommand = null;
             // the command name MUST be the first element of the input
             $command = $this->find($name);
-        } catch (\Exception $e) {
         } catch (\Throwable $e) {
-        }
-        if (null !== $e) {
             if (null !== $this->dispatcher) {
                 $event = new ConsoleErrorEvent($input, $output, $e);
                 $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
@@ -813,24 +810,17 @@ class Application
             } else {
                 $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             }
-        } catch (\Exception $e) {
         } catch (\Throwable $e) {
-        }
-        if (null !== $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);
             $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
             $e = $event->getError();
 
-            if (0 === $exitCode = $event->getExitCode()) {
-                $e = null;
+            if (0 !== $exitCode = $event->getExitCode()) {
+                throw $e;
             }
-        }
-
-        $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
-        $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
-
-        if (null !== $e) {
-            throw $e;
+        } finally {
+            $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
+            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
         }
 
         return $event->getExitCode();

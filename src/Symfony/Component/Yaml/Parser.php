@@ -93,7 +93,6 @@ class Parser
         $this->refs = array();
 
         $mbEncoding = null;
-        $e = null;
         $data = null;
 
         if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
@@ -103,22 +102,15 @@ class Parser
 
         try {
             $data = $this->doParse($value, $flags);
-        } catch (\Exception $e) {
-        } catch (\Throwable $e) {
-        }
-
-        if (null !== $mbEncoding) {
-            mb_internal_encoding($mbEncoding);
-        }
-
-        $this->lines = array();
-        $this->currentLine = '';
-        $this->refs = array();
-        $this->skippedLineNumbers = array();
-        $this->locallySkippedLineNumbers = array();
-
-        if (null !== $e) {
-            throw $e;
+        } finally {
+            if (null !== $mbEncoding) {
+                mb_internal_encoding($mbEncoding);
+            }
+            $this->lines = array();
+            $this->currentLine = '';
+            $this->refs = array();
+            $this->skippedLineNumbers = array();
+            $this->locallySkippedLineNumbers = array();
         }
 
         return $data;

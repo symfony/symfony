@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:worker cli-title-prefix="foobar">
+            <framework:fetchers>
+                <framework:amqp name="queue_a" />
+                <framework:amqp name="queue_b" />
+                <framework:amqp name="queue_c_1" queue_name="queue_c" />
+                <framework:amqp name="queue_d" />
+                <framework:amqp name="queue_e" />
+                <framework:amqp name="queue_f" connection="another_one" />
+                <framework:service name="service_a" />
+                <framework:service name="service_b" />
+                <framework:service name="service_c_1" service="service_c" />
+                <framework:service name="service_d" service="service_d" />
+                <framework:service name="service_e" service="service_e" />
+                <framework:buffer name="queue_a" />
+                <framework:buffer name="queue_b" />
+                <framework:buffer name="queue_c" wrap="queue_c_1" />
+                <framework:buffer name="queue_d_1" wrap="queue_d" />
+                <framework:buffer name="queue_e" max_messages="12" max_buffering_time="60" />
+                <framework:buffer name="service_a" />
+            </framework:fetchers>
+
+            <framework:routers>
+                <framework:direct name="queue_a" consumer="a_consumer_service" />
+                <framework:direct name="queue_b" consumer="a_consumer_service" fetcher="queue_b"/>
+                <framework:direct name="router_c" consumer="a_consumer_service" fetcher="queue_c"/>
+                <framework:direct name="router_d" consumer="a_consumer_service" fetcher="queue_d"/>
+                <framework:round-robin name="router_c_and_d">
+                    <framework:group>router_c</framework:group>
+                    <framework:group>router_d</framework:group>
+                </framework:round-robin>
+            </framework:routers>
+
+            <framework:worker name="worker_d" router="router_d" />
+            <framework:worker name="worker_service_a" fetcher="service_a" consumer="a_consumer_service" />
+
+        </framework:worker>
+    </framework:config>
+</container>

@@ -16,6 +16,7 @@ env:
     global:
         - MIN_PHP=5.5.9
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/versions/5.6/bin/php
+        - RABBITMQ_URL=amqp://guest:guest@localhost:5672/
 
 matrix:
     include:
@@ -41,6 +42,7 @@ services:
     - memcached
     - mongodb
     - redis-server
+    - rabbitmq
 
 before_install:
     - |
@@ -82,6 +84,7 @@ before_install:
       echo apc.enable_cli = 1 >> $INI
       echo extension = ldap.so >> $INI
       echo extension = redis.so >> $INI
+      echo extension = amqp.so >> $INI
       echo extension = memcached.so >> $INI
       [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI
       if [[ $PHP = 5.* ]]; then
@@ -159,6 +162,9 @@ install:
 
     - if [[ ! $skip ]]; then $COMPOSER_UP; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
+    - |
+      # setup rabbitmq
+      src/Symfony/Component/Amqp/bin/reset.php force
     - |
       # phpinfo
       if [[ ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi

@@ -16,12 +16,13 @@ use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
+use Symfony\Component\Amqp\Broker;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\ResourceCheckerInterface;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
@@ -66,6 +67,7 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
+use Symfony\Component\Worker;
 
 /**
  * FrameworkExtension.
@@ -238,6 +240,10 @@ class FrameworkExtension extends Extension
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
+        if (isset($config['amqp'])) {
+            $this->registerAmqpConfiguration($config['amqp'], $container);
+        }
+        $this->registerWorkerConfiguration($config['worker'], $container);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
@@ -1297,6 +1303,161 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
         ;
+    }
+
+    private function registerAmqpConfiguration(array $config, ContainerBuilder $container)
+    {
+        $defaultConnectionName = null;
+        if (isset($config['default_connection'])) {
+            $defaultConnectionName = $config['default_connection'];
+        }
+
+        $match = false;
+        foreach ($config['connections'] as $name => $connection) {
+            $container
+                ->register("amqp.broker.$name", Broker::class)
+                ->addArgument($connection['url'])
+                ->addArgument($connection['queues'])
+                ->addArgument($connection['exchanges'])
+                ->setPublic(false)
+            ;
+            if (!$defaultConnectionName) {
+                $defaultConnectionName = $name;
+            }
+            if ($defaultConnectionName === $name) {
+                $match = true;
+            }
+        }
+
+        if (!$match) {
+            throw new \InvalidArgumentException(sprintf('The default_connection "%s" does not exist.', $defaultConnectionName));
+        }
+
+        $container->setAlias('amqp.broker', sprintf('amqp.broker.%s', $defaultConnectionName));
+    }
+
+    private function registerWorkerConfiguration(array $config, ContainerBuilder $container)
+    {
+        $fetchers = array();
+
+        foreach ($config['fetchers']['amqps'] as $name => $fetcher) {
+            if (isset($fetchers[$name])) {
+                throw new \InvalidArgumentException(sprintf('A fetcher named "%s" already exist.', $name));
+            }
+            if (isset($fetcher['connection'])) {
+                $connection = new Reference('amqp.broker.'.$fetcher['connection']);
+            } else {
+                $connection = new Reference('amqp.broker');
+            }
+            $id = "worker.message_fetcher.amqp.$name";
+            $container
+                ->register($id, Worker\MessageFetcher\AmqpMessageFetcher::class)
+                ->addArgument($connection)
+                ->addArgument($fetcher['queue_name'])
+                ->addArgument($fetcher['auto_ack'])
+                ->setPublic(false)
+            ;
+
+            $fetchers[$name] = $id;
+        }
+
+        foreach ($config['fetchers']['services'] as $name => $fetcher) {
+            if (isset($fetchers[$name])) {
+                throw new \InvalidArgumentException(sprintf('A fetcher named "%s" already exist.', $name));
+            }
+            $id = "worker.message_fetcher.service.$name";
+            $container->setAlias($id, $fetcher['service']);
+            $fetchers[$name] = $id;
+        }
+
+        foreach ($config['fetchers']['buffers'] as $name => $fetcher) {
+            if (!isset($fetchers[$fetcher['wrap']])) {
+                throw new \InvalidArgumentException(sprintf('The fetcher named "%s" could not wrap "%s" as it does not exist.', $name, $fetcher['wrap']));
+            }
+            $id = "worker.message_fetcher.buffer.$name";
+            $container
+                ->register($id, Worker\MessageFetcher\BufferedMessageFetcher::class)
+                ->addArgument(new Reference($fetchers[$fetcher['wrap']]))
+                ->addArgument(array(
+                    'max_buffering_time' => $fetcher['max_buffering_time'],
+                    'max_messages' => $fetcher['max_messages'],
+                ))
+                ->setPublic(false)
+            ;
+            $fetchers[$name] = $id;
+        }
+
+        $routers = array();
+
+        foreach ($config['routers']['directs'] as $name => $router) {
+            if (isset($routers[$name])) {
+                throw new \InvalidArgumentException(sprintf('A router named "%s" already exist.', $name));
+            }
+            if (!isset($fetchers[$router['fetcher']])) {
+                throw new \InvalidArgumentException(sprintf('The router named "%s" could not use fetcher "%s" as it does not exist.', $name, $router['fetcher']));
+            }
+            $id = "worker.router.direct.$name";
+            $container
+                ->register($id, Worker\Router\DirectRouter::class)
+                ->addArgument(new Reference($fetchers[$router['fetcher']]))
+                ->addArgument(new Reference($router['consumer']))
+                ->setPublic(false)
+            ;
+
+            $routers[$name] = $id;
+        }
+
+        foreach ($config['routers']['round_robins'] as $name => $router) {
+            $wrappedRouters = array();
+            foreach ($router['groups'] as $wrappedRouter) {
+                if (!isset($routers[$wrappedRouter])) {
+                    throw new \InvalidArgumentException(sprintf('The router named "%s" could not use "%s" as it does not exist.', $name, $wrappedRouter));
+                }
+                $wrappedRouters[] = new Reference($routers[$wrappedRouter]);
+            }
+            $id = "worker.router.round_robin.$name";
+
+            $container
+                ->register($id, Worker\Router\RoundRobinRouter::class)
+                ->addArgument($wrappedRouters)
+                ->addArgument($router['consume_everything'])
+                ->setPublic(false)
+            ;
+            $routers[$name] = $id;
+        }
+
+        $workers = array();
+
+        foreach ($config['workers'] as $name => $worker) {
+            if (isset($worker['router'])) {
+                if (!isset($routers[$worker['router']])) {
+                    throw new \InvalidArgumentException(sprintf('The worker named "%s" could not use router "%s" as it does not exist.', $name, $worker['router']));
+                }
+                $router = new Reference($routers[$worker['router']]);
+            } elseif ($worker['fetcher']) {
+                if (!isset($fetchers[$worker['fetcher']])) {
+                    throw new \InvalidArgumentException(sprintf('The worker named "%s" could not use fetcher "%s" as it does not exist.', $name, $worker['fetcher']));
+                }
+                $router = new Definition(Worker\Router\DirectRouter::class);
+                $router->addArgument(new Reference($fetchers[$worker['fetcher']]));
+                $router->addArgument(new Reference($worker['consumer']));
+                $router->setPublic(false);
+            }
+
+            $id = "worker.worker.$name";
+            $container
+                ->register($id, Worker\Loop\Loop::class)
+                ->addArgument($router)
+                ->addArgument(new Reference('event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+                ->addArgument(new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+                ->addArgument($name)
+            ;
+
+            $workers[$name] = $id;
+        }
+
+        $container->setParameter('worker.cli_title_prefix', trim($config['cli_title_prefix'], '_'));
+        $container->setParameter('worker.workers', $workers);
     }
 
     /**

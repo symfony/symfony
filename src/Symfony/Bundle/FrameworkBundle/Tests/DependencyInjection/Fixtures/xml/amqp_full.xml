@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:amqp default_connection="queue_prod">
+            <framework:connection name="queue_staging" url="amqp://foo:baz@rabbitmq:1234/staging" />
+            <framework:connection name="queue_prod" url="amqp://foo:bar@rabbitmq:1234/prod">
+                <framework:queue name="retry_strategy_exponential" retry-strategy="exponential" >
+                    <framework:retry-strategy-options offset="1" max="3" />
+                </framework:queue>
+                <framework:queue name="arguments">
+                    <framework:argument key="routing_keys" value="my_routing_key" />
+                    <framework:argument key="flags" value="2" />
+                </framework:queue>
+                <framework:exchange name="headers">
+                    <framework:argument key="type" value="headers" />
+                </framework:exchange>
+            </framework:connection>
+        </framework:amqp>
+    </framework:config>
+</container>

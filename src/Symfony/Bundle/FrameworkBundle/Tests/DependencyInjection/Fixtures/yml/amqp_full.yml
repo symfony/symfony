@@ -1,0 +1,21 @@
+framework:
+    amqp:
+        connections:
+            queue_staging:
+                url: amqp://foo:baz@rabbitmq:1234/staging
+
+            queue_prod:
+                url: amqp://foo:bar@rabbitmq:1234/prod
+                queues:
+                    -   name: retry_strategy_exponential
+                        retry_strategy: exponential
+                        retry_strategy_options: { offset: 1 , max: 3 }
+                    -   name: arguments
+                        arguments:
+                            routing_keys: my_routing_key
+                            flags: 2
+                exchanges:
+                    -   name: headers
+                        arguments:
+                            type: headers
+        default_connection: queue_prod

@@ -1,0 +1,40 @@
+{
+    "name": "symfony/worker",
+    "type": "library",
+    "description": "Library to build workers",
+    "keywords": ["worker", "consumer", "queue", "message", "amqp"],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Grégoire Pineau",
+            "email": "lyrixx@lyrixx.info"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "ext-pcntl": "*",
+        "symfony/event-dispatcher": "^2.3|^3.0|^4.0",
+        "psr/log": "~1.0"
+    },
+    "require-dev": {
+        "symfony/amqp": "^3.4",
+        "symfony/phpunit-bridge": "^3.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Worker\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.4-dev"
+        }
+    }
+}

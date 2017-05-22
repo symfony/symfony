@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-21T09:27:31Z
+
+It looks like `ArgumentMetadataFactory::$supports*` should be removed too https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/ControllerMetadata/ArgumentMetadataFactory.php#L41..L42
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-21T09:34:36Z
+
+Thanks Robin. I'm also looking at similar checks and `@requires PHP X` in tests to find PHP versions support layers.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T17:41:17Z
+
+rebase + fix needed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-22T05:40:42Z
+
+Travis & fabbot failures unrelated (AFAIK).

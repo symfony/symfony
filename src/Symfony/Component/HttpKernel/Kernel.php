@@ -544,48 +544,19 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             );
         }
 
-        return array_merge(
-            array(
-                'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
-                'kernel.project_dir' => realpath($this->projectDir) ?: $this->projectDir,
-                'kernel.environment' => $this->environment,
-                'kernel.debug' => $this->debug,
-                'kernel.name' => $this->name,
-                'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
-                'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
-                'kernel.bundles' => $bundles,
-                'kernel.bundles_metadata' => $bundlesMetadata,
-                'kernel.charset' => $this->getCharset(),
-                'kernel.container_class' => $this->getContainerClass(),
-            ),
-            $this->getEnvParameters(false)
+        return array(
+            'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
+            'kernel.project_dir' => realpath($this->projectDir) ?: $this->projectDir,
+            'kernel.environment' => $this->environment,
+            'kernel.debug' => $this->debug,
+            'kernel.name' => $this->name,
+            'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
+            'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
+            'kernel.bundles' => $bundles,
+            'kernel.bundles_metadata' => $bundlesMetadata,
+            'kernel.charset' => $this->getCharset(),
+            'kernel.container_class' => $this->getContainerClass(),
         );
-    }
-
-    /**
-     * Gets the environment parameters.
-     *
-     * Only the parameters starting with "SYMFONY__" are considered.
-     *
-     * @return array An array of parameters
-     *
-     * @deprecated since version 3.3, to be removed in 4.0
-     */
-    protected function getEnvParameters()
-    {
-        if (0 === func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        $parameters = array();
-        foreach ($_SERVER as $key => $value) {
-            if (0 === strpos($key, 'SYMFONY__')) {
-                @trigger_error(sprintf('The support of special environment variables that start with SYMFONY__ (such as "%s") is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax instead to get the value of environment variables in configuration files.', $key), E_USER_DEPRECATED);
-                $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
-            }
-        }
-
-        return $parameters;
     }
 
     /**

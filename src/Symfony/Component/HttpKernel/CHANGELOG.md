@@ -4,6 +4,10 @@ CHANGELOG
 4.0.0
 -----
 
+ * removed the `DataCollector::varToString()` method, use `DataCollector::cloneVar()`
+   instead
+ * using the `DataCollector::cloneVar()` method requires the VarDumper component
+ * removed the `ValueExporter` class
  * removed `ControllerResolverInterface::getArguments()`
  * removed `TraceableControllerResolver::getArguments()`
  * removed `ControllerResolver::getArguments()` and the ability to resolve arguments
@@ -11,7 +15,11 @@ CHANGELOG
  * removed `LazyLoadingFragmentHandler::addRendererService()`
  * removed `Psr6CacheClearer::addPool()`
  * removed `Extension::addClassesToCompile()` and `Extension::getClassesToCompile()`
- * removed `Kernel::loadClassCache()`, `Kernel::doLoadClassCache()` and `Kernel::setClassCache()`
+ * removed `Kernel::loadClassCache()`, `Kernel::doLoadClassCache()`, `Kernel::setClassCache()`,
+   and `Kernel::getEnvParameters()`
+ * support for the `X-Status-Code` when handling exceptions in the `HttpKernel`
+   has been dropped, use the `HttpKernel::allowCustomResponseCode()` method
+   instead
 
 3.3.0
 -----

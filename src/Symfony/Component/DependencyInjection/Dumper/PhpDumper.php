@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
@@ -80,7 +81,7 @@ class PhpDumper extends Dumper
     public function __construct(ContainerBuilder $container)
     {
         if (!$container->isCompiled()) {
-            @trigger_error('Dumping an uncompiled ContainerBuilder is deprecated since version 3.3 and will not be supported anymore in 4.0. Compile the container beforehand.', E_USER_DEPRECATED);
+            throw new LogicException('Cannot dump an uncompiled container.');
         }
 
         parent::__construct($container);
@@ -154,17 +155,11 @@ class PhpDumper extends Dumper
             }
         }
 
-        $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
-
-        if ($this->container->isCompiled()) {
-            $code .= $this->addFrozenConstructor();
-            $code .= $this->addFrozenCompile();
-            $code .= $this->addFrozenIsCompiled();
-        } else {
-            $code .= $this->addConstructor();
-        }
-
-        $code .=
+        $code =
+            $this->startClass($options['class'], $options['base_class'], $options['namespace']).
+            $this->addConstructor().
+            $this->addCompile().
+            $this->addIsCompiled().
             $this->addServices().
             $this->addDefaultParametersMethod().
             $this->endClass().
@@ -783,7 +778,6 @@ EOF;
      */
     private function startClass($class, $baseClass, $namespace)
     {
-        $bagClass = $this->container->isCompiled() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
         $namespaceLine = $namespace ? "\nnamespace $namespace;\n" : '';
 
         return <<<EOF
@@ -795,7 +789,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-$bagClass
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /*{$this->docStar}
  * $class.
@@ -814,45 +808,11 @@ EOF;
     }
 
     /**
-     * Adds the constructor.
-     *
-     * @return string
-     */
-    private function addConstructor()
-    {
-        $targetDirs = $this->exportTargetDirs();
-        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
-
-        $code = <<<EOF
-
-    /*{$this->docStar}
-     * Constructor.
-     */
-    public function __construct()
-    {{$targetDirs}
-        parent::__construct($arguments);
-
-EOF;
-
-        $code .= $this->addNormalizedIds();
-        $code .= $this->addMethodMap();
-        $code .= $this->addPrivateServices();
-        $code .= $this->addAliases();
-
-        $code .= <<<'EOF'
-    }
-
-EOF;
-
-        return $code;
-    }
-
-    /**
      * Adds the constructor for a compiled container.
      *
      * @return string
      */
-    private function addFrozenConstructor()
+    private function addConstructor()
     {
         $targetDirs = $this->exportTargetDirs();
 
@@ -888,7 +848,7 @@ EOF;
      *
      * @return string
      */
-    private function addFrozenCompile()
+    private function addCompile()
     {
         return <<<EOF
 
@@ -908,7 +868,7 @@ EOF;
      *
      * @return string
      */
-    private function addFrozenIsCompiled()
+    private function addIsCompiled()
     {
         return <<<EOF
 
@@ -1001,7 +961,7 @@ EOF;
     private function addAliases()
     {
         if (!$aliases = $this->container->getAliases()) {
-            return $this->container->isCompiled() ? "\n        \$this->aliases = array();\n" : '';
+            return "\n        \$this->aliases = array();\n";
         }
 
         $code = "        \$this->aliases = array(\n";
@@ -1046,9 +1006,7 @@ EOF;
         }
         $parameters = sprintf("array(\n%s\n%s)", implode("\n", $php), str_repeat(' ', 8));
 
-        $code = '';
-        if ($this->container->isCompiled()) {
-            $code .= <<<'EOF'
+        $code = <<<'EOF'
 
     /**
      * {@inheritdoc}
@@ -1102,13 +1060,13 @@ EOF;
     }
 
 EOF;
-            if ('' === $this->docStar) {
-                $code = str_replace('/**', '/*', $code);
-            }
+        if ('' === $this->docStar) {
+            $code = str_replace('/**', '/*', $code);
+        }
 
-            if ($dynamicPhp) {
-                $loadedDynamicParameters = $this->exportParameters(array_combine(array_keys($dynamicPhp), array_fill(0, count($dynamicPhp), false)), '', 8);
-                $getDynamicParameter = <<<'EOF'
+        if ($dynamicPhp) {
+            $loadedDynamicParameters = $this->exportParameters(array_combine(array_keys($dynamicPhp), array_fill(0, count($dynamicPhp), false)), '', 8);
+            $getDynamicParameter = <<<'EOF'
         switch ($name) {
 %s
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%%s" must be defined.', $name));
@@ -1117,13 +1075,13 @@ EOF;
 
         return $this->dynamicParameters[$name] = $value;
 EOF;
-                $getDynamicParameter = sprintf($getDynamicParameter, implode("\n", $dynamicPhp));
-            } else {
-                $loadedDynamicParameters = 'array()';
-                $getDynamicParameter = str_repeat(' ', 8).'throw new InvalidArgumentException(sprintf(\'The dynamic parameter "%s" must be defined.\', $name));';
-            }
+            $getDynamicParameter = sprintf($getDynamicParameter, implode("\n", $dynamicPhp));
+        } else {
+            $loadedDynamicParameters = 'array()';
+            $getDynamicParameter = str_repeat(' ', 8).'throw new InvalidArgumentException(sprintf(\'The dynamic parameter "%s" must be defined.\', $name));';
+        }
 
-            $code .= <<<EOF
+        $code .= <<<EOF
 
     private \$loadedDynamicParameters = {$loadedDynamicParameters};
     private \$dynamicParameters = array();
@@ -1141,13 +1099,6 @@ EOF;
     {
 {$getDynamicParameter}
     }
-
-EOF;
-        } elseif ($dynamicPhp) {
-            throw new RuntimeException('You cannot dump a not-frozen container with dynamic parameters.');
-        }
-
-        $code .= <<<EOF
 
     /*{$this->docStar}
      * Gets the default parameters.
@@ -1595,7 +1546,7 @@ EOF;
      */
     private function dumpParameter($name)
     {
-        if ($this->container->isCompiled() && $this->container->hasParameter($name)) {
+        if ($this->container->hasParameter($name)) {
             return $this->dumpValue($this->container->getParameter($name), false);
         }
 

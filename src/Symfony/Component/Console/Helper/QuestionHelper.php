@@ -163,6 +163,13 @@ class QuestionHelper extends Helper
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
+            if (!$question->getChoices()) {
+                $output->writeln($question->getQuestion());
+                $output->write($question->getPrompt());
+
+                return;
+            }
+
             $maxWidth = max(array_map(array($this, 'strlen'), array_keys($question->getChoices())));
 
             $messages = (array) $question->getQuestion();

@@ -434,6 +434,21 @@ class QuestionHelperTest extends TestCase
         $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Value "irrelevant" is invalid
+     */
+    public function testEmptyChoices()
+    {
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("irrelevant\n"));
+
+        $question = new ChoiceQuestion('Question', array(), 'irrelevant');
+        $question->setMaxAttempts(1);
+
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

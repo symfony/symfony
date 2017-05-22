@@ -17,6 +17,8 @@ require PHPUNIT_COMPOSER_INSTALL;
 require_once __DIR__.'/../../bootstrap.php';
 require __DIR__.'/fake_vendor/autoload.php';
 require __DIR__.'/fake_vendor/acme/lib/deprecation_riddled.php';
+
+?>
 --EXPECTF--
 Unsilenced deprecation notices (2)
 

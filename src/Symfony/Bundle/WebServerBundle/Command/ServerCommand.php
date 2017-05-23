@@ -17,6 +17,8 @@ use Symfony\Component\Console\Command\Command;
  * Base methods for commands related to a local web server.
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
+ *
+ * @internal
  */
 abstract class ServerCommand extends Command
 {

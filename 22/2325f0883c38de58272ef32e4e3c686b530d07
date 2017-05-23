@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-22T07:12:20Z
+
+There are some other places where we use `getRootDir()`/`%kernel.root_dir%`, but updating them may not be safe.

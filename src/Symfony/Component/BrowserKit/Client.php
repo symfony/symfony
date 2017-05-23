@@ -263,6 +263,31 @@ abstract class Client
     }
 
     /**
+     * Submits a form with additional values.
+     *
+     * @param Form  $form             A Form instance
+     * @param array $values           An array of form field values
+     * @param array $additionalValues An array of additional field values
+     *
+     * @return Crawler
+     */
+    public function submitWithAdditionalValues(Form $form, array $values = array(), array $additionalValues = array())
+    {
+        $form->setValues($values);
+
+        $values = $form->getPhpValues();
+
+        if (!empty($additionalValues)) {
+            $values = array_merge(
+                $values,
+                $form->convertFieldsToArray($additionalValues)
+            );
+        }
+
+        return $this->request($form->getMethod(), $form->getUri(), $values, $form->getPhpFiles());
+    }
+
+    /**
      * Calls a URI.
      *
      * @param string $method        The request method

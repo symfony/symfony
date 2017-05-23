@@ -296,6 +296,52 @@ class ClientTest extends TestCase
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unreachable field "foo"
+     */
+    public function testSubmitMissingField()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->submit($crawler->filter('input')->form(), array('foo[0]' => 'bar'));
+    }
+
+    /**
+     * Submit the same data that in testSubmitMissingField() but
+     * without triggering an Exception.
+     */
+    public function testSubmitWithAdditionalValues()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $additionalValues = array('foo[0]' => 'bar');
+        // The field "foo[0]" will be converted to an array "foo => 0".
+        $expectedParameters = array('foo' => array('0' => 'bar'));
+
+        $client->submitWithAdditionalValues($crawler->filter('input')->form(), array(), $additionalValues);
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+        $this->assertEquals($expectedParameters, $client->getRequest()->getParameters(), 'parameters have not been added');
+
+        // Add an element to an existing collection.
+        $client->setNextResponse(new Response('<html><form action="/foo" method="post"><input type="text" name="foo[0][name]" value="foo" /><input type="text" name="foo[1][name]" value="bar" /><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $additionalValues = array('foo[2][name]' => 'foobar');
+        $expectedParameters = array('foo' => array('2' => array('name' => 'foobar')));
+
+        $form = $crawler->filter('input[type=submit]')->form();
+        $client->submitWithAdditionalValues($form, $form->getPhpValues(), $additionalValues);
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+        $this->assertEquals($expectedParameters, $client->getRequest()->getParameters(), 'parameters have not been added');
+    }
+
     public function testSubmitPreserveAuth()
     {
         $client = new TestClient(array('PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'bar'));

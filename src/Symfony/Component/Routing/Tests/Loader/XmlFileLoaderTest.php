@@ -70,7 +70,7 @@ class XmlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('validresource.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(3, $routes, 'Two routes are loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {

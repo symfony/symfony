@@ -144,6 +144,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $name = $this->getDefaultRouteName($class, $method);
         }
 
+        if (!empty($globals['name'])) {
+            $name .= '_' . $globals['name'];
+        }
+
         $defaults = array_replace($globals['defaults'], $annot->getDefaults());
         foreach ($method->getParameters() as $param) {
             if (false !== strpos($globals['path'].$annot->getPath(), sprintf('{%s}', $param->getName())) && !isset($defaults[$param->getName()]) && $param->isDefaultValueAvailable()) {
@@ -218,7 +222,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $globals = [];
         $annotations = $this->reader->getClassAnnotations($class);
 
-        // BC workaround: interface of Doctrine is broken, it returns NULL instead of empty array if nothing was found
+        // Workaround: interface of Doctrine returns NULL instead of empty array if nothing was found
         if ($annotations === null) {
             $annotations = [];
         }
@@ -226,6 +230,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         foreach ($annotations as $annotation) {
             if ($annotation instanceof $this->routeAnnotationClass) {
                 $globals[] = [
+                    'name'         => null !== $annotation->getName()         ? $annotation->getName()         : '',
                     'path'         => null !== $annotation->getPath()         ? $annotation->getPath()         : '',
                     'requirements' => null !== $annotation->getRequirements() ? $annotation->getRequirements() : [],
                     'options'      => null !== $annotation->getOptions()      ? $annotation->getOptions()      : [],
@@ -241,6 +246,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         // Add default globals if nothing was provided in class annotation
         if (empty($globals)) {
             $globals[] = [
+                'name' => '',
                 'path' => '',
                 'requirements' => [],
                 'options' => [],

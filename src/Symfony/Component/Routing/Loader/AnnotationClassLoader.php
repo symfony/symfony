@@ -120,16 +120,18 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         foreach ($class->getMethods() as $method) {
             $this->defaultRouteIndex = 0;
-            foreach ($this->reader->getMethodAnnotations($method) as $annot) {
-                if ($annot instanceof $this->routeAnnotationClass) {
-                    $this->addRoute($collection, $annot, $globals, $class, $method);
+            foreach ($globals as $global) {
+                foreach ($this->reader->getMethodAnnotations($method) as $annot) {
+                    if ($annot instanceof $this->routeAnnotationClass) {
+                        $this->addRoute($collection, $annot, $global, $class, $method);
+                    }
                 }
             }
         }
 
         if (0 === $collection->count() && $class->hasMethod('__invoke') && $annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
             $globals['path'] = '';
-            $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
+            $this->addRoute($collection, $annot, $globals[0], $class, $class->getMethod('__invoke'));
         }
 
         return $collection;
@@ -213,49 +215,41 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     protected function getGlobals(\ReflectionClass $class)
     {
-        $globals = array(
-            'path' => '',
-            'requirements' => array(),
-            'options' => array(),
-            'defaults' => array(),
-            'schemes' => array(),
-            'methods' => array(),
-            'host' => '',
-            'condition' => '',
-        );
+        $globals = [];
+        $annotations = $this->reader->getClassAnnotations($class);
 
-        if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            if (null !== $annot->getPath()) {
-                $globals['path'] = $annot->getPath();
-            }
+        // BC workaround: interface of Doctrine is broken, it returns NULL instead of empty array if nothing was found
+        if ($annotations === NULL) {
+            $annotations = [];
+        }
 
-            if (null !== $annot->getRequirements()) {
-                $globals['requirements'] = $annot->getRequirements();
+        foreach ($annotations as $annotation) {
+            if ($annotation instanceof $this->routeAnnotationClass) {
+                $globals[] = [
+                    'path'         => null !== $annotation->getPath()         ? $annotation->getPath()         : '',
+                    'requirements' => null !== $annotation->getRequirements() ? $annotation->getRequirements() : [],
+                    'options'      => null !== $annotation->getOptions()      ? $annotation->getOptions()      : [],
+                    'defaults'     => null !== $annotation->getDefaults()     ? $annotation->getDefaults()     : [],
+                    'schemes'      => null !== $annotation->getSchemes()      ? $annotation->getSchemes()      : [],
+                    'methods'      => null !== $annotation->getMethods()      ? $annotation->getMethods()      : [],
+                    'host'         => null !== $annotation->getHost()         ? $annotation->getHost()         : '',
+                    'condition'    => null !== $annotation->getCondition()    ? $annotation->getCondition()    : '',
+                ];
             }
+        }
 
-            if (null !== $annot->getOptions()) {
-                $globals['options'] = $annot->getOptions();
-            }
-
-            if (null !== $annot->getDefaults()) {
-                $globals['defaults'] = $annot->getDefaults();
-            }
-
-            if (null !== $annot->getSchemes()) {
-                $globals['schemes'] = $annot->getSchemes();
-            }
-
-            if (null !== $annot->getMethods()) {
-                $globals['methods'] = $annot->getMethods();
-            }
-
-            if (null !== $annot->getHost()) {
-                $globals['host'] = $annot->getHost();
-            }
-
-            if (null !== $annot->getCondition()) {
-                $globals['condition'] = $annot->getCondition();
-            }
+        // Add default globals if nothing was provided in class annotation
+        if (empty($globals)) {
+            $globals[] = [
+                'path' => '',
+                'requirements' => [],
+                'options' => [],
+                'defaults' => [],
+                'schemes' => [],
+                'methods' => [],
+                'host' => '',
+                'condition' => '',
+            ];
         }
 
         return $globals;

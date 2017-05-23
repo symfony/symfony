@@ -163,8 +163,8 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
         $this->reader
             ->expects($this->once())
-            ->method('getClassAnnotation')
-            ->will($this->returnValue($this->getAnnotatedRoute($classRouteData)))
+            ->method('getClassAnnotations')
+            ->will($this->returnValue([$this->getAnnotatedRoute($classRouteData)]))
         ;
         $this->reader
             ->expects($this->once())
@@ -190,7 +190,13 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         );
 
         $this->reader
-            ->expects($this->exactly(2))
+            ->expects($this->once())
+            ->method('getClassAnnotations')
+            ->will($this->returnValue([$this->getAnnotatedRoute($classRouteData)]))
+        ;
+
+        $this->reader
+            ->expects($this->once())
             ->method('getClassAnnotation')
             ->will($this->returnValue($this->getAnnotatedRoute($classRouteData)))
         ;
@@ -226,8 +232,8 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
         $this->reader
             ->expects($this->once())
-            ->method('getClassAnnotation')
-            ->will($this->returnValue($this->getAnnotatedRoute($classRouteData)))
+            ->method('getClassAnnotations')
+            ->will($this->returnValue([$this->getAnnotatedRoute($classRouteData)]))
         ;
         $this->reader
             ->expects($this->once())

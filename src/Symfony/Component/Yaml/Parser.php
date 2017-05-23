@@ -208,7 +208,7 @@ class Parser
                     $this->refs[$isRef] = end($data);
                 }
             } elseif (
-                self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|(?:![^\s]++\s++)?[^ \'"\[\{!].*?) *\:(\s++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
+                self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|(?:!?!php/const:)?(?:![^\s]++\s++)?[^ \'"\[\{!].*?) *\:(\s++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
                 && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))
             ) {
                 if ($context && 'sequence' == $context) {
@@ -221,7 +221,14 @@ class Parser
                 try {
                     Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
                     $i = 0;
-                    $key = Inline::parseScalar($values['key'], 0, null, $i, !(Yaml::PARSE_KEYS_AS_STRINGS & $flags));
+                    $evaluateKey = !(Yaml::PARSE_KEYS_AS_STRINGS & $flags);
+
+                    // constants in key will be evaluated anyway
+                    if (isset($values['key'][0]) && '!' === $values['key'][0] && Yaml::PARSE_CONSTANT & $flags) {
+                        $evaluateKey = true;
+                    }
+
+                    $key = Inline::parseScalar($values['key'], 0, null, $i, $evaluateKey);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                     $e->setSnippet($this->currentLine);

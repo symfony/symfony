@@ -180,6 +180,111 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals(array_merge($classRouteData['methods'], $methodRouteData['methods']), $route->getMethods(), '->load merges class and method route methods');
     }
 
+    //
+    // CLASS SCOPE
+    // @Route("z", defaults={"p" = "p_z"})
+    // @Route("x", defaults={"p" = "p_x"})
+    // @ORM\Table(name="asd")    <--- polluted with other annotations
+    //
+    // ACTION SCOPE
+    // @Route("/aaa")
+    // @Route("/bbb", defaults={"p" = "bbb")
+    //
+    // Must result into 3 routes with random names, as 2 routes were overlapped and first was replaced by the last
+    //    X   , /z/bbb , x/bbb , x/bbb
+    // /z/aaa , /z/bbb , x/aaa , x/bbb - when all route names are randomly generated
+    //
+    public function testClassRoutesComplexLoad()
+    {
+        $classRouteDataArray = [
+            [
+                'path' => '/z',
+                'schemes' => array('https'),
+                'methods' => array('GET'),
+                'defaults' => ['p' => 'p_z']
+            ],
+            [
+                'path' => '/x',
+                'schemes' => array('https'),
+                'methods' => array('GET'),
+                'defaults' => ['p' => 'p_x']
+            ],
+        ];
+
+        $methodRouteDataArray = [
+            [
+                'name' => 'route1',
+                'path' => '/aaa',
+                'schemes' => array('http'),
+                'methods' => array('POST', 'PUT'),
+            ],
+            [
+                //'name' => 'symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction',  <-- must be generated
+                'path' => '/bbb',
+                'schemes' => array('http'),
+                'methods' => array('POST', 'PUT'),
+                'defaults' => ['p' => 'bbb']
+            ]
+        ];
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getClassAnnotations')
+            ->will($this->returnValue([
+                $this->getAnnotatedRoute($classRouteDataArray[0]),
+                $this->getAnnotatedRoute($classRouteDataArray[1]),
+                new \Doctrine\ORM\Mapping\Table() // route annotation pollution
+            ]))
+        ;
+
+        $this->reader
+            ->expects($this->exactly(2))
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue([
+                $this->getAnnotatedRoute($methodRouteDataArray[0]),
+                $this->getAnnotatedRoute($methodRouteDataArray[1])
+            ]))
+        ;
+
+        /** @var $routeCollection \Symfony\Component\Routing\RouteCollection */
+        $routeCollection = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass');
+
+        $this->assertEquals(3, $routeCollection->count());
+
+        // z/aaa
+        /*
+        $route = $routeCollection->get('symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction');
+        $this->assertInstanceOf(\Symfony\Component\Routing\Route::class, $route);
+        $this->assertEquals('/z/aaa', $route->getPath());
+        $this->assertEquals(['https', 'http'], $route->getSchemes());
+        $this->assertEquals(['p' => 'p_z'], $route->getDefaults());
+        */
+
+        // z/bbb
+        $route = $routeCollection->get('symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction');
+        $this->assertInstanceOf(\Symfony\Component\Routing\Route::class, $route);
+        $this->assertEquals('/z/bbb', $route->getPath());
+        $this->assertEquals(['https', 'http'], $route->getSchemes(), '->load merges class and method route schemes');
+        $this->assertEquals(['GET', 'POST', 'PUT'], $route->getMethods(), '->load merges class and method route methods');
+        $this->assertEquals(['p' => 'bbb'], $route->getDefaults()); // method parameter overwrites class parameter
+
+        // x/aaa
+        $route = $routeCollection->get('route1');
+        $this->assertInstanceOf(\Symfony\Component\Routing\Route::class, $route);
+        $this->assertEquals('/x/aaa', $route->getPath());
+        $this->assertEquals(['https', 'http'], $route->getSchemes(), '->load merges class and method route schemes');
+        $this->assertEquals(['GET', 'POST', 'PUT'], $route->getMethods(), '->load merges class and method route methods');
+        $this->assertEquals(['p' => 'p_x'], $route->getDefaults());
+
+        // x/bbb
+        $route = $routeCollection->get('symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction_1');
+        $this->assertInstanceOf(\Symfony\Component\Routing\Route::class, $route);
+        $this->assertEquals('/x/bbb', $route->getPath());
+        $this->assertEquals(['https', 'http'], $route->getSchemes(), '->load merges class and method route schemes');
+        $this->assertEquals(['GET', 'POST', 'PUT'], $route->getMethods(), '->load merges class and method route methods');
+        $this->assertEquals(['p' => 'bbb'], $route->getDefaults());
+    }
+
     public function testInvokableClassRouteLoad()
     {
         $classRouteData = array(

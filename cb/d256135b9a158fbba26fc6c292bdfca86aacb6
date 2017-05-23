@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-22T10:19:45Z
+
+Was actually already the case before #20365, i preserved it. But the change makes sense i guess (not sure what we care about; browsers dont care right?)
+
+---------------------------------------------------------------------------
+
+by craue at 2017-05-22T10:22:25Z
+
+@ro0NL, you're right. The blanks were there before, but not in 3.2.

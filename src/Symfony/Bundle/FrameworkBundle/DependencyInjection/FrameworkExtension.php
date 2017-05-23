@@ -708,7 +708,9 @@ class FrameworkExtension extends Extension
         }
 
         if (!empty($config['loaders'])) {
-            $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
+            $loaders = array_map(function ($loader) {
+                return new Reference($loader);
+            }, $config['loaders']);
 
             // Use a delegation unless only a single loader was registered
             if (1 === count($loaders)) {
@@ -730,7 +732,9 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('templating.engines', $config['engines']);
-        $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
+        $engines = array_map(function ($engine) {
+            return new Reference('templating.engine.'.$engine);
+        }, $config['engines']);
 
         // Use a delegation unless only a single engine was registered
         if (1 === count($engines)) {

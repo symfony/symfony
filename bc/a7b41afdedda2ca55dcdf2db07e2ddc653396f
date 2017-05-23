@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-22T17:26:33Z
+
+👍 Fixes the issue
+
+However, I am a bit worried about the PR that introduced this - #20677 - specifically that it adds the EncoderFactoryInterface to the constructor. I think we need to be careful to keep commands lazy - I believe this change will cause that service to be instantiated just by running `bin/console` with no arguments.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-22T17:50:44Z
+
+@weaverryan : Which is something that #22734 would solve. (Anyway for this particular case, `EncoderFactory` is pretty cheap to instantiate)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-22T17:53:16Z
+
+@ogizanagi Thanks for pointing me to that :). I'd like to see that get done!
+
+👍

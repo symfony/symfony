@@ -377,6 +377,10 @@ class Container implements ResettableContainerInterface
      */
     public static function camelize($id)
     {
+        if (PHP_VERSION_ID >= 50516 || (defined('HHVM_VERSION') && HHVM_VERSION_ID >= 31200)) {
+            return str_replace(array('_', '.', '\\', ' '), array('', '_ ', '_ ', ''), ucwords($id, ' _.\\'));
+        }
+
         return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ ', '\\' => '_ '))), array(' ' => ''));
     }
 

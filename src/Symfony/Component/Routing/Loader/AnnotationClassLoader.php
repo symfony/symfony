@@ -219,7 +219,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $annotations = $this->reader->getClassAnnotations($class);
 
         // BC workaround: interface of Doctrine is broken, it returns NULL instead of empty array if nothing was found
-        if ($annotations === NULL) {
+        if ($annotations === null) {
             $annotations = [];
         }
 

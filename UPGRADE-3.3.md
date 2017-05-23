@@ -244,6 +244,10 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` class instead.
 
+ * Passing an array of validators or validator aliases as the second argument of 
+   `ConstraintValidatorFactory::__construct()` is deprecated since 3.3 and will 
+   be removed in 4.0. Use the service locator instead.
+
 HttpFoundation
 --------------
 

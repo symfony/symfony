@@ -338,6 +338,10 @@ FrameworkBundle
    has been removed. Use the `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass`
    class instead.
 
+ * Passing an array of validators or validator aliases as the second argument 
+   of `ConstraintValidatorFactory::__construct()` has been removed.
+   Use the service locator instead.
+
 HttpFoundation
 --------------
 

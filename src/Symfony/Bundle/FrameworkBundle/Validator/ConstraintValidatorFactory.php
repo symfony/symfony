@@ -45,17 +45,10 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     private $container;
     private $validators;
 
-    public function __construct(ContainerInterface $container, array $validators = null)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-
-        if (null !== $validators) {
-            @trigger_error(sprintf('Passing an array of validators or validator aliases as the second argument of "%s" is deprecated since 3.3 and will be removed in 4.0. Use the service locator instead.', __METHOD__), E_USER_DEPRECATED);
-        } else {
-            $validators = array();
-        }
-
-        $this->validators = $validators;
+        $this->validators = array();
     }
 
     /**
@@ -82,9 +75,6 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 
                 $this->validators[$name] = new $name();
             }
-        } elseif (is_string($this->validators[$name])) {
-            // To be removed in 4.0
-            $this->validators[$name] = $this->container->get($this->validators[$name]);
         }
 
         if (!$this->validators[$name] instanceof ConstraintValidatorInterface) {

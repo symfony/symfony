@@ -11,6 +11,7 @@ CHANGELOG
  * added `AddCacheClearerPass`
  * added `AddCacheWarmerPass`
  * deprecated `EnvParametersResource`
+ * added `Symfony\Component\HttpKernel\Client::catchExceptions()`
 
 3.3.0
 -----

@@ -228,6 +228,9 @@ class Container implements ResettableContainerInterface
     public function has($id)
     {
         for ($i = 2;;) {
+            if (isset($this->privates[$id])) {
+                @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
             if ('service_container' === $id) {
                 return true;
             }
@@ -236,10 +239,6 @@ class Container implements ResettableContainerInterface
             }
             if (isset($this->services[$id])) {
                 return true;
-            }
-
-            if (isset($this->privates[$id])) {
-                @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
 
             if (isset($this->methodMap[$id])) {
@@ -287,12 +286,16 @@ class Container implements ResettableContainerInterface
         // this method can be called thousands of times during a request, avoid
         // calling $this->normalizeId($id) unless necessary.
         for ($i = 2;;) {
+            if (isset($this->privates[$id])) {
+                @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
             if ('service_container' === $id) {
                 return $this;
             }
             if (isset($this->aliases[$id])) {
                 $id = $this->aliases[$id];
             }
+
             // Re-use shared service instance if it exists.
             if (isset($this->services[$id])) {
                 return $this->services[$id];
@@ -330,9 +333,6 @@ class Container implements ResettableContainerInterface
                 }
 
                 return;
-            }
-            if (isset($this->privates[$id])) {
-                @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
 
             $this->loading[$id] = true;

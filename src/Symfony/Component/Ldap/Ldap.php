@@ -63,6 +63,16 @@ final class Ldap implements LdapInterface
     }
 
     /**
+     * Checks whether the connection is already bound or not.
+     *
+     * @return bool
+     */
+    public function isBound()
+    {
+        return $this->adapter->getConnection()->isBound();
+    }
+
+    /**
      * Creates a new Ldap instance.
      *
      * @param string $adapter The adapter name

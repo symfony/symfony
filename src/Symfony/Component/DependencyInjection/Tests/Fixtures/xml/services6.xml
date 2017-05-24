@@ -4,6 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
+    <service class="Symfony\Component\DependencyInjection\ContainerInterface" id="service_container" public="false" synthetic="true"/>
+    <service alias="service_container" id="Psr\Container\ContainerInterface" public="false"/>
+    <service alias="service_container" id="Symfony\Component\DependencyInjection\ContainerInterface" public="false"/>
     <service id="foo" class="FooClass" />
     <service id="baz" class="BazClass" />
     <service id="not_shared" class="FooClass" shared="false" />

@@ -126,7 +126,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         parent::__construct($parameterBag);
 
         $this->trackResources = interface_exists('Symfony\Component\Config\Resource\ResourceInterface');
-        $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true));
+        $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true)->setPublic(false));
         $this->setAlias(PsrContainerInterface::class, new Alias('service_container', false));
         $this->setAlias(ContainerInterface::class, new Alias('service_container', false));
     }
@@ -1104,7 +1104,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $callable[0] = $parameterBag->resolveValue($callable[0]);
 
                 if ($callable[0] instanceof Reference) {
-                    $callable[0] = $this->get((string) $callable[0], $callable[0]->getInvalidBehavior());
+                    $callable[0] = 'service_container' === (string) $callable[0] ? $this : $this->get((string) $callable[0], $callable[0]->getInvalidBehavior());
                 } elseif ($callable[0] instanceof Definition) {
                     $callable[0] = $this->createService($callable[0], null);
                 }
@@ -1187,10 +1187,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
             }
             $value = function () use ($id, $method) {
-                return call_user_func_array(array($this->get($id), $method), func_get_args());
+                return call_user_func_array(array('service_container' === $id ? $this : $this->get($id), $method), func_get_args());
             };
         } elseif ($value instanceof Reference) {
-            $value = $this->get((string) $value, $value->getInvalidBehavior());
+            $value = 'service_container' === (string) $value ? $this : $this->get((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
         } elseif ($value instanceof Expression) {

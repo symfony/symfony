@@ -664,9 +664,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertFalse($container->getDefinition('child_def')->isAutowired());
 
         $definitions = $container->getDefinitions();
-        $this->assertSame('service_container', key($definitions));
-
-        array_shift($definitions);
         $this->assertStringStartsWith('1_', key($definitions));
 
         $anonymous = current($definitions);

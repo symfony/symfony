@@ -187,6 +187,9 @@ class GraphvizDumper extends Dumper
         }
 
         foreach ($container->getServiceIds() as $id) {
+            if ('service_container' === $id) { // to be removed in 4.0
+                continue;
+            }
             if (array_key_exists($id, $container->getAliases())) {
                 continue;
             }

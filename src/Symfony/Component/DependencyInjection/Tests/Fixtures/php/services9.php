@@ -64,6 +64,7 @@ class ProjectServiceContainer extends Container
             'factory_simple' => true,
             'inlined' => true,
             'new_factory' => true,
+            'service_container' => true,
         );
         $this->aliases = array(
             'Psr\\Container\\ContainerInterface' => 'service_container',

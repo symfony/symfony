@@ -43,7 +43,7 @@ class TestAbstractController extends AbstractController
         $expected = self::getSubscribedServices();
 
         foreach ($container->getServiceIds() as $id) {
-            if ('service_container' === $id) {
+            if ('service_container' === $id) { // to be removed in 4.0
                 continue;
             }
             if (!isset($expected[$id])) {

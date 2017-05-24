@@ -189,7 +189,7 @@ class Container implements ResettableContainerInterface
         $id = $this->normalizeId($id);
 
         if ('service_container' === $id) {
-            throw new InvalidArgumentException('You cannot set service "service_container".');
+            throw new InvalidArgumentException('You cannot set the private service "service_container".');
         }
 
         if (isset($this->aliases[$id])) {
@@ -229,6 +229,8 @@ class Container implements ResettableContainerInterface
     {
         for ($i = 2;;) {
             if ('service_container' === $id) {
+                @trigger_error('Checking for the existence of the "service_container" private service is deprecated since Symfony 3.4 and won\'t be supported anymore in Symfony 4.0.', E_USER_DEPRECATED);
+
                 return true;
             }
             if (isset($this->aliases[$id])) {
@@ -288,6 +290,8 @@ class Container implements ResettableContainerInterface
         // calling $this->normalizeId($id) unless necessary.
         for ($i = 2;;) {
             if ('service_container' === $id) {
+                @trigger_error('Requesting the "service_container" private service is deprecated since Symfony 3.4 and won\'t be supported anymore in Symfony 4.0.', E_USER_DEPRECATED);
+
                 return $this;
             }
             if (isset($this->aliases[$id])) {
@@ -363,6 +367,8 @@ class Container implements ResettableContainerInterface
         $id = $this->normalizeId($id);
 
         if ('service_container' === $id) {
+            @trigger_error('Checking for the initialization of the "service_container" private service is deprecated since Symfony 3.4 and won\'t be supported anymore in Symfony 4.0.', E_USER_DEPRECATED);
+
             return false;
         }
 
@@ -405,7 +411,7 @@ class Container implements ResettableContainerInterface
                 }
             }
         }
-        $ids[] = 'service_container';
+        $ids[] = 'service_container'; // to be removed in 4.0
 
         return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->services)));
     }

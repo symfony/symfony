@@ -201,6 +201,7 @@ EOF
     {
         $cacheDir = var_export($warmupDir, true);
         $rootDir = var_export(realpath($parent->getRootDir()), true);
+        $projectDir = var_export(realpath($parent->getProjectDir()), true);
         $logDir = var_export(realpath($parent->getLogDir()), true);
         // the temp kernel class name must have the same length than the real one
         // to avoid the many problems in serialized resources files
@@ -222,6 +223,11 @@ namespace $namespace
         public function getRootDir()
         {
             return $rootDir;
+        }
+
+        public function getProjectDir()
+        {
+            return $projectDir;
         }
 
         public function getLogDir()

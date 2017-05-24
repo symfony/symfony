@@ -320,7 +320,7 @@ class Process implements \IteratorAggregate
         }
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
             $this->options['bypass_shell'] = true;
-            $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup);
+            $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup, $env);
         } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
@@ -1627,7 +1627,7 @@ class Process implements \IteratorAggregate
         return true;
     }
 
-    private function prepareWindowsCommandLine($cmd, array &$envBackup)
+    private function prepareWindowsCommandLine($cmd, array &$envBackup, array &$env = null)
     {
         $uid = uniqid('', true);
         $varCount = 0;
@@ -1640,7 +1640,7 @@ class Process implements \IteratorAggregate
                     [^"%!^]*+
                 )++
             )"/x',
-            function ($m) use (&$envBackup, &$varCache, &$varCount, $uid) {
+            function ($m) use (&$envBackup, &$env, &$varCache, &$varCount, $uid) {
                 if (isset($varCache[$m[0]])) {
                     return $varCache[$m[0]];
                 }
@@ -1652,10 +1652,15 @@ class Process implements \IteratorAggregate
                 }
 
                 $value = str_replace(array('!LF!', '"^!"', '"^%"', '"^^"', '""'), array("\n", '!', '%', '^', '"'), $value);
-                $value = preg_replace('/(\\\\*)"/', '$1$1\\"', $value);
-
+                $value = '"'.preg_replace('/(\\\\*)"/', '$1$1\\"', $value).'"';
                 $var = $uid.++$varCount;
-                putenv("$var=\"$value\"");
+
+                if (null === $env) {
+                    putenv("$var=$value");
+                } else {
+                    $env[$var] = $value;
+                }
+
                 $envBackup[$var] = false;
 
                 return $varCache[$m[0]] = '!'.$var.'!';

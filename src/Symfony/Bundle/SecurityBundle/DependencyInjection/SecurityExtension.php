@@ -98,11 +98,11 @@ class SecurityExtension extends Extension
 
         if ($config['encoders']) {
             $this->createEncoders($config['encoders'], $container);
+        }
 
-            if (class_exists(Application::class)) {
-                $loader->load('console.xml');
-                $container->getDefinition('security.console.user_password_encoder_command')->replaceArgument(1, array_keys($config['encoders']));
-            }
+        if (class_exists(Application::class)) {
+            $loader->load('console.xml');
+            $container->getDefinition('security.console.user_password_encoder_command')->replaceArgument(1, array_keys($config['encoders']));
         }
 
         // load ACL

@@ -41,6 +41,8 @@ class Dumper
      * Sets the indentation.
      *
      * @param int $num The amount of spaces to use for indentation of nested nodes
+     *
+     * @deprecated since version 3.1, to be removed in 4.0. Pass the indentation to the constructor instead.
      */
     public function setIndentation($num)
     {

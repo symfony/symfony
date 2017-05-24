@@ -125,6 +125,37 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
+    public function testGetDateTime()
+    {
+        $format = 'Y-m-d H:i:s';
+        $bag = new ParameterBag(array('d1' => '2016-01-01 00:00:00'));
+        $date = \DateTime::createFromFormat($format, '2016-01-01 00:00:00');
+
+        $this->assertEquals($date, $bag->getDateTime('d1', $format), '->getDateTime() returns a date from the specified format');
+    }
+
+    public function testGetDate()
+    {
+        $isoDate = '2016-07-05T15:30:00UTC';
+        $bag = new ParameterBag(array(
+            'd1' => '2016-01-01',
+            'iso' => $isoDate,
+        ));
+
+        $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
+        $diff = $date->diff($bag->getDate('d1'));
+
+        $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
+        $this->assertNull($bag->getDate('d1', 'd/m/Y'), '->getDate() returns false if the format is not valid');
+        $this->assertNull($bag->getDate('d2', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
+
+        $date = $bag->getDate('iso', \DateTime::ISO8601);
+        $this->assertEquals(new \DateTime($isoDate), $date);
+        $this->assertEquals('UTC', $date->getTimezone()->getName());
+
+        $this->assertEquals($date, $bag->getDate('nokey', 'Y-m-d', $date));
+    }
+
     public function testFilter()
     {
         $bag = new ParameterBag(array(

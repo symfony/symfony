@@ -18,9 +18,9 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DeprecationErrorHandler
 {
-    const MODE_WEAK = 'weak';
-    const MODE_WEAK_VENDORS = 'weak_vendors';
-    const MODE_DISABLED = 'disabled';
+    public const MODE_WEAK = 'weak';
+    public const MODE_WEAK_VENDORS = 'weak_vendors';
+    public const MODE_DISABLED = 'disabled';
 
     private static $isRegistered = false;
 

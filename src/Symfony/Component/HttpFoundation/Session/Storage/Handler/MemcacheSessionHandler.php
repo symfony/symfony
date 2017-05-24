@@ -55,7 +55,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
         $this->memcache = $memcache;
         $this->ttl = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
-        $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2s';
+        $this->prefix = $options['prefix'] ?? 'sf2s';
     }
 
     /**

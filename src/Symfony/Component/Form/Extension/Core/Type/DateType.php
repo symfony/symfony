@@ -26,9 +26,9 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
 {
-    const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
+    public const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
 
-    const HTML5_FORMAT = 'yyyy-MM-dd';
+    public const HTML5_FORMAT = 'yyyy-MM-dd';
 
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,

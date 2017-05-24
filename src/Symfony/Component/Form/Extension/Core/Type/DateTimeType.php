@@ -29,9 +29,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeType extends AbstractType
 {
-    const DEFAULT_DATE_FORMAT = \IntlDateFormatter::MEDIUM;
+    public const DEFAULT_DATE_FORMAT = \IntlDateFormatter::MEDIUM;
 
-    const DEFAULT_TIME_FORMAT = \IntlDateFormatter::MEDIUM;
+    public const DEFAULT_TIME_FORMAT = \IntlDateFormatter::MEDIUM;
 
     /**
      * This is not quite the HTML5 format yet, because ICU lacks the
@@ -55,7 +55,7 @@ class DateTimeType extends AbstractType
      * yet. To temporarily circumvent this issue, DateTimeToRfc3339Transformer
      * is used when the format matches this constant.
      */
-    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+    public const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,

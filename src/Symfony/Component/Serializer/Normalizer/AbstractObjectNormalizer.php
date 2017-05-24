@@ -30,9 +30,9 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
-    const ENABLE_MAX_DEPTH = 'enable_max_depth';
-    const DEPTH_KEY_PATTERN = 'depth_%s::%s';
-    const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+    public const ENABLE_MAX_DEPTH = 'enable_max_depth';
+    public const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+    public const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
 
     private $propertyTypeExtractor;
     private $attributesCache = array();

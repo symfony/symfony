@@ -21,9 +21,9 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
-    const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
+    public const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    public const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
+    public const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
 
     protected $metadata;
 

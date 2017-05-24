@@ -20,7 +20,7 @@ use Symfony\Bridge\Twig\Node\TransNode;
  */
 class TranslationNodeVisitor extends \Twig_BaseNodeVisitor
 {
-    const UNDEFINED_DOMAIN = '_undefined';
+    public const UNDEFINED_DOMAIN = '_undefined';
 
     private $enabled = false;
     private $messages = array();

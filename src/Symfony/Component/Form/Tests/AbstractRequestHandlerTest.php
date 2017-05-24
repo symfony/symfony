@@ -341,10 +341,10 @@ abstract class AbstractRequestHandlerTest extends TestCase
     public function getPostMaxSizeFixtures()
     {
         return array(
-            array(pow(1024, 3) + 1, '1G', true, array('{{ max }}' => '1G')),
-            array(pow(1024, 3), '1G', false),
-            array(pow(1024, 2) + 1, '1M', true, array('{{ max }}' => '1M')),
-            array(pow(1024, 2), '1M', false),
+            array(1024 ** 3 + 1, '1G', true, array('{{ max }}' => '1G')),
+            array(1024 ** 3, '1G', false),
+            array(1024 ** 2 + 1, '1M', true, array('{{ max }}' => '1M')),
+            array(1024 ** 2, '1M', false),
             array(1024 + 1, '1K', true, array('{{ max }}' => '1K')),
             array(1024, '1K', false),
             array(null, '1K', false),

@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class UrlValidator extends ConstraintValidator
 {
-    const PATTERN = '~^
+    public const PATTERN = '~^
             (%s)://                                 # protocol
             (([\pL\pN-]+:)?([\pL\pN-]+)@)?          # basic auth
             (

@@ -18,17 +18,17 @@ namespace Symfony\Component\VarDumper\Cloner;
  */
 class Stub
 {
-    const TYPE_REF = 'ref';
-    const TYPE_STRING = 'string';
-    const TYPE_ARRAY = 'array';
-    const TYPE_OBJECT = 'object';
-    const TYPE_RESOURCE = 'resource';
+    public const TYPE_REF = 'ref';
+    public const TYPE_STRING = 'string';
+    public const TYPE_ARRAY = 'array';
+    public const TYPE_OBJECT = 'object';
+    public const TYPE_RESOURCE = 'resource';
 
-    const STRING_BINARY = 'bin';
-    const STRING_UTF8 = 'utf8';
+    public const STRING_BINARY = 'bin';
+    public const STRING_UTF8 = 'utf8';
 
-    const ARRAY_ASSOC = 'assoc';
-    const ARRAY_INDEXED = 'indexed';
+    public const ARRAY_ASSOC = 'assoc';
+    public const ARRAY_INDEXED = 'indexed';
 
     public $type = self::TYPE_REF;
     public $class = '';

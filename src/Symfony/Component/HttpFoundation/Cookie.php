@@ -28,8 +28,8 @@ class Cookie
     private $raw;
     private $sameSite;
 
-    const SAMESITE_LAX = 'lax';
-    const SAMESITE_STRICT = 'strict';
+    public const SAMESITE_LAX = 'lax';
+    public const SAMESITE_STRICT = 'strict';
 
     /**
      * Creates cookie from raw header string.

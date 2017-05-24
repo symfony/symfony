@@ -95,7 +95,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         $options = $this->getOptionsResolver()->resolve($options);
 
         // Should be decoupled from the specific option at some point
-        $dataClass = isset($options['data_class']) ? $options['data_class'] : null;
+        $dataClass = $options['data_class'] ?? null;
 
         $builder = $this->newBuilder($name, $dataClass, $factory, $options);
         $builder->setType($this);

@@ -25,7 +25,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
      *
      * @var string
      */
-    const SESSION_NAMESPACE = '_csrf';
+    public const SESSION_NAMESPACE = '_csrf';
 
     /**
      * @var bool

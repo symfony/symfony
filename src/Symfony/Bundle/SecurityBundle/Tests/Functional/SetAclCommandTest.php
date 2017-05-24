@@ -37,8 +37,8 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
  */
 class SetAclCommandTest extends WebTestCase
 {
-    const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
-    const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
+    public const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
+    public const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
 
     /**
      * @group legacy

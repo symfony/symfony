@@ -23,9 +23,9 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {
-    const PASSWORD = 's3Cr3t';
+    public const PASSWORD = 's3Cr3t';
 
-    const SALT = '^S4lt$';
+    public const SALT = '^S4lt$';
 
     /**
      * @var TokenStorageInterface

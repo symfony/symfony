@@ -15,7 +15,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
     protected function setUp()
     {

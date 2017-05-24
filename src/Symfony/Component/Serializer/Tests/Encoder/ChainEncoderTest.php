@@ -17,9 +17,9 @@ use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 class ChainEncoderTest extends TestCase
 {
-    const FORMAT_1 = 'format1';
-    const FORMAT_2 = 'format2';
-    const FORMAT_3 = 'format3';
+    public const FORMAT_1 = 'format1';
+    public const FORMAT_2 = 'format2';
+    public const FORMAT_3 = 'format3';
 
     private $chainEncoder;
     private $encoder1;

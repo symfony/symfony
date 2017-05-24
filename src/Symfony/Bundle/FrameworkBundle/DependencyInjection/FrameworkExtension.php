@@ -151,7 +151,7 @@ class FrameworkExtension extends Extension
                 );
                 $ide = $config['ide'];
 
-                $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+                $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: ($links[$ide] ?? $ide));
             }
             $container->setParameter('debug.file_link_format', '%templating.helper.code.file_link_format%');
         }
@@ -478,7 +478,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addTag('workflow.definition', array(
                 'name' => $name,
                 'type' => $type,
-                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
+                'marking_store' => $workflow['marking_store']['type'] ?? null,
             ));
             if (isset($workflow['initial_place'])) {
                 $definitionDefinition->addArgument($workflow['initial_place']);
@@ -804,7 +804,7 @@ class FrameworkExtension extends Extension
             } else {
                 // let format fallback to main version_format
                 $format = $package['version_format'] ?: $config['version_format'];
-                $version = isset($package['version']) ? $package['version'] : null;
+                $version = $package['version'] ?? null;
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
             }
 

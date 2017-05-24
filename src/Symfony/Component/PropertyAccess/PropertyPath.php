@@ -27,7 +27,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @var string
      */
-    const SINGULAR_SEPARATOR = '|';
+    public const SINGULAR_SEPARATOR = '|';
 
     /**
      * The elements of the property path.

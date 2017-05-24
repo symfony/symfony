@@ -553,7 +553,7 @@ class Filesystem
 
             if ($copyOnWindows) {
                 if (is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                    $this->copy($file, $target, $options['override'] ?? false);
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
@@ -565,7 +565,7 @@ class Filesystem
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } elseif (is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                    $this->copy($file, $target, $options['override'] ?? false);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
                 }

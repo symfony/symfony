@@ -11,10 +11,10 @@ class ProjectExtension implements ExtensionInterface
         $config = call_user_func_array('array_merge', $configs);
 
         $configuration->setDefinition('project.service.bar', new Definition('FooClass'));
-        $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');
+        $configuration->setParameter('project.parameter.bar', $config['foo'] ?? 'foobar');
 
         $configuration->setDefinition('project.service.foo', new Definition('FooClass'));
-        $configuration->setParameter('project.parameter.foo', isset($config['foo']) ? $config['foo'] : 'foobar');
+        $configuration->setParameter('project.parameter.foo', $config['foo'] ?? 'foobar');
 
         return $configuration;
     }

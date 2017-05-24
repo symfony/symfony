@@ -108,13 +108,13 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, $name, array $config, $path)
     {
-        $defaults = isset($config['defaults']) ? $config['defaults'] : array();
-        $requirements = isset($config['requirements']) ? $config['requirements'] : array();
-        $options = isset($config['options']) ? $config['options'] : array();
-        $host = isset($config['host']) ? $config['host'] : '';
-        $schemes = isset($config['schemes']) ? $config['schemes'] : array();
-        $methods = isset($config['methods']) ? $config['methods'] : array();
-        $condition = isset($config['condition']) ? $config['condition'] : null;
+        $defaults = $config['defaults'] ?? array();
+        $requirements = $config['requirements'] ?? array();
+        $options = $config['options'] ?? array();
+        $host = $config['host'] ?? '';
+        $schemes = $config['schemes'] ?? array();
+        $methods = $config['methods'] ?? array();
+        $condition = $config['condition'] ?? null;
 
         $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
@@ -131,15 +131,15 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseImport(RouteCollection $collection, array $config, $path, $file)
     {
-        $type = isset($config['type']) ? $config['type'] : null;
-        $prefix = isset($config['prefix']) ? $config['prefix'] : '';
-        $defaults = isset($config['defaults']) ? $config['defaults'] : array();
-        $requirements = isset($config['requirements']) ? $config['requirements'] : array();
-        $options = isset($config['options']) ? $config['options'] : array();
-        $host = isset($config['host']) ? $config['host'] : null;
-        $condition = isset($config['condition']) ? $config['condition'] : null;
-        $schemes = isset($config['schemes']) ? $config['schemes'] : null;
-        $methods = isset($config['methods']) ? $config['methods'] : null;
+        $type = $config['type'] ?? null;
+        $prefix = $config['prefix'] ?? '';
+        $defaults = $config['defaults'] ?? array();
+        $requirements = $config['requirements'] ?? array();
+        $options = $config['options'] ?? array();
+        $host = $config['host'] ?? null;
+        $condition = $config['condition'] ?? null;
+        $schemes = $config['schemes'] ?? null;
+        $methods = $config['methods'] ?? null;
 
         $this->setCurrentDir(dirname($path));
 

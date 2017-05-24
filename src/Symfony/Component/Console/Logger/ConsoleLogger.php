@@ -26,8 +26,8 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
  */
 class ConsoleLogger extends AbstractLogger
 {
-    const INFO = 'info';
-    const ERROR = 'error';
+    public const INFO = 'info';
+    public const ERROR = 'error';
 
     /**
      * @var OutputInterface

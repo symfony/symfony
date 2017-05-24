@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class FileTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()

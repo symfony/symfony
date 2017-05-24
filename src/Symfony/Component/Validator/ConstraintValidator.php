@@ -26,14 +26,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @var int
      */
-    const PRETTY_DATE = 1;
+    public const PRETTY_DATE = 1;
 
     /**
      * Whether to cast objects with a "__toString()" method to strings.
      *
      * @var int
      */
-    const OBJECT_TO_STRING = 2;
+    public const OBJECT_TO_STRING = 2;
 
     /**
      * @var ExecutionContextInterface

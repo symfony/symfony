@@ -181,7 +181,7 @@ class YamlFileLoader extends FileLoader
             }
 
             $this->setCurrentDir($defaultDirectory);
-            $this->import($import['resource'], isset($import['type']) ? $import['type'] : null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
+            $this->import($import['resource'], $import['type'] ?? null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
         }
     }
 
@@ -318,7 +318,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (is_string($service) && 0 === strpos($service, '@')) {
-            $public = isset($defaults['public']) ? $defaults['public'] : true;
+            $public = $defaults['public'] ?? true;
             $this->container->setAlias($id, new Alias(substr($service, 1), $public));
 
             return;
@@ -339,7 +339,7 @@ class YamlFileLoader extends FileLoader
         $this->checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {
-            $public = array_key_exists('public', $service) ? (bool) $service['public'] : (isset($defaults['public']) ? $defaults['public'] : true);
+            $public = array_key_exists('public', $service) ? (bool) $service['public'] : ($defaults['public'] ?? true);
             $this->container->setAlias($id, new Alias($service['alias'], $public));
 
             foreach ($service as $key => $value) {
@@ -452,7 +452,7 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $tags = isset($service['tags']) ? $service['tags'] : array();
+        $tags = $service['tags'] ?? array();
         if (!is_array($tags)) {
             throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
         }
@@ -490,8 +490,8 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['decorates'], substr($service['decorates'], 1)));
             }
 
-            $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
-            $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
+            $renameId = $service['decoration_inner_name'] ?? null;
+            $priority = $service['decoration_priority'] ?? 0;
             $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
@@ -511,7 +511,7 @@ class YamlFileLoader extends FileLoader
             if (!is_string($service['resource'])) {
                 throw new InvalidArgumentException(sprintf('A "resource" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
             }
-            $exclude = isset($service['exclude']) ? $service['exclude'] : null;
+            $exclude = $service['exclude'] ?? null;
             $this->registerClasses($definition, $id, $service['resource'], $exclude);
         } else {
             $this->setDefinition($id, $definition);

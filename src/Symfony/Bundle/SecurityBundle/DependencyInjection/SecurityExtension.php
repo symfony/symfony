@@ -280,9 +280,9 @@ class SecurityExtension extends Extension
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);
         } elseif (isset($firewall['pattern']) || isset($firewall['host'])) {
-            $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
-            $host = isset($firewall['host']) ? $firewall['host'] : null;
-            $methods = isset($firewall['methods']) ? $firewall['methods'] : array();
+            $pattern = $firewall['pattern'] ?? null;
+            $host = $firewall['host'] ?? null;
+            $methods = $firewall['methods'] ?? array();
             $matcher = $this->createRequestMatcher($container, $pattern, $host, $methods);
         }
 
@@ -386,7 +386,7 @@ class SecurityExtension extends Extension
         }
 
         // Determine default entry point
-        $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
+        $configuredEntryPoint = $firewall['entry_point'] ?? null;
 
         // Authentication listeners
         list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $configuredEntryPoint);
@@ -407,8 +407,8 @@ class SecurityExtension extends Extension
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
-        $config->replaceArgument(8, isset($firewall['access_denied_handler']) ? $firewall['access_denied_handler'] : null);
-        $config->replaceArgument(9, isset($firewall['access_denied_url']) ? $firewall['access_denied_url'] : null);
+        $config->replaceArgument(8, $firewall['access_denied_handler'] ?? null);
+        $config->replaceArgument(9, $firewall['access_denied_url'] ?? null);
 
         $container->setAlias('security.user_checker.'.$id, new Alias($firewall['user_checker'], false));
 

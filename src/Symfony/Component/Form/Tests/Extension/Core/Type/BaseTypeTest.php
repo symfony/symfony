@@ -18,7 +18,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
  */
 abstract class BaseTypeTest extends TypeTestCase
 {
-    const TESTED_TYPE = '';
+    public const TESTED_TYPE = '';
 
     public function testPassDisabledAsOption()
     {

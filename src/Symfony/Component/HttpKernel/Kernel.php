@@ -59,15 +59,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     private $projectDir;
 
-    const VERSION = '4.0.0-DEV';
-    const VERSION_ID = 40000;
-    const MAJOR_VERSION = 4;
-    const MINOR_VERSION = 0;
-    const RELEASE_VERSION = 0;
-    const EXTRA_VERSION = 'DEV';
+    public const VERSION = '4.0.0-DEV';
+    public const VERSION_ID = 40000;
+    public const MAJOR_VERSION = 4;
+    public const MINOR_VERSION = 0;
+    public const RELEASE_VERSION = 0;
+    public const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '07/2018';
-    const END_OF_LIFE = '01/2019';
+    public const END_OF_MAINTENANCE = '07/2018';
+    public const END_OF_LIFE = '01/2019';
 
     /**
      * Constructor.

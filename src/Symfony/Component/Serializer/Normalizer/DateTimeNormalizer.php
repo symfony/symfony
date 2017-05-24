@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    const FORMAT_KEY = 'datetime_format';
+    public const FORMAT_KEY = 'datetime_format';
 
     /**
      * @var string

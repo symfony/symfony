@@ -21,7 +21,7 @@ final class AuthenticationEvents
      *
      * @var string
      */
-    const AUTHENTICATION_SUCCESS = 'security.authentication.success';
+    public const AUTHENTICATION_SUCCESS = 'security.authentication.success';
 
     /**
      * The AUTHENTICATION_FAILURE event occurs after a user cannot be
@@ -31,5 +31,5 @@ final class AuthenticationEvents
      *
      * @var string
      */
-    const AUTHENTICATION_FAILURE = 'security.authentication.failure';
+    public const AUTHENTICATION_FAILURE = 'security.authentication.failure';
 }

@@ -22,8 +22,8 @@ use Doctrine\DBAL\Logging\SQLLogger;
  */
 class DbalLogger implements SQLLogger
 {
-    const MAX_STRING_LENGTH = 32;
-    const BINARY_DATA_VALUE = '(binary value)';
+    public const MAX_STRING_LENGTH = 32;
+    public const BINARY_DATA_VALUE = '(binary value)';
 
     protected $logger;
     protected $stopwatch;

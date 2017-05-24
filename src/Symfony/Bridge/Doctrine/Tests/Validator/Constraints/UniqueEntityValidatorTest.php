@@ -39,7 +39,7 @@ use Doctrine\ORM\Tools\SchemaTool;
  */
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
-    const EM_NAME = 'foo';
+    public const EM_NAME = 'foo';
 
     /**
      * @var ObjectManager

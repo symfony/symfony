@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-23T07:47:25Z
+
+CI is red :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-23T08:27:42Z
+
+@nicolas-grekas this is because of https://github.com/composer/composer/issues/6342
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T08:29:31Z
+
+Kinda clueless here... trying to fix `WebProfilerExtensionTest::testToolbarConfig`
+
+patched `assertSaneContainer` so it skips private id's (hardcoded locally to test :)
+
+however these 2 assertions pass for all provided debug modes, _indiviudally_;
+
+```php
+        $this->assertSaneContainer($this->getDumpedContainer(), '', array('web_profiler.csp.handler'));
+
+        if ($listenerInjected) {
+            $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+        }
+```
+
+the combination seems to trigger a deprecation :confused:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T08:31:16Z
+
+first patch.. lets see what happens :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T08:39:27Z
+
+`testStopwatchExtensionAvailability` actually gets a private service :angry:
+
+`$container->get('twig.extension.debug.stopwatch')->getTokenParsers()`
+
+is there a clean way to silence expected deprecations.. or should we do something else here.
+
+@stof see deprecations at appveyor ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-23T09:06:52Z
+
+well, the test should either not access a private service, or be marked as legacy. If the test is not meant to be removed in 4.0, marking it as legacy is not an option, and the test should be rewritten instead.
+This is good that I catched the mistake in the deprecation trigger in the other PR, as this allowed us to catch mistakes in our own testsuite which was using deprecated APIs without getting the notice...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T09:10:35Z
+
+Updated.. this should do. But i dont like it really :) but i guess we have no choice as we never decided how privates reflects a compiled containerbuilder.
+
+@stof  to clarify.. the root issue is `ContainerBuilder::get()` calling `parent::get`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-23T09:32:55Z
+
+I think we should move this to 3.3: it will trigger more notices in 3.2 apps and break some strict CI for no real benefit.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T09:45:28Z
+
+3.2 is truly buggy though.. (@stof's comment in previous PR) i think the `ContainerBuilder` check will prevent those unexpected notices actually; while fixing `Container`.
+
+otherwise, could you just commit the changelog against 3.2 :)) but you probably prefer a separate PR for that :P
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-23T09:55:12Z
+
+@ro0NL the ContainerBuilder check does not solve anything in 3.2.
+The issue was that we were missing deprecations when getting a private service which was already instantiated previously (due to being a dependency of another service you got earlier). This happens both for a ContainerBuilder and the dumped container.
+Your check fixes the testsuite only because the testsuite does not do any such bad `get` calls on a dumped container (as most tests don't bother about dumping the container and then loading the dumped container to run assertions)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T15:09:10Z
+
+@stof im still a bit confused.. (ive reverted the containerbuilder checks).
+
+moving the private check up (above checking for shared services), truly fixes your comments from #22801, i.e. https://github.com/symfony/symfony/pull/22866/files#diff-8aeba2b88d0347062017ee160a6beb49R408 fails otherwise.
+
+imo. it needs a fix for 3.2 (properly deprecating private services), but im missing something regarding the container builder. AFAIK the issue is `ContainerBuilder::get()` => `parent::get()`.
+
+Updating [this](https://github.com/symfony/symfony/pull/22866/files#diff-00bc5ea153482178966f6617538a8e2eR217) call to `get()` still triggers the deprecation for private service `twig.extension.debug.stopwatch`. Im curious whats the root issue here, or at least what the proper fix is for either 3.2 or 3.3.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T15:20:50Z
+
+Think this approach https://github.com/symfony/symfony/blob/v3.2.8/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php#L1488 needs to be done in container builder after compilation... ie. bypasssing `get()` internally for privates.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-23T16:17:08Z
+
+My 2 cts: `ContainerBuilder` should not care about private or not. Thus, calling `parent::get()` shouldn't matter because `$this->privates` should not be populated.
+I don't know where things fail right now but if we stick to this policy and tests fail, then I'd say these tests are broken, nothing else.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-23T16:20:10Z
+
+For me, https://github.com/symfony/symfony/blob/7fbda2eb6dbff31b864d5fff4ceb42c2c87857b3/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L577 should be removed, that's the bug.
+ContainerBuilder is a bootstrap-stage thing, and private/public is a "compiled-container" only thing.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T17:02:59Z
+
+Agree. I figured it out ;) i tend to qualify it a bug though.. as my perception is `compiled containerbuilder === compiled container === dumped  compiled container`, but for now we're good.
+
+would be nice if `ContainerBuilder::compile()` returns a new (prepped) `Container`, that would allow to even further simplify (killing `isCompiled` and such), but that's quite a step though.
+
+Squahsed&rebased. Ready for review :)
+
+Sorry for the inconvenience, but this should do.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-23T17:14:44Z
+
+@nicolas-grekas currently, you can keep using a ContainerBuilder after compilation (which is what some projects do as they don't dump the container to the cache, for instance Behat)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-23T17:38:47Z
+
+may i recall #20643 :) as containerbuilder is open for anything keeping privates empty is in line with that, and so a bugfix.
+
+but the behavior is still wrong, however currently it's half right, half wrong.

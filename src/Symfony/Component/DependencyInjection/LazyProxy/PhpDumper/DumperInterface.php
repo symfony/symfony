@@ -38,7 +38,7 @@ interface DumperInterface
      *
      * @return string
      */
-    public function getProxyFactoryCode(Definition $definition, $id, $methodName);
+    public function getProxyFactoryCode(Definition $definition, $id, $methodName = null);
 
     /**
      * Generates the code for the lazy proxy.

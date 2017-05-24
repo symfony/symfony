@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-20T10:47:44Z
+
+I've got a question regarding the `ConstraintValidatorFactory` (relates to https://github.com/symfony/symfony/pull/21730): I don't get the point of keeping the `$validators` argument in the constructor. A [related test](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Tests/Validator/ConstraintValidatorFactoryTest.php#L43-L65) uses it for declaring an alias, while we already use the service locator for this purpose in the pass for instance.
+
+So, should we remove it?
+
+ping @GuilhemN
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-20T11:32:32Z
+
+> I've got a question regarding the ConstraintValidatorFactory (relates to #21730): I don't get the point of keeping the $validators argument in the constructor. A related test uses it for declaring an alias, while we already use the service locator for this purpose in the pass for instance.
+
+I didn't need to deprecate it in https://github.com/symfony/symfony/pull/21730 so I didn't do it. I also thought it might be useful for those who want to use an existing container, but as we're moving more and more to fqcn services maybe it's better to remove it indeed, this does require a bc layer in 3.3 or 3.4 though.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-20T11:55:01Z
+
+I'll submit a PR to suggest deprecating it in 3.4 then. Thank you!
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-20T18:11:13Z
+
+See https://github.com/symfony/symfony/pull/22808 about the deprecation of `ConstraintValidatorFactory::__construct()` second argument.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T10:36:56Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-21T10:39:02Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-05-22T13:27:06Z
+
+👍

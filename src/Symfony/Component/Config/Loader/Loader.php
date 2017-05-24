@@ -39,12 +39,7 @@ abstract class Loader implements LoaderInterface
     }
 
     /**
-     * Imports a resource.
-     *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function import($resource, $type = null)
     {

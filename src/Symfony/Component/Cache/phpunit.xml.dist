@@ -33,8 +33,12 @@
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
             <arguments>
                 <array>
-                    <element><string>Cache\IntegrationTests</string></element>
-                    <element><string>Doctrine\Common\Cache</string></element>
+                    <element key="time-sensitive">
+                        <array>
+                            <element><string>Cache\IntegrationTests</string></element>
+                            <element><string>Doctrine\Common\Cache</string></element>
+                        </array>
+                    </element>
                 </array>
             </arguments>
         </listener>

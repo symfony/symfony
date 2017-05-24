@@ -107,8 +107,8 @@
     </form>
 
     {% if profile.parent %}
-        <h3>
-            Sub-Request {{ profile.getcollector('request').requestattributes.get('_controller') }}
+        <h3 class="dump-inline">
+            Sub-Request {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
             <small>
                 {{ collector.events.__section__.duration }} ms
                 <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>

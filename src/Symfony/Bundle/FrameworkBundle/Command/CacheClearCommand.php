@@ -207,6 +207,12 @@ EOF
         $class = substr($parentClass, 0, -1).'_';
         // the temp container class must be changed too
         $containerClass = var_export(substr(get_class($parent->getContainer()), 0, -1).'_', true);
+
+        $projectDir = '';
+        if (method_exists($parent, 'getProjectDir')) {
+            $projectDir = var_export(realpath($parent->getProjectDir()), true);
+        }
+
         $code = <<<EOF
 <?php
 
@@ -227,6 +233,11 @@ namespace $namespace
         public function getLogDir()
         {
             return $logDir;
+        }
+        
+        public function getProjectDir()
+        {
+            return $projectDir;
         }
 
         protected function getContainerClass()

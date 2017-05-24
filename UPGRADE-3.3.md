@@ -82,6 +82,8 @@ DependencyInjection
 
  * Autowiring services based on the types they implement is deprecated and won't be supported in version 4.0. Rename (or alias) your services to their FQCN id to make them autowirable.
 
+ * [BC BREAK] The `NullDumper` class has been made final
+
  * [BC BREAK] `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
 
  * [BC BREAK] non-numeric keys in methods and constructors arguments have never been supported and are now forbidden. Please remove them if you happen to have one.
@@ -300,6 +302,11 @@ Process
 
  * Extending `Process::run()`, `Process::mustRun()` and `Process::restart()` is
    deprecated and won't be supported in 4.0.
+
+ProxyManager
+------------
+
+ * [BC BREAK] The `ProxyDumper` class has been made final
 
 Security
 --------

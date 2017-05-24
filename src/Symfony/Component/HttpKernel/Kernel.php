@@ -780,11 +780,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function unserialize($data)
     {
-        if (PHP_VERSION_ID >= 70000) {
-            list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
-        } else {
-            list($environment, $debug) = unserialize($data);
-        }
+        list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
 
         $this->__construct($environment, $debug);
     }

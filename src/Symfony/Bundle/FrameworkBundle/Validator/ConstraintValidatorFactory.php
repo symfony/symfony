@@ -42,8 +42,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    protected $container;
-    protected $validators;
+    private $container;
+    private $validators;
 
     /**
      * Constructor.

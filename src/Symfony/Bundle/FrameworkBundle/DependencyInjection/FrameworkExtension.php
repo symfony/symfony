@@ -1242,18 +1242,7 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
-        if (isset($config['cache']) && $config['cache']) {
-            @trigger_error('The "framework.serializer.cache" option is deprecated since Symfony 3.1 and will be removed in 4.0. Configure the "cache.serializer" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
-
-            $container->setParameter(
-                'serializer.mapping.cache.prefix',
-                'serializer_'.$this->getKernelRootHash($container)
-            );
-
-            $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
-                1, new Reference($config['cache'])
-            );
-        } elseif (!$container->getParameter('kernel.debug') && class_exists(CacheClassMetadataFactory::class)) {
+        if (!$container->getParameter('kernel.debug') && class_exists(CacheClassMetadataFactory::class)) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
                 array(

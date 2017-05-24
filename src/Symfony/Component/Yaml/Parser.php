@@ -368,7 +368,11 @@ class Parser
 
                     foreach ($this->lines as $line) {
                         try {
-                            $parsedLine = Inline::parse($line, $flags, $this->refs);
+                            if (isset($line[0]) && ('"' === $line[0] || "'" === $line[0])) {
+                                $parsedLine = $line;
+                            } else {
+                                $parsedLine = Inline::parse($line, $flags, $this->refs);
+                            }
 
                             if (!is_string($parsedLine)) {
                                 $parseError = true;

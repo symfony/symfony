@@ -27,10 +27,13 @@ class WebProfilerExtensionTest extends TestCase
      */
     private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '')
+    public static function assertSaneContainer(Container $container, $message = '', $knownPrivates = array())
     {
         $errors = array();
         foreach ($container->getServiceIds() as $id) {
+            if (in_array($id, $knownPrivates, true)) { // to be removed in 4.0
+                continue;
+            }
             try {
                 $container->get($id);
             } catch (\Exception $e) {
@@ -98,7 +101,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        $this->assertSaneContainer($this->getDumpedContainer());
+        $this->assertSaneContainer($this->getDumpedContainer(), '', array('web_profiler.csp.handler'));
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());

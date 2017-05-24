@@ -573,9 +573,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $compiler->compile($this);
 
         foreach ($this->definitions as $id => $definition) {
-            if (!$definition->isPublic()) {
-                $this->privates[$id] = true;
-            }
             if ($this->trackResources && $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
                 $this->addClassResource(new \ReflectionClass($class));
             }

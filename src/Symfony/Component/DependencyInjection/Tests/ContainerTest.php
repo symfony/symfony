@@ -126,7 +126,7 @@ class ContainerTest extends TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('service_container', 'internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
+        $this->assertEquals(array('service_container', 'internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
     /**
@@ -397,7 +397,8 @@ class ContainerTest extends TestCase
     public function testChangeInternalPrivateServiceIsDeprecated()
     {
         $c = new ProjectServiceContainer();
-        $c->set('internal', new \stdClass());
+        $c->set('internal', $internal = new \stdClass());
+        $this->assertSame($c->get('internal'), $internal);
     }
 
     /**
@@ -407,7 +408,8 @@ class ContainerTest extends TestCase
     public function testCheckExistenceOfAnInternalPrivateServiceIsDeprecated()
     {
         $c = new ProjectServiceContainer();
-        $c->has('internal');
+        $c->get('internal_dependency');
+        $this->assertTrue($c->has('internal'));
     }
 
     /**
@@ -417,6 +419,7 @@ class ContainerTest extends TestCase
     public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
     {
         $c = new ProjectServiceContainer();
+        $c->get('internal_dependency');
         $c->get('internal');
     }
 }
@@ -435,6 +438,7 @@ class ProjectServiceContainer extends Container
         'circular' => 'getCircularService',
         'throw_exception' => 'getThrowExceptionService',
         'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
+        'internal_dependency' => 'getInternalDependencyService',
     );
 
     public function __construct()
@@ -451,7 +455,7 @@ class ProjectServiceContainer extends Container
 
     protected function getInternalService()
     {
-        return $this->__internal;
+        return $this->services['internal'] = $this->__internal;
     }
 
     protected function getBarService()
@@ -484,6 +488,15 @@ class ProjectServiceContainer extends Container
         $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
 
         throw new \Exception('Something was terribly wrong while trying to configure the service!');
+    }
+
+    protected function getInternalDependencyService()
+    {
+        $this->services['internal_dependency'] = $instance = new \stdClass();
+
+        $instance->internal = isset($this->services['internal']) ? $this->services['internal'] : $this->getInternalService();
+
+        return $instance;
     }
 }
 

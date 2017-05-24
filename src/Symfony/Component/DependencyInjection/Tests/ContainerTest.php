@@ -387,7 +387,8 @@ class ContainerTest extends TestCase
     public function testChangeInternalPrivateServiceIsDeprecated()
     {
         $c = new ProjectServiceContainer();
-        $c->set('internal', new \stdClass());
+        $c->set('internal', $internal = new \stdClass());
+        $this->assertSame($c->get('internal'), $internal);
     }
 
     /**
@@ -397,7 +398,8 @@ class ContainerTest extends TestCase
     public function testCheckExistenceOfAnInternalPrivateServiceIsDeprecated()
     {
         $c = new ProjectServiceContainer();
-        $c->has('internal');
+        $c->get('internal_dependency');
+        $this->assertTrue($c->has('internal'));
     }
 
     /**
@@ -407,6 +409,7 @@ class ContainerTest extends TestCase
     public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
     {
         $c = new ProjectServiceContainer();
+        $c->get('internal_dependency');
         $c->get('internal');
     }
 

@@ -21,16 +21,30 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class AutowireExceptionPass implements CompilerPassInterface
 {
     private $autowirePass;
+    private $inlineServicePass;
 
-    public function __construct(AutowirePass $autowirePass)
+    public function __construct(AutowirePass $autowirePass, InlineServiceDefinitionsPass $inlineServicePass)
     {
         $this->autowirePass = $autowirePass;
+        $this->inlineServicePass = $inlineServicePass;
     }
 
     public function process(ContainerBuilder $container)
     {
-        foreach ($this->autowirePass->getAutowiringExceptions() as $exception) {
-            if ($container->hasDefinition($exception->getServiceId())) {
+        // the pass should only be run once
+        if (null === $this->autowirePass || null === $this->inlineServicePass) {
+            return;
+        }
+
+        $inlinedIds = $this->inlineServicePass->getInlinedServiceIds();
+        $exceptions = $this->autowirePass->getAutowiringExceptions();
+
+        // free up references
+        $this->autowirePass = null;
+        $this->inlineServicePass = null;
+
+        foreach ($exceptions as $exception) {
+            if ($container->hasDefinition($exception->getServiceId()) || in_array($exception->getServiceId(), $inlinedIds)) {
                 throw $exception;
             }
         }

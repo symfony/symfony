@@ -73,11 +73,11 @@ class PassConfig
             new RemoveAbstractDefinitionsPass(),
             new RepeatedPass(array(
                 new AnalyzeServiceReferencesPass(),
-                new InlineServiceDefinitionsPass(),
+                $inlinedServicePass = new InlineServiceDefinitionsPass(),
                 new AnalyzeServiceReferencesPass(),
                 new RemoveUnusedDefinitionsPass(),
             )),
-            new AutowireExceptionPass($autowirePass),
+            new AutowireExceptionPass($autowirePass, $inlinedServicePass),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
         ));
     }

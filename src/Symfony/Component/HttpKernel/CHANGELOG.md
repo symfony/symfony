@@ -22,7 +22,7 @@ CHANGELOG
  * deprecated the special `SYMFONY__` environment variables
  * added the possibility to change the query string parameter used by `UriSigner`
  * deprecated `LazyLoadingFragmentHandler::addRendererService()`
- * deprecated `Extension::addClassesToCompile()`
+ * deprecated `Extension::addClassesToCompile()` and `Extension::getClassesToCompile()`
  * deprecated `Psr6CacheClearer::addPool()`
 
 3.2.0

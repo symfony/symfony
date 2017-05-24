@@ -301,6 +301,10 @@ FrameworkBundle
 
  * Extending `ConstraintValidatorFactory` is not supported anymore.
 
+ * Passing an array of validators or validator aliases as the second argument of 
+   `ConstraintValidatorFactory::__construct()` has been removed.
+   Use the service locator instead.
+
  * Class parameters related to routing have been removed
     * router.options.generator_class
     * router.options.generator_base_class
@@ -374,7 +378,7 @@ HttpKernel
  * Removed the `Kernel::getRootDir()` method. Use the `Kernel::getProjectDir()`
    method instead.
 
- * The `Extension::addClassesToCompile()` method has been removed.
+ * The `Extension::addClassesToCompile()` and `Extension::getClassesToCompile()` methods have been removed.
 
  * Possibility to pass non-scalar values as URI attributes to the ESI and SSI
    renderers has been removed. The inline fragment renderer should be used with

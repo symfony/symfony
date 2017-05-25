@@ -209,6 +209,10 @@ class XmlDumper extends Dumper
             $service->setAttribute('autoconfigure', 'true');
         }
 
+        if ($definition->isAbstract()) {
+            $service->setAttribute('abstract', 'true');
+        }
+
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
 

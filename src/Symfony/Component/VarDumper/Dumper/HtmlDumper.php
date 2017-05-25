@@ -425,7 +425,7 @@ return function (root, x) {
                 if (this.isEmpty()) {
                     return this.current();
                 }
-                this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : this.idx;
+                this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : 0;
         
                 return this.current();
             },
@@ -433,7 +433,7 @@ return function (root, x) {
                 if (this.isEmpty()) {
                     return this.current();
                 }
-                this.idx = this.idx > 0 ? this.idx - 1 : this.idx;
+                this.idx = this.idx > 0 ? this.idx - 1 : (this.nodes.length - 1);
         
                 return this.current();
             },

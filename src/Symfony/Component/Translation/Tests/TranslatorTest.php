@@ -357,6 +357,35 @@ class TranslatorTest extends TestCase
     }
 
     /**
+     * @dataProvider getRecursiveTransTests
+     */
+    public function testRecursiveTrans($expected, $messages, $id)
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', $messages, 'fr', '');
+
+        $this->assertEquals($expected, $translator->trans($id, array(), '', 'fr'));
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testInfiniteRecursiveTrans()
+    {
+        $messages = [
+            'foo.loop' => '{bar.loop}',
+            'bar.loop' => '{foo.loop}',
+        ];
+
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', $messages, 'fr', '');
+
+        $translator->trans('foo.loop', array(), '', 'fr');
+    }
+
+    /**
      * @dataProvider getTransChoiceTests
      */
     public function testTransChoice($expected, $id, $translation, $number, $parameters, $locale, $domain)
@@ -439,6 +468,28 @@ class TranslatorTest extends TestCase
             array('Symfony est super!', $messages, 'symfony.is.great'),
             array('Foo Bar Baz', $messages, 'foo.bar.baz'),
             array('Foo Baz', $messages, 'foo.baz'),
+        );
+    }
+
+    public function getRecursiveTransTests()
+    {
+        $messages = [
+            'sample' => [
+                'hello' => 'Hello',
+                'nested' => '{sample.hello} sir',
+                'abdellatif' => '{sample.nested} Abdellatif',
+            ],
+
+            'nested' => [
+                'symfony' => 'Symfony',
+                'is' => 'est',
+                'great' => '{nested.symfony} {nested.is} super!',
+            ],
+        ];
+
+        return array(
+            array('Hello sir Abdellatif', $messages, 'sample.abdellatif'),
+            array('Symfony est super!', $messages, 'nested.great'),
         );
     }
 

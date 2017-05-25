@@ -378,6 +378,42 @@ EOF
                 $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
             }
         }
+
+        $this->resolveCatalogueMessages($this->catalogues[$locale]);
+    }
+
+    private function resolveCatalogueMessages($catalogue)
+    {
+        $expr = '/{([^}]++)}/';
+        foreach ($catalogue->all() as $domain => $messages) {
+            preg_match_all($expr, implode($messages), $matches);
+            $parameters = [];
+            foreach ($matches[1] as $key => $id) {
+                if (isset($messages[$id])) {
+                    $parameters[$matches[0][$key]] = $messages[$id];
+                }
+            }
+
+            if (!$parameters) {
+                continue;
+            }
+
+            $ids = array_keys($parameters);
+            while (preg_match($expr, implode($parameters))) {
+                foreach ($parameters as $id => $message) {
+                    $parameters[$id] = str_replace($ids, $parameters, $message);
+
+                    // infinite loop
+                    if (false !== strpos($parameters[$id], $id)) {
+                        throw new \LogicException(sprintf('Circular reference detected when resolving the message id "%s".', $id));
+                    }
+                }
+            }
+
+            foreach ($messages as $id => $message) {
+                $catalogue->set($id, str_replace($ids, $parameters, $message), $domain);
+            }
+        }
     }
 
     private function loadFallbackCatalogues($locale)

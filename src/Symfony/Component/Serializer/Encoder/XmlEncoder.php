@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * Encodes XML data.
@@ -21,8 +23,10 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Fabian Vogler <fabian@equivalence.ch>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
+class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface, SerializerAwareInterface
 {
+    use SerializerAwareTrait;
+
     const FORMAT = 'xml';
 
     /**

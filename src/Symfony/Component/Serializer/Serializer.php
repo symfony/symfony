@@ -54,20 +54,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     protected $normalizers = array();
 
-    /**
-     * @var array
-     *
-     * @deprecated since 3.1 will be removed in 4.0
-     */
-    protected $normalizerCache = array();
-
-    /**
-     * @var array
-     *
-     * @deprecated since 3.1 will be removed in 4.0
-     */
-    protected $denormalizerCache = array();
-
     public function __construct(array $normalizers = array(), array $encoders = array())
     {
         foreach ($normalizers as $normalizer) {

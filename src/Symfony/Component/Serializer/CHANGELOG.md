@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `SerializerAwareEncoder` and `SerializerAwareNormalizer` classes,
+   use the `SerializerAwareTrait` instead
+ * removed the `Serializer::$normalizerCache` and `Serializer::$denormalizerCache`
+   properties
+
 3.3.0
 -----
 

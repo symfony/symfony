@@ -1,0 +1,70 @@
+{
+    "name": "symfony/lts",
+    "description": "Enforces Long Term Supported versions of Symfony components",
+    "type": "metapackage",
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "conflict": {
+        "symfony/asset": ">=3",
+        "symfony/browser-kit": ">=3",
+        "symfony/class-loader": ">=3",
+        "symfony/config": ">=3",
+        "symfony/console": ">=3",
+        "symfony/css-selector": ">=3",
+        "symfony/dependency-injection": ">=3",
+        "symfony/debug": ">=3",
+        "symfony/debug-bundle": ">=3",
+        "symfony/doctrine-bridge": ">=3",
+        "symfony/dom-crawler": ">=3",
+        "symfony/event-dispatcher": ">=3",
+        "symfony/expression-language": ">=3",
+        "symfony/filesystem": ">=3",
+        "symfony/finder": ">=3",
+        "symfony/form": ">=3",
+        "symfony/framework-bundle": ">=3",
+        "symfony/http-foundation": ">=3",
+        "symfony/http-kernel": ">=3",
+        "symfony/intl": ">=3",
+        "symfony/ldap": ">=3",
+        "symfony/locale": ">=3",
+        "symfony/monolog-bridge": ">=3",
+        "symfony/options-resolver": ">=3",
+        "symfony/process": ">=3",
+        "symfony/property-access": ">=3",
+        "symfony/property-info": ">=3",
+        "symfony/proxy-manager-bridge": ">=3",
+        "symfony/routing": ">=3",
+        "symfony/security": ">=3",
+        "symfony/security-core": ">=3",
+        "symfony/security-csrf": ">=3",
+        "symfony/security-guard": ">=3",
+        "symfony/security-http": ">=3",
+        "symfony/security-bundle": ">=3",
+        "symfony/serializer": ">=3",
+        "symfony/stopwatch": ">=3",
+        "symfony/swiftmailer-bridge": ">=3",
+        "symfony/templating": ">=3",
+        "symfony/translation": ">=3",
+        "symfony/twig-bridge": ">=3",
+        "symfony/twig-bundle": ">=3",
+        "symfony/validator": ">=3",
+        "symfony/var-dumper": ">=3",
+        "symfony/web-profiler-bundle": ">=3",
+        "symfony/yaml": ">=3"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2-dev"
+        }
+    }
+}

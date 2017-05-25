@@ -230,6 +230,28 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame($fooArgs[0], $barArgs[0]);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %sservices_without_id.xml at line 4.
+     */
+    public function testLoadAnonymousServicesWithoutId()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_without_id.xml');
+    }
+
+    public function testLoadAnonymousNestedServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('nested_service_without_id.xml');
+
+        $this->assertTrue($container->hasDefinition('FooClass'));
+        $arguments = $container->getDefinition('FooClass')->getArguments();
+        $this->assertInstanceOf(Reference::class, array_shift($arguments));
+    }
+
     public function testLoadServices()
     {
         $container = new ContainerBuilder();
@@ -667,9 +689,8 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('service_container', key($definitions));
 
         array_shift($definitions);
-        $this->assertStringStartsWith('1_', key($definitions));
-
         $anonymous = current($definitions);
+        $this->assertSame('bar', key($definitions));
         $this->assertTrue($anonymous->isPublic());
         $this->assertTrue($anonymous->isAutowired());
         $this->assertSame(array('foo' => array(array())), $anonymous->getTags());

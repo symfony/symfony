@@ -120,21 +120,9 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testReverseTransformUsingPipe($format, $input, $output)
+    public function testReverseTransform($format, $input, $output)
     {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, true);
-
-        $output = new \DateTime($output);
-
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
-    }
-
-    /**
-     * @dataProvider dataProvider
-     */
-    public function testReverseTransformWithoutUsingPipe($format, $input, $output)
-    {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, false);
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
         $output = new \DateTime($output);
 

@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-23T21:41:07Z
+
+@xabbuh with this the YAML will appear to be valid but, in addition to the `PARSE_CONSTANTS` flag, the DI YamlFIleLoader uses `Yaml::PARSE_KEYS_AS_STRING` for parsing. Actually those aren't compatible for keys
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-23T21:48:24Z
+
+Do you have a concrete example where this breaks a real application? This combination sounds like a real edge case to me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-23T21:55:14Z
+
+I mean that in 3.2, the following service:
+
+```yaml
+foo:
+    class: AppBundle\Foo
+    arguments:
+        -
+            !php/const:PHP_SAPI: bar
+```
+
+would have the following injected as first argument:
+
+```php
+array(
+    'cli' => 'bar'
+);
+```
+
+in 3.3, even with this, it would inject:
+
+```php
+array(
+    ' !php/const:PHP_SAPI' => 'bar'
+);
+```
+
+the DI file loader uses this edge combination since 3.3, so consts arent't resolved (the transition would be named `!php/const:...`)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2017-05-24T14:09:40Z
+
+After solving the other problem described in the issue, I did encounter the problem explained by @chalasr:
+
+```
+
+  [Symfony\Component\Workflow\Exception\InvalidArgumentException]
+  The transition "!php/const:AppBundle\TonMacron\InvitationProcessor::TRANSITION_FILL_INFO" contains invalid characters.
+
+Exception trace:
+ () at vendor/symfony/symfony/src/Symfony/Component/Workflow/Transition.php:34
+ Symfony\Component\Workflow\Transition->__construct() at n/a:n/a
+ ReflectionClass->newInstanceArgs() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:1078
+ Symfony\Component\DependencyInjection\ContainerBuilder->createService() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:1195
+ Symfony\Component\DependencyInjection\ContainerBuilder->resolveServices() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:1135
+ Symfony\Component\DependencyInjection\ContainerBuilder->resolveServices() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:1135
+ Symfony\Component\DependencyInjection\ContainerBuilder->resolveServices() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:1057
+ Symfony\Component\DependencyInjection\ContainerBuilder->createService() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:583
+ Symfony\Component\DependencyInjection\ContainerBuilder->get() at vendor/symfony/symfony/src/Symfony/Component/Workflow/DependencyInjection/ValidateWorkflowsPass.php:47
+ Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass->process() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/Compiler/Compiler.php:143
+ Symfony\Component\DependencyInjection\Compiler\Compiler->compile() at vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:736
+ Symfony\Component\DependencyInjection\ContainerBuilder->compile() at vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Kernel.php:561
+ Symfony\Component\HttpKernel\Kernel->initializeContainer() at vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Kernel.php:120
+ Symfony\Component\HttpKernel\Kernel->boot() at vendor/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Console/Application.php:68
+ Symfony\Bundle\FrameworkBundle\Console\Application->doRun() at vendor/symfony/symfony/src/Symfony/Component/Console/Application.php:130
+ Symfony\Component\Console\Application->run() at bin/console:28
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-24T14:12:07Z
+
+This is indeed an issue when the `PARSE_CONSTANT`and `PARSE_KEYS_AS_STRINGS` flags are used together. I have a failing test case locally and will look into a proper fix tonight.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-24T19:41:19Z
+
+constants should now be evaluated in mapping keys
+
+@tgalopin Can you give this another try?
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2017-05-25T08:56:42Z
+
+Works for me too, thanks @xabbuh !
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-25T09:11:09Z
+
+Thanks for the confirmation @chalasr and @tgalopin!

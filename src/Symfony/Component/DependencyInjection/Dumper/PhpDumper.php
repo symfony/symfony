@@ -1191,7 +1191,15 @@ EOF;
 
         $conditions = array();
         foreach ($services as $service) {
+            if ($this->container->hasDefinition($service) && !$this->container->getDefinition($service)->isPublic()) {
+                continue;
+            }
+
             $conditions[] = sprintf("\$this->has('%s')", $service);
+        }
+
+        if (!$conditions) {
+            return $code;
         }
 
         // re-indent the wrapped code

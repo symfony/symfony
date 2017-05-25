@@ -10,7 +10,7 @@ Finder
 ------
 
  * The `Symfony\Component\Finder\Iterator\FilterIterator` class has been
-   deprecated and will be removed in 4.0 as it used to fix a bug which existed 
+   deprecated and will be removed in 4.0 as it used to fix a bug which existed
    before version 5.5.23/5.6.7.
 
 Validator
@@ -18,3 +18,9 @@ Validator
 
  * Not setting the `strict` option of the `Choice` constraint to `true` is
    deprecated and will throw an exception in Symfony 4.0.
+
+Yaml
+----
+
+ * Using the non-specific tag `!` is deprecated and will have a different
+   behavior in 4.0. Use a plain integer or `!!float` instead.

@@ -61,7 +61,7 @@ class ParserTest extends TestCase
             restore_error_handler();
 
             $this->assertCount(1, $deprecations);
-            $this->assertContains('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', $deprecations[0]);
+            $this->assertContains(true !== $deprecated ? $deprecated : 'Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', $deprecations[0]);
         }
     }
 

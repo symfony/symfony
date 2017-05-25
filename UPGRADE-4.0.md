@@ -685,3 +685,6 @@ Yaml
 
  * The constructor arguments `$offset`, `$totalNumberOfLines` and
    `$skippedLineNumbers` of the `Parser` class were removed.
+
+ * The behavior of the non-specific tag `!` is changed and now forces
+   non-evaluating your values.

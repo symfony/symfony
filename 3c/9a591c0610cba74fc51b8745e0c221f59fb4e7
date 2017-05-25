@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-25T07:45:04Z
+
+failures unrelated.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-25T08:15:07Z
+
+Do we still have a test which ensures that deprecations are not triggered for nested anonymous definitions?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-25T08:16:17Z
+
+Yep :) https://github.com/symfony/symfony/pull/22903/files#diff-25d0b562ad1c177bac8f4f9d0247b2acR7
+
+it's tricky though due loose comparison of deprecations; if it triggered we wouldnt catch it (before it did by including the no. of occurences)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-25T08:19:35Z
+
+@ro0NL But this one is only tested in a `@legacy` test. So we would never notice when it accidentally triggered a deprecation.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-25T08:51:03Z
+
+@xabbuh extra test added

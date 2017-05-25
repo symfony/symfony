@@ -413,6 +413,8 @@ class XmlFileLoader extends FileLoader
         // anonymous services "in the wild"
         if (false !== $nodes = $xpath->query('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
+                @trigger_error(sprintf('Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %s at line %d.', $file, $node->getLineNo()), E_USER_DEPRECATED);
+
                 // give it a unique name
                 $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
                 $node->setAttribute('id', $id);

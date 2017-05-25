@@ -863,6 +863,85 @@ class ProcessTest extends TestCase
         throw $e;
     }
 
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     */
+    public function testGetStartTimeOnNonStartedProcess()
+    {
+        $this->getProcess('')->getStartTime();
+    }
+
+    public function testGetStartTimeOnStartedProcess()
+    {
+        $process = $this->getProcess('sleep 3');
+        $start = microtime(true);
+        $process->start();
+        $this->assertLessThan(0.1, $process->getStartTime() - $start);
+        $process->stop(0);
+    }
+
+    public function testGetStartTimeOnTerminatedProcess()
+    {
+        $process = $this->getProcess('echo foo');
+        $start = microtime(true);
+        $process->run();
+        $this->assertLessThan(0.1, $process->getStartTime() - $start);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     */
+    public function testGetEndTimeOnNonStartedProcess()
+    {
+        $this->getProcess('')->getEndTime();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     */
+    public function testGetEndTimeOnStartedProcess()
+    {
+        $process = $this->getProcess('sleep 3');
+        $process->start();
+        $process->getEndTime();
+    }
+
+    public function testGetEndTimeOnTerminatedProcess()
+    {
+        $process = $this->getProcess('echo foo');
+        $process->run();
+        $this->assertLessThan(0.1, $process->getEndTime() - microtime(true));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     */
+    public function testGetRunningTimeOnNonStartedProcess()
+    {
+        $this->getProcess('')->getRunningTime();
+    }
+
+    public function testGetRunningTimeOnStartedProcess()
+    {
+        $process = $this->getProcess('sleep 3');
+        $start = microtime(true);
+        $process->start();
+        usleep(100000);
+        $running = $process->getRunningTime();
+        $now = microtime(true);
+        $this->assertLessThan(0.1, ($now - $start) - $running);
+        $process->stop(0);
+    }
+
+    public function testGetRunningTimeOnTerminatedProcess()
+    {
+        $process = $this->getProcessForCode('usleep(1000);');
+        $process->run();
+        $start = $process->getStartTime();
+        $end = $process->getEndTime();
+        $this->assertEquals($end - $start, $process->getRunningTime());
+    }
+
     public function testGetPid()
     {
         $process = $this->getProcessForCode('sleep(36);');

@@ -16,7 +16,7 @@
     <div class="container">
         <div class="exception-message-wrapper">
             <h1 class="break-long-words exception-message {{ exception.message|length > 180 ? 'long' }}">
-                {{- exception.message|nl2br|format_file_from_text -}}
+                {{- exception.message|format_file_from_text -}}
             </h1>
 
             <div class="exception-illustration hidden-xs-down">

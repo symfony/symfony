@@ -15,6 +15,7 @@ use DummyProxyDumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -405,5 +406,22 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_private_frozen.php', $dumper->dump());
+    }
+
+    public function testPrivateWithIgnoreOnInvalidReference()
+    {
+        require_once self::$fixturesPath.'/includes/classes.php';
+
+        $container = new ContainerBuilder();
+        $container->register('not_invalid', 'BazClass')
+            ->setPublic(false);
+        $container->register('bar', 'BarClass')
+            ->addMethodCall('setBaz', array(new Reference('not_invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference();
+        $this->assertInstanceOf('BazClass', $container->get('bar')->getBaz());
     }
 }

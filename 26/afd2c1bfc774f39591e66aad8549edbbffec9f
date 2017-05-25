@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by aschempp at 2017-05-17T09:40:42Z
+
+This would be inconsistent with the `rootDir` imho?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-17T09:45:32Z
+
+yes - but we dont care :)
+
+if you want consistency use the method as extension hook for both.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-17T09:45:59Z
+
+Yes it's inconsistent, but allows for better maintainability and user experience at the end. There is a lot  `protected` members in the core codebase, but since a long time, we do not introduce new ones without a strong reason, and we even made some private afterwards (generally through "opportunity").
+Also, `getProjectDir()` makes `rootDir` obsolete, we should remove it on the long run, no need for changing this now.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-17T09:49:15Z
+
+Is it really required considering [it's already computed once using `Kernel::getProjectDir()` and then stored in the `Kernel::$projectDir` property ?](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Kernel.php#L85)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-17T09:52:55Z
+
+@ogizanagi is right, but I think it's better to always call the method. If the constructor behavior changes a day, and given the method itself return the property if initialized, I think it's sane to use it rather than the prop.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-17T09:57:53Z
+
+@ogizanagi you could add a method in your kernel that modifies the return value of `getProjectDir` between the moment the object is created and the moment the container is compiled.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2017-05-17T10:01:33Z
+
+> you could add a method in your kernel that modifies the return value of getProjectDir between the moment the object is created and the moment the container is compiled.
+
+That is exactly the point. Originally, we had a `setRootDir` method to tell the Kernel where it's root dir is located. Because our kernel is distributed with a bundle but the root dir is still `/app`. Now that does no longer work with `projectDir`, as we cannot override it after `__construct` (even though `getKernelParameters` has not been called yet).
+
+---------------------------------------------------------------------------
+
+by aschempp at 2017-05-17T11:38:06Z
+
+If this is to be merged, the method must not be called on the constructor, otherwise calling the method in `getKernelParameters` does not make much sense to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-17T11:40:10Z
+
+Agree; not sure what's the lazy initialization is about. But it doesnt harm really :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-17T11:54:42Z
+
+>  otherwise calling the method in getKernelParameters does not make much sense to me.
+
+I don't think so. The getter is the extension point. The private property is set at construction so that it is always available internally; and the method is called when needed. As pointed by @jvasseur, the kernel state can change after construction, always calling the method is just safe-guard, that's fine to me.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-17T12:11:54Z
+
+> you could add a method in your kernel that modifies the return value of getProjectDir between the moment the object is created and the moment the container is compiled.
+
+> the kernel state can change after construction
+
+Changing this value after initialization looks weird to me honestly, so I don't really get the point, but ¯\\\_(ツ)\_\/¯.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-17T12:15:12Z
+
+Not only the value itself, but some other properties on which the custom `getProjectRootdir()` could rely on... it's all about weird edge cases, but preventing them in the parent class doesn't harm, and since we can do it easily...
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-17T15:07:34Z
+
+@chalasr: What about removing the the assignation [on this line](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Kernel.php#L85) in this PR too, as discussed (as it's already done in the `Kernel::getProjectDir()` implementation) ?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2017-05-17T16:15:12Z
+
+> The private property is set at construction so that it is always available internally; and the method is called when needed.
+
+The property must not be used internally (except for the getter method) if the getter is to be the extension point! So there's no point in initializing it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-17T16:17:25Z
+
+Tend to agree with that :) it also makes the test valid.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-18T08:56:56Z
+
+constructor assignment removed, changed the test to better show what this prevents.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-22T07:14:53Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-05-22T13:23:29Z
+
+👍

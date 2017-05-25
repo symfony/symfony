@@ -33,6 +33,7 @@ CHANGELOG
    will not be supported anymore in 4.0
  * deprecated the `DefinitionDecorator` class in favor of `ChildDefinition`
  * allow config files to be loaded using a glob pattern
+ * [BC BREAK] the `NullDumper` class is now final
 
 3.2.0
 -----

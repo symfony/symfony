@@ -30,12 +30,13 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
-    const HEADER_FORWARDED = 0b00001;
-    const HEADER_X_FORWARDED_ALL = 0b11110;
-    const HEADER_X_FORWARDED_FOR = 2;
-    const HEADER_X_FORWARDED_HOST = 4;
-    const HEADER_X_FORWARDED_PROTO = 8;
-    const HEADER_X_FORWARDED_PORT = 16;
+    const HEADER_FORWARDED = 0b00001; // When using RFC 7239
+    const HEADER_X_FORWARDED_FOR = 0b00010;
+    const HEADER_X_FORWARDED_HOST = 0b00100;
+    const HEADER_X_FORWARDED_PROTO = 0b01000;
+    const HEADER_X_FORWARDED_PORT = 0b10000;
+    const HEADER_X_FORWARDED_ALL = 0b11110; // All "X-Forwarded-*" headers
+    const HEADER_X_FORWARDED_AWS_ELB = 0b11010; // AWS ELB doesn't send X-Forwarded-Host
 
     /** @deprecated since version 3.3, to be removed in 4.0 */
     const HEADER_CLIENT_IP = self::HEADER_X_FORWARDED_FOR;

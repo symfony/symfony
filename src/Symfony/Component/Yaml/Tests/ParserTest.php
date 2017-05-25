@@ -1717,9 +1717,59 @@ bar:
 YAML;
         $this->parser->parse($yaml);
     }
+
+    public function testPhpConstantTagMappingKey()
+    {
+        $yaml = <<<YAML
+transitions:
+    !php/const:Symfony\Component\Yaml\Tests\B::FOO:
+        from:
+            - !php/const:Symfony\Component\Yaml\Tests\B::BAR
+        to: !php/const:Symfony\Component\Yaml\Tests\B::BAZ
+YAML;
+        $expected = array(
+            'transitions' => array(
+                'foo' => array(
+                    'from' => array(
+                        'bar',
+                    ),
+                    'to' => 'baz',
+                ),
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function testPhpConstantTagMappingKeyWithKeysCastToStrings()
+    {
+        $yaml = <<<YAML
+transitions:
+    !php/const:Symfony\Component\Yaml\Tests\B::FOO:
+        from:
+            - !php/const:Symfony\Component\Yaml\Tests\B::BAR
+        to: !php/const:Symfony\Component\Yaml\Tests\B::BAZ
+YAML;
+        $expected = array(
+            'transitions' => array(
+                'foo' => array(
+                    'from' => array(
+                        'bar',
+                    ),
+                    'to' => 'baz',
+                ),
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT | Yaml::PARSE_KEYS_AS_STRINGS));
+    }
 }
 
 class B
 {
     public $b = 'foo';
+
+    const FOO = 'foo';
+    const BAR = 'bar';
+    const BAZ = 'baz';
 }

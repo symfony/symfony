@@ -119,7 +119,11 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         // Sub-request object will point to localhost as client ip and real client ip
         // will be included into trusted header for client ip
         try {
-            if ($trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP, false)) {
+            if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {
+                $currentXForwardedFor = $request->headers->get('X_FORWARDED_FOR', '');
+
+                $server['HTTP_X_FORWARDED_FOR'] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();
+            } elseif (method_exists(Request::class, 'getTrustedHeaderName') && $trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP, false)) {
                 $currentXForwardedFor = $request->headers->get($trustedHeaderName, '');
 
                 $server['HTTP_'.$trustedHeaderName] = ($currentXForwardedFor ? $currentXForwardedFor.', ' : '').$request->getClientIp();

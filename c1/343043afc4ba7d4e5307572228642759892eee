@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-25T12:05:54Z
+
+any test case possible?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-25T13:00:42Z
+
+Updated. The private definitions are now skipped from the service conditionals, like @stof mentioned.
+
+Note this only applies to dumping an uncompiled container, ie. this fest fails as of 3.3 and probably allows for the dumper to be further simplified (invalid references are removed due compilation, so it seems).

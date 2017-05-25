@@ -153,4 +153,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         return count($this->children);
     }
+    
+    /**
+     * Get the root view
+     *
+     * @return FormView the root view
+     */
+    public function getRoot()
+    {
+        return null !== $this->parent ? $this->parent->getRoot() : $this;
+    }
 }

@@ -32,90 +32,23 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {
-    /**
-     * @internal
-     */
-    const VALUE = 0;
-
-    /**
-     * @internal
-     */
-    const REF = 1;
-
-    /**
-     * @internal
-     */
-    const IS_REF_CHAINED = 2;
-
-    /**
-     * @internal
-     */
-    const ACCESS_HAS_PROPERTY = 0;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE = 1;
-
-    /**
-     * @internal
-     */
-    const ACCESS_NAME = 2;
-
-    /**
-     * @internal
-     */
-    const ACCESS_REF = 3;
-
-    /**
-     * @internal
-     */
-    const ACCESS_ADDER = 4;
-
-    /**
-     * @internal
-     */
-    const ACCESS_REMOVER = 5;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_METHOD = 0;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_PROPERTY = 1;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_MAGIC = 2;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_NOT_FOUND = 4;
-
-    /**
-     * @internal
-     */
-    const CACHE_PREFIX_READ = 'r';
-
-    /**
-     * @internal
-     */
-    const CACHE_PREFIX_WRITE = 'w';
-
-    /**
-     * @internal
-     */
-    const CACHE_PREFIX_PROPERTY_PATH = 'p';
+    private const VALUE = 0;
+    private const REF = 1;
+    private const IS_REF_CHAINED = 2;
+    private const ACCESS_HAS_PROPERTY = 0;
+    private const ACCESS_TYPE = 1;
+    private const ACCESS_NAME = 2;
+    private const ACCESS_REF = 3;
+    private const ACCESS_ADDER = 4;
+    private const ACCESS_REMOVER = 5;
+    private const ACCESS_TYPE_METHOD = 0;
+    private const ACCESS_TYPE_PROPERTY = 1;
+    private const ACCESS_TYPE_MAGIC = 2;
+    private const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
+    private const ACCESS_TYPE_NOT_FOUND = 4;
+    private const CACHE_PREFIX_READ = 'r';
+    private const CACHE_PREFIX_WRITE = 'w';
+    private const CACHE_PREFIX_PROPERTY_PATH = 'p';
 
     /**
      * @var bool

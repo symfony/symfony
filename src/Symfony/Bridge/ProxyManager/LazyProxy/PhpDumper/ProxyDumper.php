@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  * Generates dumped PHP code of proxies via reflection.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @final since version 3.3
  */
 class ProxyDumper implements DumperInterface
 {

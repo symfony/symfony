@@ -426,6 +426,11 @@ Process
  * Extending `Process::run()`, `Process::mustRun()` and `Process::restart()` is
    not supported anymore.
 
+ProxyManager
+------------
+
+ * The `ProxyDumper` class has been made final
+
 Security
 --------
 

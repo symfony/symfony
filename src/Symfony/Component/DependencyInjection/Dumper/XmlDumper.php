@@ -191,6 +191,10 @@ class XmlDumper extends Dumper
             $service->appendChild($factory);
         }
 
+        if ($definition->isAbstract()) {
+            $service->setAttribute('abstract', 'true');
+        }
+
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
 

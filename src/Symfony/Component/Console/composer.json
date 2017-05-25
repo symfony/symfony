@@ -18,14 +18,14 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/debug": "~2.8|~3.0|~4.0.0"
+        "symfony/debug": "~2.8|~3.0|~4.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "~2.8|~3.0|~4.0.0",
-        "symfony/event-dispatcher": "~2.8|~3.0|~4.0.0",
-        "symfony/dependency-injection": "~3.3|~4.0.0",
-        "symfony/filesystem": "~2.8|~3.0|~4.0.0",
-        "symfony/process": "~2.8|~3.0|~4.0.0",
+        "symfony/http-kernel": "~2.8|~3.0|~4.0",
+        "symfony/event-dispatcher": "~2.8|~3.0|~4.0",
+        "symfony/dependency-injection": "~3.3|~4.0",
+        "symfony/filesystem": "~2.8|~3.0|~4.0",
+        "symfony/process": "~2.8|~3.0|~4.0",
         "psr/log": "~1.0"
     },
     "suggest": {

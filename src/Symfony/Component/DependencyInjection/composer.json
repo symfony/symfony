@@ -20,7 +20,7 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
-        "symfony/yaml": "~3.3|~4.0",
+        "symfony/yaml": "~3.4|~4.0",
         "symfony/config": "~3.3|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0"
     },
@@ -35,7 +35,7 @@
         "symfony/config": "<3.3.1",
         "symfony/finder": "<3.3",
         "symfony/proxy-manager-bridge": "<3.4",
-        "symfony/yaml": "<3.3"
+        "symfony/yaml": "<3.4"
     },
     "provide": {
         "psr/container-implementation": "1.0"

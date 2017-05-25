@@ -170,7 +170,7 @@ class Inline
                 }
 
                 if (Yaml::DUMP_OBJECT & $flags) {
-                    return '!php/object:'.serialize($value);
+                    return '!php/object '.self::dump(serialize($value));
                 }
 
                 if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \stdClass || $value instanceof \ArrayObject)) {
@@ -620,6 +620,8 @@ class Inline
                         return (int) self::parseScalar(substr($scalar, 2), $flags);
                     case 0 === strpos($scalar, '!php/object:'):
                         if (self::$objectSupport) {
+                            @trigger_error('The !php/object: tag to indicate dumped PHP objects is deprecated since version 3.4 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.', E_USER_DEPRECATED);
+
                             return unserialize(substr($scalar, 12));
                         }
 
@@ -630,7 +632,7 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
-                            @trigger_error('The !!php/object tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object tag instead.', E_USER_DEPRECATED);
+                            @trigger_error('The !!php/object: tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.', E_USER_DEPRECATED);
 
                             return unserialize(substr($scalar, 13));
                         }
@@ -640,9 +642,35 @@ class Inline
                         }
 
                         return;
+                    case 0 === strpos($scalar, '!php/object'):
+                        if (self::$objectSupport) {
+                            return unserialize(self::parseScalar(substr($scalar, 12)));
+                        }
+
+                        if (self::$exceptionOnInvalidType) {
+                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
+                        }
+
+                        return;
                     case 0 === strpos($scalar, '!php/const:'):
                         if (self::$constantSupport) {
+                            @trigger_error('The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.', E_USER_DEPRECATED);
+
                             if (defined($const = substr($scalar, 11))) {
+                                return constant($const);
+                            }
+
+                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const));
+                        }
+                        if (self::$exceptionOnInvalidType) {
+                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar));
+                        }
+
+                        return;
+
+                    case 0 === strpos($scalar, '!php/const'):
+                        if (self::$constantSupport) {
+                            if (defined($const = self::parseScalar(substr($scalar, 11)))) {
                                 return constant($const);
                             }
 

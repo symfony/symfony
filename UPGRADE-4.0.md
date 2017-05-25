@@ -345,9 +345,9 @@ FrameworkBundle
    class instead.
 
  * Using the `KERNEL_DIR` environment variable and the automatic guessing based
-   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()` 
+   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()`
    method implementation. Set the `KERNEL_CLASS` environment variable to the
-   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()` 
+   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()`
    or `KernelTestCase::getKernelClass()` method instead.
 
  * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
@@ -356,10 +356,10 @@ FrameworkBundle
  * The `--no-prefix` option of the `translation:update` command has
    been removed.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed. 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed.
    Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed. 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed.
    Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
@@ -561,7 +561,7 @@ TwigBridge
  * The `TwigRendererEngine::setEnvironment()` method has been removed.
    Pass the Twig Environment as second argument of the constructor instead.
 
- * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability 
+ * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability
    to pass a command name as first argument.
 
  * Removed `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability
@@ -773,3 +773,21 @@ Yaml
 
  * The behavior of the non-specific tag `!` is changed and now forces
    non-evaluating your values.
+
+ * The `!php/object:` tag was removed in favor of the `!php/object` tag (without
+   the colon).
+
+ * The `!php/const:` tag was removed in favor of the `!php/const` tag (without
+   the colon).
+
+   Before:
+
+   ```yml
+   !php/const:PHP_INT_MAX
+   ```
+
+   After:
+
+   ```yml
+   !php/const PHP_INT_MAX
+   ```

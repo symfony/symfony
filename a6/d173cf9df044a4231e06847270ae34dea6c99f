@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-24T15:57:15Z
+
+Can you update the changelog of the DependencyInjection component with a similar line for the `NullDumper` class (I missed that in #22818)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-24T16:15:35Z
+
+ProxyManager part moved to 3.3 in #22892

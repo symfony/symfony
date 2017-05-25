@@ -98,7 +98,6 @@ class FactoryReturnTypePassTest extends TestCase
     }
 
     /**
-     * @requires function ReflectionMethod::getReturnType
      * @expectedDeprecation Relying on its factory's return-type to define the class of service "factory" is deprecated since Symfony 3.3 and won't work in 4.0. Set the "class" attribute to "Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy" on the service definition instead.
      */
     public function testCompile()

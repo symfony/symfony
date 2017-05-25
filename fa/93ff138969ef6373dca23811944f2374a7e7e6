@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-25T07:59:01Z
+
+Can we ignore fabbot report here? Alignment is desired to me...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-25T08:22:35Z
+
+I don't think we should keep the alignment. If we apply some code formatting syntax, we should apply it always and without exceptions. Otherwise this will cause problems when running the php-cs-fixer in the entire codebase, which is done from time to time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-25T11:39:30Z
+
+ok, fabbot green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-25T13:40:12Z
+
+Just renamed the const to be even more explicit: `Request::HEADER_X_FORWARDED_AWS_ELB`
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-25T14:11:40Z
+
+👍 This will help the docs - it's already complex enough :)

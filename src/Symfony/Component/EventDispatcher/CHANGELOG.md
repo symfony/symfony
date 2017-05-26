@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+  * added Debug\WrappingListenerInterface
+
 3.3.0
 -----
 

@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WrappedListener
+class WrappedListener implements WrappingListenerInterface
 {
     private $listener;
     private $name;
@@ -41,6 +41,8 @@ class WrappedListener
         $this->dispatcher = $dispatcher;
         $this->called = false;
         $this->stoppedPropagation = false;
+
+        $listener = $this->resolveListener($listener);
 
         if (is_array($listener)) {
             $this->name = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
@@ -92,7 +94,7 @@ class WrappedListener
     public function getInfo($eventName)
     {
         if (null === $this->stub) {
-            $this->stub = false === self::$cloner ? $this->pretty.'()' : new ClassStub($this->pretty.'()', $this->listener);
+            $this->stub = false === self::$cloner ? $this->pretty.'()' : new ClassStub($this->pretty.'()', $this->resolveListener($this->listener));
         }
 
         return array(
@@ -118,5 +120,14 @@ class WrappedListener
         if ($event->isPropagationStopped()) {
             $this->stoppedPropagation = true;
         }
+    }
+
+    private function resolveListener($listener)
+    {
+        while ($listener instanceof WrappingListenerInterface) {
+            $listener = $listener->getWrappedListener();
+        }
+
+        return $listener;
     }
 }

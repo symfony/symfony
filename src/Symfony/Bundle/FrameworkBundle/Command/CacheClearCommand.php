@@ -199,15 +199,27 @@ EOF
      */
     protected function getTempKernel(KernelInterface $parent, $namespace, $parentClass, $warmupDir)
     {
+        $projectDir = '';
         $cacheDir = var_export($warmupDir, true);
         $rootDir = var_export(realpath($parent->getRootDir()), true);
-        $projectDir = var_export(realpath($parent->getProjectDir()), true);
         $logDir = var_export(realpath($parent->getLogDir()), true);
         // the temp kernel class name must have the same length than the real one
         // to avoid the many problems in serialized resources files
         $class = substr($parentClass, 0, -1).'_';
         // the temp container class must be changed too
         $containerClass = var_export(substr(get_class($parent->getContainer()), 0, -1).'_', true);
+
+        if (method_exists($parent, 'getProjectDir')) {
+            $projectDir = var_export(realpath($parent->getProjectDir()), true);
+            $projectDir = <<<EOF
+        public function getProjectDir()
+        {
+            return $projectDir;
+        }
+        
+EOF;
+        };
+
         $code = <<<EOF
 <?php
 
@@ -225,11 +237,7 @@ namespace $namespace
             return $rootDir;
         }
 
-        public function getProjectDir()
-        {
-            return $projectDir;
-        }
-
+        $projectDir
         public function getLogDir()
         {
             return $logDir;

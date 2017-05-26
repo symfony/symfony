@@ -111,6 +111,9 @@ class RouteTest extends TestCase
         $route->addRequirements(array('bar' => '\d+'));
         $this->assertEquals($route, $route->addRequirements(array()), '->addRequirements() implements a fluent interface');
         $this->assertEquals(array('foo' => '\d+', 'bar' => '\d+'), $route->getRequirements(), '->addRequirement() keep previous requirements');
+
+        $route->setRequirements(array('foo' => '\uuid'));
+        $this->assertEquals(array('foo' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'), $route->getRequirements(), '->addRequirements() converts \uuid4');
     }
 
     public function testRequirement()
@@ -120,6 +123,9 @@ class RouteTest extends TestCase
         $route->setRequirement('foo', '^\d+$');
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the path');
         $this->assertTrue($route->hasRequirement('foo'), '->hasRequirement() return true if requirement is set');
+
+        $route->setRequirement('foo', '\uuid');
+        $this->assertEquals(array('foo' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'), $route->getRequirements(), '->addRequirement() converts \uuid4');
     }
 
     /**

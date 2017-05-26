@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-25T12:25:33Z
+
+(but missing composer.json update to make deps=low/high tests pass)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-26T09:43:00Z
+
+good for merge on my side
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-26T09:58:39Z
+
+OK, deps=high failing is because this is not yet merged in 3.4

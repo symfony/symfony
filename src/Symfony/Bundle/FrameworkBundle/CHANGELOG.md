@@ -31,7 +31,6 @@ CHANGELOG
  * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`.
    Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
  * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
- * Deprecated extending `ConstraintValidatorFactory`
  * Deprecated `ControllerArgumentValueResolverPass`. Use
    `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
  * Deprecated `RoutingResolverPass`, use `Symfony\Component\Routing\DependencyInjection\RoutingResolverPass` instead
@@ -47,9 +46,10 @@ CHANGELOG
    `Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass` instead
  * Deprecated `AddConstraintValidatorsPass`, use
    `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` instead
- * Deprecated `ValidateWorkflowsPass`, use 
+ * Deprecated `ValidateWorkflowsPass`, use
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` instead
- * Deprecated `ConstraintValidatorFactory::__construct()` second argument.
+ * Deprecated `ConstraintValidatorFactory`, use 
+   `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
 3.2.0
 -----

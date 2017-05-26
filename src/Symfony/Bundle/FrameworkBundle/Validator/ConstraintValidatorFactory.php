@@ -13,10 +13,12 @@ namespace Symfony\Bundle\FrameworkBundle\Validator;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
-use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\ValidatorException;
+
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', ConstraintValidatorFactory::class, ContainerConstraintValidatorFactory::class), E_USER_DEPRECATED);
 
 /**
  * Uses a service container to create constraint validators.
@@ -38,24 +40,19 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  *
- * @final since version 3.3
+ * @deprecated since version 3.3
  */
-class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
+class ConstraintValidatorFactory extends ContainerConstraintValidatorFactory
 {
     protected $container;
     protected $validators;
 
-    public function __construct(ContainerInterface $container, array $validators = null)
+    public function __construct(ContainerInterface $container, array $validators = array())
     {
-        $this->container = $container;
-
-        if (null !== $validators) {
-            @trigger_error(sprintf('Passing an array of validators or validator aliases as the second argument of "%s" is deprecated since 3.3 and will be removed in 4.0. Use the service locator instead.', __METHOD__), E_USER_DEPRECATED);
-        } else {
-            $validators = array();
-        }
+        parent::__construct($container);
 
         $this->validators = $validators;
+        $this->container = $container;
     }
 
     /**
@@ -73,17 +70,10 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         $name = $constraint->validatedBy();
 
         if (!isset($this->validators[$name])) {
-            if ($this->container->has($name)) {
-                $this->validators[$name] = $this->container->get($name);
-            } else {
-                if (!class_exists($name)) {
-                    throw new ValidatorException(sprintf('Constraint validator "%s" does not exist or it is not enabled. Check the "validatedBy" method in your constraint class "%s".', $name, get_class($constraint)));
-                }
+            return parent::getInstance($constraint);
+        }
 
-                $this->validators[$name] = new $name();
-            }
-        } elseif (is_string($this->validators[$name])) {
-            // To be removed in 4.0
+        if (is_string($this->validators[$name])) {
             $this->validators[$name] = $this->container->get($this->validators[$name]);
         }
 

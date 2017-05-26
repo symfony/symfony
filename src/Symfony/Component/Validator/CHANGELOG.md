@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `AddValidatorInitializersPass`
  * added `AddConstraintValidatorsPass`
+ * added `ContainerConstraintValidatorFactory`
 
 3.2.0
 -----

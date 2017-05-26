@@ -218,7 +218,7 @@ EOF
         }
         
 EOF;
-        };
+        }
 
         $code = <<<EOF
 <?php

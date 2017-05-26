@@ -331,7 +331,28 @@ class Filesystem
             }
         }
 
-        if (!$ok && true !== @symlink($originDir, $targetDir)) {
+        if (!$ok) {
+            $ok = @symlink($originDir, $targetDir);
+        }
+
+        if (!$ok && strncasecmp(PHP_OS, 'WIN', 3) == 0) {
+            // Creating symlinks on windows through PHP's symlink function
+            // is totally broken with relative paths.
+            // @see https://github.com/php/php-src/pull/1243
+            // @see https://bugs.php.net/bug.php?id=69473
+            $exitCode = 1;
+            $output = array();
+            // Without this cleanup for backslashes symlink will
+            // be created but completely broken.
+            $originDir = str_replace('/', DIRECTORY_SEPARATOR, $originDir);
+            $targetDir = str_replace('/', DIRECTORY_SEPARATOR, $targetDir);
+            // Careful as parameters here are ordered differently
+            // compared to PHP's symlink function.
+            @exec(sprintf('mklink /d %s %s', escapeshellarg($targetDir), escapeshellarg($originDir)), $ouptput, $exitCode);
+            $ok = $exitCode == 0;
+        }
+
+        if (!$ok) {
             $this->linkException($originDir, $targetDir, 'symbolic');
         }
     }

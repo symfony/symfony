@@ -20,6 +20,8 @@ CHANGELOG
 
  * added `AddValidatorInitializersPass`
  * added `AddConstraintValidatorsPass`
+ * deprecated `DateValidator` in favor of `DateTimeValidator`
+ * deprecated `TimeValidator` in favor of `DateTimeValidator`
 
 3.2.0
 -----

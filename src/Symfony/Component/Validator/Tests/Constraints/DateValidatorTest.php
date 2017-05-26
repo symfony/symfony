@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+/**
+ * @group legacy
+ */
 class DateValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()

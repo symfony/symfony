@@ -24,28 +24,28 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new DateTime());
+        $this->validator->validate(null, new DateTime('Y-m-d H:i:s'));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new DateTime());
+        $this->validator->validate('', new DateTime('Y-m-d H:i:s'));
 
         $this->assertNoViolation();
     }
 
     public function testDateTimeClassIsValid()
     {
-        $this->validator->validate(new \DateTime(), new DateTime());
+        $this->validator->validate(new \DateTime(), new DateTime('Y-m-d H:i:s'));
 
         $this->assertNoViolation();
     }
 
     public function testDateTimeImmutableClassIsValid()
     {
-        $this->validator->validate(new \DateTimeImmutable(), new DateTime());
+        $this->validator->validate(new \DateTimeImmutable(), new DateTime('Y-m-d H:i:s'));
 
         $this->assertNoViolation();
     }
@@ -55,16 +55,16 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testExpectsStringCompatibleType()
     {
-        $this->validator->validate(new \stdClass(), new DateTime());
+        $this->validator->validate(new \stdClass(), new DateTime('Y-m-d H:i:s'));
     }
 
     public function testDateTimeWithDefaultFormat()
     {
-        $this->validator->validate('1995-05-10 19:33:00', new DateTime());
+        $this->validator->validate('1995-05-10 19:33:00', new DateTime('Y-m-d H:i:s'));
 
         $this->assertNoViolation();
 
-        $this->validator->validate('1995-03-24', new DateTime());
+        $this->validator->validate('1995-03-24', new DateTime('Y-m-d H:i:s'));
 
         $this->buildViolation('This value is not a valid datetime.')
             ->setParameter('{{ value }}', '"1995-03-24"')
@@ -122,12 +122,12 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             array('H:i', '00:00:00', DateTime::INVALID_FORMAT_ERROR),
             array('Y-m-d', '2010-01-01 00:00', DateTime::INVALID_FORMAT_ERROR),
             array('Y-m-d e', '2010-01-01 TCU', DateTime::INVALID_FORMAT_ERROR),
-            array('Y-m-d H:i:s', '2010-13-01 00:00:00', DateTime::INVALID_DATE_ERROR),
-            array('Y-m-d H:i:s', '2010-04-32 00:00:00', DateTime::INVALID_DATE_ERROR),
-            array('Y-m-d H:i:s', '2010-02-29 00:00:00', DateTime::INVALID_DATE_ERROR),
-            array('Y-m-d H:i:s', '2010-01-01 24:00:00', DateTime::INVALID_TIME_ERROR),
-            array('Y-m-d H:i:s', '2010-01-01 00:60:00', DateTime::INVALID_TIME_ERROR),
-            array('Y-m-d H:i:s', '2010-01-01 00:00:60', DateTime::INVALID_TIME_ERROR),
+            array('Y-m-d H:i:s', '2010-13-01 00:00:00', DateTime::INVALID_FORMAT_ERROR),
+            array('Y-m-d H:i:s', '2010-04-32 00:00:00', DateTime::INVALID_FORMAT_ERROR),
+            array('Y-m-d H:i:s', '2010-02-29 00:00:00', DateTime::INVALID_FORMAT_ERROR),
+            array('Y-m-d H:i:s', '2010-01-01 24:00:00', DateTime::INVALID_FORMAT_ERROR),
+            array('Y-m-d H:i:s', '2010-01-01 00:60:00', DateTime::INVALID_FORMAT_ERROR),
+            array('Y-m-d H:i:s', '2010-01-01 00:00:60', DateTime::INVALID_FORMAT_ERROR),
         );
     }
 }

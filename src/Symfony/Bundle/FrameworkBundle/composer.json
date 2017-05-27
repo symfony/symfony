@@ -49,6 +49,7 @@
         "symfony/translation": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
         "symfony/validator": "~3.4|~4.0",
+        "symfony/var-dumper": "~3.4|~4.0",
         "symfony/workflow": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",

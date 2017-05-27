@@ -52,12 +52,12 @@
             <argument /> <!-- resource checkers -->
         </service>
 
-        <service class="Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker">
+        <service id="Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker">
             <argument type="service" id="service_container" />
             <tag name="config_cache.resource_checker" priority="-980" />
         </service>
 
-        <service class="Symfony\Component\Config\Resource\SelfCheckingResourceChecker">
+        <service id="Symfony\Component\Config\Resource\SelfCheckingResourceChecker">
             <tag name="config_cache.resource_checker" priority="-990" />
         </service>
     </services>

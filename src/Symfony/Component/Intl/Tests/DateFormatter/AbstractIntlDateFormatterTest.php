@@ -318,7 +318,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     /**
      * @dataProvider formatTimezoneProvider
-     * @requires PHP 5.5
+     * @requires PHP 5.5.10
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
@@ -423,6 +423,9 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         );
     }
 
+    /**
+     * @requires PHP 5.5.10
+     */
     public function testFormatWithDateTimeZoneGmt()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzz');

@@ -17,6 +17,7 @@ CHANGELOG
  * Removed `ConstraintValidatorFactory::$validators` and `ConstraintValidatorFactory::$container` protected properties
  * Removed class parameters related to routing
  * Removed absolute template paths support in the template name parser
+ * Removed `ConstraintValidatorFactory::__construct()` `$validators` argument
 
 3.3.0
 -----

@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-24T08:20:58Z
+
+> Should I add the small black top header with the Symfony logo too?
+
+If that's not too much work, I'd say yes. :)
+
+---------------------------------------------------------------------------
+
+by deflock at 2017-05-27T10:17:51Z
+
+Black header with logo may confuse when Debug is used as standalone component.
+Will this be merged until 3.3 release?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-27T14:16:02Z
+
+@javiereguiluz Last call for 3.3 :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-27T14:28:44Z
+
+If we don't want to add the black header ... this should be finished. @deflock has a good point about not adding that header. I'm divided about that.

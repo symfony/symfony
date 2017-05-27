@@ -14,7 +14,7 @@ CHANGELOG
  * Removed `cache:clear` warmup part along with the `--no-optional-warmers` option
  * Removed core form types services registration when unnecessary
  * Removed `framework.serializer.cache` option and `serializer.mapping.cache.apc`, `serializer.mapping.cache.doctrine.apc` services
- * Removed `ConstraintValidatorFactory::$validators` and `ConstraintValidatorFactory::$container` protected properties
+ * Removed `ConstraintValidatorFactory`
  * Removed class parameters related to routing
  * Removed absolute template paths support in the template name parser
 

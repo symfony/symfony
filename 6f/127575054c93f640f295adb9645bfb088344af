@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-18T22:51:32Z
+
+How did you manage to make these tests fail? For me, they're either passing or are skipped on PHP < 5.5. Travis doesn't report failures either.
+
+Anyway, I'm against adding PHP version checks to test against different values. Especially that this is caused by a (fixed) PHP bug. It only make tests harder to maintain and read. It's bad enough with "supporting" multiple ICU versions. I'd rather skip some tests for older PHP versions as we'll be phasing them out eventually.
+
+👎
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-18T22:59:21Z
+
+> How did you manage to make these tests fail? For me, they're either passing or are skipped on PHP < 5.5. Travis doesn't report failures either.
+
+Just give a look to [recent builds on AppVeyor](https://ci.appveyor.com/project/fabpot/symfony/build/1.0.22156) on PR targeting `>= 3.2` branches as the PHP version constraint is `>= 5.5.9` (and AppVeyor PHP version used is 5.5.9, which indeed has the bug).
+
+So yes, we can skip them entirely instead.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-05-18T23:32:38Z
+
+I see you already noticed what [I was doing](https://github.com/symfony/symfony/pull/22767/files) and updated your PR accordingly. We only need one PR for 2.7.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-19T06:08:37Z
+
+You're right. I closed #22760.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:23:12Z
+
+It used to work, and we support 5.5.9 as lowest version - I don't get this change.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-27T17:18:42Z
+
+We do support 5.5.9 as lowest version, but the test is not meant to cover a buggy behavior which has been fixed since. Hence excluding php 5.5.9.
+
+@jakzal explained everything by giving some examples in https://github.com/symfony/symfony/pull/22627 description and https://github.com/symfony/symfony/pull/22627#issuecomment-300431128. But trying to shorten it:
+Everything was working fine previously, because php used to convert GMT to UTC implicitly (the forehead mentioned bug), while before ICU 59.1 using UTC would output "GMT".
+With ICU 59.1, it'll output "UTC".
+
+Hence, @jakzal rightly pointed me out this was identified as a bug and we shouldn't cover it by testing the different values due to different behaviors, so we excluded the buggy version for those test cases.

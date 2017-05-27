@@ -342,7 +342,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     /**
      * @dataProvider formatTimezoneProvider
-     * @requires PHP 5.5
+     * @requires PHP 5.5.10
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
@@ -459,15 +459,11 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         );
     }
 
+    /**
+     * @requires PHP 5.5.10
+     */
     public function testFormatWithDateTimeZoneGmt()
     {
-        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
-            $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
-        }
-        if (PHP_VERSION_ID < 50510) {
-            $this->markTestSkipped('Before PHP 5.5.10 the GMT timezone used to be converted to UTC.');
-        }
-
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzz');
 
         $this->assertEquals('GMT', $formatter->format(0));

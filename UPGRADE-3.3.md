@@ -203,11 +203,6 @@ FrameworkBundle
    deprecated and will be removed in 4.0. Use the `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass`
    class instead.
 
- * The `ConstraintValidatorFactory::$validators` and `$container` properties
-   have been deprecated and will be removed in 4.0.
-
- * Extending `ConstraintValidatorFactory` is deprecated and won't be supported in 4.0.
-
  * Class parameters related to routing have been deprecated and will be removed in 4.0.
      * router.options.generator_class
      * router.options.generator_base_class
@@ -246,9 +241,9 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` class instead.
 
- * Passing an array of validators or validator aliases as the second argument of 
-   `ConstraintValidatorFactory::__construct()` is deprecated since 3.3 and will 
-   be removed in 4.0. Use the service locator instead.
+ * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory`
+   class has been deprecated and will be removed in 4.0.
+   Use `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
 HttpFoundation
 --------------

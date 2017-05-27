@@ -59,7 +59,7 @@
             </argument>
         </service>
 
-        <service id="validator.validator_factory" class="Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory">
+        <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">
             <argument /> <!-- Constraint validators locator -->
         </service>
 

@@ -69,7 +69,7 @@
         "symfony/property-info": "<3.3",
         "symfony/serializer": "<3.3",
         "symfony/translation": "<3.2",
-        "symfony/validator": "<3.3",
+        "symfony/validator": "<3.3-rc2",
         "symfony/workflow": "<3.3"
     },
     "suggest": {

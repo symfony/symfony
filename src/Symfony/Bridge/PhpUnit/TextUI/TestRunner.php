@@ -14,7 +14,7 @@ namespace Symfony\Bridge\PhpUnit\TextUI;
 use PHPUnit\TextUI\TestRunner as BaseRunner;
 use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 
-if (class_exists('PHPUnit_TextUI_Command') && !class_exists('PHPUnit\TextUI\Command')) {
+if (class_exists('PHPUnit_TextUI_Command')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\TestRunner', 'Symfony\Bridge\PhpUnit\TextUI\TestRunner');
 
     return;

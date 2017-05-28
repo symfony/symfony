@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added support of decoding JSON content type requests `application/json` in `Request::createFromGlobals`
+
 3.3.0
 -----
 

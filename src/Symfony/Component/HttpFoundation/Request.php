@@ -315,11 +315,27 @@ class Request
         }
 
         $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $server);
+        $normalizedMethod = strtoupper($request->server->get('REQUEST_METHOD', 'GET'));
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
+            && in_array($normalizedMethod, array('PUT', 'DELETE', 'PATCH'))
         ) {
             parse_str($request->getContent(), $data);
+            $request->request = new ParameterBag($data);
+        } elseif (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/json')
+            && in_array($normalizedMethod, array('POST', 'PUT', 'DELETE', 'PATCH'))
+        ) {
+            $content = trim($request->getContent());
+            $data = array();
+
+            // only JSON objects are allowed
+            if ('{' === $content[0]) {
+                $result = json_decode($content, true);
+                if ($result) {
+                    $data = $result;
+                }
+            }
+
             $request->request = new ParameterBag($data);
         }
 

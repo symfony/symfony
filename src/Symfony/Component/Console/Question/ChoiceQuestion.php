@@ -34,6 +34,10 @@ class ChoiceQuestion extends Question
      */
     public function __construct($question, array $choices, $default = null)
     {
+        if (!$choices) {
+            throw new \LogicException('Choice question must have at least 1 choice available.');
+        }
+
         parent::__construct($question, $default);
 
         $this->choices = $choices;

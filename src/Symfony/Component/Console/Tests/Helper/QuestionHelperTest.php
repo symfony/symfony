@@ -452,6 +452,15 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Choice question must have at least 1 choice available.
+     */
+    public function testEmptyChoices()
+    {
+        new ChoiceQuestion('Question', array(), 'irrelevant');
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

@@ -159,7 +159,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                     break;
 
                 default:
-                    ++$abstain;
 
                     break;
             }

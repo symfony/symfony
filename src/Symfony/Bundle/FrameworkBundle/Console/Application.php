@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -120,6 +121,16 @@ class Application extends BaseApplication
         $this->registerCommands();
 
         return parent::all($namespace);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function add(Command $command)
+    {
+        $this->registerCommands();
+
+        return parent::add($command);
     }
 
     protected function registerCommands()

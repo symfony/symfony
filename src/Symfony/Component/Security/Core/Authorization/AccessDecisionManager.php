@@ -144,7 +144,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $grant = 0;
         $deny = 0;
-        $abstain = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-22T10:44:39Z
+
+What is the behavior proposed here? If you pass zero choices to a choice question, shouldn't we throw an exception?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-22T11:15:23Z
+
+Perhaps easier yes. Went for safe, as i wasnt really sure about the default value behavior (without any further options); or a default value being an unknown option.
+
+The first (actually the case from the issue) also crashes, the latter is already validated when the question is optional.
+
+So :+1: for throwing in the constructor, unless im unaware of any side effects :) but im fine either way.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-22T14:36:04Z
+
+Updated.

@@ -347,6 +347,8 @@ class InlineTest extends TestCase
             array('{\'foo\': \'bar\', "bar": \'foo: bar\'}', array('foo' => 'bar', 'bar' => 'foo: bar')),
             array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', array('foo\'' => 'bar', 'bar"' => 'foo: bar')),
             array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', array('foo: ' => 'bar', 'bar: ' => 'foo: bar')),
+            array('{"foo:bar": "baz"}', array('foo:bar' => 'baz')),
+            array('{"foo":"bar"}', array('foo' => 'bar')),
 
             // nested sequences and mappings
             array('[foo, [bar, foo]]', array('foo', array('bar', 'foo'))),
@@ -416,6 +418,8 @@ class InlineTest extends TestCase
             array('{\'foo\': \'bar\', "bar": \'foo: bar\'}', (object) array('foo' => 'bar', 'bar' => 'foo: bar')),
             array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', (object) array('foo\'' => 'bar', 'bar"' => 'foo: bar')),
             array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', (object) array('foo: ' => 'bar', 'bar: ' => 'foo: bar')),
+            array('{"foo:bar": "baz"}', (object) array('foo:bar' => 'baz')),
+            array('{"foo":"bar"}', (object) array('foo' => 'bar')),
 
             // nested sequences and mappings
             array('[foo, [bar, foo]]', array('foo', array('bar', 'foo'))),

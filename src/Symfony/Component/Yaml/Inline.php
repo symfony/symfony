@@ -426,6 +426,7 @@ class Inline
 
             // key
             $offsetBeforeKeyParsing = $i;
+            $isKeyQuoted = in_array($mapping[$i], array('"', "'"), true);
             $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false, array());
 
             if ($offsetBeforeKeyParsing === $i) {
@@ -444,7 +445,7 @@ class Inline
                 }
             }
 
-            if (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true)) {
+            if (!$isKeyQuoted && (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
                 throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
             }
 

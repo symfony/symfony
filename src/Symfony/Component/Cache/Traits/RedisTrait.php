@@ -303,6 +303,14 @@ trait RedisTrait
             foreach ($results as $k => list($h, $c)) {
                 $results[$k] = $connections[$h][$c];
             }
+        } elseif ($this->redis instanceof \RedisCluster) {
+            // phpredis doesn't support pipelining with RedisCluster
+            // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining
+            $results = array();
+            foreach ($generator() as $command => $args) {
+                $results[] = call_user_func_array(array($this->redis, $command), $args);
+                $ids[] = $args[0];
+            }
         } else {
             $this->redis->multi(\Redis::PIPELINE);
             foreach ($generator() as $command => $args) {

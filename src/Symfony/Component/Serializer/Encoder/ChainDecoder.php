@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 class ChainDecoder implements DecoderInterface
 {
     protected $decoders = array();
-    protected $decoderByFormat = array();
+    private $decoderByFormat = array();
 
     public function __construct(array $decoders = array())
     {

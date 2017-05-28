@@ -219,7 +219,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function has($id)
     {
-        for ($i = 2;;) {
+        for ($i = 2; ;) {
             if ('service_container' === $id
                 || isset($this->aliases[$id])
                 || isset($this->services[$id])
@@ -258,7 +258,7 @@ class Container implements IntrospectableContainerInterface
         // available services. Service IDs are case insensitive, however since
         // this method can be called thousands of times during a request, avoid
         // calling strtolower() unless necessary.
-        for ($i = 2;;) {
+        for ($i = 2; ;) {
             if ('service_container' === $id) {
                 return $this;
             }

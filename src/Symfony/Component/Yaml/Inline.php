@@ -479,6 +479,7 @@ class Inline
             }
 
             // key
+            $isKeyQuoted = in_array($mapping[$i], array('"', "'"), true);
             $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false, array(), true);
 
             if (':' !== $key && false === $i = strpos($mapping, ':', $i)) {
@@ -497,8 +498,8 @@ class Inline
                 }
             }
 
-            if (':' !== $key && (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
-                @trigger_error('Using a colon that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}" is deprecated since version 3.2 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
+            if (':' !== $key && !$isKeyQuoted && (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
+                @trigger_error('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
             }
 
             while ($i < $len) {

@@ -115,6 +115,21 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
     }
 
+    public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
+    {
+        $command = new Command('example');
+
+        $bundle = $this->createBundleMock(array($command));
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+        $newCommand = new Command('example');
+        $application->add($newCommand);
+
+        $this->assertSame($newCommand, $application->get('example'));
+    }
+
     private function getKernel(array $bundles, $useDispatcher = false)
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

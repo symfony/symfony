@@ -306,10 +306,10 @@ class RedisAdapter extends AbstractAdapter
         } elseif ($this->redis instanceof \RedisCluster) {
             // phpredis doesn't support pipelining with RedisCluster
             // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining
-            $result = array();
+            $results = array();
             foreach ($generator() as $command => $args) {
+                $results[] = call_user_func_array(array($this->redis, $command), $args);
                 $ids[] = $args[0];
-                $result[] = call_user_func_array(array($this->redis, $command), $args);
             }
         } else {
             $this->redis->multi(\Redis::PIPELINE);

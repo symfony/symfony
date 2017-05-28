@@ -624,7 +624,10 @@
                     <th>{{ option }}</th>
                     <td>{{ profiler_dump(value) }}</td>
                     <td>
-                        {% if data.resolved_options[option] == value %}
+                        {# values can be stubs #}
+                        {% set option_value = value.value|default(value) %}
+                        {% set resolved_option_value = data.resolved_options[option].value|default(data.resolved_options[option]) %}
+                        {% if resolved_option_value == option_value %}
                             <em class="font-normal text-muted">same as passed value</em>
                         {% else %}
                             {{ profiler_dump(data.resolved_options[option]) }}

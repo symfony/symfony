@@ -89,7 +89,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
         if (!is_callable($preferredChoices) && !empty($preferredChoices)) {
             $preferredChoices = function ($choice) use ($preferredChoices) {
-                return false !== array_search($choice, $preferredChoices, true);
+                return in_array($choice, $preferredChoices, true);
             };
         }
 

@@ -21,7 +21,7 @@ use Doctrine\DBAL\Connection;
  */
 final class Schema extends BaseSchema
 {
-    protected $options;
+    private $options;
 
     /**
      * Constructor.

@@ -73,7 +73,6 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         }
 
         $file = null;
-        $previous = null;
         try {
             $file = parent::findTemplate($logicalName);
         } catch (\Twig_Error_Loader $e) {

@@ -278,14 +278,14 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         );
 
         $dialog = new QuestionHelper();
-        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $inputStream = $this->getInputStream($providedAnswer."\n");
         $helperSet = new HelperSet(array(new FormatterHelper()));
         $dialog->setHelperSet($helperSet);
 
         $question = new ChoiceQuestion('Please select the directory', $possibleChoices);
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
-        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+        $answer = $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
 
         $this->assertSame($expectedValue, $answer);
     }

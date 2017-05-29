@@ -83,18 +83,17 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {
-        $ret = array();
-        $ct = 0;
-        if (!is_string($resource) || false === strpbrk($resource, '*?{[')) {
-            $ret[] = $this->doImport($resource, $type, $ignoreErrors, $sourceResource);
-        } else {
-            foreach ($this->glob($resource, false, $_, $ignoreErrors) as $path => $info) {
-                ++$ct;
+        if (is_string($resource) && false !== strpbrk($resource, '*?{[')) {
+            $ret = array();
+            foreach ($this->glob($resource, false, $_, true) as $path => $info) {
                 $ret[] = $this->doImport($path, $type, $ignoreErrors, $sourceResource);
+            }
+            if ($ret) {
+                return count($ret) > 1 ? $ret : $ret[0];
             }
         }
 
-        return $ct > 1 ? $ret : (isset($ret[0]) ? $ret[0] : null);
+        return $this->doImport($resource, $type, $ignoreErrors, $sourceResource);
     }
 
     /**

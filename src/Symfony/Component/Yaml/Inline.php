@@ -490,7 +490,7 @@ class Inline
                 @trigger_error('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
             }
 
-            if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags)) {
+            if (!$isKeyQuoted) {
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey) && !is_int($evaluatedKey)) {

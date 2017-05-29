@@ -30,13 +30,13 @@ FrameworkBundle
    require symfony/stopwatch` in your `dev` environment.
 
  * Using the `KERNEL_DIR` environment variable or the automatic guessing based
-   on the `phpunit.xml` / `phpunit.xml.dist` file location is deprecated since 3.4. 
+   on the `phpunit.xml` / `phpunit.xml.dist` file location is deprecated since 3.4.
    Set the `KERNEL_CLASS` environment variable to the fully-qualified class name
-   of your Kernel instead. Not setting the `KERNEL_CLASS` environment variable 
-   will throw an exception on 4.0 unless you override the `KernelTestCase::createKernel()` 
+   of your Kernel instead. Not setting the `KERNEL_CLASS` environment variable
+   will throw an exception on 4.0 unless you override the `KernelTestCase::createKernel()`
    or `KernelTestCase::getKernelClass()` method.
-   
- * The `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` 
+
+ * The `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
    methods are deprecated since 3.4 and will be removed in 4.0.
 
  * The `--no-prefix` option of the `translation:update` command is deprecated and
@@ -83,7 +83,7 @@ TwigBridge
  * deprecated the `Symfony\Bridge\Twig\Form\TwigRenderer` class, use the `FormRenderer`
    class from the Form component instead
 
- * deprecated `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability 
+ * deprecated `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability
    to pass a command name as first argument
 
  * deprecated `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability
@@ -95,7 +95,7 @@ TwigBundle
  * deprecated the `Symfony\Bundle\TwigBundle\Command\DebugCommand` class, use the `DebugCommand`
    class from the Twig bridge instead
 
- * deprecated relying on the `ContainerAwareInterface` implementation for 
+ * deprecated relying on the `ContainerAwareInterface` implementation for
    `Symfony\Bundle\TwigBundle\Command\LintCommand`
 
 Validator
@@ -111,3 +111,30 @@ Yaml
 
  * Using the non-specific tag `!` is deprecated and will have a different
    behavior in 4.0. Use a plain integer or `!!float` instead.
+
+ * Using the `Yaml::PARSE_KEYS_AS_STRINGS` flag is deprecated as it will be
+   removed in 4.0.
+
+   Before:
+
+   ```php
+   $yaml = <<<YAML
+   null: null key
+   true: boolean true
+   2.0: float key
+   YAML;
+
+   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   ```
+
+   After:
+
+   ```php
+   $yaml = <<<YAML
+   "null": null key
+   "true": boolean true
+   "2.0": float key
+   YAML;
+
+   Yaml::parse($yaml);
+   ```

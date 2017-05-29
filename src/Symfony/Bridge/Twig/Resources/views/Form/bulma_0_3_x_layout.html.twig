@@ -1,0 +1,229 @@
+{%- use "form_div_layout.html.twig" -%}
+
+{# Widgets #}
+
+{%- block form_widget_simple -%}
+{% spaceless %}
+    {%- if type is not defined or type not in ['file', 'hidden'] -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' input')|trim}) -%}
+    {%- endif -%}
+    {%- set size_class = '' -%}
+    {%- for size in ['is-small', 'is-medium', 'is-large'] if size in form.vars.attr.class|default('') -%}
+        {%- set size_class = size -%}
+    {%- endfor -%}
+    {%- set widget_icon = attribute(form.vars, 'bulma_icon')|default(false) -%}
+    <p {{ block('form_widget_container_attributes') }}>
+        {{- parent() -}}
+        {%- if widget_icon != false -%}
+            <span class="{{ ('icon ' ~ size_class|default(''))|trim -}}">
+                <i class="fa fa-{{ attribute(widget_icon, 'icon')|default('') -}}"></i>
+            </span>
+        {%- endif -%}
+        {{- block('form_errors') -}}
+    </p>
+{% endspaceless %}
+{%- endblock form_widget_simple %}
+
+{%- block choice_widget_collapsed -%}
+{% spaceless %}
+    {%- set size_class = '' -%}
+    {%- for size in ['is-small', 'is-medium', 'is-large'] if size in form.vars.attr.class|default('') -%}
+        {%- set size_class = size -%}
+    {%- endfor -%}
+    <p {{ block('form_widget_container_attributes') }}>
+        <span class="{{ ('select ' ~ size_class)|trim }}">
+            {{- parent() -}}
+        </span>
+        {{- block('form_errors') -}}
+    </p>
+{% endspaceless %}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block choice_widget_expanded -%}
+    {%- if '--inline' in form.vars.attr.class|default('') -%}
+        {%- set inline_choice = true -%}
+    {%- endif -%}
+    
+    {%- if inline_choice|default(false) == true -%}
+        <p {{ block('form_widget_container_attributes') }}>
+    {%- endif -%}
+    
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control')|trim}) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form -%}
+            {{- form_widget(child, {
+                inline_choice: inline_choice|default(false),
+                translation_domain: choice_translation_domain,
+            }) -}}
+        {%- endfor -%}
+        {{- block('form_errors') -}}
+    </div>
+        
+    {%- if inline_choice|default(false) == true -%}
+        </p>
+    {%- endif -%}
+{%- endblock choice_widget_expanded -%}
+
+{%- block textarea_widget -%}
+    <p {{ block('form_widget_container_attributes') }}>
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' textarea')|trim}) -%}
+        <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+        {{- block('form_errors') -}}
+    </p>
+{%- endblock textarea_widget -%}
+
+{%- block number_widget -%}
+    {# type="number" doesn't work with floats #}
+    {%- set type = type|default('text') -%}
+    {{- block('form_widget_simple') -}}
+{%- endblock number_widget -%}
+
+{% block checkbox_widget -%}
+    {{- form_label(form, null, { widget: parent() }) -}}
+{%- endblock checkbox_widget %}
+
+{% block radio_widget -%}
+    {{- form_label(form, null, { widget: parent() }) -}}
+{%- endblock radio_widget %}
+
+{%- block datetime_widget -%}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' datetime-widget')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_widget(form.date) -}}
+            {{- form_widget(form.time) -}}
+            {{- form_errors(form) -}}
+            {{- form_errors(form.date) -}}
+            {{- form_errors(form.time) -}}
+        </div>
+    {%- endif -%}
+{%- endblock datetime_widget -%}
+
+{%- block date_widget -%}
+    {%- if widget != 'single_text' -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control is-grouped date-widget')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock date_widget -%}
+
+{%- block time_widget -%}
+    {%- if widget != 'single_text' -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control is-grouped time-widget')|trim}) -%}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock time_widget -%}
+
+{%- block submit_widget -%}
+    {%- set type = type|default('submit') -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ 'button is-primary')|trim}) -%}
+    {{- block('button_widget') -}}
+{%- endblock submit_widget -%}
+
+{%- block reset_widget -%}
+    {%- set type = type|default('reset') -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ 'button is-link')|trim}) -%}
+    {{- block('button_widget') -}}
+{%- endblock reset_widget -%}
+
+{%- block button_widget -%}
+    {%- set btn_class = 'is-link' -%}
+    {%- for color in [ 'is-primary', 'is-info', 'is-success', 'is-warning', 'is-danger' ]
+        if color in attr.class|default('')
+    -%}
+        {%- set btn_class = color -%}
+    {%- endfor -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' button ' ~ btn_class)|trim})-%}
+    <p {{ block('form_widget_container_attributes') }}>
+        {{- parent() -}}
+    </p>
+{%- endblock button_widget -%}
+
+{# Labels #}
+
+{%- block form_label -%}
+    {%- set label_attr = label_attr|merge({class: (attr.class|default('') ~ ' label')|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{%- block checkbox_label -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' checkbox')|trim}) -%}
+    {{- block('checkbox_radio_label') -}}
+{%- endblock checkbox_label %}
+
+{%- block radio_label -%}
+    {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' radio')|trim}) -%}
+    {{- block('checkbox_radio_label') -}}
+{%- endblock radio_label -%}
+
+{%- block checkbox_radio_label -%}
+    {# Do not display the label if widget is not defined in order to prevent double label rendering #}
+    {%- if widget is defined -%}
+        {%- if required -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
+        {%- endif -%}
+        {%- if label is not same as(false) and label is empty -%}
+            {%- if label_format is not empty -%}
+                {%- set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) -%}
+            {%- else -%}
+                {%- set label = name|humanize -%}
+            {%- endif -%}
+        {%- endif -%}
+        {%- if not inline_choice|default(false) %}<p class="control">{% endif -%}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
+        </label>
+        {{- block('form_errors') -}}
+        {%- if not inline_choice|default(false) %}</p>{% endif -%}
+    {% endif %}
+{% endblock checkbox_radio_label %}
+
+{# Rows #}
+
+{%- block form_row -%}
+    {{- form_label(form) -}}
+    {{- form_widget(form) -}}
+{%- endblock form_row -%}
+
+{%- block checkbox_row -%}
+    {{- form_widget(form) -}}
+{%- endblock checkbox_row -%}
+
+{%- block radio_row -%}
+    {{- form_widget(form) -}}
+{%- endblock radio_row -%}
+
+{%- block money_row -%}
+    {{- form_label(form) -}}
+    {{- block('form_widget_simple') -}}
+{%- endblock money_row -%}
+
+{%- block percent_row -%}
+    {{- form_label(form) -}}
+    {{- block('form_widget_simple') -}}
+{%- endblock percent_row -%}
+
+{# Errors #}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        {%- for error in errors -%}
+            <span class="help is-danger">{{ error.message }}</span>
+        {%- endfor -%}
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{# Support #}
+
+{%- block form_widget_container_attributes -%}
+    {%- set class = 'control' -%}
+    {%- set widget_icon = attribute(form.vars, 'bulma_icon')|default() -%}
+    {%- if widget_icon is defined and widget_icon is iterable -%}
+        {%- set class = class ~ ' has-icon has-icon-' ~ (attribute(widget_icon, 'position')|default('right'))|trim -%}
+    {%- endif -%}
+    class="{{ class }}"
+{%- endblock form_widget_container_attributes -%}

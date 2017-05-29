@@ -66,6 +66,14 @@ class FileLoaderTest extends TestCase
             $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException', $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         }
     }
+
+    public function testImportWithGlobLikeResource()
+    {
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $loader = new TestFileLoader($locatorMock);
+
+        $this->assertSame('[foo]', $loader->import('[foo]'));
+    }
 }
 
 class TestFileLoader extends FileLoader

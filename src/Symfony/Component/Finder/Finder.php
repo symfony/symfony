@@ -21,6 +21,7 @@ use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
 use Symfony\Component\Finder\Iterator\FilenameFilterIterator;
 use Symfony\Component\Finder\Iterator\SizeRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\SortableIterator;
+use Symfony\Component\Finder\Iterator\FinderIterator;
 
 /**
  * Finder allows to build rules to find files and directories.
@@ -77,6 +78,28 @@ class Finder implements \IteratorAggregate, \Countable
     public static function create()
     {
         return new static();
+    }
+
+    /**
+     * Get the first element in the finder.
+     *
+     * @return SplFileInfo|null The first element in the Finder or `null`
+     *                          if it is empty.
+     */
+    public function first()
+    {
+        return $this->getIterator()->first();
+    }
+
+    /**
+     * Get the last element in the Finder.
+     *
+     * @return SplFileInfo|null The last element in the Finder or `null`
+     *                          if it is empty.
+     */
+    public function last()
+    {
+        return $this->getIterator()->last();
     }
 
     /**
@@ -568,10 +591,13 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if (1 === count($this->dirs) && 0 === count($this->iterators)) {
-            return $this->searchInDirectory($this->dirs[0]);
+            $iterator = new FinderIterator();
+            $iterator->append($this->searchInDirectory($this->dirs[0]));
+
+            return $iterator;
         }
 
-        $iterator = new \AppendIterator();
+        $iterator = new FinderIterator();
         foreach ($this->dirs as $dir) {
             $iterator->append($this->searchInDirectory($dir));
         }

@@ -20,6 +20,22 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertInstanceOf('Symfony\Component\Finder\Finder', Finder::create());
     }
 
+    public function testGetFirstElement()
+    {
+        $finder = $this->buildFinder();
+        $finder->in(self::$tmpDir)->files();
+
+        $this->assertNotNull($finder->files()->first());
+    }
+
+    public function testGetLastElement()
+    {
+        $finder = $this->buildFinder();
+        $finder->in(self::$tmpDir);
+
+        $this->assertNotNull($finder->files()->last());
+    }
+
     public function testDirectories()
     {
         $finder = $this->buildFinder();
@@ -309,6 +325,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder = $this->buildFinder();
         $this->assertEquals(2, iterator_count($finder->directories()->in(self::$tmpDir)), 'implements the \IteratorAggregate interface');
+        $this->assertInstanceOf('Symfony\Component\Finder\Iterator\FinderIterator', $finder->directories()->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
         $a = iterator_to_array($finder->directories()->in(self::$tmpDir));

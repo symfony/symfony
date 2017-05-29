@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,13 +27,11 @@ class FirewallMap implements FirewallMapInterface
 {
     protected $container;
     protected $map;
-    private $contexts;
 
     public function __construct(ContainerInterface $container, array $map)
     {
         $this->container = $container;
         $this->map = $map;
-        $this->contexts = new \SplObjectStorage();
     }
 
     /**
@@ -63,15 +62,27 @@ class FirewallMap implements FirewallMapInterface
         return $context->getConfig();
     }
 
+    /**
+     * @return FirewallContext
+     */
     private function getFirewallContext(Request $request)
     {
-        if ($this->contexts->contains($request)) {
-            return $this->contexts[$request];
+        if ($request->attributes->has('_firewall_context')) {
+            $storedContextId = $request->attributes->get('_firewall_context');
+            foreach ($this->map as $contextId => $requestMatcher) {
+                if ($contextId === $storedContextId) {
+                    return $this->container->get($contextId);
+                }
+            }
+
+            $request->attributes->remove('_firewall_context');
         }
 
         foreach ($this->map as $contextId => $requestMatcher) {
             if (null === $requestMatcher || $requestMatcher->matches($request)) {
-                return $this->contexts[$request] = $this->container->get($contextId);
+                $request->attributes->set('_firewall_context', $contextId);
+
+                return $this->container->get($contextId);
             }
         }
     }

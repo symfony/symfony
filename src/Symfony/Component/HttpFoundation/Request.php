@@ -329,7 +329,7 @@ class Request
             $data = array();
 
             // only JSON objects are allowed
-            if ('{' === $content[0]) {
+            if ($content && '{' === $content[0]) {
                 $result = json_decode($content, true);
                 if ($result) {
                     $data = $result;

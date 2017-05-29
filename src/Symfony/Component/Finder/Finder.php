@@ -614,6 +614,26 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Extract data from the finder.
+     *
+     * By default path names from the current Finder are extracted.
+     *
+     * @param callable|null $extractor
+     *
+     * @return \Generator|mixed[] A generator yielding the extracted data.
+     */
+    public function extract(callable $extractor = null)
+    {
+        foreach ($this->getIterator() as $file) {
+            if (null === $extractor) {
+                yield $file->getPathname();
+            } else {
+                yield $extractor($file);
+            }
+        }
+    }
+
+    /**
      * Counts all the results collected by the iterators.
      *
      * @return int

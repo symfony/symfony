@@ -513,6 +513,14 @@
                         toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
                     });
                 }
+
+                /* Prevents from disallowing clicks on links inside toggles */
+                var toggleLinks = document.querySelectorAll('.sf-toggle a');
+                for (var i = 0; i < toggleLinks.length; i++) {
+                    addEventListener(toggleLinks[i], 'click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
             }
         };
     })();

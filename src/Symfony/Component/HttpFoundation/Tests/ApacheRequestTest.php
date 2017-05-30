@@ -34,6 +34,16 @@ class ApacheRequestTest extends TestCase
         return array(
             array(
                 array(
+                    'REQUEST_URI' => 'http://example.com/foo/app_dev.php/bar',
+                    'SCRIPT_NAME' => '/foo/app_dev.php',
+                    'PATH_INFO' => '/bar',
+                ),
+                '/foo/app_dev.php/bar',
+                '/foo/app_dev.php',
+                '/bar',
+            ),
+            array(
+                array(
                     'REQUEST_URI' => '/foo/app_dev.php/bar',
                     'SCRIPT_NAME' => '/foo/app_dev.php',
                     'PATH_INFO' => '/bar',

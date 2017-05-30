@@ -24,11 +24,13 @@ namespace Symfony\Component\EventDispatcher;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
+ * @author Daniel Santamaría <santaka87@gmail.com>
  */
-class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher implements EventDispatcherInterface, AnonymousEventDispatcherInterface, EventPropagationTrackerInterface
 {
     private $listeners = array();
     private $sorted = array();
+    private $stoppedEvents = array();
 
     /**
      * {@inheritdoc}
@@ -44,6 +46,20 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         return $event;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dispatchAnonymousEvent($event)
+    {
+        if (!is_object($event)) {
+            throw new \InvalidArgumentException(sprintf('$event must be an object ("%s" given)', gettype($event)));
+        }
+
+        if ($listeners = $this->getListeners(get_class($event))) {
+            $this->doAnonymousEventDispatch($listeners, $event);
+        }
     }
 
     /**
@@ -176,6 +192,25 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
+     * Triggers the listeners of an anonymous event.
+     *
+     * This method can be overridden to add functionality that is executed
+     * for each listener.
+     *
+     * @param callable[] $listeners The event listeners
+     * @param object     $event     The event object to pass to the event handlers/listeners
+     */
+    protected function doAnonymousEventDispatch($listeners, $event)
+    {
+        foreach ($listeners as $listener) {
+            if ($this->isPropagationStopped($event)) {
+                break;
+            }
+            call_user_func($listener, $event, get_class($event), $this);
+        }
+    }
+
+    /**
      * Sorts the internal list of listeners for the given event by priority.
      *
      * @param string $eventName The name of the event
@@ -184,5 +219,23 @@ class EventDispatcher implements EventDispatcherInterface
     {
         krsort($this->listeners[$eventName]);
         $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPropagationStopped($event)
+    {
+        return in_array($event, $this->stoppedEvents);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stopPropagation($event)
+    {
+        if (!$this->isPropagationStopped($event)) {
+            $this->stoppedEvents[] = $event;
+        }
     }
 }

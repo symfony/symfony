@@ -478,6 +478,11 @@
                     addEventListener(toggles[i], 'click', function(e) {
                         e.preventDefault();
 
+                        if ('' !== window.getSelection().toString()) {
+                            /* Don't do anything on text selection */
+                            return;
+                        }
+
                         var toggle = e.target || e.srcElement;
 
                         /* needed because when the toggle contains HTML contents, user can click */

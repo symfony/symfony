@@ -12,39 +12,43 @@
 namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\FormThemeNode;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Node;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
 
 /**
  * Token Parser for the 'form_theme' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FormThemeTokenParser extends \Twig_TokenParser
+class FormThemeTokenParser extends AbstractTokenParser
 {
     /**
      * Parses a token and returns a node.
      *
-     * @param \Twig_Token $token A Twig_Token instance
+     * @param Token $token
      *
-     * @return \Twig_Node A Twig_Node instance
+     * @return Node
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
         $form = $this->parser->getExpressionParser()->parseExpression();
 
-        if ($this->parser->getStream()->test(\Twig_Token::NAME_TYPE, 'with')) {
+        if ($this->parser->getStream()->test(Token::NAME_TYPE, 'with')) {
             $this->parser->getStream()->next();
             $resources = $this->parser->getExpressionParser()->parseExpression();
         } else {
-            $resources = new \Twig_Node_Expression_Array(array(), $stream->getCurrent()->getLine());
+            $resources = new ArrayExpression(array(), $stream->getCurrent()->getLine());
             do {
                 $resources->addElement($this->parser->getExpressionParser()->parseExpression());
-            } while (!$stream->test(\Twig_Token::BLOCK_END_TYPE));
+            } while (!$stream->test(Token::BLOCK_END_TYPE));
         }
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        $stream->expect(Token::BLOCK_END_TYPE);
 
         return new FormThemeNode($form, $resources, $lineno, $this->getTag());
     }

@@ -13,15 +13,21 @@ namespace Symfony\Bridge\Twig\Tests\Node;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
+use Twig\Compiler;
+use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
 
 class FormThemeTest extends TestCase
 {
     public function testConstructor()
     {
-        $form = new \Twig_Node_Expression_Name('form', 0);
-        $resources = new \Twig_Node(array(
-            new \Twig_Node_Expression_Constant('tpl1', 0),
-            new \Twig_Node_Expression_Constant('tpl2', 0),
+        $form = new NameExpression('form', 0);
+        $resources = new Node(array(
+            new ConstantExpression('tpl1', 0),
+            new ConstantExpression('tpl2', 0),
         ));
 
         $node = new FormThemeNode($form, $resources, 0);
@@ -32,17 +38,17 @@ class FormThemeTest extends TestCase
 
     public function testCompile()
     {
-        $form = new \Twig_Node_Expression_Name('form', 0);
-        $resources = new \Twig_Node_Expression_Array(array(
-            new \Twig_Node_Expression_Constant(0, 0),
-            new \Twig_Node_Expression_Constant('tpl1', 0),
-            new \Twig_Node_Expression_Constant(1, 0),
-            new \Twig_Node_Expression_Constant('tpl2', 0),
+        $form = new NameExpression('form', 0);
+        $resources = new ArrayExpression(array(
+            new ConstantExpression(0, 0),
+            new ConstantExpression('tpl1', 0),
+            new ConstantExpression(1, 0),
+            new ConstantExpression('tpl2', 0),
         ), 0);
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
 
         $this->assertEquals(
             sprintf(
@@ -52,7 +58,7 @@ class FormThemeTest extends TestCase
             trim($compiler->compile($node)->getSource())
         );
 
-        $resources = new \Twig_Node_Expression_Constant('tpl1', 0);
+        $resources = new ConstantExpression('tpl1', 0);
 
         $node = new FormThemeNode($form, $resources, 0);
 

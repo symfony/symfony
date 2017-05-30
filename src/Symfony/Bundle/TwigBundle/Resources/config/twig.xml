@@ -5,9 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="twig.class">Twig_Environment</parameter>
+        <parameter key="twig.class">Twig\Environment</parameter>
         <parameter key="twig.loader.filesystem.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
-        <parameter key="twig.loader.chain.class">Twig_Loader_Chain</parameter>
+        <parameter key="twig.loader.chain.class">Twig\Loader\ChainLoader</parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
         <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
@@ -51,7 +51,7 @@
             <argument type="service" id="templating.finder" on-invalid="ignore" />
         </service>
 
-        <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
+        <service id="twig.loader.native_filesystem" class="Twig\Loader\FilesystemLoader" public="false">
             <argument type="collection" />
             <tag name="twig.loader"/>
         </service>
@@ -63,7 +63,7 @@
             <argument type="service" id="debug.stopwatch" on-invalid="null" />
         </service>
 
-        <service id="twig.profile" class="Twig_Profiler_Profile" />
+        <service id="twig.profile" class="Twig\Profiler\Profile" />
 
         <service id="data_collector.twig" class="Symfony\Bridge\Twig\DataCollector\TwigDataCollector" public="false">
             <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="255" />
@@ -117,7 +117,7 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
 
-        <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
+        <service id="twig.extension.debug" class="Twig\Extension\DebugExtension" public="false" />
 
         <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">
             <argument type="service" id="twig" />

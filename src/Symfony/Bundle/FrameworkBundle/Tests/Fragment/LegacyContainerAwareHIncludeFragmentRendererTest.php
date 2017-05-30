@@ -25,7 +25,7 @@ class LegacyContainerAwareHIncludeFragmentRendererTest extends TestCase
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock()))
+            ->will($this->returnValue($this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock()))
         ;
         $renderer = new ContainerAwareHIncludeFragmentRenderer($container);
         $renderer->render('/', Request::create('/'));

@@ -12,26 +12,29 @@
 namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Twig\Node\Node;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
 
 /**
  * Token Parser for the 'trans_default_domain' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TransDefaultDomainTokenParser extends \Twig_TokenParser
+class TransDefaultDomainTokenParser extends AbstractTokenParser
 {
     /**
      * Parses a token and returns a node.
      *
-     * @param \Twig_Token $token A Twig_Token instance
+     * @param Token $token
      *
-     * @return \Twig_Node A Twig_Node instance
+     * @return Node
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $expr = $this->parser->getExpressionParser()->parseExpression();
 
-        $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);
+        $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
         return new TransDefaultDomainNode($expr, $token->getLine(), $this->getTag());
     }

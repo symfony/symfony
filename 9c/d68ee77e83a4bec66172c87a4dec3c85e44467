@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-31T14:39:03Z
+
+Second commit actually removes the `getInlinedServiceIds()` method. This has only existed since 3.3.0 - so it's a BC break, but is highly unlikely to be used. I'm fine with keeping it (deprecated) or removing it.

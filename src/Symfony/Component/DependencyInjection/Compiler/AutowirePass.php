@@ -133,7 +133,13 @@ class AutowirePass extends AbstractRecursivePass
         $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
         $methodCalls = $value->getMethodCalls();
 
-        if ($constructor = $this->getConstructor($value, false)) {
+        try {
+            $constructor = $this->getConstructor($value, false);
+        } catch (RuntimeException $e) {
+            throw new AutowiringFailedException($this->currentId, $e->getMessage(), 0, $e);
+        }
+
+        if ($constructor) {
             array_unshift($methodCalls, array($constructor, $value->getArguments()));
         }
 
@@ -242,7 +248,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @return array The autowired arguments
      *
-     * @throws RuntimeException
+     * @throws AutowiringFailedException
      */
     private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments)
     {

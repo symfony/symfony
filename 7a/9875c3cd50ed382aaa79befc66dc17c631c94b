@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-30T15:40:30Z
+
+In 3.2 we use file_exists, this somehow got lost in a merge I guess
+https://github.com/symfony/symfony/blob/3.2/src/Symfony/Component/Cache/Adapter/PhpArrayAdapter.php#L326
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-30T18:07:34Z
+
+you refactored in #20694 :) from the looks of it i'd say stream_resolve_include_path + include without @ but im not sure that needs to be supported or so; otherwise file_exists/is_file will do. Note 3.2 doesnt use @
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-30T20:17:56Z
+
+let's do the same as in 3.2, that's fine
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-31T07:13:32Z
+
+This should do.

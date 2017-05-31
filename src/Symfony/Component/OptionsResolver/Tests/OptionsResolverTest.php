@@ -374,6 +374,61 @@ class OptionsResolverTest extends TestCase
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    // setFrozen()/isFrozen()/getFrozenOptions()
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionFrozenException
+     * @expectedExceptionMessage The option "foo" is frozen. You cannot change its value.
+     */
+    public function testFailIfFrozenOptionSetted()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setFrozen('foo');
+
+        $this->resolver->resolve(array('foo' => 'baz'));
+    }
+
+    public function testIsFrozen()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setFrozen('foo');
+
+        $this->assertTrue($this->resolver->isFrozen('foo'));
+        $this->assertFalse($this->resolver->isFrozen('bar'));
+    }
+
+    public function testGetFrozenOptions()
+    {
+        $this->assertEquals(array(), $this->resolver->getFrozenOptions());
+
+        $this->resolver->setDefaults(array('foo' => 1, 'bar' => 2, 'baz' => 3));
+        $this->resolver->setFrozen(array('foo', 'bar', 'baz'));
+
+        $this->assertEquals(array('foo', 'bar', 'baz'), $this->resolver->getFrozenOptions());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingDefaultValueException
+     * @expectedExceptionMessage The option "foo" has no default value. You cannot freeze it.
+     */
+    public function testFailIfUnassignedOptionTryingToFrozen()
+    {
+        $this->resolver->setFrozen('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionFrozenException
+     * @expectedExceptionMessage The option "foo" is frozen. You cannot change its default value.
+     */
+    public function testFailIfTryingToSetDefaultForFrozenOption()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setFrozen('foo');
+        $this->resolver->setDefault('foo', 'baz');
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // setDefined()/isDefined()/getDefinedOptions()
     ////////////////////////////////////////////////////////////////////////////
 

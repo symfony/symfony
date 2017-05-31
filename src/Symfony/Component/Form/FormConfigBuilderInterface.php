@@ -228,7 +228,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param bool $locked whether to lock the default data
      *
      * @return $this the configuration object
-     *
+     */
     public function setDataLocked($locked);
 
     /**

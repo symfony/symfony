@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-30T16:47:14Z
+
+Pelease dont merge this yet.  Thanks.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-31T06:27:32Z
+
+Sorry about my last comment, but I wasn't at the computer and I couldn't explain myself. The reason I disabled the selection is that when you click the trace header to collapse/expand it, random parts of it are selected by the browser:
+
+![expcetion-selection](https://cloud.githubusercontent.com/assets/73419/26618403/9a3ea082-45da-11e7-9ef3-64729e630007.gif)
+
+Is there any way to enable selecting text but disabling that undesired random selection? Thanks!
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-31T07:28:23Z
+
+You don't need to apologize!
+However, that's really weird. I tried on my own laptop, using chrome, safari and firefox, but I don't get such random selection by simply clicking on the header for collapsing (except when double-clicking, but that's the normal behavior) :/
+
+Can someone else try on his side?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-31T07:36:23Z
+
+Oh, but re-considering your gif, that's indeed because you're toggling it quite fast, so it's considered a double-click by the browser.
+I'd say it should not really happen in normal usage of the page. You're not likely to collapse/uncollapse everything like this. However, you're likely to need to select and copy the exception or message 😄
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-31T07:40:15Z
+
+OK ... and have you tried collapsing/expanding each line of the trace? Because I remember having issues with that too: the entire line was selected and looked ugly.
+
+In any case, 👍  from me if you have reviewed this and it works as expected.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-31T07:48:59Z
+
+I've just tried. Nothing to report. Maybe the issues you're talking about were more prominent and annoying in a first version of the redesigned page, but now the result is really satisfying to me :)
+The only issue I still get by expanding everything is the one I suggested to fix in #22971. Sometime it  gets entirely out of my screen.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-31T07:51:07Z
+
+Yes, but I thought the error reported in #22971 was fixed and merged in another PR. It was the first thing some people notice with the redesign and there was a PR for that. I can't find it now.

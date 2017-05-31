@@ -40,7 +40,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      *
      * @return array
      */
-    public function getInlinedServiceIdData()
+    public function getInlinedServiceIds()
     {
         return $this->inlinedServiceIds;
     }

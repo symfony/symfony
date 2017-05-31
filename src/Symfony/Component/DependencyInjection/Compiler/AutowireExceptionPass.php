@@ -36,7 +36,7 @@ class AutowireExceptionPass implements CompilerPassInterface
             return;
         }
 
-        $inlinedIds = $this->inlineServicePass->getInlinedServiceIdData();
+        $inlinedIds = $this->inlineServicePass->getInlinedServiceIds();
         $exceptions = $this->autowirePass->getAutowiringExceptions();
 
         // free up references

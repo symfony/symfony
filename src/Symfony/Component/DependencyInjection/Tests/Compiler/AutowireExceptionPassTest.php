@@ -33,7 +33,7 @@ class AutowireExceptionPassTest extends TestCase
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
-            ->method('getInlinedServiceIdData')
+            ->method('getInlinedServiceIds')
             ->will($this->returnValue(array()));
 
         $container = new ContainerBuilder();
@@ -62,7 +62,7 @@ class AutowireExceptionPassTest extends TestCase
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
-            ->method('getInlinedServiceIdData')
+            ->method('getInlinedServiceIds')
             ->will($this->returnValue(array(
                 // a_service inlined into b_service
                 'a_service' => 'b_service',
@@ -97,7 +97,7 @@ class AutowireExceptionPassTest extends TestCase
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
-            ->method('getInlinedServiceIdData')
+            ->method('getInlinedServiceIds')
             ->will($this->returnValue(array(
                 // a_service inlined into b_service
                 'a_service' => 'b_service',
@@ -128,7 +128,7 @@ class AutowireExceptionPassTest extends TestCase
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
-            ->method('getInlinedServiceIdData')
+            ->method('getInlinedServiceIds')
             ->will($this->returnValue(array()));
 
         $container = new ContainerBuilder();

@@ -149,7 +149,7 @@ class TwigExtension extends Extension
         $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)
             ->addTag('twig.loader');
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Twig_Environment',
                 'Twig_Extension',

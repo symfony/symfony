@@ -63,7 +63,7 @@ class FileLinkFormatter implements \Serializable
 
     public function unserialize($serialized)
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             $this->fileLinkFormat = unserialize($serialized, array('allowed_classes' => false));
         } else {
             $this->fileLinkFormat = unserialize($serialized);

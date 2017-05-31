@@ -435,7 +435,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithDateTimeZoneGmtOffset()
     {
-        if (defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) {
+        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 

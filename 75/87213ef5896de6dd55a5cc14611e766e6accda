@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-30T13:01:57Z
+
+Shouldn't we have a separate `TagAwareTraceableAdapter` to decorate tag aware adapters and keep the current one for non tag aware adapters to prevent having an adapter implementing the `TagAwareAdapterInterface` when in doesn't?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-30T14:00:08Z
+
+`TraceableTagAwareAdapter` added and wired to decorate tag aware adapters

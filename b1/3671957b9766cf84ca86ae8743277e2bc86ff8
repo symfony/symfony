@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by sstok at 2017-05-31T09:28:57Z
+
+How would this look like for `$loader->load($confDir.'/container'.self::CONFIG_EXTS, 'glob');` ?
+Would the path be something like `$configDir.'/./*.xml'`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-31T09:31:54Z
+
+you can run the code to know ;)
+the answer to your 2nd question is no

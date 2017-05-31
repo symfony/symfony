@@ -83,13 +83,18 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {
-        if (is_string($resource) && false !== strpbrk($resource, '*?{[')) {
+        if (is_string($resource) && strlen($resource) !== $i = strcspn($resource, '*?{[')) {
             $ret = array();
-            foreach ($this->glob($resource, false, $_, true) as $path => $info) {
-                $ret[] = $this->doImport($path, $type, $ignoreErrors, $sourceResource);
+            $isSubpath = 0 !== $i && false !== strpos(substr($resource, 0, $i), '/');
+            foreach ($this->glob($resource, false, $_, $ignoreErrors || !$isSubpath) as $path => $info) {
+                if (null !== $res = $this->doImport($path, $type, $ignoreErrors, $sourceResource)) {
+                    $ret[] = $res;
+                }
+                $isSubpath = true;
             }
-            if ($ret) {
-                return count($ret) > 1 ? $ret : $ret[0];
+
+            if ($isSubpath) {
+                return isset($ret[1]) ? $ret : (isset($ret[0]) ? $ret[0] : null);
             }
         }
 
@@ -104,7 +109,7 @@ abstract class FileLoader extends Loader
         if (strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
             $pattern = '';
-        } elseif (0 === $i) {
+        } elseif (0 === $i || false === strpos(substr($pattern, 0, $i), '/')) {
             $prefix = '.';
             $pattern = '/'.$pattern;
         } else {

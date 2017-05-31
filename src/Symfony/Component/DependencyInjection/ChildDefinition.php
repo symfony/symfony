@@ -74,17 +74,7 @@ class ChildDefinition extends Definition
             return $this->arguments['index_'.$index];
         }
 
-        if (0 === strpos($index, '$') && array_key_exists($index, $this->arguments)) {
-            return $this->arguments[$index];
-        }
-
-        $lastIndex = count(array_filter(array_keys($this->arguments), 'is_int')) - 1;
-
-        if ($index < 0 || $index > $lastIndex) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, $lastIndex));
-        }
-
-        return $this->arguments[$index];
+        return parent::getArgument($index);
     }
 
     /**
@@ -109,7 +99,7 @@ class ChildDefinition extends Definition
         } elseif (0 === strpos($index, '$')) {
             $this->arguments[$index] = $value;
         } else {
-            throw new InvalidArgumentException('$index must be an integer.');
+            throw new InvalidArgumentException('The argument must be an existing index or the name of a constructor\'s parameter.');
         }
 
         return $this;

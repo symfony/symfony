@@ -116,7 +116,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $globals = $this->getGlobals($class);
 
         $collection = new RouteCollection();
-        $collection->addResource(new FileResource($class->getFileName()));
+        $collection->addResource($this->createConfigResource($class));
 
         foreach ($class->getMethods() as $method) {
             $this->defaultRouteIndex = 0;
@@ -264,6 +264,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
     protected function createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition)
     {
         return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+    }
+
+    protected function createConfigResource(\ReflectionClass $class)
+    {
+        return new FileResource($class->getFileName());
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);

@@ -54,7 +54,7 @@ class AutowireExceptionPassTest extends TestCase
         $autowirePass = $this->getMockBuilder(AutowirePass::class)
             ->getMock();
 
-        $autowireException = new AutowiringFailedException('foo_service_id', 'An autowiring exception message');
+        $autowireException = new AutowiringFailedException('a_service', 'An autowiring exception message');
         $autowirePass->expects($this->any())
             ->method('getAutowiringExceptions')
             ->will($this->returnValue(array($autowireException)));
@@ -63,10 +63,16 @@ class AutowireExceptionPassTest extends TestCase
             ->getMock();
         $inlinePass->expects($this->any())
             ->method('getInlinedServiceIds')
-            ->will($this->returnValue(array('foo_service_id')));
+            ->will($this->returnValue(array(
+                // a_service inlined into b_service
+                'a_service' => 'b_service',
+                // b_service inlined into c_service
+                'b_service' => 'c_service',
+            )));
 
-        // don't register the foo_service_id service
         $container = new ContainerBuilder();
+        // ONLY register c_service in the final container
+        $container->register('c_service', 'stdClass');
 
         $pass = new AutowireExceptionPass($autowirePass, $inlinePass);
 
@@ -76,6 +82,37 @@ class AutowireExceptionPassTest extends TestCase
         } catch (\Exception $e) {
             $this->assertSame($autowireException, $e);
         }
+    }
+
+    public function testDoNotThrowExceptionIfServiceInlinedButRemoved()
+    {
+        $autowirePass = $this->getMockBuilder(AutowirePass::class)
+            ->getMock();
+
+        $autowireException = new AutowiringFailedException('a_service', 'An autowiring exception message');
+        $autowirePass->expects($this->any())
+            ->method('getAutowiringExceptions')
+            ->will($this->returnValue(array($autowireException)));
+
+        $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
+            ->getMock();
+        $inlinePass->expects($this->any())
+            ->method('getInlinedServiceIds')
+            ->will($this->returnValue(array(
+                // a_service inlined into b_service
+                'a_service' => 'b_service',
+                // b_service inlined into c_service
+                'b_service' => 'c_service',
+            )));
+
+        // do NOT register c_service in the container
+        $container = new ContainerBuilder();
+
+        $pass = new AutowireExceptionPass($autowirePass, $inlinePass);
+
+        $pass->process($container);
+        // mark the test as passed
+        $this->assertTrue(true);
     }
 
     public function testNoExceptionIfServiceRemoved()

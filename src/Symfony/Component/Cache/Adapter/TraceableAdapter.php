@@ -22,7 +22,7 @@ use Psr\Cache\CacheItemInterface;
  */
 class TraceableAdapter implements AdapterInterface
 {
-    private $pool;
+    protected $pool;
     private $calls = array();
 
     public function __construct(AdapterInterface $pool)
@@ -177,7 +177,7 @@ class TraceableAdapter implements AdapterInterface
         }
     }
 
-    private function start($name)
+    protected function start($name)
     {
         $this->calls[] = $event = new TraceableAdapterEvent();
         $event->name = $name;

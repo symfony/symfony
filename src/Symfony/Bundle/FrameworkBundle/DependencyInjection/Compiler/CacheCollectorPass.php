@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
+use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -34,11 +36,12 @@ class CacheCollectorPass implements CompilerPassInterface
 
         $collectorDefinition = $container->getDefinition('data_collector.cache');
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $attributes) {
-            if ($container->getDefinition($id)->isAbstract()) {
+            $definition = $container->getDefinition($id);
+            if ($definition->isAbstract()) {
                 continue;
             }
 
-            $container->register($id.'.recorder', TraceableAdapter::class)
+            $container->register($id.'.recorder', is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class)
                 ->setDecoratedService($id)
                 ->addArgument(new Reference($id.'.recorder.inner'))
                 ->setPublic(false);

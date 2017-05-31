@@ -80,6 +80,28 @@ class AutowirePassTest extends TestCase
 
     /**
      * @group legacy
+     * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. Try changing the type-hint for argument "$a" of method "Symfony\Component\DependencyInjection\Tests\Compiler\C::__construct()" to "Symfony\Component\DependencyInjection\Tests\Compiler\AInterface" instead.
+     * @expectedExceptionInSymfony4 \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessageInSymfony4 Cannot autowire service "c": argument "$a" of method "Symfony\Component\DependencyInjection\Tests\Compiler\C::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\A" but no such service exists. You should maybe alias this class to the existing "Symfony\Component\DependencyInjection\Tests\Compiler\B" service.
+     */
+    public function testProcessLegacyAutowireWithAvailableInterface()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setAlias(AInterface::class, B::class);
+        $container->register(B::class);
+        $cDefinition = $container->register('c', __NAMESPACE__.'\C');
+        $cDefinition->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $this->assertCount(1, $container->getDefinition('c')->getArguments());
+        $this->assertEquals(B::class, (string) $container->getDefinition('c')->getArgument(0));
+    }
+
+    /**
+     * @group legacy
      * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. You should alias the "Symfony\Component\DependencyInjection\Tests\Compiler\F" service to "Symfony\Component\DependencyInjection\Tests\Compiler\DInterface" instead.
      * @expectedExceptionInSymfony4 \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessageInSymfony4 Cannot autowire service "g": argument "$d" of method "Symfony\Component\DependencyInjection\Tests\Compiler\G::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\DInterface" but no such service exists. You should maybe alias this interface to the existing "Symfony\Component\DependencyInjection\Tests\Compiler\F" service.
@@ -730,7 +752,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. You should rename (or alias) the "i" service to "Symfony\Component\DependencyInjection\Tests\Compiler\I" instead.
+     * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. Try changing the type-hint for argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" to "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" instead.
      * @expectedExceptionInSymfony4 \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
      * @expectedExceptionMessageInSymfony4 Cannot autowire service "j": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\J::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\I" but no such service exists. Try changing the type-hint to "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" instead.
      */
@@ -742,6 +764,25 @@ class AutowirePassTest extends TestCase
         $container->register('i', I::class);
         $container->register('j', J::class)
             ->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. Try changing the type-hint for "Symfony\Component\DependencyInjection\Tests\Compiler\A" in "Symfony\Component\DependencyInjection\Tests\Compiler\Bar" to "Symfony\Component\DependencyInjection\Tests\Compiler\AInterface" instead.
+     */
+    public function testTypedReferenceDeprecationNotice()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('aClass', A::class);
+        $container->setAlias(AInterface::class, 'aClass');
+        $container
+            ->register('bar', Bar::class)
+            ->setProperty('a', array(new TypedReference(A::class, A::class, Bar::class)))
+        ;
 
         $pass = new AutowirePass();
         $pass->process($container);
@@ -798,7 +839,11 @@ class Bar
     }
 }
 
-class A
+interface AInterface
+{
+}
+
+class A implements AInterface
 {
     public static function create(Foo $foo)
     {

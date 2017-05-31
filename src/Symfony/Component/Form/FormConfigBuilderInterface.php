@@ -22,9 +22,9 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Adds an event listener to an event on this form.
      *
-     * @param string   $eventName The name of the event to listen to.
-     * @param callable $listener  The listener to execute.
-     * @param int      $priority  The priority of the listener. Listeners
+     * @param string   $eventName the name of the event to listen to.
+     * @param callable $listener  the listener to execute.
+     * @param int      $priority  the priority of the listener. Listeners
      *                            with a higher priority are called before
      *                            listeners with a lower priority.
      *
@@ -35,7 +35,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Adds an event subscriber for events on this form.
      *
-     * @param EventSubscriberInterface $subscriber The subscriber to attach.
+     * @param EventSubscriberInterface $subscriber the subscriber to attach.
      *
      * @return $this the configuration object.
      */
@@ -88,8 +88,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the value for an attribute.
      *
-     * @param string $name  The name of the attribute
-     * @param mixed  $value The value of the attribute
+     * @param string $name  the name of the attribute
+     * @param mixed  $value the value of the attribute
      *
      * @return $this the configuration object.
      */
@@ -98,7 +98,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the attributes.
      *
-     * @param array $attributes The attributes.
+     * @param array $attributes the attributes.
      *
      * @return $this the configuration object.
      */
@@ -116,7 +116,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Set whether the form is disabled.
      *
-     * @param bool $disabled Whether the form is disabled
+     * @param bool $disabled whether the form is disabled
      *
      * @return $this the configuration object.
      */
@@ -125,7 +125,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the data used for the client data when no value is submitted.
      *
-     * @param mixed $emptyData The empty data.
+     * @param mixed $emptyData the empty data.
      *
      * @return $this the configuration object.
      */
@@ -164,7 +164,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Sets whether the form should be mapped to an element of its
      * parent's data.
      *
-     * @param bool $mapped Whether the form should be mapped.
+     * @param bool $mapped whether the form should be mapped.
      *
      * @return $this the configuration object.
      */
@@ -173,7 +173,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets whether the form's data should be modified by reference.
      *
-     * @param bool $byReference Whether the data should be
+     * @param bool $byReference whether the data should be
      *                          modified by reference.
      *
      * @return $this the configuration object.
@@ -183,7 +183,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets whether the form should read and write the data of its parent.
      *
-     * @param bool $inheritData Whether the form should inherit its parent's data.
+     * @param bool $inheritData whether the form should inherit its parent's data.
      *
      * @return $this the configuration object.
      */
@@ -192,7 +192,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets whether the form should be compound.
      *
-     * @param bool $compound Whether the form should be compound.
+     * @param bool $compound whether the form should be compound.
      *
      * @return $this the configuration object.
      *
@@ -203,7 +203,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Set the types.
      *
-     * @param ResolvedFormTypeInterface $type The type of the form.
+     * @param ResolvedFormTypeInterface $type the type of the form.
      *
      * @return $this the configuration object.
      */
@@ -212,7 +212,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the initial data of the form.
      *
-     * @param mixed $data The data of the form in application format.
+     * @param mixed $data the data of the form in application format.
      *
      * @return $this the configuration object.
      */
@@ -225,7 +225,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * this configuration. The data can only be modified then by
      * submitting the form.
      *
-     * @param bool $locked Whether to lock the default data.
+     * @param bool $locked whether to lock the default data.
      *
      * @return $this the configuration object.
      */
@@ -234,14 +234,14 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the form factory used for creating new forms.
      *
-     * @param FormFactoryInterface $formFactory The form factory.
+     * @param FormFactoryInterface $formFactory the form factory.
      */
     public function setFormFactory(FormFactoryInterface $formFactory);
 
     /**
      * Sets the target URL of the form.
      *
-     * @param string $action The target URL of the form.
+     * @param string $action the target URL of the form.
      *
      * @return $this the configuration object.
      */
@@ -250,7 +250,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the HTTP method used by the form.
      *
-     * @param string $method The HTTP method of the form.
+     * @param string $method the HTTP method of the form.
      *
      * @return $this the configuration object.
      */
@@ -270,7 +270,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * Should be set to true only for root forms.
      *
-     * @param bool $initialize True to initialize the form automatically,
+     * @param bool $initialize true to initialize the form automatically,
      *                         false to suppress automatic initialization.
      *                         In the second case, you need to call
      *                         {@link FormInterface::initialize()} manually.

@@ -45,8 +45,8 @@ class UserSecurityIdentityTest extends TestCase
     public function getCompareData()
     {
         $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
-                            ->setMockClassName('USI_AccountImpl')
-                            ->getMock();
+            ->setMockClassName('USI_AccountImpl')
+            ->getMock();
         $account
             ->expects($this->any())
             ->method('getUsername')

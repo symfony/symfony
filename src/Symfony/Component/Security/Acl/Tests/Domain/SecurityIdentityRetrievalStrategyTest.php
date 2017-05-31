@@ -27,8 +27,8 @@ class SecurityIdentityRetrievalStrategyTest extends TestCase
 
         if ('anonymous' === $authenticationStatus) {
             $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')
-                                ->disableOriginalConstructor()
-                                ->getMock();
+                ->disableOriginalConstructor()
+                ->getMock();
         } else {
             $class = '';
             if (is_string($user)) {
@@ -36,8 +36,8 @@ class SecurityIdentityRetrievalStrategyTest extends TestCase
             }
 
             $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-                        ->setMockClassName($class)
-                        ->getMock();
+                ->setMockClassName($class)
+                ->getMock();
         }
         $token
             ->expects($this->once())

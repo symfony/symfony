@@ -124,9 +124,9 @@ class FormTypeTest extends BaseTypeTest
     public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', static::TESTED_TYPE)
-                ->add('child', static::TESTED_TYPE)
-                ->getForm()
-                ->createView();
+            ->add('child', static::TESTED_TYPE)
+            ->getForm()
+            ->createView();
 
         $this->assertFalse($view['child']->vars['read_only']);
     }
@@ -478,9 +478,9 @@ class FormTypeTest extends BaseTypeTest
     public function testViewIsNotRenderedByDefault()
     {
         $view = $this->factory->createBuilder(static::TESTED_TYPE)
-                ->add('foo', static::TESTED_TYPE)
-                ->getForm()
-                ->createView();
+            ->add('foo', static::TESTED_TYPE)
+            ->getForm()
+            ->createView();
 
         $this->assertFalse($view->isRendered());
     }

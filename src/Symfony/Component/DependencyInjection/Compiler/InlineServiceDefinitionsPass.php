@@ -37,8 +37,24 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      * Returns an array of all services inlined by this pass.
      *
      * @return array Service id strings
+     *
+     * @deprecated This method is deprecated as of 3.3 and will be removed in 4.0. Use getInlinedServiceIdData() instead.
      */
     public function getInlinedServiceIds()
+    {
+        @trigger_error(sprintf('%s is deprecated as of 3.3 and will be removed in 4.0. Use getInlinedServiceIdData() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return array_keys($this->inlinedServiceIds);
+    }
+
+    /**
+     * Returns an array of all services inlined by this pass.
+     *
+     * The key is the inlined service id and its value is the service it was inlined into.
+     *
+     * @return array
+     */
+    public function getInlinedServiceIdData()
     {
         return $this->inlinedServiceIds;
     }
@@ -57,7 +73,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 
             if ($this->isInlineableDefinition($id, $definition, $this->container->getCompiler()->getServiceReferenceGraph())) {
                 $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
-                $this->inlinedServiceIds[] = $id;
+                $this->inlinedServiceIds[$id] = $this->currentId;
 
                 if ($definition->isShared()) {
                     return $definition;

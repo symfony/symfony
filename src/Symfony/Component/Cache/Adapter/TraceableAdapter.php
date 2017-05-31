@@ -107,7 +107,7 @@ class TraceableAdapter implements AdapterInterface
      */
     public function getItems(array $keys = array())
     {
-        $event = $this->start(__FUNCTION__, $keys);
+        $event = $this->start(__FUNCTION__);
         try {
             $result = $this->pool->getItems($keys);
         } finally {

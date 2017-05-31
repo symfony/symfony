@@ -125,6 +125,34 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
+    public function testGetDate()
+    {
+        $isoDate = '2016-07-05T15:30:00UTC';
+        $bag = new ParameterBag(array(
+            'd1' => '2016-01-01',
+            'iso' => $isoDate,
+        ));
+
+        $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
+        $diff = $date->diff($bag->getDate('d1', 'Y-m-d'));
+
+        $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
+        $this->assertNull($bag->getDate('d1', 'd/m/Y'), '->getDate() returns null if the format is not valid');
+        $this->assertNull($bag->getDate('d2', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
+        $this->assertEquals($date->format('Ymd'), $bag->getDate('d1', 'Y-m-d', new \DateTime('2016-12-01'))->format('Ymd'), '->getDate() parses the value if the key is present');
+
+        $date = $bag->getDate('iso', \DateTime::ISO8601);
+        $this->assertEquals(new \DateTime($isoDate), $date);
+        $this->assertEquals('UTC', $date->getTimezone()->getName());
+
+        $this->assertEquals($date, $bag->getDate('nokey', \DateTime::ISO8601, $isoDate));
+        $this->assertInstanceOf(\DateTimeInterface::class, $bag->getDate('nokey', \DateTime::ISO8601, $date));
+        $this->assertNull($bag->getDate('nokey', 'd/m/Y', $isoDate), '->getDate() returns null when the default value is not in the specified format');
+
+        $tz = $bag->getDate('d1', 'Y-m-d', null, new \DateTimeZone('Europe/Tirane'))->getTimezone()->getName();
+        $this->assertEquals('Europe/Tirane', $tz, '->getDate() accepts a DateTimeZone object which specifies the preferred timezone');
+    }
+
     public function testFilter()
     {
         $bag = new ParameterBag(array(
@@ -134,7 +162,7 @@ class ParameterBagTest extends TestCase
             'dec' => '256',
             'hex' => '0x100',
             'array' => array('bang'),
-            ));
+        ));
 
         $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
 

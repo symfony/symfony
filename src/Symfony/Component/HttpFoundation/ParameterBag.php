@@ -188,6 +188,39 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the parameter value converted to a DateTime object.
+     *
+     * @param string                          $key      The parameter key
+     * @param string                          $format   The expected date format
+     * @param \DateTimeInterface|string|null  $default  The default value to be converted to a DateTime object if the parameter key does not exist
+     * @param \DateTimeZone|null              $timeZone A DateTimeZone object representing the desired time zone
+     *
+     * @return \DateTimeInterface|null
+     */
+    public function getDate($key, $format, $default = null, \DateTimeZone $timeZone = null)
+    {
+        $time = $this->get($key, $default);
+
+        if ((null === $time) || $time instanceof \DateTimeInterface) {
+            return $time;
+        }
+
+        // if the user has specified a timezone then pass that
+        // otherwise do not even attempt to put a value but rather let the runtime decide
+        // the default value by itself
+        // this is in order to ensure compatibility with all php versions since
+        // some accept null as a TimeZone parameter and others do not
+        if (null !== $timeZone) {
+            $result = \DateTime::createFromFormat($format, $time, $timeZone);
+        } else {
+            $result = \DateTime::createFromFormat($format, $time);
+        }
+
+        // Failure to parse the date according to the specified format will return null
+        return false === $result ? null : $result;
+    }
+
+    /**
      * Filter key.
      *
      * @param string $key     Key

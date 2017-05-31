@@ -62,7 +62,7 @@ class ChildDefinition extends Definition
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param int $index
+     * @param int|string $index
      *
      * @return mixed The argument value
      *
@@ -72,6 +72,10 @@ class ChildDefinition extends Definition
     {
         if (array_key_exists('index_'.$index, $this->arguments)) {
             return $this->arguments['index_'.$index];
+        }
+
+        if (0 === strpos($index, '$') && array_key_exists($index, $this->arguments)) {
+            return $this->arguments[$index];
         }
 
         $lastIndex = count(array_filter(array_keys($this->arguments), 'is_int')) - 1;
@@ -91,8 +95,8 @@ class ChildDefinition extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param int   $index
-     * @param mixed $value
+     * @param int|string $index
+     * @param mixed      $value
      *
      * @return self the current instance
      *

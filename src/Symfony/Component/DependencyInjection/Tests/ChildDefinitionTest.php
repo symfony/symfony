@@ -113,6 +113,10 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame('baz', $def->getArgument(1));
 
         $this->assertSame(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz'), $def->getArguments());
+
+        $this->assertSame($def, $def->replaceArgument('$bar', 'val'));
+        $this->assertSame('val', $def->getArgument('$bar'));
+        $this->assertSame(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz', '$bar' => 'val'), $def->getArguments());
     }
 
     /**

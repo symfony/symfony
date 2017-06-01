@@ -62,6 +62,21 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetEmbeddableProperties()
+    {
+        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            return;
+        }
+
+        $this->assertEquals(
+            array(
+                'id',
+                'embedded',
+            ),
+            $this->extractor->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
+        );
+    }
+
     /**
      * @dataProvider typesProvider
      */

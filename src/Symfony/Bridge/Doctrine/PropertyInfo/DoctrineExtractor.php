@@ -50,7 +50,19 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             return;
         }
 
-        return array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
+        $properties = array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
+
+        if (class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            if ($metadata instanceof ClassMetadataInfo && count($metadata->embeddedClasses) > 0) {
+                $properties = array_filter($properties, function ($property) {
+                    return false === strpos($property, '.');
+                });
+
+                $properties = array_merge($properties, array_keys($metadata->embeddedClasses));
+            }
+        }
+
+        return $properties;
     }
 
     /**

@@ -345,12 +345,33 @@ class PhpMatcherDumperTest extends TestCase
         $groupOptimisedCollection->add('slashed_b', new Route('/slashed/group/b/'));
         $groupOptimisedCollection->add('slashed_c', new Route('/slashed/group/c/'));
 
+        $trailingSlashCollection = new RouteCollection();
+        $trailingSlashCollection->add('simple_trailing_slash_no_methods', new Route('/trailing/simple/no-methods/', array(), array(), array(), '', array(), array()));
+        $trailingSlashCollection->add('simple_trailing_slash_GET_method', new Route('/trailing/simple/get-method/', array(), array(), array(), '', array(), array('GET')));
+        $trailingSlashCollection->add('simple_trailing_slash_HEAD_method', new Route('/trailing/simple/head-method/', array(), array(), array(), '', array(), array('HEAD')));
+        $trailingSlashCollection->add('simple_trailing_slash_POST_method', new Route('/trailing/simple/post-method/', array(), array(), array(), '', array(), array('POST')));
+        $trailingSlashCollection->add('regex_trailing_slash_no_methods', new Route('/trailing/regex/no-methods/{param}/', array(), array(), array(), '', array(), array()));
+        $trailingSlashCollection->add('regex_trailing_slash_GET_method', new Route('/trailing/regex/get-method/{param}/', array(), array(), array(), '', array(), array('GET')));
+        $trailingSlashCollection->add('regex_trailing_slash_HEAD_method', new Route('/trailing/regex/head-method/{param}/', array(), array(), array(), '', array(), array('HEAD')));
+        $trailingSlashCollection->add('regex_trailing_slash_POST_method', new Route('/trailing/regex/post-method/{param}/', array(), array(), array(), '', array(), array('POST')));
+
+        $trailingSlashCollection->add('simple_not_trailing_slash_no_methods', new Route('/not-trailing/simple/no-methods', array(), array(), array(), '', array(), array()));
+        $trailingSlashCollection->add('simple_not_trailing_slash_GET_method', new Route('/not-trailing/simple/get-method', array(), array(), array(), '', array(), array('GET')));
+        $trailingSlashCollection->add('simple_not_trailing_slash_HEAD_method', new Route('/not-trailing/simple/head-method', array(), array(), array(), '', array(), array('HEAD')));
+        $trailingSlashCollection->add('simple_not_trailing_slash_POST_method', new Route('/not-trailing/simple/post-method', array(), array(), array(), '', array(), array('POST')));
+        $trailingSlashCollection->add('regex_not_trailing_slash_no_methods', new Route('/not-trailing/regex/no-methods/{param}', array(), array(), array(), '', array(), array()));
+        $trailingSlashCollection->add('regex_not_trailing_slash_GET_method', new Route('/not-trailing/regex/get-method/{param}', array(), array(), array(), '', array(), array('GET')));
+        $trailingSlashCollection->add('regex_not_trailing_slash_HEAD_method', new Route('/not-trailing/regex/head-method/{param}', array(), array(), array(), '', array(), array('HEAD')));
+        $trailingSlashCollection->add('regex_not_trailing_slash_POST_method', new Route('/not-trailing/regex/post-method/{param}', array(), array(), array(), '', array(), array('POST')));
+
         return array(
            array($collection, 'url_matcher1.php', array()),
            array($redirectCollection, 'url_matcher2.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($rootprefixCollection, 'url_matcher3.php', array()),
            array($headMatchCasesCollection, 'url_matcher4.php', array()),
            array($groupOptimisedCollection, 'url_matcher5.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
+           array($trailingSlashCollection, 'url_matcher6.php', array()),
+           array($trailingSlashCollection, 'url_matcher7.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
         );
     }
 }

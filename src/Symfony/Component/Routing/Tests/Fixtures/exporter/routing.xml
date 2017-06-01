@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://symfony.com/schema/routing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+  <route id="foo" path="/foo/{bar}">
+    <default key="def">test</default>
+    <requirement key="bar">baz|symfony</requirement>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="foobar" path="/foo/{bar}">
+    <default key="bar">toto</default>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="bar" path="/bar/{foo}" methods="GET, HEAD">
+    <requirement key="_method">GET|head</requirement>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baragain" path="/baragain/{foo}" methods="GET, POST">
+    <requirement key="_method">get|post</requirement>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz" path="/test/baz">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz2" path="/test/baz.html">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz3" path="/test/baz3/">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz4" path="/test/{foo}/">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz5" path="/test/{foo}/" methods="GET">
+    <requirement key="_method">get</requirement>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz5unsafe" path="/testunsafe/{foo}/" methods="POST">
+    <requirement key="_method">post</requirement>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz6" path="/test/baz">
+    <default key="foo">bar baz</default>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz7" path="/te st/baz">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz8" path="/te\ st/baz">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="baz9" path="/test/{baz}">
+    <requirement key="baz">te\\ st</requirement>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route1" path="/route1" host="a.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route2" path="/c2/route2" host="a.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route3" path="/c2/route3" host="b.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route4" path="/route4" host="a.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route5" path="/route5" host="c.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route6" path="/route6">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route11" path="/route11" host="{var1}.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route12" path="/route12" host="{var1}.example.com">
+    <default key="var1">val</default>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route13" path="/route13/{name}" host="{var1}.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route14" path="/route14/{name}" host="{var1}.example.com">
+    <default key="var1">val</default>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route15" path="/route15/{name}" host="c.example.com">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route16" path="/route16/{name}">
+    <default key="var1">val</default>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+  <route id="route17" path="/route17">
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+  </route>
+</routes>

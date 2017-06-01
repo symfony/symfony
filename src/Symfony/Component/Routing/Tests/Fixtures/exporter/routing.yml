@@ -1,0 +1,128 @@
+foo:
+    path: '/foo/{bar}'
+    defaults: { def: test }
+    requirements: { bar: baz|symfony }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+foobar:
+    path: '/foo/{bar}'
+    defaults: { bar: toto }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+bar:
+    path: '/bar/{foo}'
+    defaults: {  }
+    requirements: { _method: GET|head }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    methods: [GET, HEAD]
+baragain:
+    path: '/baragain/{foo}'
+    defaults: {  }
+    requirements: { _method: get|post }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    methods: [GET, POST]
+baz:
+    path: /test/baz
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz2:
+    path: /test/baz.html
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz3:
+    path: /test/baz3/
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz4:
+    path: '/test/{foo}/'
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz5:
+    path: '/test/{foo}/'
+    defaults: {  }
+    requirements: { _method: get }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    methods: [GET]
+baz5unsafe:
+    path: '/testunsafe/{foo}/'
+    defaults: {  }
+    requirements: { _method: post }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    methods: [POST]
+baz6:
+    path: /test/baz
+    defaults: { foo: 'bar baz' }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz7:
+    path: '/te st/baz'
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz8:
+    path: '/te\ st/baz'
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+baz9:
+    path: '/test/{baz}'
+    defaults: {  }
+    requirements: { baz: 'te\\ st' }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+route1:
+    path: /route1
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: a.example.com
+route2:
+    path: /c2/route2
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: a.example.com
+route3:
+    path: /c2/route3
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: b.example.com
+route4:
+    path: /route4
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: a.example.com
+route5:
+    path: /route5
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: c.example.com
+route6:
+    path: /route6
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+route11:
+    path: /route11
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: '{var1}.example.com'
+route12:
+    path: /route12
+    defaults: { var1: val }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: '{var1}.example.com'
+route13:
+    path: '/route13/{name}'
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: '{var1}.example.com'
+route14:
+    path: '/route14/{name}'
+    defaults: { var1: val }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: '{var1}.example.com'
+route15:
+    path: '/route15/{name}'
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+    host: c.example.com
+route16:
+    path: '/route16/{name}'
+    defaults: { var1: val }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }
+route17:
+    path: /route17
+    defaults: {  }
+    options: { compiler_class: Symfony\Component\Routing\RouteCompiler }

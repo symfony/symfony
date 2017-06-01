@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class AbstractEventDispatcherTest extends TestCase
@@ -301,6 +302,17 @@ abstract class AbstractEventDispatcherTest extends TestCase
     {
         $this->assertFalse($this->dispatcher->hasListeners('foo'));
         $this->assertFalse($this->dispatcher->hasListeners());
+    }
+
+    public function testEventListener()
+    {
+        $dispatcher = $this->createEventDispatcher();
+        $listener = new EventListener(function(Event $event) {});
+        $dispatcher->addListener('foo', $listener);
+        $dispatcher->addListener('foo', $listener);
+        $dispatcher->dispatch('foo');
+
+        $this->assertSame(2, $listener->getCallingCount());
     }
 }
 

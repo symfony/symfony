@@ -21,7 +21,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
 {
     protected function setUp()
     {
-        @trigger_error('Abstract class '.__CLASS__.' is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Test\TypeTestCase class instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('Abstract class %s is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Test\TypeTestCase class instead.', __CLASS__),  E_USER_DEPRECATED);
         parent::setUp();
     }
 }

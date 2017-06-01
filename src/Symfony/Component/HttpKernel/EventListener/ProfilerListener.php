@@ -53,7 +53,7 @@ class ProfilerListener implements EventSubscriberInterface
             // Prevent the deprecation notice to be triggered all the time.
             // The onKernelRequest() method fires some logic only when the
             // RequestStack instance is not provided as a dependency.
-            @trigger_error('Since version 2.4, the '.__METHOD__.' method must accept a RequestStack instance to get the request instead of using the '.__CLASS__.'::onKernelRequest method that will be removed in 3.0.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Since version 2.4, the %s method must accept a RequestStack instance to get the request instead of using the %s::onKernelRequest method that will be removed in 3.0.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
         }
 
         $this->profiler = $profiler;

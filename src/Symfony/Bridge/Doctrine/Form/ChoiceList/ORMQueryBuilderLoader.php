@@ -57,14 +57,14 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         }
 
         if ($queryBuilder instanceof \Closure) {
-            @trigger_error('Passing a QueryBuilder closure to '.__CLASS__.'::__construct() is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a QueryBuilder closure to %s::__construct() is deprecated since version 2.7 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
 
             if (!$manager instanceof ObjectManager) {
                 throw new UnexpectedTypeException($manager, 'Doctrine\Common\Persistence\ObjectManager');
             }
 
-            @trigger_error('Passing an EntityManager to '.__CLASS__.'::__construct() is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
-            @trigger_error('Passing a class to '.__CLASS__.'::__construct() is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an EntityManager to %s::__construct() is deprecated since version 2.7 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a class to %s::__construct() is deprecated since version 2.7 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
 
             $queryBuilder = $queryBuilder($manager->getRepository($class));
 

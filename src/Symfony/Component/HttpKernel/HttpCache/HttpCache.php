@@ -177,7 +177,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     public function getEsi()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getSurrogate() method instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s method is deprecated since version 2.6 and will be removed in 3.0. Use the getSurrogate() method instead.', __METHOD__),  E_USER_DEPRECATED);
 
         return $this->getSurrogate();
     }

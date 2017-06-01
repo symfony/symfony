@@ -187,7 +187,7 @@ class ExecutionContext implements ExecutionContextInterface
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
         if (func_num_args() > 2) {
-            @trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('The parameters $invalidValue, $plural and $code in method %s are deprecated since version 2.5 and will be removed in 3.0. Use the %s::buildViolation method instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
             $this
                 ->buildViolation($message, $parameters)
@@ -321,7 +321,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s method is deprecated since version 2.5 and will be removed in 3.0. Use the %s::buildViolation method instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
         if (func_num_args() > 2) {
             $this
@@ -348,7 +348,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator() method instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s method is deprecated since version 2.5 and will be removed in 3.0. Use the %s::getValidator() method instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
         if (is_array($value)) {
             // The $traverse flag is ignored for arrays
@@ -386,7 +386,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator() method instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s method is deprecated since version 2.5 and will be removed in 3.0. Use the %s::getValidator() method instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
         return $this
             ->getValidator()
@@ -401,7 +401,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getMetadataFactory()
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext::getValidator method in combination with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext::getValidator method in combination with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', __METHOD__),  E_USER_DEPRECATED);
 
         $validator = $this->getValidator();
 

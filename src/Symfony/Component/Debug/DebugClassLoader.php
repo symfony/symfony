@@ -42,7 +42,7 @@ class DebugClassLoader
         $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
 
         if ($this->wasFinder) {
-            @trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s method will no longer support receiving an object into its $classLoader argument in 3.0.', __METHOD__),  E_USER_DEPRECATED);
             $this->classLoader = array($classLoader, 'loadClass');
             $this->isFinder = true;
         } else {
@@ -143,7 +143,7 @@ class DebugClassLoader
      */
     public function findFile($class)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s method is deprecated since version 2.5 and will be removed in 3.0.', __METHOD__),  E_USER_DEPRECATED);
 
         if ($this->wasFinder) {
             return $this->classLoader[0]->findFile($class);

@@ -1072,7 +1072,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function synchronize($id)
     {
         if ('request' !== $id) {
-            @trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s method is deprecated in version 2.7 and will be removed in version 3.0.', __METHOD__),  E_USER_DEPRECATED);
         }
 
         foreach ($this->definitions as $definitionId => $definition) {

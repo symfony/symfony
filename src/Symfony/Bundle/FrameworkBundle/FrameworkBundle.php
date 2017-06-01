@@ -107,7 +107,7 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $this->addCompilerPassIfExists($container, ConfigCachePass::class);
-            $container->addCompilerPass(new CacheCollectorPass());
+            $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
         }
     }
 

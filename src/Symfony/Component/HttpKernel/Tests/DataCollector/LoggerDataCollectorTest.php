@@ -17,6 +17,27 @@ use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
 class LoggerDataCollectorTest extends TestCase
 {
+    public function testCollectWithUnexpectedFormat()
+    {
+        $logger = $this->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')->getMock();
+        $logger->expects($this->once())->method('countErrors')->will($this->returnValue('foo'));
+        $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue(array()));
+
+        $c = new LoggerDataCollector($logger, __DIR__.'/');
+        $c->lateCollect();
+        $compilerLogs = $c->getCompilerLogs()->getValue('message');
+
+        $this->assertSame(array(
+            array('message' => 'Removed service "Psr\Container\ContainerInterface"; reason: private alias.'),
+            array('message' => 'Removed service "Symfony\Component\DependencyInjection\ContainerInterface"; reason: private alias.'),
+        ), $compilerLogs['Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass']);
+
+        $this->assertSame(array(
+            array('message' => 'Some custom logging message'),
+            array('message' => 'With ending :'),
+        ), $compilerLogs['Unknown Compiler Pass']);
+    }
+
     /**
      * @dataProvider getCollectTestData
      */

@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -41,13 +42,25 @@ class CacheCollectorPass implements CompilerPassInterface
                 continue;
             }
 
-            $container->register($id.'.recorder', is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class)
-                ->setDecoratedService($id)
-                ->addArgument(new Reference($id.'.recorder.inner'))
-                ->setPublic(false);
+            $recorder = new Definition(is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class);
+            $recorder->setTags($definition->getTags());
+            $recorder->setPublic($definition->isPublic());
+            $recorder->setArguments(array(new Reference($innerId = $id.'.recorder_inner')));
+
+            $definition->setTags(array());
+            $definition->setPublic(false);
+
+            if ($types = $definition->getAutowiringTypes(false)) {
+                $recorder->setAutowiringTypes($types);
+                $definition->setAutowiringTypes(array());
+            }
+
+            $container->setDefinition($innerId, $definition);
+            $container->setDefinition($id, $recorder);
 
             // Tell the collector to add the new instance
             $collectorDefinition->addMethodCall('addInstance', array($id, new Reference($id)));
+            $collectorDefinition->setPublic(false);
         }
     }
 }

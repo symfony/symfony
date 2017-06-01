@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures\Container33;
 
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 if (!class_exists(Foo::class, false)) {

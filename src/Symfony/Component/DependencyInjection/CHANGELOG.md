@@ -20,7 +20,6 @@ CHANGELOG
  * added support for omitting the factory class name in a service definition if the definition class is set
  * deprecated case insensitivity of service identifiers
  * added "iterator" argument type for lazy iteration over a set of values and services
- * added "closure-proxy" argument type for turning services' methods into lazy callables
  * added file-wide configurable defaults for service attributes "public", "tags",
    "autowire" and "autoconfigure"
  * made the "class" attribute optional, using the "id" as fallback

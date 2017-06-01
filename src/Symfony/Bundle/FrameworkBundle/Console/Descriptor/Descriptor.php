@@ -312,10 +312,6 @@ abstract class Descriptor implements DescriptorInterface
     {
         $r = new \ReflectionFunction($closure);
 
-        if (preg_match('#^/\*\* @closure-proxy ([^: ]++)::([^: ]++) \*/$#', $r->getDocComment(), $m)) {
-            return sprintf('%s::%s', $m[1], $m[2]);
-        }
-
         return 'closure';
     }
 }

@@ -85,7 +85,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         foreach ($files as $file) {
             $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
 
-            if (PHP_VERSION_ID >= 70000) {
+            if (\PHP_VERSION_ID >= 70000) {
                 // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
                 gc_mem_caches();
             }

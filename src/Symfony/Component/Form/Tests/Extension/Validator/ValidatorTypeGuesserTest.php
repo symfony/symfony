@@ -90,7 +90,7 @@ class ValidatorTypeGuesserTest extends TestCase
      */
     public function testLegacyGuessRequired()
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             $this->markTestSkipped('Cannot use a class called True on PHP 7 or higher.');
         }
         $true = 'Symfony\Component\Validator\Constraints\True';

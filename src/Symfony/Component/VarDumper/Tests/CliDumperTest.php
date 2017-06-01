@@ -45,7 +45,7 @@ class CliDumperTest extends VarDumperTestCase
         $closure54 = '';
         $r = defined('HHVM_VERSION') ? '' : '#%d';
 
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $closure54 = <<<EOTXT
 
     class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
@@ -364,7 +364,7 @@ EOTXT
      */
     public function testBuggyRefs()
     {
-        if (PHP_VERSION_ID >= 50600) {
+        if (\PHP_VERSION_ID >= 50600) {
             $this->markTestSkipped('PHP 5.6 fixed refs counting');
         }
 

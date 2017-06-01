@@ -108,7 +108,7 @@ class ClassMapGeneratorTest extends TestCase
             )),
         );
 
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $data[] = array(__DIR__.'/Fixtures/php5.4', array(
                 'TFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'CFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
@@ -119,7 +119,7 @@ class ClassMapGeneratorTest extends TestCase
             ));
         }
 
-        if (PHP_VERSION_ID >= 50500) {
+        if (\PHP_VERSION_ID >= 50500) {
             $data[] = array(__DIR__.'/Fixtures/php5.5', array(
                 'ClassCons\\Foo' => __DIR__.'/Fixtures/php5.5/class_cons.php',
             ));

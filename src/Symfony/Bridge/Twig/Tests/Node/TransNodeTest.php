@@ -40,11 +40,11 @@ class TransNodeTest extends TestCase
 
     protected function getVariableGetterWithoutStrictCheck($name)
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             return sprintf('($context["%s"] ?? null)', $name, $name);
         }
 
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
         }
 
@@ -57,11 +57,11 @@ class TransNodeTest extends TestCase
             return sprintf('(isset($context["%s"]) || array_key_exists("%s", $context) ? $context["%s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%s" does not exist.\', 0, $this->getSourceContext()); })())', $name, $name, $name, $name);
         }
 
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             return sprintf('($context["%s"] ?? $this->getContext($context, "%s"))', $name, $name, $name);
         }
 
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             return sprintf('(isset($context["%s"]) ? $context["%s"] : $this->getContext($context, "%s"))', $name, $name, $name);
         }
 

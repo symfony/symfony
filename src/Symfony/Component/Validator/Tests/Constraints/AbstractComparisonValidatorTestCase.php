@@ -36,7 +36,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 {
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
-        if (PHP_VERSION_ID < 50500) {
+        if (\PHP_VERSION_ID < 50500) {
             return $comparisons;
         }
 
@@ -130,7 +130,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
         if ($dirtyValue instanceof \DateTime || $dirtyValue instanceof \DateTimeInterface) {
             IntlTestHelper::requireIntl($this, '57.1');
 
-            if (PHP_VERSION_ID < 50304 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+            if (\PHP_VERSION_ID < 50304 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
                 $this->markTestSkipped('Intl supports formatting DateTime objects since 5.3.4');
             }
         }

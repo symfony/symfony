@@ -272,7 +272,7 @@ class DateType extends AbstractType
         $timezone = $formatter->getTimezoneId();
         $formattedTimestamps = array();
 
-        if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
+        if ($setTimeZone = \PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
             $formatter->setTimeZone('UTC');
         } else {
             $formatter->setTimeZoneId('UTC');

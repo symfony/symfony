@@ -44,7 +44,7 @@ class JsonBundleWriterTest extends TestCase
 
     protected function tearDown()
     {
-        if (PHP_VERSION_ID < 50400) {
+        if (\PHP_VERSION_ID < 50400) {
             return;
         }
 

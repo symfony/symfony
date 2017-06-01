@@ -88,7 +88,7 @@ class AbstractProxyTest extends TestCase
 
     public function testIsActivePhp53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
@@ -109,7 +109,7 @@ class AbstractProxyTest extends TestCase
 
     public function testSetActivePhp53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
@@ -147,7 +147,7 @@ class AbstractProxyTest extends TestCase
      */
     public function testNameExceptionPhp53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
@@ -184,7 +184,7 @@ class AbstractProxyTest extends TestCase
      */
     public function testIdExceptionPhp53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 

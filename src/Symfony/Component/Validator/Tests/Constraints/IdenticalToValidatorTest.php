@@ -64,7 +64,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array(null, 1),
         );
 
-        if (PHP_VERSION_ID >= 50500) {
+        if (\PHP_VERSION_ID >= 50500) {
             $immutableDate = new \DateTimeImmutable('2000-01-01');
             $comparisons[] = array($immutableDate, $immutableDate);
         }

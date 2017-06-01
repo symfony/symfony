@@ -184,7 +184,7 @@ class ControllerResolverTest extends TestCase
         $request->attributes->set('foobar', 'foobar');
         $controller = array(new self(), 'controllerMethod3');
 
-        if (PHP_VERSION_ID === 50316) {
+        if (\PHP_VERSION_ID === 50316) {
             $this->markTestSkipped('PHP 5.3.16 has a major bug in the Reflection sub-system');
         } else {
             try {

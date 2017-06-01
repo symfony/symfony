@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-19T06:21:56Z
+
+There are many more occurrences right? Or is it work in progress :)
+
+---------------------------------------------------------------------------
+
+by flip111 at 2017-05-22T11:29:29Z
+
+Already many people switch their infrastructure to HHVM this PR will complicate working with symfony for them.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-22T11:32:47Z
+
+Are the really people switching from PHP 7 to HHVM (or from PHP 5 to HHVM instead of PHP 7)?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-22T11:33:41Z
+
+@flip111 I'm sorry but the evidence we have (including Composer's own stats abut PHP usage) shows that almost nobody is using HHVM.
+
+---------------------------------------------------------------------------
+
+by flip111 at 2017-05-22T11:41:49Z
+
+People were switching to HHVM before PHP 7 was a thing. Since removing functionality (support for an alternative platform) is a big thing i had at least expected to see something positive here on the tradeoff.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T11:45:13Z
+
+@flip111 see also #22765. The thing is, since things do not happen by magic, HHVM support needs someone to care about it. Here, nobody cared nor made it to work on a PHP 7.1 code base. Unless *you* want to do the job, it looks like nobody did in the last months, if not years.
+
+---------------------------------------------------------------------------
+
+by flip111 at 2017-05-22T11:49:40Z
+
+@nicolas-grekas fair enough, would have been nice to have in the PR description something like `"hhvm support was not properly maintained for months, removing to reduce the burdon of maintaining this code. [User statistics](link) show that hhvm was hardly used."`. This is not obvious to know before i asked about it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-05-22T12:41:18Z
+
+So, if HHVM support is being removed from `master`, that means it'll stay around for Symfony 3.4 LTS which is going to be maintained until November 2020, am I right? So, I'd say HHVM/Symfony projects are safe for another 3.5 years.
+
+Within those 3.5 years, those projects could be migrated away from HHVM (or Symfony if you like) or HHVM maybe manages to get their compatibility issues under control.
+
+And Symfony is going to be your least problem. Other libraries that go php-7-only will be running into similar trouble and most of the have shorter maintenance periods than Symfony does.
+
+Anyway, maybe the drop of HHVM should be announced in a blog article with some explanation to avoid confusion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T12:42:47Z
+
+@derrabus :100:
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-22T13:12:07Z
+
+I agree with the fact we should write a blog post about this /cc @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-23T05:55:12Z
+
+I'm going to write a blog post about this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-23T07:35:01Z
+
+See http://symfony.com/blog/symfony-4-end-of-hhvm-support for the blog post

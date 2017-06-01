@@ -12,8 +12,9 @@
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 class RegisterListenersPassTest extends TestCase
@@ -127,17 +128,17 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($container);
 
         $definition = $container->getDefinition('event_dispatcher');
-        $expected_calls = array(
+        $expectedCalls = array(
             array(
                 'addListener',
                 array(
                     'event',
-                    new ClosureProxyArgument('foo', 'onEvent'),
+                    array(new ServiceClosureArgument(new Reference('foo')), 'onEvent'),
                     0,
                 ),
             ),
         );
-        $this->assertEquals($expected_calls, $definition->getMethodCalls());
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
     /**

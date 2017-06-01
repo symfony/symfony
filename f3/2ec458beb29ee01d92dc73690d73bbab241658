@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-06-01T09:58:37Z
+
+In the current implementation I saw that redirects behaviour is still rather naive. For example, when a route is registered with with POST and GET as available methods and there's a trailing slash the dumped matcher will try to redirect it, which I think it shouldn't. We have a number of options to resolve this:
+
+1. Not redirect requests where the canonical method != `GET`. In this case the route would match.
+2. Separate match check based on wether the route is redirectable (by RFC)
+3. Keep current behaviour.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-06-01T14:09:29Z
+
+> In the current implementation I saw that redirects behaviour is still rather naive.
+
+By "current implementation", do you mean 3.2 and before?
+
+It looks like this PR fixes the behavior change from 3.2 to 3.3 (correct?). Should we discuss the proper/better behavior on a different issue to keep this one moving?
+
+Thanks for the fast PR btw!
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-06-01T14:12:43Z
+
+@weaverryan ah yeah sorry about this, should have been more specific. But yeah, it's also 3.2 and before. I'll open a new issue for the redirect behaviour.
+
+---------------------------------------------------------------------------
+
+by dubaksk at 2017-06-01T14:52:37Z
+
+@weaverryan We were upgrading from 3.2.9 to 3.3.0 and also we have another project running on 3.2.8 which is also redirecting.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2017-06-01T14:53:21Z
+
+I think this was a side-effect of introducing the canonical method btw. There was some not super well defined handling going on there. With the PR it was (accidentally) made clearer, but this one seemed to have slipped through.

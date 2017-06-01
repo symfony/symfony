@@ -478,6 +478,11 @@
                     addEventListener(toggles[i], 'click', function(e) {
                         e.preventDefault();
 
+                        if ('' !== window.getSelection().toString()) {
+                            /* Don't do anything on text selection */
+                            return;
+                        }
+
                         var toggle = e.target || e.srcElement;
 
                         /* needed because when the toggle contains HTML contents, user can click */
@@ -506,6 +511,14 @@
                         var originalContent = toggle.getAttribute('data-toggle-original-content');
                         var altContent = toggle.getAttribute('data-toggle-alt-content');
                         toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
+                    });
+                }
+
+                /* Prevents from disallowing clicks on links inside toggles */
+                var toggleLinks = document.querySelectorAll('.sf-toggle a');
+                for (var i = 0; i < toggleLinks.length; i++) {
+                    addEventListener(toggleLinks[i], 'click', function(e) {
+                        e.stopPropagation();
                     });
                 }
             }

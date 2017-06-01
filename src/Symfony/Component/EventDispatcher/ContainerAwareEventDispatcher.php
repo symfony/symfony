@@ -116,7 +116,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     public function hasListeners($eventName = null)
     {
         if (null === $eventName) {
-            return (bool) count($this->listenerIds) || (bool) count($this->listeners);
+            return count($this->listenerIds) || count($this->listeners) || parent::hasListeners();
         }
 
         if (isset($this->listenerIds[$eventName])) {

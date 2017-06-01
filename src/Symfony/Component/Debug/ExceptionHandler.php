@@ -316,7 +316,6 @@ EOF;
             .exception-illustration { flex-basis: 111px; flex-shrink: 0; height: 66px; margin-left: 15px; opacity: .7; }
 
             .trace + .trace { margin-top: 30px; }
-            .trace-head { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
             .trace-head .trace-class { color: #222; font-size: 18px; font-weight: bold; line-height: 1.3; margin: 0; position: relative; }
 
             .trace-message { font-size: 14px; font-weight: normal; margin: .5em 0 0; }

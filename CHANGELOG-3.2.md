@@ -7,6 +7,29 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.9 (2017-05-29)
+
+ * bug #22847 [Console] ChoiceQuestion must have choices (ro0NL)
+ * bug #22900 [FrameworkBundle][Console] Fix the override of a command registered by the kernel (aaa2000)
+ * bug #22910 [Filesystem] improve error handling in lock() (xabbuh)
+ * bug #22924 [Cache] Dont use pipelining with RedisCluster (nicolas-grekas)
+ * bug #22718 [Console] Fixed different behaviour of key and value user inputs in multiple choice question (borNfreee)
+ * bug #22829 [Yaml] fix colon without space deprecation (xabbuh)
+ * bug #22901 Fix missing abstract key in XmlDumper (weaverryan)
+ * bug #22912 [DI] Avoid private call to Container::has() (ro0NL)
+ * bug #22866 [DI] Check for privates before shared services (ro0NL)
+ * bug #22874 [WebProfilerBundle] Fix sub-requests display in time profiler panel (nicolas-grekas)
+ * bug #22817 [PhpUnitBridge] optional error handler arguments (xabbuh)
+ * bug #22752 Improved how profiler errors are displayed on small screens (javiereguiluz)
+ * bug #22715 [FrameworkBundle] remove Security deps from the require section (xabbuh)
+ * bug #22647 [VarDumper] Fix dumping of non-nested stubs (nicolas-grekas)
+ * bug #22409 [Yaml] respect inline level when dumping objects as maps (goetas, xabbuh)
+ * bug #22584 [Security] Avoid unnecessary route lookup for empty logout path (ro0NL)
+ * bug #22690 [Console] Fix errors not rethrown even if not handled by console.error listeners (chalasr)
+ * bug #22669 [FrameworkBundle] AbstractConfigCommand: do not try registering bundles twice (ogizanagi)
+ * bug #22676 [FrameworkBundle] Adding the extension XML (flug)
+ * bug #22652 [Workflow] Move twig extension registration to twig bundle (ogizanagi)
+
 * 3.2.8 (2017-05-01)
 
  * bug #22550 Allow Upper Case property names in ObjectNormalizer (insekticid)

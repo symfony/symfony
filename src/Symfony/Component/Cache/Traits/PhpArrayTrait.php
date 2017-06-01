@@ -126,6 +126,6 @@ EOF;
      */
     private function initialize()
     {
-        $this->values = @(include $this->file) ?: array();
+        $this->values = file_exists($this->file) ? (include $this->file ?: array()) : array();
     }
 }

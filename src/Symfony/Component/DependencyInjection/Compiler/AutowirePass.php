@@ -114,7 +114,7 @@ class AutowirePass extends AbstractRecursivePass
     private function doProcessValue($value, $isRoot = false)
     {
         if ($value instanceof TypedReference) {
-            if ($ref = $this->getAutowiredReference($value)) {
+            if ($ref = $this->getAutowiredReference($value, $value->getRequiringClass() ? sprintf('for "%s" in "%s"', $value->getType(), $value->getRequiringClass()) : '')) {
                 return $ref;
             }
             $this->container->log($this, $this->createTypeNotFoundMessage($value, 'it'));
@@ -133,7 +133,13 @@ class AutowirePass extends AbstractRecursivePass
         $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
         $methodCalls = $value->getMethodCalls();
 
-        if ($constructor = $this->getConstructor($value, false)) {
+        try {
+            $constructor = $this->getConstructor($value, false);
+        } catch (RuntimeException $e) {
+            throw new AutowiringFailedException($this->currentId, $e->getMessage(), 0, $e);
+        }
+
+        if ($constructor) {
             array_unshift($methodCalls, array($constructor, $value->getArguments()));
         }
 
@@ -242,7 +248,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @return array The autowired arguments
      *
-     * @throws RuntimeException
+     * @throws AutowiringFailedException
      */
     private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments)
     {
@@ -276,7 +282,7 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''))) {
+            if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''), 'for '.sprintf('argument "$%s" of method "%s()"', $parameter->name, $class.'::'.$method))) {
                 $failureMessage = $this->createTypeNotFoundMessage($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                 if ($parameter->isDefaultValueAvailable()) {
@@ -310,7 +316,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * @return TypedReference|null A reference to the service matching the given type, if any
      */
-    private function getAutowiredReference(TypedReference $reference)
+    private function getAutowiredReference(TypedReference $reference, $deprecationMessage)
     {
         $this->lastFailure = null;
         $type = $reference->getType();
@@ -328,7 +334,14 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if (isset($this->types[$type])) {
-            @trigger_error(sprintf('Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0. You should %s the "%s" service to "%s" instead.', isset($this->types[$this->types[$type]]) ? 'alias' : 'rename (or alias)', $this->types[$type], $type), E_USER_DEPRECATED);
+            $message = 'Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0.';
+            if ($aliasSuggestion = $this->getAliasesSuggestionForType($type = $reference->getType(), $deprecationMessage)) {
+                $message .= ' '.$aliasSuggestion;
+            } else {
+                $message .= sprintf(' You should %s the "%s" service to "%s" instead.', isset($this->types[$this->types[$type]]) ? 'alias' : 'rename (or alias)', $this->types[$type], $type);
+            }
+
+            @trigger_error($message, E_USER_DEPRECATED);
 
             return new TypedReference($this->types[$type], $type);
         }
@@ -484,25 +497,9 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeAlternatives(TypedReference $reference)
     {
-        $type = $reference->getType();
-        $aliases = array();
-        foreach (class_parents($type) + class_implements($type) as $parent) {
-            if ($this->container->has($parent) && !$this->container->findDefinition($parent)->isAbstract()) {
-                $aliases[] = $parent;
-            }
-        }
-
-        if (1 < $len = count($aliases)) {
-            $message = ' Try changing the type-hint to one of its parents: ';
-            for ($i = 0, --$len; $i < $len; ++$i) {
-                $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
-            }
-            $message .= sprintf('or %s "%s".', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
-
-            return $message;
-        }
-        if ($aliases) {
-            return sprintf(' Try changing the type-hint to "%s" instead.', $aliases[0]);
+        // try suggesting available aliases first
+        if ($message = $this->getAliasesSuggestionForType($type = $reference->getType())) {
+            return ' '.$message;
         }
 
         if (isset($this->ambiguousServiceTypes[$type])) {
@@ -541,5 +538,30 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return $methodArgumentsMetadata;
+    }
+
+    private function getAliasesSuggestionForType($type, $extraContext = null)
+    {
+        $aliases = array();
+        foreach (class_parents($type) + class_implements($type) as $parent) {
+            if ($this->container->has($parent) && !$this->container->findDefinition($parent)->isAbstract()) {
+                $aliases[] = $parent;
+            }
+        }
+
+        $extraContext = $extraContext ? ' '.$extraContext : '';
+        if (1 < $len = count($aliases)) {
+            $message = sprintf('Try changing the type-hint%s to one of its parents: ', $extraContext);
+            for ($i = 0, --$len; $i < $len; ++$i) {
+                $message .= sprintf('%s "%s", ', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
+            }
+            $message .= sprintf('or %s "%s".', class_exists($aliases[$i], false) ? 'class' : 'interface', $aliases[$i]);
+
+            return $message;
+        }
+
+        if ($aliases) {
+            return sprintf('Try changing the type-hint%s to "%s" instead.', $extraContext, $aliases[0]);
+        }
     }
 }

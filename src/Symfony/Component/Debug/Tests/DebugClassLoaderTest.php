@@ -61,7 +61,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testUnsilencing()
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             $this->markTestSkipped('PHP7 throws exceptions, unsilencing is not required anymore.');
         }
         if (defined('HHVM_VERSION')) {
@@ -109,7 +109,7 @@ class DebugClassLoaderTest extends TestCase
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
-            if (PHP_VERSION_ID < 70000) {
+            if (\PHP_VERSION_ID < 70000) {
                 $this->assertRegExp('/^Runtime Notice: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_STRICT, $exception->getSeverity());
             } else {
@@ -245,7 +245,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testReservedForPhp7()
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             $this->markTestSkipped('PHP7 already prevents using reserved names.');
         }
 

@@ -105,6 +105,16 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
             ));
         }
 
+        if (class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            if ($metadata instanceof ClassMetadataInfo && isset($metadata->embeddedClasses[$property])) {
+                return array(new Type(
+                    Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    $metadata->embeddedClasses[$property]['class']
+                ));
+            }
+        }
+
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
             $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);

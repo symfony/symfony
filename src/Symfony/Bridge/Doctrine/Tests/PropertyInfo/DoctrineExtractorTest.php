@@ -70,6 +70,27 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, array()));
     }
 
+    public function testExtractEmbeddable()
+    {
+        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            return;
+        }
+
+        $expectedTypes = [new Type(
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
+        )];
+
+        $actualTypes = $this->extractor->getTypes(
+            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',
+            'embedded',
+            array()
+        );
+
+        $this->assertEquals($expectedTypes, $actualTypes);
+    }
+
     public function typesProvider()
     {
         return array(

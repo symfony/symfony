@@ -70,5 +70,10 @@
         <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener" public="true">
             <tag name="kernel.event_subscriber" />
         </service>
+
+        <service id="resolve_controller_name_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\ResolveControllerNameSubscriber">
+            <argument type="service" id="controller_name_converter" />
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

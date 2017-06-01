@@ -123,7 +123,7 @@ class ParseException extends RuntimeException
         }
 
         if (null !== $this->parsedFile) {
-            if (PHP_VERSION_ID >= 50400) {
+            if (\PHP_VERSION_ID >= 50400) {
                 $jsonOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
             } else {
                 $jsonOptions = 0;

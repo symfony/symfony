@@ -35,7 +35,7 @@ class JsonBundleWriter implements BundleWriterInterface
             }
         });
 
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             // Use JSON_PRETTY_PRINT so that we can see what changed in Git diffs
             file_put_contents(
                 $path.'/'.$locale.'.json',

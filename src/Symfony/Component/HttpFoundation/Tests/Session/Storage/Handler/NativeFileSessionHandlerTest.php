@@ -29,7 +29,7 @@ class NativeFileSessionHandlerTest extends TestCase
     {
         $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler(sys_get_temp_dir()));
 
-        if (PHP_VERSION_ID < 50400) {
+        if (\PHP_VERSION_ID < 50400) {
             $this->assertEquals('files', $storage->getSaveHandler()->getSaveHandlerName());
             $this->assertEquals('files', ini_get('session.save_handler'));
         } else {

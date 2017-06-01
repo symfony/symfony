@@ -40,7 +40,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     public function testSessionIsMigrated()
     {
-        if (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50411) {
+        if (\PHP_VERSION_ID >= 50400 && \PHP_VERSION_ID < 50411) {
             $this->markTestSkipped('We cannot destroy the old session on PHP 5.4.0 - 5.4.10.');
         }
 
@@ -53,7 +53,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     public function testSessionIsMigratedWithPhp54Workaround()
     {
-        if (PHP_VERSION_ID < 50400 || PHP_VERSION_ID >= 50411) {
+        if (\PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411) {
             $this->markTestSkipped('This PHP version is not affected.');
         }
 

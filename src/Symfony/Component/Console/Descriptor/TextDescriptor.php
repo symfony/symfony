@@ -247,7 +247,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        if (PHP_VERSION_ID < 50400) {
+        if (\PHP_VERSION_ID < 50400) {
             return str_replace(array('\/', '\\\\'), array('/', '\\'), json_encode($default));
         }
 

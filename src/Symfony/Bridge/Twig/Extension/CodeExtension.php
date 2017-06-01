@@ -174,7 +174,7 @@ class CodeExtension extends \Twig_Extension
         $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            if (PHP_VERSION_ID >= 50400) {
+            if (\PHP_VERSION_ID >= 50400) {
                 $flags = ENT_QUOTES | ENT_SUBSTITUTE;
             } else {
                 $flags = ENT_QUOTES;

@@ -121,7 +121,7 @@ class JsonResponse extends Response
             $data = json_encode($data, $this->encodingOptions);
         } else {
             try {
-                if (PHP_VERSION_ID < 50400) {
+                if (\PHP_VERSION_ID < 50400) {
                     // PHP 5.3 triggers annoying warnings for some
                     // types that can't be serialized as JSON (INF, resources, etc.)
                     // but doesn't provide the JsonSerializable interface.
@@ -131,7 +131,7 @@ class JsonResponse extends Response
                     // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
                     // objects in a new exception that needs to be removed.
                     // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
-                    if (PHP_VERSION_ID < 50500) {
+                    if (\PHP_VERSION_ID < 50500) {
                         // Clear json_last_error()
                         json_encode(null);
                         $errorHandler = set_error_handler('var_dump');
@@ -146,14 +146,14 @@ class JsonResponse extends Response
                     $data = json_encode($data, $this->encodingOptions);
                 }
 
-                if (PHP_VERSION_ID < 50500) {
+                if (\PHP_VERSION_ID < 50500) {
                     restore_error_handler();
                 }
             } catch (\Exception $e) {
-                if (PHP_VERSION_ID < 50500) {
+                if (\PHP_VERSION_ID < 50500) {
                     restore_error_handler();
                 }
-                if (PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                if (\PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                     throw $e->getPrevious() ?: $e;
                 }
                 throw $e;

@@ -52,12 +52,8 @@ class FactoryReturnTypePassTest extends TestCase
     /**
      * @dataProvider returnTypesProvider
      */
-    public function testReturnTypes($factory, $returnType, $hhvmSupport = true)
+    public function testReturnTypes($factory, $returnType)
     {
-        if (!$hhvmSupport && defined('HHVM_VERSION')) {
-            $this->markTestSkipped('Scalar typehints not supported by hhvm.');
-        }
-
         $container = new ContainerBuilder();
 
         $service = $container->register('service');
@@ -73,7 +69,7 @@ class FactoryReturnTypePassTest extends TestCase
     {
         return array(
             // must be loaded before the function as they are in the same file
-            array(array(FactoryDummy::class, 'createBuiltin'), null, false),
+            array(array(FactoryDummy::class, 'createBuiltin'), null),
             array(array(FactoryDummy::class, 'createParent'), FactoryParent::class),
             array(array(FactoryDummy::class, 'createSelf'), FactoryDummy::class),
             array(factoryFunction::class, FactoryDummy::class),

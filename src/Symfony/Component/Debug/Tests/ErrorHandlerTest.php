@@ -489,38 +489,4 @@ class ErrorHandlerTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $args[0]);
         $this->assertStringStartsWith("Attempted to load class \"Foo\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
     }
-
-    public function testHandleFatalErrorOnHHVM()
-    {
-        try {
-            $handler = ErrorHandler::register();
-
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
-            $logger
-                ->expects($this->once())
-                ->method('log')
-                ->with(
-                    $this->equalTo(LogLevel::CRITICAL),
-                    $this->equalTo('Fatal Error: foo')
-                )
-            ;
-
-            $handler->setDefaultLogger($logger, E_ERROR);
-
-            $error = array(
-                'type' => E_ERROR + 0x1000000, // This error level is used by HHVM for fatal errors
-                'message' => 'foo',
-                'file' => 'bar',
-                'line' => 123,
-                'context' => array(123),
-                'backtrace' => array(456),
-            );
-
-            call_user_func_array(array($handler, 'handleError'), $error);
-            $handler->handleFatalError($error);
-        } finally {
-            restore_error_handler();
-            restore_exception_handler();
-        }
-    }
 }

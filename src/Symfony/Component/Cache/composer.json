@@ -34,9 +34,6 @@
     "conflict": {
         "symfony/var-dumper": "<3.4"
     },
-    "suggest": {
-        "symfony/polyfill-apcu": "For using ApcuAdapter on HHVM"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },
         "exclude-from-classmap": [

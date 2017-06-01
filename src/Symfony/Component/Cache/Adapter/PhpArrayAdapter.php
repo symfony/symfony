@@ -63,7 +63,7 @@ class PhpArrayAdapter implements AdapterInterface
     public static function create($file, CacheItemPoolInterface $fallbackPool)
     {
         // Shared memory is available in PHP 7.0+ with OPCache enabled and in HHVM
-        if (ini_get('opcache.enable') || defined('HHVM_VERSION')) {
+        if (ini_get('opcache.enable')) {
             if (!$fallbackPool instanceof AdapterInterface) {
                 $fallbackPool = new ProxyAdapter($fallbackPool);
             }

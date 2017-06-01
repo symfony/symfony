@@ -49,10 +49,6 @@ class IniFileLoaderTest extends TestCase
      */
     public function testTypeConversionsWithNativePhp($key, $value, $supported)
     {
-        if (defined('HHVM_VERSION_ID')) {
-            return $this->markTestSkipped();
-        }
-
         if (!$supported) {
             $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }

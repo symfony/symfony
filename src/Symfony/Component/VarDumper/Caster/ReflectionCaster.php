@@ -36,7 +36,6 @@ class ReflectionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
         $c = new \ReflectionFunction($c);
 
-        $stub->class = 'Closure'; // HHVM generates unique class names for closures
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
 
         if (isset($a[$prefix.'parameters'])) {
@@ -213,9 +212,6 @@ class ReflectionCaster
             self::addExtra($a, $c);
         }
 
-        // Added by HHVM
-        unset($a[Caster::PREFIX_DYNAMIC.'static']);
-
         return $a;
     }
 
@@ -229,9 +225,6 @@ class ReflectionCaster
     public static function castParameter(\ReflectionParameter $c, array $a, Stub $stub, $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
-
-        // Added by HHVM
-        unset($a['info']);
 
         self::addMap($a, $c, array(
             'position' => 'getPosition',

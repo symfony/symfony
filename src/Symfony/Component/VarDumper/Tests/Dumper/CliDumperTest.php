@@ -46,7 +46,6 @@ class CliDumperTest extends TestCase
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -74,9 +73,9 @@ array:24 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {{$r}
+  "closure" => Closure {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {{$r} …}
+    this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
     parameters: {
       \$a: {}
       &\$b: {
@@ -231,10 +230,6 @@ EOTXT
 
     public function testClosedResource()
     {
-        if (defined('HHVM_VERSION') && HHVM_VERSION_ID < 30600) {
-            $this->markTestSkipped();
-        }
-
         $var = fopen(__FILE__, 'r');
         fclose($var);
 
@@ -325,11 +320,10 @@ EOTXT
         $dumper->dump($data, $out);
         $out = stream_get_contents($out, -1, 0);
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 stream resource {@{$ref}
-  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
+  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2: {
@@ -384,10 +378,9 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $out = $dumper->dump($data, true);
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
-{{$r}
+{#%d
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }

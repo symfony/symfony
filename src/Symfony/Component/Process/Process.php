@@ -1449,7 +1449,7 @@ class Process implements \IteratorAggregate
             return self::$sigchild;
         }
 
-        if (!function_exists('phpinfo') || defined('HHVM_VERSION')) {
+        if (!function_exists('phpinfo')) {
             return self::$sigchild = false;
         }
 

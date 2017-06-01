@@ -58,21 +58,25 @@ class ClientTest extends TestCase
         $m->setAccessible(true);
 
         $expected = array(
-            'foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly',
-            'foo1=bar1; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly',
+            '#^foo=bar; expires=Sun, 15.Feb.2009 20:00:00 GMT; (domain=http://example.com; path=/foo|max-age=-?\d+; path=/foo; domain=http://example.com); secure; httponly$#',
+            '#^foo1=bar1; expires=Sun, 15.Feb.2009 20:00:00 GMT; (domain=http://example.com; path=/foo|max-age=-?\d+; path=/foo; domain=http://example.com); secure; httponly$#',
         );
 
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
+        $this->assertRegExp($expected[0], (string) $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
-        $this->assertEquals($expected, $domResponse->getHeader('Set-Cookie', false));
+        $this->assertRegExp($expected[0], (string) $domResponse->getHeader('Set-Cookie'));
+
+        $cookies = $domResponse->getHeader('Set-Cookie', false);
+        foreach ($expected as $i => $regexp) {
+            $this->assertRegExp($expected[$i], (string) $cookies[$i]);
+        }
     }
 
     public function testFilterResponseSupportsStreamedResponses()

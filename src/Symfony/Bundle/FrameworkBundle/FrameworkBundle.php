@@ -53,7 +53,7 @@ class FrameworkBundle extends Bundle
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
 
         if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies($trustedProxies);
+            Request::setTrustedProxies($trustedProxies, -1);
         }
 
         if ($this->container->getParameter('kernel.http_method_override')) {
@@ -61,7 +61,7 @@ class FrameworkBundle extends Bundle
         }
 
         if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
-            Request::setTrustedHosts($trustedHosts);
+            Request::setTrustedHosts($trustedHosts, -1);
         }
     }
 

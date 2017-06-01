@@ -21,8 +21,8 @@
         "symfony/http-kernel": "~2.4"
     },
     "require-dev": {
-        "symfony/console": "~2.4|~3.0.0",
-        "symfony/event-dispatcher": "~2.2|~3.0.0"
+        "symfony/console": "~2.4|~3.0",
+        "symfony/event-dispatcher": "~2.2|~3.0"
     },
     "conflict": {
         "symfony/http-kernel": ">=3.0"

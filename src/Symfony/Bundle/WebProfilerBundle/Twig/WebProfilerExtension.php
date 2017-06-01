@@ -66,7 +66,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
     public function getFunctions()
     {
         $profilerDump = function (\Twig_Environment $env, $value, $maxDepth = 0) {
-            return $value instanceof Data ? $this->dumpData($env, $value, $maxDepth) : twig_escape_filter($env, $this->dumpValue($value));
+            return $value instanceof Data ? $this->dumpData($env, $value, $maxDepth) : $this->dumpValue($value);
         };
 
         return array(

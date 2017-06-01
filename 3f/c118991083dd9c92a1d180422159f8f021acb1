@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-01T11:30:19Z
+
+now with simplified logic
+
+---------------------------------------------------------------------------
+
+by Gemineye at 2017-06-01T11:35:57Z
+
+This patch seems to fix my Issue in #22970.  👍
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-06-01T13:02:59Z
+
+This also appears to fix #23011
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-01T13:17:24Z
+
+> could that be done in a separate PR?
+
+not without conflicts, which means process overhead, I'd prefer not
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-06-01T13:35:37Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-06-01T16:26:35Z
+
+Some tests would be good for it I think :smile: :+1:
+
+Edit: ah did not see your comment :wink:
+
+> (I'll add tests once confirmed)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-01T18:25:31Z
+
+Now with tests

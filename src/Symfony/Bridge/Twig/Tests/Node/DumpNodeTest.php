@@ -113,7 +113,7 @@ if ($this->env->isDebug()) {
 
 EOTXT;
 
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
         } else {
             $expected = preg_replace('/%(.*?)%/', '(isset($context["$1"]) ? $context["$1"] : null)', $expected);

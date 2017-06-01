@@ -245,7 +245,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } catch (\TypeError $e) {
             self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
         } finally {
-            if (PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
+            if (\PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
                 restore_error_handler();
                 self::$previousErrorHandler = false;
             }

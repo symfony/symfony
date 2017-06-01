@@ -354,7 +354,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
         }
 
@@ -368,7 +368,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function setClassCache(array $classes)
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
         }
 
@@ -420,7 +420,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function doLoadClassCache($name, $extension)
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
         }
 
@@ -838,7 +838,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function unserialize($data)
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
         } else {
             list($environment, $debug) = unserialize($data);

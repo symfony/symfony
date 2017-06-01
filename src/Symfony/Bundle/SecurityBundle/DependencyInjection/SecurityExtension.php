@@ -113,7 +113,7 @@ class SecurityExtension extends Extension
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             // add some required classes for compilation
             $this->addClassesToCompile(array(
                 'Symfony\Component\Security\Http\Firewall',
@@ -204,7 +204,7 @@ class SecurityExtension extends Extension
             return;
         }
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\\Component\\Security\\Http\\AccessMap',
             ));

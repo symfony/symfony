@@ -4,7 +4,7 @@
     "description": "Symfony WebProfilerBundle",
     "keywords": [],
     "homepage": "https://symfony.com",
-    "license": "MIT",
+    "license": "(MIT and CC-BY-3.0)",
     "authors": [
         {
             "name": "Fabien Potencier",

@@ -46,6 +46,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()
                 ->scalarNode('excluded_ajax_paths')->defaultValue('^/(app(_[\\w]+)?\\.php/)?_wdt')->end()
+                ->integerNode('max_tries')->defaultValue(5)->end()
             ->end()
         ;
 

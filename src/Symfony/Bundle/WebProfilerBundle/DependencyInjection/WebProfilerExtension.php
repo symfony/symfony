@@ -45,6 +45,7 @@ class WebProfilerExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('profiler.xml');
         $container->setParameter('web_profiler.debug_toolbar.position', $config['position']);
+        $container->setParameter('web_profiler.debug_toolbar.max_tries', $config['max_tries']);
 
         if ($config['toolbar'] || $config['intercept_redirects']) {
             $loader->load('toolbar.xml');

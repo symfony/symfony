@@ -36,7 +36,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
     /**
      * Returns an array of all services inlined by this pass.
      *
-     * The key is the inlined service id and its value is the service it was inlined into.
+     * The key is the inlined service id and its value is the list of services it was inlined into.
      *
      * @return array
      */
@@ -59,7 +59,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 
             if ($this->isInlineableDefinition($id, $definition, $this->container->getCompiler()->getServiceReferenceGraph())) {
                 $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
-                $this->inlinedServiceIds[$id] = $this->currentId;
+                $this->inlinedServiceIds[$id][] = $this->currentId;
 
                 if ($definition->isShared()) {
                     return $definition;

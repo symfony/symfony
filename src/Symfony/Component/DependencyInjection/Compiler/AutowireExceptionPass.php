@@ -58,7 +58,11 @@ class AutowireExceptionPass implements CompilerPassInterface
 
         // was the service inlined? Of so, does its parent service exist?
         if (isset($inlinedIds[$serviceId])) {
-            return $this->doesServiceExistInTheContainer($inlinedIds[$serviceId], $container, $inlinedIds);
+            foreach ($inlinedIds[$serviceId] as $parentId) {
+                if ($this->doesServiceExistInTheContainer($parentId, $container, $inlinedIds)) {
+                    return true;
+                }
+            }
         }
 
         return false;

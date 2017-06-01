@@ -7,6 +7,20 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.28 (2017-05-29)
+
+ * bug #22847 [Console] ChoiceQuestion must have choices (ro0NL)
+ * bug #22900 [FrameworkBundle][Console] Fix the override of a command registered by the kernel (aaa2000)
+ * bug #22910 [Filesystem] improve error handling in lock() (xabbuh)
+ * bug #22718 [Console] Fixed different behaviour of key and value user inputs in multiple choice question (borNfreee)
+ * bug #22901 Fix missing abstract key in XmlDumper (weaverryan)
+ * bug #22817 [PhpUnitBridge] optional error handler arguments (xabbuh)
+ * bug #22647 [VarDumper] Fix dumping of non-nested stubs (nicolas-grekas)
+ * bug #22584 [Security] Avoid unnecessary route lookup for empty logout path (ro0NL)
+ * bug #22690 [Console] Fix errors not rethrown even if not handled by console.error listeners (chalasr)
+ * bug #22669 [FrameworkBundle] AbstractConfigCommand: do not try registering bundles twice (ogizanagi)
+ * bug #22676 [FrameworkBundle] Adding the extension XML (flug)
+
 * 2.7.27 (2017-05-01)
 
  * bug #22528 [Asset] Starting slash should indicate no basePath wanted (weaverryan)

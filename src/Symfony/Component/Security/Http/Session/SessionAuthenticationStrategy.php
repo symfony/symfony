@@ -49,7 +49,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
             case self::MIGRATE:
                 // Destroying the old session is broken in php 5.4.0 - 5.4.10
                 // See php bug #63379
-                $destroy = PHP_VERSION_ID < 50400 || PHP_VERSION_ID >= 50411;
+                $destroy = \PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411;
                 $request->getSession()->migrate($destroy);
 
                 return;

@@ -82,7 +82,8 @@ class DateType extends AbstractType
                 \Locale::getDefault(),
                 $dateFormat,
                 $timeFormat,
-                null,
+                // see https://bugs.php.net/bug.php?id=66323
+                class_exists('IntlTimeZone', false) ? \IntlTimeZone::createDefault() : null,
                 $calendar,
                 $pattern
             );
@@ -306,7 +307,7 @@ class DateType extends AbstractType
         $timezone = $formatter->getTimezoneId();
         $formattedTimestamps = array();
 
-        if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
+        if ($setTimeZone = \PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
             $formatter->setTimeZone('UTC');
         } else {
             $formatter->setTimeZoneId('UTC');

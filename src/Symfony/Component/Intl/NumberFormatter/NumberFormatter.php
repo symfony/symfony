@@ -856,7 +856,7 @@ class NumberFormatter
             // The negative PHP_INT_MAX was being converted to float
             if (
                 $value == -self::$int32Max - 1 &&
-                ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone')))
+                ((\PHP_VERSION_ID < 50400 && \PHP_VERSION_ID >= 50314) || \PHP_VERSION_ID >= 50404 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone')))
             ) {
                 return (int) $value;
             }
@@ -869,7 +869,7 @@ class NumberFormatter
             // A 32 bit integer was being generated instead of a 64 bit integer
             if (
                   ($value > self::$int32Max || $value < -self::$int32Max - 1) &&
-                  (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) &&
+                  (\PHP_VERSION_ID < 50314 || (\PHP_VERSION_ID >= 50400 && \PHP_VERSION_ID < 50404)) &&
                   !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))
             ) {
                 $value = (-2147483648 - ($value % -2147483648)) * ($value / abs($value));

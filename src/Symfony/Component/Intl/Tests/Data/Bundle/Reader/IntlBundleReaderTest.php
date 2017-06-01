@@ -51,7 +51,7 @@ class IntlBundleReaderTest extends TestCase
 
     public function testReadDoesNotFollowFallback()
     {
-        if (PHP_VERSION_ID < 50307 || PHP_VERSION_ID === 50400) {
+        if (\PHP_VERSION_ID < 50307 || \PHP_VERSION_ID === 50400) {
             $this->markTestSkipped('ResourceBundle handles disabling fallback properly only as of PHP 5.3.7 and 5.4.1.');
         }
 
@@ -71,7 +71,7 @@ class IntlBundleReaderTest extends TestCase
 
     public function testReadDoesNotFollowFallbackAlias()
     {
-        if (PHP_VERSION_ID < 50307 || PHP_VERSION_ID === 50400) {
+        if (\PHP_VERSION_ID < 50307 || \PHP_VERSION_ID === 50400) {
             $this->markTestSkipped('ResourceBundle handles disabling fallback properly only as of PHP 5.3.7 and 5.4.1.');
         }
 

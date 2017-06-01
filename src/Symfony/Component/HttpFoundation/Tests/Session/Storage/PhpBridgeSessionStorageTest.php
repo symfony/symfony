@@ -62,7 +62,7 @@ class PhpBridgeSessionStorageTest extends TestCase
 
     public function testPhpSession53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 

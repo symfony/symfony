@@ -107,7 +107,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (count($attributes) > 0) {
-            if (PHP_VERSION_ID >= 50400) {
+            if (\PHP_VERSION_ID >= 50400) {
                 $flags = ENT_QUOTES | ENT_SUBSTITUTE;
             } else {
                 $flags = ENT_QUOTES;

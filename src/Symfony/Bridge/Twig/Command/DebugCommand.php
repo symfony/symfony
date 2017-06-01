@@ -158,14 +158,20 @@ EOF
                 throw new \UnexpectedValueException('Unsupported callback type');
             }
 
-            // filter out context/environment args
-            $args = array_filter($refl->getParameters(), function ($param) use ($entity) {
-                if ($entity->needsContext() && $param->getName() === 'context') {
-                    return false;
-                }
+            $args = $refl->getParameters();
 
-                return !$param->getClass() || $param->getClass()->getName() !== 'Twig_Environment';
-            });
+            // filter out context/environment args
+            if ($entity->needsEnvironment()) {
+                array_shift($args);
+            }
+            if ($entity->needsContext()) {
+                array_shift($args);
+            }
+
+            if ($type === 'filters') {
+                // remove the value the filter is applied on
+                array_shift($args);
+            }
 
             // format args
             $args = array_map(function ($param) {
@@ -175,11 +181,6 @@ EOF
 
                 return $param->getName();
             }, $args);
-
-            if ($type === 'filters') {
-                // remove the value the filter is applied on
-                array_shift($args);
-            }
 
             return $args;
         }

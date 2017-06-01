@@ -154,7 +154,7 @@ class CodeHelper extends Helper
      */
     public function formatFile($file, $line, $text = null)
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $flags = ENT_QUOTES | ENT_SUBSTITUTE;
         } else {
             $flags = ENT_QUOTES;

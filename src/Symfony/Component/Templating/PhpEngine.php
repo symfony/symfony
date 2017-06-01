@@ -420,7 +420,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected function initializeEscapers()
     {
         $that = $this;
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $flags = ENT_QUOTES | ENT_SUBSTITUTE;
         } else {
             $flags = ENT_QUOTES;

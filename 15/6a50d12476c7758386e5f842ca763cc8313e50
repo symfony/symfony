@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by tifabien at 2017-06-01T16:22:19Z
+
+@chalasr I just tested your PR in my project and it seems it solves my issue :) Should I have a short explanation of what was the problem?
+
+Thanks a lot!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-01T16:38:02Z
+
+@tifabien The `cache.app` service [extends the `cache.adapter.filesystem` one](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Resources/config/cache.xml#L10).
+There is [a compiler pass](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Compiler/ResolveDefinitionTemplatesPass.php) responsible for completing all services which extend another (merging from the parent). This pass processes the container in its optimization phase.
+On the other hand, there is a compiler pass responsible for decorating all `cache.pool` tagged services to make them "traceable" and for injecting them into the data collector. Given this pass was processing the container before its optimization phase, child services weren't complete yet (hence the missing class). This makes it run after optimization, so the data collector pass can rely on the class even for services which inherit it from their parent.
+
+You're welcome, thanks for confirming.

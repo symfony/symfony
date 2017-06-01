@@ -163,6 +163,10 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;
         $timezone = $ignoreTimezone ? 'UTC' : $this->outputTimezone;
+        if (class_exists('IntlTimeZone', false)) {
+            // see https://bugs.php.net/bug.php?id=66323
+            $timezone = \IntlTimeZone::createTimeZone($timezone);
+        }
         $calendar = $this->calendar;
         $pattern = $this->pattern;
 

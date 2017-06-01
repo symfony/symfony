@@ -273,7 +273,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), $inlinePass));
         $repeatedPass->process($container);
 
-        $this->assertEquals(array('inlinable.service' => 'other_service'), $inlinePass->getInlinedServiceIds());
+        $this->assertEquals(array('inlinable.service' => array('other_service')), $inlinePass->getInlinedServiceIds());
     }
 
     protected function process(ContainerBuilder $container)

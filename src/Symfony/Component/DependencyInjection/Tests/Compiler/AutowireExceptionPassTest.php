@@ -65,9 +65,9 @@ class AutowireExceptionPassTest extends TestCase
             ->method('getInlinedServiceIds')
             ->will($this->returnValue(array(
                 // a_service inlined into b_service
-                'a_service' => 'b_service',
+                'a_service' => array('b_service'),
                 // b_service inlined into c_service
-                'b_service' => 'c_service',
+                'b_service' => array('c_service'),
             )));
 
         $container = new ContainerBuilder();
@@ -100,9 +100,9 @@ class AutowireExceptionPassTest extends TestCase
             ->method('getInlinedServiceIds')
             ->will($this->returnValue(array(
                 // a_service inlined into b_service
-                'a_service' => 'b_service',
+                'a_service' => array('b_service'),
                 // b_service inlined into c_service
-                'b_service' => 'c_service',
+                'b_service' => array('c_service'),
             )));
 
         // do NOT register c_service in the container

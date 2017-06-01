@@ -76,11 +76,11 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
             return;
         }
 
-        $expectedTypes = [new Type(
+        $expectedTypes = array(new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
             'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
-        )];
+        ));
 
         $actualTypes = $this->extractor->getTypes(
             'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',

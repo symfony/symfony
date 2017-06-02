@@ -238,6 +238,20 @@ class DeprecationErrorHandler
         }
     }
 
+    public static function collectDeprecations($outputFile)
+    {
+        $deprecations = array();
+        $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, &$previousErrorHandler) {
+            if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+                return $previousErrorHandler ? $previousErrorHandler($type, $msg, $file, $line, $context) : false;
+            }
+            $deprecations[] = array(error_reporting(), $msg);
+        });
+        register_shutdown_function(function () use ($outputFile, &$deprecations) {
+            file_put_contents($outputFile, serialize($deprecations));
+        });
+    }
+
     private static function hasColorSupport()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {

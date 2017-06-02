@@ -291,7 +291,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     protected function getTwigMock($render = 'WDT')
     {
-        $templating = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $templating = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $templating->expects($this->any())
             ->method('render')
             ->will($this->returnValue($render));

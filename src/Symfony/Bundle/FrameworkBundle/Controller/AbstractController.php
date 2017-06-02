@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Provides common features needed in controllers.
@@ -59,7 +60,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'session' => '?'.SessionInterface::class,
             'security.authorization_checker' => '?'.AuthorizationCheckerInterface::class,
             'templating' => '?'.EngineInterface::class,
-            'twig' => '?'.\Twig_Environment::class,
+            'twig' => '?'.Environment::class,
             'doctrine' => '?'.ManagerRegistry::class,
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,

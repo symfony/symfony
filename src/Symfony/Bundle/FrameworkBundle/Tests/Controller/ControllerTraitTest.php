@@ -317,7 +317,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testRenderViewTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
@@ -331,7 +331,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testRenderTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
@@ -345,7 +345,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testStreamTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
 
         $container = new Container();
         $container->set('twig', $twig);

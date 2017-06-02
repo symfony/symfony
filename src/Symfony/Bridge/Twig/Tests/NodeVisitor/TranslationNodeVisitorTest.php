@@ -13,13 +13,19 @@ namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
+use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\FilterExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
 
 class TranslationNodeVisitorTest extends TestCase
 {
     /** @dataProvider getMessagesExtractionTestData */
-    public function testMessagesExtraction(\Twig_Node $node, array $expectedMessages)
+    public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
-        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationNodeVisitor();
         $visitor->enable();
         $visitor->enterNode($node, $env);
@@ -31,12 +37,12 @@ class TranslationNodeVisitorTest extends TestCase
     {
         $message = 'new key';
 
-        $node = new \Twig_Node_Expression_Filter(
-            new \Twig_Node_Expression_Constant($message, 0),
-            new \Twig_Node_Expression_Constant('trans', 0),
-            new \Twig_Node(array(
-                new \Twig_Node_Expression_Array(array(), 0),
-                new \Twig_Node_Expression_Name('variable', 0),
+        $node = new FilterExpression(
+            new ConstantExpression($message, 0),
+            new ConstantExpression('trans', 0),
+            new Node(array(
+                new ArrayExpression(array(), 0),
+                new NameExpression('variable', 0),
             )),
             0
         );

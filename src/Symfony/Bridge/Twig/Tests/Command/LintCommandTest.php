@@ -16,6 +16,8 @@ use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
 
 class LintCommandTest extends TestCase
 {
@@ -71,7 +73,7 @@ class LintCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem());
+        $twig = new Environment(new FilesystemLoader());
 
         $command = new LintCommand();
         $command->setTwigEnvironment($twig);

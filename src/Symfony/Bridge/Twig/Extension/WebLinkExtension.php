@@ -14,13 +14,15 @@ namespace Symfony\Bridge\Twig\Extension;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * Twig extension for the Symfony WebLink component.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class WebLinkExtension extends \Twig_Extension
+class WebLinkExtension extends AbstractExtension
 {
     private $requestStack;
 
@@ -35,12 +37,12 @@ class WebLinkExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('link', array($this, 'link')),
-            new \Twig_SimpleFunction('preload', array($this, 'preload')),
-            new \Twig_SimpleFunction('dns_prefetch', array($this, 'dnsPrefetch')),
-            new \Twig_SimpleFunction('preconnect', array($this, 'preconnect')),
-            new \Twig_SimpleFunction('prefetch', array($this, 'prefetch')),
-            new \Twig_SimpleFunction('prerender', array($this, 'prerender')),
+            new TwigFunction('link', array($this, 'link')),
+            new TwigFunction('preload', array($this, 'preload')),
+            new TwigFunction('dns_prefetch', array($this, 'dnsPrefetch')),
+            new TwigFunction('preconnect', array($this, 'preconnect')),
+            new TwigFunction('prefetch', array($this, 'prefetch')),
+            new TwigFunction('prerender', array($this, 'prerender')),
         );
     }
 

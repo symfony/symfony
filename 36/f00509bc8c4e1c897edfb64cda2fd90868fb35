@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-31T12:41:16Z
+
+Just fixed a few potential BC breaks related to the use of aliases type hints.
+Should be ready, waiting for https://github.com/twigphp/Twig/pull/2490
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-31T19:42:06Z
+
+now green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-01T22:05:42Z
+
+renaming done, now green

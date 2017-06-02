@@ -36,12 +36,16 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
-    public function testThrowsExceptionIfNotTraversable()
+    public function testAddViolationIfNotTraversable()
     {
-        $this->validator->validate('foo.barbar', new All(new Range(array('min' => 4))));
+        $this->validator->validate('foo.barbar', new All(array(
+            'constraints' => array(new Range(array('min' => 4))),
+            'wrongTypeMessage' => 'myMessage',
+        )));
+
+        $this->buildViolation('myMessage')
+            ->setCode(All::WRONG_TYPE_ERROR)
+            ->assertRaised();
     }
 
     /**

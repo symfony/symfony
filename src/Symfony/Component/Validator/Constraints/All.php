@@ -19,7 +19,14 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class All extends Composite
 {
+    const WRONG_TYPE_ERROR = '824268b5-91c0-4730-983f-896fb0f971f0';
+
+    protected static $errorNames = array(
+        self::WRONG_TYPE_ERROR => 'WRONG_TYPE_ERROR',
+    );
+
     public $constraints = array();
+    public $wrongTypeMessage = 'This value should be an array.';
 
     public function getDefaultOption()
     {

@@ -57,14 +57,18 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
-    public function testThrowsExceptionIfNotTraversable()
+    public function testAddViolationIfNotTraversable()
     {
-        $this->validator->validate('foobar', new Collection(array('fields' => array(
-            'foo' => new Range(array('min' => 4)),
-        ))));
+        $this->validator->validate('foobar', new Collection(array(
+            'fields' => array(
+                'foo' => new Range(array('min' => 4)),
+            ),
+            'wrongTypeMessage' => 'myMessage',
+        )));
+
+        $this->buildViolation('myMessage')
+            ->setCode(Collection::WRONG_TYPE_ERROR)
+            ->assertRaised();
     }
 
     public function testWalkSingleConstraint()

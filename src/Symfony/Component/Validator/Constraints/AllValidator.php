@@ -35,7 +35,11 @@ class AllValidator extends ConstraintValidator
         }
 
         if (!is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedTypeException($value, 'array or Traversable');
+            $this->context->buildViolation($constraint->wrongTypeMessage)
+                ->setCode(All::WRONG_TYPE_ERROR)
+                ->addViolation();
+
+            return;
         }
 
         $context = $this->context;

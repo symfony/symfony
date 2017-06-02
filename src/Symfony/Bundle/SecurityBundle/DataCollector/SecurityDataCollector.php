@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
@@ -73,6 +74,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $this->data = array(
                 'enabled' => false,
                 'authenticated' => false,
+                'impersonated' => false,
+                'impersonator_user' => null,
+                'impersonation_exit_path' => null,
                 'token' => null,
                 'token_class' => null,
                 'logout_url' => null,
@@ -85,6 +89,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => false,
+                'impersonated' => false,
+                'impersonator_user' => null,
+                'impersonation_exit_path' => null,
                 'token' => null,
                 'token_class' => null,
                 'logout_url' => null,
@@ -96,6 +103,14 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         } else {
             $inheritedRoles = array();
             $assignedRoles = $token->getRoles();
+
+            $impersonatorUser = null;
+            foreach ($assignedRoles as $role) {
+                if ($role instanceof SwitchUserRole) {
+                    $impersonatorUser = $role->getSource()->getUsername();
+                    break;
+                }
+            }
 
             if (null !== $this->roleHierarchy) {
                 $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
@@ -126,6 +141,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
+                'impersonated' => null !== $impersonatorUser,
+                'impersonator_user' => $impersonatorUser,
+                'impersonation_exit_path' => null,
                 'token' => $token,
                 'token_class' => $this->hasVarDumper ? new ClassStub(get_class($token)) : get_class($token),
                 'logout_url' => $logoutUrl,
@@ -169,6 +187,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'user_checker' => $firewallConfig->getUserChecker(),
                     'listeners' => $firewallConfig->getListeners(),
                 );
+
+                // generate exit impersonation path from current request
+                if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
+                    $exitPath = $request->getRequestUri();
+                    $exitPath .= null === $request->getQueryString() ? '?' : '&';
+                    $exitPath .= urlencode($switchUserConfig['parameter']).'=_exit';
+
+                    $this->data['impersonation_exit_path'] = $exitPath;
+                }
             }
         }
 
@@ -243,6 +270,36 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function isAuthenticated()
     {
         return $this->data['authenticated'];
+    }
+
+    /**
+     * Checks if the user is impersonated or not.
+     *
+     * @return bool true if the user is impersonated, false otherwise
+     */
+    public function isImpersonated()
+    {
+        return $this->data['impersonated'];
+    }
+
+    /**
+     * Returns the impersonation source user.
+     *
+     * @return string The username
+     */
+    public function getImpersonatorUser()
+    {
+        return $this->data['impersonator_user'];
+    }
+
+    /**
+     * Returns the exit impersonation path.
+     *
+     * @return string The URI path
+     */
+    public function getImpersonationExitPath()
+    {
+        return $this->data['impersonation_exit_path'];
     }
 
     /**

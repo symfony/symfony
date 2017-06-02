@@ -337,13 +337,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Retrieves the requested reflection class and registers it for resource tracking.
      *
      * @param string $class
-     * @param bool   $koWithThrowingAutoloader Whether autoload should be protected against bad parents or not
      *
      * @return \ReflectionClass|null
      *
      * @final
      */
-    public function getReflectionClass($class, $koWithThrowingAutoloader = false)
+    public function getReflectionClass($class)
     {
         if (!$class = $this->getParameterBag()->resolveValue($class)) {
             return;
@@ -353,12 +352,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         try {
             if (isset($this->classReflectors[$class])) {
                 $classReflector = $this->classReflectors[$class];
-            } elseif ($koWithThrowingAutoloader) {
-                $resource = new ClassExistenceResource($class, ClassExistenceResource::EXISTS_KO_WITH_THROWING_AUTOLOADER);
-
-                $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
             } else {
-                $classReflector = new \ReflectionClass($class);
+                $resource = new ClassExistenceResource($class, false);
+                $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
             }
         } catch (\ReflectionException $e) {
             $classReflector = false;
@@ -366,7 +362,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($this->trackResources) {
             if (!$classReflector) {
-                $this->addResource($resource ?: new ClassExistenceResource($class, ClassExistenceResource::EXISTS_KO));
+                $this->addResource($resource ?: new ClassExistenceResource($class, false));
             } elseif (!$classReflector->isInternal()) {
                 $path = $classReflector->getFileName();
 

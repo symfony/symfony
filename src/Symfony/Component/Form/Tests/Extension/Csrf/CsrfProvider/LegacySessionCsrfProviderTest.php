@@ -37,8 +37,8 @@ class LegacySessionCsrfProviderTest extends TestCase
     public function testGenerateCsrfToken()
     {
         $this->session->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('ABCDEF'));
+            ->method('getId')
+            ->will($this->returnValue('ABCDEF'));
 
         $token = $this->provider->generateCsrfToken('foo');
 
@@ -48,8 +48,8 @@ class LegacySessionCsrfProviderTest extends TestCase
     public function testIsCsrfTokenValidSucceeds()
     {
         $this->session->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('ABCDEF'));
+            ->method('getId')
+            ->will($this->returnValue('ABCDEF'));
 
         $token = sha1('SECRET'.'foo'.'ABCDEF');
 
@@ -59,8 +59,8 @@ class LegacySessionCsrfProviderTest extends TestCase
     public function testIsCsrfTokenValidFails()
     {
         $this->session->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('ABCDEF'));
+            ->method('getId')
+            ->will($this->returnValue('ABCDEF'));
 
         $token = sha1('SECRET'.'bar'.'ABCDEF');
 

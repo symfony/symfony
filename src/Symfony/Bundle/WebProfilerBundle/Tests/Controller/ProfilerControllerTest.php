@@ -24,7 +24,7 @@ class ProfilerControllerTest extends TestCase
     public function testEmptyToken($token)
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
             ->disableOriginalConstructor()
@@ -48,7 +48,7 @@ class ProfilerControllerTest extends TestCase
     public function testReturns404onTokenNotFound()
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
             ->disableOriginalConstructor()
@@ -76,7 +76,7 @@ class ProfilerControllerTest extends TestCase
     public function testSearchResult()
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
             ->disableOriginalConstructor()

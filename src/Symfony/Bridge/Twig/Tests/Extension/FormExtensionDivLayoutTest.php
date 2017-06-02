@@ -20,6 +20,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Twig\Environment;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
@@ -49,7 +50,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
         // the value can be any template that exists

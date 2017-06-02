@@ -18,6 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
+use Twig\Environment;
+use Twig\Error\Error;
+use Twig\Loader\ArrayLoader;
+use Twig\Source;
 
 /**
  * Command that will validate your template syntax and output encountered errors.
@@ -37,18 +41,13 @@ class LintCommand extends Command
         parent::__construct($name);
     }
 
-    /**
-     * Sets the twig environment.
-     *
-     * @param \Twig_Environment $twig
-     */
-    public function setTwigEnvironment(\Twig_Environment $twig)
+    public function setTwigEnvironment(Environment $twig)
     {
         $this->twig = $twig;
     }
 
     /**
-     * @return \Twig_Environment $twig
+     * @return Environment $twig
      */
     protected function getTwigEnvironment()
     {
@@ -118,7 +117,7 @@ EOF
         return $this->display($input, $output, $io, $filesInfo);
     }
 
-    private function getFilesInfo(\Twig_Environment $twig, array $filenames)
+    private function getFilesInfo(Environment $twig, array $filenames)
     {
         $filesInfo = array();
         foreach ($filenames as $filename) {
@@ -141,16 +140,16 @@ EOF
         throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
-    private function validate(\Twig_Environment $twig, $template, $file)
+    private function validate(Environment $twig, $template, $file)
     {
         $realLoader = $twig->getLoader();
         try {
-            $temporaryLoader = new \Twig_Loader_Array(array((string) $file => $template));
+            $temporaryLoader = new ArrayLoader(array((string) $file => $template));
             $twig->setLoader($temporaryLoader);
-            $nodeTree = $twig->parse($twig->tokenize(new \Twig_Source($template, (string) $file)));
+            $nodeTree = $twig->parse($twig->tokenize(new Source($template, (string) $file)));
             $twig->compile($nodeTree);
             $twig->setLoader($realLoader);
-        } catch (\Twig_Error $e) {
+        } catch (Error $e) {
             $twig->setLoader($realLoader);
 
             return array('template' => $template, 'file' => $file, 'valid' => false, 'exception' => $e);
@@ -212,7 +211,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
+    private function renderException(OutputInterface $output, $template, Error $exception, $file = null)
     {
         $line = $exception->getTemplateLine();
 

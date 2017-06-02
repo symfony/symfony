@@ -14,6 +14,8 @@ namespace Symfony\Component\VarDumper\Tests;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -202,14 +204,14 @@ EOTXT
     }
 
     /**
-     * @requires function Twig_Template::getSourceContext
+     * @requires function Twig\Template::getSourceContext
      */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');
 
         require_once __DIR__.'/Fixtures/Twig.php';
-        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()));
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -225,7 +227,7 @@ EOTXT
             ':stream' => eval('return function () use ($twig) {
                 try {
                     $twig->render(array());
-                } catch (\Twig_Error_Runtime $e) {
+                } catch (\Twig\Error\RuntimeError $e) {
                     throw $e->getPrevious();
                 }
             };'),
@@ -265,16 +267,16 @@ stream resource {@{$ref}
             """
         }
       }
-      %d. Twig_Template->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
+      %d. Twig%cTemplate->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
         src: {
           %sTemplate.php:%d: """
             try {\\n
                 \$this->doDisplay(\$context, \$blocks);\\n
-            } catch (Twig_Error \$e) {\\n
+            } catch (Twig\Error \$e) {\\n
             """
         }
       }
-      %d. Twig_Template->display() ==> Twig_Template->displayWithErrorHandling(): {
+      %d. Twig%cTemplate->display() ==> Twig%cTemplate->displayWithErrorHandling(): {
         src: {
           %sTemplate.php:%d: """
             {\\n
@@ -283,7 +285,7 @@ stream resource {@{$ref}
             """
         }
       }
-      %d. Twig_Template->render() ==> Twig_Template->display(): {
+      %d. Twig%cTemplate->render() ==> Twig%cTemplate->display(): {
         src: {
           %sTemplate.php:%d: """
             try {\\n
@@ -292,7 +294,7 @@ stream resource {@{$ref}
             """
         }
       }
-      %d. %slosure%s() ==> Twig_Template->render(): {
+      %d. %slosure%s() ==> Twig%cTemplate->render(): {
         src: {
           %sCliDumperTest.php:%d: """
 %A

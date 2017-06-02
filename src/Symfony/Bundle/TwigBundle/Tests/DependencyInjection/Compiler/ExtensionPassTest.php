@@ -26,7 +26,7 @@ class ExtensionPassTest extends TestCase
         $container->register('twig.app_variable', '\Symfony\Bridge\Twig\AppVariable');
         $container->register('templating', '\Symfony\Bundle\TwigBundle\TwigEngine');
 
-        $nativeTwigLoader = new Definition('\Twig_Loader_Filesystem');
+        $nativeTwigLoader = new Definition('\Twig\Loader\FilesystemLoader');
         $nativeTwigLoader->addMethodCall('addPath', array());
         $container->setDefinition('twig.loader.native_filesystem', $nativeTwigLoader);
 

@@ -20,7 +20,7 @@
         "symfony/http-kernel": "~2.4|~3.0.0",
         "symfony/routing": "~2.2|~3.0.0",
         "symfony/twig-bridge": "~2.7|~3.0.0",
-        "twig/twig": "~1.28|~2.0"
+        "twig/twig": "~1.34|~2.4"
     },
     "require-dev": {
         "symfony/config": "~2.2|~3.0.0",

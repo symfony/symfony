@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestCase;
 class ExceptionCasterTest extends VarDumperTestCase
 {
     /**
-     * @requires function Twig_Template::getSourceContext
+     * @requires function Twig\Template::getSourceContext
      */
     public function testFrameWithTwig()
     {

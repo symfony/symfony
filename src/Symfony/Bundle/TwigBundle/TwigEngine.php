@@ -17,6 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
+use Twig\Environment;
+use Twig\Error\Error;
+use Twig\FileExtensionEscapingStrategy;
 
 /**
  * This engine renders Twig templates.
@@ -27,14 +30,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
 {
     protected $locator;
 
-    /**
-     * Constructor.
-     *
-     * @param \Twig_Environment           $environment A \Twig_Environment instance
-     * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
-     * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
-     */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator)
+    public function __construct(Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator)
     {
         parent::__construct($environment, $parser);
 
@@ -43,13 +39,13 @@ class TwigEngine extends BaseEngine implements EngineInterface
 
     /**
      * @deprecated since version 2.7, to be removed in 3.0.
-     *             Inject the escaping strategy on \Twig_Environment instead.
+     *             Inject the escaping strategy on Twig instead.
      */
     public function setDefaultEscapingStrategy($strategy)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Inject the escaping strategy in the Twig_Environment object instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Inject the escaping strategy in the Twig\Environment object instead.', E_USER_DEPRECATED);
 
-        $this->environment->getExtension('Twig_Extension_Escaper')->setDefaultStrategy($strategy);
+        $this->environment->getExtension('Twig\Extension\EscaperExtension')->setDefaultStrategy($strategy);
     }
 
     /**
@@ -58,9 +54,9 @@ class TwigEngine extends BaseEngine implements EngineInterface
      */
     public function guessDefaultEscapingStrategy($name)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the Twig_FileExtensionEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the Twig\FileExtensionEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
 
-        return \Twig_FileExtensionEscapingStrategy::guess($name);
+        return FileExtensionEscapingStrategy::guess($name);
     }
 
     /**
@@ -70,7 +66,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
     {
         try {
             return parent::render($name, $parameters);
-        } catch (\Twig_Error $e) {
+        } catch (Error $e) {
             if ($name instanceof TemplateReference && !method_exists($e, 'setSourceContext')) {
                 try {
                     // try to get the real name of the template where the error occurred
@@ -88,7 +84,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \Twig_Error if something went wrong like a thrown exception while rendering the template
+     * @throws Error if something went wrong like a thrown exception while rendering the template
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

@@ -22,7 +22,7 @@ class TemplateControllerTest extends TestCase
 {
     public function testTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

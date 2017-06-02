@@ -12,13 +12,15 @@
 namespace Symfony\Bundle\WebProfilerBundle\Twig;
 
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * Twig extension for the profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WebProfilerExtension extends \Twig_Extension
+class WebProfilerExtension extends AbstractExtension
 {
     /**
      * @var ValueExporter
@@ -31,7 +33,7 @@ class WebProfilerExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('profiler_dump', array($this, 'dumpValue')),
+            new TwigFunction('profiler_dump', array($this, 'dumpValue')),
         );
     }
 

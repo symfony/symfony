@@ -62,10 +62,10 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetEmbeddableProperties()
+    public function testGetPropertiesWithEmbedded()
     {
         if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
-            return;
+            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
         $this->assertEquals(
@@ -85,10 +85,10 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, array()));
     }
 
-    public function testExtractEmbeddable()
+    public function testExtractWithEmbedded()
     {
         if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
-            return;
+            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
         $expectedTypes = array(new Type(

@@ -21,6 +21,7 @@
         "symfony/debug": "~2.8|~3.0"
     },
     "require-dev": {
+        "symfony/config": "~3.3",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/dependency-injection": "~3.3",

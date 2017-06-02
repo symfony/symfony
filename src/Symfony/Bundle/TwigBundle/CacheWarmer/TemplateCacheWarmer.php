@@ -30,8 +30,8 @@ class TemplateCacheWarmer implements CacheWarmerInterface
     /**
      * TemplateCacheWarmer constructor.
      *
-     * @param ContainerInterface|Environment $container
-     * @param \Traversable                   $iterator
+     * @param ContainerInterface $container
+     * @param \Traversable       $iterator
      */
     public function __construct($container, \Traversable $iterator)
     {
@@ -40,8 +40,9 @@ class TemplateCacheWarmer implements CacheWarmerInterface
             $this->container = $container;
         } elseif ($container instanceof Environment) {
             $this->twig = $container;
+            @trigger_error(sprintf('Using a "%s" as first argument of %s is deprecated since version 3.4 and will be unsupported in version 4.0. Use a %s instead.', Environment::class, __CLASS__, Container::class), E_USER_DEPRECATED);
         } else {
-            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface or Environment as first argument.', __CLASS__));
+            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface as first argument.', __CLASS__));
         }
 
         $this->iterator = $iterator;

@@ -29,7 +29,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface
     /**
      * TranslationsCacheWarmer constructor.
      *
-     * @param ContainerInterface|TranslatorInterface $container
+     * @param ContainerInterface $container
      */
     public function __construct($container)
     {
@@ -38,8 +38,9 @@ class TranslationsCacheWarmer implements CacheWarmerInterface
             $this->container = $container;
         } elseif ($container instanceof TranslatorInterface) {
             $this->translator = $container;
+            @trigger_error(sprintf('Using a "%s" as first argument of %s is deprecated since version 3.4 and will be unsupported in version 4.0. Use a %s instead.', TranslatorInterface::class, __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
         } else {
-            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface or Symfony\Component\Translation\TranslatorInterface as first argument.', __CLASS__));
+            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface as first argument.', __CLASS__));
         }
     }
 

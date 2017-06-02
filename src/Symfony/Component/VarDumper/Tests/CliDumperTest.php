@@ -272,7 +272,7 @@ stream resource {@{$ref}
           %sTemplate.php:%d: """
             try {\\n
                 \$this->doDisplay(\$context, \$blocks);\\n
-            } catch (Twig\Error \$e) {\\n
+            } catch (Twig%sError \$e) {\\n
             """
         }
       }

@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T12:45:13Z
+
+For the record, passing a `Twig_Environment` on constructor might be deprecated on 3.4. Are you okay with this ? In this case i'd do the PR once this one is merged
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-01T13:07:58Z
+
+Isn't it true for any cache warmer though ? As soon as a cache warmer has deps, booting requires to instantiate the object graph
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T13:18:13Z
+
+@stof I don't know. What I'm sure is that is a regression from Symfony 2.7
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T13:20:22Z
+
+FYI here are the services that are instanciated on cache warm:
+router / translator / doctrine manager registry
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T13:33:46Z
+
+FYI the `Symfony\Bridge\Doctrine\CacheWarmer\ProxyCacheWarmer` is not optional, so there's no optimization to do here.
+However, the same patch can be applied to
+`Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer` and
+`Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer`
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T16:01:04Z
+
+PR updated, I've fixed the three optional cache warmers
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T20:04:04Z
+
+Woops ! It's now fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-01T20:13:30Z
+
+Can you add a note on each cache warmer class to explain why we want to inject the Container instead of the real service? That would avoid PRs that remove that later on.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-01T20:29:23Z
+
+PR updated comments addressed
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-06-02T07:56:22Z
+
+PR Updated comments addressed

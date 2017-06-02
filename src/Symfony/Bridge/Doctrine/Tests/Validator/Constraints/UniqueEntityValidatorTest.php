@@ -103,8 +103,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->getMock()
         ;
         $em->expects($this->any())
-             ->method('getRepository')
-             ->will($this->returnValue($repositoryMock))
+            ->method('getRepository')
+            ->will($this->returnValue($repositoryMock))
         ;
 
         $classMetadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')->getMock();
@@ -129,8 +129,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ;
         $classMetadata->reflFields = array('name' => $refl);
         $em->expects($this->any())
-             ->method('getClassMetadata')
-             ->will($this->returnValue($classMetadata))
+            ->method('getClassMetadata')
+            ->will($this->returnValue($classMetadata))
         ;
 
         return $em;
@@ -361,8 +361,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $repository = $this->createRepositoryMock();
         $repository->expects($this->once())
-             ->method('findByCustom')
-             ->will($this->returnValue(array()))
+            ->method('findByCustom')
+            ->will($this->returnValue(array()))
         ;
         $this->em = $this->createEntityManagerMock($repository);
         $this->registry = $this->createRegistryMock($this->em);

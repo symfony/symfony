@@ -179,6 +179,52 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
+    public function testRefererUrlAndLoginPathRouteNameHasToBeDifferentThanLoginUrl()
+    {
+        $options = array(
+            'login_path' => 'login_route',
+            'use_referer' => true,
+        );
+
+        $this->request->headers->expects($this->any())
+            ->method('get')->with('Referer')
+            ->will($this->returnValue('http://example.com/login'));
+
+        $this->httpUtils->expects($this->once())
+            ->method('generateUri')->with($this->request, 'login_route')
+            ->will($this->returnValue('http://example.com/login'));
+
+        $response = $this->expectRedirectResponse('/');
+
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testRefererUrlWithoutParametersAndLoginPathRouteNameHasToBeDifferentThanLoginUrl()
+    {
+        $options = array(
+            'login_path' => 'login_route',
+            'use_referer' => true,
+        );
+
+        $this->request->headers->expects($this->any())
+            ->method('get')->with('Referer')
+            ->will($this->returnValue('http://example.com/subfolder/login?t=1&p=2'));
+
+        $this->httpUtils->expects($this->once())
+            ->method('generateUri')->with($this->request, 'login_route')
+            ->will($this->returnValue('http://example.com/subfolder/login'));
+
+        $response = $this->expectRedirectResponse('/');
+
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
+
+        $this->assertSame($response, $result);
+    }
+
     public function testRefererTargetPathIsIgnoredByDefault()
     {
         $this->request->headers->expects($this->never())->method('get');

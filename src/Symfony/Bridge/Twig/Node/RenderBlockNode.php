@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Compiler;
+use Twig\Node\Expression\FunctionExpression;
+
 /**
  * Compiles a call to {@link \Symfony\Component\Form\FormRendererInterface::renderBlock()}.
  *
@@ -19,9 +22,9 @@ namespace Symfony\Bridge\Twig\Node;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RenderBlockNode extends \Twig_Node_Expression_Function
+class RenderBlockNode extends FunctionExpression
 {
-    public function compile(\Twig_Compiler $compiler)
+    public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
         $arguments = iterator_to_array($this->getNode('arguments'));

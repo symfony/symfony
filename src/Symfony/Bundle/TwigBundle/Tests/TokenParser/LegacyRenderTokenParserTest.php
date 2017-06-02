@@ -14,6 +14,11 @@ namespace Symfony\Bundle\TwigBundle\Tests\TokenParser;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Bundle\TwigBundle\Node\RenderNode;
+use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Parser;
+use Twig\Source;
 
 /**
  * @group legacy
@@ -25,10 +30,10 @@ class LegacyRenderTokenParserTest extends TestCase
      */
     public function testCompile($source, $expected)
     {
-        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $env->addTokenParser(new RenderTokenParser());
-        $stream = $env->tokenize(new \Twig_Source($source, ''));
-        $parser = new \Twig_Parser($env);
+        $stream = $env->tokenize(new Source($source, ''));
+        $parser = new Parser($env);
 
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
     }
@@ -39,8 +44,8 @@ class LegacyRenderTokenParserTest extends TestCase
             array(
                 '{% render "foo" %}',
                 new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(), 1),
+                    new ConstantExpression('foo', 1),
+                    new ArrayExpression(array(), 1),
                     1,
                     'render'
                 ),
@@ -48,10 +53,10 @@ class LegacyRenderTokenParserTest extends TestCase
             array(
                 '{% render "foo", {foo: 1} %}',
                 new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(
-                        new \Twig_Node_Expression_Constant('foo', 1),
-                        new \Twig_Node_Expression_Constant('1', 1),
+                    new ConstantExpression('foo', 1),
+                    new ArrayExpression(array(
+                        new ConstantExpression('foo', 1),
+                        new ConstantExpression('1', 1),
                     ), 1),
                     1,
                     'render'

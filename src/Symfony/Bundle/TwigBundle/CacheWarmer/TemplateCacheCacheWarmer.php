@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
+use Twig\Error\Error;
 
 /**
  * Generates the Twig cache for all templates.
@@ -65,7 +66,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
 
             try {
                 $twig->loadTemplate($template);
-            } catch (\Twig_Error $e) {
+            } catch (Error $e) {
                 // problem during compilation, give up
             }
         }

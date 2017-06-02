@@ -12,16 +12,18 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Stopwatch\Stopwatch;
+use Twig\Extension\ProfilerExtension as BaseProfilerExtension;
+use Twig\Profiler\Profile;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ProfilerExtension extends \Twig_Extension_Profiler
+class ProfilerExtension extends BaseProfilerExtension
 {
     private $stopwatch;
     private $events;
 
-    public function __construct(\Twig_Profiler_Profile $profile, Stopwatch $stopwatch = null)
+    public function __construct(Profile $profile, Stopwatch $stopwatch = null)
     {
         parent::__construct($profile);
 
@@ -29,7 +31,7 @@ class ProfilerExtension extends \Twig_Extension_Profiler
         $this->events = new \SplObjectStorage();
     }
 
-    public function enter(\Twig_Profiler_Profile $profile)
+    public function enter(Profile $profile)
     {
         if ($this->stopwatch && $profile->isTemplate()) {
             $this->events[$profile] = $this->stopwatch->start($profile->getName(), 'template');
@@ -38,7 +40,7 @@ class ProfilerExtension extends \Twig_Extension_Profiler
         parent::enter($profile);
     }
 
-    public function leave(\Twig_Profiler_Profile $profile)
+    public function leave(Profile $profile)
     {
         parent::leave($profile);
 

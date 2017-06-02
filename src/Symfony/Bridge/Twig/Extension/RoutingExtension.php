@@ -12,13 +12,18 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Node;
+use Twig\TwigFunction;
 
 /**
  * Provides integration of the Routing component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RoutingExtension extends \Twig_Extension
+class RoutingExtension extends AbstractExtension
 {
     private $generator;
 
@@ -35,8 +40,8 @@ class RoutingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
-            new \Twig_SimpleFunction('path', array($this, 'getPath'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
+            new TwigFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
+            new TwigFunction('path', array($this, 'getPath'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
         );
     }
 
@@ -82,9 +87,11 @@ class RoutingExtension extends \Twig_Extension
      * - path('route', {'param1': 'value1', 'param2': 'value2'})
      * If param1 and param2 reference placeholder in the route, it would still be safe. But we don't know.
      *
-     * @param \Twig_Node $argsNode The arguments of the path/url function
+     * @param Node $argsNode The arguments of the path/url function
      *
      * @return array An array with the contexts the URL is safe
+     *
+     * To be made @final in 3.4, and the type-hint be changed to "\Twig\Node\Node" in 4.0.
      */
     public function isUrlGenerationSafe(\Twig_Node $argsNode)
     {
@@ -93,8 +100,8 @@ class RoutingExtension extends \Twig_Extension
             $argsNode->hasNode(1) ? $argsNode->getNode(1) : null
         );
 
-        if (null === $paramsNode || $paramsNode instanceof \Twig_Node_Expression_Array && count($paramsNode) <= 2 &&
-            (!$paramsNode->hasNode(1) || $paramsNode->getNode(1) instanceof \Twig_Node_Expression_Constant)
+        if (null === $paramsNode || $paramsNode instanceof ArrayExpression && count($paramsNode) <= 2 &&
+            (!$paramsNode->hasNode(1) || $paramsNode->getNode(1) instanceof ConstantExpression)
         ) {
             return array('html');
         }

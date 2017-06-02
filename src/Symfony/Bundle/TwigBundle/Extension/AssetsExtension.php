@@ -11,10 +11,12 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
+@trigger_error('The '.__NAMESPACE__.'\AssetsExtension class is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Bridge\Twig\Extension\AssetExtension class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
-
-@trigger_error('The '.__NAMESPACE__.'\AssetsExtension class is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Bridge\Twig\Extension\AssetExtension class instead.', E_USER_DEPRECATED);
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * Twig extension for Symfony assets helper.
@@ -23,7 +25,7 @@ use Symfony\Component\Routing\RequestContext;
  *
  * @deprecated since 2.7, to be removed in 3.0. Use Symfony\Bridge\Twig\Extension\AssetExtension instead.
  */
-class AssetsExtension extends \Twig_Extension
+class AssetsExtension extends AbstractExtension
 {
     private $container;
     private $context;
@@ -42,8 +44,8 @@ class AssetsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
-            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
+            new TwigFunction('asset', array($this, 'getAssetUrl')),
+            new TwigFunction('assets_version', array($this, 'getAssetsVersion')),
         );
     }
 

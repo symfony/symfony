@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Twig\Environment;
 use Twig\Error\Error;
@@ -21,7 +22,7 @@ use Twig\Error\Error;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateCacheWarmer implements CacheWarmerInterface
+class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
     private $container;
     private $twig;
@@ -41,7 +42,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface
         } elseif ($container instanceof Environment) {
             $this->twig = $container;
         } else {
-            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface or Environment as first argument.', __CLASS__));
+            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Psr\Container\ContainerInterface as first argument.', __CLASS__));
         }
 
         $this->iterator = $iterator;
@@ -72,5 +73,15 @@ class TemplateCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'twig' => Environment::class,
+        );
     }
 }

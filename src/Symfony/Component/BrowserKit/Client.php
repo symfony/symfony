@@ -523,6 +523,9 @@ abstract class Client
      */
     protected function getAbsoluteUri($uri)
     {
+        // Implicitly convert to string to enable string operations
+        $uri = strval($uri);
+
         // already absolute?
         if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {
             return $uri;

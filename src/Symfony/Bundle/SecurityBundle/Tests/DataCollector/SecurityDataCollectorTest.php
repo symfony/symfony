@@ -13,13 +13,19 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
+use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
+use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\FirewallMapInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 class SecurityDataCollectorTest extends TestCase
 {
@@ -89,7 +95,7 @@ class SecurityDataCollectorTest extends TestCase
             ->with($request)
             ->willReturn($firewallConfig);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $this->getResponse());
         $collector->lateCollect();
         $collected = $collector->getFirewall();
@@ -124,7 +130,7 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
@@ -134,9 +140,48 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testGetListeners()
+    {
+        $request = $this->getRequest();
+        $event = new GetResponseEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event->setResponse($response = $this->getResponse());
+        $listener = $this->getMockBuilder(ListenerInterface::class)->getMock();
+        $listener
+            ->expects($this->once())
+            ->method('handle')
+            ->with($event);
+        $firewallMap = $this
+            ->getMockBuilder(FirewallMap::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $firewallMap
+            ->expects($this->any())
+            ->method('getFirewallConfig')
+            ->with($request)
+            ->willReturn(null);
+        $firewallMap
+            ->expects($this->once())
+            ->method('getListeners')
+            ->with($request)
+            ->willReturn(array(array($listener), null));
+
+        $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
+        $firewall->onKernelRequest($event);
+
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall);
+        $collector->collect($request, $response);
+
+        $this->assertNotEmpty($collected = $collector->getListeners()[0]);
+        $collector->lateCollect();
+        $this->addToAssertionCount(1);
     }
 
     public function provideRoles()

@@ -150,6 +150,8 @@
             </div>
 
             {% if collector.firewall.security_enabled %}
+                <h4>Configuration</h4>
+
                 <table>
                     <thead>
                         <tr>
@@ -188,6 +190,46 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <h4>Listeners</h4>
+
+                {% if collector.listeners|default([]) is empty %}
+                    <div class="empty">
+                        <p>No security listeners have been recorded. Check that debugging is enabled in the kernel.</p>
+                    </div>
+                {% else %}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Listener</th>
+                            <th>Duration</th>
+                            <th>Response</th>
+                        </tr>
+                        </thead>
+
+                        {% set previous_event = (collector.listeners|first) %}
+                        {% for listener in collector.listeners %}
+                            {% if loop.first or listener != previous_event %}
+                                {% if not loop.first %}
+                                    </tbody>
+                                {% endif %}
+
+                                <tbody>
+                                {% set previous_event = listener %}
+                            {% endif %}
+
+                            <tr>
+                                <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
+                                <td class="no-wrap">{{ '%0.2f'|format(listener.time * 1000) }} ms</td>
+                                <td class="font-normal">{{ listener.response ? profiler_dump(listener.response) : '(none)' }}</td>
+                            </tr>
+
+                            {% if loop.last %}
+                                </tbody>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                {% endif %}
             {% endif %}
         {% elseif collector.enabled %}
             <div class="empty">

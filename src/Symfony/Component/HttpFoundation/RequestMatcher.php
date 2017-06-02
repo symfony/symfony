@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\RequestMatcher as BaseRequestMatcher;
+
+@trigger_error('The '.RequestMatcher::class.' class is deprecated since version 3.2 and will be removed in 4.0. Use the '.BaseRequestMatcher::class.' class instead.', E_USER_DEPRECATED);
+
 /**
  * RequestMatcher compares a pre-defined set of checks against a Request instance.
  *
@@ -96,6 +101,8 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchPath($regexp)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.2 and will be removed in 4.0. Use the '.PathRequestMatcher::class.' class instead.', E_USER_DEPRECATED);
+
         $this->path = $regexp;
     }
 

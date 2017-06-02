@@ -1,0 +1,49 @@
+{
+    "name": "symfony/value-exporter",
+    "type": "library",
+    "description": "Symfony mechanism for formatting PHP variables",
+    "keywords": ["export", "php values", "logs"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Bernhard Schussek",
+            "email": "bschussek@gmail.com"
+        },
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Jules Pietri",
+            "email": "jules@heahprod.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "suggest": {
+        "symfony/var-dumper": "To dump PHP values"
+    },
+    "autoload": {
+        "files": [ "Resources/functions/to_string.php" ],
+        "psr-4": { "Symfony\\Component\\ValueExporter\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.1-dev"
+        }
+    }
+}

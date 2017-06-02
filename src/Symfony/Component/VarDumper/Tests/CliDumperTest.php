@@ -14,13 +14,9 @@ namespace Symfony\Component\VarDumper\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-<<<<<<< HEAD
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
-=======
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
->>>>>>> 2.8
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

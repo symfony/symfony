@@ -54,7 +54,7 @@
         "symfony/property-info": "~3.1",
         "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0",
-        "twig/twig": "~1.26|~2.0",
+        "twig/twig": "~1.34|~2.4",
         "sensio/framework-extra-bundle": "^3.0.2"
     },
     "conflict": {

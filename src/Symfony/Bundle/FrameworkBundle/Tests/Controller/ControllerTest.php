@@ -367,7 +367,7 @@ class ControllerTest extends TestCase
 
     public function testRenderViewTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
@@ -383,7 +383,7 @@ class ControllerTest extends TestCase
 
     public function testRenderTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
@@ -399,7 +399,7 @@ class ControllerTest extends TestCase
 
     public function testStreamTwig()
     {
-        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($this->at(0))->method('has')->will($this->returnValue(false));

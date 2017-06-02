@@ -21,8 +21,8 @@
         "symfony/polyfill-php70": "~1.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/twig-bridge": "~2.8|~3.0",
-        "twig/twig": "~1.28|~2.0",
-        "symfony/var-dumper": "~3.2"
+        "symfony/var-dumper": "~3.2",
+        "twig/twig": "~1.34|~2.4"
     },
     "require-dev": {
         "symfony/config": "~2.8|~3.0",

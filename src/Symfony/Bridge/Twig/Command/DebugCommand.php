@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Twig\Environment;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project.
@@ -35,18 +36,13 @@ class DebugCommand extends Command
         parent::__construct($name);
     }
 
-    /**
-     * Sets the twig environment.
-     *
-     * @param \Twig_Environment $twig
-     */
-    public function setTwigEnvironment(\Twig_Environment $twig)
+    public function setTwigEnvironment(Environment $twig)
     {
         $this->twig = $twig;
     }
 
     /**
-     * @return \Twig_Environment $twig
+     * @return Environment $twig
      */
     protected function getTwigEnvironment()
     {

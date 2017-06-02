@@ -14,13 +14,17 @@ namespace Symfony\Bundle\WebProfilerBundle\Twig;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+use Twig\Environment;
+use Twig\Extension\ProfilerExtension;
+use Twig\Profiler\Profile;
+use Twig\TwigFunction;
 
 /**
  * Twig extension for the profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WebProfilerExtension extends \Twig_Extension_Profiler
+class WebProfilerExtension extends ProfilerExtension
 {
     /**
      * @var ValueExporter
@@ -48,12 +52,12 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
     }
 
-    public function enter(\Twig_Profiler_Profile $profile)
+    public function enter(Profile $profile)
     {
         ++$this->stackLevel;
     }
 
-    public function leave(\Twig_Profiler_Profile $profile)
+    public function leave(Profile $profile)
     {
         if (0 === --$this->stackLevel) {
             $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
@@ -65,17 +69,17 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
      */
     public function getFunctions()
     {
-        $profilerDump = function (\Twig_Environment $env, $value, $maxDepth = 0) {
+        $profilerDump = function (Environment $env, $value, $maxDepth = 0) {
             return $value instanceof Data ? $this->dumpData($env, $value, $maxDepth) : twig_escape_filter($env, $this->dumpValue($value));
         };
 
         return array(
-            new \Twig_SimpleFunction('profiler_dump', $profilerDump, array('is_safe' => array('html'), 'needs_environment' => true)),
-            new \Twig_SimpleFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
+            new TwigFunction('profiler_dump', $profilerDump, array('is_safe' => array('html'), 'needs_environment' => true)),
+            new TwigFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
 
-    public function dumpData(\Twig_Environment $env, Data $data, $maxDepth = 0)
+    public function dumpData(Environment $env, Data $data, $maxDepth = 0)
     {
         $this->dumper->setCharset($env->getCharset());
         $this->dumper->dump($data, null, array(
@@ -89,7 +93,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         return str_replace("\n</pre", '</pre', rtrim($dump));
     }
 
-    public function dumpLog(\Twig_Environment $env, $message, Data $context)
+    public function dumpLog(Environment $env, $message, Data $context)
     {
         $message = twig_escape_filter($env, $message);
 

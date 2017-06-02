@@ -12,13 +12,15 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * ExpressionExtension gives a way to create Expressions from a template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExpressionExtension extends \Twig_Extension
+class ExpressionExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
@@ -26,7 +28,7 @@ class ExpressionExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('expression', array($this, 'createExpression')),
+            new TwigFunction('expression', array($this, 'createExpression')),
         );
     }
 

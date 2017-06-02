@@ -14,7 +14,13 @@ namespace Symfony\Component\VarDumper\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+<<<<<<< HEAD
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+=======
+use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+>>>>>>> 2.8
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -230,14 +236,14 @@ EOTXT
     }
 
     /**
-     * @requires function Twig_Template::getSourceContext
+     * @requires function Twig\Template::getSourceContext
      */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');
 
         require_once __DIR__.'/Fixtures/Twig.php';
-        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()));
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -253,7 +259,7 @@ EOTXT
             ':stream' => eval('return function () use ($twig) {
                 try {
                     $twig->render(array());
-                } catch (\Twig_Error_Runtime $e) {
+                } catch (\Twig\Error\RuntimeError $e) {
                     throw $e->getPrevious();
                 }
             };'),
@@ -279,7 +285,7 @@ stream resource {@{$ref}
       %sTemplate.php:%d: {
         : try {
         :     \$this->doDisplay(\$context, \$blocks);
-        : } catch (Twig_Error \$e) {
+        : } catch (Twig%sError \$e) {
       }
       %sTemplate.php:%d: {
         : {

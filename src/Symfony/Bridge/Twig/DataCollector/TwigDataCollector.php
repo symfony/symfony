@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Markup;
+use Twig\Profiler\Dumper\HtmlDumper;
+use Twig\Profiler\Profile;
 
 /**
  * TwigDataCollector.
@@ -26,7 +29,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     private $profile;
     private $computed;
 
-    public function __construct(\Twig_Profiler_Profile $profile)
+    public function __construct(Profile $profile)
     {
         $this->profile = $profile;
     }
@@ -73,7 +76,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
 
     public function getHtmlCallGraph()
     {
-        $dumper = new \Twig_Profiler_Dumper_Html();
+        $dumper = new HtmlDumper();
         $dump = $dumper->dump($this->getProfile());
 
         // needed to remove the hardcoded CSS styles
@@ -87,7 +90,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
             '<span class="status-success">',
         ), $dump);
 
-        return new \Twig_Markup($dump, 'UTF-8');
+        return new Markup($dump, 'UTF-8');
     }
 
     public function getProfile()
@@ -108,7 +111,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->computed[$index];
     }
 
-    private function computeData(\Twig_Profiler_Profile $profile)
+    private function computeData(Profile $profile)
     {
         $data = array(
             'template_count' => 0,

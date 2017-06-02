@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-06-01T11:01:53Z
+
+Another solution would be to resolve the controller name with the `ControllerNameParser` in the `ServiceValueResolver`.
+
+This would remove the BC break.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-06-01T14:01:36Z
+
+@jvasseur I really like that idea... but the `ServiceValueResolver` is in the component, and the `ControllerNameParser` is in the framework only. So, this approach *is* still a valid alternative. Specifically, instead of a subscriber, we would sub-class the `ServiceValueResolver` in the FW to parse the controller string. Do people like that better?
+
+In the mean time, I've made updates from Stof's comments!

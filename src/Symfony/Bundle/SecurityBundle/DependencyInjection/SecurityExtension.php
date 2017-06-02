@@ -448,6 +448,7 @@ class SecurityExtension extends Extension
         }
 
         $config->replaceArgument(10, $listenerKeys);
+        $config->replaceArgument(11, isset($firewall['switch_user']) ? $firewall['switch_user'] : null);
 
         return array($matcher, $listeners, $exceptionListener);
     }

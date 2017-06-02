@@ -286,7 +286,7 @@ class Command
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                if (PHP_VERSION_ID < 70000) {
+                if (\PHP_VERSION_ID < 70000) {
                     // Bug in PHP5: https://bugs.php.net/bug.php?id=64761
                     // This means that we cannot bind static closures and therefore we must
                     // ignore any errors here.  There is no way to test if the closure is

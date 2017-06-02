@@ -40,7 +40,7 @@
 
         <service id="twig.template_cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="twig" />
+            <argument type="service" id="service_container" />
             <argument type="service" id="twig.template_iterator" />
         </service>
 

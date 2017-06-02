@@ -575,7 +575,7 @@ class InlineTest extends TestCase
         $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
 
-        if (PHP_VERSION_ID >= 70100) {
+        if (\PHP_VERSION_ID >= 70100) {
             $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
         } else {
             $expected->setTime($hour, $minute, $second);
@@ -604,7 +604,7 @@ class InlineTest extends TestCase
         $expected = new \DateTime($yaml);
         $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
-        if (PHP_VERSION_ID >= 70100) {
+        if (\PHP_VERSION_ID >= 70100) {
             $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
         } else {
             $expected->setTime($hour, $minute, $second);

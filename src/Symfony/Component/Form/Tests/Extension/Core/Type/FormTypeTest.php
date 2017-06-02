@@ -470,9 +470,9 @@ class FormTypeTest extends BaseTypeTest
     public function testViewIsNotRenderedByDefault()
     {
         $view = $this->factory->createBuilder(static::TESTED_TYPE)
-                ->add('foo', static::TESTED_TYPE)
-                ->getForm()
-                ->createView();
+            ->add('foo', static::TESTED_TYPE)
+            ->getForm()
+            ->createView();
 
         $this->assertFalse($view->isRendered());
     }

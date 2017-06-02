@@ -81,7 +81,7 @@ class HttpKernelExtensionTest extends TestCase
         $twig = new Environment($loader, array('debug' => true, 'cache' => false));
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->getMockBuilder('Twig\Loader\RuntimeLoaderInterface')->getMock();
+        $loader = $this->getMockBuilder('Twig\RuntimeLoader\RuntimeLoaderInterface')->getMock();
         $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
             array('Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)),
         )));

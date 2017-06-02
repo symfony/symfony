@@ -13,13 +13,14 @@ namespace Symfony\Bundle\TwigBundle;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 /**
  * Loads Twig extension runtimes via the service container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ContainerAwareRuntimeLoader implements \Twig_RuntimeLoaderInterface
+class ContainerAwareRuntimeLoader implements RuntimeLoaderInterface
 {
     private $container;
     private $mapping;

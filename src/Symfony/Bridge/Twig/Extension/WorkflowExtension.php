@@ -13,13 +13,15 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Transition;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * WorkflowExtension.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class WorkflowExtension extends \Twig_Extension
+class WorkflowExtension extends AbstractExtension
 {
     private $workflowRegistry;
 
@@ -31,8 +33,8 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('workflow_can', array($this, 'canTransition')),
-            new \Twig_SimpleFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
+            new TwigFunction('workflow_can', array($this, 'canTransition')),
+            new TwigFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
         );
     }
 

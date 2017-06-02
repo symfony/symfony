@@ -31,7 +31,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     private $template;
 
-    public function __construct(array $defaultThemes = array(), \Twig_Environment $environment = null)
+    public function __construct(array $defaultThemes = array(), Environment $environment = null)
     {
         if (null === $environment) {
             @trigger_error(sprintf('Not passing a Twig Environment as the second argument for "%s" constructor is deprecated since version 3.2 and won\'t be possible in 4.0.', static::class), E_USER_DEPRECATED);

@@ -28,7 +28,7 @@ CHANGELOG
    // ...
    $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'), $twig);
    // require Twig 1.30+
-   $twig->addRuntimeLoader(new \Twig_FactoryRuntimeLoader(array(
+   $twig->addRuntimeLoader(new \Twig\RuntimeLoader\FactoryRuntimeLoader(array(
        TwigRenderer::class => function () use ($rendererEngine, $csrfTokenManager) {
            return new TwigRenderer($rendererEngine, $csrfTokenManager);
        },

@@ -123,7 +123,7 @@ class DumpExtensionTest extends TestCase
             '</pre><script>Sfdump("%s")</script>'
         );
         $extension = new DumpExtension(new VarCloner(), $dumper);
-        $twig = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array(
+        $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array(
             'debug' => true,
             'cache' => false,
             'optimizations' => 0,

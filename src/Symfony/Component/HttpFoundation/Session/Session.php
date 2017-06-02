@@ -238,9 +238,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * Gets the flashbag interface.
-     *
-     * @return FlashBagInterface
+     * {@inheritdoc}
      */
     public function getFlashBag()
     {

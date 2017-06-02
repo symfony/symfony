@@ -179,4 +179,11 @@ interface SessionInterface
      * @return MetadataBag
      */
     public function getMetadataBag();
+
+    /**
+     * Gets the flash bag.
+     *
+     * @return FlashBagInterface
+     */
+    public function getFlashBag();
 }

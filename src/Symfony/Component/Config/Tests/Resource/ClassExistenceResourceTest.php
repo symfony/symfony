@@ -66,7 +66,7 @@ EOF
 
             $loadedClass = 123;
 
-            $res = new ClassExistenceResource('MissingFooClass', ClassExistenceResource::EXISTS_KO);
+            $res = new ClassExistenceResource('MissingFooClass', false);
 
             $this->assertSame(123, $loadedClass);
         } finally {
@@ -76,7 +76,7 @@ EOF
 
     public function testConditionalClass()
     {
-        $res = new ClassExistenceResource(ConditionalClass::class, ClassExistenceResource::EXISTS_KO_WITH_THROWING_AUTOLOADER);
+        $res = new ClassExistenceResource(ConditionalClass::class, false);
 
         $this->assertFalse($res->isFresh(0));
     }

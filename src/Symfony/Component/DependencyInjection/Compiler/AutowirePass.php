@@ -388,7 +388,7 @@ class AutowirePass extends AbstractRecursivePass
             unset($this->ambiguousServiceTypes[$type]);
         }
 
-        if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), true)) {
+        if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass())) {
             return;
         }
 
@@ -444,7 +444,7 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function createAutowiredDefinition($type)
     {
-        if (!($typeHint = $this->container->getReflectionClass($type, true)) || !$typeHint->isInstantiable()) {
+        if (!($typeHint = $this->container->getReflectionClass($type)) || !$typeHint->isInstantiable()) {
             return;
         }
 
@@ -478,7 +478,7 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
-        if (!$r = $this->container->getReflectionClass($type = $reference->getType(), true)) {
+        if (!$r = $this->container->getReflectionClass($type = $reference->getType())) {
             $message = sprintf('has type "%s" but this class does not exist.', $type);
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';

@@ -3,7 +3,6 @@
 require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';
 
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -139,10 +138,6 @@ $container
 $container
     ->register('lazy_context_ignore_invalid_ref', 'LazyContext')
     ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))), new IteratorArgument(array())))
-;
-$container
-    ->register('closure_proxy', 'BarClass')
-    ->setArguments(array(new ClosureProxyArgument('closure_proxy', 'getBaz')))
 ;
 
 return $container;

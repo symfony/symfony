@@ -471,40 +471,6 @@ class PhpDumperTest extends TestCase
         $this->assertEmpty(iterator_to_array($lazyContext->lazyEmptyValues));
     }
 
-    public function testClosureProxy()
-    {
-        $container = include self::$fixturesPath.'/containers/container31.php';
-        $container->compile();
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services31.php', $dumper->dump());
-        $res = $container->getResources();
-        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo', (string) array_pop($res));
-    }
-
-    public function testClosureProxyWithVoidReturnType()
-    {
-        $container = include self::$fixturesPath.'/containers/container_dump_proxy_with_void_return_type.php';
-
-        $container->compile();
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dump_proxy_with_void_return_type.php', $dumper->dump());
-        $res = $container->getResources();
-        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\ContainerVoid\Foo', (string) array_pop($res));
-    }
-
-    public function testClosureProxyPhp71()
-    {
-        $container = include self::$fixturesPath.'/containers/container32.php';
-        $container->compile();
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services32.php', $dumper->dump());
-        $res = $container->getResources();
-        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container32\Foo', (string) array_pop($res));
-    }
-
     public function testNormalizedId()
     {
         $container = include self::$fixturesPath.'/containers/container33.php';

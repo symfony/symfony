@@ -32,7 +32,6 @@ class ProjectServiceContainer extends Container
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
-            'closure_proxy' => 'getClosureProxyService',
             'configured_service' => 'getConfiguredServiceService',
             'configured_service_simple' => 'getConfiguredServiceSimpleService',
             'decorator_service' => 'getDecoratorServiceService',
@@ -107,21 +106,6 @@ class ProjectServiceContainer extends Container
         $instance->setFoo(($this->services['foo_with_inline'] ?? $this->get('foo_with_inline')));
 
         return $instance;
-    }
-
-    /**
-     * Gets the 'closure_proxy' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \BarClass A BarClass instance
-     */
-    protected function getClosureProxyService()
-    {
-        return $this->services['closure_proxy'] = new \BarClass(/** @closure-proxy BarClass::getBaz */ function () {
-            return ($this->services['closure_proxy'] ?? $this->get('closure_proxy'))->getBaz();
-        });
     }
 
     /**

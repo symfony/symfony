@@ -15,7 +15,6 @@ use Symfony\Component\Yaml\Dumper as YmlDumper;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -248,8 +247,6 @@ class YamlDumper extends Dumper
         if ($value instanceof ArgumentInterface) {
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
-            } elseif ($value instanceof ClosureProxyArgument) {
-                $tag = 'closure_proxy';
             } else {
                 throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_class($value)));
             }

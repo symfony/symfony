@@ -62,29 +62,6 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'bar' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
-     */
-    protected function getBarService()
-    {
-        $this->services['bar'] = $instance = new \stdClass();
-
-        $instance->foo = array(0 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo::withNoArgs */ function () {
-            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withNoArgs();
-        }, 1 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo::withArgs */ function ($a, \Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo $b = NULL, $c = array(0 => 123)) {
-            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withArgs($a, $b, $c);
-        }, 2 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo::withRefs */ function &(&$a = NULL, &$b) {
-            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withRefs($a, $b);
-        });
-
-        return $instance;
-    }
-
-    /**
      * Gets the 'foo' service.
      *
      * This service is shared.

@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -678,21 +677,6 @@ class YamlFileLoader extends FileLoader
                 } catch (InvalidArgumentException $e) {
                     throw new InvalidArgumentException(sprintf('"!iterator" tag only accepts arrays of "@service" references in "%s".', $file));
                 }
-            }
-            if ('closure_proxy' === $value->getTag()) {
-                if (!is_array($argument) || array(0, 1) !== array_keys($argument) || !is_string($argument[0]) || !is_string($argument[1]) || 0 !== strpos($argument[0], '@') || 0 === strpos($argument[0], '@@')) {
-                    throw new InvalidArgumentException(sprintf('"!closure_proxy" tagged values must be arrays of [@service, method] in "%s".', $file));
-                }
-
-                if (0 === strpos($argument[0], '@?')) {
-                    $argument[0] = substr($argument[0], 2);
-                    $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-                } else {
-                    $argument[0] = substr($argument[0], 1);
-                    $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-                }
-
-                return new ClosureProxyArgument($argument[0], $argument[1], $invalidBehavior);
             }
             if ('service' === $value->getTag()) {
                 if ($isParameter) {

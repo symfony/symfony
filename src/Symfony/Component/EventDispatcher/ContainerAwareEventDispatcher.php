@@ -160,7 +160,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      */
     public function addSubscriberService($serviceId, $class)
     {
-        @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure-proxy injection instead.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
 
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
             if (is_string($params)) {

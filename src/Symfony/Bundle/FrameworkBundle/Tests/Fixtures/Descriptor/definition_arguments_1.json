@@ -58,13 +58,6 @@
                 "type": "service",
                 "id": "definition_2"
             }
-        ],
-        [
-            {
-                "type": "service",
-                "id": "definition1"
-            },
-            "get"
         ]
     ],
     "file": null,

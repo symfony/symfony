@@ -132,7 +132,7 @@ EventDispatcher
 ---------------
 
  * The `ContainerAwareEventDispatcher` class has been removed.
-   Use `EventDispatcher` with closure-proxy injection instead.
+   Use `EventDispatcher` with closure factories instead.
 
 ExpressionLanguage
 ------------------

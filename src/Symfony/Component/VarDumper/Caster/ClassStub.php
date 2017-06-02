@@ -38,10 +38,6 @@ class ClassStub extends ConstStub
             if (null !== $callable) {
                 if ($callable instanceof \Closure) {
                     $r = new \ReflectionFunction($callable);
-
-                    if (preg_match('#^/\*\* @closure-proxy ([^: ]++)::([^: ]++) \*/$#', $r->getDocComment(), $m)) {
-                        $r = array($m[1], $m[2]);
-                    }
                 } elseif (is_object($callable)) {
                     $r = array($callable, '__invoke');
                 } elseif (is_array($callable)) {

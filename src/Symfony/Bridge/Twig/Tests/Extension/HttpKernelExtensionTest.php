@@ -17,11 +17,13 @@ use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class HttpKernelExtensionTest extends TestCase
 {
     /**
-     * @expectedException \Twig_Error_Runtime
+     * @expectedException \Twig\Error\RuntimeError
      */
     public function testFragmentWithError()
     {
@@ -75,11 +77,11 @@ class HttpKernelExtensionTest extends TestCase
 
     protected function renderTemplate(FragmentHandler $renderer, $template = '{{ render("foo") }}')
     {
-        $loader = new \Twig_Loader_Array(array('index' => $template));
-        $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
+        $loader = new ArrayLoader(array('index' => $template));
+        $twig = new Environment($loader, array('debug' => true, 'cache' => false));
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->getMockBuilder('Twig_RuntimeLoaderInterface')->getMock();
+        $loader = $this->getMockBuilder('Twig\RuntimeLoader\RuntimeLoaderInterface')->getMock();
         $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
             array('Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)),
         )));

@@ -15,13 +15,15 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class ExceptionControllerTest extends TestCase
 {
     public function testShowActionCanBeForcedToShowErrorPage()
     {
-        $twig = new \Twig_Environment(
-            new \Twig_Loader_Array(array(
+        $twig = new Environment(
+            new ArrayLoader(array(
                 '@Twig/Exception/error404.html.twig' => 'ok',
             ))
         );
@@ -40,8 +42,8 @@ class ExceptionControllerTest extends TestCase
 
     public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
     {
-        $twig = new \Twig_Environment(
-            new \Twig_Loader_Array(array(
+        $twig = new Environment(
+            new ArrayLoader(array(
                 '@Twig/Exception/error.html.twig' => 'html',
             ))
         );

@@ -171,7 +171,7 @@ EODUMP;
     }
 
     /**
-     * @requires function Twig_Template::getSourceContext
+     * @requires function Twig\Template::getSourceContext
      */
     public function testFrameWithTwig()
     {

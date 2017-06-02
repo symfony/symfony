@@ -123,7 +123,7 @@ class Configuration implements ConfigurationInterface
                 ->variableNode('autoescape')->defaultValue('name')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
-                ->scalarNode('base_template_class')->example('Twig_Template')->cannotBeEmpty()->end()
+                ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()

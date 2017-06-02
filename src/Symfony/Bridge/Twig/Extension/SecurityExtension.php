@@ -14,13 +14,15 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * SecurityExtension exposes security context features.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SecurityExtension extends \Twig_Extension
+class SecurityExtension extends AbstractExtension
 {
     private $securityChecker;
 
@@ -52,7 +54,7 @@ class SecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('is_granted', array($this, 'isGranted')),
+            new TwigFunction('is_granted', array($this, 'isGranted')),
         );
     }
 

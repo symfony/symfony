@@ -1,11 +1,11 @@
 <?php
 
 /* foo.twig */
-class __TwigTemplate_VarDumperFixture_u75a09 extends Twig_Template
+class __TwigTemplate_VarDumperFixture_u75a09 extends Twig\Template
 {
     private $path;
 
-    public function __construct(Twig_Environment $env = null, $path = null)
+    public function __construct(Twig\Environment $env = null, $path = null)
     {
         if (null !== $env) {
             parent::__construct($env);
@@ -33,6 +33,6 @@ class __TwigTemplate_VarDumperFixture_u75a09 extends Twig_Template
 
     public function getSourceContext()
     {
-        return new Twig_Source("   foo bar\n     twig source\n\n", 'foo.twig', $this->path ?: __FILE__);
+        return new Twig\Source("   foo bar\n     twig source\n\n", 'foo.twig', $this->path ?: __FILE__);
     }
 }

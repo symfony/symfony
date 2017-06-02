@@ -12,6 +12,10 @@
 namespace Symfony\Bridge\Twig\Form;
 
 use Symfony\Component\Form\FormRendererInterface;
+use Twig\Environment;
+
+// BC/FC with namespaced Twig
+class_exists('Twig\Environment');
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -20,10 +24,5 @@ use Symfony\Component\Form\FormRendererInterface;
  */
 interface TwigRendererInterface extends FormRendererInterface
 {
-    /**
-     * Sets Twig's environment.
-     *
-     * @param \Twig_Environment $environment
-     */
-    public function setEnvironment(\Twig_Environment $environment);
+    public function setEnvironment(Environment $environment);
 }

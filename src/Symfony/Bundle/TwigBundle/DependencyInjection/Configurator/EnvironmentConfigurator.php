@@ -11,6 +11,11 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Configurator;
 
+use Twig\Environment;
+
+// BC/FC with namespaced Twig
+class_exists('Twig\Environment');
+
 /**
  * Twig environment configurator.
  *
@@ -35,14 +40,14 @@ class EnvironmentConfigurator
         $this->thousandsSeparator = $thousandsSeparator;
     }
 
-    public function configure(\Twig_Environment $environment)
+    public function configure(Environment $environment)
     {
-        $environment->getExtension('Twig_Extension_Core')->setDateFormat($this->dateFormat, $this->intervalFormat);
+        $environment->getExtension('Twig\Extension\CoreExtension')->setDateFormat($this->dateFormat, $this->intervalFormat);
 
         if (null !== $this->timezone) {
-            $environment->getExtension('Twig_Extension_Core')->setTimezone($this->timezone);
+            $environment->getExtension('Twig\Extension\CoreExtension')->setTimezone($this->timezone);
         }
 
-        $environment->getExtension('Twig_Extension_Core')->setNumberFormat($this->decimals, $this->decimalPoint, $this->thousandsSeparator);
+        $environment->getExtension('Twig\Extension\CoreExtension')->setNumberFormat($this->decimals, $this->decimalPoint, $this->thousandsSeparator);
     }
 }

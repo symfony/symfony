@@ -7,7 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="twig" class="Twig_Environment" public="true">
+        <service id="twig" class="Twig\Environment" public="true">
             <argument type="service" id="twig.loader" />
             <argument /> <!-- Twig options -->
             <call method="addGlobal">
@@ -20,6 +20,7 @@
             <configurator service="twig.configurator.environment" method="configure" />
         </service>
         <service id="Twig_Environment" alias="twig" />
+        <service id="Twig\Environment" alias="twig" />
 
         <service id="twig.app_variable" class="Symfony\Bridge\Twig\AppVariable">
             <call method="setEnvironment"><argument>%kernel.environment%</argument></call>
@@ -48,20 +49,20 @@
             <argument type="service" id="twig.template_iterator" />
         </service>
 
-        <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem">
+        <service id="twig.loader.native_filesystem" class="Twig\Loader\FilesystemLoader">
             <argument type="collection" /> <!-- paths -->
             <argument>%kernel.project_dir%</argument>
             <tag name="twig.loader"/>
         </service>
 
-        <service id="twig.loader.chain" class="Twig_Loader_Chain" />
+        <service id="twig.loader.chain" class="Twig\Loader\ChainLoader" />
 
         <service id="twig.extension.profiler" class="Symfony\Bridge\Twig\Extension\ProfilerExtension">
             <argument type="service" id="twig.profile" />
             <argument type="service" id="debug.stopwatch" on-invalid="null" />
         </service>
 
-        <service id="twig.profile" class="Twig_Profiler_Profile" public="true" />
+        <service id="twig.profile" class="Twig\Profiler\Profile" public="true" />
 
         <service id="data_collector.twig" class="Symfony\Bridge\Twig\DataCollector\TwigDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="257" />
@@ -108,7 +109,7 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
 
-        <service id="twig.extension.debug" class="Twig_Extension_Debug" />
+        <service id="twig.extension.debug" class="Twig\Extension\DebugExtension" />
 
         <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor" public="true">
             <argument type="service" id="twig" />
@@ -145,7 +146,7 @@
             <argument /> <!-- thousands separator, set in TwigExtension -->
         </service>
 
-        <service id="twig.runtime_loader" class="Twig_ContainerRuntimeLoader">
+        <service id="twig.runtime_loader" class="Twig\RuntimeLoader\ContainerRuntimeLoader">
             <argument /> <!-- runtime locator -->
         </service>
     </services>

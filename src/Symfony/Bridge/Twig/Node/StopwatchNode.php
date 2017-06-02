@@ -11,19 +11,23 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Compiler;
+use Twig\Node\Expression\AssignNameExpression;
+use Twig\Node\Node;
+
 /**
  * Represents a stopwatch node.
  *
  * @author Wouter J <wouter@wouterj.nl>
  */
-class StopwatchNode extends \Twig_Node
+class StopwatchNode extends Node
 {
-    public function __construct(\Twig_Node $name, \Twig_Node $body, \Twig_Node_Expression_AssignName $var, $lineno = 0, $tag = null)
+    public function __construct(Node $name, Node $body, AssignNameExpression $var, $lineno = 0, $tag = null)
     {
         parent::__construct(array('body' => $body, 'name' => $name, 'var' => $var), array(), $lineno, $tag);
     }
 
-    public function compile(\Twig_Compiler $compiler)
+    public function compile(Compiler $compiler)
     {
         $compiler
             ->addDebugInfo($this)

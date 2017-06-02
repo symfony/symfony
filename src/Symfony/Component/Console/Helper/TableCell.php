@@ -49,6 +49,14 @@ class TableCell
         }
 
         $this->options = array_merge($this->options, $options);
+
+        if (0 >= (int) $this->options['colspan']) {
+            throw new InvalidArgumentException(sprintf('The colspan value must be a positive integer ("%s" given).', $this->options['colspan']));
+        }
+
+        if (0 >= (int) $this->options['rowspan']) {
+            throw new InvalidArgumentException(sprintf('The rowspan value must be a positive integer ("%s" given).', $this->options['rowspan']));
+        }
     }
 
     /**

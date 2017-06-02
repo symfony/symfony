@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T17:29:11Z
+
+Related to https://github.com/symfony/recipes/pull/91 (missing parent should not make the container compilation fail)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T18:24:31Z
+
+Appveyor failure is from a transient test.
+deps=high line needs a merge up to be green.
+Ready.

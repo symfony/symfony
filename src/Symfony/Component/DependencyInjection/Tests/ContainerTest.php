@@ -698,7 +698,7 @@ class ContainerTest extends TestCase
     {
         $class = new \ReflectionClass('Symfony\Component\DependencyInjection\Container');
         $clone = $class->getMethod('__clone');
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             $this->assertFalse($class->isCloneable());
         }
         $this->assertTrue($clone->isPrivate());

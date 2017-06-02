@@ -1191,7 +1191,7 @@ class Crawler extends \SplObjectStorage
     private function triggerDeprecation($methodName, $useTrace = false)
     {
         if ($useTrace || defined('HHVM_VERSION')) {
-            if (PHP_VERSION_ID >= 50400) {
+            if (\PHP_VERSION_ID >= 50400) {
                 $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
             } else {
                 $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);

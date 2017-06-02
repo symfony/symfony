@@ -13,13 +13,22 @@ namespace Symfony\Bridge\Twig\NodeVisitor;
 
 use Symfony\Bridge\Twig\Node\TransNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\AssignNameExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\FilterExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\ModuleNode;
+use Twig\Node\Node;
+use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
  * TranslationDefaultDomainNodeVisitor.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
+class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {
     /**
      * @var Scope
@@ -37,23 +46,23 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
     /**
      * {@inheritdoc}
      */
-    protected function doEnterNode(\Twig_Node $node, \Twig_Environment $env)
+    protected function doEnterNode(Node $node, Environment $env)
     {
-        if ($node instanceof \Twig_Node_Block || $node instanceof \Twig_Node_Module) {
+        if ($node instanceof Node_Block || $node instanceof ModuleNode) {
             $this->scope = $this->scope->enter();
         }
 
         if ($node instanceof TransDefaultDomainNode) {
-            if ($node->getNode('expr') instanceof \Twig_Node_Expression_Constant) {
+            if ($node->getNode('expr') instanceof ConstantExpression) {
                 $this->scope->set('domain', $node->getNode('expr'));
 
                 return $node;
             } else {
                 $var = $this->getVarName();
-                $name = new \Twig_Node_Expression_AssignName($var, $node->getTemplateLine());
-                $this->scope->set('domain', new \Twig_Node_Expression_Name($var, $node->getTemplateLine()));
+                $name = new AssignNameExpression($var, $node->getTemplateLine());
+                $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
 
-                return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getTemplateLine());
+                return new Node_Set(false, new Node(array($name)), new Node(array($node->getNode('expr'))), $node->getTemplateLine());
             }
         }
 
@@ -61,7 +70,7 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
             return $node;
         }
 
-        if ($node instanceof \Twig_Node_Expression_Filter && in_array($node->getNode('filter')->getAttribute('value'), array('trans', 'transchoice'))) {
+        if ($node instanceof FilterExpression && in_array($node->getNode('filter')->getAttribute('value'), array('trans', 'transchoice'))) {
             $arguments = $node->getNode('arguments');
             $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
             if ($this->isNamedArguments($arguments)) {
@@ -71,7 +80,7 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
             } else {
                 if (!$arguments->hasNode($ind)) {
                     if (!$arguments->hasNode($ind - 1)) {
-                        $arguments->setNode($ind - 1, new \Twig_Node_Expression_Array(array(), $node->getTemplateLine()));
+                        $arguments->setNode($ind - 1, new ArrayExpression(array(), $node->getTemplateLine()));
                     }
 
                     $arguments->setNode($ind, $this->scope->get('domain'));
@@ -89,13 +98,13 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
     /**
      * {@inheritdoc}
      */
-    protected function doLeaveNode(\Twig_Node $node, \Twig_Environment $env)
+    protected function doLeaveNode(Node $node, Environment $env)
     {
         if ($node instanceof TransDefaultDomainNode) {
             return false;
         }
 
-        if ($node instanceof \Twig_Node_Block || $node instanceof \Twig_Node_Module) {
+        if ($node instanceof Node_Block || $node instanceof ModuleNode) {
             $this->scope = $this->scope->leave();
         }
 

@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
+use Twig\Environment;
+use Twig\Error\Error;
+use Twig\Loader\ArrayLoader;
 
 class TwigExtractorTest extends TestCase
 {
@@ -23,8 +26,8 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = $this->getMockBuilder('Twig_LoaderInterface')->getMock();
-        $twig = new \Twig_Environment($loader, array(
+        $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
+        $twig = new Environment($loader, array(
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
@@ -73,19 +76,19 @@ class TwigExtractorTest extends TestCase
     }
 
     /**
-     * @expectedException \Twig_Error
+     * @expectedException \Twig\Error\Error
      * @dataProvider resourcesWithSyntaxErrorsProvider
      */
     public function testExtractSyntaxError($resources)
     {
-        $twig = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock());
+        $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
         $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
 
         $extractor = new TwigExtractor($twig);
 
         try {
             $extractor->extract($resources, new MessageCatalogue('en'));
-        } catch (\Twig_Error $e) {
+        } catch (Error $e) {
             if (method_exists($e, 'getSourceContext')) {
                 $this->assertSame(dirname(__DIR__).strtr('/Fixtures/extractor/syntax_error.twig', '/', DIRECTORY_SEPARATOR), $e->getFile());
                 $this->assertSame(1, $e->getLine());
@@ -114,8 +117,8 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractWithFiles($resource)
     {
-        $loader = new \Twig_Loader_Array(array());
-        $twig = new \Twig_Environment($loader, array(
+        $loader = new ArrayLoader(array());
+        $twig = new Environment($loader, array(
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,

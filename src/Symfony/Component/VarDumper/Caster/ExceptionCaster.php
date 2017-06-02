@@ -198,7 +198,7 @@ class ExceptionCaster
                 $ellipsis = isset($ellipsis['ellipsis']) ? $ellipsis['ellipsis'] : 0;
 
                 if (file_exists($f['file']) && 0 <= self::$srcContext) {
-                    if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig_Template') && method_exists($f['class'], 'getDebugInfo')) {
+                    if (!empty($f['class']) && (is_subclass_of($f['class'], 'Twig\Template') || is_subclass_of($f['class'], 'Twig_Template')) && method_exists($f['class'], 'getDebugInfo')) {
                         $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
 
                         $ellipsis = 0;

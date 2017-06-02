@@ -41,14 +41,14 @@ class RouterListenerTest extends TestCase
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
         $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')
-                             ->disableOriginalConstructor()
-                             ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $context = new RequestContext();
         $context->setHttpPort($defaultHttpPort);
         $context->setHttpsPort($defaultHttpsPort);
         $urlMatcher->expects($this->any())
-                     ->method('getContext')
-                     ->will($this->returnValue($context));
+            ->method('getContext')
+            ->will($this->returnValue($context));
 
         $listener = new RouterListener($urlMatcher, $this->requestStack);
         $event = $this->createGetResponseEventForUri($uri);
@@ -141,13 +141,13 @@ class RouterListenerTest extends TestCase
     {
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->once())
-          ->method('matchRequest')
-          ->will($this->returnValue($parameter));
+            ->method('matchRequest')
+            ->will($this->returnValue($parameter));
 
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())
-          ->method('info')
-          ->with($this->equalTo($log), $this->equalTo($parameters));
+            ->method('info')
+            ->with($this->equalTo($log), $this->equalTo($parameters));
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('http://localhost/');

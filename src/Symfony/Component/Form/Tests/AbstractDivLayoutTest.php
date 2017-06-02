@@ -346,8 +346,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
 
         $form = $this->factory->createNamedBuilder('form', 'form')
-          ->add($collection)
-          ->getForm();
+            ->add($collection)
+            ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div

@@ -31,8 +31,8 @@ class AuditLoggerTest extends TestCase
             ;
 
             $ace
-               ->expects($this->never())
-               ->method('isAuditFailure')
+                ->expects($this->never())
+                ->method('isAuditFailure')
             ;
         } else {
             $ace
@@ -49,9 +49,9 @@ class AuditLoggerTest extends TestCase
 
         if (true === $audit) {
             $logger
-               ->expects($this->once())
-               ->method('doLog')
-               ->with($this->equalTo($granting), $this->equalTo($ace))
+                ->expects($this->once())
+                ->method('doLog')
+                ->with($this->equalTo($granting), $this->equalTo($ace))
             ;
         } else {
             $logger

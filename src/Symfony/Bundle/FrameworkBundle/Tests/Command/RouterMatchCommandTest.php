@@ -76,8 +76,8 @@ class RouterMatchCommandTest extends TestCase
         ;
 
         $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
-             ->disableOriginalConstructor()
-             ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container

@@ -16,7 +16,7 @@ use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Framework\Warning;
 
-if (class_exists('PHPUnit_Framework_BaseTestListener')) {
+if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
 
     return;

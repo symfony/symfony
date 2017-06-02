@@ -237,7 +237,8 @@ class Parser
                 }
 
                 if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags) && !is_string($key)) {
-                    @trigger_error('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.', E_USER_DEPRECATED);
+                    $keyType = is_numeric($key) ? 'numeric key' : 'incompatible key type';
+                    @trigger_error(sprintf('Implicit casting of %s to string on line %d is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.', $keyType, $this->getRealCurrentLineNb()), E_USER_DEPRECATED);
                 }
 
                 // Convert float keys to strings, to avoid being converted to integers by PHP

@@ -96,7 +96,7 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $definition = $container->getDefinition('kernel.class_cache.cache_warmer');
             $definition->addTag('kernel.cache_warmer');
             // Ignore deprecation for PHP versions below 7.0
@@ -289,7 +289,7 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\\Component\\Config\\ConfigCache',
                 'Symfony\\Component\\Config\\FileLocator',
@@ -674,7 +674,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
                 'Symfony\\Component\\Routing\\RequestContext',
@@ -725,7 +725,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('session.save_path', $config['save_path']);
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\\Component\\HttpKernel\\EventListener\\SessionListener',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
@@ -810,7 +810,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition('templating.loader', $loaderCache);
         }
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateReference',
@@ -850,7 +850,7 @@ class FrameworkExtension extends Extension
                 $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
             }
 
-            if (PHP_VERSION_ID < 70000) {
+            if (\PHP_VERSION_ID < 70000) {
                 $this->addClassesToCompile(array(
                     'Symfony\\Component\\Templating\\Storage\\FileStorage',
                     'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
@@ -1191,7 +1191,7 @@ class FrameworkExtension extends Extension
                 $definition = $container->findDefinition('annotations.cache_warmer');
                 $definition->addTag('kernel.cache_warmer');
 
-                if (PHP_VERSION_ID < 70000) {
+                if (\PHP_VERSION_ID < 70000) {
                     $this->addClassesToCompile(array(
                         'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
                         'Symfony\Component\Cache\DoctrineProvider',
@@ -1448,7 +1448,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\Component\Cache\Adapter\ApcuAdapter',
                 'Symfony\Component\Cache\Adapter\FilesystemAdapter',

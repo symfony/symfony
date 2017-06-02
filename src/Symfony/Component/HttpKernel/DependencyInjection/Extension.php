@@ -32,7 +32,7 @@ abstract class Extension extends BaseExtension
      */
     public function getClassesToCompile()
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
         }
 
@@ -58,7 +58,7 @@ abstract class Extension extends BaseExtension
      */
     public function addClassesToCompile(array $classes)
     {
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
         }
 

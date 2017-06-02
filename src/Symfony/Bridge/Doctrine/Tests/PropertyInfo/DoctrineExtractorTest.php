@@ -55,6 +55,7 @@ class DoctrineExtractorTest extends TestCase
                 'bool',
                 'binary',
                 'customFoo',
+                'bigint',
                 'foo',
                 'bar',
                 'indexedBar',
@@ -76,6 +77,7 @@ class DoctrineExtractorTest extends TestCase
         return array(
             array('id', array(new Type(Type::BUILTIN_TYPE_INT))),
             array('guid', array(new Type(Type::BUILTIN_TYPE_STRING))),
+            array('bigint', array(new Type(Type::BUILTIN_TYPE_STRING))),
             array('float', array(new Type(Type::BUILTIN_TYPE_FLOAT))),
             array('decimal', array(new Type(Type::BUILTIN_TYPE_STRING))),
             array('bool', array(new Type(Type::BUILTIN_TYPE_BOOL))),

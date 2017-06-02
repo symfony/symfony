@@ -174,13 +174,13 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         switch ($doctrineType) {
             case DBALType::SMALLINT:
-            case DBALType::BIGINT:
             case DBALType::INTEGER:
                 return Type::BUILTIN_TYPE_INT;
 
             case DBALType::FLOAT:
                 return Type::BUILTIN_TYPE_FLOAT;
 
+            case DBALType::BIGINT:
             case DBALType::STRING:
             case DBALType::TEXT:
             case DBALType::GUID:
@@ -196,9 +196,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
             case DBALType::OBJECT:
                 return Type::BUILTIN_TYPE_OBJECT;
-
-            default:
-                return;
         }
     }
 }

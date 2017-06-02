@@ -150,7 +150,7 @@ class ArgvInput extends Input
             if (0 === strlen($value = substr($name, $pos + 1))) {
                 // if no value after "=" then substr() returns "" since php7 only, false before
                 // see http://php.net/manual/fr/migration70.incompatible.php#119151
-                if (PHP_VERSION_ID < 70000 && false === $value) {
+                if (\PHP_VERSION_ID < 70000 && false === $value) {
                     $value = '';
                 }
                 array_unshift($this->parsed, $value);

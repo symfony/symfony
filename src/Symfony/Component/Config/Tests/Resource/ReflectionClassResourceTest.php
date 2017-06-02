@@ -124,10 +124,10 @@ EOPHP;
         yield array(0, 8, '/** priv docblock */');
         yield array(0, 9, 'private $priv = 123;');
         yield array(1, 10, '/** pub docblock */');
-        if (PHP_VERSION_ID >= 50600) {
+        if (\PHP_VERSION_ID >= 50600) {
             yield array(1, 11, 'public function pub(...$arg) {}');
         }
-        if (PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000) {
             yield array(1, 11, 'public function pub($arg = null): Foo {}');
         }
         yield array(0, 11, "public function pub(\$arg = null) {\nreturn 123;\n}");

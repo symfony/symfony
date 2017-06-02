@@ -22,7 +22,6 @@
       <argument type="service" id="definition_1"/>
       <argument type="service" id="definition_2"/>
     </argument>
-    <argument type="closure-proxy" id="definition1" method="get"/>
   </definition>
   <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerBuilder"/>
 </container>

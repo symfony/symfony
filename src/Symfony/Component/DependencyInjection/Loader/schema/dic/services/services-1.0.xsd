@@ -218,7 +218,6 @@
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="strict" type="boolean" />
-    <xsd:attribute name="method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -244,7 +243,6 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
-      <xsd:enumeration value="closure-proxy" />
     </xsd:restriction>
   </xsd:simpleType>
 

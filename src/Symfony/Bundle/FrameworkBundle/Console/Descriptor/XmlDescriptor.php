@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -444,11 +443,6 @@ class XmlDescriptor extends Descriptor
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);
                 }
-            } elseif ($argument instanceof ClosureProxyArgument) {
-                list($reference, $method) = $argument->getValues();
-                $argumentXML->setAttribute('type', 'closure-proxy');
-                $argumentXML->setAttribute('id', (string) $reference);
-                $argumentXML->setAttribute('method', $method);
             } elseif ($argument instanceof Definition) {
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
             } elseif (is_array($argument)) {

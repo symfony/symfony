@@ -127,7 +127,7 @@ EventDispatcher
 ---------------
 
  * The `ContainerAwareEventDispatcher` class has been deprecated.
-   Use `EventDispatcher` with closure-proxy injection instead.
+   Use `EventDispatcher` with closure factories instead.
 
 Finder
 ------

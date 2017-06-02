@@ -40,7 +40,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         $annotatedClasses = array();
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof Extension) {
-                if (PHP_VERSION_ID < 70000) {
+                if (\PHP_VERSION_ID < 70000) {
                     $classes = array_merge($classes, $extension->getClassesToCompile());
                 }
                 $annotatedClasses = array_merge($annotatedClasses, $extension->getAnnotatedClassesToCompile());
@@ -49,7 +49,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
         $existingClasses = $this->getClassesInComposerClassMaps();
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             $classes = $container->getParameterBag()->resolveValue($classes);
             $this->kernel->setClassCache($this->expandClasses($classes, $existingClasses));
         }

@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -494,15 +493,6 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'expression':
                     $arguments[$key] = new Expression($arg->nodeValue);
-                    break;
-                case 'closure-proxy':
-                    if (!$arg->getAttribute('id')) {
-                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="closure-proxy" has no or empty "id" attribute in "%s".', $name, $file));
-                    }
-                    if (!$arg->getAttribute('method')) {
-                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="closure-proxy" has no or empty "method" attribute in "%s".', $name, $file));
-                    }
-                    $arguments[$key] = new ClosureProxyArgument($arg->getAttribute('id'), $arg->getAttribute('method'), $invalidBehavior);
                     break;
                 case 'collection':
                     $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, $file, false);

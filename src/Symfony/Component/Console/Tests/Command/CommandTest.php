@@ -386,7 +386,7 @@ class CommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(array());
 
-        if (PHP_VERSION_ID < 70000) {
+        if (\PHP_VERSION_ID < 70000) {
             // Cannot bind static closures in PHP 5
             $this->assertEquals('interact called'.PHP_EOL.'not bound'.PHP_EOL, $tester->getDisplay());
         } else {

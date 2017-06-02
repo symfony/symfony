@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-01T14:00:55Z
+
+https://github.com/symfony/symfony/pull/22925 did a similar change, and we had to revert it in #22930 because it broke other cases
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-06-01T14:13:39Z
+
+@stof Oh. In that case how about something like this?

@@ -37,6 +37,10 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $overwriteNewerFiles = false)
     {
+        if(!file_exists($originFile)){
+            throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);    
+        }
+        
         if (stream_is_local($originFile) && !is_file($originFile)) {
             throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
         }

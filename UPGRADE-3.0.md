@@ -265,6 +265,9 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The `max_length` option was removed. Use the `attr` option instead by setting it to
+   an `array` with a `maxlength` key.
+
  * The `getBlockPrefix()` method was added to the `FormTypeInterface` in replacement of
    the `getName()` method which has been removed.
 

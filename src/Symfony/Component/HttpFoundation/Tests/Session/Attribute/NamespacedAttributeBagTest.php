@@ -77,6 +77,12 @@ class NamespacedAttributeBagTest extends TestCase
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }
 
+    public function testSetWrongName()
+    {
+        $this->bag->set('', '');
+        $this->assertEquals('', $this->bag->get(''));
+    }
+
     /**
      * @dataProvider attributesProvider
      */

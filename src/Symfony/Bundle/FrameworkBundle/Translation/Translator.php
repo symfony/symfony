@@ -38,6 +38,15 @@ class Translator extends BaseTranslator implements WarmableInterface
     private $resourceLocales;
 
     /**
+     * Holds parameters from addResource() calls so we can add these resources
+     * after the ones passed in the resource_files option (which are added
+     * lazily in loadResources() as well).
+     *
+     * @var array
+     */
+    private $otherResources = array();
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -93,6 +102,11 @@ class Translator extends BaseTranslator implements WarmableInterface
         }
     }
 
+    public function addResource($format, $resource, $locale, $domain = null)
+    {
+        $this->otherResources[] = array($format, $resource, $locale, $domain);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -118,9 +132,15 @@ class Translator extends BaseTranslator implements WarmableInterface
             foreach ($files as $key => $file) {
                 // filename is domain.locale.format
                 list($domain, $locale, $format) = explode('.', basename($file), 3);
-                $this->addResource($format, $file, $locale, $domain);
+                parent::addResource($format, $file, $locale, $domain);
                 unset($this->options['resource_files'][$locale][$key]);
             }
+        }
+
+        foreach ($this->otherResources as $key => $params) {
+            list($format, $resource, $locale, $domain) = $params;
+            parent::addResource($format, $resource, $locale, $domain);
+            unset($this->otherResources[$key]);
         }
     }
 }

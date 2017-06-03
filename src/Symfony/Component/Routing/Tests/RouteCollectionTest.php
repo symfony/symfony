@@ -200,6 +200,22 @@ class RouteCollectionTest extends TestCase
         $this->assertCount(1, $collection1->getIterator(), '->addCollection() removes previous routes when adding new routes with the same name');
     }
 
+    public function testHas()
+    {
+        $collection = new RouteCollection();
+        $collection->add('x', new Route('/x'));
+        $childCollection = new RouteCollection();
+        $childCollection->add('y', new Route('/y'));
+        $collection->addCollection($childCollection);
+        $collection->add('$péß^a|', new Route('/special'));
+
+        $this->assertTrue($collection->has('y'), '->has() handles correct route in child collection');
+        $this->assertTrue($collection->has('$péß^a|'), '->has() can handle special characters');
+        $this->assertFalse($childCollection->has('x'), '->has() does not check the route defined in parent collection');
+        $this->assertFalse($collection->has('non-existent'), '->has() returns false when route does not exist');
+        $this->assertFalse($collection->has(0), '->has() does not disclose internal child RouteCollection');
+    }
+
     public function testGet()
     {
         $collection1 = new RouteCollection();

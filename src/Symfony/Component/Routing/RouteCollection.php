@@ -90,6 +90,18 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns whether a route with the given name exists.
+     *
+     * @param string $name The route name
+     *
+     * @return bool
+     */
+    public function has($name)
+    {
+        return isset($this->routes[$name]);
+    }
+
+    /**
      * Gets a route by name.
      *
      * @param string $name The route name

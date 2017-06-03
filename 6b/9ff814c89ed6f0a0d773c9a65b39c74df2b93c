@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-05-30T17:48:14Z
+
+:+1: to never wrap! it feels less messy (to me too)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-30T17:59:36Z
+
+Looking at it, i think the line-height really needs a patch as well (part of discussion in #22439, but perhaps we can do it here already). The space between `}` and `throw` intuitively looks like 2 line breaks (based on the font size).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-30T21:38:20Z
+
+Hmmm. I guess we can close this one if we can accept #22439 as a "bug fix".
+Or we can merge this one instead, just fixing the code wrapping and keep the nowrap suggestion for 3.4 in #22439, but I guess it'd be better to have something consistent between 3.3 and 3.4 about this...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T18:40:40Z
+
+I like how github does. Wrapping code is a bad idea I think.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-02T21:27:08Z
+
+Great! So it seems we have a consensus about this currently (at least no opponent right now).
+
+Either I update this PR to always prevent wrapping and allow horizontal scrolling with minimal changes, either we reconsider #22439 to target 3.3 as a bug fix and we close this one.
+IMHO, I'd love to see #22439 merged in 3.3, because (despite I didn't check it out yet), it seems @sustmi did great and it's not DX but UI/UX fixes to me. Also, I clearly think having 2 different UI/UX on 3.3 and 3.4+ will only complicate maintenance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T21:50:38Z
+
+> prevent wrapping and allow horizontal scrolling with minimal changes
+
+if it's a few css lines+classes, let's do that - it wouldn't prevent considering #22439 afterwards
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-03T08:41:21Z
+
+Done.
+
+|Before|After|
+|--|--|
+|![juin-03-2017 10-38-47](https://cloud.githubusercontent.com/assets/2211145/26752121/fbd41c4e-4848-11e7-9272-646dbd79ca50.gif)|![juin-03-2017 10-39-04](https://cloud.githubusercontent.com/assets/2211145/26752123/03f6c822-4849-11e7-9f34-c9ca4f4f5beb.gif)|
+
+(I also slightly updated the line height, so it feels more natural and consistant for every lines. Poke @ro0NL)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-03T10:16:40Z
+
+Much better :+1:

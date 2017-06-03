@@ -74,9 +74,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
+     *
+     * @throws \InvalidArgumentException if an environment is empty
      */
     public function __construct($environment, $debug)
     {
+        if (empty($environment)) {
+            throw new \InvalidArgumentException('An environment must not be empty.');
+        }
+
         $this->environment = $environment;
         $this->debug = (bool) $debug;
         $this->rootDir = $this->getRootDir();

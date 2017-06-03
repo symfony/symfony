@@ -39,6 +39,15 @@ class KernelTest extends TestCase
         $this->assertNull($kernel->getContainer());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage An environment must not be empty.
+     */
+    public function testConstructorThrowsExceptionWhenEnvironmentIsEmptyString()
+    {
+        $kernel = new KernelForTest('', true);
+    }
+
     public function testClone()
     {
         $env = 'test_env';

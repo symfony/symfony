@@ -156,7 +156,7 @@ class TranslatorTest extends TestCase
 
         $options = array(
             'resource_files' => array('some_locale' => array('messages.some_locale.loader')),
-            'debug' => $debug
+            'debug' => $debug,
         );
 
         if ($enableCache) {

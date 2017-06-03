@@ -134,7 +134,7 @@ class Compiler
             } while ($prev = $prev->getPrevious());
 
             if ($usedEnvs) {
-                $e = new EnvParameterException($usedEnvs, 'Incompatible use of dynamic environment variables "%s" found in parameters.', $e);
+                $e = new EnvParameterException($usedEnvs, $e);
             }
 
             throw $e;

@@ -114,29 +114,48 @@ EOT
         $rows = array();
         $copyUsed = false;
         $exitCode = 0;
-        /** @var BundleInterface $bundle */
-        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
-            if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
+
+        $kernel = $this->getContainer()->get('kernel');
+        $pubFolders = array_merge(
+            [
+                'app assets' => [
+                    'name' => 'app assets',
+                    'originDir' => $kernel->getRootDir().'/Resources/public',
+                    'targetDir' => $targetArg.'/assets',
+                ],
+            ],
+            array_map(
+                function (BundleInterface $bundle) use ($bundlesDir) {
+                    return [
+                        'name' => $bundle->getName(),
+                        'originDir' => $bundle->getPath().'/Resources/public',
+                        'targetDir' => $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName())),
+                    ];
+                },
+                $kernel->getBundles()
+            )
+        );
+
+        foreach ($pubFolders as $pubFolder) {
+            if (!is_dir($pubFolder['originDir'])) {
                 continue;
             }
 
-            $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
-
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $message = sprintf("%s\n-> %s", $bundle->getName(), $targetDir);
+                $message = sprintf("%s\n-> %s", $pubFolder['name'], $pubFolder['targetDir']);
             } else {
-                $message = $bundle->getName();
+                $message = $pubFolder['name'];
             }
 
             try {
-                $this->filesystem->remove($targetDir);
+                $this->filesystem->remove($pubFolder['targetDir']);
 
                 if (self::METHOD_RELATIVE_SYMLINK === $expectedMethod) {
-                    $method = $this->relativeSymlinkWithFallback($originDir, $targetDir);
+                    $method = $this->relativeSymlinkWithFallback($pubFolder['originDir'], $pubFolder['targetDir']);
                 } elseif (self::METHOD_ABSOLUTE_SYMLINK === $expectedMethod) {
-                    $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
+                    $method = $this->absoluteSymlinkWithFallback($pubFolder['originDir'], $pubFolder['targetDir']);
                 } else {
-                    $method = $this->hardCopy($originDir, $targetDir);
+                    $method = $this->hardCopy($pubFolder['originDir'], $pubFolder['targetDir']);
                 }
 
                 if (self::METHOD_COPY === $method) {

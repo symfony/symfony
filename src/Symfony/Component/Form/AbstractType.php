@@ -62,4 +62,19 @@ abstract class AbstractType implements FormTypeInterface
     {
         return 'Symfony\Component\Form\Extension\Core\Type\FormType';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName ()
+    {
+        $className = get_class($this);
+
+        if (false !== ($lastPosition = mb_strrpos($className, "\\")))
+        {
+            return mb_substr($className, $lastPosition + 1);
+        }
+
+        return $className;
+    }
 }

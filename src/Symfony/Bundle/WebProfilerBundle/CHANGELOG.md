@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `WebProfilerExtension::dumpValue()` method
+
 3.1.0
 -----
 

@@ -19,6 +19,8 @@ use Symfony\Component\Routing\RouterInterface;
  * Generates the router matcher and generator classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4, to be given a container instead in 4.0
  */
 class RouterCacheWarmer implements CacheWarmerInterface
 {

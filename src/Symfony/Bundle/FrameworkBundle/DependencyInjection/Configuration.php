@@ -67,7 +67,11 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('trusted_proxies') // @deprecated in version 3.3, to be removed in 4.0
                     ->beforeNormalization()
-                        ->always()
+                        ->ifTrue(function ($v) { return empty($v); })
+                        ->then(function () { @trigger_error('The "framework.trusted_proxies" configuration key has been removed in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.', E_USER_DEPRECATED); })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return !empty($v); })
                         ->thenInvalid('The "framework.trusted_proxies" configuration key has been removed in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.')
                     ->end()
                 ->end()

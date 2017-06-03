@@ -43,6 +43,38 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.trusted_proxies" configuration key has been removed in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.
+     */
+    public function testTrustedProxiesSetToNullIsDeprecated()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(array('trusted_proxies' => null)));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.trusted_proxies" configuration key has been removed in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.
+     */
+    public function testTrustedProxiesSetToEmptyArrayIsDeprecated()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(array('trusted_proxies' => array())));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTrustedProxiesSetToNonEmptyArrayIsInvalid()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(array('trusted_proxies' => array('127.0.0.1'))));
+    }
+
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();

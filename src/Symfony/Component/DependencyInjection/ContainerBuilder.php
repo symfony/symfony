@@ -1077,6 +1077,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Get statistics about env usage.
      *
+     * @deprecated unused and must be removed in some next release
+     *
      * @return int[] The number of time each env vars has been resolved
      */
     public function getEnvCounters()

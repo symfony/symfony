@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by syrm at 2017-06-03T10:08:58Z
+
+One step closer to respect semver :-)
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-06-03T11:58:29Z
+
+Looks good to me 👍 maybe add an exception-message expectation?

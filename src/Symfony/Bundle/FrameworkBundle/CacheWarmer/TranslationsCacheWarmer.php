@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Xavier Leune <xavier.leune@gmail.com>
  */
-class TranslationsCacheWarmer implements CacheWarmerInterface
+class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
     private $container;
     private $translator;
@@ -39,7 +40,7 @@ class TranslationsCacheWarmer implements CacheWarmerInterface
         } elseif ($container instanceof TranslatorInterface) {
             $this->translator = $container;
         } else {
-            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Symfony\Component\DependencyInjection\ContainerInterface or Symfony\Component\Translation\TranslatorInterface as first argument.', __CLASS__));
+            throw new \InvalidArgumentException(sprintf('%s only accepts instance of Psr\Container\ContainerInterface as first argument.', __CLASS__));
         }
     }
 
@@ -63,5 +64,15 @@ class TranslationsCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array(
+            'translator' => TranslatorInterface::class,
+        );
     }
 }

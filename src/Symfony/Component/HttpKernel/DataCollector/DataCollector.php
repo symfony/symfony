@@ -57,7 +57,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
     {
         if (null === self::$cloner) {
             if (!class_exists(ClassStub::class)) {
-                throw new \LogicException(sprintf('The VarDumper component is needed for the %s() method. Install symfony/var-dumper version 3.2 or above.', __METHOD__));
+                throw new \LogicException(sprintf('The VarDumper component is needed for the %s() method. Install symfony/var-dumper version 3.4 or above.', __METHOD__));
             }
 
             self::$cloner = new VarCloner();

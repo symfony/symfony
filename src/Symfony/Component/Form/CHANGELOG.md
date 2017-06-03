@@ -13,6 +13,11 @@ CHANGELOG
  * removed the support for caching loaded choice lists in `LazyChoiceList`,
    cache the choice list in the used `ChoiceLoaderInterface` implementation
    instead
+ * removed the support for objects implementing both `\Traversable` and `\ArrayAccess` in `ResizeFormListener::preSubmit()`
+ * removed the ability to use `FormDataCollector` without the `symfony/var-dumper` component
+ * removed passing a `ValueExporter` instance to the `FormDataExtractor::__construct()` method
+ * removed passing guesser services ids as the fourth argument of `DependencyInjectionExtension::__construct()`
+ * removed the ability to validate an unsubmitted form.
 
 3.3.0
 -----

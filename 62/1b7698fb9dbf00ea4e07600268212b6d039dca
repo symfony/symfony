@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-05-29T17:15:28Z
+
+I've updated the solution mixing `attr` options between type-guess options and user options. It's already supported between `maxlength`/`pattern` and user options attributes.
+
+Status: Needs Review

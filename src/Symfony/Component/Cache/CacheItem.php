@@ -99,6 +99,18 @@ final class CacheItem implements CacheItemInterface
     }
 
     /**
+     * Remove the expiry time.
+     *
+     * @return static
+     */
+    public function clearExpiry()
+    {
+        $this->expiry = null;
+
+        return $this;
+    }
+
+    /**
      * Adds a tag to a cache item.
      *
      * @param string|string[] $tags A tag or array of tags

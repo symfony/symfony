@@ -28,4 +28,13 @@ class DbalSessionHandlerTest extends TestCase
 
         $this->assertInstanceOf('Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler', $handler);
     }
+
+    public function testConstructWithTableNameAndOptions()
+    {
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $options = array('db_id_col' => 'id', 'db_data_col' => 'data', 'db_time_col' => 'time');
+        $table = 'sessions';
+
+        $handler = new DbalSessionHandler($connection, $table, $options);
+    }
 }

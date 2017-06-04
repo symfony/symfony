@@ -1340,6 +1340,25 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Returns PipesInterface for underlying process.
+     *
+     * Useful for performing stream operations directly on the pipes. For
+     * example performing a stream_select() across multiple processes.
+     *
+     * Obviously, closing or altering pipes may cause errors.
+     *
+     * @throws LogicException In case the process is not running
+     */
+    public function getPipes()
+    {
+        if (!$this->isRunning()) {
+            throw new LogicException('Process pipes are not available while the process is not running.');
+        }
+
+        return $this->processPipes;
+    }
+
+    /**
      * Returns whether PTY is supported on the current operating system.
      *
      * @return bool

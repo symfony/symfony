@@ -99,7 +99,7 @@ class StreamOutput extends Output
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
         }
-
-        return function_exists('posix_isatty') && @posix_isatty($this->stream);
+        $metadata = is_resource($this->stream) ? stream_get_meta_data($this->stream) : false;
+        return $metadata && $metadata['stream_type'] !== 'MEMORY' && function_exists('posix_isatty') && @posix_isatty($this->stream);
     }
 }

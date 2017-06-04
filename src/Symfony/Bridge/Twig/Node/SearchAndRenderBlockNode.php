@@ -21,16 +21,28 @@ use Twig\Node\Expression\FunctionExpression;
  */
 class SearchAndRenderBlockNode extends FunctionExpression
 {
+    use NamedArgumentsResolverTrait;
+
     public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
         $compiler->raw('$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(');
 
-        preg_match('/_([^_]+)$/', $this->getAttribute('name'), $matches);
+        $name = $this->getAttribute('name');
+        preg_match('/_([^_]+)$/', $name, $matches);
+        $blockNameSuffix = $matches[1];
 
         $label = null;
-        $arguments = iterator_to_array($this->getNode('arguments'));
-        $blockNameSuffix = $matches[1];
+
+        $parameters = array('view');
+        if ('form_label' === $name) {
+            $parameters[] = 'label';
+        }
+        if ('form_errors' !== $name) {
+            $parameters[] = 'variables';
+        }
+
+        $arguments = $this->resolveNamedArguments($name, $parameters);
 
         if (isset($arguments[0])) {
             $compiler->subcompile($arguments[0]);

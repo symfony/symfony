@@ -307,11 +307,4 @@ abstract class Descriptor implements DescriptorInterface
 
         return $serviceIds;
     }
-
-    protected function formatClosure(\Closure $closure)
-    {
-        $r = new \ReflectionFunction($closure);
-
-        return 'closure';
-    }
 }

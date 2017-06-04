@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
  *
- * @deprecated since 3.3, to be removed in 4.0. Use EventDispatcher with closure-proxy injection instead.
+ * @deprecated since 3.3, to be removed in 4.0. Use EventDispatcher with closure factories instead.
  */
 class ContainerAwareEventDispatcher extends EventDispatcher
 {
@@ -60,7 +60,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             $class = get_parent_class($class);
         }
         if (__CLASS__ !== $class) {
-            @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure-proxy injection instead.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
         }
     }
 
@@ -78,7 +78,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      */
     public function addListenerService($eventName, $callback, $priority = 0)
     {
-        @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure-proxy injection instead.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
 
         if (!is_array($callback) || 2 !== count($callback)) {
             throw new \InvalidArgumentException('Expected an array("service", "method") argument');

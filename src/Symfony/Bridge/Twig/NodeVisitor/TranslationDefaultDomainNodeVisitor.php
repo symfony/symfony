@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\NodeVisitor;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Twig\Environment;
+use Twig\Node\BlockNode;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\AssignNameExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -21,6 +22,7 @@ use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
+use Twig\Node\SetNode;
 use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
@@ -48,7 +50,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
      */
     protected function doEnterNode(Node $node, Environment $env)
     {
-        if ($node instanceof Node_Block || $node instanceof ModuleNode) {
+        if ($node instanceof BlockNode || $node instanceof ModuleNode) {
             $this->scope = $this->scope->enter();
         }
 
@@ -62,7 +64,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
                 $name = new AssignNameExpression($var, $node->getTemplateLine());
                 $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
 
-                return new Node_Set(false, new Node(array($name)), new Node(array($node->getNode('expr'))), $node->getTemplateLine());
+                return new SetNode(false, new Node(array($name)), new Node(array($node->getNode('expr'))), $node->getTemplateLine());
             }
         }
 
@@ -104,7 +106,7 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
             return false;
         }
 
-        if ($node instanceof Node_Block || $node instanceof ModuleNode) {
+        if ($node instanceof BlockNode || $node instanceof ModuleNode) {
             $this->scope = $this->scope->leave();
         }
 

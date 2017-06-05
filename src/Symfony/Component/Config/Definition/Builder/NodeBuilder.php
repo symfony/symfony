@@ -34,6 +34,7 @@ class NodeBuilder implements NodeParentInterface
             'float' => __NAMESPACE__.'\\FloatNodeDefinition',
             'array' => __NAMESPACE__.'\\ArrayNodeDefinition',
             'enum' => __NAMESPACE__.'\\EnumNodeDefinition',
+            'datetime' => __NAMESPACE__.'\\DateTimeNodeDefinition',
         );
     }
 
@@ -121,6 +122,18 @@ class NodeBuilder implements NodeParentInterface
     public function enumNode($name)
     {
         return $this->node($name, 'enum');
+    }
+
+    /**
+     * Creates a child DateTimeNode.
+     *
+     * @param string $name
+     *
+     * @return DateTimeNodeDefinition
+     */
+    public function datetimeNode($name)
+    {
+        return $this->node($name, 'datetime');
     }
 
     /**

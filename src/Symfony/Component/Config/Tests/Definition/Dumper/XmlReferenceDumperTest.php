@@ -40,6 +40,9 @@ class XmlReferenceDumperTest extends TestCase
 <!-- scalar-required: Required -->
 <!-- enum-with-default: One of "this"; "that" -->
 <!-- enum: One of "this"; "that" -->
+<!-- datetime: A timestamp or datetime string -->
+<!-- datetime-with-timezone: A timestamp or datetime string (default timezone: "Japan") -->
+<!-- datetime-with-format-and-timezone: A timestamp or datetime string matching the "d/m/Y" format (default timezone: "Japan") -->
 <config
     boolean="true"
     scalar-empty=""
@@ -53,6 +56,9 @@ class XmlReferenceDumperTest extends TestCase
     node-with-a-looong-name=""
     enum-with-default="this"
     enum=""
+    datetime=""
+    datetime-with-timezone=""
+    datetime-with-format-and-timezone=""
 >
 
     <!-- some info -->

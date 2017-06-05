@@ -166,6 +166,11 @@ class CommandTest extends TestCase
         $command = new \TestCommand();
         $command->setHelp('');
         $this->assertContains('description', $command->getProcessedHelp(), '->getProcessedHelp() falls back to the description');
+
+        $command = new \TestCommand();
+        $command->setFullNamePrefix('custom');
+        $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
+        $this->assertContains('Example: custom namespace:name.', $command->getProcessedHelp(), '->getProcessedHelp() uses predefined full_name');
     }
 
     public function testGetSetAliases()

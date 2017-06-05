@@ -31,6 +31,7 @@ class Command
 {
     private $application;
     private $name;
+    private $fullNamePrefix;
     private $processTitle;
     private $aliases = array();
     private $definition;
@@ -426,6 +427,20 @@ class Command
     }
 
     /**
+     * Sets the full name of the command.
+     *
+     * @param string $fullNamePrefix The full command name
+     *
+     * @return Command The current instance
+     */
+    public function setFullNamePrefix($fullNamePrefix)
+    {
+        $this->fullNamePrefix = $fullNamePrefix;
+
+        return $this;
+    }
+
+    /**
      * Sets the process title of the command.
      *
      * This feature should be used only when creating a long process command,
@@ -531,6 +546,7 @@ class Command
     public function getProcessedHelp()
     {
         $name = $this->name;
+        $fullNamePrefix = $this->fullNamePrefix ?: $_SERVER['PHP_SELF'];
 
         $placeholders = array(
             '%command.name%',
@@ -538,7 +554,7 @@ class Command
         );
         $replacements = array(
             $name,
-            $_SERVER['PHP_SELF'].' '.$name,
+            sprintf('%s %s', $fullNamePrefix, $name),
         );
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());

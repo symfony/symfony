@@ -643,6 +643,21 @@ class ClientTest extends TestCase
         $this->assertEquals('testua', $client->getServerParameter('HTTP_USER_AGENT'));
     }
 
+    public function testUnSetServerParameter()
+    {
+        $client = new TestClient();
+
+        $client->setServerParameter('HTTP_X-Requested-With', 'XMLHttpRequest');
+
+        $this->assertSame('XMLHttpRequest', $client->getServerParameter('HTTP_X-Requested-With'));
+
+        $client->unSetServerParameter('HTTP_X-Requested-With');
+        $client->request('GET', 'https://www.example.com/https/www.example.com');
+
+        $this->assertSame('', $client->getServerParameter('HTTP_X-Requested-With'));
+        $this->assertArrayNotHasKey('HTTP_X-Requested-With', $client->getInternalRequest()->getServer());
+    }
+
     public function testSetServerParameterInRequest()
     {
         $client = new TestClient();

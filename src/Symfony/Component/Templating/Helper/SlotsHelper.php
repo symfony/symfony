@@ -97,6 +97,26 @@ class SlotsHelper extends Helper
     }
 
     /**
+     * Appends a value to a slot
+     *
+     * @param string $name    The slot name
+     * @param string $content The slot content
+     */
+    public function append($name, $content) {
+      $this->set($name, $this->get($name) . $content);
+    }
+
+    /**
+     * Prepends a value to a slot
+     *
+     * @param string $name    The slot name
+     * @param string $content The slot content
+     */
+    public function prepend($name, $content) {
+      $this->set($name, $content . $this->get($name));
+    }
+
+    /**
      * Outputs a slot.
      *
      * @param string      $name    The slot name

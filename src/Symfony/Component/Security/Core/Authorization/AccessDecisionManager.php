@@ -53,20 +53,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * Configures the voters.
-     *
-     * @param VoterInterface[] $voters An array of VoterInterface instances
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Pass the voters to the constructor instead.
-     */
-    public function setVoters(array $voters)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Pass the voters to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->voters = $voters;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)

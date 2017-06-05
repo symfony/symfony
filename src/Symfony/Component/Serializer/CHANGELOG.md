@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `SerializerAwareEncoder` and `SerializerAwareNormalizer` classes,
+   use the `SerializerAwareTrait` instead
+ * removed the `Serializer::$normalizerCache` and `Serializer::$denormalizerCache`
+   properties
+ * added an optional `string $format = null` argument to `AbstractNormalizer::instantiateObject`
+ * added an optional `array $context = array()` to `Serializer::supportsNormalization`, `Serializer::supportsDenormalization`,
+   `Serializer::supportsEncoding` and `Serializer::supportsDecoding`
+
 3.3.0
 -----
 

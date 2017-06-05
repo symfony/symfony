@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class AutowirePass extends AbstractRecursivePass
 {
-    private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
     private $autowired = array();
@@ -62,7 +61,6 @@ class AutowirePass extends AbstractRecursivePass
         try {
             parent::process($container);
         } finally {
-            $this->definedTypes = array();
             $this->types = null;
             $this->ambiguousServiceTypes = array();
             $this->autowired = array();
@@ -255,7 +253,7 @@ class AutowirePass extends AbstractRecursivePass
         $class = $reflectionMethod instanceof \ReflectionMethod ? $reflectionMethod->class : $this->currentId;
         $method = $reflectionMethod->name;
         $parameters = $reflectionMethod->getParameters();
-        if (method_exists('ReflectionMethod', 'isVariadic') && $reflectionMethod->isVariadic()) {
+        if ($reflectionMethod->isVariadic()) {
             array_pop($parameters);
         }
 
@@ -329,10 +327,6 @@ class AutowirePass extends AbstractRecursivePass
             $this->populateAvailableTypes();
         }
 
-        if (isset($this->definedTypes[$type])) {
-            return new TypedReference($this->types[$type], $type);
-        }
-
         if (isset($this->types[$type])) {
             $message = 'Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0.';
             if ($aliasSuggestion = $this->getAliasesSuggestionForType($type = $reference->getType(), $deprecationMessage)) {
@@ -382,12 +376,6 @@ class AutowirePass extends AbstractRecursivePass
             return;
         }
 
-        foreach ($definition->getAutowiringTypes(false) as $type) {
-            $this->definedTypes[$type] = true;
-            $this->types[$type] = $id;
-            unset($this->ambiguousServiceTypes[$type]);
-        }
-
         if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass())) {
             return;
         }
@@ -409,10 +397,6 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function set($type, $id)
     {
-        if (isset($this->definedTypes[$type])) {
-            return;
-        }
-
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {
             $this->ambiguousServiceTypes[$type][] = $id;
@@ -529,11 +513,10 @@ class AutowirePass extends AbstractRecursivePass
                 $class = false;
             }
 
-            $isVariadic = method_exists($parameter, 'isVariadic') && $parameter->isVariadic();
             $methodArgumentsMetadata[] = array(
                 'class' => $class,
                 'isOptional' => $parameter->isOptional(),
-                'defaultValue' => ($parameter->isOptional() && !$isVariadic) ? $parameter->getDefaultValue() : null,
+                'defaultValue' => ($parameter->isOptional() && !$parameter->isVariadic()) ? $parameter->getDefaultValue() : null,
             );
         }
 

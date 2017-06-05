@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * the `$format`, `$dateFormat`, `$allowInlineLineBreaks`, and `$ignoreEmptyContextAndExtra`
+   constructor arguments of the `ConsoleFormatter` class have been removed, use
+   `$options` instead
+ * the `DebugHandler` class has been removed
+
 3.3.0
 -----
 

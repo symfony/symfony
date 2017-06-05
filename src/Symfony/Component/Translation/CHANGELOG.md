@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the backup feature of the `FileDumper` class
+
 3.2.0
 -----
 

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^7.1.3",
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
@@ -27,8 +27,7 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
     },
     "suggest": {
-        "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
-        "ext-symfony_debug": ""
+        "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used)."
     },
     "autoload": {
         "files": [ "Resources/functions/dump.php" ],
@@ -40,7 +39,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.0-dev"
         }
     }
 }

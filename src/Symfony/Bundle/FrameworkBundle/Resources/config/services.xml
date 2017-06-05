@@ -7,9 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher" public="true">
-            <argument type="service" id="service_container" />
-        </service>
+        <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true" />
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" />
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel" public="true">
@@ -25,18 +23,6 @@
 
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate" public="true">
             <argument type="collection" />
-        </service>
-
-        <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer" public="true">
-            <argument type="collection">
-                <argument>Symfony\Component\HttpFoundation\ParameterBag</argument>
-                <argument>Symfony\Component\HttpFoundation\HeaderBag</argument>
-                <argument>Symfony\Component\HttpFoundation\FileBag</argument>
-                <argument>Symfony\Component\HttpFoundation\ServerBag</argument>
-                <argument>Symfony\Component\HttpFoundation\Request</argument>
-                <argument>Symfony\Component\HttpKernel\Kernel</argument>
-            </argument>
-            <deprecated>The "%service_id%" option is deprecated since version 3.3, to be removed in 4.0.</deprecated>
         </service>
 
         <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer" public="true">

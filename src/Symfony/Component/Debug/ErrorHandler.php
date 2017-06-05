@@ -541,7 +541,6 @@ class ErrorHandler
         if ($this->loggedErrors & $type) {
             try {
                 $this->loggers[$type][0]->log($this->loggers[$type][1], $message, array('exception' => $exception));
-            } catch (\Exception $handlerException) {
             } catch (\Throwable $handlerException) {
             }
         }
@@ -558,7 +557,6 @@ class ErrorHandler
         }
         try {
             call_user_func($this->exceptionHandler, $exception);
-        } catch (\Exception $handlerException) {
         } catch (\Throwable $handlerException) {
         }
         if (isset($handlerException)) {
@@ -598,8 +596,6 @@ class ErrorHandler
             while (self::$stackedErrorLevels) {
                 static::unstackErrors();
             }
-        } catch (\Exception $exception) {
-            // Handled below
         } catch (\Throwable $exception) {
             // Handled below
         }

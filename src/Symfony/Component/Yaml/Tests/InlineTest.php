@@ -75,17 +75,6 @@ class InlineTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @dataProvider getTestsForParseWithMapObjects
-     */
-    public function testParseWithMapObjectsPassingTrue($yaml, $value)
-    {
-        $actual = Inline::parse($yaml, false, false, true);
-
-        $this->assertSame(serialize($value), serialize($actual));
-    }
-
-    /**
      * @dataProvider getTestsForDump
      */
     public function testDump($yaml, $value, $parseFlags = 0)
@@ -167,13 +156,12 @@ class InlineTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0.
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}")
      */
     public function testParseMappingKeyWithColonNotFollowedBySpace()
     {
-        Inline::parse('{1:""}');
+        Inline::parse('{foo:""}');
     }
 
     /**
@@ -208,15 +196,6 @@ class InlineTest extends TestCase
         $this->assertSame($expected, Inline::parse($yaml, 0, array('var' => 'var-value')));
     }
 
-    /**
-     * @group legacy
-     * @dataProvider getDataForParseReferences
-     */
-    public function testParseReferencesAsFifthArgument($yaml, $expected)
-    {
-        $this->assertSame($expected, Inline::parse($yaml, false, false, false, array('var' => 'var-value')));
-    }
-
     public function getDataForParseReferences()
     {
         return array(
@@ -239,19 +218,6 @@ class InlineTest extends TestCase
             'c' => 'Brian',
         );
         $this->assertSame(array($foo), Inline::parse('[*foo]', 0, array('foo' => $foo)));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testParseMapReferenceInSequenceAsFifthArgument()
-    {
-        $foo = array(
-            'a' => 'Steve',
-            'b' => 'Clark',
-            'c' => 'Brian',
-        );
-        $this->assertSame(array($foo), Inline::parse('[*foo]', false, false, false, array('foo' => $foo)));
     }
 
     /**
@@ -299,17 +265,7 @@ class InlineTest extends TestCase
 
     public function getScalarIndicators()
     {
-        return array(array('|'), array('>'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not quoting the scalar "%bar " starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
-     */
-    public function testParseUnquotedScalarStartingWithPercentCharacter()
-    {
-        Inline::parse('{ foo: %bar }');
+        return array(array('|'), array('>'), array('%'));
     }
 
     /**
@@ -574,12 +530,7 @@ class InlineTest extends TestCase
         $expected = new \DateTime($yaml);
         $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
-
-        if (\PHP_VERSION_ID >= 70100) {
-            $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
-        } else {
-            $expected->setTime($hour, $minute, $second);
-        }
+        $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
 
         $date = Inline::parse($yaml, Yaml::PARSE_DATETIME);
         $this->assertEquals($expected, $date);
@@ -604,11 +555,7 @@ class InlineTest extends TestCase
         $expected = new \DateTime($yaml);
         $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
-        if (\PHP_VERSION_ID >= 70100) {
-            $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
-        } else {
-            $expected->setTime($hour, $minute, $second);
-        }
+        $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
 
         $expectedNested = array('nested' => array($expected));
         $yamlNested = "{nested: [$yaml]}";
@@ -699,12 +646,12 @@ class InlineTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Missing mapping key
      */
-    public function testOmittedMappingKeyIsParsedAsColon()
+    public function testMappingKeysCannotBeOmitted()
     {
-        $this->assertSame(array(':' => 'foo'), Inline::parse('{: foo}'));
+        Inline::parse('{: foo}');
     }
 
     /**
@@ -729,8 +676,9 @@ class InlineTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
+     *
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
     public function testImplicitStringCastingOfMappingKeysIsDeprecated($yaml, $expected)

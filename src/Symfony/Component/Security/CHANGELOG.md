@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * The `AbstractFormLoginAuthenticator::onAuthenticationSuccess()` was removed.
+   You should implement this method yourself in your concrete authenticator.
+ * removed the `AccessDecisionManager::setVoters()` method
+ * removed the `RoleInterface`
+ * added a sixth `string $context` argument to`LogoutUrlGenerator::registerListener()`
+
 3.3.0
 -----
 

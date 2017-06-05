@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * The default `type` option of the `framework.workflows.*` configuration entries is `state_machine`
+ * removed `AddConsoleCommandPass`, `AddConstraintValidatorsPass`,
+   `AddValidatorInitializersPass`, `CompilerDebugDumpPass`,  `ConfigCachePass`,
+   `ControllerArgumentValueResolverPass`, `FormPass`, `PropertyInfoPass`,
+   `RoutingResolverPass`, `SerializerPass`, `ValidateWorkflowsPass`
+ * made  `Translator::__construct()` `$defaultLocale` argument required
+ * removed `SessionListener`, `TestSessionListener`
+ * Removed `cache:clear` warmup part along with the `--no-optional-warmers` option
+ * Removed core form types services registration when unnecessary
+ * Removed `framework.serializer.cache` option and `serializer.mapping.cache.apc`, `serializer.mapping.cache.doctrine.apc` services
+ * Removed `ConstraintValidatorFactory`
+ * Removed class parameters related to routing
+ * Removed absolute template paths support in the template name parser
+
 3.3.0
 -----
 

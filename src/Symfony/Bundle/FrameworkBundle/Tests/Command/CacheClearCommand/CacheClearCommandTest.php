@@ -14,12 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TestAppKernel;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\Config\ConfigCacheFactory;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 
 class CacheClearCommandTest extends TestCase
 {
@@ -43,10 +40,7 @@ class CacheClearCommandTest extends TestCase
         $this->fs->remove($this->rootDir);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCacheIsFreshAfterCacheClearedWithWarmup()
+    public function testCacheIsCleared()
     {
         $input = new ArrayInput(array('cache:clear'));
         $application = new Application($this->kernel);
@@ -54,35 +48,6 @@ class CacheClearCommandTest extends TestCase
 
         $application->doRun($input, new NullOutput());
 
-        // Ensure that all *.meta files are fresh
-        $finder = new Finder();
-        $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
-        // simply check that cache is warmed up
-        $this->assertGreaterThanOrEqual(1, count($metaFiles));
-        $configCacheFactory = new ConfigCacheFactory(true);
-
-        foreach ($metaFiles as $file) {
-            $configCacheFactory->cache(substr($file, 0, -5), function () use ($file) {
-                $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
-            });
-        }
-
-        // check that app kernel file present in meta file of container's cache
-        $containerRef = new \ReflectionObject($this->kernel->getContainer());
-        $containerFile = $containerRef->getFileName();
-        $containerMetaFile = $containerFile.'.meta';
-        $kernelRef = new \ReflectionObject($this->kernel);
-        $kernelFile = $kernelRef->getFileName();
-        /** @var ResourceInterface[] $meta */
-        $meta = unserialize(file_get_contents($containerMetaFile));
-        $found = false;
-        foreach ($meta as $resource) {
-            if ((string) $resource === $kernelFile) {
-                $found = true;
-                break;
-            }
-        }
-        $this->assertTrue($found, 'Kernel file should present as resource');
-        $this->assertRegExp(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', get_class($this->kernel->getContainer())), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
+        $this->assertDirectoryNotExists($this->kernel->getCacheDir());
     }
 }

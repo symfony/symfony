@@ -37,10 +37,6 @@ class FactoryReturnTypePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // works only since php 7.0 and hhvm 3.11
-        if (!method_exists(\ReflectionMethod::class, 'getReturnType')) {
-            return;
-        }
         $resolveClassPassChanges = null !== $this->resolveClassPass ? $this->resolveClassPass->getChanges() : array();
 
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -93,7 +89,7 @@ class FactoryReturnTypePass implements CompilerPassInterface
 
         $returnType = $m->getReturnType();
         if (null !== $returnType && !$returnType->isBuiltin()) {
-            $returnType = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : $returnType->__toString();
+            $returnType = $returnType->getName();
             if (null !== $class) {
                 $declaringClass = $m->getDeclaringClass()->getName();
                 if ('self' === strtolower($returnType)) {

@@ -40,9 +40,6 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, (string) $container->getDefinition('bar')->getArgument(0));
     }
 
-    /**
-     * @requires PHP 5.6
-     */
     public function testProcessVariadic()
     {
         $container = new ContainerBuilder();

@@ -33,7 +33,6 @@ use Symfony\Component\Config\Loader\GlobFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -57,19 +56,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $booted = false;
     protected $name;
     protected $startTime;
-    protected $loadClassCache;
 
     private $projectDir;
 
-    const VERSION = '3.4.0-DEV';
-    const VERSION_ID = 30400;
-    const MAJOR_VERSION = 3;
-    const MINOR_VERSION = 4;
+    const VERSION = '4.0.0-DEV';
+    const VERSION_ID = 40000;
+    const MAJOR_VERSION = 4;
+    const MINOR_VERSION = 0;
     const RELEASE_VERSION = 0;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '11/2020';
-    const END_OF_LIFE = '11/2021';
+    const END_OF_MAINTENANCE = '07/2018';
+    const END_OF_LIFE = '01/2019';
 
     /**
      * Constructor.
@@ -106,10 +104,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         if (true === $this->booted) {
             return;
-        }
-
-        if ($this->loadClassCache) {
-            $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
         }
 
         // init bundles
@@ -339,43 +333,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Loads the PHP class cache.
-     *
-     * This methods only registers the fact that you want to load the cache classes.
-     * The cache will actually only be loaded when the Kernel is booted.
-     *
-     * That optimization is mainly useful when using the HttpCache class in which
-     * case the class cache is not loaded if the Response is in the cache.
-     *
-     * @param string $name      The cache name prefix
-     * @param string $extension File extension of the resulting file
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    public function loadClassCache($name = 'classes', $extension = '.php')
-    {
-        if (\PHP_VERSION_ID >= 70000) {
-            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
-        }
-
-        $this->loadClassCache = array($name, $extension);
-    }
-
-    /**
-     * @internal
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    public function setClassCache(array $classes)
-    {
-        if (\PHP_VERSION_ID >= 70000) {
-            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
-        }
-
-        file_put_contents($this->getCacheDir().'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
-    }
-
-    /**
      * @internal
      */
     public function setAnnotatedClassCache(array $annotatedClasses)
@@ -413,20 +370,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getCharset()
     {
         return 'UTF-8';
-    }
-
-    /**
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    protected function doLoadClassCache($name, $extension)
-    {
-        if (\PHP_VERSION_ID >= 70000) {
-            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
-        }
-
-        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
-            ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
-        }
     }
 
     /**
@@ -600,48 +543,19 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             );
         }
 
-        return array_merge(
-            array(
-                'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
-                'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
-                'kernel.environment' => $this->environment,
-                'kernel.debug' => $this->debug,
-                'kernel.name' => $this->name,
-                'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
-                'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
-                'kernel.bundles' => $bundles,
-                'kernel.bundles_metadata' => $bundlesMetadata,
-                'kernel.charset' => $this->getCharset(),
-                'kernel.container_class' => $this->getContainerClass(),
-            ),
-            $this->getEnvParameters(false)
+        return array(
+            'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
+            'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
+            'kernel.environment' => $this->environment,
+            'kernel.debug' => $this->debug,
+            'kernel.name' => $this->name,
+            'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
+            'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
+            'kernel.bundles' => $bundles,
+            'kernel.bundles_metadata' => $bundlesMetadata,
+            'kernel.charset' => $this->getCharset(),
+            'kernel.container_class' => $this->getContainerClass(),
         );
-    }
-
-    /**
-     * Gets the environment parameters.
-     *
-     * Only the parameters starting with "SYMFONY__" are considered.
-     *
-     * @return array An array of parameters
-     *
-     * @deprecated since version 3.3, to be removed in 4.0
-     */
-    protected function getEnvParameters()
-    {
-        if (0 === func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax to get the value of any environment variable from configuration files instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        $parameters = array();
-        foreach ($_SERVER as $key => $value) {
-            if (0 === strpos($key, 'SYMFONY__')) {
-                @trigger_error(sprintf('The support of special environment variables that start with SYMFONY__ (such as "%s") is deprecated as of 3.3 and will be removed in 4.0. Use the %%env()%% syntax instead to get the value of environment variables in configuration files.', $key), E_USER_DEPRECATED);
-                $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
-            }
-        }
-
-        return $parameters;
     }
 
     /**
@@ -822,11 +736,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $output .= $rawChunk;
 
-        if (\PHP_VERSION_ID >= 70000) {
-            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
-            unset($tokens, $rawChunk);
-            gc_mem_caches();
-        }
+        // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+        unset($tokens, $rawChunk);
+        gc_mem_caches();
 
         return $output;
     }
@@ -838,11 +750,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function unserialize($data)
     {
-        if (\PHP_VERSION_ID >= 70000) {
-            list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
-        } else {
-            list($environment, $debug) = unserialize($data);
-        }
+        list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
 
         $this->__construct($environment, $debug);
     }

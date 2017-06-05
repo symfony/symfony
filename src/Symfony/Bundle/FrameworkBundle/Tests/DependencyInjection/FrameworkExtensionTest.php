@@ -154,8 +154,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('workflows');
 
-        $this->assertTrue($container->hasDefinition('workflow.article', 'Workflow is registered as a service'));
-        $this->assertTrue($container->hasDefinition('workflow.article.definition', 'Workflow definition is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
+        $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
+        $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
 
@@ -173,8 +174,9 @@ abstract class FrameworkExtensionTest extends TestCase
         );
         $this->assertSame(array('workflow.definition' => array(array('name' => 'article', 'type' => 'workflow', 'marking_store' => 'multiple_state'))), $workflowDefinition->getTags());
 
-        $this->assertTrue($container->hasDefinition('state_machine.pull_request', 'State machine is registered as a service'));
-        $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition', 'State machine definition is registered as a service'));
+        $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
+        $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
+        $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame('draft', $workflowDefinition->getArgument(2));
 
@@ -205,15 +207,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
         $registryDefinition = $container->getDefinition('workflow.registry');
         $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "type" option of the "framework.workflows.missing_type" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.
-     */
-    public function testDeprecatedWorkflowMissingType()
-    {
-        $container = $this->createContainerFromFile('workflows_without_type');
     }
 
     /**
@@ -793,21 +786,6 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('serializer_enabled', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
         $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "framework.serializer.cache" option is deprecated %s.
-     */
-    public function testDeprecatedSerializerCacheOption()
-    {
-        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
-
-        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-        $this->assertTrue($container->hasDefinition('serializer.mapping.class_metadata_factory'));
-
-        $cache = $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1);
-        $this->assertEquals(new Reference('foo'), $cache);
     }
 
     public function testSerializerMapping()

@@ -69,7 +69,7 @@ class JsonDecode implements DecoderInterface
      *      If not specified, this method will use the default set in JsonDecode::__construct
      *
      * json_decode_options: integer
-     *      Specifies additional options as per documentation for json_decode. Only supported with PHP 5.4.0 and higher
+     *      Specifies additional options as per documentation for json_decode.
      *
      * @return mixed
      *

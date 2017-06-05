@@ -54,7 +54,6 @@ class YamlFileLoader extends FileLoader
         'decoration_inner_name' => 'decoration_inner_name',
         'decoration_priority' => 'decoration_priority',
         'autowire' => 'autowire',
-        'autowiring_types' => 'autowiring_types',
         'autoconfigure' => 'autoconfigure',
     );
 
@@ -314,8 +313,9 @@ class YamlFileLoader extends FileLoader
     private function parseDefinition($id, $service, $file, array $defaults)
     {
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
-            @trigger_error(sprintf('Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "%s" service or define it in XML instead.', $id), E_USER_DEPRECATED);
+            throw new InvalidArgumentException(sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
         }
+
         if (is_string($service) && 0 === strpos($service, '@')) {
             $public = isset($defaults['public']) ? $defaults['public'] : true;
             $this->container->setAlias($id, new Alias(substr($service, 1), $public));
@@ -343,7 +343,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service as $key => $value) {
                 if (!in_array($key, array('alias', 'public'))) {
-                    @trigger_error(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
+                    throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public".', $key, $id, $file));
                 }
             }
 
@@ -496,24 +496,6 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['autowire'])) {
             $definition->setAutowired($service['autowire']);
-        }
-
-        if (isset($service['autowiring_types'])) {
-            if (is_string($service['autowiring_types'])) {
-                $definition->addAutowiringType($service['autowiring_types']);
-            } else {
-                if (!is_array($service['autowiring_types'])) {
-                    throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
-                }
-
-                foreach ($service['autowiring_types'] as $autowiringType) {
-                    if (!is_string($autowiringType)) {
-                        throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
-                    }
-
-                    $definition->addAutowiringType($autowiringType);
-                }
-            }
         }
 
         if (isset($service['autoconfigure'])) {
@@ -724,11 +706,6 @@ class YamlFileLoader extends FileLoader
                 $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             }
 
-            if ('=' === substr($value, -1)) {
-                @trigger_error(sprintf('The "=" suffix that used to disable strict references in Symfony 2.x is deprecated since 3.3 and will be unsupported in 4.0. Remove it in "%s".', $value), E_USER_DEPRECATED);
-                $value = substr($value, 0, -1);
-            }
-
             if (null !== $invalidBehavior) {
                 $value = new Reference($value, $invalidBehavior);
             }
@@ -766,7 +743,7 @@ class YamlFileLoader extends FileLoader
      */
     private function checkDefinition($id, array $definition, $file)
     {
-        if ($throw = $this->isLoadingInstanceof) {
+        if ($this->isLoadingInstanceof) {
             $keywords = self::$instanceofKeywords;
         } elseif ($throw = isset($definition['resource'])) {
             $keywords = self::$prototypeKeywords;
@@ -776,11 +753,7 @@ class YamlFileLoader extends FileLoader
 
         foreach ($definition as $key => $value) {
             if (!isset($keywords[$key])) {
-                if ($throw) {
-                    throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', $keywords)));
-                }
-
-                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', $keywords)), E_USER_DEPRECATED);
+                throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', $keywords)));
             }
         }
     }

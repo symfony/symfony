@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,41 +19,25 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\User\User;
 
 /**
  * Encode a user's password.
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
  */
-class UserPasswordEncoderCommand extends ContainerAwareCommand
+class UserPasswordEncoderCommand extends Command
 {
     private $encoderFactory;
     private $userClasses;
 
-    public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = array())
+    public function __construct(EncoderFactoryInterface $encoderFactory, array $userClasses = array())
     {
-        if (null === $encoderFactory) {
-            @trigger_error(sprintf('Passing null as the first argument of "%s" is deprecated since version 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->encoderFactory = $encoderFactory;
         $this->userClasses = $userClasses;
 
         parent::__construct();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.3 and "%s" won\'t implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
     }
 
     /**
@@ -123,8 +107,7 @@ EOF
         $userClass = $this->getUserClass($input, $io);
         $emptySalt = $input->getOption('empty-salt');
 
-        $encoderFactory = $this->encoderFactory ?: parent::getContainer()->get('security.encoder_factory');
-        $encoder = $encoderFactory->getEncoder($userClass);
+        $encoder = $this->encoderFactory->getEncoder($userClass);
         $bcryptWithoutEmptySalt = !$emptySalt && $encoder instanceof BCryptPasswordEncoder;
 
         if ($bcryptWithoutEmptySalt) {
@@ -206,11 +189,6 @@ EOF
         }
 
         if (empty($this->userClasses)) {
-            if (null === $this->encoderFactory) {
-                // BC to be removed and simply keep the exception whenever there is no configured user classes in 4.0
-                return User::class;
-            }
-
             throw new \RuntimeException('There are no configured encoders for the "security" extension.');
         }
 

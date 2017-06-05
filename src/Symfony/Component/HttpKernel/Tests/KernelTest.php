@@ -88,20 +88,6 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testClassCacheIsLoaded()
-    {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
-        $kernel->loadClassCache('name', '.extension');
-        $kernel->expects($this->once())
-            ->method('doLoadClassCache')
-            ->with('name', '.extension');
-
-        $kernel->boot();
-    }
-
     public function testClassCacheIsNotLoadedByDefault()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
@@ -109,17 +95,6 @@ class KernelTest extends TestCase
             ->method('doLoadClassCache');
 
         $kernel->boot();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
-    {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
-        $kernel->loadClassCache();
-        $kernel->expects($this->never())
-            ->method('doLoadClassCache');
     }
 
     public function testEnvParametersResourceIsAdded()
@@ -741,34 +716,6 @@ EOF;
         require_once $dir.'/Kernel123.php';
         $kernel = new \Symfony\Component\HttpKernel\Tests\Fixtures\_123\Kernel123('dev', true);
         $this->assertEquals('_123', $kernel->getName());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The Symfony\Component\HttpKernel\Kernel::getEnvParameters() method is deprecated as of 3.3 and will be removed in 4.0. Use the %cenv()%c syntax to get the value of any environment variable from configuration files instead.
-     * @expectedDeprecation The support of special environment variables that start with SYMFONY__ (such as "SYMFONY__FOO__BAR") is deprecated as of 3.3 and will be removed in 4.0. Use the %cenv()%c syntax instead to get the value of environment variables in configuration files.
-     */
-    public function testSymfonyEnvironmentVariables()
-    {
-        $_SERVER['SYMFONY__FOO__BAR'] = 'baz';
-
-        $kernel = $this->getKernel();
-        $method = new \ReflectionMethod($kernel, 'getEnvParameters');
-        $method->setAccessible(true);
-
-        $envParameters = $method->invoke($kernel);
-        $this->assertSame('baz', $envParameters['foo.bar']);
-
-        unset($_SERVER['SYMFONY__FOO__BAR']);
-    }
-
-    public function testProjectDirExtension()
-    {
-        $kernel = new CustomProjectDirKernel('test', true);
-        $kernel->boot();
-
-        $this->assertSame('foo', $kernel->getProjectDir());
-        $this->assertSame('foo', $kernel->getContainer()->getParameter('kernel.project_dir'));
     }
 
     /**

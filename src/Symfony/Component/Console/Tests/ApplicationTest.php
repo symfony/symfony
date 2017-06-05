@@ -28,7 +28,6 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -1107,36 +1106,6 @@ class ApplicationTest extends TestCase
         $this->assertEquals(1, $tester->getStatusCode());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "ConsoleEvents::EXCEPTION" event is deprecated since Symfony 3.3 and will be removed in 4.0. Listen to the "ConsoleEvents::ERROR" event instead.
-     */
-    public function testLegacyExceptionListenersAreStillTriggered()
-    {
-        $dispatcher = $this->getDispatcher();
-        $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
-            $event->getOutput()->write('caught.');
-
-            $event->setException(new \RuntimeException('replaced in caught.'));
-        });
-
-        $application = new Application();
-        $application->setDispatcher($dispatcher);
-        $application->setAutoExit(false);
-
-        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
-            throw new \RuntimeException('foo');
-        });
-
-        $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'foo'));
-        $this->assertContains('before.caught.error.after.', $tester->getDisplay());
-        $this->assertContains('replaced in caught.', $tester->getDisplay());
-    }
-
-    /**
-     * @requires PHP 7
-     */
     public function testErrorIsRethrownIfNotHandledByConsoleErrorEvent()
     {
         $application = new Application();
@@ -1287,24 +1256,6 @@ class ApplicationTest extends TestCase
         $this->assertEquals('some test value', $extraValue);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testTerminalDimensions()
-    {
-        $application = new Application();
-        $originalDimensions = $application->getTerminalDimensions();
-        $this->assertCount(2, $originalDimensions);
-
-        $width = 80;
-        if ($originalDimensions[0] == $width) {
-            $width = 100;
-        }
-
-        $application->setTerminalDimensions($width, 80);
-        $this->assertSame(array($width, 80), $application->getTerminalDimensions());
-    }
-
     public function testSetRunCustomDefaultCommand()
     {
         $command = new \FooCommand();
@@ -1388,9 +1339,6 @@ class ApplicationTest extends TestCase
         return $dispatcher;
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testErrorIsRethrownIfNotHandledByConsoleErrorEventWithCatchingEnabled()
     {
         $application = new Application();

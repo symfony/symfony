@@ -593,7 +593,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if ($callable instanceof \Closure) {
-            $callableXML->setAttribute('type', $this->formatClosure($callable));
+            $callableXML->setAttribute('type', 'closure');
 
             return $dom;
         }

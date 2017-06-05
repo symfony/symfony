@@ -12,15 +12,16 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 /**
  * A builder for {@link Button} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface, OrderedFormConfigBuilderInterface
 {
     /**
      * @var bool
@@ -48,6 +49,11 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     private $attributes = array();
 
     /**
+     * @var null|string|array
+     */
+    private $position;
+
+    /**
      * @var array
      */
     private $options;
@@ -58,7 +64,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @param string $name    The name of the button
      * @param array  $options The button's options
      *
-     * @throws InvalidArgumentException If the name is empty.
+     * @throws InvalidArgumentException if the name is empty
      */
     public function __construct($name, array $options = array())
     {
@@ -504,6 +510,28 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setPosition($position)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('ButtonBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        if (is_string($position) && $position !== 'first' && $position !== 'last') {
+            throw new InvalidConfigurationException('When using position as a string, the only supported values are "first" and "last".');
+        }
+
+        if (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
+            throw new InvalidConfigurationException('When using position as an array, the "before" or "after" option must be defined.');
+        }
+
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
      * Unsupported method.
      *
      * @param bool $inheritData
@@ -750,6 +778,14 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function getAutoInitialize()
     {
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPosition()
+    {
+        return $this->position;
     }
 
     /**

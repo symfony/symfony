@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormConfigBuilder implements FormConfigBuilderInterface
+class FormConfigBuilder implements FormConfigBuilderInterface, OrderedFormConfigBuilderInterface
 {
     /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
@@ -173,6 +174,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $autoInitialize = false;
 
     /**
+     * @var null|string|array
+     */
+    private $position;
+
+    /**
      * @var array
      */
     private $options;
@@ -185,8 +191,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws InvalidArgumentException If the data class is not a valid class or if
-     *                                  the name contains invalid characters.
+     * @throws InvalidArgumentException if the data class is not a valid class or if
+     *                                  the name contains invalid characters
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
@@ -516,6 +522,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -834,6 +848,28 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setPosition($position)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        if (is_string($position) && ($position !== 'first') && ($position !== 'last')) {
+            throw new InvalidConfigurationException('When using position as a string, the only supported values are "first" and "last".');
+        }
+
+        if (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
+            throw new InvalidConfigurationException('When using position as an array, the "before" or "after" option must be defined.');
+        }
+
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFormConfig()
     {
         if ($this->locked) {
@@ -852,8 +888,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @param string|int $name The tested form name
      *
-     * @throws UnexpectedTypeException  If the name is not a string or an integer.
-     * @throws InvalidArgumentException If the name contains invalid characters.
+     * @throws UnexpectedTypeException  if the name is not a string or an integer
+     * @throws InvalidArgumentException if the name contains invalid characters
      */
     public static function validateName($name)
     {

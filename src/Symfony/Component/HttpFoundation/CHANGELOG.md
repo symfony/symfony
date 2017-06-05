@@ -4,7 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
- * [BC BREAK] the `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument,
+ * the `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument,
    see http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info,
  * deprecated the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods,
  * added `File\Stream`, to be passed to `BinaryFileResponse` when the size of the served file is unknown,

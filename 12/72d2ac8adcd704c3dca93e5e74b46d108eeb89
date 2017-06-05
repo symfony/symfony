@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-31T07:20:49Z
+
+I would also update the exception message. "$index must be an integer." is not really right anymore.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-31T11:11:52Z
+
+@xabbuh updated, `ChildDefinition` now delegates the common behavior to the parent class.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-31T12:03:50Z
+
+@dunglas I meant the one in `replaceArgument()`: https://github.com/dunglas/symfony/blob/9245400aa0a3467d89565ecdda8bd1d5315bbe21/src/Symfony/Component/DependencyInjection/ChildDefinition.php#L102
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-31T12:16:05Z
+
+@xabbuh updated
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-05-31T17:05:53Z
+
+The exception message in `Definition::replaceArgument`
+
+> The index "%d" is not in the range [0, %d]
+
+is also not correct anymore in case an argument exists as a string. Then you can't actually access the argument with the given range.
+
+---------------------------------------------------------------------------
+
+by yukoff at 2017-05-31T19:44:07Z
+
+Seems false alarm, I'll remove confusing comment to avoid indexing and leading others to wrong place ;)
+
+---------------------------------------------------------------------------
+
+by yukoff at 2017-05-31T20:29:38Z
+
+Despite [my false alarm](22979#issuecomment-305289124) in #22979 ;) still doesn't work with PR applied locally:
+```
+PHP Fatal error:  Uncaught Symfony\Component\DependencyInjection\Exception\InvalidArgumentException: Invalid key "collaboration" found in arguments of method "__construct()" for service "sulu_admin.js_config_pool": only integer or $named arguments are allowed. in D:\sandbox\vendor\symfony\symfony\src\Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass.php:47
+Stack trace:
+#0 D:\sandbox\vendor\symfony\symfony\src\Symfony\Component\DependencyInjection\Compiler\AbstractRecursivePass.php(57): Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass->processValue(Object(Symfony\Component\DependencyInjection\Definition), false)
+#1 D:\sandbox\vendor\symfony\symfony\src\Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass.php(30): Symfony\Component\DependencyInjection\Compiler\AbstractRecursivePass->processValue(Array, false)
+#2 D:\sandbox\vendor\symfony\sym in D:\sandbox\vendor\symfony\symfony\src\Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass.php on line 47
+```
+
+Service description is quite trivial
+```xml
+        <service id="sulu_admin.js_config_pool" class="%sulu_admin.js_config_pool.class%"/>
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T18:37:57Z
+
+@yukoff named args must start with a `$`
+
+---------------------------------------------------------------------------
+
+by yukoff at 2017-06-02T19:46:55Z
+
+My previous comment is not actual as of sulu/sulu#3379 - works now.
+
+@nicolas-grekas not quite sure I got to where you're referencing... ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T19:51:16Z
+
+I'm referencing the error message you pasted just above: it looks legit to me.
+
+---------------------------------------------------------------------------
+
+by yukoff at 2017-06-02T20:20:36Z
+
+Oh... Anyway it seems not actual any more, thanks!

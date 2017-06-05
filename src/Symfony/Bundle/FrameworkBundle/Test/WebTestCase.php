@@ -18,12 +18,15 @@ use Symfony\Bundle\FrameworkBundle\Client;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class WebTestCase extends KernelTestCase
+abstract class WebTestCase extends ContainerAwareTestCase
 {
     /**
      * Creates a Client.
      *
-     * @param array $options An array of options to pass to the createKernel class
+     * Note: When this method is called multiple times to create different client instances,
+     * each client will be using a new, fresh kernel and container instance.
+     *
+     * @param array $options An array of options to pass to the KernelTestCase::createKernel method
      * @param array $server  An array of server parameters
      *
      * @return Client A Client instance

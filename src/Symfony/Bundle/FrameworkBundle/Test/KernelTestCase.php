@@ -194,6 +194,7 @@ abstract class KernelTestCase extends TestCase
             if ($container instanceof ResettableContainerInterface) {
                 $container->reset();
             }
+            static::$kernel = null;
         }
     }
 

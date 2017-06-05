@@ -23,8 +23,7 @@ class AutowiringTypesTest extends WebTestCase
 {
     public function testAnnotationReaderAutowiring()
     {
-        static::bootKernel(array('root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache'));
-        $container = static::$kernel->getContainer();
+        $container = static::getContainer(array('root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache'));
 
         $annotationReader = $container->get('test.autowiring_types.autowired_services')->getAnnotationReader();
         $this->assertInstanceOf(AnnotationReader::class, $annotationReader);
@@ -32,8 +31,7 @@ class AutowiringTypesTest extends WebTestCase
 
     public function testCachedAnnotationReaderAutowiring()
     {
-        static::bootKernel();
-        $container = static::$kernel->getContainer();
+        $container = static::getContainer();
 
         $annotationReader = $container->get('test.autowiring_types.autowired_services')->getAnnotationReader();
         $this->assertInstanceOf(CachedReader::class, $annotationReader);
@@ -41,8 +39,7 @@ class AutowiringTypesTest extends WebTestCase
 
     public function testTemplatingAutowiring()
     {
-        static::bootKernel();
-        $container = static::$kernel->getContainer();
+        $container = static::getContainer();
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
         $this->assertInstanceOf(FrameworkBundleEngineInterface::class, $autowiredServices->getFrameworkBundleEngine());

@@ -1422,14 +1422,25 @@ EOF;
                 if ($value instanceof ServiceClosureArgument) {
                     $value = $value->getValues()[0];
                     $code = $this->dumpValue($value, $interpolate);
+                    $return = '';
 
                     if ($value instanceof TypedReference) {
-                        $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() ? ' = null' : '', $code);
+                        $nullable = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior();
+                        if (70000 <= \PHP_VERSION_ID) {
+                            if (70100 > PHP_VERSION_ID || !$nullable) {
+                                $return = sprintf(': %s%s', $nullable ? '?' : '', $value->getType());
+                                $code = sprintf('return %s;', $code);
+                            } else {
+                                $code = sprintf('$f = function (\\%s $v = null) { return $v; }; return $f(%s);', $value->getType(), $code);
+                            }
+                        } else {
+                            $code = sprintf('$f = function (\\%s $v%s) { return $v; }; return $f(%s);', $value->getType(), $nullable ? ' = null' : '', $code);
+                        }
                     } else {
                         $code = sprintf('return %s;', $code);
                     }
 
-                    return sprintf("function () {\n            %s\n        }", $code);
+                    return sprintf("function ()%s {\n            %s\n        }", $return, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {

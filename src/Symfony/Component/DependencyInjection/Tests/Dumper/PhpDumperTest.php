@@ -545,6 +545,10 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
+        if (70000 > \PHP_VERSION_ID) {
+            return $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator_php5.php', $dumper->dump());
+        }
+
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator.php', $dumper->dump());
     }
 
@@ -563,6 +567,10 @@ class PhpDumperTest extends TestCase
         $container->compile();
 
         $dumper = new PhpDumper($container);
+
+        if (70000 > \PHP_VERSION_ID) {
+            return $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber_php5.php', $dumper->dump());
+        }
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
     }

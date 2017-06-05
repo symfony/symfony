@@ -104,8 +104,8 @@ EOF;
     public function match(\$pathinfo)
     {
         \$allow = array();
-        \$pathinfo = rawurldecode(\$pathinfo);
-        \$trimmedPathinfo = rtrim(\$pathinfo, '/');
+        \$pathinfo = \\rawurldecode(\$pathinfo);
+        \$trimmedPathinfo = \\rtrim(\$pathinfo, '/');
         \$context = \$this->context;
         \$request = \$this->request;
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
@@ -118,7 +118,7 @@ EOF;
 
 $code
 
-        throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();
+        throw 0 < \\count(\$allow) ? new MethodNotAllowedException(\\array_unique(\$allow)) : new ResourceNotFoundException();
     }
 EOF;
     }
@@ -144,7 +144,7 @@ EOF;
                     $fetchedHost = true;
                 }
 
-                $code .= sprintf("        if (preg_match(%s, \$host, \$hostMatches)) {\n", var_export($regex, true));
+                $code .= sprintf("        if (\\preg_match(%s, \$host, \$hostMatches)) {\n", var_export($regex, true));
             }
 
             $tree = $this->buildStaticPrefixCollection($collection);
@@ -192,7 +192,7 @@ EOF;
         $prefix = $collection->getPrefix();
 
         if (!empty($prefix) && '/' !== $prefix) {
-            $code .= sprintf("    %s (0 === strpos(\$pathinfo, %s)) {\n", $ifOrElseIf, var_export($prefix, true));
+            $code .= sprintf("    %s (0 === \\strpos(\$pathinfo, %s)) {\n", $ifOrElseIf, var_export($prefix, true));
         }
 
         $ifOrElseIf = 'if';
@@ -250,14 +250,14 @@ EOF;
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
-                $conditions[] = sprintf('0 === strpos($pathinfo, %s)', var_export($compiledRoute->getStaticPrefix(), true));
+                $conditions[] = sprintf('0 === \\strpos($pathinfo, %s)', var_export($compiledRoute->getStaticPrefix(), true));
             }
 
             if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
-            $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
+            $conditions[] = sprintf('\\preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
 
             $matches = true;
         }
@@ -322,8 +322,8 @@ EOF;
                 } else {
                     $methods = implode("', '", $methods);
                     $code .= <<<EOF
-            if (!in_array(\$$methodVariable, array('$methods'))) {
-                \$allow = array_merge(\$allow, array('$methods'));
+            if (!\\in_array(\$$methodVariable, array('$methods'))) {
+                \$allow = \\array_merge(\$allow, array('$methods'));
                 goto $gotoname;
             }
 
@@ -335,7 +335,7 @@ EOF;
 
         if ($hasTrailingSlash) {
             $code .= <<<EOF
-            if (substr(\$pathinfo, -1) !== '/') {
+            if (\\substr(\$pathinfo, -1) !== '/') {
                 return \$this->redirect(\$pathinfo.'/', '$name');
             }
 
@@ -351,7 +351,7 @@ EOF;
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$scheme])) {
-                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
+                return \$this->redirect(\$pathinfo, '$name', \\key(\$requiredSchemes));
             }
 
 
@@ -370,7 +370,7 @@ EOF;
             $vars[] = "array('_route' => '$name')";
 
             $code .= sprintf(
-                "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
+                "            return \$this->mergeDefaults(\\array_replace(%s), %s);\n",
                 implode(', ', $vars),
                 str_replace("\n", '', var_export($route->getDefaults(), true))
             );

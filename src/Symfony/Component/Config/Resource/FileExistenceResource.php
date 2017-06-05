@@ -21,9 +21,9 @@ namespace Symfony\Component\Config\Resource;
  */
 class FileExistenceResource implements SelfCheckingResourceInterface, \Serializable
 {
-    private $resource;
+    protected $resource;
 
-    private $exists;
+    protected $exists;
 
     /**
      * Constructor.

@@ -15,6 +15,15 @@ use Cache\IntegrationTests\SimpleCacheTest;
 
 abstract class CacheTestCase extends SimpleCacheTest
 {
+    public static function validKeys()
+    {
+        if (defined('HHVM_VERSION')) {
+            return parent::validKeys();
+        }
+
+        return array_merge(parent::validKeys(), array(array("a\0b")));
+    }
+
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

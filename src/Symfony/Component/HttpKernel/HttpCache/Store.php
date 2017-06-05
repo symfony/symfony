@@ -130,6 +130,11 @@ class Store implements StoreInterface
         return (bool) $wouldBlock;
     }
 
+    public function isCached(Request $request)
+    {
+        return is_file($this->getLocation($request));
+    }
+
     /**
      * Locates a cached Response for the Request provided.
      *
@@ -417,6 +422,11 @@ class Store implements StoreInterface
         }
 
         @chmod($path, 0666 & ~umask());
+    }
+
+    public function getLocation(Request $request)
+    {
+        return $this->getPath($this->getCacheKey($request));
     }
 
     public function getPath($key)

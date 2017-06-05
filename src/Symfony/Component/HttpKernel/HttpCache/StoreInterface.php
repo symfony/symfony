@@ -81,6 +81,24 @@ interface StoreInterface
     public function isLocked(Request $request);
 
     /**
+     * Returns whether or not a cache entry exists.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return Boolean true if cache entry exists, false otherwise
+     */
+    public function isCached(Request $request);
+
+    /**
+     * Returns the location where the cache entry is stored
+     *
+     * @param Request $request A Request instance
+     *
+     * @return string Location of the cache entry for the given Request
+     */
+    public function getLocation(Request $request);
+
+    /**
      * Purges data for the given URL.
      *
      * @param string $url A URL

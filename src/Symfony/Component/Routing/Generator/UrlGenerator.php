@@ -74,6 +74,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%2A' => '*',
         '%7C' => '|',
     );
+    
+    /**
+     * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the fragment of the generated URL.
+     */
+    protected $decodedFragmentChars = array(
+        '%2F' => '/', 
+        '%3F' => '?',  
+    );
 
     /**
      * Constructor.
@@ -280,7 +288,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         if ('' !== $fragment) {
-            $url .= '#'.strtr(rawurlencode($fragment), array('%2F' => '/', '%3F' => '?'));
+            $url .= '#'.strtr(rawurlencode($fragment), $this->decodedFragmentChars);
         }
 
         return $url;

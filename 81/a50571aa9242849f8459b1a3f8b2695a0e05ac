@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-05T06:06:50Z
+
+You are not supposed to change the value of this const, that's why self:: is used.
+The core issue is that memcached doesn't handle the NUL char in keys.
+Did you enable its binary protocol? `$client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);`
+Does that fix the root issue?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-05T06:11:52Z
+
+As a side note, you should know that with its LRU mechanism, Memcached is not suited for storing tags.
+Tags must have a longer persistence duration than any items that reference them.
+Using Memcached, it's your responsibility to be sure that this is the case. The only way to achieve it is to be sure that your Memcached memory size will never be exhausted, thus will never trigger LRU.
+
+---------------------------------------------------------------------------
+
+by wucdbm at 2017-06-05T10:42:02Z
+
+Thank you for your quick response. I'll give `$client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);` a try.
+
+As for LRU, the project will run with obscenely high amount of memory on a separate Memcached instance for a critical subset of the data it caches. Besides, there's always the option to give Redis a go.

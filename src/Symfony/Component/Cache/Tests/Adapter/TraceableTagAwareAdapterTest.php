@@ -15,6 +15,9 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 
+/**
+ * @group time-sensitive
+ */
 class TraceableTagAwareAdapterTest extends TraceableAdapterTest
 {
     public function testInvalidateTags()

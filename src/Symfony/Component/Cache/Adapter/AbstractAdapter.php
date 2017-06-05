@@ -266,6 +266,9 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
         try {
             foreach ($items as $id => $value) {
+                if (!isset($keys[$id])) {
+                    $id = key($keys);
+                }
                 $key = $keys[$id];
                 unset($keys[$id]);
                 yield $key => $f($key, $value, true);

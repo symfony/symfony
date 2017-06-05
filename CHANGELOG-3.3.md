@@ -7,6 +7,36 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.1 (2017-06-05)
+
+ * bug #23067 [HttpFoundation][FrameworkBundle] Revert "trusted proxies" BC break (nicolas-grekas)
+ * bug #23065 [Cache] Fallback to positional when keyed results are broken (nicolas-grekas)
+ * bug #22981 [DependencyInjection] Fix named args support in ChildDefinition (dunglas)
+ * bug #23050 [Form][Profiler] Fixes form collector triggering deprecations (ogizanagi)
+ * bug #22971 [Profiler] Fix code excerpt wrapping (ogizanagi)
+ * bug #23049 [FrameworkBundle] mitigate BC break with empty trusted_proxies (xabbuh)
+ * bug #23045 [Cache] fix Redis scheme detection (xabbuh)
+ * bug #23013 Parse the _controller format in sub-requests (weaverryan)
+ * bug #23015 [PhpUnitBridge] Fix detection of PHPUnit 5 (enumag)
+ * bug #23041 [Config] Always protected ClassExistenceResource against bad parents (nicolas-grekas)
+ * bug #22988 [PropertyInfo][DoctrineBridge] The bigint Doctrine's type must be converted to string (dunglas)
+ * bug #23014 Fix optional cache warmers are always instantiated whereas they should be lazy-loaded (romainneutron)
+ * feature #23022 [Di] Remove closure-proxy arguments (nicolas-grekas)
+ * bug #23024 [EventDispatcher] Fix ContainerAwareEventDispatcher::hasListeners(null) (nicolas-grekas)
+ * bug #23008 [EventDispatcher] Handle laziness internally instead of relying on ClosureProxyArgument (nicolas-grekas)
+ * bug #23018 [FrameworkBundle] Fix CacheCollectorPass priority (chalasr)
+ * bug #23009 [Routing] Allow GET requests to be redirected. Fixes #23004 (frankdejonge)
+ * bug #22996 [Form] Fix \IntlDateFormatter timezone parameter usage to bypass PHP bug #66323 (romainneutron)
+ * bug #22965 [Cache] Ignore missing annotations.php (ro0NL)
+ * bug #22993 [DI] Autowiring exception thrown when inlined service is removed (weaverryan)
+ * bug #22999 Better DI type deprecation message (weaverryan)
+ * bug #22985 [Config] Allow empty globs (nicolas-grekas)
+ * bug #22961 [HttpKernel] Support unknown format in LoggerDataCollector (iltar)
+ * bug #22991 [DI] Don't throw Autowire exception for removed service with private __construct (weaverryan)
+ * bug #22968 [Profiler] Fix text selection & click on file links on exception pages (ogizanagi)
+ * bug #22994 Harden the debugging of Twig filters and functions (stof)
+ * bug #22960 [Cache] Fix decoration of TagAware adapters in dev (chalasr)
+
 * 3.3.0 (2017-05-29)
 
  * bug #22940 [Config] Fallback to regular import when glob fails (nicolas-grekas)

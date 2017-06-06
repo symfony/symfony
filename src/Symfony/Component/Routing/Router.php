@@ -84,6 +84,24 @@ class Router implements RouterInterface, RequestMatcherInterface
     private $expressionLanguageProviders = array();
 
     /**
+     * @var array
+     */
+    protected $defaultOptions = array(
+        'cache_dir' => null,
+        'debug' => false,
+        'generator_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
+        'generator_base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
+        'generator_dumper_class' => 'Symfony\\Component\\Routing\\Generator\\Dumper\\PhpGeneratorDumper',
+        'generator_cache_class' => 'ProjectUrlGenerator',
+        'matcher_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
+        'matcher_base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
+        'matcher_dumper_class' => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
+        'matcher_cache_class' => 'ProjectUrlMatcher',
+        'resource_type' => null,
+        'strict_requirements' => true,
+    );
+
+    /**
      * Constructor.
      *
      * @param LoaderInterface $loader   A LoaderInterface instance
@@ -126,20 +144,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     public function setOptions(array $options)
     {
-        $this->options = array(
-            'cache_dir' => null,
-            'debug' => false,
-            'generator_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'generator_base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'generator_dumper_class' => 'Symfony\\Component\\Routing\\Generator\\Dumper\\PhpGeneratorDumper',
-            'generator_cache_class' => 'ProjectUrlGenerator',
-            'matcher_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-            'matcher_base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-            'matcher_dumper_class' => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
-            'matcher_cache_class' => 'ProjectUrlMatcher',
-            'resource_type' => null,
-            'strict_requirements' => true,
-        );
+        $this->options = $this->defaultOptions;
 
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = array();

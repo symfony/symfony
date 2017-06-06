@@ -103,7 +103,8 @@
             <argument type="service" id="event_dispatcher" />
         </service>
 
-        <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
+        <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap">
+            <tag name="kernel.event_subscriber" />
             <argument type="service" id="service_container" />
             <argument type="collection" />
         </service>

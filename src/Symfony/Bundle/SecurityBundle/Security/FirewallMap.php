@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class FirewallMap implements FirewallMapInterface
+class FirewallMap implements FirewallMapInterface, EventSubscriberInterface
 {
     protected $container;
     protected $map;
@@ -74,5 +77,20 @@ class FirewallMap implements FirewallMapInterface
                 return $this->contexts[$request] = $this->container->get($contextId);
             }
         }
+    }
+
+    public function onKernelFinishRequest(FinishRequestEvent $event)
+    {
+        unset($this->contexts[$event->getRequest()]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
+        );
     }
 }

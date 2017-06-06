@@ -686,7 +686,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\TextType',
-                array('attr' => array('maxlength' => 10)),
+                array('attr' => array('class' => 'foo', 'maxlength' => 10)),
                 Guess::MEDIUM_CONFIDENCE
             )));
 
@@ -694,7 +694,7 @@ class FormFactoryTest extends TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('attr' => array('maxlength' => 11)))
+            ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array('attr' => array('class' => 'foo', 'maxlength' => 11)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(

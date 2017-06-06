@@ -373,7 +373,7 @@ class JsonDescriptor extends Descriptor
         }
 
         if ($callable instanceof \Closure) {
-            $data['type'] = $this->formatClosure($callable);
+            $data['type'] = 'closure';
 
             return $data;
         }

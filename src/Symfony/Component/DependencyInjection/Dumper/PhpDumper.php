@@ -175,7 +175,7 @@ class PhpDumper extends Dumper
             }
         }
         if ($unusedEnvs) {
-            throw new EnvParameterException($unusedEnvs);
+            throw new EnvParameterException($unusedEnvs, null, 'Environment variables "%s" are never used. Please, check your container\'s configuration.');
         }
 
         return $code;

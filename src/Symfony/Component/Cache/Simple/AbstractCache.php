@@ -162,6 +162,9 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface
     {
         try {
             foreach ($values as $id => $value) {
+                if (!isset($keys[$id])) {
+                    $id = key($keys);
+                }
                 $key = $keys[$id];
                 unset($keys[$id]);
                 yield $key => $value;

@@ -95,7 +95,7 @@ header .container { display: flex; justify-content: space-between; }
 .trace-head .icon svg { height: 24px; width: 24px; }
 
 .trace-message { font-size: 14px; font-weight: normal; margin: .5em 0 0; }
-
+.trace-details { table-layout: fixed; }
 .trace-line { position: relative; padding-left: 36px; }
 .trace-line.sf-toggle:hover { background: #F5F5F5; }
 .trace-line a { color: #222; }
@@ -108,12 +108,12 @@ header .container { display: flex; justify-content: space-between; }
 .trace-method { color: #B0413E; color: #222; font-weight: bold; color: #B0413E; }
 .trace-arguments { color: #222; color: #999; font-weight: normal; color: #795da3; color: #777; padding-left: 2px; }
 
-.trace-code { background: #FFF; font-size: 12px; margin: 10px 0 2px; padding: 10px; }
-.trace-code ol { margin: 0; }
-.trace-code li { color: #969896; margin: 0; padding-left: 10px; }
-.trace-code li + li { margin-top: 10px; }
-.trace-code li.selected { background: #F8EEC7; padding: 3px 0 3px 10px; }
-.trace-code li code { color: #222; }
+.trace-code { background: #FFF; font-size: 12px; margin: 10px 0 2px; padding: 10px; overflow-x: auto; }
+.trace-code ol { margin: 0; float: left; }
+.trace-code li { color: #969896; margin: 0; padding-left: 10px; float: left; width: 100%; }
+.trace-code li + li { margin-top: 5px; }
+.trace-code li.selected { background: #F8EEC7; padding: 3px 0 3px 10px; margin-top: 2px; }
+.trace-code li code { color: #222; white-space: nowrap; }
 
 .trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
 

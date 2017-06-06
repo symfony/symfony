@@ -108,7 +108,7 @@ class DeprecationErrorHandler
             $trace = debug_backtrace(true);
             $group = 'other';
 
-            $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = $inVendors($file));
+            $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (self::MODE_WEAK_VENDORS === $mode && $isVendor = $inVendors($file));
 
             $i = count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
@@ -192,7 +192,7 @@ class DeprecationErrorHandler
                     $colorize = function ($str) { return $str; };
                 }
                 if ($currErrorHandler !== $deprecationHandler) {
-                    echo "\n", $colorize('THE ERROR HANDLER HAS CHANGED!', true), "\n";
+                    echo "\n", $colorize("THE ERROR HANDLER HAS CHANGED!\n".var_export(error_get_last(), true), true), "\n";
                 }
 
                 $cmp = function ($a, $b) {

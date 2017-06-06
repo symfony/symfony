@@ -1,0 +1,162 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-01T10:58:19Z
+
+Do deprecations catched by the error handler have their trace properly already ? You haven't changed this code path
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-01T10:59:17Z
+
+This might explode memory.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-01T11:18:34Z
+
+> Do deprecations catched by the error handler have their trace properly already
+
+They did. So I didn't dig deeper in the debug component and the usage of the `SilencedErrorContext` actually (this only targets the deprecations collected during bootstrapping).
+
+> This might explode memory.
+
+I think we're safe enough, as we ignore args and objects (which anyway is required to me as I serialize the trace). But perhaps set a limit on `debug_backtrace`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-01T13:25:02Z
+
+Works for us :+1:
+
+```
+{▼
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/HttpKernel/DependencyInjection/Extension.php:62: {▶}
+  /base-path/vendor/symfony/assetic-bundle/DependencyInjection/AsseticExtension.php:135: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/Compiler/MergeExtensionConfigurationPass.php:59: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/HttpKernel/DependencyInjection/MergeExtensionConfigurationPass.php:39: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/Compiler/Compiler.php:143: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php:736: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Kernel.php:564: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Kernel.php:119: {▶}
+  /base-path/vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Kernel.php:168: {▶}
+  /base-path/web/app.php:24: {▶}
+}
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-01T16:31:52Z
+
+@stof : I updated the PR to use back the SilencedErrorContext DTO.
+
+Actually, the trace was already available for runtime deprecations because they were thrown, and thus convert to `\ErrorException`. But if the error is not thrown (for instance by triggering a php warning (silenced) or using `@trigger_error('foo', E_USER_WARNING))`, the log doesn't come with the full trace:
+
+|Before|After|
+|--|--|
+|<img width="1094" alt="screenshot 2017-06-01 a 18 26 09" src="https://cloud.githubusercontent.com/assets/2211145/26690103/5cf1e148-46f8-11e7-9ef9-80d895dc6e6b.PNG">|<img width="1093" alt="screenshot 2017-06-01 a 18 25 59" src="https://cloud.githubusercontent.com/assets/2211145/26690077/464a07c2-46f8-11e7-8ca3-b796dd6b0da7.PNG">|
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T22:12:44Z
+
+I'm still worried about the perf impact, both in terms of memory and speed. Deprecations can be thousands, this may add overhead to a hot code path.
+
+I was about to propose deduplicating silenced notices based solely on the message. To prevent any mem leak, we should have a fixed size dedup map, keyed by messages. Then we could add a counter to silenced error objects.
+
+Or any better idea. The main point is doing as less as possible here :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-03T07:53:40Z
+
+For the record, I made some comparisons for runtimes silenced errors:
+
+- 1 vs 1 000 warnings: https://blackfire.io/profiles/compare/16a69caa-8004-42d7-beb8-066ae4f1c1a1/graph
+- 1 vs 10 000 warnings: https://blackfire.io/profiles/compare/0d4e2718-1a16-4385-a989-3e427c5e539d/graph
+
+So indeed, dedup silenced notices based on their type, file, line and message looks like a good tradeoff to me.
+Hence, I added a cache for `SilencedErrorContext` instances in the `ErrorHandler`. This change looks enough to me to get satisfying results for silenced errors:
+
+- 1 000 warnings vs 1 000 warnings with cache: https://blackfire.io/profiles/compare/35872a18-2815-4aab-b9e3-245a7d0f0402/graph
+- 10 000 warnings vs 10 000 warnings with cache: https://blackfire.io/profiles/compare/fae60ef6-f17d-44c5-8f43-05b3b8af70a1/graph
+- 1 vs 10 000 warnings with cache: https://blackfire.io/profiles/compare/d9c9ba87-af73-4243-ac9e-e02dbcd0a1bf/graph
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-03T09:11:34Z
+
+Here is one more (unfinished) step:
+```diff
+--- a/src/Symfony/Component/Debug/ErrorHandler.php
++++ b/src/Symfony/Component/Debug/ErrorHandler.php
+@@ -408,13 +408,17 @@ class ErrorHandler
+             $errorAsException = self::$toStringException;
+             self::$toStringException = null;
+         } elseif (!$throw && !($type & $level)) {
+-            $cacheKey = md5("$type/$line/$file\0$message", true);
+-            if (isset(self::$silencedErrorCache[$cacheKey])) {
+-                $errorAsException = self::$silencedErrorCache[$cacheKey];
+-            } else {
+-                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $type, $file, $line, false) : array();
+-                $errorAsException = self::$silencedErrorCache[$cacheKey] = new SilencedErrorContext($type, $file, $line, $lightTrace);
++            if (isset(self::$silencedErrorCache[$message])) {
++                self::$silencedErrorCache[$message]->count += 1;
++
++                return;
++            }
++
++            if (100 < count(self::$silencedErrorCache)) {
++                self::$silencedErrorCache = array();
+             }
++            $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $type, $file, $line, false) : array();
++            $errorAsException = self::$silencedErrorCache[$message] = new SilencedErrorContext($type, $file, $line, $lightTrace);
+         } else {
+             if ($scope) {
+                 $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-03T09:29:34Z
+
+Is just using `$message` over `md5("$type/$line/$file\0$message", true)` done on purpose? That does not seem enough to me. A same error can happen from multiple files. We only want to dedup same code paths triggering the same error, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-03T09:41:26Z
+
+md5 removal is on purpose, that's a "heavy" call.
+I propose using only $message because it removes any need for computation - even string hashing would be unnecessary to do the isset check. I agree that in theory this can be too aggressive, but I doubt this will make any practical difference (but the perf optim.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-03T09:50:42Z
+
+Better?
+```diff
+--- a/src/Symfony/Component/Debug/ErrorHandler.php
++++ b/src/Symfony/Component/Debug/ErrorHandler.php
+@@ -408,13 +408,17 @@ class ErrorHandler
+             $errorAsException = self::$toStringException;
+             self::$toStringException = null;
+         } elseif (!$throw && !($type & $level)) {
+-            $cacheKey = md5("$type/$line/$file\0$message", true);
+-            if (isset(self::$silencedErrorCache[$cacheKey])) {
+-                $errorAsException = self::$silencedErrorCache[$cacheKey];
+-            } else {
+-                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $type, $file, $line, false) : array();
+-                $errorAsException = self::$silencedErrorCache[$cacheKey] = new SilencedErrorContext($type, $file, $line, $lightTrace);
++            if (100 < ++self::$silencedErrorCounter)) {
++                self::$silencedErrorCache = array();
++                self::$silencedErrorCounter = 1;
++            } elseif (isset(self::$silencedErrorCache[$message])) {
++                self::$silencedErrorCache[$message]->count += 1;
++
++                return;
+             }
++            $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $type, $file, $line, false) : array();
++            $errorAsException = self::$silencedErrorCache[$message] = new SilencedErrorContext($type, $file, $line, $lightTrace);
+         } else {
+             if ($scope) {
+                 $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
+```

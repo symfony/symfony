@@ -140,6 +140,8 @@ class Workflow
 
             $this->markingStore->setMarking($subject, $marking);
 
+            $this->entered($subject, $transition, $marking);
+
             $this->announce($subject, $transition, $marking);
         }
 
@@ -271,6 +273,22 @@ class Workflow
 
         foreach ($places as $place) {
             $marking->mark($place);
+        }
+    }
+
+    private function entered($subject, Transition $transition, Marking $marking)
+    {
+        if (null === $this->dispatcher) {
+            return;
+        }
+
+        $event = new Event($subject, $marking, $transition);
+
+        $this->dispatcher->dispatch('workflow.entered', $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.entered', $this->name), $event);
+
+        foreach ($transition->getTos() as $place) {
+            $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
         }
     }
 

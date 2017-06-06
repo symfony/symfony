@@ -73,14 +73,14 @@ class ControllerNameParser
             throw new \InvalidArgumentException($message, 0, $e);
         }
 
-        foreach ($allBundles as $b) {
-            $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
-            if (class_exists($try)) {
-                return $try.'::'.$action.'Action';
+        foreach ($allBundles as $bundle) {
+            $controllerName = $bundle->getNamespace().'\\Controller\\'.$controller.'Controller';
+            if (class_exists($controllerName)) {
+                return $controllerName.'::'.$action.'Action';
             }
 
-            $bundles[] = $b->getName();
-            $msg = sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundle, $controller, $action, $try);
+            $bundles[] = $bundle->getName();
+            $msg = sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundle, $controller, $action, $controllerName);
         }
 
         if (count($bundles) > 1) {

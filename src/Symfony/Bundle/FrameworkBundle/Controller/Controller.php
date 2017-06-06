@@ -192,8 +192,11 @@ abstract class Controller implements ContainerAwareInterface
     {
         if (!$this->isGranted($attributes, $object)) {
             $exception = $this->createAccessDeniedException($message);
-            $exception->setAttributes($attributes);
-            $exception->setSubject($object);
+
+            if ($exception instanceof AccessDeniedException) {
+                $exception->setAttributes($attributes);
+                $exception->setSubject($object);
+            }
 
             throw $exception;
         }

@@ -336,7 +336,7 @@ class PhpDumperTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
-     * @expectedExceptionMessage Incompatible use of dynamic environment variables "FOO" found in parameters.
+     * @expectedExceptionMessage Environment variables "FOO" are never used. Please, check your container's configuration.
      */
     public function testUnusedEnvParameter()
     {

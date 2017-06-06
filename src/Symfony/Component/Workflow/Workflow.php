@@ -186,19 +186,25 @@ class Workflow
         return $this->definition;
     }
 
+    /**
+     * Check if this marking has at least one place in the froms transition.
+     * Check also if the transition is guarded for this marking.
+     *
+     * @param object     $subject
+     * @param Marking    $marking
+     * @param Transition $transition
+     *
+     * @return bool
+     */
     private function doCan($subject, Marking $marking, Transition $transition)
     {
         foreach ($transition->getFroms() as $place) {
-            if (!$marking->has($place)) {
-                return false;
+            if ($marking->has($place) && true !== $this->guardTransition($subject, $marking, $transition)) {
+                return true;
             }
         }
 
-        if (true === $this->guardTransition($subject, $marking, $transition)) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     /**

@@ -130,7 +130,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     }
 
     /**
-     * Generates path part of URL, based on the given path, absolute URL or route
+     * Generates path part of URL, based on the given path, absolute URL or route.
      *
      * @param Request $request A Request instance
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))

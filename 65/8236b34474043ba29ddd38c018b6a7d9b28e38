@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by alOneh at 2017-06-05T20:11:08Z
+
+I do the same fix, too late... ;)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-06-05T20:24:01Z
+
+The [test needs to be completed](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bridge/Twig/Tests/NodeVisitor/TranslationDefaultDomainNodeVisitorTest.php).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-06-06T02:18:30Z
+
+Was this the only file that had an issue? It's the only one that caused issues for me, but I wasn't sure if possibly some bad find/replace caused issues in other files.
+
+And yea... it's not technically needed, but it would be awesome if the test was extended to catch this - it's surprising to see an error like this not caught by a test.
+
+And mostly, thanks for the fast PR :)

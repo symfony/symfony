@@ -124,7 +124,13 @@ class FormFactory implements FormFactoryInterface
 
         // user options may override guessed options
         if ($typeGuess) {
-            $options = array_merge($typeGuess->getOptions(), $options);
+            $attrs = array();
+            $typeGuessOptions = $typeGuess->getOptions();
+            if (isset($typeGuessOptions['attr']) && isset($options['attr'])) {
+                $attrs = array('attr' => array_merge($typeGuessOptions['attr'], $options['attr']));
+            }
+
+            $options = array_merge($typeGuessOptions, $options, $attrs);
         }
 
         return $this->createNamedBuilder($property, $type, $data, $options);

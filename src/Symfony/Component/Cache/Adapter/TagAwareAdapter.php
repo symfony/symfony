@@ -281,7 +281,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface
 
         foreach ($items as $key => $item) {
             if (!$tagKeys) {
-                yield $key => $f($item, self::TAGS_PREFIX.$key, $itemTags);
+                yield $key => $f($item, static::TAGS_PREFIX.$key, $itemTags);
                 continue;
             }
             if (!isset($tagKeys[$key])) {
@@ -306,7 +306,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface
                 $tagVersions = $tagKeys = null;
 
                 foreach ($bufferedItems as $key => $item) {
-                    yield $key => $f($item, self::TAGS_PREFIX.$key, $itemTags);
+                    yield $key => $f($item, static::TAGS_PREFIX.$key, $itemTags);
                 }
                 $bufferedItems = null;
             }

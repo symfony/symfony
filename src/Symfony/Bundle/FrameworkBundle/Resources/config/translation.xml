@@ -123,8 +123,9 @@
         <service id="translation.writer" class="Symfony\Component\Translation\Writer\TranslationWriter" public="true" />
 
         <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
-            <argument type="service" id="service_container" />
+            <tag name="container.service_subscriber" id="translator" />
             <tag name="kernel.cache_warmer" />
+            <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
 
         <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener" public="true">

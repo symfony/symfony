@@ -568,7 +568,7 @@ class Request
      * You should only list the reverse proxies that you manage directly.
      *
      * @param array $proxies          A list of trusted proxies
-     * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, usually either Request::HEADER_FORWARDED or Request::HEADER_X_FORWARDED_ALL, to set which headers to trust from your proxies
+     * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, to set which headers to trust from your proxies
      *
      * @throws \InvalidArgumentException When $trustedHeaderSet is invalid
      */
@@ -577,10 +577,11 @@ class Request
         self::$trustedProxies = $proxies;
 
         if (2 > func_num_args()) {
-            // @deprecated code path in 3.3, to be replaced by mandatory argument in 4.0.
-            throw new \InvalidArgumentException(sprintf('The %s() method expects a bit field of Request::HEADER_* as second argument. Defining it is required since version 3.3. See http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info.', __METHOD__));
+            @trigger_error(sprintf('The %s() method expects a bit field of Request::HEADER_* as second argument since version 3.3. Defining it will be required in 4.0. ', __METHOD__), E_USER_DEPRECATED);
+
+            return;
         }
-        $trustedHeaderSet = func_get_arg(1);
+        $trustedHeaderSet = (int) func_get_arg(1);
 
         foreach (self::$trustedHeaderNames as $header => $name) {
             self::$trustedHeaders[$header] = $header & $trustedHeaderSet ? $name : null;
@@ -652,11 +653,11 @@ class Request
      *
      * @throws \InvalidArgumentException
      *
-     * @deprecated since version 3.3, to be removed in 4.0. Use "X-Forwarded-*" headers or the "Forwarded" header defined in RFC7239, and the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.
+     * @deprecated since version 3.3, to be removed in 4.0. Use the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.
      */
     public static function setTrustedHeaderName($key, $value)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.3 and will be removed in 4.0. Use "X-Forwarded-*" headers or the "Forwarded" header defined in RFC7239, and the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.3 and will be removed in 4.0. Use the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         if (!array_key_exists($key, self::$trustedHeaders)) {
             throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for key "%s".', $key));
@@ -666,6 +667,9 @@ class Request
 
         if (null !== $value) {
             self::$trustedHeaderNames[$key] = $value;
+            self::$trustedHeaderSet |= $key;
+        } else {
+            self::$trustedHeaderSet &= ~$key;
         }
     }
 
@@ -873,8 +877,8 @@ class Request
      * adding the IP address where it received the request from.
      *
      * If your reverse proxy uses a different header name than "X-Forwarded-For",
-     * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
-     * the "client-ip" key.
+     * ("Client-Ip" for instance), configure it via the $trustedHeaderSet
+     * argument of the Request::setTrustedProxies() method instead.
      *
      * @return string|null The client IP address
      *
@@ -980,7 +984,8 @@ class Request
      * The "X-Forwarded-Port" header must contain the client port.
      *
      * If your reverse proxy uses a different header name than "X-Forwarded-Port",
-     * configure it via "setTrustedHeaderName()" with the "client-port" key.
+     * configure it via via the $trustedHeaderSet argument of the
+     * Request::setTrustedProxies() method instead.
      *
      * @return int|string can be a string if fetched from the server bag
      */
@@ -1197,8 +1202,8 @@ class Request
      * The "X-Forwarded-Proto" header must contain the protocol: "https" or "http".
      *
      * If your reverse proxy uses a different header name than "X-Forwarded-Proto"
-     * ("SSL_HTTPS" for instance), configure it via "setTrustedHeaderName()" with
-     * the "client-proto" key.
+     * ("SSL_HTTPS" for instance), configure it via the $trustedHeaderSet
+     * argument of the Request::setTrustedProxies() method instead.
      *
      * @return bool
      */
@@ -1222,7 +1227,8 @@ class Request
      * The "X-Forwarded-Host" header must contain the client host name.
      *
      * If your reverse proxy uses a different header name than "X-Forwarded-Host",
-     * configure it via "setTrustedHeaderName()" with the "client-host" key.
+     * configure it via the $trustedHeaderSet argument of the
+     * Request::setTrustedProxies() method instead.
      *
      * @return string
      *

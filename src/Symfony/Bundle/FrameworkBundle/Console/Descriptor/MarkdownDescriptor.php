@@ -345,8 +345,7 @@ class MarkdownDescriptor extends Descriptor
         }
 
         if ($callable instanceof \Closure) {
-            $formatted = $this->formatClosure($callable);
-            $string .= "\n- Type: `$formatted`";
+            $string .= "\n- Type: `closure`";
 
             return $this->write($string."\n");
         }

@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Ldap\LdapClientInterface;
 use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Security\Core\User\LdapUserProvider;
 
 /**
  * LdapBindAuthenticationProvider authenticates a user against an LDAP server.
@@ -78,9 +79,22 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         }
 
         try {
-            $username = $this->ldap->escape($username, '', LDAP_ESCAPE_DN);
-            $dn = str_replace('{username}', $username, $this->dnString);
-
+			
+			$username = $this->ldap->escape($username, '', LDAP_ESCAPE_DN);
+			$dn = str_replace('{username}', $username, $this->dnString);
+			
+			if($this->ldap->ldapBaseDn && $this->ldap->ldapSearchDn){
+				if($this->userProvider instanceof LdapUserProvider) {
+					$ldapUser = $this->userProvider->getUser($dn);
+				}
+				else{
+					$ldapUserProvider = new LdapUserProvider($this->ldap, $this->ldap->ldapBaseDn, $this->ldap->ldapSearchDn, $this->ldap->ldapSearchPassword, array(), $this->ldap->ldapUidKey, $this->ldap->ldapFilter);
+					$ldapUser = $ldapUserProvider->getUser($dn);
+					if(count($ldapUser)){
+						$dn = $ldapUser['dn'];
+					}
+				}
+			}
             $this->ldap->bind($dn, $password);
         } catch (ConnectionException $e) {
             throw new BadCredentialsException('The presented password is invalid.');

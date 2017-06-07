@@ -41,7 +41,7 @@ class LdapClient implements LdapClientInterface
      * @param bool   $useStartTls
      * @param bool   $optReferrals
      */
-    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false)
+    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false, $ldapBaseDn = null, $ldapSearchDn = null, $ldapSearchPassword = null, $ldapUidKey = null, $ldapFilter = null)
     {
         if (!extension_loaded('ldap')) {
             throw new LdapException('The ldap module is needed.');
@@ -53,6 +53,11 @@ class LdapClient implements LdapClientInterface
         $this->useSsl = (bool) $useSsl;
         $this->useStartTls = (bool) $useStartTls;
         $this->optReferrals = (bool) $optReferrals;
+		$this->ldapBaseDn = $ldapBaseDn;
+		$this->ldapSearchDn = $ldapSearchDn;
+		$this->ldapSearchPassword = $ldapSearchPassword;
+		$this->ldapUidKey = $ldapUidKey;
+		$this->ldapFilter = $ldapFilter;
     }
 
     public function __destruct()
@@ -68,7 +73,7 @@ class LdapClient implements LdapClientInterface
         if (!$this->connection) {
             $this->connect();
         }
-
+		
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             throw new ConnectionException(ldap_error($this->connection));
         }

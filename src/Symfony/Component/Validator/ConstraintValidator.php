@@ -170,7 +170,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
             return 'array';
         }
 
-        if (is_string($value)) {
+        if (is_string($value) && trim($value, '"') === $value) {
             return '"'.$value.'"';
         }
 

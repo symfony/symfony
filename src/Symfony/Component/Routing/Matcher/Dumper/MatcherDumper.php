@@ -32,6 +32,13 @@ abstract class MatcherDumper implements MatcherDumperInterface
      */
     public function __construct(RouteCollection $routes)
     {
+        trigger_error(
+            'The Symfony\Component\Routing\Matcher\Dumper\MatcherDumper is deprecated '.
+            'since it\'s hard to replicate the behaviour of the PHP implementation and '.
+            'the performance gains are minimal.',
+            E_USER_DEPRECATED
+        );
+
         $this->routes = $routes;
     }
 

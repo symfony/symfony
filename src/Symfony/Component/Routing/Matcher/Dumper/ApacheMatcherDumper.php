@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 @trigger_error('The '.__NAMESPACE__.'\ApacheMatcherDumper class is deprecated since version 2.5 and will be removed in 3.0. It\'s hard to replicate the behaviour of the PHP implementation and the performance gains are minimal.', E_USER_DEPRECATED);
 
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Dumps a set of Apache mod_rewrite rules.
@@ -27,6 +28,20 @@ use Symfony\Component\Routing\Route;
  */
 class ApacheMatcherDumper extends MatcherDumper
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(RouteCollection $routes)
+    {
+        trigger_error(
+            'The Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper is deprecated '.
+            'since it\'s hard to replicate the behaviour of the PHP implementation and '.
+            'the performance gains are minimal.',
+            E_USER_DEPRECATED
+        );
+        parent::__construct($routes);
+    }
+
     /**
      * Dumps a set of Apache mod_rewrite rules.
      *

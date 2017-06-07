@@ -112,7 +112,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             return $this->fallbackCatalogue->get($id, $domain);
         }
 
-        return $id;
+        return $domain . ':' . $id;
     }
 
     /**

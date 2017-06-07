@@ -100,6 +100,10 @@ EOF;
     {
         $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
 
+        if ('' === $code && class_exists('Symfony\Bundle\FrameworkBundle\Controller\WelcomeController')) {
+            $code = "        return array (  '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\WelcomeController',  '_route' => 'welcome',);";
+        }
+
         return <<<EOF
     public function match(\$pathinfo)
     {

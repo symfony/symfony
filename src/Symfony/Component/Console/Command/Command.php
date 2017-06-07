@@ -301,6 +301,19 @@ class Command
     public function mergeApplicationDefinition($mergeArgs = true)
     {
         if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
+            if (!$mergeArgs && $this->applicationDefinitionMergedWithArgs) {
+                $commandArgs = array_udiff(
+                    $this->definition->getArguments(),
+                    $this->application->getDefinition()->getArguments(),
+                    function ($arg1, $arg2) {
+                        return strcmp($arg1->getName(), $arg2->getName());
+                    }
+                );
+
+                $this->definition->setArguments($commandArgs);
+                $this->applicationDefinitionMergedWithArgs = false;
+            }
+
             return;
         }
 

@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class Container extends AbstractContainer
 {
-    private $parameters;
-    private $targetDirs = array();
 
     /**
      * Constructor.

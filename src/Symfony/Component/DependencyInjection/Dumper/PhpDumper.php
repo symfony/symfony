@@ -151,7 +151,7 @@ class PhpDumper extends Dumper
 
         $code .=
             $this->addServices().
-            $this->addDefaultParametersMethod().
+            $this->addParametersMethods().
             $this->endClass().
             $this->addProxyClasses()
         ;
@@ -829,6 +829,14 @@ EOF;
         $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
         $namespaceLine = $namespace ? "\nnamespace $namespace;\n" : '';
 
+        // Inject the parameters as a static property so OPcache can optimize it for speed and memory
+        if ($this->container->getParameterBag()->all()) {
+            $parametersArray = $this->exportParameters($this->container->getParameterBag()->all());
+            $parameters = "\n    private static \$parameters = $parametersArray;";
+        } else {
+            $parameters = '';
+        }
+
         return <<<EOF
 <?php
 $namespaceLine
@@ -847,9 +855,7 @@ $bagClass
  * by the Symfony Dependency Injection Component.
  */
 class $class extends $baseClass
-{
-    private \$parameters;
-    private \$targetDirs = array();
+{{$parameters}
 
 EOF;
     }
@@ -861,8 +867,7 @@ EOF;
      */
     private function addConstructor()
     {
-        $targetDirs = $this->exportTargetDirs();
-        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
+        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag(self::$parameters)' : null;
 
         $code = <<<EOF
 
@@ -870,7 +875,7 @@ EOF;
      * Constructor.
      */
     public function __construct()
-    {{$targetDirs}
+    {
         parent::__construct($arguments);
 
 EOF;
@@ -899,20 +904,14 @@ EOF;
      */
     private function addFrozenConstructor()
     {
-        $targetDirs = $this->exportTargetDirs();
-
         $code = <<<EOF
 
     /*{$this->docStar}
      * Constructor.
      */
     public function __construct()
-    {{$targetDirs}
+    {
 EOF;
-
-        if ($this->container->getParameterBag()->all()) {
-            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
-        }
 
         $code .= <<<'EOF'
 
@@ -1030,13 +1029,11 @@ EOF;
      *
      * @return string
      */
-    private function addDefaultParametersMethod()
+    private function addParametersMethods()
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
         }
-
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
 
         $code = '';
         if ($this->container->isFrozen()) {
@@ -1049,11 +1046,11 @@ EOF;
     {
         $name = strtolower($name);
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
+        if (!(isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
-        return $this->parameters[$name];
+        return self::$parameters[$name];
     }
 
     /**
@@ -1063,7 +1060,7 @@ EOF;
     {
         $name = strtolower($name);
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
+        return isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters);
     }
 
     /**
@@ -1080,7 +1077,7 @@ EOF;
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag($this->parameters);
+            $this->parameterBag = new FrozenParameterBag(self::$parameters);
         }
 
         return $this->parameterBag;
@@ -1091,20 +1088,6 @@ EOF;
                 $code = str_replace('/**', '/*', $code);
             }
         }
-
-        $code .= <<<EOF
-
-    /*{$this->docStar}
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return $parameters;
-    }
-
-EOF;
 
         return $code;
     }
@@ -1578,17 +1561,6 @@ EOF;
         return $this->expressionLanguage;
     }
 
-    private function exportTargetDirs()
-    {
-        return null === $this->targetDirRegex ? '' : <<<EOF
-
-        \$dir = __DIR__;
-        for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
-            \$this->targetDirs[\$i] = \$dir = dirname(\$dir);
-        }
-EOF;
-    }
-
     private function export($value)
     {
         if (null !== $this->targetDirRegex && is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
@@ -1597,8 +1569,9 @@ EOF;
             $suffix = isset($value[$suffix]) ? '.'.var_export(substr($value, $suffix), true) : '';
             $dirname = '__DIR__';
 
-            if (0 < $offset = 1 + $this->targetDirMaxMatches - count($matches)) {
-                $dirname = sprintf('$this->targetDirs[%d]', $offset);
+            if (0 < $pathDepth = 1 + $this->targetDirMaxMatches - count($matches)) {
+                // Using __DIR__ and ../ makes this an immutable array which opcache can optimize
+                $dirname = "__DIR__.'".str_repeat('/..', $pathDepth)."'";
             }
 
             if ($prefix || $suffix) {

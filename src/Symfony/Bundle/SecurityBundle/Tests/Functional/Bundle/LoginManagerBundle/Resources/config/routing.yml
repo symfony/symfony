@@ -1,0 +1,13 @@
+login:
+    path:     /login
+    defaults: { _controller: LoginManagerBundle:Login:login }
+
+login_check:
+    path:     /login_check
+    defaults: { _controller: LoginManagerBundle:Login:loginCheck }
+
+secured_index:
+    path:     /secured/index
+    defaults: { _controller: LoginManagerBundle:Secured:index }
+
+

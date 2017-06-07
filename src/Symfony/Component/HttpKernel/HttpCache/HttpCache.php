@@ -196,23 +196,24 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             }
         }
 
-        $path = $request->getPathInfo();
-        if ($qs = $request->getQueryString()) {
-            $path .= '?'.$qs;
-        }
-        $this->traces[$request->getMethod().' '.$path] = array();
+        $this->traces[$this->getTraceKey($request)] = array();
 
         if (!$request->isMethodSafe(false)) {
             $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect') || !$request->isMethodCacheable()) {
             $response = $this->pass($request, $catch);
+        } elseif ($this->options['allow_reload'] && $request->isNoCache()) {
+            /*
+                If allow_reload is configured and the client requests "Cache-Control: no-cache",
+                reload the cache by fetching a fresh response and caching it (if possible).
+            */
+            $this->record($request, 'reload');
+            $response = $this->fetch($request, $catch);
         } else {
             $response = $this->lookup($request, $catch);
         }
 
         $this->restoreResponseBody($request, $response);
-
-        $response->setDate(\DateTime::createFromFormat('U', time(), new \DateTimeZone('UTC')));
 
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
@@ -319,13 +320,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function lookup(Request $request, $catch = false)
     {
-        // if allow_reload and no-cache Cache-Control, allow a cache reload
-        if ($this->options['allow_reload'] && $request->isNoCache()) {
-            $this->record($request, 'reload');
-
-            return $this->fetch($request, $catch);
-        }
-
         try {
             $entry = $this->store->lookup($request);
         } catch (\Exception $e) {
@@ -423,9 +417,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Forwards the Request to the backend and determines whether the response should be stored.
-     *
-     * This methods is triggered when the cache missed or a reload is required.
+     * Unconditionally fetches a fresh response from the backend and
+     * stores it in the cache if is cacheable.
      *
      * @param Request $request A Request instance
      * @param bool    $catch   whether to process exceptions
@@ -456,6 +449,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * Forwards the Request to the backend and returns the Response.
+     *
+     * All backend requests (cache passes, fetches, cache validations)
+     * run through this method.
      *
      * @param Request  $request A Request instance
      * @param bool     $catch   Whether to catch exceptions or not
@@ -502,6 +498,17 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
                 return $entry;
             }
+        }
+
+        /*
+            RFC 7231 Sect. 7.1.1.2 says that a server that does not have a reasonably accurate
+            clock MUST NOT send a "Date" header, although it MUST send one in most other cases
+            except for 1xx or 5xx responses where it MAY do so.
+
+            Anyway, a client that received a message without a "Date" header MUST add it.
+        */
+        if (!$response->headers->has('Date')) {
+            $response->setDate(\DateTime::createFromFormat('U', time()));
         }
 
         $this->processResponseBody($request, $response);
@@ -604,9 +611,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function store(Request $request, Response $response)
     {
-        if (!$response->headers->has('Date')) {
-            $response->setDate(\DateTime::createFromFormat('U', time()));
-        }
         try {
             $this->store->write($request, $response);
 
@@ -704,10 +708,23 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     private function record(Request $request, $event)
     {
+        $this->traces[$this->getTraceKey($request)][] = $event;
+    }
+
+    /**
+     * Calculates the key we use in the "trace" array for a given request.
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    private function getTraceKey(Request $request)
+    {
         $path = $request->getPathInfo();
         if ($qs = $request->getQueryString()) {
             $path .= '?'.$qs;
         }
-        $this->traces[$request->getMethod().' '.$path][] = $event;
+
+        return $request->getMethod().' '.$path;
     }
 }

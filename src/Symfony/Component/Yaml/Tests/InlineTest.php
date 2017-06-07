@@ -247,6 +247,8 @@ class InlineTest extends TestCase
             array('{\'foo\': \'bar\', "bar": \'foo: bar\'}', array('foo' => 'bar', 'bar' => 'foo: bar')),
             array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', array('foo\'' => 'bar', 'bar"' => 'foo: bar')),
             array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', array('foo: ' => 'bar', 'bar: ' => 'foo: bar')),
+            array('{foo:bar: "baz"}', array('foo:bar' => 'baz')),
+            array('{foo:bar:baz}', array('foo' => 'bar:baz')),
 
             // nested sequences and mappings
             array('[foo, [bar, foo]]', array('foo', array('bar', 'foo'))),

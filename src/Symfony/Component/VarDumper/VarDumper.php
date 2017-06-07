@@ -25,7 +25,7 @@ class VarDumper
 {
     private static $handler;
 
-    public static function dump($var)
+    public static function dump($var = 'NO ARGUMENTS PASSED')
     {
         if (null === self::$handler) {
             $cloner = new VarCloner();

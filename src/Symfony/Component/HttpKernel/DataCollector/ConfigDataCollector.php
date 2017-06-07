@@ -70,7 +70,7 @@ class ConfigDataCollector extends DataCollector
             'php_version' => PHP_VERSION,
             'xdebug_enabled' => extension_loaded('xdebug'),
             'eaccel_enabled' => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
-            'apc_enabled' => extension_loaded('apc') && ini_get('apc.enabled'),
+            'apc_enabled' => (extension_loaded('apc') || extension_loaded('apcu'))  && ini_get('apc.enabled'),
             'xcache_enabled' => extension_loaded('xcache') && ini_get('xcache.cacher'),
             'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
             'zend_opcache_enabled' => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),

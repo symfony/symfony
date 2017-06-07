@@ -46,7 +46,7 @@ class ConfigDataCollectorTest extends TestCase
         // if else clause because we don't know it
         if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
                 ||
-                (extension_loaded('apc') && ini_get('apc.enabled'))
+                ((extension_loaded('apc') || extension_loaded('apcu')) && ini_get('apc.enabled'))
                 ||
                 (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
                 ||

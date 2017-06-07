@@ -53,7 +53,7 @@ class Interval
 
         if ($matches[1]) {
             foreach (explode(',', $matches[2]) as $n) {
-                if ($number == $n) {
+                if ($number == self::convertNumber($n)) {
                     return true;
                 }
             }

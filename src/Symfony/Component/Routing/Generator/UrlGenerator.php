@@ -268,7 +268,13 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             return $a == $b ? 0 : 1;
         });
 
-        if ($extra && $query = http_build_query($extra, '', '&')) {
+        if (defined('PHP_QUERY_RFC3986')) {
+            $query = http_build_query($extra, '', '&', PHP_QUERY_RFC3986);
+        } else {
+            $query = http_build_query($extra, '', '&');
+        }
+
+        if ($extra && $query) {
             // "/" and "?" can be left decoded for better user experience, see
             // http://tools.ietf.org/html/rfc3986#section-3.4
             $url .= '?'.strtr($query, array('%2F' => '/'));

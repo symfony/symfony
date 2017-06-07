@@ -47,6 +47,13 @@ interface StyleInterface
     public function text($message);
 
     /**
+     * Formats a comment result bar.
+     *
+     * @param string|array $message
+     */
+    public function comment($message);
+
+    /**
      * Formats a success result bar.
      *
      * @param string|array $message

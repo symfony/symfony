@@ -111,7 +111,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
         $finder = new Finder();
 
         foreach ($finder->files()->followLinks()->in($dir) as $file) {
-            $name = $file->getRelativePathname();
+            $name = str_replace('\\', '/', $file->getRelativePathname());
             $templates[] = new TemplateReference(
                 $namespace ? sprintf('@%s/%s', $namespace, $name) : $name,
                 'twig'

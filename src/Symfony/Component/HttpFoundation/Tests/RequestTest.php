@@ -1133,6 +1133,16 @@ class RequestTest extends TestCase
         $this->disableHttpMethodParameterOverride();
     }
 
+    public function testQueryStringIsRemovedFromRequestUriIfNoRequestPathIsGiven()
+    {
+        $_SERVER['QUERY_STRING'] = 'a=b';
+        $_SERVER['REQUEST_URI'] = '?a=b';
+
+        $request = Request::createFromGlobals();
+
+        $this->assertSame('/', $request->getPathInfo());
+    }
+
     public function testOverrideGlobals()
     {
         $request = new Request();

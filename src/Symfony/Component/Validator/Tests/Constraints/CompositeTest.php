@@ -145,4 +145,19 @@ class CompositeTest extends TestCase
             new Valid(),
         ));
     }
+
+    public function testDefaultGroupIsEquivalentToImplicitGroup()
+    {
+        $constraint = new ConcreteComposite(array(
+            new NotNull(array('groups' => 'ImplicitGroup')),
+            new NotBlank(array('groups' => array('Strict', 'ImplicitGroup'))),
+        ));
+
+        $constraint->addImplicitGroupName('ImplicitGroup');
+
+        $this->assertEquals(array('ImplicitGroup', 'Strict', 'Default'), $constraint->groups);
+        $this->assertEquals(array('ImplicitGroup', 'Default'), $constraint->constraints[0]->groups);
+        $this->assertEquals(array('Strict', 'ImplicitGroup', 'Default'), $constraint->constraints[1]->groups);
+    }
+
 }

@@ -132,12 +132,13 @@ class ExprBuilderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Invalid configuration for path "test.key": Invalid value "value"
      */
     public function testThenInvalid()
     {
         $test = $this->getTestBuilder()
             ->ifString()
-            ->thenInvalid('Invalid value')
+            ->thenInvalid('Invalid value "%s"')
         ->end();
         $this->finalizeTestBuilder($test);
     }

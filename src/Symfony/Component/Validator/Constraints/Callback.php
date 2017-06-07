@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+trigger_error('The property "methods" is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\Constraint;
 
 /**

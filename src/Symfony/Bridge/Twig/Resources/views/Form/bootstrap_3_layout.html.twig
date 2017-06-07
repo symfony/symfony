@@ -4,7 +4,7 @@
 
 {% block form_widget_simple -%}
     {% if type is not defined or type not in ['file', 'hidden'] %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('form-control'))|trim}) -%}
     {% endif %}
     {{- parent() -}}
 {%- endblock form_widget_simple %}

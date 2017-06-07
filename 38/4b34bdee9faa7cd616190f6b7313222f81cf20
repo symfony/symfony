@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by Gregoire-M at 2017-05-12T12:02:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-12T12:17:24Z
+
+I don't think the failing test on Travis is related to this changeset in any way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-15T07:31:23Z
+
+I don't think it's a good idea to allow this kind of global configuration. All instances will be impacted by this overriding.
+Instead, what about turning these into regular properties?
+This should be done on master as a new feature btw.
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-15T08:03:33Z
+
+Fair enough! I'll be working on this.
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-15T10:52:15Z
+
+@nicolas-grekas Does this look good to you? I left the static properties untouched (apart from their name) because they are referenced in `PhpDocExtractor`.
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-16T12:26:52Z
+
+@nicolas-grekas @dunglas Is that better?
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-16T14:39:14Z
+
+@nicolas-grekas There you go ;)
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-16T15:11:54Z
+
+Once again, the CI results are beyond me.
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-22T07:58:07Z
+
+@nicolas-grekas @dunglas Just fixed conflicts that occurred since the last merges on `master`. May I request a moment of your time to review this changeset for what I reckon will be the last time? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T08:29:58Z
+
+this should be rebased on 3.4 in fact (I already changed the base branch)
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-22T09:20:50Z
+
+@nicolas-grekas Alright, done!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-27T07:31:15Z
+
+`PhpDocExtractor` tests should probably be updated too.
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-29T08:19:40Z
+
+@xabbuh Thanks for the feedback, I took it into account.
+@nicolas-grekas @dunglas Anything left to do in your opinion?
+
+---------------------------------------------------------------------------
+
+by neemzy at 2017-05-31T07:30:19Z
+
+@dunglas Is that OK for you? :)

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -52,6 +53,10 @@ class Router extends BaseRouter implements WarmableInterface
     {
         if (null === $this->collection) {
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
+
+            $containerClassPath = sprintf('%s/%s.php', $this->container->getParameter('kernel.cache_dir'), $this->container->getParameter('kernel.container_class'));
+            $this->collection->addResource(new FileResource($containerClassPath));
+
             $this->resolveParameters($this->collection);
         }
 

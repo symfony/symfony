@@ -95,38 +95,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * Grants access if any voter returns an affirmative response.
-     *
-     * If all voters abstained from voting, the decision will be based on the
-     * allowIfAllAbstainDecisions property value (defaults to false).
-     */
-    private function decideAffirmative(TokenInterface $token, array $attributes, $object = null)
-    {
-        $deny = 0;
-        foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
-            switch ($result) {
-                case VoterInterface::ACCESS_GRANTED:
-                    return true;
-
-                case VoterInterface::ACCESS_DENIED:
-                    ++$deny;
-
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        if ($deny > 0) {
-            return false;
-        }
-
-        return $this->allowIfAllAbstainDecisions;
-    }
-
-    /**
      * Grants access if there is consensus of granted against denied responses.
      *
      * Consensus means majority-rule (ignoring abstains) rather than unanimous

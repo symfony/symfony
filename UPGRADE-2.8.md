@@ -511,6 +511,9 @@ FrameworkBundle
        session:
            cookie_httponly: false
    ```
+ 
+ * The ability to pass a `LoggerInterface` instance as the second argument of the `DelegatingLoader` 
+   constructor was deprecated and will be removed in Symfony 3.0.
 
  * The `validator.mapping.cache.apc` service is deprecated, and will be removed in 3.0.
    Use `validator.mapping.cache.doctrine.apc` instead.

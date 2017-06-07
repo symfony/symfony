@@ -1,0 +1,12 @@
+imports:
+    - { resource: ./config.yml }
+
+security:
+    firewalls:
+        default:
+            form_login:
+                check_path: /login_check
+                default_target_path: /profile
+            anonymous: ~
+            session_concurrency:
+                max_sessions: 1

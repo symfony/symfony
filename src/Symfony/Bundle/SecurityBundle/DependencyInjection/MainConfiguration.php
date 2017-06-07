@@ -88,6 +88,7 @@ class MainConfiguration implements ConfigurationInterface
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
+        $this->addSessionRegistrySection($rootNode);
 
         return $tb;
     }
@@ -298,6 +299,21 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
                 ->end()
             ->end()
+            ->arrayNode('session_expiration')
+                ->canBeUnset()
+                ->children()
+                    ->integerNode('max_idle_time')->defaultValue(ini_get('session.gc_maxlifetime'))->min(1)->end()
+                    ->scalarNode('expiration_url')->defaultNull()->end()
+                ->end()
+            ->end()
+            ->arrayNode('session_concurrency')
+                ->canBeUnset()
+                ->children()
+                    ->integerNode('max_sessions')->min(0)->end()
+                    ->booleanNode('error_if_maximum_exceeded')->defaultTrue()->end()
+                    ->booleanNode('register_new_sessions')->defaultNull()->end()
+                ->end()
+            ->end()
         ;
 
         $abstractFactoryKeys = array();
@@ -435,6 +451,15 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+    }
+
+    private function addSessionRegistrySection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->scalarNode('session_registry_storage')->defaultValue('security.session_registry.storage.file')->end()
             ->end()
         ;
     }

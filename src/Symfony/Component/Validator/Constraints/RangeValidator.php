@@ -59,11 +59,11 @@ class RangeValidator extends ConstraintValidator
         // http://php.net/manual/en/datetime.formats.php
         if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
             if (is_string($min)) {
-                $min = new \DateTime($min);
+                $min = date_create($min);
             }
 
             if (is_string($max)) {
-                $max = new \DateTime($max);
+                $max = date_create($max);
             }
         }
 

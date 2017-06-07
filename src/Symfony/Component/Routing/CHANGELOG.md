@@ -1,6 +1,35 @@
 CHANGELOG
 =========
 
+2.7.22
+-----
+
+ * [BC BREAK] The `AnnotationClassLoader` no longer sets request attributes from method arguments default values.
+   Define these attributes explicitly in the `@Route` annotation instead, as for other configuration formats.
+ 
+   Before:
+   
+   ```php
+    /**
+     * @Route("/hello/{name}", name="hello")
+     */
+    public function indexAction($name = null)
+    {
+        // ...
+    }
+   ```
+   
+   After:
+   ```php
+    /**
+     * @Route("/hello/{name}", name="hello", defaults={"name": null})
+     */
+    public function indexAction($name = null)
+    {
+        // ...
+    }
+   ```
+
 2.5.0
 -----
 

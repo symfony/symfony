@@ -4,6 +4,7 @@ CHANGELOG
 2.8.0
 -----
 
+ * Deprecated the `ContainerAwareCommand` class in favor of the `ContainerAwareTrait`
  * Deprecated the `alias` option of the `form.type_extension` tag in favor of the
    `extended_type`/`extended-type` option
  * Deprecated the `alias` option of the `form.type` tag

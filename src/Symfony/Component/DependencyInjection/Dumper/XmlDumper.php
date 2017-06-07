@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\EnvVariable;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
@@ -375,6 +376,8 @@ class XmlDumper extends Dumper
                 return 'false';
             case $value instanceof Parameter:
                 return '%'.$value.'%';
+            case $value instanceof EnvVariable:
+                return '$'.$value.'$';
             case is_object($value) || is_resource($value):
                 throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
             default:

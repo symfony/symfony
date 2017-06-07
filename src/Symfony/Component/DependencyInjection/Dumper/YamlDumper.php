@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Dumper as YmlDumper;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\EnvVariable;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -274,6 +275,8 @@ class YamlDumper extends Dumper
             return $code;
         } elseif ($value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
+        } elseif ($value instanceof EnvVariable) {
+            return sprintf('$%s$', (string) $value);
         } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif ($value instanceof Expression) {

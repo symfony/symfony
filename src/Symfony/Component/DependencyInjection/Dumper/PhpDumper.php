@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\EnvVariable;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
@@ -1422,6 +1423,8 @@ EOF;
             return $this->getServiceCall((string) $value, $value);
         } elseif ($value instanceof Expression) {
             return $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
+        } elseif ($value instanceof EnvVariable) {
+            return $this->dumpEnvVariable($value);
         } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif (true === $interpolate && is_string($value)) {
@@ -1429,6 +1432,8 @@ EOF;
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter(strtolower($match[1]));
+            } elseif (preg_match('/^\$([^\$]+)\$$/', $value, $match)) {
+                return $this->dumpEnvVariable($match[1]);
             } else {
                 $that = $this;
                 $replaceParameters = function ($match) use ($that) {
@@ -1481,6 +1486,11 @@ EOF;
         }
 
         return sprintf("\$this->getParameter('%s')", strtolower($name));
+    }
+
+    private function dumpEnvVariable($name)
+    {
+        return sprintf("getenv('%s')", $name);
     }
 
     /**

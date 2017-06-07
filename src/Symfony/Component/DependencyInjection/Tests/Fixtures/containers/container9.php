@@ -4,6 +4,7 @@ require_once __DIR__.'/../includes/classes.php';
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\EnvVariable;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -14,7 +15,7 @@ $container
     ->addTag('foo', array('foo' => 'foo'))
     ->addTag('foo', array('bar' => 'bar', 'baz' => 'baz'))
     ->setFactory(array('Bar\\FooClass', 'getInstance'))
-    ->setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))
+    ->setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%', 'foo_env' => new EnvVariable('FOO')), true, new Reference('service_container')))
     ->setProperties(array('foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%')))
     ->addMethodCall('setBar', array(new Reference('bar')))
     ->addMethodCall('initialize')
@@ -27,7 +28,7 @@ $container
 ;
 $container
     ->register('bar', 'Bar\FooClass')
-    ->setArguments(array('foo', new Reference('foo.baz'), new Parameter('foo_bar')))
+    ->setArguments(array('foo', new Reference('foo.baz'), new Parameter('foo_bar'), new EnvVariable('FOO')))
     ->setConfigurator(array(new Reference('foo.baz'), 'configure'))
 ;
 $container

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\EnvVariable;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -136,6 +137,8 @@ class GraphvizDumper extends Dumper
         foreach ($arguments as $argument) {
             if ($argument instanceof Parameter) {
                 $argument = $this->container->hasParameter($argument) ? $this->container->getParameter($argument) : null;
+            } elseif ($argument instanceof EnvVariable) {
+                $argument = '$'.$argument.'$';
             } elseif (is_string($argument) && preg_match('/^%([^%]+)%$/', $argument, $match)) {
                 $argument = $this->container->hasParameter($match[1]) ? $this->container->getParameter($match[1]) : null;
             }

@@ -69,6 +69,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('fabien@symfony.com'),
             array('example@example.co.uk'),
             array('fabien_potencier@example.fr'),
+            array('"foo@bar"@example.com'),
         );
     }
 
@@ -96,6 +97,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('example@'),
             array('example@localhost'),
             array('foo@example.com bar'),
+            array('foo@bar@example.com'),
         );
     }
 

@@ -39,4 +39,11 @@ final class AuthenticationEvents
      * @var string
      */
     const AUTHENTICATION_FAILURE = 'security.authentication.failure';
+
+    /**
+     * This class should not be instantiated.
+     */
+    private function __construct()
+    {
+    }
 }

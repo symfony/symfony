@@ -38,4 +38,11 @@ final class SecurityEvents
      * @var string
      */
     const SWITCH_USER = 'security.switch_user';
+
+    /**
+     * This class should not be instantiated.
+     */
+    private function __construct()
+    {
+    }
 }

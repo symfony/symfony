@@ -324,6 +324,8 @@ class RouteCollectionBuilder
     /**
      * Generates a route name based on details of this route.
      *
+     * @param Route $route
+     *
      * @return string
      */
     private function generateRouteName(Route $route)

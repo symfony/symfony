@@ -9,6 +9,7 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
+        - libdouble-conversion1
 
 env:
     global:

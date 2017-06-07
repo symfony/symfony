@@ -76,10 +76,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 
-            $propertyName = $property->name;
-            if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->normalize($propertyName);
-            }
+            $propertyName = $this->normalizeName($property->name);
 
             $attributes[$propertyName] = $attributeValue;
         }
@@ -101,9 +98,7 @@ class PropertyNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($data as $propertyName => $value) {
-            if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->denormalize($propertyName);
-            }
+            $propertyName = $this->denormalizeName($propertyName);
 
             $allowed = $allowedAttributes === false || in_array($propertyName, $allowedAttributes);
             $ignored = in_array($propertyName, $this->ignoredAttributes);

@@ -78,9 +78,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                     $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
                 }
 
-                if ($this->nameConverter) {
-                    $attributeName = $this->nameConverter->normalize($attributeName);
-                }
+                $attributeName = $this->normalizeName($attributeName);
 
                 $attributes[$attributeName] = $attributeValue;
             }

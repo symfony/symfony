@@ -103,6 +103,13 @@ class DebugHandlersListener implements EventSubscriberInterface
                 }
                 $this->exceptionHandler = function ($e) use ($app, $output) {
                     $app->renderException($e, $output);
+
+                    if ($e instanceof \ErrorException) {
+                        // CLI - do not display the error and trace twice
+                        ini_set('display_errors', 0);
+
+                        throw $e; // Give back $exception to the native handler
+                    }
                 };
             }
         }

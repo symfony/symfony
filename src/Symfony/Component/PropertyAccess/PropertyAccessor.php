@@ -435,6 +435,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             } elseif (is_object($result[self::VALUE])) {
                 $result[self::REF] = $result[self::VALUE];
             }
+        } else {
+            $message = sprintf('Undefined index %s.', $index);
+
+            if ($keys = array_keys($zval[self::VALUE])) {
+                $message .= sprintf('Available indexes are "%s".', print_r($keys, true));
+            }
+
+            throw new NoSuchIndexException($message);
         }
 
         return $result;

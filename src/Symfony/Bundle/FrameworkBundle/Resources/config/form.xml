@@ -55,7 +55,7 @@
         </service>
 
         <!-- CoreExtension -->
-        <service id="form.property_accessor" alias="property_accessor" public="false" />
+        <service id="form.property_accessor" alias="property_accessor" />
 
         <service id="form.choice_list_factory.default" class="Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory" public="false"/>
 

@@ -17,7 +17,7 @@
             <argument type="collection" />
         </service>
 
-        <service id="serializer.property_accessor" alias="property_accessor" public="false" />
+        <service id="serializer.property_accessor" alias="property_accessor" />
 
         <!-- Normalizer -->
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer" public="false">

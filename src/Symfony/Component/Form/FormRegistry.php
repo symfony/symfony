@@ -108,6 +108,15 @@ class FormRegistry implements FormRegistryInterface
 
         $typeExtensions = array();
 
+        if (!$parentType) {
+            foreach ($this->extensions as $extension) {
+                $typeExtensions = array_merge(
+                    $typeExtensions,
+                    $extension->getTypeExtensions(FormTypeExtensionInterface::ALL_TYPES)
+                );
+            }
+        }
+
         foreach ($this->extensions as $extension) {
             $typeExtensions = array_merge(
                 $typeExtensions,

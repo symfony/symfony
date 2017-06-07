@@ -98,6 +98,25 @@ class ControllerTest extends TestCase
     }
 
     /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Sessions are disabled.
+     */
+    public function testGetSessionWithEmptyContainer()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('session')
+            ->will($this->returnValue(false));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $controller->getSession();
+    }
+
+    /**
      * @param $token
      *
      * @return ContainerInterface
@@ -389,6 +408,11 @@ class TestController extends Controller
     public function forward($controller, array $path = array(), array $query = array())
     {
         return parent::forward($controller, $path, $query);
+    }
+
+    public function getSession()
+    {
+        return parent::getSession();
     }
 
     public function getUser()

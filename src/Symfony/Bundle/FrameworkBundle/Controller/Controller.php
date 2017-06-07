@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -111,6 +112,22 @@ class Controller extends ContainerAware
         }
 
         $this->container->get('session')->getFlashBag()->add($type, $message);
+    }
+
+    /**
+     * Returns the Session Object.
+     *
+     * @throws \LogicException
+     *
+     * @return SessionInterface
+     */
+    protected function getSession()
+    {
+        if (!$this->container->has('session')) {
+            throw new \LogicException('Sessions are disabled.');
+        }
+
+        return $this->container->get('session');
     }
 
     /**

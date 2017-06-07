@@ -56,6 +56,7 @@ class CoreExtension extends AbstractExtension
             new Type\EmailType(),
             new Type\HiddenType(),
             new Type\IntegerType(),
+            new Type\RangeType(),
             new Type\LanguageType(),
             new Type\LocaleType(),
             new Type\MoneyType(),

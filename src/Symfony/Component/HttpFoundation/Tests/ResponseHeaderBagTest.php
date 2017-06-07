@@ -38,6 +38,10 @@ class ResponseHeaderBagTest extends TestCase
                 array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache')),
             ),
             array(
+                array('fOo' => 'BAR', 'Cache-Control' => array('no-cache')),
+                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache')),
+            ),
+            array(
                 array('ETag' => 'xyzzy'),
                 array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate')),
             ),
@@ -142,6 +146,15 @@ class ResponseHeaderBagTest extends TestCase
         $bag->replace(array('Cache-Control' => 'public'));
         $this->assertEquals('public', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('public'));
+
+        $bag = new ResponseHeaderBag(array('Etag' => 'aaaa'));
+        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('private'));
+        $this->assertTrue($bag->hasCacheControlDirective('must-revalidate'));
+
+        $bag->replace(array());
+        $this->assertEquals('no-cache', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
     }
 
     public function testReplaceWithRemove()
@@ -258,6 +271,14 @@ class ResponseHeaderBagTest extends TestCase
         $allHeaders = $headers->allPreserveCase();
         $this->assertEquals(array('http://www.symfony.com'), $allHeaders['Location']);
         $this->assertEquals(array('text/html'), $allHeaders['Content-type']);
+    }
+
+    public function testEquality()
+    {
+        $headers = new ResponseHeaderBag();
+        $anotherHeaders = new ResponseHeaderBag($headers->allPreserveCase());
+
+        $this->assertEquals($headers->allPreserveCase(), $anotherHeaders->allPreserveCase());
     }
 
     public function provideMakeDisposition()

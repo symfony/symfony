@@ -257,9 +257,14 @@ EOF;
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
-            $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
 
-            $matches = true;
+            if (!preg_match('#^'.preg_quote('#^/(?P<', '#').'([A-Za-z0-9_]+)'.preg_quote('>.*)?$#s', '#').'$#', $regex)) {
+                $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
+
+                $matches = true;
+            } else {
+                $conditions[] = 'true';
+            }
         }
 
         if ($compiledRoute->getHostVariables()) {

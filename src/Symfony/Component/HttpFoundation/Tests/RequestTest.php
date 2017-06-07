@@ -804,6 +804,14 @@ class RequestTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+        $request->query->set('_method', 'purge');
+        $request->getMethod();
+        Request::enableHttpMethodParameterOverride();
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returned a previously cached value after enabling parameter override');
+        $this->disableHttpMethodParameterOverride();
+
+        $request = new Request();
+        $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
 

@@ -28,18 +28,30 @@ class CompiledRoute implements \Serializable
     private $hostTokens;
 
     /**
+     * @var array
+     */
+    private $regexVariablesAliases;
+
+    /**
+     * @var array
+     */
+    private $hostRegexVariablesAliases;
+
+    /**
      * Constructor.
      *
-     * @param string      $staticPrefix  The static prefix of the compiled route
-     * @param string      $regex         The regular expression to use to match this route
-     * @param array       $tokens        An array of tokens to use to generate URL for this route
-     * @param array       $pathVariables An array of path variables
-     * @param string|null $hostRegex     Host regex
-     * @param array       $hostTokens    Host tokens
-     * @param array       $hostVariables An array of host variables
-     * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
+     * @param string      $staticPrefix              The static prefix of the compiled route
+     * @param string      $regex                     The regular expression to use to match this route
+     * @param array       $tokens                    An array of tokens to use to generate URL for this route
+     * @param array       $pathVariables             An array of path variables
+     * @param string|null $hostRegex                 Host regex
+     * @param array       $hostTokens                Host tokens
+     * @param array       $hostVariables             An array of host variables
+     * @param array       $variables                 An array of variables (variables defined in the path and in the host patterns)
+     * @param array       $regexVariablesAliases     An array containing path variables aliases as keys and actual path variables names as values
+     * @param array       $hostRegexVariablesAliases An array containing host variables aliases as keys and actual host variables names as values
      */
-    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array())
+    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array(), array $regexVariablesAliases = array(), array $hostRegexVariablesAliases = array())
     {
         $this->staticPrefix = (string) $staticPrefix;
         $this->regex = $regex;
@@ -49,6 +61,8 @@ class CompiledRoute implements \Serializable
         $this->hostTokens = $hostTokens;
         $this->hostVariables = $hostVariables;
         $this->variables = $variables;
+        $this->regexVariablesAliases = $regexVariablesAliases;
+        $this->hostRegexVariablesAliases = $hostRegexVariablesAliases;
     }
 
     /**
@@ -62,9 +76,11 @@ class CompiledRoute implements \Serializable
             'path_regex' => $this->regex,
             'path_tokens' => $this->tokens,
             'path_vars' => $this->pathVariables,
+            'path_regex_vars_aliases' => $this->regexVariablesAliases,
             'host_regex' => $this->hostRegex,
             'host_tokens' => $this->hostTokens,
             'host_vars' => $this->hostVariables,
+            'host_regex_vars_aliases' => $this->hostRegexVariablesAliases,
         ));
     }
 
@@ -79,9 +95,11 @@ class CompiledRoute implements \Serializable
         $this->regex = $data['path_regex'];
         $this->tokens = $data['path_tokens'];
         $this->pathVariables = $data['path_vars'];
+        $this->regexVariablesAliases = $data['path_regex_vars_aliases'];
         $this->hostRegex = $data['host_regex'];
         $this->hostTokens = $data['host_tokens'];
         $this->hostVariables = $data['host_vars'];
+        $this->hostRegexVariablesAliases = $data['host_regex_vars_aliases'];
     }
 
     /**
@@ -162,5 +180,21 @@ class CompiledRoute implements \Serializable
     public function getHostVariables()
     {
         return $this->hostVariables;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegexVariablesAliases()
+    {
+        return $this->regexVariablesAliases;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHostRegexVariablesAliases()
+    {
+        return $this->hostRegexVariablesAliases;
     }
 }

@@ -60,6 +60,56 @@ class ReflectionExtractorTest extends TestCase
         );
     }
 
+    public function testGetPropertiesWithCustomPrefixes()
+    {
+        $customExtractor = new ReflectionExtractor(array('add', 'remove'), array('is', 'can'));
+
+        $this->assertSame(
+            array(
+                'bal',
+                'parent',
+                'collection',
+                'B',
+                'Guid',
+                'g',
+                'foo',
+                'foo2',
+                'foo3',
+                'foo4',
+                'foo5',
+                'files',
+                'c',
+                'd',
+                'e',
+                'f',
+            ),
+            $customExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
+        );
+    }
+
+    public function testGetPropertiesWithNoPrefixes()
+    {
+        $noPrefixExtractor = new ReflectionExtractor(array(), array(), array());
+
+        $this->assertSame(
+            array(
+                'bal',
+                'parent',
+                'collection',
+                'B',
+                'Guid',
+                'g',
+                'foo',
+                'foo2',
+                'foo3',
+                'foo4',
+                'foo5',
+                'files',
+            ),
+            $noPrefixExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
+        );
+    }
+
     /**
      * @dataProvider typesProvider
      */

@@ -51,9 +51,15 @@ class ServerLogHandler extends AbstractHandler
             if (!$this->socket = $this->socket ?: $this->createSocket()) {
                 return false === $this->bubble;
             }
+        } finally {
+            restore_error_handler();
+        }
 
-            $recordFormatted = $this->formatRecord($record);
+        $recordFormatted = $this->formatRecord($record);
 
+        set_error_handler(self::class.'::nullErrorHandler');
+
+        try {
             if (-1 === stream_socket_sendto($this->socket, $recordFormatted)) {
                 stream_socket_shutdown($this->socket, STREAM_SHUT_RDWR);
 

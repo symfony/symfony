@@ -163,6 +163,10 @@ class FrameworkExtension extends Extension
             $definition->replaceArgument(1, null);
         }
 
+        if (!$config['warm_up_class_cache']) {
+            $container->removeDefinition('kernel.class_cache.cache_warmer');
+        }
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\FileLocator',
 

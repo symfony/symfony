@@ -1,0 +1,2 @@
+framework:
+    warm_up_class_cache: false

@@ -163,6 +163,7 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                     ->prototype('scalar')->end()
                 ->end()
+                ->booleanNode('warm_up_class_cache')->defaultTrue()->end()
             ->end()
         ;
 

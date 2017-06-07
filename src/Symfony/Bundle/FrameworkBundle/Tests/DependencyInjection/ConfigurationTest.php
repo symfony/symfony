@@ -191,6 +191,7 @@ class ConfigurationTest extends TestCase
                 'base_urls' => array(),
                 'packages' => array(),
             ),
+            'warm_up_class_cache' => true,
         );
     }
 }

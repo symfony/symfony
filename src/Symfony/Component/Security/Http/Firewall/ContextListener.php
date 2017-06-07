@@ -157,7 +157,7 @@ class ContextListener implements ListenerInterface
                 $refreshedUser = $provider->refreshUser($user);
                 $token->setUser($refreshedUser);
 
-                if (null !== $this->logger) {
+                if (spl_object_hash($user) !== spl_object_hash($refreshedUser) && null !== $this->logger) {
                     $this->logger->debug('User was reloaded from a user provider.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
                 }
 

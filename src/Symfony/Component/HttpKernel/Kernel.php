@@ -684,9 +684,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param ContainerInterface $container The service container
      *
      * @return DelegatingLoader The loader
+     *
+     * @throws \InvalidArgumentException When the container is not an instance of ContainerBuilder
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
+        if (!$container instanceof ContainerBuilder) {
+            throw new \InvalidArgumentException(sprintf('The container must be an instance of Symfony\Component\DependencyInjection\ContainerBuilder, got %s.', get_class($container)));
+        }
+
         $locator = new FileLocator($this);
         $resolver = new LoaderResolver(array(
             new XmlFileLoader($container, $locator),

@@ -187,12 +187,28 @@ class RouterTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Default value "baz" for "bar" does not match requirement "\d+" in "foo" route.
+     */
+    public function testExceptionOnDefaultValueNotMatchingRequirement()
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('foo', array('bar' => 'baz'), array('bar' => '\d+')));
+
+        $sc = $this->getServiceContainer($routes);
+
+        $router = new Router($sc, 'foo');
+
+        $route = $router->getRouteCollection()->get('foo');
+    }
+
+    /**
      * @dataProvider getNonStringValues
      */
     public function testDefaultValuesAsNonStrings($value)
     {
         $routes = new RouteCollection();
-        $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
+        $routes->add('foo', new Route('foo', array('foo' => $value)));
 
         $sc = $this->getServiceContainer($routes);
 

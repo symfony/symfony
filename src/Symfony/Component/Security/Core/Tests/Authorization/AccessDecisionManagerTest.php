@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerAwareInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
@@ -59,6 +60,25 @@ class AccessDecisionManagerTest extends TestCase
     public function testSetUnsupportedStrategy()
     {
         new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'fooBar');
+    }
+
+    public function testAccessDecisionManagerInterfaceSetting()
+    {
+        $strategies = array('affirmative', 'consensus', 'unanimous');
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        foreach ($strategies as $strategy) {
+            // mock our stub voter that implements the AccessDecisionManagerAwareInterface
+            $voter = $this->getMock('Symfony\Component\Security\Core\Tests\Authorization\VoterWithAccessDecisionManagerAwareInterfaceStub');
+
+            $manager = new AccessDecisionManager(array($voter), $strategy);
+
+            $voter->expects($this->once())
+                  ->method('setAccessDecisionManager')
+                  ->with($manager);
+
+            $manager->decide($token, array('ROLE_DOES_NOT_MATTER'));
+        }
     }
 
     /**
@@ -194,4 +214,9 @@ class AccessDecisionManagerTest extends TestCase
 
         return $voter;
     }
+}
+
+// stub class that implements AccessDecisionManagerAwareInterface
+abstract class VoterWithAccessDecisionManagerAwareInterfaceStub implements VoterInterface, AccessDecisionManagerAwareInterface
+{
 }

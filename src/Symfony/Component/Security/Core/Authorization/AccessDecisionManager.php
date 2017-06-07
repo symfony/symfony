@@ -30,6 +30,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private $strategy;
     private $allowIfAllAbstainDecisions;
     private $allowIfEqualGrantedDeniedDecisions;
+    private $areVotersPrepared = false;
 
     /**
      * Constructor.
@@ -112,6 +113,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function decideAffirmative(TokenInterface $token, array $attributes, $object = null)
     {
+        $this->prepareVoters();
         $deny = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
@@ -152,6 +154,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function decideConsensus(TokenInterface $token, array $attributes, $object = null)
     {
+        $this->prepareVoters();
         $grant = 0;
         $deny = 0;
         foreach ($this->voters as $voter) {
@@ -193,6 +196,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function decideUnanimous(TokenInterface $token, array $attributes, $object = null)
     {
+        $this->prepareVoters();
         $grant = 0;
         foreach ($attributes as $attribute) {
             foreach ($this->voters as $voter) {
@@ -219,5 +223,24 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    /**
+     * Guarantees that AccessDecisionManagerAwareInterface voters have
+     * been prepared properly.
+     */
+    private function prepareVoters()
+    {
+        if ($this->areVotersPrepared) {
+            return;
+        }
+
+        // inject this AccessDecisionManager into any voters that want it
+        foreach ($this->voters as $voter) {
+            if ($voter instanceof AccessDecisionManagerAwareInterface) {
+                $voter->setAccessDecisionManager($this);
+            }
+        }
+        $this->areVotersPrepared = true;
     }
 }

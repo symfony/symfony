@@ -7,6 +7,13 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.2 (2017-06-06)
+
+ * bug #23073 [TwigBridge] Fix namespaced classes (ogizanagi)
+ * bug #23063 [Cache] Fix extensibility of TagAwareAdapter::TAGS_PREFIX (wucdbm)
+ * bug #22936 [Form] Mix attr option between guessed options and user options (yceruto)
+ * bug #22976 [DependencyInjection] Use more clear message when unused environment variables detected (voronkovich)
+
 * 3.3.1 (2017-06-05)
 
  * bug #23067 [HttpFoundation][FrameworkBundle] Revert "trusted proxies" BC break (nicolas-grekas)

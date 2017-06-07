@@ -100,6 +100,21 @@ class RedirectControllerTest extends TestCase
         );
     }
 
+    public function testRedirectWithQueryParams()
+    {
+        $host = 'www.example.com';
+        $path = '/redirect-path';
+        $queryString = 'query-parameter=value&query-flag';
+        $expectedUrl = "http://$host$path?$queryString";
+
+        $request = $this->createRequestObject('http', $host, null, null, $queryString);
+
+        $controller = $this->createRedirectController();
+
+        $returnValue = $controller->urlRedirectAction($request, $path);
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+    }
+
     public function testEmptyPath()
     {
         $request = new Request();

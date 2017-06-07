@@ -140,4 +140,38 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader = new ORMQueryBuilderLoader($qb);
         $loader->getEntitiesByIds('id.value', array(1, '', 2, 3, 'foo'));
     }
+
+    public function testEmbeddedIdentifierName()
+    {
+        if (Version::compare('2.5.0') > 0) {
+            $this->markTestSkipped('Applicable only for Doctrine >= 2.5.0');
+
+            return;
+        }
+
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $query = $this->getMockBuilder('QueryMock')
+            ->setMethods(array('setParameter', 'getResult', 'getSql', '_doExecute'))
+            ->getMock();
+
+        $query->expects($this->once())
+            ->method('setParameter')
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id_value', array(1, 2, 3), Connection::PARAM_INT_ARRAY)
+            ->willReturn($query);
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setConstructorArgs(array($em))
+            ->setMethods(array('getQuery'))
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $qb->select('e')
+            ->from('Symfony\Bridge\Doctrine\Tests\Fixtures\EmbeddedIdentifierEntity', 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+        $loader->getEntitiesByIds('id.value', array(1, '', 2, 3, 'foo'));
+    }
 }

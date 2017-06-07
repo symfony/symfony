@@ -54,13 +54,17 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function hasParameterOption($values)
+    public function hasParameterOption($values, $flags = InputInterface::OPTION_FLAG_DEFAULT)
     {
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (!is_int($k)) {
                 $v = $k;
+            }
+
+            if ($this->isEndOfOptions($v, $flags)) {
+                break;
             }
 
             if (in_array($v, $values)) {
@@ -74,11 +78,14 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function getParameterOption($values, $default = false)
+    public function getParameterOption($values, $default = false, $flags = InputInterface::OPTION_FLAG_DEFAULT)
     {
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
+            if ($this->isEndOfOptions(is_int($k) ? $v : $k, $flags)) {
+                break;
+            }
             if (is_int($k)) {
                 if (in_array($v, $values)) {
                     return true;
@@ -89,6 +96,23 @@ class ArrayInput extends Input
         }
 
         return $default;
+    }
+
+    /**
+     * private helper method to detect end of options in command-line arguments, used
+     * to assist with a more POSIX compatible parsing of arguments.
+     *
+     * @param string $token
+     * @param int    $flags
+     *
+     * @return bool
+     */
+    private function isEndOfOptions($token, $flags = InputInterface::OPTION_FLAG_DEFAULT)
+    {
+        return
+            $flags & InputInterface::OPTION_FLAG_POSIX
+            && InputInterface::POSIX_OPTIONS_END === $token
+        ;
     }
 
     /**

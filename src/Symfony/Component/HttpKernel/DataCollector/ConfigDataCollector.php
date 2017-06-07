@@ -79,10 +79,7 @@ class ConfigDataCollector extends DataCollector
         );
 
         if (isset($this->kernel)) {
-            foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = $bundle->getPath();
-            }
-
+            $this->data['bundles'] = $this->getBundleData();
             $this->data['symfony_state'] = $this->determineSymfonyState();
         }
     }
@@ -287,5 +284,125 @@ class ConfigDataCollector extends DataCollector
         }
 
         return $versionState;
+    }
+
+    /**
+     * Gets the names, paths and installed versions of the bundles enabled in
+     * the application.
+     *
+     * @return array
+     */
+    public function getBundleData()
+    {
+        $bundles = array();
+        $installedPackages = $this->getInstalledPackages();
+        $enabledBundles = $this->getEnabledBundles();
+
+        foreach ($this->getEnabledBundles() as $bundleName => $bundlePath) {
+            foreach ($installedPackages as $packageName => $packageVersion) {
+                if (strpos($bundlePath.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.$packageName.DIRECTORY_SEPARATOR)) {
+                    $bundleVersion = $packageVersion;
+
+                    break;
+                } elseif (strpos($bundlePath, 'symfony'.DIRECTORY_SEPARATOR.'symfony'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Symfony'.DIRECTORY_SEPARATOR.'Bundle')) {
+                    // this is a built-in Symfony bundle; its version is the same as Symfony
+                    $bundleVersion = Kernel::VERSION;
+
+                    break;
+                }
+
+                $bundleVersion = null;
+            }
+
+            $bundles[$bundleName] = array('name' => $bundleName, 'path' => $bundlePath, 'version' => $bundleVersion);
+        }
+
+        ksort($bundles);
+
+        return $bundles;
+    }
+
+    /**
+     * Finds the path of the 'composer.lock' file starting from the current
+     * kernel dir and going up recursively up until the project root dir.
+     *
+     * @return string
+     */
+    private function findComposerLockPath()
+    {
+        $path = $this->kernel->getRootDir();
+        $projectRootDirectory = $this->findProjectRootDirectory();
+
+        while ($path !== $projectRootDirectory) {
+            if (file_exists($composerLockPath = $path.DIRECTORY_SEPARATOR.'composer.lock')) {
+                return $composerLockPath;
+            }
+
+            $path = realpath($path.DIRECTORY_SEPARATOR.'..');
+        }
+    }
+
+    /**
+     * It returns the absolute path of the root directory of the Symfony project.
+     * This is usually the directory above the kernel directory, but in complex
+     * setups it can be different.
+     *
+     * @return string
+     */
+    private function findProjectRootDirectory()
+    {
+        // The project root directory is calculated as the longest prefix
+        // intersection between the kernel directory and the current file path
+        $paths = array($this->kernel->getRootDir(), __DIR__);
+
+        $longestCommonPrefix = array_reduce($paths, function ($prefix, $path) {
+            $length = min(strlen($prefix), strlen($path));
+            while (substr($prefix, 0, $length) !== substr($path, 0, $length)) {
+                --$length;
+            }
+
+            return substr($prefix, 0, $length);
+        });
+
+        return rtrim($longestCommonPrefix, '/');
+    }
+
+    /**
+     * Returns an array with the names and versions of the installed Composer
+     * packages for the current project.
+     *
+     * @return array
+     */
+    private function getInstalledPackages()
+    {
+        $installedPackages = array();
+
+        if (!file_exists($composerLockPath = $this->findComposerLockPath())) {
+            return $installedPackages;
+        }
+
+        $composerLock = json_decode(file_get_contents($composerLockPath), true);
+        $packages = isset($composerLock['packages-dev']) ? array_merge($composerLock['packages'], $composerLock['packages-dev']) : $composerLock['packages'];
+        foreach ($packages as $package) {
+            $installedPackages[$package['name']] = $package['version'];
+        }
+
+        return $installedPackages;
+    }
+
+    /**
+     * Returns the names and paths of the bundles enabled in the current kernel.
+     *
+     * @return array
+     */
+    private function getEnabledBundles()
+    {
+        $enabledBundles = array();
+
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            $enabledBundles[$name] = $bundle->getPath();
+        }
+
+        return $enabledBundles;
     }
 }

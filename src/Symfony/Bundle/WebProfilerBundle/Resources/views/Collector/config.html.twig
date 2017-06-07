@@ -227,13 +227,15 @@
                 <tr>
                     <th class="key">Name</th>
                     <th>Path</th>
+                    <th>Version</th>
                 </tr>
             </thead>
             <tbody>
-                {% for name in collector.bundles|keys|sort %}
+                {% for bundle in collector.bundles %}
                 <tr>
-                    <th scope="row" class="font-normal">{{ name }}</th>
-                    <td class="font-normal">{{ collector.bundles[name] }}</td>
+                    <th scope="row" class="font-normal">{{ bundle.name }}</th>
+                    <td class="font-normal">{{ bundle.path }}</td>
+                    <td>{{ bundle.version|default('-') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

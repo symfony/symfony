@@ -386,10 +386,10 @@ EOF;
         if ($linkFormat = $this->fileLinkFormat) {
             $link = strtr($this->escapeHtml($linkFormat), array('%f' => $path, '%l' => (int) $line));
 
-            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
+            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', htmlspecialchars($link), htmlspecialchars($file), $line);
         }
 
-        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
+        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', htmlspecialchars($path), htmlspecialchars($file), $line);
     }
 
     /**

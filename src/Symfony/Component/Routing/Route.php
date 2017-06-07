@@ -17,7 +17,7 @@ namespace Symfony\Component\Routing;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class Route implements \Serializable
+class Route
 {
     /**
      * @var string
@@ -96,46 +96,6 @@ class Route implements \Serializable
             $this->setMethods($methods);
         }
         $this->setCondition($condition);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return serialize(array(
-            'path' => $this->path,
-            'host' => $this->host,
-            'defaults' => $this->defaults,
-            'requirements' => $this->requirements,
-            'options' => $this->options,
-            'schemes' => $this->schemes,
-            'methods' => $this->methods,
-            'condition' => $this->condition,
-            'compiled' => $this->compiled,
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        $data = unserialize($serialized);
-        $this->path = $data['path'];
-        $this->host = $data['host'];
-        $this->defaults = $data['defaults'];
-        $this->requirements = $data['requirements'];
-        $this->options = $data['options'];
-        $this->schemes = $data['schemes'];
-        $this->methods = $data['methods'];
-
-        if (isset($data['condition'])) {
-            $this->condition = $data['condition'];
-        }
-        if (isset($data['compiled'])) {
-            $this->compiled = $data['compiled'];
-        }
     }
 
     /**

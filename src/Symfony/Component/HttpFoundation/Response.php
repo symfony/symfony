@@ -270,7 +270,11 @@ class Response
 
         if ($this->isInformational() || $this->isEmpty()) {
             $this->setContent(null);
-            $headers->remove('Content-Type');
+            // Remove the Content-Type header
+            // Apache, Nginx and PHP's built-in web server removes the header when it's set to empty
+            // If the header is not present, it results in a default being added
+            // see https://github.com/slimphp/Slim/issues/1612#issuecomment-159389799
+            $headers->set('Content-Type', '');
             $headers->remove('Content-Length');
         } else {
             // Content-type based on the Request

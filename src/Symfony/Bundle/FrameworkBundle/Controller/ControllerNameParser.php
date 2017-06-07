@@ -25,6 +25,20 @@ class ControllerNameParser
     protected $kernel;
 
     /**
+     * The postfix that will be appended to controller names.
+     *
+     * @var string
+     */
+    protected static $controllerPostfix = 'Controller';
+
+    /**
+     * The postfix that will be appended to action method names.
+     *
+     * @var string
+     */
+    protected static $actionPostfix = 'Action';
+
+    /**
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
@@ -74,9 +88,9 @@ class ControllerNameParser
         }
 
         foreach ($allBundles as $b) {
-            $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
+            $try = $b->getNamespace().'\\Controller\\'.$controller.static::$controllerPostfix;
             if (class_exists($try)) {
-                return $try.'::'.$action.'Action';
+                return $try.'::'.$action.static::$actionPostfix;
             }
 
             $bundles[] = $b->getName();

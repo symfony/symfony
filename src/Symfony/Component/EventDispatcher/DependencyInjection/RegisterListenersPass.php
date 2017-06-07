@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
@@ -83,8 +81,6 @@ class RegisterListenersPass implements CompilerPassInterface
             }
         }
 
-        $extractingDispatcher = new ExtractingEventDispatcher();
-
         foreach ($container->findTaggedServiceIds($this->subscriberTag, true) as $id => $attributes) {
             $def = $container->getDefinition($id);
 
@@ -100,36 +96,18 @@ class RegisterListenersPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
             $container->addObjectResource($class);
-
-            ExtractingEventDispatcher::$subscriber = $class;
-            $extractingDispatcher->addSubscriber($extractingDispatcher);
-            foreach ($extractingDispatcher->listeners as $args) {
-                $args[1] = array(new ServiceClosureArgument(new Reference($id)), $args[1]);
-                $definition->addMethodCall('addListener', $args);
+            $subscriber = new ServiceClosureArgument(new Reference($id));
+            foreach ($class::getSubscribedEvents() as $eventName => $params) {
+                if (is_string($params)) {
+                    $definition->addMethodCall('addListener', array($eventName, array($subscriber, $params), 0));
+                } elseif (is_string($params[0])) {
+                    $definition->addMethodCall('addListener', array($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0));
+                } else {
+                    foreach ($params as $listener) {
+                        $definition->addMethodCall('addListener', array($eventName, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0));
+                    }
+                }
             }
-            $extractingDispatcher->listeners = array();
         }
-    }
-}
-
-/**
- * @internal
- */
-class ExtractingEventDispatcher extends EventDispatcher implements EventSubscriberInterface
-{
-    public $listeners = array();
-
-    public static $subscriber;
-
-    public function addListener($eventName, $listener, $priority = 0)
-    {
-        $this->listeners[] = array($eventName, $listener[1], $priority);
-    }
-
-    public static function getSubscribedEvents()
-    {
-        $callback = array(self::$subscriber, 'getSubscribedEvents');
-
-        return $callback();
     }
 }

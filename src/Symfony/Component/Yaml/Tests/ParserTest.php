@@ -68,6 +68,22 @@ class ParserTest extends TestCase
         return $tests;
     }
 
+    public function testLineBreaksBeforeDocumentSeparatorAndComment()
+    {
+        $this->assertSame($this->parser->parse("\n \n# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).\n   \n\n---\nkey2: value2\n"), array(
+            'key2' => 'value2',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Unable to parse at line 3 (near "  ---").
+     */
+    public function testSpacesBeforeDocumentSeparator()
+    {
+        $this->parser->parse("   \n\n  ---\nkey2: value2\n");
+    }
+
     public function testTabsInYaml()
     {
         // test tabs in YAML

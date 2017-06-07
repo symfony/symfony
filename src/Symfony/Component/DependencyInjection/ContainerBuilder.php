@@ -736,7 +736,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function register($id, $class = null)
     {
-        return $this->setDefinition($id, new Definition($class));
+        return $this->setDefinition($id, $this->createDefinition($class));
     }
 
     /**
@@ -1089,6 +1089,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $services;
+    }
+
+    /**
+     * Creates a new Definition used by register().
+     *
+     * @param string $class
+     * @return Definition
+     */
+    protected function createDefinition($class)
+    {
+        return new Definition($class);
     }
 
     /**

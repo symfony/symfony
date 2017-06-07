@@ -467,6 +467,34 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /*
+     * When there is no data transformer and the data is a boolean, it should not be converted to a string
+     */
+    public function testSetDataIsIgnoredIfDataIsBooleanFalse()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->setData(false);
+
+        $this->assertFalse($form->getData());
+        $this->assertFalse($form->getNormData());
+        $this->assertSame('', $form->getViewData());
+    }
+
+    /*
+     * When there is no data transformer and the data is a boolean, it should not be converted to a string
+     */
+    public function testSetDataIsIgnoredIfDataIsBooleanTrue()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->setData(true);
+
+        $this->assertTrue($form->getData());
+        $this->assertTrue($form->getNormData());
+        $this->assertSame('1', $form->getViewData());
+    }
+
+    /*
      * Data in client format should, if possible, always be a string to
      * facilitate differentiation between '0' and ''
      */

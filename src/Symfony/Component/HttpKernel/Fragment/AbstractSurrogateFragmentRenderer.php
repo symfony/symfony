@@ -64,6 +64,10 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     public function render($uri, Request $request, array $options = array())
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
+            if ($uri instanceof ControllerReference) {
+                $this->checkNonScalar($uri->attributes);
+            }
+
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 

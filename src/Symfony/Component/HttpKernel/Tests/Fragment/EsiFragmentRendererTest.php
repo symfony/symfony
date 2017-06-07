@@ -85,6 +85,20 @@ class EsiFragmentRendererTest extends TestCase
         $strategy->render('/', $request, array('alt' => new ControllerReference('alt_controller')));
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRenderFallbackWithObjectAttributesThrowsException()
+    {
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(), new UriSigner('foo'));
+
+        $request = Request::create('/');
+
+        $reference = new ControllerReference('main_controller', array('foo' => new \stdClass()), array());
+
+        $strategy->render($reference, $request);
+    }
+
     private function getInlineStrategy($called = false)
     {
         $inline = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer')->disableOriginalConstructor()->getMock();

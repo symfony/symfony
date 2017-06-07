@@ -67,5 +67,6 @@ class BooleanToStringTransformerTest extends TestCase
         $this->assertTrue($this->transformer->reverseTransform('foobar'));
         $this->assertTrue($this->transformer->reverseTransform(''));
         $this->assertFalse($this->transformer->reverseTransform(null));
+        $this->assertFalse($this->transformer->reverseTransform('0'));
     }
 }

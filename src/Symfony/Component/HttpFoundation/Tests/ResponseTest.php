@@ -258,6 +258,24 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isValidateable(), '->isValidateable() returns false when no validator is present');
     }
 
+    public function testIsExpirable()
+    {
+        $response = new Response('', 200);
+        $response->setSharedMaxAge(100);
+        $this->assertTrue($response->isExpirable(), '->isExpirable() returns true if a shared-maxage is set');
+
+        $response = new Response('', 200);
+        $response->setMaxAge(100);
+        $this->assertTrue($response->isExpirable(), '->isExpirable() returns true if a maxage is set');
+
+        $response = new Response('', 200);
+        $response->setExpires($this->createDateTimeOneHourLater());
+        $this->assertTrue($response->isExpirable(), '->isExpirable() returns true if an Expires date present');
+
+        $response = new Response();
+        $this->assertFalse($response->isExpirable(), '->isExpirable() returns false when no max-age or expire date is present');
+    }
+
     public function testGetDate()
     {
         $oneHourAgo = $this->createDateTimeOneHourAgo();
@@ -304,6 +322,14 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
+    }
+
+    public function testMaxAge0IsStillCacheable()
+    {
+        $response = new Response();
+        $response->setSharedMaxAge(0);
+
+        $this->assertTrue($response->isCacheable(), '->isCacheable() returns true even if the Response must always be revalidated');
     }
 
     public function testSetSharedMaxAge()

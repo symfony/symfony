@@ -234,7 +234,7 @@ class ArrayChoiceList implements ChoiceListInterface
                 }
 
                 continue;
-            } elseif (!is_scalar($choice)) {
+            } elseif (null !== $choice && !is_scalar($choice)) {
                 return false;
             }
 

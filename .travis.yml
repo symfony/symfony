@@ -79,6 +79,8 @@ before_install:
       echo session.gc_probability = 0 >> $INI
       echo opcache.enable_cli = 1 >> $INI
       echo hhvm.jit = 0 >> $INI
+      echo hhvm.php7.all = 1 >> $INI
+      echo hhvm.scalar_types = 0 >> $INI
       echo apc.enable_cli = 1 >> $INI
       echo extension = ldap.so >> $INI
       echo extension = redis.so >> $INI

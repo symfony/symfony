@@ -199,10 +199,11 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function ask($question, $default = null, $validator = null)
+    public function ask($question, $default = null, $validator = null, $autocompleterValues = null)
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
+        $question->setAutocompleterValues($autocompleterValues);
 
         return $this->askQuestion($question);
     }

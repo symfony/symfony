@@ -16,6 +16,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * Finds all the templates.
@@ -72,7 +73,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @return TemplateReferenceInterface[]
      */
-    private function findTemplatesInFolder($dir)
+    protected function findTemplatesInFolder($dir)
     {
         $templates = array();
 

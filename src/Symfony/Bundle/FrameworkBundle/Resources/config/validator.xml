@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 
 <container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\Validator\ValidatorInterface</parameter>
@@ -40,7 +40,8 @@
             <deprecated>The "%service_id%" service is deprecated since Symfony 2.5 and will be removed in 3.0.</deprecated>
         </service>
 
-        <service id="validator.mapping.cache.doctrine.apc" class="Symfony\Component\Validator\Mapping\Cache\DoctrineCache" public="false">
+        <service id="validator.mapping.cache.doctrine.apc"
+                 class="Symfony\Component\Validator\Mapping\Cache\DoctrineCache" public="false">
             <argument type="service">
                 <service class="Doctrine\Common\Cache\ApcCache">
                     <call method="setNamespace">
@@ -60,7 +61,13 @@
             <tag name="validator.constraint_validator" alias="validator.expression" />
         </service>
 
+        <service id="validator.l18n" class="Symfony\Component\Validator\Constraints\L18nValidator">
+            <argument type="service" id="request_stack"/>
+            <tag name="validator.constraint_validator" alias="validator.l18n"/>
+        </service>
+
         <service id="validator.email" class="%validator.email.class%">
+            <argument type="service" id="request_stack" />
             <argument></argument>
             <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\EmailValidator" />
         </service>

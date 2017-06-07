@@ -144,6 +144,10 @@ class Router extends BaseRouter implements WarmableInterface
 
         $container = $this->container;
 
+        if (preg_match('/^%[^%\s]+%$/', $value)) {
+            return $container->getParameter(trim($value, '%'));
+        }
+
         $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value) {
             // skip %%
             if (!isset($match[1])) {

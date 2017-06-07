@@ -19,8 +19,6 @@ class Author
     public $child;
     private $readPermissions;
 
-    private $privateProperty;
-
     public function __construct($firstName = null, $lastName = null)
     {
         $this->firstName = $firstName;
@@ -35,11 +33,6 @@ class Author
     public function getLastName()
     {
         return $this->lastName;
-    }
-
-    private function getPrivateGetter()
-    {
-        return 'foobar';
     }
 
     public function setAustralian($australian)
@@ -62,16 +55,7 @@ class Author
         return $this->readPermissions;
     }
 
-    private function isPrivateIsser()
-    {
-        return true;
-    }
-
     public function getPrivateSetter()
-    {
-    }
-
-    private function setPrivateSetter($data)
     {
     }
 }

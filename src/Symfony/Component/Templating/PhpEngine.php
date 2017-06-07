@@ -91,7 +91,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
             $slots->set('_content', array_pop($this->stack));
         }
-
+        
+        if ($_SERVER['environment'] !== 'prod') {
+            $content = '<!-- Start Viewscript: '.$this->parser->parse($name).' -->'.$content.'<!-- End Viewscript: '.$this->parser->parse($name).' -->';
+        }
+        
         return $content;
     }
 

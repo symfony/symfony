@@ -53,6 +53,8 @@ class LdapClient implements LdapClientInterface
         $this->useSsl = (bool) $useSsl;
         $this->useStartTls = (bool) $useStartTls;
         $this->optReferrals = (bool) $optReferrals;
+
+        $this->connect();
     }
 
     public function __destruct()
@@ -65,10 +67,6 @@ class LdapClient implements LdapClientInterface
      */
     public function bind($dn = null, $password = null)
     {
-        if (!$this->connection) {
-            $this->connect();
-        }
-
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             throw new ConnectionException(ldap_error($this->connection));
         }
@@ -123,23 +121,56 @@ class LdapClient implements LdapClientInterface
         return $value;
     }
 
+    /**
+     * Add entry to the ldap.
+     *
+     * @param string $dn       A LDAP dn
+     * @param array $entry key:value
+     *
+     * @throws \Exception.
+     */
+    public function add($dn, $entry)
+    {
+        if(ldap_add($this->connection, $dn, $entry) === false)
+        {
+            throw new \Exception('Cannot add to ldap : '.ldap_error($this->connection));
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete entry to the ldap.
+     *
+     * @param string $dn       A LDAP dn
+     *
+     * @throws \Exception.
+     */
+    public function delete($dn)
+    {
+        if(ldap_delete($this->connection, $dn) === false)
+        {
+            throw new \Exception('Cannot delete to ldap : '.ldap_error($this->connection));
+        }
+
+        return true;
+    }
+
     private function connect()
     {
-        if (!$this->connection) {
-            $host = $this->host;
+        $host = $this->host;
 
-            if ($this->useSsl) {
-                $host = 'ldaps://'.$host;
-            }
+        if ($this->useSsl) {
+            $host = 'ldaps://'.$host;
+        }
 
-            $this->connection = ldap_connect($host, $this->port);
+        $this->connection = ldap_connect($host, $this->port);
 
-            ldap_set_option($this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->version);
-            ldap_set_option($this->connection, LDAP_OPT_REFERRALS, $this->optReferrals);
+        ldap_set_option($this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->version);
+        ldap_set_option($this->connection, LDAP_OPT_REFERRALS, $this->optReferrals);
 
-            if ($this->useStartTls) {
-                ldap_start_tls($this->connection);
-            }
+        if ($this->useStartTls) {
+            ldap_start_tls($this->connection);
         }
     }
 

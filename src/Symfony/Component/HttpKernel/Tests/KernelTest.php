@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
+use Symfony\Component\HttpKernel\Exception\MethodNotImplementedException;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -149,6 +150,29 @@ class KernelTest extends TestCase
         }
 
         $this->assertTrue($found);
+    }
+
+    public function testLogDirIsDisabled()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCacheDir', 'getLogDir'))
+            ->getMock();
+
+        $kernel->expects($this->any())
+            ->method('getCacheDir')
+            ->will($this->returnValue(sys_get_temp_dir()));
+
+        $kernel->expects($this->any())
+            ->method('getLogDir')
+            ->will($this->throwException(new MethodNotImplementedException()));
+
+        $reflection = new \ReflectionClass(get_class($kernel));
+        $method = $reflection->getMethod('initializeContainer');
+        $method->setAccessible(true);
+        $method->invoke($kernel);
+
+        $this->assertFalse($kernel->getContainer()->getParameter('kernel.logs_dir'));
     }
 
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\Exception\DisableLogDirectoryException;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -163,6 +164,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Gets the log directory.
      *
      * @return string The log directory
+     *
+     * @throws DisableLogDirectoryException when the standard log directory is disabled
      */
     public function getLogDir();
 

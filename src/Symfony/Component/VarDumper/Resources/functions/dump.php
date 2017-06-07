@@ -21,4 +21,9 @@ if (!function_exists('dump')) {
             VarDumper::dump($var);
         }
     }
+    function dump_die($var) 
+    {
+        dump($var);
+        die;
+    }
 }

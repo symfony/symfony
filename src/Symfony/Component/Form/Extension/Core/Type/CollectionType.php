@@ -30,6 +30,7 @@ class CollectionType extends AbstractType
             $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
                 'label' => $options['prototype_name'].'label__',
             ), $options['options']));
+            $prototype->setAttribute('prototype_of', $builder);
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 

@@ -46,6 +46,9 @@ class ProcessHelperTest extends TestCase
         $this->assertTrue($executed);
     }
 
+    /**
+     * @return array
+     */
     public function provideCommandsAndOutput()
     {
         $successOutputVerbose = <<<'EOT'

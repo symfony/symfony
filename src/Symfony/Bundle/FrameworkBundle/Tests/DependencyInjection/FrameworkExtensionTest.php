@@ -214,9 +214,32 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyAssetsDefaultVersionStrategyAsService()
+    {
+        $container = $this->createContainerFromFile('legacy_templating_assets_version_strategy_as_service');
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
+    }
+
     public function testAssets()
     {
         $this->checkAssetsPackages($this->createContainerFromFile('assets'));
+    }
+
+    public function testAssetsDefaultVersionStrategyAsService()
+    {
+        $container = $this->createContainerFromFile('assets_version_strategy_as_service');
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testTranslator()
@@ -596,7 +619,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount($legacy ? 4 : 5, $packages);
+        $this->assertCount($legacy ? 5 : 6, $packages);
 
         if (!$legacy) {
             $package = $container->getDefinition($packages['images_path']);
@@ -614,6 +637,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals($legacy ? 'assets.empty_version_strategy' : 'assets._version__default', (string) $container->getDefinition('assets._package_bar')->getArgument(1));
         $this->assertEquals('assets.empty_version_strategy', (string) $container->getDefinition('assets._package_bar_null_version')->getArgument(1));
+
+        $this->assertEquals('assets.custom_version_strategy', (string) $container->getDefinition('assets._package_bar_version_strategy')->getArgument(1));
     }
 
     private function assertPathPackage(ContainerBuilder $container, DefinitionDecorator $package, $basePath, $version, $format)

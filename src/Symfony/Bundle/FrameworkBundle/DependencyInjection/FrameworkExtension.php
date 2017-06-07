@@ -590,14 +590,22 @@ class FrameworkExtension extends Extension
     {
         $loader->load('assets.xml');
 
-        $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
+        $defaultVersion = null;
+
+        if ($config['version_strategy']) {
+            $defaultVersion = new Reference($config['version_strategy']);
+        } else {
+            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
+        }
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
         $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
-            if (!array_key_exists('version', $package)) {
+            if (null !== $package['version_strategy']) {
+                $version = new Reference($package['version_strategy']);
+            } else if (!array_key_exists('version', $package)) {
                 $version = $defaultVersion;
             } else {
                 $format = $package['version_format'] ?: $config['version_format'];

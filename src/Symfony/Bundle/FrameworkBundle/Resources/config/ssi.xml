@@ -7,7 +7,9 @@
     <services>
         <defaults public="false" />
 
-        <service id="ssi" class="Symfony\Component\HttpKernel\HttpCache\Ssi" public="true" />
+        <service id="cache" class="Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache" public="true" synthetic="true" />
+
+        <service id="ssi" class="Symfony\Component\HttpKernel\HttpCache\Ssi" public="true" synthetic="true" />
 
         <service id="ssi_listener" class="Symfony\Component\HttpKernel\EventListener\SurrogateListener" public="true">
             <tag name="kernel.event_subscriber" />

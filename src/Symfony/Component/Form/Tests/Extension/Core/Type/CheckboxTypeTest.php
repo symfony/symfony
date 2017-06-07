@@ -82,15 +82,15 @@ class CheckboxTypeTest extends BaseTypeTest
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testSubmitWithRandomValueChecked()
+    public function testSubmitWithUnknownValueUnchecked()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'value' => 'foobar',
         ));
         $form->submit('krixikraxi');
 
-        $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getViewData());
+        $this->assertNull($form->getData());
+        $this->assertEquals('krixikraxi', $form->getViewData());
     }
 
     public function testSubmitWithValueUnchecked()

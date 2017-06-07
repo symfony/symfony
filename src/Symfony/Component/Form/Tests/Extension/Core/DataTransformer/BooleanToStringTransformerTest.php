@@ -61,11 +61,34 @@ class BooleanToStringTransformerTest extends TestCase
         $this->transformer->reverseTransform(1);
     }
 
-    public function testReverseTransform()
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformFailsIfUnexspectedValue()
     {
-        $this->assertTrue($this->transformer->reverseTransform(self::TRUE_VALUE));
-        $this->assertTrue($this->transformer->reverseTransform('foobar'));
-        $this->assertTrue($this->transformer->reverseTransform(''));
-        $this->assertFalse($this->transformer->reverseTransform(null));
+        $this->transformer->reverseTransform('foobar');
+    }
+
+    /**
+     * @dataProvider reverseTransformProvider
+     */
+    public function testReverseTransform($value, $result)
+    {
+        $this->assertEquals($result, $this->transformer->reverseTransform($value));
+    }
+
+    public function reverseTransformProvider()
+    {
+        return array(
+            array(self::TRUE_VALUE, true),
+            array('1', true),
+            array(null, false),
+            array(true, true),
+            array(false, false),
+            array('', false),
+            array('0', false),
+            array('false', false),
+            array('true', true),
+        );
     }
 }

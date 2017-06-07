@@ -140,6 +140,12 @@ class TextDescriptor extends Descriptor
         $command->getSynopsis(false);
         $command->mergeApplicationDefinition(false);
 
+        $this->writeText('<comment>Description:</comment>', $options);
+        $this->writeText("\n");
+        $this->writeText(' '.$command->getDescription(), $options);
+        $this->writeText("\n");
+
+        $this->writeText("\n");
         $this->writeText('<comment>Usage:</comment>', $options);
         foreach (array_merge(array($command->getSynopsis(true)), $command->getAliases(), $command->getUsages()) as $usage) {
             $this->writeText("\n");

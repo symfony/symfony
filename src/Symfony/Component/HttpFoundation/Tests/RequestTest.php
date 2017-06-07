@@ -1108,9 +1108,11 @@ class RequestTest extends TestCase
     public function provideOverloadedMethods()
     {
         return array(
+            array('POST'),
             array('PUT'),
             array('DELETE'),
             array('PATCH'),
+            array('post'),
             array('put'),
             array('delete'),
             array('patch'),
@@ -1139,11 +1141,26 @@ class RequestTest extends TestCase
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
 
+        // ignore POST requests
+        if ('POST' != $normalizedMethod) {
+            $_SERVER['REQUEST_METHOD'] = $method;
+            $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+            $request = RequestContentProxy::createFromGlobals();
+            $this->assertEquals($normalizedMethod, $request->getMethod());
+            $this->assertEquals('mycontent', $request->request->get('content'));
+
+            unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
+        }
+
+        // JSON request
         $_SERVER['REQUEST_METHOD'] = $method;
-        $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        $request = RequestContentProxy::createFromGlobals();
-        $this->assertEquals($normalizedMethod, $request->getMethod());
-        $this->assertEquals('mycontent', $request->request->get('content'));
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        // valid
+        $request = ValidJsonRequestContentProxy::createFromGlobals();
+        $this->assertEquals('foo', $request->request->get('name'));
+        // invalid
+        $request = InvalidJsonRequestContentProxy::createFromGlobals();
+        $this->assertEmpty($request->request->all());
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 
@@ -2195,6 +2212,22 @@ class RequestContentProxy extends Request
     public function getContent($asResource = false)
     {
         return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+    }
+}
+
+class ValidJsonRequestContentProxy extends Request
+{
+    public function getContent($asResource = false)
+    {
+        return '  { "name": "foo" }     ';
+    }
+}
+
+class InvalidJsonRequestContentProxy extends Request
+{
+    public function getContent($asResource = false)
+    {
+        return '[ "foo" ]';
     }
 }
 

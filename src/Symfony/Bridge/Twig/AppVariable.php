@@ -95,7 +95,7 @@ class AppVariable
                 return;
             }
 
-            $this->tokenStorage = $this->container->get('security.context');
+            $this->tokenStorage = $this->container->get('security.token_storage');
         }
 
         if (!$token = $this->tokenStorage->getToken()) {

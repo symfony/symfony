@@ -426,6 +426,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * Also MySQLs default isolation, REPEATABLE READ, causes deadlock for different sessions
      * due to http://www.mysqlperformanceblog.com/2013/12/12/one-more-innodb-gap-lock-to-avoid/ .
      * So we change it to READ COMMITTED.
+     * 
+     * MySQLs default binlog_fomat is STATEMENT, and it's not good for single row operations.
+     * Also you would have a General error: 1665 in some MySQL versions
      */
     private function beginTransaction()
     {
@@ -435,6 +438,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             } else {
                 if ('mysql' === $this->driver) {
                     $this->pdo->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+                    $this->pdo->exec('SET binlog_format=row');
                 }
                 $this->pdo->beginTransaction();
             }

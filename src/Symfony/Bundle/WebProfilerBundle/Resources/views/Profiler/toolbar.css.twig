@@ -195,6 +195,12 @@
     text-align: center;
 }
 
+.sf-toolbar-block .sf-toolbar-status-loading {
+    -webkit-animation: sf-blink .5s ease-in-out infinite;
+    -o-animation: sf-blink .5s ease-in-out infinite;
+    -moz-animation: sf-blink .5s ease-in-out infinite;
+    animation: sf-blink .5s ease-in-out infinite;
+}
 .sf-toolbar-block .sf-toolbar-status-green {
     background-color: {{ colors.success|raw }};
 }

@@ -160,7 +160,6 @@ class StringUtil
         $pluralRev = strrev($plural);
         $lowerPluralRev = strtolower($pluralRev);
         $pluralLength = strlen($lowerPluralRev);
-
         // The outer loop iterates over the entries of the plural table
         // The inner loop $j iterates over the characters of the plural suffix
         // in the plural table to compare them with the characters of the actual
@@ -181,6 +180,11 @@ class StringUtil
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $pluralLength) {
+                        if ($lowerPluralRev[$j - 1] === 's' && $lowerPluralRev[$j] === 's') {
+                            //double ss at the end should not replaced with single s
+                            break;
+                        }
+
                         $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
 
                         if (!$map[2] && $nextIsVocal) {

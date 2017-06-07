@@ -70,6 +70,7 @@ class StringInputTest extends TestCase
             array('-a', array('-a'), '->tokenize() parses short options'),
             array('-azc', array('-azc'), '->tokenize() parses aggregated short options'),
             array('-awithavalue', array('-awithavalue'), '->tokenize() parses short options with a value'),
+            array('-a=bar', array('-a=bar'), '->tokenize() parses short options with a value'),
             array('-a"foo bar"', array('-afoo bar'), '->tokenize() parses short options with a value'),
             array('-a"foo bar""foo bar"', array('-afoo barfoo bar'), '->tokenize() parses short options with a value'),
             array('-a\'foo bar\'', array('-afoo bar'), '->tokenize() parses short options with a value'),

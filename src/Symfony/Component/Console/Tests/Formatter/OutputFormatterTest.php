@@ -107,6 +107,11 @@ class OutputFormatterTest extends TestCase
             "\033[32m<error>some error</error>\033[39m",
             $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>')
         );
+
+        $this->assertEquals(
+            "\033[32m<error>some error</error>\033[39m",
+            $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>')
+        );
     }
 
     public function testDeepNestedStyles()

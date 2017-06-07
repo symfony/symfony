@@ -104,7 +104,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function get($id, $domain = 'messages')
     {
-        if (isset($this->messages[$domain][$id])) {
+        if (isset($this->messages[$domain][$id]) && '' !== $this->messages[$domain][$id]) {
             return $this->messages[$domain][$id];
         }
 

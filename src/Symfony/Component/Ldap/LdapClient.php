@@ -103,6 +103,38 @@ class LdapClient implements LdapClientInterface
     }
 
     /**
+     * Sets the time limit.
+     *
+     * @param integer $timeLimit
+     */
+    public function setTimeLimit($timeLimit)
+    {
+        if (!$this->connection) {
+            $this->connect();
+        }
+
+        if (false === ldap_set_option($this->connection, LDAP_OPT_TIMELIMIT, $timeLimit)) {
+            throw new LdapException(ldap_error($this->connection));
+        }
+    }
+
+    /**
+     * Sets the size limit.
+     *
+     * @param integer $timelimit
+     */
+    public function setSizeLimit($sizeLimit)
+    {
+        if (!$this->connection) {
+            $this->connect();
+        }
+
+        if (false === ldap_set_option($this->connection, LDAP_OPT_SIZELIMIT, $sizeLimit)) {
+            throw new LdapException(ldap_error($this->connection));
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function escape($subject, $ignore = '', $flags = 0)

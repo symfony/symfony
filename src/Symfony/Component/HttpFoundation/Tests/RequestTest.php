@@ -1119,6 +1119,13 @@ class RequestTest extends TestCase
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 
+        $_SERVER['REQUEST_METHOD'] = $method;
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $request = RequestJsonContentProxy::createFromGlobals();
+        $this->assertEquals('mycontent', $request->request->get('content'));
+
+        unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
+
         Request::createFromGlobals();
         Request::enableHttpMethodParameterOverride();
         $_POST['_method'] = $method;
@@ -2055,6 +2062,14 @@ class RequestContentProxy extends Request
     public function getContent($asResource = false)
     {
         return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+    }
+}
+
+class RequestJsonContentProxy extends Request
+{
+    public function getContent($asResource = false)
+    {
+        return json_encode(array('content' => 'mycontent'));
     }
 }
 

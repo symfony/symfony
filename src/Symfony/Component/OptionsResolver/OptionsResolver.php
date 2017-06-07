@@ -289,7 +289,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function getRequiredOptions()
     {
-        return array_keys($this->required);
+        return $this->orderValues(array_keys($this->required));
     }
 
     /**
@@ -317,7 +317,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function getMissingOptions()
     {
-        return array_keys(array_diff_key($this->required, $this->defaults));
+        return $this->orderValues(array_keys(array_diff_key($this->required, $this->defaults)));
     }
 
     /**
@@ -370,7 +370,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function getDefinedOptions()
     {
-        return array_keys($this->defined);
+        return $this->orderValues(array_keys($this->defined));
     }
 
     /**
@@ -406,12 +406,11 @@ class OptionsResolver implements Options, OptionsResolverInterface
         if ($this->locked) {
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
         }
-
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
-                implode('", "', array_keys($this->defined))
+                implode('", "', $this->orderValues(array_keys($this->defined)))
             ));
         }
 
@@ -489,7 +488,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
-                implode('", "', array_keys($this->defined))
+                implode('", "', $this->orderValues(array_keys($this->defined)))
             ));
         }
 
@@ -545,7 +544,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
-                implode('", "', array_keys($this->defined))
+                implode('", "', $this->orderValues(array_keys($this->defined)))
             ));
         }
 
@@ -601,7 +600,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
-                implode('", "', array_keys($this->defined))
+                implode('", "', $this->orderValues(array_keys($this->defined)))
             ));
         }
 
@@ -651,7 +650,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
-                implode('", "', array_keys($this->defined))
+                implode('", "', $this->orderValues(array_keys($this->defined)))
             ));
         }
 
@@ -759,8 +758,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
             throw new UndefinedOptionsException(sprintf(
                 (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Defined options are: "%s".',
-                implode('", "', array_keys($diff)),
-                implode('", "', array_keys($clone->defined))
+                implode('", "', $this->orderValues(array_keys($diff))),
+                implode('", "', $this->orderValues(array_keys($clone->defined)))
             ));
         }
 
@@ -778,7 +777,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
             throw new MissingOptionsException(sprintf(
                 count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
-                implode('", "', array_keys($diff))
+                implode('", "', $this->orderValues(array_keys($diff)))
             ));
         }
 
@@ -826,7 +825,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
                 throw new NoSuchOptionException(sprintf(
                     'The option "%s" does not exist. Defined options are: "%s".',
                     $option,
-                    implode('", "', array_keys($this->defined))
+                    implode('", "', $this->orderValues(array_keys($this->defined)))
                 ));
             }
 
@@ -845,7 +844,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             if (isset($this->calling[$option])) {
                 throw new OptionDefinitionException(sprintf(
                     'The options "%s" have a cyclic dependency.',
-                    implode('", "', array_keys($this->calling))
+                    implode('", "', $this->orderValues(array_keys($this->calling)))
                 ));
             }
 
@@ -950,7 +949,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             if (isset($this->calling[$option])) {
                 throw new OptionDefinitionException(sprintf(
                     'The options "%s" have a cyclic dependency.',
-                    implode('", "', array_keys($this->calling))
+                    implode('", "', $this->orderValues(array_keys($this->calling)))
                 ));
             }
 
@@ -1220,5 +1219,12 @@ class OptionsResolver implements Options, OptionsResolverInterface
         }
 
         return implode(', ', $values);
+    }
+
+    private function orderValues(array $values)
+    {
+        sort($values, SORT_STRING | SORT_FLAG_CASE);
+
+        return $values;
     }
 }

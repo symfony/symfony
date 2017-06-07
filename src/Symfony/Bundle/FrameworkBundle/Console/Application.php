@@ -29,16 +29,19 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class Application extends BaseApplication
 {
     private $kernel;
+    private $loadDefaultCommands;
     private $commandsRegistered = false;
 
     /**
      * Constructor.
      *
-     * @param KernelInterface $kernel A KernelInterface instance
+     * @param KernelInterface $kernel              A KernelInterface instance
+     * @param bool            $loadDefaultCommands Load all the default commands
      */
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, $loadDefaultCommands = true)
     {
         $this->kernel = $kernel;
+        $this->loadDefaultCommands = $loadDefaultCommands;
 
         parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
 
@@ -133,7 +136,7 @@ class Application extends BaseApplication
 
     protected function registerCommands()
     {
-        if ($this->commandsRegistered) {
+        if ($this->commandsRegistered || !$this->loadDefaultCommands) {
             return;
         }
 

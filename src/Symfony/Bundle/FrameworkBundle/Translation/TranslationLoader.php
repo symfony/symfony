@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Loader\RemoteLoaderInterface;
 
 /**
  * TranslationLoader loads translation messages from translation files.
@@ -53,6 +54,27 @@ class TranslationLoader
         }
 
         foreach ($this->loaders as $format => $loader) {
+            // load data from remote providers
+            if ($loader instanceof RemoteLoaderInterface) {
+                $resources = $loader->getRemoteResources();
+
+                foreach ($resources as $resource) {
+                    $locales = $loader->getLocalesForResource($resource);
+
+                    foreach ($locales as $locale) {
+                        $domains = $loader->getDomainsForLocale($resource, $locale);
+
+                        foreach ($domains as $domain) {
+                            $catalogue->addCatalogue(
+                                $loader->load($resource, $locale, $domain)
+                            );
+                        }
+                    }
+                }
+
+                continue;
+            }
+
             // load any existing translation files
             $finder = new Finder();
             $extension = $catalogue->getLocale().'.'.$format;

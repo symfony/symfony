@@ -14,6 +14,7 @@
                     {% if profile %}
                         <div id="resume">
                             <a id="resume-view-all" href="{{ path('_profiler_search', {limit: 10}) }}">View last 10</a>
+                            <a id="resume-view-latest" href="{{ path('_profiler', {token: 'latest', 'panel': panel}) }}">View latest</a>
                             <strong>Profile for:</strong>
                             {{ profile.method|upper }}
                             {% if profile.method|upper in ['GET', 'HEAD'] %}

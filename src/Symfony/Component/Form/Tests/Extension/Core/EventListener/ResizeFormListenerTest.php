@@ -275,4 +275,73 @@ class ResizeFormListenerTest extends TestCase
         $this->assertArrayNotHasKey(0, $event->getData());
         $this->assertArrayNotHasKey(2, $event->getData());
     }
+
+    public function testPreSubmitReindexArray()
+    {
+        $this->form->add($this->getForm('0'));
+        $this->form->add($this->getForm('1'));
+        $this->form->add($this->getForm('2'));
+
+        $this->factory->expects($this->at(0))
+            ->method('createNamed')
+            ->with(3, 'text', null, array('property_path' => '[3]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
+            ->will($this->returnValue($this->getForm('3')));
+        $this->factory->expects($this->at(1))
+            ->method('createNamed')
+            ->with(4, 'text', null, array('property_path' => '[4]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
+            ->will($this->returnValue($this->getForm('4')));
+
+        $data = array(0 => 'first', 2 => 'second', 4 => 'third', 6 => 'fourth');
+        $event = new FormEvent($this->form, $data);
+        $listener = new ResizeFormListener('text', array('attr' => array('maxlength' => 10)), true, true, false, true);
+        $listener->preSubmit($event);
+
+        $this->assertEquals(array(0 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth'), $event->getData());
+    }
+
+    public function testPreSubmitReindexArrayWithMixedKeys()
+    {
+        $this->form->add($this->getForm('0'));
+        $this->form->add($this->getForm('x'));
+        $this->form->add($this->getForm('2'));
+
+        $this->factory->expects($this->at(0))
+            ->method('createNamed')
+            ->with(3, 'text', null, array('property_path' => '[3]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
+            ->will($this->returnValue($this->getForm('3')));
+        $this->factory->expects($this->at(1))
+            ->method('createNamed')
+            ->with(4, 'text', null, array('property_path' => '[4]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
+            ->will($this->returnValue($this->getForm('4')));
+
+        $data = array(0 => 'first', 'x' => 'second', 4 => 'third', 6 => 'fourth');
+        $event = new FormEvent($this->form, $data);
+        $listener = new ResizeFormListener('text', array('attr' => array('maxlength' => 10)), true, true, false, true);
+        $listener->preSubmit($event);
+
+        $this->assertEquals(array(0 => 'first', 'x' => 'second', 3 => 'third', 4 => 'fourth'), $event->getData());
+    }
+
+    public function testPreSubmitReindexArrayObject()
+    {
+        $this->form->add($this->getForm('0'));
+        $this->form->add($this->getForm('1'));
+        $this->form->add($this->getForm('2'));
+
+        $this->factory->expects($this->at(0))
+            ->method('createNamed')
+            ->with(3, 'text', null, array('property_path' => '[3]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
+            ->will($this->returnValue($this->getForm('3')));
+        $this->factory->expects($this->at(1))
+            ->method('createNamed')
+            ->with(4, 'text', null, array('property_path' => '[4]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
+            ->will($this->returnValue($this->getForm('4')));
+
+        $data = new \ArrayObject(array(0 => 'first', 2 => 'second', 4 => 'third', 6 => 'fourth'));
+        $event = new FormEvent($this->form, $data);
+        $listener = new ResizeFormListener('text', array('attr' => array('maxlength' => 10)), true, true, false, true);
+        $listener->preSubmit($event);
+
+        $this->assertEquals(new \ArrayObject(array(0 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth')), $event->getData());
+    }
 }

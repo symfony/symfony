@@ -81,7 +81,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
-        $dom->loadXML($data, LIBXML_NONET | LIBXML_NOBLANKS);
+        $dom->loadXML($data, LIBXML_NONET | LIBXML_NOBLANKS | (defined('LIBXML_PARSEHUGE') ? LIBXML_PARSEHUGE : 0));
 
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);

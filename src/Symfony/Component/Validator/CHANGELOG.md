@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added the BIC (SWIFT-Code) validator
+ * deprecated `DateTimeValidator::PATTERN` constant
+ * added a `format` option to the `DateTime` constraint
 
 2.7.0
 -----

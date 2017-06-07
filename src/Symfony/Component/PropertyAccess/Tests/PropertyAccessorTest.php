@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
 class PropertyAccessorTest extends TestCase
@@ -577,5 +578,16 @@ class PropertyAccessorTest extends TestCase
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
+    }
+
+    /**
+     * @requires PHP 7.0
+     * @expectedException \TypeError
+     */
+    public function testThrowTypeErrorInsideSetterCall()
+    {
+        $object = new TestClassTypeErrorInsideCall();
+
+        $this->propertyAccessor->setValue($object, 'property', 'foo');
     }
 }

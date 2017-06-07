@@ -31,6 +31,7 @@ Community
 * [Get Symfony support][13] on Stack Overflow, Slack, IRC, etc.
 * Follow us on [GitHub][14], [Twitter][15] and [Facebook][16].
 
+
 Contributing
 ------------
 

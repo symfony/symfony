@@ -212,7 +212,7 @@ abstract class Bundle implements BundleInterface
      *
      * @return string
      */
-    protected function getContainerExtensionClass()
+    public function getContainerExtensionClass()
     {
         $basename = preg_replace('/Bundle$/', '', $this->getName());
 

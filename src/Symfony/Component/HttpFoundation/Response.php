@@ -112,6 +112,11 @@ class Response
     protected $charset;
 
     /**
+     * @var bool
+     */
+    private $allowEarlyFastCGIFinishRequest = true;
+
+    /**
      * Status codes translation table.
      *
      * The list of codes is complete according to the
@@ -383,7 +388,7 @@ class Response
         $this->sendHeaders();
         $this->sendContent();
 
-        if (function_exists('fastcgi_finish_request')) {
+        if ($this->allowEarlyFastCGIFinishRequest && function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
         } elseif ('cli' !== PHP_SAPI) {
             static::closeOutputBuffers(0, true);
@@ -391,6 +396,20 @@ class Response
 
         return $this;
     }
+
+      /**
+       * Allows to suppress the call to fastcgi_finish_request() on send().
+       *
+       * @param bool $allow
+       *
+       * @return $this
+       */
+      public function allowEarlyFastcgiFinishRequest($allow)
+      {
+          $this->allowEarlyFastCGIFinishRequest = $allow;
+
+          return $this;
+      }
 
     /**
      * Sets the response content.

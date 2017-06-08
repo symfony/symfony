@@ -111,6 +111,11 @@ class SecurityDataCollectorTest extends TestCase
                 array('ROLE_ADMIN'),
                 array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
             ),
+            array(
+                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
+                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
+                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
+            ),
         );
     }
 
@@ -118,6 +123,7 @@ class SecurityDataCollectorTest extends TestCase
     {
         return new RoleHierarchy(array(
             'ROLE_ADMIN' => array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
+            'ROLE_OPERATOR' => array('ROLE_USER'),
         ));
     }
 

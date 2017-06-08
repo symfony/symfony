@@ -7,6 +7,15 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.29 (2017-06-07)
+
+ * bug #23069 [SecurityBundle] Show unique Inherited roles in profile panel (yceruto)
+ * bug #23073 [TwigBridge] Fix namespaced classes (ogizanagi)
+ * bug #22936 [Form] Mix attr option between guessed options and user options (yceruto)
+ * bug #23024 [EventDispatcher] Fix ContainerAwareEventDispatcher::hasListeners(null) (nicolas-grekas)
+ * bug #22996 [Form] Fix \IntlDateFormatter timezone parameter usage to bypass PHP bug #66323 (romainneutron)
+ * bug #22994 Harden the debugging of Twig filters and functions (stof)
+
 * 2.7.28 (2017-05-29)
 
  * bug #22847 [Console] ChoiceQuestion must have choices (ro0NL)

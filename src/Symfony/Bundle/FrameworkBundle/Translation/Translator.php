@@ -38,7 +38,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     private $resourceLocales;
 
     /**
-     * Holds parameters from addResource() calls so we can defer the acutal
+     * Holds parameters from addResource() calls so we can defer the actual
      * parent::addResource() calls until initialize() is executed.
      *
      * @var array

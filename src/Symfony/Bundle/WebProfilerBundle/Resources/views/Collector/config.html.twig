@@ -254,6 +254,25 @@
         <a href="{{ path('_profiler_phpinfo') }}">View full PHP configuration</a>
     </p>
 
+    <h2>Environment Configuration <small>({{ collector.environment|length }})</small></h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="key">Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name in collector.environment|keys|sort %}
+            <tr>
+                <th scope="row" class="font-normal">{{ name }}</th>
+                <td class="font-normal">{{ collector.environment[name] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     {% if collector.bundles %}
         <h2>Enabled Bundles <small>({{ collector.bundles|length }})</small></h2>
         <table>

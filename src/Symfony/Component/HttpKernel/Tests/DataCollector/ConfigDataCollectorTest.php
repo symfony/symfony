@@ -41,6 +41,7 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(extension_loaded('xdebug'), $c->hasXDebug());
         $this->assertSame(extension_loaded('Zend OPcache') && ini_get('opcache.enable'), $c->hasZendOpcache());
         $this->assertSame(extension_loaded('apcu') && ini_get('apc.enabled'), $c->hasApcu());
+        $this->assertSame($_ENV, $c->getEnvironment());
     }
 }
 

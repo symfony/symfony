@@ -35,6 +35,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $addDefaultChildren = false;
     protected $nodeBuilder;
     protected $normalizeKeys = true;
+    protected $preserveKeys = false;
 
     /**
      * {@inheritdoc}
@@ -246,6 +247,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this;
     }
 
+    public function preserveKeys()
+    {
+        $this->preserveKeys = true;
+
+        return $this;
+    }
+
     /**
      * Sets whether the node can be unset.
      *
@@ -426,6 +434,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             if (null !== $this->key) {
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
+            }
+
+            if (true === $this->preserveKeys) {
+                $node->setPreserveKeys();
             }
 
             if (true === $this->atLeastOne) {

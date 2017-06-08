@@ -31,6 +31,7 @@ class InputOption
     private $mode;
     private $default;
     private $description;
+    private $validator;
 
     /**
      * Constructor.
@@ -190,6 +191,22 @@ class InputOption
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @param callable $validator A callable that returns the validated value or throws an exception
+     */
+    public function setValidator(callable $validator)
+    {
+        $this->validator = $validator;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getValidator()
+    {
+        return $this->validator;
     }
 
     /**

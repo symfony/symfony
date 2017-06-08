@@ -207,4 +207,23 @@ class InputOptionTest extends TestCase
         $option2 = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, 'Some description');
         $this->assertFalse($option->equals($option2));
     }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid value "value".
+     */
+    public function testGetSetValidator()
+    {
+        $argument = new InputOption('foo');
+        $argument->setValidator(function ($v) {
+            if ('value' === $v) {
+                throw new \InvalidArgumentException(sprintf('Invalid value "%s".', $v));
+            }
+
+            return $v;
+        });
+
+        $validator = $argument->getValidator();
+        $validator('value');
+    }
 }

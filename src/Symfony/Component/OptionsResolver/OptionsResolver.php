@@ -792,21 +792,12 @@ class OptionsResolver implements Options
         // Validate the type of the resolved option
         if (isset($this->allowedTypes[$option])) {
             $valid = false;
+            $invalidTypes = array();
 
             foreach ($this->allowedTypes[$option] as $type) {
                 $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
 
-                if (function_exists($isFunction = 'is_'.$type)) {
-                    if ($isFunction($value)) {
-                        $valid = true;
-                        break;
-                    }
-
-                    continue;
-                }
-
-                if ($value instanceof $type) {
-                    $valid = true;
+                if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
                 }
             }
@@ -818,7 +809,7 @@ class OptionsResolver implements Options
                     $option,
                     $this->formatValue($value),
                     implode('" or "', $this->allowedTypes[$option]),
-                    $this->formatTypeOf($value)
+                    implode('|', array_keys($invalidTypes))
                 ));
             }
         }
@@ -896,6 +887,45 @@ class OptionsResolver implements Options
     }
 
     /**
+     * @param string $type
+     * @param mixed  $value
+     * @param array  &$invalidTypes
+     *
+     * @return bool
+     */
+    private function verifyTypes($type, $value, array &$invalidTypes)
+    {
+        if ('[]' === substr($type, -2) && is_array($value)) {
+            $originalType = $type;
+            $type = substr($type, 0, -2);
+            $invalidValues = array_filter( // Filter out valid values, keeping invalid values in the resulting array
+                $value,
+                function ($value) use ($type) {
+                    return (function_exists($isFunction = 'is_'.$type) && !$isFunction($value)) || !$value instanceof $type;
+                }
+            );
+
+            if (!$invalidValues) {
+                return true;
+            }
+
+            $invalidTypes[$this->formatTypeOf($value, $originalType)] = true;
+
+            return false;
+        }
+
+        if ((function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type) {
+            return true;
+        }
+
+        if (!$invalidTypes) {
+            $invalidTypes[$this->formatTypeOf($value, null)] = true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns whether a resolved option with the given name exists.
      *
      * @param string $option The option name
@@ -963,13 +993,38 @@ class OptionsResolver implements Options
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed $value The value to return the type of
+     * @param mixed  $value The value to return the type of
+     * @param string $type
      *
      * @return string The type of the value
      */
-    private function formatTypeOf($value)
+    private function formatTypeOf($value, $type)
     {
-        return is_object($value) ? get_class($value) : gettype($value);
+        $suffix = '';
+
+        if ('[]' === substr($type, -2)) {
+            $suffix = '[]';
+            $type = substr($type, 0, -2);
+            while ('[]' === substr($type, -2)) {
+                $type = substr($type, 0, -2);
+                $value = array_shift($value);
+                if (!is_array($value)) {
+                    break;
+                }
+                $suffix .= '[]';
+            }
+
+            if (is_array($value)) {
+                $subTypes = array();
+                foreach ($value as $val) {
+                    $subTypes[$this->formatTypeOf($val, null)] = true;
+                }
+
+                return implode('|', array_keys($subTypes)).$suffix;
+            }
+        }
+
+        return (is_object($value) ? get_class($value) : gettype($value)).$suffix;
     }
 
     /**

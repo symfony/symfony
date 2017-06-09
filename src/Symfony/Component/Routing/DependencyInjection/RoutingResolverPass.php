@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\DependencyInjection;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 
 /**
  * Adds tagged routing.loader services to routing.resolver service.
@@ -22,6 +23,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class RoutingResolverPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     private $resolverServiceId;
     private $loaderTag;
 
@@ -39,7 +42,7 @@ class RoutingResolverPass implements CompilerPassInterface
 
         $definition = $container->getDefinition($this->resolverServiceId);
 
-        foreach ($container->findTaggedServiceIds($this->loaderTag, true) as $id => $attributes) {
+        foreach ($this->findAndSortTaggedServices($this->loaderTag, $container) as $id) {
             $definition->addMethodCall('addLoader', array(new Reference($id)));
         }
     }

@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
@@ -48,6 +49,8 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
+use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -694,6 +697,29 @@ class FrameworkExtension extends Extension
                 'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableUrlMatcher',
                 $container->findDefinition('router.default')->getClass(),
             ));
+        }
+
+        if ($this->annotationsConfigEnabled) {
+            $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
+                ->setPublic(false)
+                ->addTag('routing.loader', array('priority' => -10))
+                ->addArgument(new Reference('annotation_reader'));
+
+            $container->register('routing.loader.directory', AnnotationDirectoryLoader::class)
+                ->setPublic(false)
+                ->addTag('routing.loader', array('priority' => -10))
+                ->setArguments(array(
+                    new Reference('file_locator'),
+                    new Reference('routing.loader.annotation'),
+                ));
+
+            $container->register('routing.loader.file', AnnotationFileLoader::class)
+                ->setPublic(false)
+                ->addTag('routing.loader', array('priority' => -10))
+                ->setArguments(array(
+                    new Reference('file_locator'),
+                    new Reference('routing.loader.annotation'),
+                ));
         }
     }
 

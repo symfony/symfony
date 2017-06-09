@@ -11,10 +11,8 @@
 
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle;
 
 return array(
     new FrameworkBundle(),
     new TestBundle(),
-    new SensioFrameworkExtraBundle(),
 );

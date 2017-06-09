@@ -48,7 +48,7 @@ CHANGELOG
    `Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass` instead
  * Deprecated `ValidateWorkflowsPass`, use
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` instead
- * Deprecated `ConstraintValidatorFactory`, use 
+ * Deprecated `ConstraintValidatorFactory`, use
    `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
 3.2.0

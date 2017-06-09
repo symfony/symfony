@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Wirone at 2017-06-07T08:13:02Z
+
+This PR is related to my specific case where upgrading to 3.3 in one of our apps makes it unusable in `app_dev.php`. I took Blackfire profile for `bin/console cache:clear` and it took 1m47s. After applying this patch it took 54s.
+
+@nicolas-grekas can view those profiles.
+
+---------------------------------------------------------------------------
+
+by Wirone at 2017-06-07T08:34:42Z
+
+Without additional `depth` limitations it took 1m8s.

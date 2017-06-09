@@ -4,7 +4,7 @@ UPGRADE FROM 3.3 to 3.4
 DependencyInjection
 -------------------
 
-  * Top-level anonymous services in XML are deprecated and will throw an exception in Symfony 4.0.
+ * Top-level anonymous services in XML are deprecated and will throw an exception in Symfony 4.0.
 
 Finder
 ------
@@ -31,6 +31,11 @@ Process
 
  * The `Symfony\Component\Process\ProcessBuilder` class has been deprecated,
    use the `Symfony\Component\Process\Process` class directly instead.
+
+SecurityBundle
+--------------
+
+ * `FirewallContext::getListeners()` now returns `\Traversable|array`
 
 Validator
 ---------

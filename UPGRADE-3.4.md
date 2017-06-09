@@ -26,6 +26,12 @@ FrameworkBundle
  * The `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` 
    methods are deprecated since 3.4 and will be removed in 4.0.
 
+Process
+-------
+
+ * The `Symfony\Component\Process\ProcessBuilder` class has been deprecated,
+   use the `Symfony\Component\Process\Process` class directly instead.
+
 Validator
 ---------
 

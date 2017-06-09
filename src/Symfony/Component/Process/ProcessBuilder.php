@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use the Process class instead.', ProcessBuilder::class), E_USER_DEPRECATED);
+
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 
@@ -18,6 +20,8 @@ use Symfony\Component\Process\Exception\LogicException;
  * Process builder.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use the Process class instead.
  */
 class ProcessBuilder
 {
@@ -120,13 +124,9 @@ class ProcessBuilder
      * @param bool $inheritEnv
      *
      * @return $this
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function inheritEnvironmentVariables($inheritEnv = true)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
         $this->inheritEnv = $inheritEnv;
 
         return $this;
@@ -221,13 +221,9 @@ class ProcessBuilder
      * @param string $value The option value
      *
      * @return $this
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setOption($name, $value)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
         $this->options[$name] = $value;
 
         return $this;

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated the ProcessBuilder class
+
 3.3.0
 -----
 

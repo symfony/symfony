@@ -222,7 +222,7 @@
                 {% for voter in collector.voters %}
                     <tr>
                         <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
-                        <td class="font-normal">{{ voter }}</td>
+                        <td class="font-normal">{{ profiler_dump(voter) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

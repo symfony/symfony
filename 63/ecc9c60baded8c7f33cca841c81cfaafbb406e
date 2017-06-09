@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-09T11:09:28Z
+
+All fixed, typehints to be uncommented when merging into master
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-09T15:37:21Z
+
+Build failure unrelated, seems like apcu ext is unavailable in travis builds.

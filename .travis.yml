@@ -87,7 +87,7 @@ before_install:
       fi
 
       # Matrix lines for intermediate PHP versions are skipped for pull requests
-      if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then
+      if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && ! $PHP = nightly* && $TRAVIS_PULL_REQUEST != false ]]; then
           deps=skip
           skip=1
       else

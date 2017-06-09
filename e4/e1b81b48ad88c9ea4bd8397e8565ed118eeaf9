@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-10T06:25:18Z
+
+I changed my mind about `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` and I deprecated it as well (to be removed in 4.0). It's unlikely someone is using it for another reason (if it is, it's probably fragile) and has nothing to do in `KernelTestCase` once the current implementation of `KernelTestCase::getKernelClass()` is removed.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-12T17:04:11Z
+
+Thanks for all the suggested improvements @xabbuh!

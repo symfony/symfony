@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Hanmac at 2017-06-07T11:57:21Z
+
+i don't like it to make `security.authorization_checker` private.
+i have many bundles in my projects (like Sonata, or Sensio) which does use this service for the `isGranted` check. what else should be used for that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-07T11:58:41Z
+
+@Hanmac this is making
+`Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface`
+and
+`Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface`
+private,
+it doesn't change anything when using `security.authorization_checker`.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-07T13:34:06Z
+
+I'm 👍 for this, as we never documented these aliases (they are there for autowiring purpose only)

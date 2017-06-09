@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
+
 3.3.0
 -----
 

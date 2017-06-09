@@ -30,7 +30,10 @@ matrix:
           env: deps=high
         - php: 7.1
           env: deps=low
+        - php: nightly
     fast_finish: true
+    allow_failures:
+        - php: nightly
 
 cache:
     directories:

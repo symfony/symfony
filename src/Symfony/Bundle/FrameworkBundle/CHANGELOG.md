@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+* Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
+* Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+
 3.3.0
 -----
 

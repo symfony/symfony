@@ -13,6 +13,19 @@ Finder
    deprecated and will be removed in 4.0 as it used to fix a bug which existed 
    before version 5.5.23/5.6.7.
 
+FrameworkBundle
+---------------
+
+ * Using the `KERNEL_DIR` environment variable or the automatic guessing based
+   on the `phpunit.xml` / `phpunit.xml.dist` file location is deprecated since 3.4. 
+   Set the `KERNEL_CLASS` environment variable to the fully-qualified class name
+   of your Kernel instead. Not setting the `KERNEL_CLASS` environment variable 
+   will throw an exception on 4.0 unless you override the `KernelTestCase::createKernel()` 
+   or `KernelTestCase::getKernelClass()` method.
+   
+ * The `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` 
+   methods are deprecated since 3.4 and will be removed in 4.0.
+
 Validator
 ---------
 

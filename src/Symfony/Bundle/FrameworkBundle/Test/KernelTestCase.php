@@ -39,9 +39,13 @@ abstract class KernelTestCase extends TestCase
      * @return string The directory where phpunit.xml(.dist) is stored
      *
      * @throws \RuntimeException
+     *
+     * @deprecated since 3.4 and will be removed in 4.0.
      */
     protected static function getPhpUnitXmlDir()
     {
+        @trigger_error(sprintf('The %s() method is deprecated since 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the KernelTestCase::createKernel() method.');
         }
@@ -72,9 +76,13 @@ abstract class KernelTestCase extends TestCase
      * the last configuration argument.
      *
      * @return string The value of the PHPUnit CLI configuration option
+     *
+     * @deprecated since 3.4 and will be removed in 4.0.
      */
     private static function getPhpUnitCliConfigArgument()
     {
+        @trigger_error(sprintf('The %s() method is deprecated since 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
         foreach ($reversedArgs as $argIndex => $testArg) {
@@ -112,6 +120,8 @@ abstract class KernelTestCase extends TestCase
             }
 
             return $class;
+        } else {
+            @trigger_error(sprintf('Using the KERNEL_DIR environment variable or the automatic guessing based on the phpunit.xml / phpunit.xml.dist file location is deprecated since 3.4. Set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel instead. Not setting the KERNEL_CLASS environment variable will throw an exception on 4.0 unless you override the %1$::createKernel() or %1$::getKernelClass() method.', static::class), E_USER_DEPRECATED);
         }
 
         if (isset($_SERVER['KERNEL_DIR'])) {

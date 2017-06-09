@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-26T09:02:35Z
+
+Hey @ro0NL! The current behavior was my own preference: I don't like the cyclic search actually.
+No strong opinion about the case sensitivity, though. I guess most of the time case doesn't matter when you're searching something in the dump, indeed. :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-26T09:22:19Z
+
+Perhaps im too much used to it... it's really common though =/ (gedit, firefox, chrome, office)
+
+Phpstorm preserves one enter (which i find annoying :)
+![image](https://cloud.githubusercontent.com/assets/1047696/26488628/7066f0ae-4204-11e7-90c2-f3de5e5666e4.png)
+
+Ill keep it open for now, lets see what others think. Otherwise your call :)
+
+The case-insenstive search also happens in all mentioned above. That should be patched at least.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-28T09:31:18Z
+
+Moved to milestone 3.4

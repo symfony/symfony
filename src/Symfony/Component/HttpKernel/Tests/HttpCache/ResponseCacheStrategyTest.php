@@ -178,4 +178,45 @@ class ResponseCacheStrategyTest extends TestCase
         // Not sure if we should pass "max-age: 60" in this case, as long as the response is private and
         // that's the more conservative of both the master and embedded response...?
     }
+
+    public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()
+    {
+        /* When "expiration wins over validation" (https://symfony.com/doc/current/http_cache/validation.html)
+         * and both the main and embedded response provide s-maxage, then the more restricting value of both
+         * should be fine, regardless of whether the embedded response can be validated later on or must be
+         * completely regenerated.
+         */
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $masterResponse = new Response();
+        $masterResponse->setSharedMaxAge(3600);
+
+        $embeddedResponse = new Response();
+        $embeddedResponse->setSharedMaxAge(60);
+        $embeddedResponse->setEtag('foo');
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($masterResponse);
+
+        $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('s-maxage'));
+    }
+
+    public function testResponseIsExpirableButNotValidateableWhenMasterResponseCombinesExpirationAndValidation()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $masterResponse = new Response();
+        $masterResponse->setSharedMaxAge(3600);
+        $masterResponse->setEtag('foo');
+        $masterResponse->setLastModified(new \DateTime());
+
+        $embeddedResponse = new Response();
+        $embeddedResponse->setSharedMaxAge(60);
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($masterResponse);
+
+        $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('s-maxage'));
+        $this->assertFalse($masterResponse->isValidateable());
+    }
 }

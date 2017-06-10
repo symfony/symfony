@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-10T11:51:02Z
+
+Is this the only place in the code where `each()` is being used?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-06-10T11:53:52Z
+
+Yes, it's the only place I could find

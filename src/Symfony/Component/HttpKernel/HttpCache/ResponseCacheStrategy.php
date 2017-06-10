@@ -39,7 +39,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
      */
     public function add(Response $response)
     {
-        if ($response->isValidateable()) {
+        if ($response->isValidateable() || !$response->isCacheable()) {
             $this->cacheable = false;
         } else {
             $maxAge = $response->getMaxAge();

@@ -43,9 +43,7 @@ class ProcessHelper extends Helper
 
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        if (is_array($cmd)) {
-            $process = new Process($cmd);
-        } elseif ($cmd instanceof Process) {
+        if ($cmd instanceof Process) {
             $process = $cmd;
         } else {
             $process = new Process($cmd);

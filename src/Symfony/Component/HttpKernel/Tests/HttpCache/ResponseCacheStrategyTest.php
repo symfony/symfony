@@ -76,7 +76,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testMasterResponseNotCacheableWhenEmbeddedResponseRequiresValdation()
+    public function testMasterResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
     {
         $cacheStrategy = new ResponseCacheStrategy();
 

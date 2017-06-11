@@ -49,7 +49,7 @@ class LockHandlerTest extends TestCase
             $this->markTestSkipped('This test cannot run on Windows.');
         }
 
-        $lockPath = sys_get_temp_dir().'/'.uniqid();
+        $lockPath = sys_get_temp_dir().'/'.uniqid('', true);
         $e = null;
         $wrongMessage = null;
 

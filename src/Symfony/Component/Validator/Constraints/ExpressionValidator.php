@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\RuntimeException;
@@ -46,6 +47,10 @@ class ExpressionValidator extends ConstraintValidator
         $variables['value'] = $value;
         $variables['this'] = $this->context->getObject();
 
+        if (strlen($constraint->dataPath) > 0) {
+            $variables['this'] = $this->getPropertyAccessor()->getValue($this->context, $constraint->dataPath);
+        }
+
         if (!$this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
@@ -64,5 +69,13 @@ class ExpressionValidator extends ConstraintValidator
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function getPropertyAccessor()
+    {
+        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccess')) {
+            throw new RuntimeException('Unable to use expressions with data path as the Symfony PropertyAccess component is not installed.');
+        }
+        return PropertyAccess::createPropertyAccessor();
     }
 }

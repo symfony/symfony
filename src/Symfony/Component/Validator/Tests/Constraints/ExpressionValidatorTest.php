@@ -235,4 +235,17 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
     }
+
+    public function testExpressionLanguageUsageWithCustomDataPath()
+    {
+        $constraint = new Expression(['expression' => 'value <= this["dateEnd"]', 'dataPath' => 'root[data]']);
+
+        $this->setRoot(['data' => ['dateEnd' => '2011-06-07', 'dateStart' => '2011-06-05']]);
+        $this->setPropertyPath('');
+        $this->setProperty(null, 'property');
+
+        $this->validator->validate('2011-06-05', $constraint);
+
+        $this->assertNoViolation();
+    }
 }

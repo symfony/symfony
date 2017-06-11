@@ -16,6 +16,8 @@ Finder
 FrameworkBundle
 ---------------
 
+ * The `validator.mapping.cache.doctrine.apc` service has been deprecated.
+
  * Using the `KERNEL_DIR` environment variable or the automatic guessing based
    on the `phpunit.xml` / `phpunit.xml.dist` file location is deprecated since 3.4. 
    Set the `KERNEL_CLASS` environment variable to the fully-qualified class name

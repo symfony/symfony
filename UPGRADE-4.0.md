@@ -227,6 +227,8 @@ Form
 FrameworkBundle
 ---------------
 
+ * The `validator.mapping.cache.doctrine.apc` service has been removed.
+
  * The `cache:clear` command does not warmup the cache anymore. Warmup should
    be done via the `cache:warmup` command.
 

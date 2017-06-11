@@ -7,6 +7,7 @@ CHANGELOG
  * not setting the `strict` option of the `Choice` constraint to `true` is
    deprecated and will throw an exception in Symfony 4.0
  * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of constant values and will throw an exception in Symfony 4.0
+ * added a `dataPath` option to the `Expression` constraint to allow an other way to get "this" from the context
 
 3.3.0
 -----

@@ -4,6 +4,8 @@ CHANGELOG
 3.4.0
 -----
 
+* Removed `doctrine/cache` from the list of required dependencies in `composer.json`
+* Deprecated `validator.mapping.cache.doctrine.apc` service
 * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
 * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
 

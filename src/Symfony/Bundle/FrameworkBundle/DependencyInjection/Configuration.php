@@ -663,9 +663,9 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('cache')
                             ->beforeNormalization()
-                                // Can be removed in 4.0, when validator.mapping.cache.apc is removed
+                                // Can be removed in 4.0, when validator.mapping.cache.doctrine.apc is removed
                                 ->ifString()->then(function ($v) {
-                                    if ('validator.mapping.cache.apc' === $v && !class_exists('Doctrine\Common\Cache\ApcCache')) {
+                                    if ('validator.mapping.cache.doctrine.apc' === $v && !class_exists('Doctrine\Common\Cache\ApcCache')) {
                                         throw new LogicException('Doctrine APC cache for the validator cannot be enabled as the Doctrine Cache package is not installed.');
                                     }
 

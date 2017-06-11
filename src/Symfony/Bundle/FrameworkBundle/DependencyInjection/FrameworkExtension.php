@@ -1220,6 +1220,10 @@ class FrameworkExtension extends Extension
         $loader->load('annotations.xml');
 
         if ('none' !== $config['cache']) {
+            if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
+                throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
+            }
+
             $cacheService = $config['cache'];
 
             if ('php_array' === $config['cache']) {

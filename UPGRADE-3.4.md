@@ -16,6 +16,9 @@ Finder
 FrameworkBundle
 ---------------
 
+ * The `doctrine/cache` dependency has been removed; require it via `composer
+   require doctrine/cache` if you are using Doctrine cache in your project.
+
  * The `validator.mapping.cache.doctrine.apc` service has been deprecated.
 
  * Using the `KERNEL_DIR` environment variable or the automatic guessing based

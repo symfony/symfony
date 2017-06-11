@@ -29,10 +29,10 @@
         "symfony/filesystem": "~2.8|~3.0|~4.0",
         "symfony/finder": "~2.8|~3.0|~4.0",
         "symfony/routing": "~3.4|~4.0",
-        "symfony/stopwatch": "~2.8|~3.0|~4.0",
-        "doctrine/cache": "~1.0"
+        "symfony/stopwatch": "~2.8|~3.0|~4.0"
     },
     "require-dev": {
+        "doctrine/cache": "~1.0",
         "fig/link-util": "^1.0",
         "symfony/asset": "~3.3|~4.0",
         "symfony/browser-kit": "~2.8|~3.0|~4.0",

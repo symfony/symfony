@@ -238,9 +238,9 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpressionLanguageUsageWithCustomDataPath()
     {
-        $constraint = new Expression(['expression' => 'value <= this["dateEnd"]', 'dataPath' => 'root[data]']);
+        $constraint = new Expression(array('expression' => 'value <= this["dateEnd"]', 'dataPath' => 'root[data]'));
 
-        $this->setRoot(['data' => ['dateEnd' => '2011-06-07', 'dateStart' => '2011-06-05']]);
+        $this->setRoot(array('data' => array('dateEnd' => '2011-06-07', 'dateStart' => '2011-06-05')));
         $this->setPropertyPath('');
         $this->setProperty(null, 'property');
 

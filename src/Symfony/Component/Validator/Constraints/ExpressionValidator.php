@@ -76,6 +76,7 @@ class ExpressionValidator extends ConstraintValidator
         if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccess')) {
             throw new RuntimeException('Unable to use expressions with data path as the Symfony PropertyAccess component is not installed.');
         }
+
         return PropertyAccess::createPropertyAccessor();
     }
 }

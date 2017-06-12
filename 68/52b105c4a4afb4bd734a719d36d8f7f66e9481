@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-12T13:57:59Z
+
+Should we do the same for Command and TestRunner?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T14:06:18Z
+
+These classes are used by the `simple-phpunit` script. So they are not affected by the bug
+
+---------------------------------------------------------------------------
+
+by jpauli at 2017-06-12T14:19:47Z
+
+Class definitions are fully resolved at compile time and require zero runtime (when they are not conditional), so yes, they gets parsed before code gets executed.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T14:42:50Z
+
+@jpauli but an early return in the global code of the file placed before the class definition should make it conditional.
+And then, why would it be failing only in some cases rather than always failing ? We have several cases where the early return before the class definition does work (the same code when the parent class is not yet loaded, for instance).

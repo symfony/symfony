@@ -23,9 +23,6 @@
             <argument>true</argument>
         </service>
 
-        <service id="debug.stopwatch" class="Symfony\Component\Stopwatch\Stopwatch" public="true" />
-        <service id="Symfony\Component\Stopwatch\Stopwatch" alias="debug.stopwatch" />
-
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter">
             <argument>%debug.file_link_format%</argument>
         </service>

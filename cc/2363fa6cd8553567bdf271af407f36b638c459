@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T14:48:00Z
+
+does TwigBundle works fine for the Stopwatch extension if the service is not always available anymore ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-12T14:52:40Z
+
+Good question, I did not check what's happing if the `debug.stopwatch` service is not present as it would already be ignored then. So if that was not working properly, it would already have to be fixed in older branches IMO.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T14:57:01Z
+
+@xabbuh well, currently, the debug.stopwatch service is always present. So we clearly need to check the impact of this change
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-12T15:01:07Z
+
+@stof all usage in Symfony uses `on-invalid=null`, so we're good here.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T15:05:20Z
+
+> As the stopwatch service is only available in the dev env, this looks good to me. We cannot break production inadvertently.
+
+@fabpot that's not true. This service was defined in `debug_prod.xml`, and so loaded in all environments
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T15:05:36Z
+
+However, it won't change anything for fullstack users
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-12T15:07:41Z
+
+@stof indeed, I thought I remembered it being defined in `debug.xml` Anyway, you're right about not being a problem for people using the full-stack. That's why I was also able to remove many other deps in 3.2.

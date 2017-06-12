@@ -17,7 +17,6 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 class ProcessHelperTest extends TestCase
 {
@@ -85,8 +84,8 @@ EOT;
 EOT;
 
         $errorMessage = 'An error occurred';
-        $args = new ProcessBuilder(array('php', '-r', 'echo 42;'));
-        $args = $args->getProcess()->getCommandLine();
+        $args = new Process(array('php', '-r', 'echo 42;'));
+        $args = $args->getCommandLine();
         $successOutputProcessDebug = str_replace("'php' '-r' 'echo 42;'", $args, $successOutputProcessDebug);
 
         return array(

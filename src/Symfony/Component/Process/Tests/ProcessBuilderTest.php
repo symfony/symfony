@@ -14,11 +14,11 @@ namespace Symfony\Component\Process\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ProcessBuilder;
 
+/**
+ * @group legacy
+ */
 class ProcessBuilderTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
     public function testInheritEnvironmentVars()
     {
         $proc = ProcessBuilder::create()

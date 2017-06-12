@@ -19,7 +19,7 @@
             <argument type="service" id="security.access.decision_manager" />
             <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
-        <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" public="true" />
+        <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" />
 
         <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" public="true" />
         <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" />
@@ -59,7 +59,7 @@
         </service>
 
         <service id="security.password_encoder" alias="security.user_password_encoder.generic" public="true" />
-        <service id="Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface" alias="security.password_encoder" public="true" />
+        <service id="Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface" alias="security.password_encoder" />
 
         <service id="security.user_checker" class="Symfony\Component\Security\Core\User\UserChecker" />
 

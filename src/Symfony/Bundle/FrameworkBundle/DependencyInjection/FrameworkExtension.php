@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
@@ -46,6 +47,8 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
+use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -56,6 +59,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
@@ -571,9 +575,14 @@ class FrameworkExtension extends Extension
     {
         $loader->load('debug_prod.xml');
 
+        if (class_exists(Stopwatch::class)) {
+            $container->register('debug.stopwatch', Stopwatch::class);
+            $container->setAlias(Stopwatch::class, 'debug.stopwatch');
+        }
+
         $debug = $container->getParameter('kernel.debug');
 
-        if ($debug) {
+        if ($debug && class_exists(Stopwatch::class)) {
             $loader->load('debug.xml');
         }
 
@@ -620,6 +629,29 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
+
+        if ($this->annotationsConfigEnabled) {
+            $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
+                ->setPublic(false)
+                ->addTag('routing.loader', array('priority' => -10))
+                ->addArgument(new Reference('annotation_reader'));
+
+            $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
+                ->setPublic(false)
+                ->addTag('routing.loader', array('priority' => -10))
+                ->setArguments(array(
+                    new Reference('file_locator'),
+                    new Reference('routing.loader.annotation'),
+                ));
+
+            $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
+                ->setPublic(false)
+                ->addTag('routing.loader', array('priority' => -10))
+                ->setArguments(array(
+                    new Reference('file_locator'),
+                    new Reference('routing.loader.annotation'),
+                ));
+        }
     }
 
     /**
@@ -753,7 +785,7 @@ class FrameworkExtension extends Extension
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
-            if ($container->getParameter('kernel.debug')) {
+            if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
                 $loader->load('templating_debug.xml');
 
                 $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
@@ -1084,6 +1116,10 @@ class FrameworkExtension extends Extension
         $loader->load('annotations.xml');
 
         if ('none' !== $config['cache']) {
+            if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
+                throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
+            }
+
             $cacheService = $config['cache'];
 
             if ('php_array' === $config['cache']) {

@@ -243,7 +243,7 @@ class SecurityExtension extends Extension
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new ChildDefinition('security.firewall.context'));
             $context
-                ->replaceArgument(0, $listeners)
+                ->replaceArgument(0, new IteratorArgument($listeners))
                 ->replaceArgument(1, $exceptionListener)
                 ->replaceArgument(2, new Reference($configId))
             ;

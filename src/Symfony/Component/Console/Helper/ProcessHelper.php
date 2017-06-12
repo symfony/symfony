@@ -15,7 +15,6 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * The ProcessHelper class provides helpers to run external processes.
@@ -44,9 +43,7 @@ class ProcessHelper extends Helper
 
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        if (is_array($cmd)) {
-            $process = ProcessBuilder::create($cmd)->getProcess();
-        } elseif ($cmd instanceof Process) {
+        if ($cmd instanceof Process) {
             $process = $cmd;
         } else {
             $process = new Process($cmd);

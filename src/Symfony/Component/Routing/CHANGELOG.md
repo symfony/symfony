@@ -7,6 +7,11 @@ CHANGELOG
  * dropped support for using UTF-8 route patterns without using the `utf8` option
  * dropped support for using UTF-8 route requirements without using the `utf8` option
 
+3.4.0
+-----
+
+ * Added support for prioritized routing loaders.
+
 3.3.0
 -----
 
@@ -25,7 +30,7 @@ CHANGELOG
 
  * Added support for `bool`, `int`, `float`, `string`, `list` and `map` defaults in XML configurations.
  * Added support for UTF-8 requirements
-  
+
 2.8.0
 -----
 

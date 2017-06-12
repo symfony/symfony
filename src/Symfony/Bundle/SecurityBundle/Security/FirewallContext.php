@@ -25,7 +25,12 @@ class FirewallContext
     private $exceptionListener;
     private $config;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
+    /**
+     * @param \Traversable|array     $listeners
+     * @param ExceptionListener|null $exceptionListener
+     * @param FirewallConfig|null    $firewallConfig
+     */
+    public function __construct($listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
@@ -37,6 +42,9 @@ class FirewallContext
         return $this->config;
     }
 
+    /**
+     * @return \Traversable|array
+     */
     public function getListeners()
     {
         return $this->listeners;

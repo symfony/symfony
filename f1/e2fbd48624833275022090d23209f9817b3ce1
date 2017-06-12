@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-06-08T18:18:17Z
+
+Which IDE are you using? With PHPStorm this works without any issues for me as it currently is :wink:
+
+---------------------------------------------------------------------------
+
+by SteppingHat at 2017-06-09T00:20:00Z
+
+I'm using PhpStorm also. It only occurs when you chain some of the form builder functions together. The following, for example, doesn't work.
+
+```
+$form = $this->createFormBuilder()
+	->add('asset')
+	->add('division')
+	->add('move', SubmitType::class)
+	->getForm();
+```
+
+The resulting object is not of type FormBuilder.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-06-12T18:36:31Z
+
+Ok now I see what you mean :+1:

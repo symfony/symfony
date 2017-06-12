@@ -705,7 +705,7 @@ class FrameworkExtension extends Extension
                 ->addTag('routing.loader', array('priority' => -10))
                 ->addArgument(new Reference('annotation_reader'));
 
-            $container->register('routing.loader.directory', AnnotationDirectoryLoader::class)
+            $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
                 ->setPublic(false)
                 ->addTag('routing.loader', array('priority' => -10))
                 ->setArguments(array(
@@ -713,7 +713,7 @@ class FrameworkExtension extends Extension
                     new Reference('routing.loader.annotation'),
                 ));
 
-            $container->register('routing.loader.file', AnnotationFileLoader::class)
+            $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
                 ->setPublic(false)
                 ->addTag('routing.loader', array('priority' => -10))
                 ->setArguments(array(

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-11T11:42:58Z
+
+I think we also need check for the existence of the Doctrine Cache package when annotation support is enabled in the config as by default we use a caching annotation reader.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T14:50:35Z
+
+@xabbuh is right about the annotation reader
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-12T15:03:02Z
+
+check on annotations added

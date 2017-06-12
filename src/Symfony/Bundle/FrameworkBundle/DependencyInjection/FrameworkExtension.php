@@ -61,6 +61,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
@@ -639,9 +640,14 @@ class FrameworkExtension extends Extension
     {
         $loader->load('debug_prod.xml');
 
+        if (class_exists(Stopwatch::class)) {
+            $container->register('debug.stopwatch', Stopwatch::class);
+            $container->setAlias(Stopwatch::class, 'debug.stopwatch');
+        }
+
         $debug = $container->getParameter('kernel.debug');
 
-        if ($debug) {
+        if ($debug && class_exists(Stopwatch::class)) {
             $loader->load('debug.xml');
         }
 
@@ -881,7 +887,7 @@ class FrameworkExtension extends Extension
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
-            if ($container->getParameter('kernel.debug')) {
+            if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
                 $loader->load('templating_debug.xml');
 
                 $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));

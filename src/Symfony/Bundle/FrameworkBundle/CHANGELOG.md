@@ -4,10 +4,14 @@ CHANGELOG
 3.4.0
 -----
 
-* Removed `doctrine/cache` from the list of required dependencies in `composer.json`
-* Deprecated `validator.mapping.cache.doctrine.apc` service
-* Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
-* Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+ * Removed `doctrine/cache` from the list of required dependencies in `composer.json`
+ * Deprecated `validator.mapping.cache.doctrine.apc` service
+ * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
+ * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+ * The `symfony/stopwatch` dependency has been removed, require it via `composer
+   require symfony/stopwatch` in your `dev` environment.
+ * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
+ * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
 
 3.3.0
 -----

@@ -21,6 +21,9 @@ FrameworkBundle
 
  * The `validator.mapping.cache.doctrine.apc` service has been deprecated.
 
+ * The `symfony/stopwatch` dependency has been removed, require it via `composer
+   require symfony/stopwatch` in your `dev` environment.
+
  * Using the `KERNEL_DIR` environment variable or the automatic guessing based
    on the `phpunit.xml` / `phpunit.xml.dist` file location is deprecated since 3.4. 
    Set the `KERNEL_CLASS` environment variable to the fully-qualified class name

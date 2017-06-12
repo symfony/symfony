@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
@@ -235,7 +234,7 @@ class ExceptionHandler
 EOF
                         , $ind, $total, $class, $message);
                     foreach ($e['trace'] as $trace) {
-                        $content .= '<tr><td class="trace-row ' . static::getTraceClassname($trace) . '">';
+                        $content .= '<tr><td class="trace-row '.static::getTraceClassname($trace).'">';
                         if ($trace['function']) {
                             $content .= sprintf('at <span class="trace-class">%s</span><span class="trace-type">%s</span><span class="trace-method">%s</span>(<span class="trace-arguments">%s</span>)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                         }
@@ -423,9 +422,9 @@ EOF;
         }
 
         $vendorRoot = static::getVendorRoot();
-        $traceFileRelative = str_replace($vendorRoot, '', $trace['file']);
+        $traceFileRelative = str_replace($vendorRoot, '', realpath($trace['file']));
 
-        if (strpos($traceFileRelative, '\\vendor\\') === 0) {
+        if (strpos($traceFileRelative, '/vendor/') === 0) {
             return null;
         }
 

@@ -221,6 +221,21 @@ class RouteTest extends TestCase
     }
 
     /**
+     * Tests that the compiled version does not fail when the Route refers to
+     * arbitrary classes.
+     */
+    public function testSerializeWhenCompiledWithClass()
+    {
+        $testClass = new \Symfony\Component\Cache\CacheItem();
+        $route = new Route('/', array(), array(), array('foo' => $testClass));
+
+        $serialized = serialize($route);
+        $unserialized = unserialize($serialized);
+
+        $this->assertInstanceOf(get_class($testClass), $unserialized->getOption('foo'));
+    }
+
+    /**
      * Tests that the serialized representation of a route in one symfony version
      * also works in later symfony versions, i.e. the unserialized route is in the
      * same state as another, semantically equivalent, route.

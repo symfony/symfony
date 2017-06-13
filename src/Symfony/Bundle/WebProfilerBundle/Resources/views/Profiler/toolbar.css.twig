@@ -252,6 +252,10 @@
     line-height: 17px;
 }
 
+.sf-toolbar-block-ajax .sf-toolbar-icon {
+    cursor: pointer;
+}
+
 .sf-toolbar-status-green .sf-toolbar-label,
 .sf-toolbar-status-yellow .sf-toolbar-label,
 .sf-toolbar-status-red .sf-toolbar-label {
@@ -295,15 +299,19 @@
     margin-left: 4px;
 }
 
-.sf-toolbar-block:hover {
+.sf-toolbar-block:hover,
+.sf-toolbar-block.hover {
     position: relative;
 }
-.sf-toolbar-block:hover .sf-toolbar-icon {
+.sf-toolbar-block:hover .sf-toolbar-icon,
+.sf-toolbar-block.hover .sf-toolbar-icon
+{
     background-color: #444;
     position: relative;
     z-index: 10002;
 }
-.sf-toolbar-block:hover .sf-toolbar-info {
+.sf-toolbar-block:hover .sf-toolbar-info,
+.sf-toolbar-block.hover .sf-toolbar-info {
     display: block;
     padding: 10px;
     max-width: 480px;

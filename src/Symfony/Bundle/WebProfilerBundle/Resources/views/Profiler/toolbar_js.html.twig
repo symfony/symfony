@@ -93,6 +93,11 @@
                     Sfjs.setPreference('toolbar/displayState', 'block');
                 });
                 Sfjs.renderAjaxRequests();
+                Sfjs.addEventListener(document.querySelector('.sf-toolbar-block-ajax > .sf-toolbar-icon'), 'click', function(event) {
+                    event.preventDefault();
+
+                    Sfjs.toggleClass(this.parentNode, 'hover');
+                });
             },
             function(xhr) {
                 if (xhr.status !== 0) {

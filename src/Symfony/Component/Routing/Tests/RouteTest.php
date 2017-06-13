@@ -233,7 +233,7 @@ class RouteTest extends TestCase
         try {
             $unserialized = unserialize($serialized);
             $this->assertInstanceOf('\Symfony\Component\Routing\Tests\Fixtures\CustomCompiledRoute', $unserialized->compile(), 'the unserialized route compiled successfully');
-        } catch (\Exception $except) {
+        } catch (\Exception $e) {
             $this->fail('unserializing a route which uses a custom compiled route class');
         }
     }

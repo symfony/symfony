@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
 
 class AbstractControllerTest extends ControllerTraitTest
 {

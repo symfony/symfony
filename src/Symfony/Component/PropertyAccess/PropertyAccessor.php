@@ -504,7 +504,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getReadAccessInfo($class, $property)
     {
-        $key = $class.'::'.$property;
+        $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
         if (isset($this->readPropertyCache[$key])) {
             $access = $this->readPropertyCache[$key];
@@ -672,7 +672,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getWriteAccessInfo($class, $property, $value)
     {
-        $key = $class.'::'.$property;
+        $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
         if (isset($this->writePropertyCache[$key])) {
             $access = $this->writePropertyCache[$key];

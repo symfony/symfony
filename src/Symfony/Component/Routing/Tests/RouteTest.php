@@ -221,6 +221,24 @@ class RouteTest extends TestCase
     }
 
     /**
+     * Tests that unserialization does not fail when the compiled Route is of a
+     * class other than CompiledRoute, such as a subclass of it.
+     */
+    public function testSerializeWhenCompiledWithClass()
+    {
+        $route = new Route('/', array(), array(), array('compiler_class' => '\Symfony\Component\Routing\Tests\Fixtures\CustomRouteCompiler'));
+        $this->assertInstanceOf('\Symfony\Component\Routing\Tests\Fixtures\CustomCompiledRoute', $route->compile(), '->compile() returned a proper route');
+
+        $serialized = serialize($route);
+        try {
+            $unserialized = unserialize($serialized);
+            $this->assertInstanceOf('\Symfony\Component\Routing\Tests\Fixtures\CustomCompiledRoute', $unserialized->compile(), 'the unserialized route compiled successfully');
+        } catch (\Exception $e) {
+            $this->fail('unserializing a route which uses a custom compiled route class');
+        }
+    }
+
+    /**
      * Tests that the serialized representation of a route in one symfony version
      * also works in later symfony versions, i.e. the unserialized route is in the
      * same state as another, semantically equivalent, route.

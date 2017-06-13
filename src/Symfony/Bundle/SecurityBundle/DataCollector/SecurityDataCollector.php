@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
@@ -39,6 +40,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private $logoutUrlGenerator;
     private $accessDecisionManager;
     private $firewallMap;
+    private $firewall;
     private $hasVarDumper;
 
     /**
@@ -49,14 +51,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      * @param LogoutUrlGenerator|null             $logoutUrlGenerator
      * @param AccessDecisionManagerInterface|null $accessDecisionManager
      * @param FirewallMapInterface|null           $firewallMap
+     * @param TraceableFirewallListener|null      $firewall
      */
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->firewallMap = $firewallMap;
+        $this->firewall = $firewall;
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
@@ -166,6 +170,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'listeners' => $firewallConfig->getListeners(),
                 );
             }
+        }
+
+        // collect firewall listeners information
+        $this->data['listeners'] = array();
+        if ($this->firewall) {
+            $this->data['listeners'] = $this->firewall->getWrappedListeners();
         }
     }
 
@@ -303,6 +313,11 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getFirewall()
     {
         return $this->data['firewall'];
+    }
+
+    public function getListeners()
+    {
+        return $this->data['listeners'];
     }
 
     /**

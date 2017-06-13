@@ -578,4 +578,74 @@ class PropertyAccessorTest extends TestCase
 
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
     }
+
+
+    public function testAnonymousClassRead()
+    {
+        if (PHP_MAJOR_VERSION < 7) {
+            $this->markTestSkipped('Anonymous Classes are only supported on PHP7');
+            return;
+        }
+
+        $value = 'bar';
+
+        $obj = $this->generateAnonymousClass($value);
+
+        $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
+
+        $this->assertEquals($value, $propertyAccessor->getValue($obj, 'foo'));
+
+    }
+
+    public function testAnonymousClassWrite()
+    {
+        if (PHP_MAJOR_VERSION < 7) {
+            $this->markTestSkipped('Anonymous Classes are only supported on PHP7');
+            return;
+        }
+
+        $value = 'bar';
+
+        $obj = $this->generateAnonymousClass('');
+
+        $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
+        $propertyAccessor->setValue($obj, 'foo', $value);
+
+        $this->assertEquals($value, $propertyAccessor->getValue($obj, 'foo'));
+
+    }
+
+    /**
+     * @param $value
+     */
+    private function generateAnonymousClass($value)
+    {
+        $obj = new class($value)
+        {
+            private $foo;
+
+            public function __construct($foo)
+            {
+                $this->foo = $foo;
+            }
+
+            /**
+             * @return mixed
+             */
+            public function getFoo()
+            {
+                return $this->foo;
+            }
+
+            /**
+             * @param mixed $foo
+             */
+            public function setFoo($foo)
+            {
+                $this->foo = $foo;
+            }
+        };
+
+        return $obj;
+    }
 }

@@ -27,6 +27,14 @@ class VarDumper
 
     public static function dump($var)
     {
+        $args = func_get_args();
+        if (count($args) > 1) {
+            foreach ($args as $arg) {
+                self::dump($arg);
+            }
+            return false;
+        }
+        
         if (null === self::$handler) {
             $cloner = new VarCloner();
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();

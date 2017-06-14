@@ -17,6 +17,8 @@ CHANGELOG
  * Removed `ConstraintValidatorFactory`
  * Removed class parameters related to routing
  * Removed absolute template paths support in the template name parser
+ * Removed support of the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
+ * Removed the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
 
 3.4.0
 -----

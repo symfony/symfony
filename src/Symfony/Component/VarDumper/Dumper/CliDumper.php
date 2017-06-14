@@ -123,9 +123,9 @@ class CliDumper extends AbstractDumper
                 $style = 'num';
 
                 switch (true) {
-                    case INF === $value:  $value = 'INF';  break;
+                    case INF === $value:  $value = 'INF'; break;
                     case -INF === $value: $value = '-INF'; break;
-                    case is_nan($value):  $value = 'NAN';  break;
+                    case is_nan($value):  $value = 'NAN'; break;
                     default:
                         $value = (string) $value;
                         if (false === strpos($value, $this->decimalPoint)) {

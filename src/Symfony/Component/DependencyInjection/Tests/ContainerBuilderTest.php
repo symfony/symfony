@@ -120,7 +120,7 @@ class ContainerBuilderTest extends TestCase
             $this->assertEquals('Circular reference detected for service "baz", path: "baz".', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
-        $this->assertTrue($builder->get('bar') === $builder->get('bar'), '->get() always returns the same instance if the service is shared');
+        $this->assertSame($builder->get('bar'), $builder->get('bar'), '->get() always returns the same instance if the service is shared');
     }
 
     public function testNonSharedServicesReturnsDifferentInstances()

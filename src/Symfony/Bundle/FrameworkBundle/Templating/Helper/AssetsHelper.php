@@ -78,7 +78,7 @@ class AssetsHelper extends Helper
 
         // packageName is null and path not, so path is a path or a packageName
         try {
-            $package = $this->packages->getPackage($path);
+            $this->packages->getPackage($path);
         } catch (\InvalidArgumentException $e) {
             // path is not a package, so it should be a path
             return $this->packages->getVersion($path);

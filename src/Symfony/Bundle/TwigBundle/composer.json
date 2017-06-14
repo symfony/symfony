@@ -35,7 +35,8 @@
         "symfony/yaml": "~2.8|~3.0",
         "symfony/framework-bundle": "^3.2.8",
         "symfony/web-link": "~3.3",
-        "doctrine/annotations": "~1.0"
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.0"
     },
     "conflict": {
         "symfony/dependency-injection": "<3.3"

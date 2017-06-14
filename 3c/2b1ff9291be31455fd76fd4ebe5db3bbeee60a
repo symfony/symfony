@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-14T20:48:58Z
+
+@fabpot Rebased to resolve conflicts after #23123 merge
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-14T21:31:17Z
+
+Should be rebased now :)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-14T22:01:14Z
+
+Note to self: Don't open three different PRs at once that change the same part of code, will save yourself a lot of work.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-14T22:01:41Z
+
+@fabpot rebased
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-14T22:08:58Z
+
+@mpdude Actually, that would have saved a lot of work for me as well :) At first, I didn't realized that the 3 PRs were about the same topic. In such a case, I generally ask to merge them all into one PR.

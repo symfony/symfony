@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-07T16:11:44Z
+
+I don't know if it's possible to change it, but don't you think that the error message in this case should be a yellow warning with this message?
+
+```
+Route "homepage" may match if condition "request.isXmlHttpRequest()" evaluates to true.
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-07T16:26:58Z
+
+It's possible... sure ;-) but perhaps out-of-scope for now.
+
+The part after `almost matches but ...` comes from the traces log.. so im not really sure what i get myself into, in terms of other variants.
+
+Also `if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {` is quite explicit... im not sure it covers "may match" :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-14T07:08:04Z
+
+@fabpot this should do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-14T20:57:32Z
+
+Thank you @ro0NL.

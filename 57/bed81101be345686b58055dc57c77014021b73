@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-06T04:47:27Z
+
+I'm not sure we should go that far in BC, especially since this is non serializable data (since we're talking about consts used in static props only.)
+I'd suggest to wait for an actual bug report before adding this, if any.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-06T07:26:08Z
+
+The thing is we even advised to use these strings in the previous docblocks of [`getClientIp()`](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Component/HttpFoundation/Request.php#L823-L825), [`getPort()`](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Component/HttpFoundation/Request.php#L930-L931), [`isSecure()`](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Component/HttpFoundation/Request.php#L1147-L1149) and [`getHost()`](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Component/HttpFoundation/Request.php#L1172-L1173).

@@ -59,7 +59,8 @@ class FirewallMapTest extends TestCase
 
         $firewallContext = $this->getMockBuilder(FirewallContext::class)->disableOriginalConstructor()->getMock();
         $firewallContext->expects($this->once())->method('getConfig')->willReturn('CONFIG');
-        $firewallContext->expects($this->once())->method('getContext')->willReturn(array('LISTENERS', 'EXCEPTION LISTENER'));
+        $firewallContext->expects($this->once())->method('getListeners')->willReturn('LISTENERS');
+        $firewallContext->expects($this->once())->method('getExceptionListener')->willReturn('EXCEPTION LISTENER');
 
         $matcher = $this->getMockBuilder(RequestMatcherInterface::class)->getMock();
         $matcher->expects($this->once())

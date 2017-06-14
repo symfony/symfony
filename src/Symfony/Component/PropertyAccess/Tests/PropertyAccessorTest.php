@@ -641,6 +641,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
+     * @requires PHP 7.0
      * @expectedException \TypeError
      */
     public function testThrowTypeErrorInsideSetterCall()

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-14T08:11:43Z
+
+Just wondering: is there a reason you did not include trans_sid_hosts and trans_sid_tags?
+
+---------------------------------------------------------------------------
+
+by vincentaubert at 2017-06-14T17:37:32Z
+
+just forgot it :) fixed and branch rebased

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-09T09:03:11Z
+
+Complex topic :)
+This will break if anyone is using e.g. the 'esi' service directly.
+If adding the "cache" service in the xml is not required, I'd suggest removing it also, for BC concerns.
+Then, what about deprecating the esi and ssi services, and passing the service around using a request parameter instead? It's a scoped service to me, that doesn't fit the container, isn't it?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-09T09:23:36Z
+
+:+1: for deprecation the esi/ssi defintions (and revert adding `cache` definition).
+
+About
+
+```
+$this->getKernel()->getContainer()->set('cache', $this);
+$this->getKernel()->getContainer()->set($this->getSurrogate()->getName(), $this->getSurrogate());
+```
+
+Is this needed, either setting them as request attribute or service =/ I believe `@cache` will equal `@kernel` anyway. And `@<surrogate-name>` equals `@kernel->getSurrogate()`
+
+Not sure we need to pass anything here =/
+
+edit:
+but `@esi_listener` needs a patch, or indeed, depend on a request param.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-09T09:32:19Z
+
+@ro0NL right, let's try this way.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-09T11:10:52Z
+
+Hm.. we can have 2 `SurrogateListener`'s, the `HttpCache` will only have 1 surrogate.
+
+So we cant deprecate the service really, but we should check for a esi/ssi surrogate from the kernel first. Let me try :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-09T11:22:02Z
+
+Something like this :)

@@ -51,7 +51,7 @@ class PassConfig
             new ResolveDefinitionTemplatesPass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),
-            new ResolveParameterPlaceHoldersPass(),
+            new ResolveParameterPlaceHoldersPass(false),
             new ResolveFactoryClassPass(),
             new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),

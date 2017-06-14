@@ -34,7 +34,7 @@ class ProjectServiceContainer extends Container
 
         $this->services = array();
         $this->methodMap = array(
-            'test' => 'getTestService',
+            'bar' => 'getBarService',
         );
 
         $this->aliases = array();
@@ -67,16 +67,20 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'test' service.
+     * Gets the 'bar' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \stdClass A stdClass instance
+     * @return \BarClass A BarClass instance
      */
-    protected function getTestService()
+    protected function getBarService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
+        $this->services['bar'] = $instance = new \BarClass();
+
+        $instance->setBaz($this->parameters['array_1'], $this->getParameter('array_2'), '%array_1%');
+
+        return $instance;
     }
 
     /**
@@ -133,8 +137,7 @@ class ProjectServiceContainer extends Container
     }
 
     private $loadedDynamicParameters = array(
-        'foo' => false,
-        'buz' => false,
+        'array_2' => false,
     );
     private $dynamicParameters = array();
 
@@ -150,8 +153,9 @@ class ProjectServiceContainer extends Container
     private function getDynamicParameter($name)
     {
         switch ($name) {
-            case 'foo': $value = ('wiz'.$this->targetDirs[1]); break;
-            case 'buz': $value = $this->targetDirs[2]; break;
+            case 'array_2': $value = array(
+                0 => ($this->targetDirs[2].'/Dumper'),
+            ); break;
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
         }
         $this->loadedDynamicParameters[$name] = true;
@@ -167,8 +171,9 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters()
     {
         return array(
-            'bar' => __DIR__,
-            'baz' => (__DIR__.'/PhpDumperTest.php'),
+            'array_1' => array(
+                0 => 123,
+            ),
         );
     }
 }

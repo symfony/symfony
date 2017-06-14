@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-03T21:37:45Z
+
+Is loading the resources immediately in the constructor ([here](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php#L68,L70)) really necessary (why)? Commenting it out does at least not break tests.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-08T08:18:10Z
+
+@fabot / @nicolas-grekas does this look sensible? If you basically agree, I probably should rebase it onto 2.7.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-08T08:29:38Z
+
+Rebased onto 2.7; no modifications were necessary

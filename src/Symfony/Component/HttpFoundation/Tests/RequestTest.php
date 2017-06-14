@@ -1959,6 +1959,17 @@ class RequestTest extends TestCase
         Request::setTrustedHosts(array());
     }
 
+    public function testInheritedTrustedProxies()
+    {
+        $request = InheritedRequest::create('/');
+        $request->server->set('REMOTE_ADDR', '3.3.3.3');
+        $request->headers->set('X_FORWARDED_FOR', '1.1.1.1, 2.2.2.2');
+        $request->headers->set('X_FORWARDED_HOST', 'foo.example.com:1234, real.example.com:8080');
+        $request->headers->set('X_FORWARDED_PROTO', 'https');
+        $request->headers->set('X_FORWARDED_PORT', 443);
+        $this->assertFalse($request->isSecure());
+    }
+
     public function testFactory()
     {
         Request::setFactory(function (array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null) {
@@ -2188,4 +2199,9 @@ class NewRequest extends Request
     {
         return 'foo';
     }
+}
+
+class InheritedRequest extends Request
+{
+    protected static $trustedProxies = array('3.3.3.4', '2.2.2.2');
 }

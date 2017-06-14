@@ -574,7 +574,7 @@ class Request
      */
     public static function setTrustedProxies(array $proxies/*, int $trustedHeaderSet*/)
     {
-        self::$trustedProxies = $proxies;
+        static::$trustedProxies = $proxies;
 
         if (2 > func_num_args()) {
             @trigger_error(sprintf('The %s() method expects a bit field of Request::HEADER_* as second argument since version 3.3. Defining it will be required in 4.0. ', __METHOD__), E_USER_DEPRECATED);
@@ -596,7 +596,7 @@ class Request
      */
     public static function getTrustedProxies()
     {
-        return self::$trustedProxies;
+        return static::$trustedProxies;
     }
 
     /**
@@ -2012,7 +2012,7 @@ class Request
      */
     public function isFromTrustedProxy()
     {
-        return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), self::$trustedProxies);
+        return static::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), static::$trustedProxies);
     }
 
     private function getTrustedValues($type, $ip = null)
@@ -2072,7 +2072,7 @@ class Request
                 continue;
             }
 
-            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
+            if (IpUtils::checkIp($clientIp, static::$trustedProxies)) {
                 unset($clientIps[$key]);
 
                 // Fallback to this when the client IP falls into the range of trusted proxies

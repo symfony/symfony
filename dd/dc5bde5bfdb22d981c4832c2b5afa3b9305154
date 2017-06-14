@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-05-29T17:23:30Z
+
+why is it opened against the master branch if you want it for 3.4 ? master is 4.0
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-06-05T20:30:40Z
+
+Is it possible that a sub-request get created with all the attributes of its master request? In that case, using the request attributes as a cache would be wrong.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-06-09T12:24:16Z
+
+@fabpot The cache was introduced in 3.2. I've updated the PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-10T17:56:42Z
+
+Tests are broken.

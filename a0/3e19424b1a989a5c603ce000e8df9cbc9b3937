@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T15:58:30Z
+
+couldn't this cause issue if we keep some parameters unresolved in the container ? Are we already unescaping string values containing a `%` before reaching the dumper ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-12T16:11:34Z
+
+Tests added, PR is RFR.
+@stof I don't see where this could break. Can you elaborate if you have a broken case?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-13T07:12:30Z
+
+@nicolas-grekas if I have an argument configured as `%%array_param%%`, will your code properly inject the string `%array_param%` or will it inject the `array_param` parameter instead ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-13T08:22:23Z
+
+@stof test added, looks all good (the PhpDumper handles that logic)

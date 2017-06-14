@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-13T07:30:48Z
+
+I'm not sure about this because it introduces a different behavior in the toolbar depending on the panel the user clicks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-13T07:43:48Z
+
+Well.. currently it's the only block (by default) that has no click handler (ie. is not a link). So it already behaves different, but in a more frustrating way :)
+
+it's truly convenient :))
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-06-14T18:04:23Z
+
+i think we should do this for all blocks that are not linking btw =/ (ie. `.sf-toolbar-block > .sf-toolbar-icon` vs. `.sf-toolbar-block > a > .sf-toolbar-icon`) if that's the standard format.

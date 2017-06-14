@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -141,15 +142,27 @@ class _FirewallMap
         return $context->getConfig();
     }
 
+    /**
+     * @return FirewallContext
+     */
     private function getFirewallContext(Request $request)
     {
-        if ($this->contexts->contains($request)) {
-            return $this->contexts[$request];
+        if ($request->attributes->has('_firewall_context')) {
+            $storedContextId = $request->attributes->get('_firewall_context');
+            foreach ($this->map as $contextId => $requestMatcher) {
+                if ($contextId === $storedContextId) {
+                    return $this->container->get($contextId);
+                }
+            }
+
+            $request->attributes->remove('_firewall_context');
         }
 
         foreach ($this->map as $contextId => $requestMatcher) {
             if (null === $requestMatcher || $requestMatcher->matches($request)) {
-                return $this->contexts[$request] = $this->container->get($contextId);
+                $request->attributes->set('_firewall_context', $contextId);
+
+                return $this->container->get($contextId);
             }
         }
     }

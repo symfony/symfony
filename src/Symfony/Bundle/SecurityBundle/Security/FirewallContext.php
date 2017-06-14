@@ -25,12 +25,7 @@ class FirewallContext
     private $exceptionListener;
     private $config;
 
-    /**
-     * @param \Traversable|array     $listeners
-     * @param ExceptionListener|null $exceptionListener
-     * @param FirewallConfig|null    $firewallConfig
-     */
-    public function __construct($listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
+    public function __construct(iterable $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
@@ -42,10 +37,7 @@ class FirewallContext
         return $this->config;
     }
 
-    /**
-     * @return \Traversable|array
-     */
-    public function getListeners()
+    public function getListeners(): iterable
     {
         return $this->listeners;
     }

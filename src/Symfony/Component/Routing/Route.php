@@ -116,11 +116,7 @@ class Route implements \Serializable
      */
     public function unserialize($serialized)
     {
-        if (\PHP_VERSION_ID >= 70000) {
-            $data = unserialize($serialized, array('allowed_classes' => array(CompiledRoute::class)));
-        } else {
-            $data = unserialize($serialized);
-        }
+        $data = unserialize($serialized);
         $this->path = $data['path'];
         $this->host = $data['host'];
         $this->defaults = $data['defaults'];

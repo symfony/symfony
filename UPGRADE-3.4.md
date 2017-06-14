@@ -34,6 +34,10 @@ FrameworkBundle
  * The `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` 
    methods are deprecated since 3.4 and will be removed in 4.0.
 
+ * The `--no-prefix` option of the `translation:update` command is deprecated and
+   will be removed in 4.0. Use the `--prefix` option with an empty string as value
+   instead (e.g. `--prefix=""`)
+
 Process
 -------
 

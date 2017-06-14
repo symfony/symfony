@@ -13,6 +13,7 @@ CHANGELOG
 -----
 
  * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
+ * added info about called security listeners in profiler 
 
 3.3.0
 -----

@@ -345,6 +345,9 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
    Use `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
+ * The `--no-prefix` option of the `translation:update` command has
+   been removed.
+
 HttpFoundation
 --------------
 

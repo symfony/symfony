@@ -31,6 +31,9 @@
         "doctrine/cache": "~1.0",
         "egulias/email-validator": "^1.2.1"
     },
+    "conflict": {
+        "egulias/email-validator": ">=2.0"
+    },
     "suggest": {
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
         "doctrine/cache": "For using the default cached annotation reader and metadata cache.",

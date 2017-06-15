@@ -163,8 +163,8 @@ EOT
                     $this->filesystem->remove($bundlesDir.$file);
                 }
             }
-            closedir($dir);
-        }        
+        }
+        closedir($dir);
         
         $io->table(array('', 'Bundle', 'Method / Error'), $rows);
 

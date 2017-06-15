@@ -132,20 +132,15 @@ EOT
                 } else {
                     $this->hardCopy($originDir, $targetDir);
                 }
-            }
-            if (is_dir($targetDir)) {
-                array_push($validAssetDir, $targetDir);
+                $validAssetDir[] = $targetDir;
             }
         }
         // Check in $bundlesDir, if all links/folder still have an existing Bundle
-        if ($dir = opendir($bundlesDir)) {
-            while (($file = readdir($dir)) !== false) {
-                if ($file != '.' && $file != '..' && !in_array($bundlesDir.$file, $validAssetDir)) {
-                    $filesystem->remove($bundlesDir.$file);
-                }
+        foreach (new \FilesystemIterator($bundlesDir) as $file) {
+            if (!in_array($file, $validAssetDir)) {
+                $filesystem->remove($file);
             }
         }
-        closedir($dir);
     }
 
     /**

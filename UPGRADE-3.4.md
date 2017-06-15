@@ -47,6 +47,9 @@ Process
 SecurityBundle
 --------------
 
+ * Using voters that do not implement the `VoterInterface`is now deprecated in
+   the `AccessDecisionManager` and this functionality will be removed in 4.0.
+
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
 
 Validator

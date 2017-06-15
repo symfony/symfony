@@ -165,7 +165,6 @@ EOT
             }
         }
         closedir($dir);
-        
         $io->table(array('', 'Bundle', 'Method / Error'), $rows);
 
         if (0 !== $exitCode) {

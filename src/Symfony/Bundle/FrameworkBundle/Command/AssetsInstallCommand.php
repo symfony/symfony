@@ -149,9 +149,7 @@ EOT
                 } else {
                     $rows[] = array(sprintf('<fg=yellow;options=bold>%s</>', '\\' === DIRECTORY_SEPARATOR ? 'WARNING' : '!'), $message, $method);
                 }
-                
                 array_push($validAssetDir, $targetDir);
-                
             } catch (\Exception $e) {
                 $exitCode = 1;
                 $rows[] = array(sprintf('<fg=red;options=bold>%s</>', '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage());
@@ -159,9 +157,9 @@ EOT
         }
 
         // Check in $bundlesDir, if all links/folder still have an existing Bundle
-        if($dir = opendir($bundlesDir)) {
+        if ($dir = opendir($bundlesDir)) {
             while (($file = readdir($dir)) !== false) {
-                if($file != '.' && $file != '..' && !in_array($bundlesDir.$file, $validAssetDir)) {
+                if ($file != '.' && $file != '..' && !in_array($bundlesDir.$file, $validAssetDir)) {
                     $this->filesystem->remove($bundlesDir.$file);
                 }
             }

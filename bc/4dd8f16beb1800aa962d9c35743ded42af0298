@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by vamsiikrishna at 2017-05-04T10:14:44Z
+
+I have got some Voters which are tagged as voters but don't implement ```VoterInterface``` .
+Thanks for addressing this and adhering to  BC promise .
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-06-15T06:56:07Z
+
+@fabpot while you approved it, you also closed it but I don't see another commit in the list for 3.4 (as it usually does), I think something went wrong

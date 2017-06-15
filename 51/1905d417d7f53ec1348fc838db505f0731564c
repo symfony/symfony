@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-14T21:14:09Z
+
+Oh. Actually, it fixes a bug in 3.3 with the `AbstractController`, but it could also be applicable in lower branches. WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-14T21:18:52Z
+
+If framework.templating is disabled and the `templating.engine.twig` service is registered then its definition is invalid, I think it's worth fixing it on lower branches.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-15T07:49:51Z
+
+Problem is that we must ensure the TwigBundle TemplatingPass is executed before the FrameworkBundle one, hence using the 3.2 compiler pass priority feature.
+
+So we'll need to act differently for lower branches: instead of differing the loading of the `templating.xml` file in a pass, we should remove the two `twig.loader.filesystem` and `templating.engine.twig` in the `ExtensionPass`, where some similar operations are made.
+
+For now, rebased on 3.2 at least.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-15T11:48:48Z
+
+Re-targeted to 2.7.

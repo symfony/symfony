@@ -21,6 +21,20 @@ use Symfony\Component\Validator\Constraint;
  */
 class Url extends Constraint
 {
+    const CHECK_DNS_TYPE_ANY = 'ANY';
+    const CHECK_DNS_TYPE_NONE = false;
+    const CHECK_DNS_TYPE_A = 'A';
+    const CHECK_DNS_TYPE_A6 = 'A6';
+    const CHECK_DNS_TYPE_AAAA = 'AAAA';
+    const CHECK_DNS_TYPE_CNAME = 'CNAME';
+    const CHECK_DNS_TYPE_MX = 'MX';
+    const CHECK_DNS_TYPE_NAPTR = 'NAPTR';
+    const CHECK_DNS_TYPE_NS = 'NS';
+    const CHECK_DNS_TYPE_PTR = 'PTR';
+    const CHECK_DNS_TYPE_SOA = 'SOA';
+    const CHECK_DNS_TYPE_SRV = 'SRV';
+    const CHECK_DNS_TYPE_TXT = 'TXT';
+
     const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
 
     protected static $errorNames = array(
@@ -30,5 +44,5 @@ class Url extends Constraint
     public $message = 'This value is not a valid URL.';
     public $dnsMessage = 'The host could not be resolved.';
     public $protocols = array('http', 'https');
-    public $checkDNS = false;
+    public $checkDNS = self::CHECK_DNS_TYPE_NONE;
 }

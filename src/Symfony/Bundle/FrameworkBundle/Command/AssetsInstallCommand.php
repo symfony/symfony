@@ -78,6 +78,11 @@ EOT
 
         // Create the bundles directory otherwise symlink will fail.
         $bundlesDir = $targetArg.'/bundles/';
+
+        if ($filesystem->exists($bundlesDir)) {
+            $filesystem->remove($bundlesDir);
+        }
+
         $filesystem->mkdir($bundlesDir, 0777);
 
         // relative implies symlink

@@ -137,7 +137,6 @@ EOT
                 array_push($validAssetDir, $targetDir);
             }
         }
-        
         // Check in $bundlesDir, if all links/folder still have an existing Bundle
         if ($dir = opendir($bundlesDir)) {
             while (($file = readdir($dir)) !== false) {

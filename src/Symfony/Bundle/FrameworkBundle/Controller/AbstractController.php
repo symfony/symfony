@@ -35,7 +35,10 @@ abstract class AbstractController implements ServiceSubscriberInterface
 {
     use ControllerTrait;
 
-    private $container;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @internal

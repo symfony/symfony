@@ -448,6 +448,7 @@ abstract class Client
 
         if (-1 !== $this->maxRedirects) {
             if ($this->redirectCount > $this->maxRedirects) {
+                $this->redirectCount = 0;
                 throw new \LogicException(sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
             }
         }

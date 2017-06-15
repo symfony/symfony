@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by BPScott at 2017-06-15T12:54:20Z
+
+Added the docblock.
+
+Adding the get/has methods would also solve my use-case. Am happy to add those too or in place of changing the visibility if desired. [Controller](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Controller/Controller.php) does both (protected $container comes via ContainerAwareTrait).
+
+Laziness is exactly the use case I'm aiming for. [This is what I'm trying to do](https://github.com/bbc/programmes-frontend/compare/to-abstractcontroller) - my base controller will contain various utility methods, and I don't want the overhead of creating the services used by those utilities until I know I need them.

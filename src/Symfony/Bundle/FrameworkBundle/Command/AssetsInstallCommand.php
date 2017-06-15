@@ -136,9 +136,9 @@ EOT
             }
         }
         // Check in $bundlesDir, if all links/folder still have an existing Bundle
-        foreach (new \FilesystemIterator($bundlesDir) as $file) {
-            if (!in_array($file, $validAssetDir)) {
-                $filesystem->remove($file);
+        foreach (new \FilesystemIterator($bundlesDir) as $dir) {
+            if (!in_array($dir, $validAssetDir)) {
+                $filesystem->remove($dir);
             }
         }
     }

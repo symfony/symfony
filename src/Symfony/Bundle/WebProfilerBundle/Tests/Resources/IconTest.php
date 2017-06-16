@@ -25,9 +25,6 @@ class IconTest extends TestCase
 
     public function provideIconFilePaths()
     {
-        return array_map(
-            function ($filePath) { return (array) $filePath; },
-            glob(__DIR__.'/../../Resources/views/Icon/*.svg')
-        );
+        return array_map(function ($filePath) { return (array) $filePath; }, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
     }
 }

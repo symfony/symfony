@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by Hanmac at 2017-06-13T10:21:32Z
+
+hm i would add more attributes
+that are the attributes of another icon:
+```xml
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
+```
+i think the other should be added to the cache icon too.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-13T10:25:15Z
+
+@javiereguiluz would it be worth writing a simple PHPUnit test enforcing the presence of these attributes in all SVG files of the icon folder ? It would forbid reintroducing the same bug each time we add a new panel.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-06-13T10:42:41Z
+
+This PR fixes the issue for me. Thanks a lot. :-)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-13T12:35:26Z
+
+@javiereguiluz this PR should go in 3.3. Please change it to have a working CI (the master branch is currently broken)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-16T15:46:34Z
+
+I've made the requested changes.

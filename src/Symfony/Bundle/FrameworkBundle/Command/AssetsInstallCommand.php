@@ -135,7 +135,7 @@ EOT
                 $validAssetDirs[] = $targetDir;
             }
         }
-        // Check in $bundlesDir, if all links/folder still have an existing Bundle
+        // remove the assets of the bundles that no longer exist
         foreach (new \FilesystemIterator($bundlesDir) as $dir) {
             if (!in_array($dir, $validAssetDirs)) {
                 $filesystem->remove($dir);

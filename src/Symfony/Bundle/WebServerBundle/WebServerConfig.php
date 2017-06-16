@@ -36,7 +36,18 @@ class WebServerConfig
 
         $this->documentRoot = $documentRoot;
         $this->env = $env;
-        $this->router = $router ?: __DIR__.'/Resources/router.php';
+
+        if (null !== $router) {
+            $absoluteRouterPath = realpath($router);
+
+            if (false === $absoluteRouterPath) {
+                throw new \InvalidArgumentException(sprintf('Router script "%s" does not exist.', $router));
+            }
+
+            $this->router = $absoluteRouterPath;
+        } else {
+            $this->router = __DIR__.'/Resources/router.php';
+        }
 
         if (null === $address) {
             $this->hostname = '127.0.0.1';

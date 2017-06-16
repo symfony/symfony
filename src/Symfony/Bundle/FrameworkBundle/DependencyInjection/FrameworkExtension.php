@@ -1177,7 +1177,10 @@ class FrameworkExtension extends Extension
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
             $dirname = $bundle['path'];
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/validation.yml', false)) {
+            if (
+                $container->fileExists($file = $dirname.'/Resources/config/validation.yaml', false) ||
+                $container->fileExists($file = $dirname.'/Resources/config/validation.yml', false)
+            ) {
                 $fileRecorder('yml', $file);
             }
 
@@ -1385,7 +1388,10 @@ class FrameworkExtension extends Extension
                 $fileRecorder('xml', $file);
             }
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/serialization.yml', false)) {
+            if (
+                $container->fileExists($file = $dirname.'/Resources/config/serialization.yaml', false) ||
+                $container->fileExists($file = $dirname.'/Resources/config/serialization.yml', false)
+            ) {
                 $fileRecorder('yml', $file);
             }
 

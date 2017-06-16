@@ -33,7 +33,7 @@
         </service>
 
         <service id="translation.loader.yml" class="Symfony\Component\Translation\Loader\YamlFileLoader" public="true">
-            <tag name="translation.loader" alias="yml" />
+            <tag name="translation.loader" alias="yaml" legacy-alias="yml" />
         </service>
 
         <service id="translation.loader.xliff" class="Symfony\Component\Translation\Loader\XliffFileLoader" public="true">
@@ -90,6 +90,11 @@
 
         <service id="translation.dumper.yml" class="Symfony\Component\Translation\Dumper\YamlFileDumper" public="true">
             <tag name="translation.dumper" alias="yml" />
+        </service>
+
+        <service id="translation.dumper.yaml" class="Symfony\Component\Translation\Dumper\YamlFileDumper">
+            <argument>yaml</argument>
+            <tag name="translation.dumper" alias="yaml" />
         </service>
 
         <service id="translation.dumper.qt" class="Symfony\Component\Translation\Dumper\QtFileDumper" public="true">

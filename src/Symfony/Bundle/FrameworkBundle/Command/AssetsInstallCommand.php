@@ -89,7 +89,7 @@ EOT
             $output->writeln('Installing assets as <comment>hard copies</comment>.');
         }
 
-        $validAssetDir = array();
+        $validAssetDirs = array();
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
@@ -132,12 +132,12 @@ EOT
                 } else {
                     $this->hardCopy($originDir, $targetDir);
                 }
-                $validAssetDir[] = $targetDir;
+                $validAssetDirs[] = $targetDir;
             }
         }
         // Check in $bundlesDir, if all links/folder still have an existing Bundle
         foreach (new \FilesystemIterator($bundlesDir) as $dir) {
-            if (!in_array($dir, $validAssetDir)) {
+            if (!in_array($dir, $validAssetDirs)) {
                 $filesystem->remove($dir);
             }
         }

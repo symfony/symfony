@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T14:17:09Z
+
+I would do that in master as there is no bug fix here.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-03-23T16:41:43Z
+
+@fabpot Fine for me. Can you do this when merging, or do you need a new PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T16:58:14Z
+
+You can change the target branch on the PR directly.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-03-23T17:02:49Z
+
+Must be a new GH feature or it has always been so well hidden I missed it.
+
+Changed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-16T17:56:02Z
+
+If you could also change the target to 3.4, that would be wonderful.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-16T18:13:04Z
+
+@fabpot changed base to 3.4 – did I get you right?
+
+Also, at least in the web interface, GitHub shows no merge conflicts...?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-16T18:14:41Z
+
+3.4 👍
+Can you still rebase please? We don't merge PRs with merge commits.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-16T19:09:17Z
+
+Hm, rebasing and fixing up a branch that I had previously rebased in the GH web interface, including merge conflicts, really challenged my git skills... hope it's allright now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-16T19:39:58Z
+
+Apparently, tests are broken on deps low.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-16T21:05:47Z
+
+Messed up the test during merge conflict resolution, should be fixed now.

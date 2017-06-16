@@ -284,6 +284,28 @@ XML;
         $this->assertSame(array('@index' => -12.11, '#' => 'Name'), $this->encoder->decode($source, 'xml'));
     }
 
+    public function testNoTypeCastAttribute()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document a="018" b="-12.11">
+    <node a="018" b="-12.11"/>
+</document>
+XML;
+
+        $data = $this->encoder->decode($source, 'xml', array('xml_type_cast_attributes' => false));
+        $expected = array(
+            '@a' => '018',
+            '@b' => '-12.11',
+            'node' => array(
+                '@a' => '018',
+                '@b' => '-12.11',
+                '#' => '',
+            ),
+        );
+        $this->assertSame($expected, $data);
+    }
+
     public function testEncode()
     {
         $source = $this->getXmlSource();

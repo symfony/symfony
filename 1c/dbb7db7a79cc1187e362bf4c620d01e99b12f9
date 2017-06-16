@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by ragboyjr at 2017-06-09T21:21:10Z
+
+@sstok @dunglas what do you think?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-06-10T10:29:37Z
+
+I think this might count as a new feature, since you are adding a new flag which must be explicitly opt-in to use, so it probably needs to go against the `3.4` branch instead of `2.7`
+
+---------------------------------------------------------------------------
+
+by ragboyjr at 2017-06-10T21:05:53Z
+
+@pierredup I understand what you mean; however, the issue is that the bug/issue of typecasting everything was merged into 2.7. So, some type of fix will be needed for that. I couldn't figure out a way to fix that bug in a bc manner. The only other solution I could come up with would be to maybe use regex to parse the string and verify that it doesn't start with zero's, however, that could open its own can of worms which might cause other users to complain.
+
+If you have any ideas on how to fix the issue and merge into 2.7, then i'm all ears.
+
+---------------------------------------------------------------------------
+
+by ragboyjr at 2017-06-12T05:58:19Z
+
+@pierredup updated the test case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-14T08:31:16Z
+
+I think that if the issue is only about numbers that start with a zero, then we could consider keeping them as strings ~~(and consider this fixes a BC break introduced by #22478).~~
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-06-14T18:16:14Z
+
+👍 to merge this in 3.4. It should be the default behavior IMO but it's too late now.

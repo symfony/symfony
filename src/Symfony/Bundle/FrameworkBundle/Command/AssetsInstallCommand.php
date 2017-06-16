@@ -89,6 +89,7 @@ EOT
             $output->writeln('Installing assets as <comment>hard copies</comment>.');
         }
 
+        $validAssetDirs = array();
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
@@ -131,6 +132,13 @@ EOT
                 } else {
                     $this->hardCopy($originDir, $targetDir);
                 }
+                $validAssetDirs[] = $targetDir;
+            }
+        }
+        // remove the assets of the bundles that no longer exist
+        foreach (new \FilesystemIterator($bundlesDir) as $dir) {
+            if (!in_array($dir, $validAssetDirs)) {
+                $filesystem->remove($dir);
             }
         }
     }

@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-16T13:20:04Z
+
+Well, if we have some configuration set based on the presence of an extension (or the existence of a class provided by an extension), this would prevent purging the cache when needed
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-06-16T13:22:58Z
+
+I know, but I also consider this an edge-case. When you enable a module, it makes sense to use a clear cache. If your feature doesn't work after enabling the module, first thing you should do: clear your cache.
+
+Perhaps this check can be done elsewhere (WDT?) and show that the modules have changed between 2 requests.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-16T13:31:04Z
+
+but if the cache was created in the CLI assuming the extension was there, and there you PHP-FPM process does not have it, your project is broken too
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-06-16T13:41:03Z
+
+I don't have have PHP-FPM and my project is not broken in the web because it doesn't have PCNTL. In this case, not having PCNTL in the web, is by design.
+
+Another solution that I've discussed with colleagues here, is making it configurable via possibly a composer extra setting.
+
+---------------------------------------------------------------------------
+
+by yannickl88 at 2017-06-16T13:56:54Z
+
+@stof, are you aware this is broken now for every setup where the CLI and Web extensions differ? (for instance, not having an apachehandler in CLI makes sense, since you do not need it).
+
+The current behavior triggers a container rebuild for *every* request for no reason.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-16T14:00:59Z
+
+I don't get why you say this is triggering a rebuild for *every* request.
+Only the first web request should do it, then the next ones should be "fresh" from this resource's pov, isn't it?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-06-16T14:04:19Z
+
+@nicolas-grekas That's what I expected, but is not the case, most likely because we run commands on the CLI during cache warmup.
+
+But even in this case, calling the console would again trigger a rebuild, switching back to the web, another one.
+
+---------------------------------------------------------------------------
+
+by yannickl88 at 2017-06-16T14:16:56Z
+
+@nicolas-grekas ah yes, what @iltar says.
+
+During a request when the cache needs a warmup we run a CLI command, which triggers this bug again and rebuilds the container *again* for CLI. So at the end of that request we are back in "CLI-config" so the next request will do the same rebuild. Hence why it happens with every request.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-16T14:31:44Z
+
+Let's do that and maybe add another more fine grained resource in 3.4 if we want to - tracking only the actually used extensions.

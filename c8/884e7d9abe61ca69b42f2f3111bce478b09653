@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-14T20:01:26Z
+
+Don't we have the same issue on 2.7 and 2.8? If yes, then could you rebase this PR on 2.7? Thanks.
+
+---------------------------------------------------------------------------
+
+by rchoquet at 2017-06-15T09:55:16Z
+
+@fabpot yep my bad, done.

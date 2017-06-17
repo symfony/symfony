@@ -45,7 +45,7 @@ class PhpArrayCache implements CacheInterface
      */
     public static function create($file, CacheInterface $fallbackPool)
     {
-        // Shared memory is available in PHP 7.0+ with OPCache enabled and in HHVM
+        // Shared memory is available in PHP 7.0+ with OPCache enabled
         if (ini_get('opcache.enable')) {
             return new static($file, $fallbackPool);
         }

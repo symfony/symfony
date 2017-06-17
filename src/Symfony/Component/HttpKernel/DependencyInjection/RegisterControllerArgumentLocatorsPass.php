@@ -132,16 +132,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         } elseif ($p->allowsNull() && !$p->isOptional()) {
                             $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                         }
-                    } elseif (isset($bindings['$'.$p->name])) {
-                        $binding = $bindings['$'.$p->name];
-
-                        list($bindingValue, $bindingId) = $binding->getValues();
-                        $binding->setValues(array($bindingValue, $bindingId, true));
-                        $args[$p->name] = $bindingValue;
-
-                        continue;
-                    } elseif (isset($bindings[$type])) {
-                        $binding = $bindings[$type];
+                    } elseif (isset($bindings[$bindingName = '$'.$p->name]) || isset($bindings[$bindingName = $type])) {
+                        $binding = $bindings[$bindingName];
 
                         list($bindingValue, $bindingId) = $binding->getValues();
                         $binding->setValues(array($bindingValue, $bindingId, true));

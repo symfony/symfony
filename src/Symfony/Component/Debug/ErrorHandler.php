@@ -382,25 +382,14 @@ class ErrorHandler
 
         if (4 < $numArgs = func_num_args()) {
             $context = $scope ? (func_get_arg(4) ?: array()) : array();
-            $backtrace = 5 < $numArgs ? func_get_arg(5) : null; // defined on HHVM
         } else {
             $context = array();
-            $backtrace = null;
         }
 
         if (isset($context['GLOBALS']) && $scope) {
             $e = $context;                  // Whatever the signature of the method,
             unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
             $context = $e;
-        }
-
-        if (null !== $backtrace && $type & E_ERROR) {
-            // E_ERROR fatal errors are triggered on HHVM when
-            // hhvm.error_handling.call_user_handler_on_fatals=1
-            // which is the way to get their backtrace.
-            $this->handleFatalError(compact('type', 'message', 'file', 'line', 'backtrace'));
-
-            return true;
         }
 
         $logMessage = $this->levels[$type].': '.$message;
@@ -436,11 +425,12 @@ class ErrorHandler
 
             // Clean the trace by removing function arguments and the first frames added by the error handler itself.
             if ($throw || $this->tracedErrors & $type) {
-                $backtrace = $backtrace ?: $errorAsException->getTrace();
+                $backtrace = $errorAsException->getTrace();
                 $lightTrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
                 $this->traceReflector->setValue($errorAsException, $lightTrace);
             } else {
                 $this->traceReflector->setValue($errorAsException, array());
+                $backtrace = array();
             }
         }
 

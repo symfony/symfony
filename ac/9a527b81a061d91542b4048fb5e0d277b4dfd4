@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-27T07:20:03Z
+
+You will also need to update the XML schema definition.
+
+---------------------------------------------------------------------------
+
+by MacDada at 2017-06-02T17:18:22Z
+
+> You will also need to update _the XML schema definition_.
+
+@xabbuh ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-03T07:50:42Z
+
+What I mean is that you will have to update [this block](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Resources/config/schema/symfony-1.0.xsd#L99-L114) to allow to use the new option in XML configs.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-14T20:46:41Z
+
+I think being able to configure all options in the config make sense (rebase on current 2.7 as we've just added 4 new options from 7.1). Doing that in a somewhat automated way would be even better if possible.
+
+---------------------------------------------------------------------------
+
+by MacDada at 2017-06-15T18:14:42Z
+
+I don't know how could it be automated.
+
+---------------------------------------------------------------------------
+
+by MacDada at 2017-06-16T18:53:09Z
+
+I rebased against 2.7 and squashed my commits into one.

@@ -111,6 +111,7 @@
         <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
         <xsd:attribute name="gc-divisor" type="xsd:string" />
         <xsd:attribute name="gc-probability" type="xsd:string" />
+        <xsd:attribute name="use-strict-mode" type="xsd:boolean" />
         <xsd:attribute name="save-path" type="xsd:string" />
     </xsd:complexType>
 

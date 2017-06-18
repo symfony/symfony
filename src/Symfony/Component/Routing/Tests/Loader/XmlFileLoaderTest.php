@@ -287,4 +287,78 @@ class XmlFileLoaderTest extends TestCase
             $route->getDefault('map')
         );
     }
+
+    public function testLoadRouteWithControllerAttribute()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $route = $routeCollection->get('app_homepage');
+
+        $this->assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
+    }
+
+    public function testLoadRouteWithoutControllerAttribute()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $route = $routeCollection->get('app_logout');
+
+        $this->assertNull($route->getDefault('_controller'));
+    }
+
+    public function testLoadRouteWithControllerSetInDefaults()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $route = $routeCollection->get('app_blog');
+
+        $this->assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/
+     */
+    public function testOverrideControllerInDefaults()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader->load('override_defaults.xml');
+    }
+
+    /**
+     * @dataProvider provideFilesImportingRoutesWithControllers
+     */
+    public function testImportRouteWithController($file)
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load($file);
+
+        $route = $routeCollection->get('app_homepage');
+        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('app_blog');
+        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('app_logout');
+        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+    }
+
+    public function provideFilesImportingRoutesWithControllers()
+    {
+        yield array('import_controller.xml');
+        yield array('import__controller.xml');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/
+     */
+    public function testImportWithOverriddenController()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader->load('import_override_defaults.xml');
+    }
 }

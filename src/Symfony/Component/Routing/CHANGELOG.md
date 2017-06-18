@@ -6,6 +6,7 @@ CHANGELOG
 
  * Added support for prioritized routing loaders.
  * Add matched and default parameters to redirect responses
+ * Added support for a `controller` keyword for configuring route controllers in YAML and XML configurations.
 
 3.3.0
 -----

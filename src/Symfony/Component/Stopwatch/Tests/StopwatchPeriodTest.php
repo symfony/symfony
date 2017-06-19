@@ -19,37 +19,49 @@ class StopwatchPeriodTest extends TestCase
     /**
      * @dataProvider provideTimeValues
      */
-    public function testGetStartTime($start, $end)
+    public function testGetStartTime($start, $useMorePrecision, $expected)
     {
-        $period = new StopwatchPeriod($start, $end);
-        $this->assertSame($start, $period->getStartTime());
+        $period = new StopwatchPeriod($start, $start, $useMorePrecision);
+        $this->assertSame($expected, $period->getStartTime());
     }
 
     /**
      * @dataProvider provideTimeValues
      */
-    public function testGetEndTime($start, $end)
+    public function testGetEndTime($end, $useMorePrecision, $expected)
     {
-        $period = new StopwatchPeriod($start, $end);
-        $this->assertSame($end, $period->getEndTime());
+        $period = new StopwatchPeriod($end, $end, $useMorePrecision);
+        $this->assertSame($expected, $period->getEndTime());
     }
 
     /**
-     * @dataProvider provideTimeValues
+     * @dataProvider provideDurationValues
      */
-    public function testGetDuration($start, $end, $duration)
+    public function testGetDuration($start, $end, $useMorePrecision, $duration)
     {
-        $period = new StopwatchPeriod($start, $end);
+        $period = new StopwatchPeriod($start, $end, $useMorePrecision);
         $this->assertSame($duration, $period->getDuration());
     }
 
     public function provideTimeValues()
     {
-        yield array(0, 0, 0);
-        yield array(0.0, 0.0, 0.0);
-        yield array(0.0, 2.7182, 2.7182);
-        yield array(3, 7, 4);
-        yield array(3, 3.14, 0.14);
-        yield array(3.10, 3.14, 0.04);
+        yield array(0, false, 0);
+        yield array(0, true, 0);
+        yield array(0.0, false, 0);
+        yield array(0.0, true, 0.0);
+        yield array(2.71, false, 2);
+        yield array(2.71, true, 2.71);
+    }
+
+    public function provideDurationValues()
+    {
+        yield array(0, 0, false, 0);
+        yield array(0, 0, true, 0);
+        yield array(0.0, 0.0, false, 0);
+        yield array(0.0, 0.0, true, 0.0);
+        yield array(2, 3.14, false, 1);
+        yield array(2, 3.14, true, 1.14);
+        yield array(2.71, 3.14, false, 1);
+        yield array(2.71, 3.14, true, 0.43);
     }
 }

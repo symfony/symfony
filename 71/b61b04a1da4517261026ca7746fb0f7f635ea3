@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2017-06-19T05:16:28Z
+
+Hello,
+
+Thanks for your contribution!
+
+Please fix your code using the fabbot fix:
+```
+$ curl http://fabbot.io/patch/symfony/symfony/23222/f6a94cb56fc544f66e39e0658143976c852a14bb/cs.diff | patch -p0
+```
+Then [squash](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) your commits so there is still only one commit.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-19T06:27:30Z
+
+@Nek- your comment is correct ... but for Symfony repos we use a tool to merge PRs that squashes everything automatically. So there's no need to do that. Thanks!
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-06-19T06:46:25Z
+
+@Nek-, fabbot suggests to fix docblocks that I didn’t change:
+```diff
+--- src/Symfony/Component/Routing/Loader/XmlFileLoader.php	2017-06-18 19:04:58.715402348 +0000
++++ src/Symfony/Component/Routing/Loader/XmlFileLoader.php	2017-06-18 19:05:00.419350700 +0000
+@@ -36,8 +36,8 @@
+      *
+      * @return RouteCollection A RouteCollection instance
+      *
+-     * @throws \InvalidArgumentException When the file cannot be loaded or when the XML cannot be
+-     *                                   parsed because it does not validate against the scheme.
++     * @throws \InvalidArgumentException when the file cannot be loaded or when the XML cannot be
++     *                                   parsed because it does not validate against the scheme
+      */
+     public function load($file, $type = null)
+     {
+@@ -219,7 +219,7 @@
+      * @param \DOMElement $node Element to parse that contains the configs
+      * @param string      $path Full path of the XML file being processed
+      *
+-     * @return array An array with the defaults as first item, requirements as second and options as third.
++     * @return array an array with the defaults as first item, requirements as second and options as third
+      *
+      * @throws \InvalidArgumentException When the XML is invalid
+      */
+```

@@ -25,19 +25,14 @@ class StopwatchPeriod
     /**
      * Constructor.
      *
-     * @param int|float $start The relative time of the start of the period (in milliseconds)
-     * @param int|float $end   The relative time of the end of the period (in milliseconds)
+     * @param int|float $start         The relative time of the start of the period (in milliseconds)
+     * @param int|float $end           The relative time of the end of the period (in milliseconds)
+     * @param bool      $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct($start, $end /*, $useMicroPrecision = false*/)
+    public function __construct($start, $end, /* bool */ $morePrecision = false)
     {
-        if (func_num_args() > 2 && true === func_get_arg(2)) {
-            $this->start = $start;
-            $this->end = $end;
-        } else {
-            $this->start = (int) $start;
-            $this->end = (int) $end;
-        }
-
+        $this->start = $morePrecision ? $start : (int) $start;
+        $this->end = $morePrecision ? $end : (int) $end;
         $this->memory = memory_get_usage(true);
     }
 

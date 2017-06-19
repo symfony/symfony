@@ -45,11 +45,11 @@ class StopwatchPeriodTest extends TestCase
 
     public function provideTimeValues()
     {
-        yield [0, 0, 0];
-        yield [0.0, 0.0, 0.0];
-        yield [0.0, 2.7182, 2.7182];
-        yield [3, 7, 4];
-        yield [3, 3.14, 0.14];
-        yield [3.10, 3.14, 0.04];
+        yield array(0, 0, 0);
+        yield array(0.0, 0.0, 0.0);
+        yield array(0.0, 2.7182, 2.7182);
+        yield array(3, 7, 4);
+        yield array(3, 3.14, 0.14);
+        yield array(3.10, 3.14, 0.04);
     }
 }

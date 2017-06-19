@@ -49,7 +49,7 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
         }
 
         $container
-            ->getDefinition('validator.validator_factory')
+            ->getDefinition($this->validatorFactoryServiceId)
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $validators))
         ;
     }

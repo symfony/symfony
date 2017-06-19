@@ -97,7 +97,7 @@ class StopwatchEvent
             throw new \LogicException('stop() called but start() has not been called before.');
         }
 
-        $this->periods[] = new StopwatchPeriod(array_pop($this->started), $this->getNow());
+        $this->periods[] = new StopwatchPeriod(array_pop($this->started), $this->getNow(), true);
 
         return $this;
     }
@@ -177,7 +177,7 @@ class StopwatchEvent
 
         for ($i = 0; $i < $left; ++$i) {
             $index = $stopped + $i;
-            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow());
+            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow(), true);
         }
 
         $total = 0;

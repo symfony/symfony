@@ -47,7 +47,7 @@ class ExpressionValidator extends ConstraintValidator
         $variables['value'] = $value;
         $variables['this'] = $this->context->getObject();
 
-        if (strlen($constraint->dataPath) > 0) {
+        if (null !== $constraint->dataPath && '' !== $constraint->dataPath) {
             $variables['this'] = $this->getPropertyAccessor()->getValue($this->context, $constraint->dataPath);
         }
 

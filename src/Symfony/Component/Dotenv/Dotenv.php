@@ -45,10 +45,11 @@ final class Dotenv
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function load($path/*, ...$paths*/)
+    public function load($path, ...$paths)
     {
-        // func_get_args() to be replaced by a variadic argument for Symfony 4.0
-        foreach (func_get_args() as $path) {
+        array_unshift($paths, $path);
+
+        foreach ($paths as $path) {
             if (!is_readable($path) || is_dir($path)) {
                 throw new PathException($path);
             }

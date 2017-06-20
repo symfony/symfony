@@ -13,6 +13,7 @@
             </h2>
         </div>
     </div>
+    {% if exception.message is not empty %}
     <div class="container">
         <div class="exception-message-wrapper">
             <h1 class="break-long-words exception-message {{ exception.message|length > 180 ? 'long' }}">
@@ -24,6 +25,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <div class="container">

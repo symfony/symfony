@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-23T11:52:17Z
+
+looks like we need #22873 first
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-28T09:46:08Z
+
+so, InlineFragmentRenderer 4 still conditionally calls getTrustedHeaderName for BC for 3.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-29T06:42:07Z
+
+> so, InlineFragmentRenderer 4 still conditionally calls getTrustedHeaderName for BC for 3.4?
+
+Ah no, that was not intended. Should be fixed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-03T07:47:15Z
+
+Status: Needs Review

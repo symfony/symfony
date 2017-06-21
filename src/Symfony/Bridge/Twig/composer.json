@@ -22,7 +22,7 @@
     "require-dev": {
         "symfony/asset": "~2.7",
         "symfony/finder": "~2.3",
-        "symfony/form": "~2.7.26|^2.8.19",
+        "symfony/form": "~2.7.30|^2.8.23",
         "symfony/http-kernel": "~2.3",
         "symfony/intl": "~2.3",
         "symfony/routing": "~2.2",
@@ -35,6 +35,9 @@
         "symfony/console": "~2.7",
         "symfony/var-dumper": "~2.7.16|^2.8.9",
         "symfony/expression-language": "~2.4"
+    },
+    "conflict": {
+        "symfony/form": "<2.7.30|~2.8,<2.8.23"
     },
     "suggest": {
         "symfony/finder": "",

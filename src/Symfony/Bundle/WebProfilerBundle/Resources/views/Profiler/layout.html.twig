@@ -76,7 +76,16 @@
                             <dd>{{ profile.time|date('r') }}</dd>
 
                             <dt>Token</dt>
-                            <dd>{{ profile.token }}</dd>
+                            <dd>
+                                {{ profile.token }}
+                                {% if can_replay %}
+                                    <form action="{{ path('_profiler_replay', { token: token, panel: request.query.get('panel', 'request') }) }}" method="post" style="display: inline-block;">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-sm">Replay</button>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            </dd>
                         </dl>
                     </div>
                 </div>

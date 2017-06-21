@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-02T03:26:56Z
+
+AppVeyor fails unrelated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T09:18:47Z
+
+Should be for 3.4
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-02T11:57:55Z
+
+Comments addressed and I've updated the screenshot with "Impersonator" label, thanks!
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-02T12:00:36Z
+
+You forgot to change the targeted branch for 3.4 😉
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-02T14:26:44Z
+
+Sorry for the (base branch) mess :) I was not on the PC and I needed to resolve a conflict.
+
+Rebased!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-21T15:14:38Z
+
+The failure occurs in [`deps=high`](https://travis-ci.org/symfony/symfony/jobs/245388903#L2545) because the new `const` does not exists in Security `master` yet.
+
+I've finished here, ready for final review!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-21T17:37:36Z
+
+@fabpot the `composer.json` of the bundle was already updated [in other PR](https://github.com/symfony/symfony/pull/23105/files#diff-2f921a4ac8ad70d0453786e1099c3f9fR20) to the top available `~3.4` ([Btw same case of failure (see comment)](https://github.com/symfony/symfony/pull/23105#issuecomment-307324818)) and the constant was introduced here also, so I don't understand what I should do to avoid the failure on `deps=high` which loads `dev-master` (`~4.0`) of the Security Component?
+
+I guess this failure will be solved when [this commit](https://github.com/symfony/symfony/pull/23026/commits/fe34c0f81c63513c3e2240bea0d19eb4e608836c) is merged into `master` branch?

@@ -611,6 +611,34 @@ class Response
     }
 
     /**
+     * Marks the response as "immutable".
+     *
+     * @param bool $immutable Enables or disables the immutable directive.
+     *
+     * @return $this
+     */
+    public function setImmutable($immutable = true)
+    {
+        if ($immutable) {
+            $this->headers->addCacheControlDirective('immutable');
+        } else {
+            $this->headers->removeCacheControlDirective('immutable');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns true if the response is marked as "immutable".
+     *
+     * @return bool Returns true if the response is marked as "immutable"; otherwise false.
+     */
+    public function isImmutable()
+    {
+        return $this->headers->hasCacheControlDirective('immutable');
+    }
+
+    /**
      * Returns true if the response must be revalidated by caches.
      *
      * This method indicates that the response must not be served stale by a
@@ -937,7 +965,7 @@ class Response
      */
     public function setCache(array $options)
     {
-        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public'))) {
+        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public', 'immutable'))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_values($diff))));
         }
 
@@ -971,6 +999,10 @@ class Response
             } else {
                 $this->setPublic();
             }
+        }
+
+        if (isset($options['immutable'])) {
+            $this->setImmutable((bool) $options['immutable']);
         }
 
         return $this;

@@ -42,6 +42,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $position;
     protected $excludedAjaxPaths;
+    protected $showErrorConfirmation = true;
     private $cspHandler;
 
     public function __construct(Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
@@ -58,6 +59,11 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public function isEnabled()
     {
         return self::DISABLED !== $this->mode;
+    }
+
+    public function setShowErrorConfirmation($showErrorConfirmation)
+    {
+        $this->showErrorConfirmation = (bool) $showErrorConfirmation;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -130,6 +136,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'request' => $request,
                     'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
                     'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
+                    'show_error_confirmation' => $this->showErrorConfirmation,
                 )
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);

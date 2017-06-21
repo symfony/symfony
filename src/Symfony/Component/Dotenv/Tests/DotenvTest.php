@@ -146,6 +146,28 @@ class DotenvTest extends TestCase
         return $tests;
     }
 
+    public function testLoad()
+    {
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, 'FOO=BAR');
+        file_put_contents($path2, 'BAR=BAZ');
+
+        (new DotEnv())->load($path1, $path2);
+
+        $this->assertSame('BAR', getenv('FOO'));
+        $this->assertSame('BAZ', getenv('BAR'));
+
+        putenv('FOO');
+        putenv('BAR');
+        unlink($path1);
+        unlink($path2);
+        rmdir($tmpdir);
+    }
+
     /**
      * @expectedException \Symfony\Component\Dotenv\Exception\PathException
      */

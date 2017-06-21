@@ -10,6 +10,7 @@ CHANGELOG
    require symfony/stopwatch` in your `dev` environment.
  * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+ * Added a configuration to exclude logging channels from the profiler by setting `framework.profiler.log_channels`.
 
 3.3.0
 -----

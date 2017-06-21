@@ -231,6 +231,7 @@ class FrameworkExtension extends Extension
         $this->registerCacheConfiguration($config['cache'], $container);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
+        $this->registerDebugLoggerConfiguration($config['profiler'], $container);
 
         if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -672,10 +673,29 @@ class FrameworkExtension extends Extension
 
         $definition->replaceArgument(4, $debug);
         $definition->replaceArgument(6, $debug);
+    }
+
+    /**
+     * Registers the debug log processor if debug is enabled.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     */
+    private function registerDebugLoggerConfiguration(array $config, ContainerBuilder $container)
+    {
+        $debug = $container->getParameter('kernel.debug');
 
         if ($debug && class_exists(DebugProcessor::class)) {
             $definition = new Definition(DebugProcessor::class);
             $definition->setPublic(false);
+
+            if (isset($config['log_channels'])) {
+                $definition->addMethodCall('setChannels', array(
+                    $config['log_channels']['channels'],
+                    $config['log_channels']['type'] === 'exclusive',
+                ));
+            }
+
             $container->setDefinition('debug.log_processor', $definition);
         }
     }

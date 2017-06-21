@@ -16,11 +16,27 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class DebugProcessor implements DebugLoggerInterface
 {
+    private $channels = array();
+    private $channelsExclusive = true;
     private $records = array();
     private $errorCount = 0;
 
+    /**
+     * @param array $channels
+     * @param bool  $exclude
+     */
+    public function setFilterChannels(array $channels, $exclude = true)
+    {
+        $this->channels = $channels;
+        $this->channelsExclusive = (bool) $exclude;
+    }
+
     public function __invoke(array $record)
     {
+        if ($this->isFiltered($record)) {
+            return $record;
+        }
+
         $this->records[] = array(
             'timestamp' => $record['datetime']->getTimestamp(),
             'message' => $record['message'],
@@ -38,6 +54,17 @@ class DebugProcessor implements DebugLoggerInterface
         }
 
         return $record;
+    }
+
+    private function isFiltered(array $record)
+    {
+        if ($this->channelsExclusive && !in_array($record['channel'], $this->channels)) {
+            return false;
+        } elseif (!$this->channelsExclusive && in_array($record['channel'], $this->channels)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

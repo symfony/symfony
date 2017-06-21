@@ -17,6 +17,7 @@ use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -219,6 +220,64 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
+                        ->arrayNode('log_channels')
+                            ->info('list of log channels to handle in profiler')
+                            ->canBeUnset()
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(function ($v) { return array('channels' => array($v)); })
+                            ->end()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return is_array($v) && is_numeric(key($v)); })
+                                ->then(function ($v) { return array('channels' => $v); })
+                            ->end()
+                            ->validate()
+                                ->ifTrue(function ($v) { return empty($v); })
+                                ->thenUnset()
+                            ->end()
+                            ->validate()
+                                ->always(function ($v) {
+                                    $isExclusive = null;
+                                    if (isset($v['type'])) {
+                                        $isExclusive = 'exclusive' === $v['type'];
+                                    }
+
+                                    $channels = array();
+                                    foreach ($v['channels'] as $channel) {
+                                        if (0 === strpos($channel, '!')) {
+                                            if (false === $isExclusive) {
+                                                throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in profiler log_channels list.');
+                                            }
+                                            $channels[] = substr($channel, 1);
+                                            $isExclusive = true;
+                                        } else {
+                                            if (true === $isExclusive) {
+                                                throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in profiler log_channels list');
+                                            }
+                                            $channels[] = $channel;
+                                            $isExclusive = false;
+                                        }
+                                    }
+
+                                    if (!count($channels)) {
+                                        return null;
+                                    }
+
+                                    return array('type' => $isExclusive ? 'exclusive' : 'inclusive', 'channels' => $channels);
+                                })
+                            ->end()
+                            ->children()
+                                ->scalarNode('type')
+                                    ->validate()
+                                        ->ifNotInArray(array('inclusive', 'exclusive'))
+                                        ->thenInvalid('The type of log_channels has to be inclusive or exclusive')
+                                    ->end()
+                                ->end()
+                                ->arrayNode('channels')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('matcher')
                             ->canBeEnabled()
                             ->performNoDeepMerging()

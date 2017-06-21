@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-20T21:16:32Z
+
+Should we update the signature from `($path, ...$paths)` to `(string $path, string ...$paths)` (Dotenv is final)?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-21T14:17:53Z
+
+rebased, not added string typehints, let me know if I should.

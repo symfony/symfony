@@ -100,7 +100,7 @@
                 });
             },
             function(xhr) {
-                if (xhr.status !== 0) {
+                if (xhr.status !== 0 && {{ show_error_confirmation ? 'true' : 'false' }}) {
                     confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
                 }
             },

@@ -80,6 +80,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * @internal
      */
+    const ACCESS_PRESENCE = 6;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE_METHOD = 0;
 
     /**
@@ -480,6 +485,10 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access = $this->getReadAccessInfo(get_class($object), $property);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+            if (isset($access[self::ACCESS_PRESENCE]) && !$object->{$access[self::ACCESS_PRESENCE]}()) {
+                return $result;
+            }
+
             $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
             $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
@@ -549,6 +558,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
             $access[self::ACCESS_NAME] = $getter;
+            $access[self::ACCESS_PRESENCE] = $reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic() ? $hasser : null;
         } elseif ($reflClass->hasMethod($getsetter) && $reflClass->getMethod($getsetter)->isPublic()) {
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
             $access[self::ACCESS_NAME] = $getsetter;

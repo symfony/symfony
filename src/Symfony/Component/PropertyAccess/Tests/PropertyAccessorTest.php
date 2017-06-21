@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassGetValueTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
@@ -577,5 +578,14 @@ class PropertyAccessorTest extends TestCase
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
+    }
+
+    public function testUseHasBeforeGetWhenAvailable()
+    {
+        $object = new TestClassGetValueTyped();
+        $this->assertNull($this->propertyAccessor->getValue($object, 'value'));
+
+        $object->setValue($object);
+        $this->assertSame($object, $this->propertyAccessor->getValue($object, 'value'));
     }
 }

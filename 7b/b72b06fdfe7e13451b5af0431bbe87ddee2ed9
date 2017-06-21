@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-20T17:35:03Z
+
+@flolivaud Can you change the base to the lowest possible version?
+
+---------------------------------------------------------------------------
+
+by flolivaud at 2017-06-20T18:36:20Z
+
+@fabpot Done
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-21T05:58:00Z
+
+when lowering the branch on gh interface, one needs to rebase the branch as well, as if not, he ends up with all commits from original base branch in his PR
+
+---------------------------------------------------------------------------
+
+by flolivaud at 2017-06-21T06:54:12Z
+
+@keradus yes sorry, seems to be good ! /cc @fabpot
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-21T07:30:38Z
+
+all bugfixes deserve a test. please add one
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-21T08:22:32Z
+
+Note that in this case, having a test might be complicated...
+
+---------------------------------------------------------------------------
+
+by flolivaud at 2017-06-21T08:45:18Z
+
+Yes it is. I try to fix the test to connect in cluster mode but i don't know how to do more.

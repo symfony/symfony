@@ -95,7 +95,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     public function getFallbackLocales()
     {
-        if ($this->translator instanceof Translator) {
+        if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
             return $this->translator->getFallbackLocales();
         }
 

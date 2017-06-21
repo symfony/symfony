@@ -145,7 +145,7 @@ final class FirewallConfig
     }
 
     /**
-     * @return array|null The switch_user config if enabled, null otherwise
+     * @return array|null The switch_user parameters if configured, null otherwise
      */
     public function getSwitchUser()
     {

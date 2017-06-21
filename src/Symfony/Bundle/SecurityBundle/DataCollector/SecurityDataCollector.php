@@ -273,31 +273,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['authenticated'];
     }
 
-    /**
-     * Checks if the user is impersonated or not.
-     *
-     * @return bool true if the user is impersonated, false otherwise
-     */
     public function isImpersonated()
     {
         return $this->data['impersonated'];
     }
 
-    /**
-     * Returns the impersonation source user.
-     *
-     * @return string The username
-     */
     public function getImpersonatorUser()
     {
         return $this->data['impersonator_user'];
     }
 
-    /**
-     * Returns the exit impersonation path.
-     *
-     * @return string The URI path
-     */
     public function getImpersonationExitPath()
     {
         return $this->data['impersonation_exit_path'];

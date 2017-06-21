@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-05-30T19:01:55Z
+
+1. Fetch all new commits: `git fetch --all`. ⬇️
+2. Rebase on what you fetched interactively: ✂️
+    1. `git rebase -i origin/3.4`, assuming `origin` is a git remote that points to this repository, and not your fork. If you're not sure what your remotes are, run `git remote -vvv`, there should be your fork and the holy/reference/base/origin repository.
+    2. A window will show up with many lines, remove every line but the last one, which should correspond to your commit.
+   2. If you run into a conflict: 💥
+        1. fix it with `git mergetool`. 😷
+        1. continue on your merry way with `git rebase --continue`. ⏩
+3. Force push to overwrite all this : `git push --force`. ⬆️

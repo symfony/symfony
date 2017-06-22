@@ -10,6 +10,8 @@ framework:
         enabled:    true
     esi:
         enabled: true
+    ssi:
+        enabled: true
     profiler:
         only_exceptions: true
         enabled: false

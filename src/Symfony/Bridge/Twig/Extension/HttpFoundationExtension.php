@@ -73,9 +73,7 @@ class HttpFoundationExtension extends \Twig_Extension
                 if ('#' === $path[0]) {
                     $queryString = $this->requestContext->getQueryString();
                     $path = $this->requestContext->getPathInfo().($queryString ? '?'.$queryString : '').$path;
-                }
-
-                if ('?' === $path[0]) {
+                } elseif ('?' === $path[0]) {
                     $path = $this->requestContext->getPathInfo().$path;
                 }
 
@@ -91,9 +89,7 @@ class HttpFoundationExtension extends \Twig_Extension
 
         if ('#' === $path[0]) {
             $path = $request->getRequestUri().$path;
-        }
-
-        if ('?' === $path[0]) {
+        } elseif ('?' === $path[0]) {
             $path = $request->getPathInfo().$path;
         }
 

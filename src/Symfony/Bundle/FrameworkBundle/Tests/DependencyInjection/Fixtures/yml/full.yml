@@ -9,6 +9,8 @@ framework:
     trusted_proxies: ['127.0.0.1', '10.0.0.1']
     esi:
         enabled: true
+    ssi:
+        enabled: true
     profiler:
         only_exceptions: true
         enabled: false

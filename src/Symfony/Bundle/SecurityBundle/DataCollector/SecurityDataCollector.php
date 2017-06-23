@@ -114,7 +114,7 @@ class SecurityDataCollector extends DataCollector
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
                 'roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole(); }, $assignedRoles)),
-                'inherited_roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles)),
+                'inherited_roles' => $this->cloneVar(array_unique(array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles))),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }

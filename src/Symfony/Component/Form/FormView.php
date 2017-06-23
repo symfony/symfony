@@ -53,6 +53,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     private $rendered = false;
 
+    private $methodRendered = false;
+
     public function __construct(FormView $parent = null)
     {
         $this->parent = $parent;
@@ -88,6 +90,19 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         $this->rendered = true;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMethodRendered()
+    {
+        return $this->methodRendered;
+    }
+
+    public function setMethodRendered()
+    {
+        $this->methodRendered = true;
     }
 
     /**

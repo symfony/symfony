@@ -47,6 +47,7 @@ class HttpFoundationExtensionTest extends \PHPUnit_Framework_TestCase
             array('http://localhost/foo/baz?baz=1', 'baz?baz=1', '/foo/bar?foo=1'),
 
             array('http://localhost/foo/bar#baz', '#baz', '/foo/bar'),
+            array('http://localhost/foo/bar?0#baz', '#baz', '/foo/bar?0'),
             array('http://localhost/foo/bar?baz=1#baz', '?baz=1#baz', '/foo/bar?foo=1'),
             array('http://localhost/foo/baz?baz=1#baz', 'baz?baz=1#baz', '/foo/bar?foo=1'),
         );

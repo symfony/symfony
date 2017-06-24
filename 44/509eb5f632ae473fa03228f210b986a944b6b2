@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by sstok at 2017-06-24T09:14:24Z
+
+It seems to be gone since 3.0?
+https://github.com/symfony/symfony/pull/13046
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-06-24T09:49:39Z
+
+@sstok indeed, this should be merged in 3.0.

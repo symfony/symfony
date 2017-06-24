@@ -4,6 +4,8 @@ CHANGELOG
 3.4.0
 -----
 
+ * Support for the `!str` tag is deprecated, use the `!!str` tag instead.
+
  * Deprecated using the non-specific tag `!` as its behavior will change in 4.0.
    It will force non-evaluating your values in 4.0. Use plain integers or `!!float` instead.
 

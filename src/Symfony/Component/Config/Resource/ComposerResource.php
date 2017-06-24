@@ -18,16 +18,13 @@ namespace Symfony\Component\Config\Resource;
  */
 class ComposerResource implements SelfCheckingResourceInterface, \Serializable
 {
-    private $versions;
     private $vendors;
 
-    private static $runtimeVersion;
     private static $runtimeVendors;
 
     public function __construct()
     {
         self::refresh();
-        $this->versions = self::$runtimeVersion;
         $this->vendors = self::$runtimeVendors;
     }
 
@@ -51,35 +48,22 @@ class ComposerResource implements SelfCheckingResourceInterface, \Serializable
     {
         self::refresh();
 
-        if (self::$runtimeVersion !== $this->versions) {
-            return false;
-        }
-
         return self::$runtimeVendors === $this->vendors;
     }
 
     public function serialize()
     {
-        return serialize(array($this->versions, $this->vendors));
+        return serialize($this->vendors);
     }
 
     public function unserialize($serialized)
     {
-        list($this->versions, $this->vendors) = unserialize($serialized);
+        $this->vendors = unserialize($serialized);
     }
 
     private static function refresh()
     {
-        if (null !== self::$runtimeVersion) {
-            return;
-        }
-
-        self::$runtimeVersion = array();
         self::$runtimeVendors = array();
-
-        foreach (get_loaded_extensions() as $ext) {
-            self::$runtimeVersion[$ext] = phpversion($ext);
-        }
 
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {

@@ -8,6 +8,8 @@ framework:
     http_method_override: false
     esi:
         enabled: true
+    ssi:
+        enabled: true
     profiler:
         only_exceptions: true
         enabled: false

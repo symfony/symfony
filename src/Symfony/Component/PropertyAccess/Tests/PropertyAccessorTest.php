@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
 class PropertyAccessorTest extends TestCase
@@ -577,5 +578,76 @@ class PropertyAccessorTest extends TestCase
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
+    }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testAnonymousClassRead()
+    {
+        $value = 'bar';
+
+        $obj = $this->generateAnonymousClass($value);
+
+        $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
+
+        $this->assertEquals($value, $propertyAccessor->getValue($obj, 'foo'));
+    }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testAnonymousClassWrite()
+    {
+        $value = 'bar';
+
+        $obj = $this->generateAnonymousClass('');
+
+        $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
+        $propertyAccessor->setValue($obj, 'foo', $value);
+
+        $this->assertEquals($value, $propertyAccessor->getValue($obj, 'foo'));
+    }
+
+    private function generateAnonymousClass($value)
+    {
+        $obj = eval('return new class($value)
+        {
+            private $foo;
+
+            public function __construct($foo)
+            {
+                $this->foo = $foo;
+            }
+
+            /**
+             * @return mixed
+             */
+            public function getFoo()
+            {
+                return $this->foo;
+            }
+
+            /**
+             * @param mixed $foo
+             */
+            public function setFoo($foo)
+            {
+                $this->foo = $foo;
+            }
+        };');
+
+        return $obj;
+    }
+
+    /**
+     * @requires PHP 7.0
+     * @expectedException \TypeError
+     */
+    public function testThrowTypeErrorInsideSetterCall()
+    {
+        $object = new TestClassTypeErrorInsideCall();
+
+        $this->propertyAccessor->setValue($object, 'property', 'foo');
     }
 }

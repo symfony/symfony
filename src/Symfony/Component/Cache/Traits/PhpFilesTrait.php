@@ -28,7 +28,7 @@ trait PhpFilesTrait
 
     public static function isSupported()
     {
-        return function_exists('opcache_compile_file') && ini_get('opcache.enable');
+        return function_exists('opcache_invalidate') && ini_get('opcache.enable');
     }
 
     /**
@@ -108,7 +108,7 @@ trait PhpFilesTrait
             $ok = $this->write($file, '<?php return '.var_export($data, true).';') && $ok;
 
             if ($allowCompile) {
-                @opcache_compile_file($file);
+                @opcache_invalidate($file, true);
             }
         }
 

@@ -54,7 +54,7 @@ abstract class FileLoader extends ArrayLoader
         return $catalogue;
     }
 
-    /*
+    /**
      * @param string $resource
      *
      * @return array

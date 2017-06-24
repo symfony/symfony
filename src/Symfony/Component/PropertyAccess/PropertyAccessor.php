@@ -244,6 +244,9 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         } catch (\TypeError $e) {
             self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
+
+            // It wasn't thrown in this class so rethrow it
+            throw $e;
         } finally {
             if (\PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
                 restore_error_handler();
@@ -523,7 +526,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getReadAccessInfo($class, $property)
     {
-        $key = $class.'..'.$property;
+        $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
         if (isset($this->readPropertyCache[$key])) {
             return $this->readPropertyCache[$key];
@@ -702,7 +705,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getWriteAccessInfo($class, $property, $value)
     {
-        $key = $class.'..'.$property;
+        $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
         if (isset($this->writePropertyCache[$key])) {
             return $this->writePropertyCache[$key];

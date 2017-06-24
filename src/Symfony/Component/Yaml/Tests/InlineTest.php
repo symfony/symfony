@@ -730,7 +730,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRING flag to explicitly enable the type casts.
+     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRINGS flag to explicitly enable the type casts.
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
     public function testImplicitStringCastingOfMappingKeysIsDeprecated($yaml, $expected)

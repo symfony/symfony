@@ -150,7 +150,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
                 'roles' => array_map($extractRoles, $assignedRoles),
-                'inherited_roles' => array_map($extractRoles, $inheritedRoles),
+                'inherited_roles' => array_unique(array_map($extractRoles, $inheritedRoles)),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }

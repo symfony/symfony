@@ -72,7 +72,7 @@ class ExceptionController
                 'logger' => $logger,
                 'currentContent' => $currentContent,
             )
-        ));
+        ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
     }
 
     /**
@@ -123,7 +123,7 @@ class ExceptionController
         // default to a generic HTML exception
         $request->setRequestFormat('html');
 
-        return sprintf('@Twig/Exception/%s.html.twig', $showException ? 'exception_full' : $name);
+        return sprintf('@Twig/Exception/%s.html.twig', $name);
     }
 
     // to be removed when the minimum required version of Twig is >= 3.0

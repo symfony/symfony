@@ -4,6 +4,8 @@ CHANGELOG
 4.0.0
 -----
 
+ * The behavior of the non-specific tag `!` is changed and now forces
+   non-evaluating your values.
  * complex mappings will throw a `ParseException`
  * support for the comma as a group separator for floats has been dropped, use
    the underscore instead

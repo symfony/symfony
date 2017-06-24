@@ -158,7 +158,7 @@ EOT
         // remove the assets of the bundles that no longer exist
         foreach (new \FilesystemIterator($bundlesDir) as $dir) {
             if (!in_array($dir, $validAssetDirs)) {
-                $filesystem->remove($dir);
+                $this->filesystem->remove($dir);
             }
         }
 

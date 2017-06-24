@@ -38,6 +38,9 @@
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/web-link": "~3.4|~4.0"
     },
+    "conflict": {
+        "symfony/form": "<3.4"
+    },
     "suggest": {
         "symfony/finder": "",
         "symfony/asset": "For using the AssetExtension",

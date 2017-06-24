@@ -12,6 +12,8 @@ CHANGELOG
 3.4.0
 -----
 
+ * Tagging voters with the `security.voter` tag without implementing the
+   `VoterInterface` on the class is now deprecated and will be removed in 4.0.
  * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
  * added info about called security listeners in profiler 
 

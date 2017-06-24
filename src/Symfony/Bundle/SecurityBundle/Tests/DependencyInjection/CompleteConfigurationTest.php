@@ -107,6 +107,10 @@ abstract class CompleteConfigurationTest extends TestCase
                     'remember_me',
                     'anonymous',
                 ),
+                array(
+                    'parameter' => '_switch_user',
+                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                ),
             ),
             array(
                 'host',
@@ -123,6 +127,7 @@ abstract class CompleteConfigurationTest extends TestCase
                     'http_basic',
                     'anonymous',
                 ),
+                null,
             ),
             array(
                 'with_user_checker',
@@ -139,6 +144,7 @@ abstract class CompleteConfigurationTest extends TestCase
                     'http_basic',
                     'anonymous',
                 ),
+                null,
             ),
         ), $configs);
 

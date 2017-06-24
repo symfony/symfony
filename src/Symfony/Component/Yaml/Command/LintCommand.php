@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Validates YAML files syntax and outputs encountered errors.
@@ -111,7 +112,7 @@ EOF
         });
 
         try {
-            $this->getParser()->parse($content);
+            $this->getParser()->parse($content, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
             return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
         } finally {

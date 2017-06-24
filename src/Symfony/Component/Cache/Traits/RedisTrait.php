@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Predis\Connection\Factory;
+use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Response\Status;
@@ -284,7 +285,7 @@ trait RedisTrait
     {
         $ids = array();
 
-        if ($this->redis instanceof \Predis\Client) {
+        if ($this->redis instanceof \Predis\Client && !$this->redis->getConnection() instanceof ClusterInterface) {
             $results = $this->redis->pipeline(function ($redis) use ($generator, &$ids) {
                 foreach ($generator() as $command => $args) {
                     call_user_func_array(array($redis, $command), $args);
@@ -308,9 +309,10 @@ trait RedisTrait
             foreach ($results as $k => list($h, $c)) {
                 $results[$k] = $connections[$h][$c];
             }
-        } elseif ($this->redis instanceof \RedisCluster) {
-            // phpredis doesn't support pipelining with RedisCluster
+        } elseif ($this->redis instanceof \RedisCluster || ($this->redis instanceof \Predis\Client && $this->redis->getConnection() instanceof ClusterInterface)) {
+            // phpredis & predis don't support pipelining with RedisCluster
             // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining
+            // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
             $results = array();
             foreach ($generator() as $command => $args) {
                 $results[] = call_user_func_array(array($this->redis, $command), $args);

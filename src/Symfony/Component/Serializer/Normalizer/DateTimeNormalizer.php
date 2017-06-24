@@ -23,18 +23,22 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     const FORMAT_KEY = 'datetime_format';
+    const TIMEZONE_KEY = 'datetime_timezone';
 
     /**
      * @var string
      */
     private $format;
+    private $timezone;
 
     /**
-     * @param string $format
+     * @param string             $format
+     * @param \DateTimeZone|null $timezone
      */
-    public function __construct($format = \DateTime::RFC3339)
+    public function __construct($format = \DateTime::RFC3339, \DateTimeZone $timezone = null)
     {
         $this->format = $format;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -49,6 +53,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         $format = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $timezone = $this->getTimezone($context);
+
+        if (null !== $timezone) {
+            $object = (new \DateTimeImmutable('@'.$object->getTimestamp()))->setTimezone($timezone);
+        }
 
         return $object->format($format);
     }
@@ -69,9 +78,15 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         $dateTimeFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : null;
+        $timezone = $this->getTimezone($context);
 
         if (null !== $dateTimeFormat) {
-            $object = \DateTime::class === $class ? \DateTime::createFromFormat($dateTimeFormat, $data) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data);
+            if (null === $timezone && PHP_VERSION_ID < 70000) {
+                // https://bugs.php.net/bug.php?id=68669
+                $object = \DateTime::class === $class ? \DateTime::createFromFormat($dateTimeFormat, $data) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data);
+            } else {
+                $object = \DateTime::class === $class ? \DateTime::createFromFormat($dateTimeFormat, $data, $timezone) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data, $timezone);
+            }
 
             if (false !== $object) {
                 return $object;
@@ -89,7 +104,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         try {
-            return \DateTime::class === $class ? new \DateTime($data) : new \DateTimeImmutable($data);
+            return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
             throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
         }
@@ -125,5 +140,16 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         return $formattedErrors;
+    }
+
+    private function getTimezone(array $context)
+    {
+        $dateTimeZone = array_key_exists(self::TIMEZONE_KEY, $context) ? $context[self::TIMEZONE_KEY] : $this->timezone;
+
+        if (null === $dateTimeZone) {
+            return null;
+        }
+
+        return $dateTimeZone instanceof \DateTimeZone ? $dateTimeZone : new \DateTimeZone($dateTimeZone);
     }
 }

@@ -991,7 +991,7 @@ EOF;
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
+     * @expectedExceptionMessage Numeric keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
      */
     public function testFloatKeys()
     {
@@ -1006,7 +1006,7 @@ EOF;
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
+     * @expectedExceptionMessage Non-string keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
      */
     public function testBooleanKeys()
     {

@@ -16,7 +16,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -36,7 +35,10 @@ abstract class AbstractController implements ServiceSubscriberInterface
 {
     use ControllerTrait;
 
-    private $container;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @internal

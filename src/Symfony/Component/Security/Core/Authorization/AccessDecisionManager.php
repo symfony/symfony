@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\LogicException;
 
 /**
  * AccessDecisionManager is the base class for all access decision managers
@@ -70,7 +71,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $deny = 0;
         foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
+            $result = $this->vote($voter, $token, $object, $attributes);
             switch ($result) {
                 case VoterInterface::ACCESS_GRANTED:
                     return true;
@@ -111,7 +112,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $grant = 0;
         $deny = 0;
         foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
+            $result = $this->vote($voter, $token, $object, $attributes);
 
             switch ($result) {
                 case VoterInterface::ACCESS_GRANTED:
@@ -152,7 +153,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $grant = 0;
         foreach ($this->voters as $voter) {
             foreach ($attributes as $attribute) {
-                $result = $voter->vote($token, $object, array($attribute));
+                $result = $this->vote($voter, $token, $object, array($attribute));
 
                 switch ($result) {
                     case VoterInterface::ACCESS_GRANTED:
@@ -175,5 +176,28 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    /**
+     * TokenInterface vote proxy method.
+     *
+     * Acts as a BC layer when the VoterInterface is not implemented on the voter.
+     *
+     * @deprecated as of 3.4 and will be removed in 4.0. Call the voter directly as the instance will always be a VoterInterface
+     */
+    private function vote($voter, TokenInterface $token, $subject, $attributes)
+    {
+        if ($voter instanceof VoterInterface) {
+            return $voter->vote($token, $subject, $attributes);
+        }
+
+        if (method_exists($voter, 'vote')) {
+            @trigger_error(sprintf('Calling vote() on an voter without %1$s is deprecated as of 3.4 and will be removed in 4.0. Implement the %1$s on your voter.', VoterInterface::class), E_USER_DEPRECATED);
+
+            // making the assumption that the signature matches
+            return $voter->vote($token, $subject, $attributes);
+        }
+
+        throw new LogicException(sprintf('%s should implement the %s interface when used as voter.', get_class($voter), VoterInterface::class));
     }
 }

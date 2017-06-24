@@ -68,12 +68,23 @@ class SwitchUserListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
      */
+    public function testExitUserThrowsAuthenticationExceptionIfNoCurrentToken()
+    {
+        $this->tokenStorage->setToken(null);
+        $this->request->query->set('_switch_user', '_exit');
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener->handle($this->event);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
+     */
     public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
     {
         $token = new UsernamePasswordToken('username', '', 'key', array('ROLE_FOO'));
 
         $this->tokenStorage->setToken($token);
-        $this->request->query->set('_switch_user', '_exit');
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
@@ -84,7 +95,7 @@ class SwitchUserListenerTest extends TestCase
         $originalToken = new UsernamePasswordToken('username', '', 'key', array());
         $this->tokenStorage->setToken(new UsernamePasswordToken('username', '', 'key', array(new SwitchUserRole('ROLE_PREVIOUS', $originalToken))));
 
-        $this->request->query->set('_switch_user', '_exit');
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
@@ -108,7 +119,7 @@ class SwitchUserListenerTest extends TestCase
             ->willReturn($refreshedUser);
         $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
         $this->tokenStorage->setToken(new UsernamePasswordToken('username', '', 'key', array(new SwitchUserRole('ROLE_PREVIOUS', $originalToken))));
-        $this->request->query->set('_switch_user', '_exit');
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher
@@ -132,7 +143,7 @@ class SwitchUserListenerTest extends TestCase
             ->method('refreshUser');
         $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
         $this->tokenStorage->setToken(new UsernamePasswordToken('username', '', 'key', array(new SwitchUserRole('ROLE_PREVIOUS', $originalToken))));
-        $this->request->query->set('_switch_user', '_exit');
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher

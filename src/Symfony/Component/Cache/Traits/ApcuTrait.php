@@ -23,7 +23,7 @@ trait ApcuTrait
 {
     public static function isSupported()
     {
-        return function_exists('apcu_fetch') && ini_get('apc.enabled') && !('cli' === PHP_SAPI && !ini_get('apc.enable_cli'));
+        return function_exists('apcu_fetch') && ini_get('apc.enabled');
     }
 
     private function init($namespace, $defaultLifetime, $version)
@@ -71,7 +71,7 @@ trait ApcuTrait
      */
     protected function doClear($namespace)
     {
-        return isset($namespace[0]) && class_exists('APCuIterator', false)
+        return isset($namespace[0]) && class_exists('APCuIterator', false) && ('cli' !== PHP_SAPI || ini_get('apc.enable_cli'))
             ? apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY))
             : apcu_clear_cache();
     }

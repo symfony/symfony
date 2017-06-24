@@ -188,7 +188,7 @@ class Parser
                 }
 
                 if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags) && !is_string($key) && !is_int($key)) {
-                    throw new ParseException('Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
+                    throw new ParseException(sprintf('%s keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings.', is_numeric($key) ? 'Numeric' : 'Non-string'), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                 }
 
                 // Convert float keys to strings, to avoid being converted to integers by PHP

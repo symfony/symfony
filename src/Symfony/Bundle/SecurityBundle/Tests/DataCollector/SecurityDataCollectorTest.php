@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
@@ -37,6 +38,9 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('security', $collector->getName());
         $this->assertFalse($collector->isEnabled());
         $this->assertFalse($collector->isAuthenticated());
+        $this->assertFalse($collector->isImpersonated());
+        $this->assertNull($collector->getImpersonatorUser());
+        $this->assertNull($collector->getImpersonationExitPath());
         $this->assertNull($collector->getTokenClass());
         $this->assertFalse($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
@@ -53,6 +57,9 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertTrue($collector->isEnabled());
         $this->assertFalse($collector->isAuthenticated());
+        $this->assertFalse($collector->isImpersonated());
+        $this->assertNull($collector->getImpersonatorUser());
+        $this->assertNull($collector->getImpersonationExitPath());
         $this->assertNull($collector->getTokenClass());
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertCount(0, $collector->getRoles());
@@ -73,10 +80,40 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertTrue($collector->isEnabled());
         $this->assertTrue($collector->isAuthenticated());
+        $this->assertFalse($collector->isImpersonated());
+        $this->assertNull($collector->getImpersonatorUser());
+        $this->assertNull($collector->getImpersonationExitPath());
         $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
         $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
+        $this->assertSame('hhamon', $collector->getUser());
+    }
+
+    public function testCollectImpersonatedToken()
+    {
+        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', array('ROLE_ADMIN'));
+
+        $userRoles = array(
+            'ROLE_USER',
+            new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $adminToken),
+        );
+
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles));
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
+        $collector->collect($this->getRequest(), $this->getResponse());
+        $collector->lateCollect();
+
+        $this->assertTrue($collector->isEnabled());
+        $this->assertTrue($collector->isAuthenticated());
+        $this->assertTrue($collector->isImpersonated());
+        $this->assertSame('yceruto', $collector->getImpersonatorUser());
+        $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
+        $this->assertTrue($collector->supportsRoleHierarchy());
+        $this->assertSame(array('ROLE_USER', 'ROLE_PREVIOUS_ADMIN'), $collector->getRoles()->getValue(true));
+        $this->assertSame(array(), $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
 
@@ -209,6 +246,11 @@ class SecurityDataCollectorTest extends TestCase
                 array('ROLE_ADMIN'),
                 array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
             ),
+            array(
+                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
+                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
+                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
+            ),
         );
     }
 
@@ -216,6 +258,7 @@ class SecurityDataCollectorTest extends TestCase
     {
         return new RoleHierarchy(array(
             'ROLE_ADMIN' => array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
+            'ROLE_OPERATOR' => array('ROLE_USER'),
         ));
     }
 

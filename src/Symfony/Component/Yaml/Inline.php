@@ -441,7 +441,7 @@ class Inline
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey) && !is_int($evaluatedKey)) {
-                    throw new ParseException('Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings.', self::$parsedLineNumber + 1, $mapping);
+                    throw new ParseException('Implicit casting of incompatible mapping keys to strings is not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings.', self::$parsedLineNumber + 1, $mapping);
                 }
             }
 
@@ -553,6 +553,8 @@ class Inline
                     case 0 === strpos($scalar, '!str'):
                         return (string) substr($scalar, 5);
                     case 0 === strpos($scalar, '! '):
+                        @trigger_error('Using the non-specific tag "!" is deprecated since version 3.4 as its behavior will change in 4.0. It will force non-evaluating your values in 4.0. Use plain integers or !!float instead.', E_USER_DEPRECATED);
+
                         return (int) self::parseScalar(substr($scalar, 2), $flags);
                     case 0 === strpos($scalar, '!php/object:'):
                         if (self::$objectSupport) {

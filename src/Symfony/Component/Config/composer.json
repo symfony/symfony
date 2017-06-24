@@ -20,10 +20,12 @@
         "symfony/filesystem": "~3.4|~4.0"
     },
     "require-dev": {
+        "symfony/finder": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0"
     },
     "conflict": {
+        "symfony/finder": "<3.4",
         "symfony/dependency-injection": "<3.4"
     },
     "suggest": {

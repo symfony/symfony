@@ -22,6 +22,12 @@ CHANGELOG
  * the constructor arguments of the `Parser` class have been removed
  * the `Inline` class is internal and no longer part of the BC promise
 
+3.4.0
+-----
+
+ * Deprecated using the non-specific tag `!` as its behavior will change in 4.0.
+   It will force non-evaluating your values in 4.0. Use plain integers or `!!float` instead.
+
 3.3.0
 -----
 

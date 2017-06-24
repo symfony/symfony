@@ -123,10 +123,10 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             unset($data['@xmlns:xml']);
 
             if (empty($data)) {
-                return $this->parseXml($rootNode);
+                return $this->parseXml($rootNode, $context);
             }
 
-            return array_merge($data, (array) $this->parseXml($rootNode));
+            return array_merge($data, (array) $this->parseXml($rootNode, $context));
         }
 
         if (!$rootNode->hasAttributes()) {
@@ -265,11 +265,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array|string
      */
-    private function parseXml(\DOMNode $node)
+    private function parseXml(\DOMNode $node, array $context = array())
     {
-        $data = $this->parseXmlAttributes($node);
+        $data = $this->parseXmlAttributes($node, $context);
 
-        $value = $this->parseXmlValue($node);
+        $value = $this->parseXmlValue($node, $context);
 
         if (!count($data)) {
             return $value;
@@ -301,16 +301,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array
      */
-    private function parseXmlAttributes(\DOMNode $node)
+    private function parseXmlAttributes(\DOMNode $node, array $context = array())
     {
         if (!$node->hasAttributes()) {
             return array();
         }
 
         $data = array();
+        $typeCastAttributes = $this->resolveXmlTypeCastAttributes($context);
 
         foreach ($node->attributes as $attr) {
-            if (!is_numeric($attr->nodeValue)) {
+            if (!is_numeric($attr->nodeValue) || !$typeCastAttributes) {
                 $data['@'.$attr->nodeName] = $attr->nodeValue;
 
                 continue;
@@ -335,7 +336,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array|string
      */
-    private function parseXmlValue(\DOMNode $node)
+    private function parseXmlValue(\DOMNode $node, array $context = array())
     {
         if (!$node->hasChildNodes()) {
             return $node->nodeValue;
@@ -352,7 +353,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                 continue;
             }
 
-            $val = $this->parseXml($subnode);
+            $val = $this->parseXml($subnode, $context);
 
             if ('item' === $subnode->nodeName && isset($val['@key'])) {
                 if (isset($val['#'])) {
@@ -529,6 +530,20 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return isset($context['xml_root_node_name'])
             ? $context['xml_root_node_name']
             : $this->rootNodeName;
+    }
+
+    /**
+     * Get XML option for type casting attributes Defaults to true.
+     *
+     * @param array $context
+     *
+     * @return bool
+     */
+    private function resolveXmlTypeCastAttributes(array $context = array())
+    {
+        return isset($context['xml_type_cast_attributes'])
+            ? (bool) $context['xml_type_cast_attributes']
+            : true;
     }
 
     /**

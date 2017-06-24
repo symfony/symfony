@@ -116,7 +116,7 @@ class Route implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized, array('allowed_classes' => array(CompiledRoute::class)));
+        $data = unserialize($serialized);
         $this->path = $data['path'];
         $this->host = $data['host'];
         $this->defaults = $data['defaults'];

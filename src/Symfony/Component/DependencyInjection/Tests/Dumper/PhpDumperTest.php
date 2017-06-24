@@ -583,4 +583,18 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference();
         $this->assertInstanceOf('BazClass', $container->get('bar')->getBaz());
     }
+
+    public function testArrayParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('array_1', array(123));
+        $container->setParameter('array_2', array(__DIR__));
+        $container->register('bar', 'BarClass')
+            ->addMethodCall('setBaz', array('%array_1%', '%array_2%', '%%array_1%%'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace('\\\\Dumper', '/Dumper', $dumper->dump(array('file' => self::$fixturesPath.'/php/services_array_params.php'))));
+    }
 }

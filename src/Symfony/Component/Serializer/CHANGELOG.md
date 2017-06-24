@@ -50,6 +50,8 @@ CHANGELOG
  * [DEPRECATION] the `Exception` interface has been renamed to `ExceptionInterface`
  * added `ObjectNormalizer` leveraging the `PropertyAccess` component to normalize
    objects containing both properties and getters / setters / issers / hassers methods.
+ * added `xml_type_cast_attributes` context option for allowing users to opt-out of typecasting
+   xml attributes.
 
 2.6.0
 -----

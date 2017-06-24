@@ -677,7 +677,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Non-string mapping keys are not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
+     * @expectedExceptionMessage Implicit casting of incompatible mapping keys to strings is not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings
      *
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */

@@ -38,6 +38,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener implements ListenerInterface
 {
+    const EXIT_VALUE = '_exit';
+
     private $tokenStorage;
     private $provider;
     private $userChecker;
@@ -80,7 +82,7 @@ class SwitchUserListener implements ListenerInterface
             return;
         }
 
-        if ('_exit' === $request->get($this->usernameParameter)) {
+        if (self::EXIT_VALUE === $request->get($this->usernameParameter)) {
             $this->tokenStorage->setToken($this->attemptExitUser($request));
         } else {
             try {
@@ -161,7 +163,7 @@ class SwitchUserListener implements ListenerInterface
      */
     private function attemptExitUser(Request $request)
     {
-        if (false === $original = $this->getOriginalToken($this->tokenStorage->getToken())) {
+        if (null === ($currentToken = $this->tokenStorage->getToken()) || false === $original = $this->getOriginalToken($currentToken)) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 

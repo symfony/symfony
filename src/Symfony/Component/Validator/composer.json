@@ -22,6 +22,8 @@
     },
     "require-dev": {
         "symfony/http-foundation": "~3.4|~4.0",
+        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/var-dumper": "~3.4|~4.0",
         "symfony/intl": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/config": "~3.4|~4.0",

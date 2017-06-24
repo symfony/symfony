@@ -79,6 +79,7 @@ class FrameworkExtension extends Extension
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
     private $annotationsConfigEnabled = false;
+    private $validatorConfigEnabled = false;
 
     /**
      * @var string|null
@@ -395,6 +396,10 @@ class FrameworkExtension extends Extension
             $loader->load('form_debug.xml');
         }
 
+        if ($this->validatorConfigEnabled) {
+            $loader->load('validator_debug.xml');
+        }
+
         if ($this->translationConfigEnabled) {
             $loader->load('translation_debug.xml');
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
@@ -672,7 +677,7 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -997,7 +1002,7 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->validatorConfigEnabled = $this->isConfigEnabled($container, $config)) {
             return;
         }
 
@@ -1067,7 +1072,10 @@ class FrameworkExtension extends Extension
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
             $dirname = $bundle['path'];
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/validation.yml', false)) {
+            if (
+                $container->fileExists($file = $dirname.'/Resources/config/validation.yaml', false) ||
+                $container->fileExists($file = $dirname.'/Resources/config/validation.yml', false)
+            ) {
                 $fileRecorder('yml', $file);
             }
 
@@ -1268,7 +1276,10 @@ class FrameworkExtension extends Extension
                 $fileRecorder('xml', $file);
             }
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/serialization.yml', false)) {
+            if (
+                $container->fileExists($file = $dirname.'/Resources/config/serialization.yaml', false) ||
+                $container->fileExists($file = $dirname.'/Resources/config/serialization.yml', false)
+            ) {
                 $fileRecorder('yml', $file);
             }
 

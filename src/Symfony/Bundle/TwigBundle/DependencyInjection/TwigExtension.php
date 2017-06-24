@@ -128,6 +128,17 @@ class TwigExtension extends Extension
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
 
+        if ($container->fileExists($dir = $container->getParameter('kernel.project_dir').'/templates', false)) {
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+        }
+
+        if ($container->fileExists($dir = $container->getParameter('kernel.project_dir').'/templates/bundles', false)) {
+            foreach (glob($dir.'/*', GLOB_ONLYDIR) as $path) {
+                $parts = explode(DIRECTORY_SEPARATOR, $path);
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, end($parts)));
+            }
+        }
+
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
             foreach ($config['globals'] as $key => $global) {

@@ -115,7 +115,6 @@
             "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
             "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
             "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
-            "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
             "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"

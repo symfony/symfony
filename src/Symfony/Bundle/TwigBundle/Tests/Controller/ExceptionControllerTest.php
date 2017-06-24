@@ -50,7 +50,7 @@ class ExceptionControllerTest extends TestCase
 
     public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown()
     {
-        $twig = $this->createTwigEnv(array('TwigBundle:Exception:exception_full.html.twig' => '<html></html>'));
+        $twig = $this->createTwigEnv(array('@Twig/Exception/exception_full.html.twig' => '<html></html>'));
 
         $request = $this->createRequest('txt');
         $request->attributes->set('showException', true);

@@ -76,7 +76,6 @@ class FilesystemLoader extends BaseFilesystemLoader
         }
 
         $file = null;
-        $previous = null;
         try {
             $file = parent::findTemplate($logicalName);
         } catch (LoaderError $e) {

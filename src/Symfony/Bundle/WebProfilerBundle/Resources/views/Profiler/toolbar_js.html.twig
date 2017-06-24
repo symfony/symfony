@@ -95,8 +95,17 @@
                 Sfjs.renderAjaxRequests();
             },
             function(xhr) {
+                var errorToolbarHtml = '
+                    <style>
+                        .sfErrorToolbar { background: #222; bottom: 0; color: #f5f5f5; font: 13px/36px Arial, sans-serif; height: 36px; padding: 0 15px; position: fixed; width: 100%; }
+                        .sfErrorToolbar a { color: #99cdd8; margin-left: 5px; text-decoration: underline; }
+                        .sfErrorToolbar a:hover { text-decoration: none; }
+                    </style>
+                    <div class="sfErrorToolbar">An error occurred while loading the web debug toolbar. <a href="{{ path("_profiler", { "token": token }) }}">Open the web profiler.</a></div>
+                ';
+
                 if (xhr.status !== 0) {
-                    confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
+                    window.document.body.insertAdjacentHTML('beforeend', errorToolbarHtml);
                 }
             },
             { maxTries: 5 }

@@ -276,6 +276,13 @@ class Filesystem
         }
 
         if (true !== @rename($origin, $target)) {
+            if (is_dir($origin)) {
+                // See https://bugs.php.net/bug.php?id=54097 & http://php.net/manual/en/function.rename.php#113943
+                $this->mirror($origin, $target, null, array('override' => $overwrite, 'delete' => $overwrite));
+                $this->remove($origin);
+
+                return;
+            }
             throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target), 0, null, $target);
         }
     }

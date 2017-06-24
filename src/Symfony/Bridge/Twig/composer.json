@@ -23,7 +23,7 @@
         "fig/link-util": "^1.0",
         "symfony/asset": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
-        "symfony/form": "^3.2.7",
+        "symfony/form": "^3.2.10|^3.3.3",
         "symfony/http-kernel": "~3.2",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~2.8|~3.0",
@@ -37,6 +37,9 @@
         "symfony/var-dumper": "~2.8.10|~3.1.4|~3.2",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/web-link": "~3.3"
+    },
+    "conflict": {
+        "symfony/form": "<3.2.10|~3.3,<3.3.3"
     },
     "suggest": {
         "symfony/finder": "",

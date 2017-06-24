@@ -114,6 +114,7 @@ EOT
         $rows = array();
         $copyUsed = false;
         $exitCode = 0;
+        $validAssetDirs = array();
         /** @var BundleInterface $bundle */
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
@@ -151,6 +152,13 @@ EOT
             } catch (\Exception $e) {
                 $exitCode = 1;
                 $rows[] = array(sprintf('<fg=red;options=bold>%s</>', '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage());
+            }
+            $validAssetDirs[] = $targetDir;
+        }
+        // remove the assets of the bundles that no longer exist
+        foreach (new \FilesystemIterator($bundlesDir) as $dir) {
+            if (!in_array($dir, $validAssetDirs)) {
+                $filesystem->remove($dir);
             }
         }
 

@@ -302,6 +302,7 @@
 {%- endblock form -%}
 
 {%- block form_start -%}
+    {%- do form.setMethodRendered() -%}
     {% set method = method|upper %}
     {%- if method in ["GET", "POST"] -%}
         {% set form_method = method %}
@@ -337,6 +338,20 @@
             {{- form_row(child) -}}
         {% endif %}
     {%- endfor %}
+
+    {% if not form.methodRendered %}
+        {%- do form.setMethodRendered() -%}
+        {% set method = method|upper %}
+        {%- if method in ["GET", "POST"] -%}
+            {% set form_method = method %}
+        {%- else -%}
+            {% set form_method = "POST" %}
+        {%- endif -%}
+
+        {%- if form_method != method -%}
+            <input type="hidden" name="_method" value="{{ method }}" />
+        {%- endif -%}
+    {% endif %}
 {% endblock form_rest %}
 
 {# Support #}

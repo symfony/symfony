@@ -337,6 +337,16 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
+    public function testRequestCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo/{bar}');
+        $route->setCondition('request.getBaseUrl() == "/sub/front.php" and request.getPathInfo() == "/foo/bar"');
+        $coll->add('foo', $route);
+        $matcher = new UrlMatcher($coll, new RequestContext('/sub/front.php'));
+        $this->assertEquals(array('bar' => 'bar', '_route' => 'foo'), $matcher->match('/foo/bar'));
+    }
+
     public function testDecodeOnce()
     {
         $coll = new RouteCollection();

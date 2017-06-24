@@ -48,6 +48,20 @@ class ExceptionControllerTest extends TestCase
         $this->assertEquals('html', $request->getRequestFormat());
     }
 
+    public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown()
+    {
+        $twig = $this->createTwigEnv(array('TwigBundle:Exception:exception_full.html.twig' => '<html></html>'));
+
+        $request = $this->createRequest('txt');
+        $request->attributes->set('showException', true);
+        $exception = FlattenException::create(new \Exception());
+        $controller = new ExceptionController($twig, false);
+
+        $controller->showAction($request, $exception);
+
+        $this->assertEquals('html', $request->getRequestFormat());
+    }
+
     public function testResponseHasRequestedMimeType()
     {
         $twig = $this->createTwigEnv(array('@Twig/Exception/error.json.twig' => '{}'));

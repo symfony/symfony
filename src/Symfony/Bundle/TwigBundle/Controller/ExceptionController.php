@@ -123,7 +123,7 @@ class ExceptionController
         // default to a generic HTML exception
         $request->setRequestFormat('html');
 
-        return sprintf('@Twig/Exception/%s.html.twig', $name);
+        return sprintf('@Twig/Exception/%s.html.twig', $showException ? 'exception_full' : $name);
     }
 
     // to be removed when the minimum required version of Twig is >= 3.0

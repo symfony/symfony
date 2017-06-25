@@ -34,7 +34,7 @@ class LoggingTranslatorPassTest extends TestCase
             ->method('getAlias')
             ->will($this->returnValue('translation.default'));
 
-        $container->expects($this->exactly(3))
+        $container->expects($this->exactly(2))
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 

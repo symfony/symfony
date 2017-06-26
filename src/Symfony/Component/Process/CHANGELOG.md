@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * environment variables will always be inherited
+ * added a second `array $env = array()` argument to the `start()`, `run()`,
+   `mustRun()`, and `restart()` methods of the `Process` class
+ * added a second `array $env = array()` argument to the `start()` method of the
+   `PhpProcess` class
+ * the `ProcessUtils::escapeArgument()` method has been removed
+ * the `areEnvironmentVariablesInherited()`, `getOptions()`, and `setOptions()`
+   methods of the `Process` class have been removed
+ * support for passing `proc_open()` options has been removed
+ * removed the `ProcessBuilder` class, use the `Process` class instead
+
 3.4.0
 -----
 

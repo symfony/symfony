@@ -444,32 +444,25 @@ class ErrorHandler
                         && ('trigger_error' === $backtrace[$i - 1]['function'] || 'user_error' === $backtrace[$i - 1]['function'])
                     ) {
                         // Here, we know trigger_error() has been called from __toString().
-                        // HHVM is fine with throwing from __toString() but PHP triggers a fatal error instead.
+                        // PHP triggers a fatal error when throwing from __toString().
                         // A small convention allows working around the limitation:
                         // given a caught $e exception in __toString(), quitting the method with
                         // `return trigger_error($e, E_USER_ERROR);` allows this error handler
                         // to make $e get through the __toString() barrier.
 
                         foreach ($context as $e) {
-                            if (($e instanceof \Exception || $e instanceof \Throwable) && $e->__toString() === $message) {
-                                if (1 === $i) {
-                                    // On HHVM
-                                    $errorAsException = $e;
-                                    break;
-                                }
+                            if ($e instanceof \Throwable && $e->__toString() === $message) {
                                 self::$toStringException = $e;
 
                                 return true;
                             }
                         }
 
-                        if (1 < $i) {
-                            // On PHP (not on HHVM), display the original error message instead of the default one.
-                            $this->handleException($errorAsException);
+                        // Display the original error message instead of the default one.
+                        $this->handleException($errorAsException);
 
-                            // Stop the process by giving back the error to the native handler.
-                            return false;
-                        }
+                        // Stop the process by giving back the error to the native handler.
+                        return false;
                     }
                 }
             }

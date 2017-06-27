@@ -32,6 +32,7 @@
         "symfony/polyfill-php72": "~1.5"
     },
     "replace": {
+        "symfony/amqp": "self.version",
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/cache": "self.version",

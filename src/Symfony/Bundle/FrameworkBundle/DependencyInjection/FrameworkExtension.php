@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\Amqp\Broker;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -251,6 +252,9 @@ class FrameworkExtension extends Extension
         $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        if (isset($config['amqp'])) {
+            $this->registerAmqpConfiguration($config['amqp'], $container, $loader);
+        }
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists('Symfony\Component\Serializer\Serializer')) {
@@ -1215,6 +1219,40 @@ class FrameworkExtension extends Extension
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
+        ;
+    }
+
+    private function registerAmqpConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('amqp.xml');
+
+        $defaultConnectionName = $config['default_connection'] ?? null;
+
+        $match = false;
+        foreach ($config['connections'] as $name => $connection) {
+            $container
+                ->register("amqp.broker.$name", Broker::class)
+                ->setFactory(array(Broker::class, 'createWithDsn'))
+                ->addArgument($connection['dsn'])
+                ->addArgument($connection['queues'])
+                ->addArgument($connection['exchanges'])
+            ;
+
+            if (!$defaultConnectionName) {
+                $defaultConnectionName = $name;
+            }
+            if ($defaultConnectionName === $name) {
+                $match = true;
+            }
+        }
+
+        if (!$match) {
+            throw new \InvalidArgumentException(sprintf('The "framework.amqp.default_connection" option "%s" does not exist.', $defaultConnectionName));
+        }
+
+        $container
+            ->setAlias('amqp.broker', "amqp.broker.$defaultConnectionName")
+            ->setPublic(true)
         ;
     }
 

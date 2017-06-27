@@ -104,6 +104,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
         $this->addMessengerSection($rootNode);
+        $this->addAmqpSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1070,5 +1071,153 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function addAmqpSection($rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('amqp')
+                    ->fixXmlConfig('connection')
+                    ->children()
+                        ->arrayNode('connections')
+                            ->addDefaultChildrenIfNoneSet('default')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->fixXmlConfig('exchange')
+                                ->fixXmlConfig('queue')
+                                ->children()
+                                    ->scalarNode('name')
+                                        ->cannotBeEmpty()
+                                    ->end()
+                                    ->scalarNode('dsn')
+                                        ->cannotBeEmpty()
+                                        ->defaultValue('amqp://guest:guest@localhost:5672/symfony')
+                                    ->end()
+                                    ->arrayNode('exchanges')
+                                        ->prototype('array')
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->variableNode('arguments')
+                                                    ->defaultValue(array())
+                                                    // Deal with XML config
+                                                    ->beforeNormalization()
+                                                        ->always()
+                                                        ->then(function ($v) {
+                                                            return $this->fixXmlArguments($v);
+                                                        })
+                                                    ->end()
+                                                    ->validate()
+                                                        ->ifTrue(function ($v) {
+                                                            return !is_array($v);
+                                                        })
+                                                        ->thenInvalid('Arguments must be an array (got %s).')
+                                                    ->end()
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('queues')
+                                        ->prototype('array')
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->variableNode('arguments')
+                                                    ->defaultValue(array())
+                                                    // Deal with XML config
+                                                    ->beforeNormalization()
+                                                        ->always()
+                                                        ->then(function ($v) {
+                                                            return $this->fixXmlArguments($v);
+                                                        })
+                                                    ->end()
+                                                    ->validate()
+                                                        ->ifTrue(function ($v) {
+                                                            return !is_array($v);
+                                                        })
+                                                        ->thenInvalid('Arguments must be an array (got %s).')
+                                                    ->end()
+                                                ->end()
+                                                ->enumNode('retry_strategy')
+                                                    ->values(array(null, 'constant', 'exponential'))
+                                                    ->defaultNull()
+                                                ->end()
+                                                ->variableNode('retry_strategy_options')
+                                                    ->validate()
+                                                        ->ifTrue(function ($v) {
+                                                            return !is_array($v);
+                                                        })
+                                                        ->thenInvalid('Arguments must be an array (got %s).')
+                                                    ->end()
+                                                ->end()
+                                                ->arrayNode('thresholds')
+                                                    ->addDefaultsIfNotSet()
+                                                    ->children()
+                                                        ->integerNode('warning')->defaultNull()->end()
+                                                        ->integerNode('critical')->defaultNull()->end()
+                                                    ->end()
+                                                ->end()
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'constant' === $config['retry_strategy'] && !array_key_exists('max', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"max" of "retry_strategy_options" must be set for constant retry strategy.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'constant' === $config['retry_strategy'] && !array_key_exists('time', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"time" of "retry_strategy_options" must be set for constant retry strategy.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'exponential' === $config['retry_strategy'] && !array_key_exists('max', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"max" of "retry_strategy_options" must be set for exponential retry strategy.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'exponential' === $config['retry_strategy'] && !array_key_exists('offset', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"offset" of "retry_strategy_options" must be set for exponential retry strategy.')
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('default_connection')
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function fixXmlArguments($v)
+    {
+        if (!is_array($v)) {
+            return $v;
+        }
+
+        $tmp = array();
+
+        foreach ($v as $key => $value) {
+            if (!isset($value['key']) && !isset($value['value'])) {
+                return $v;
+            }
+            $tmp[$value['key']] = $value['value'];
+        }
+
+        return $tmp;
     }
 }

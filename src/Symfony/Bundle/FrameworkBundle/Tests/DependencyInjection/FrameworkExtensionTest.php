@@ -1206,6 +1206,71 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
     }
 
+    public function testAmqpEmpty()
+    {
+        $container = $this->createContainerFromFile('amqp_empty');
+
+        $this->assertTrue($container->hasDefinition('amqp.broker.default'));
+        $this->assertSame(\Symfony\Component\Amqp\Broker::class, $container->getDefinition('amqp.broker.default')->getClass());
+        $this->assertSame('amqp://guest:guest@localhost:5672/symfony', $container->getDefinition('amqp.broker.default')->getArgument(0));
+
+        $this->assertTrue($container->hasAlias('amqp.broker'));
+        $this->assertSame('amqp.broker.default', (string) $container->getAlias('amqp.broker'));
+    }
+
+    public function testAmqpFull()
+    {
+        $container = $this->createContainerFromFile('amqp_full');
+
+        $this->assertTrue($container->hasDefinition('amqp.broker.queue_staging'));
+        $this->assertSame(\Symfony\Component\Amqp\Broker::class, $container->getDefinition('amqp.broker.queue_staging')->getClass());
+        $this->assertSame('amqp://foo:baz@rabbitmq:1234/staging', $container->getDefinition('amqp.broker.queue_staging')->getArgument(0));
+
+        $this->assertTrue($container->hasDefinition('amqp.broker.queue_prod'));
+        $this->assertSame(\Symfony\Component\Amqp\Broker::class, $container->getDefinition('amqp.broker.queue_prod')->getClass());
+        $this->assertSame('amqp://foo:bar@rabbitmq:1234/prod', $container->getDefinition('amqp.broker.queue_prod')->getArgument(0));
+        $queueConfiguration = array(
+            array(
+                'name' => 'retry_strategy_exponential',
+                'retry_strategy' => 'exponential',
+                'retry_strategy_options' => array(
+                    'offset' => 1,
+                    'max' => 3,
+                ),
+                'arguments' => array(),
+                'thresholds' => array(
+                    'warning' => null,
+                    'critical' => null,
+                ),
+            ),
+            array(
+                'name' => 'arguments',
+                'arguments' => array(
+                    'routing_keys' => 'my_routing_key',
+                    'flags' => 2,
+                ),
+                'retry_strategy' => null,
+                'thresholds' => array(
+                    'warning' => null,
+                    'critical' => null,
+                ),
+            ),
+        );
+        $this->assertEquals($queueConfiguration, $container->getDefinition('amqp.broker.queue_prod')->getArgument(1));
+        $exchangeConfiguration = array(
+            array(
+                'name' => 'headers',
+                'arguments' => array(
+                    'type' => 'headers',
+                ),
+            ),
+        );
+        $this->assertSame($exchangeConfiguration, $container->getDefinition('amqp.broker.queue_prod')->getArgument(2));
+
+        $this->assertTrue($container->hasAlias('amqp.broker'));
+        $this->assertSame('amqp.broker.queue_prod', (string) $container->getAlias('amqp.broker'));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

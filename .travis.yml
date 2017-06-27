@@ -18,7 +18,8 @@ env:
     global:
         - MIN_PHP=7.1.3
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
-        - MESSENGER_AMQP_DSN=amqp://localhost/%2f/messages
+        - MESSENGER_AMQP_DSN=amqp://localhost/
+        - AMQP_DSN=amqp://localhost/
 
 matrix:
     include:

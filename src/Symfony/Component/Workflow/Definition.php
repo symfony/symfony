@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\Exception\LogicException;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-final class Definition
+class Definition
 {
     private $places = array();
     private $transitions = array();

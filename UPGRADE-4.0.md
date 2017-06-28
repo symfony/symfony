@@ -455,6 +455,8 @@ Security
  * The `AccessDecisionManager::setVoters()` method has been removed. Pass the
    voters to the constructor instead.
 
+ * Support for defining voters that don't implement the `VoterInterface` has been removed.
+
 SecurityBundle
 --------------
 

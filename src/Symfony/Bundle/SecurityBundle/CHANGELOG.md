@@ -8,6 +8,7 @@ CHANGELOG
  * made `FirewallMap::$container` and `::$map` private
  * made the first `UserPasswordEncoderCommand::_construct()` argument mandatory
  * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` anymore
+ * removed support for voters that don't implement the `VoterInterface`
 
 3.4.0
 -----

@@ -437,10 +437,25 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_maxlifetime')->end()
                         ->booleanNode('use_strict_mode')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
+                        ->scalarNode('psr6_ttl')->defaultNull()->end()
+                        ->scalarNode('psr6_prefix')->defaultNull()->end()
+                        ->scalarNode('psr6_service')->defaultNull()->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue('0')
                             ->info('seconds to wait between 2 session metadata updates, it will also prevent the session handler to write if the session has not changed')
                         ->end()
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return $v['handler_id'] === 'session.handler.psr6' && !isset($v['psr6_service']);
+                        })
+                        ->thenInvalid('When handler_id="session.handler.psr6" you must also define a value for "psr6_service". Example "cache.app".')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return $v['handler_id'] !== 'session.handler.psr6' && (isset($v['psr6_ttl']) || isset($v['psr6_prefix']) || isset($v['psr6_service']));
+                        })
+                        ->thenInvalid('You must specify handler_id="session.handler.psr6" when you use "psr6_ttl", "psr6_prefix" or "prr6_service".')
                     ->end()
                 ->end()
             ->end()

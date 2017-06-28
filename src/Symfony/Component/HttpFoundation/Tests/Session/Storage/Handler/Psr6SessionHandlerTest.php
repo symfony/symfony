@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\Psr6SessionHandler;
 
 /**
@@ -40,9 +39,9 @@ class Psr6SessionHandlerTest extends TestCase
         parent::setUp();
 
         $this->psr6 = $this->getMockBuilder(Cache::class)
-            ->setMethods(['getItem', 'deleteItem', 'save'])
+            ->setMethods(array('getItem', 'deleteItem', 'save'))
             ->getMock();
-        $this->handler = new Psr6SessionHandler($this->psr6, ['prefix' => self::PREFIX, 'ttl' => self::TTL]);
+        $this->handler = new Psr6SessionHandler($this->psr6, array('prefix' => self::PREFIX, 'ttl' => self::TTL));
     }
 
     public function testOpen()
@@ -131,20 +130,46 @@ class Psr6SessionHandlerTest extends TestCase
     private function getItemMock()
     {
         return $this->getMockBuilder(CacheItemInterface::class)
-            ->setMethods(['isHit', 'getKey', 'get', 'set', 'expiresAt', 'expiresAfter'])
+            ->setMethods(array('isHit', 'getKey', 'get', 'set', 'expiresAt', 'expiresAfter'))
             ->getMock();
     }
 }
 
 class Cache implements CacheItemPoolInterface
 {
-    public function getItem($key) {}
-    public function getItems(array $keys = array()) {}
-    public function hasItem($key) {}
-    public function clear() {}
-    public function deleteItem($key) {}
-    public function deleteItems(array $keys) {}
-    public function save(CacheItemInterface $item) {}
-    public function saveDeferred(CacheItemInterface $item) {}
-    public function commit() {}
+    public function getItem($key)
+    {
+    }
+
+    public function getItems(array $keys = array())
+    {
+    }
+
+    public function hasItem($key)
+    {
+    }
+
+    public function clear()
+    {
+    }
+
+    public function deleteItem($key)
+    {
+    }
+
+    public function deleteItems(array $keys)
+    {
+    }
+
+    public function save(CacheItemInterface $item)
+    {
+    }
+
+    public function saveDeferred(CacheItemInterface $item)
+    {
+    }
+
+    public function commit()
+    {
+    }
 }

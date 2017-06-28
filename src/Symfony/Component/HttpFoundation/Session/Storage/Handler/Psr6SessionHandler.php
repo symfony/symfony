@@ -114,7 +114,7 @@ class Psr6SessionHandler implements \SessionHandlerInterface
      *
      * @return \Psr\Cache\CacheItemInterface
      */
-    private function getCacheItem(string $sessionId)
+    private function getCacheItem($sessionId)
     {
         return $this->cache->getItem($this->prefix.$sessionId);
     }

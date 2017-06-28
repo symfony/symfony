@@ -455,7 +455,7 @@ class Configuration implements ConfigurationInterface
                         ->ifTrue(function ($v) {
                             return $v['handler_id'] !== 'session.handler.psr6' && (isset($v['psr6_ttl']) || isset($v['psr6_prefix']) || isset($v['psr6_service']));
                         })
-                        ->thenInvalid('You must specify handler_id="session.handler.psr6" when you use "psr6_ttl", "psr6_prefix" or "prr6_service".')
+                        ->thenInvalid('You must specify handler_id="session.handler.psr6" when you use "psr6_ttl", "psr6_prefix" or "psr6_service".')
                     ->end()
                 ->end()
             ->end()

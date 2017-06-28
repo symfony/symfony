@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * Added `Psr6SessionHandler`.
+
 3.3.0
 -----
 

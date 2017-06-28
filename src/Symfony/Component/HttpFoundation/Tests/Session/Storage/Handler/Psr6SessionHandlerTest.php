@@ -38,7 +38,9 @@ class Psr6SessionHandlerTest extends TestCase
     {
         parent::setUp();
 
-        $this->psr6 = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
+        $this->psr6 = $this->getMockBuilder(CacheItemPoolInterface::class)
+            ->setMethods(['getItem', 'deleteItem'])
+            ->getMock();
         $this->handler = new Psr6SessionHandler($this->psr6, ['prefix' => self::PREFIX, 'ttl' => self::TTL]);
     }
 

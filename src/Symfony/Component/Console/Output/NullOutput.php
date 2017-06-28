@@ -108,6 +108,14 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
+    public function clear()
+    {
+        // do nothing
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function writeln($messages, $options = self::OUTPUT_NORMAL)
     {
         // do nothing

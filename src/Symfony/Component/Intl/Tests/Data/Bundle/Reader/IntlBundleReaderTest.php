@@ -51,10 +51,6 @@ class IntlBundleReaderTest extends TestCase
 
     public function testReadDoesNotFollowFallback()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('ResourceBundle does not support disabling fallback properly on HHVM.');
-        }
-
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
 
@@ -67,10 +63,6 @@ class IntlBundleReaderTest extends TestCase
 
     public function testReadDoesNotFollowFallbackAlias()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('ResourceBundle does not support disabling fallback properly on HHVM.');
-        }
-
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 

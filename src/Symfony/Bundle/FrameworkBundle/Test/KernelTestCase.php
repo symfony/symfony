@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -31,123 +30,20 @@ abstract class KernelTestCase extends TestCase
     protected static $kernel;
 
     /**
-     * Finds the directory where the phpunit.xml(.dist) is stored.
-     *
-     * If you run tests with the PHPUnit CLI tool, everything will work as expected.
-     * If not, override this method in your test classes.
-     *
-     * @return string The directory where phpunit.xml(.dist) is stored
-     *
-     * @throws \RuntimeException
-     *
-     * @deprecated since 3.4 and will be removed in 4.0.
-     */
-    protected static function getPhpUnitXmlDir()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
-            throw new \RuntimeException('You must override the KernelTestCase::createKernel() method.');
-        }
-
-        $dir = static::getPhpUnitCliConfigArgument();
-        if (null === $dir &&
-            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
-            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
-            $dir = getcwd();
-        }
-
-        // Can't continue
-        if (null === $dir) {
-            throw new \RuntimeException('Unable to guess the Kernel directory.');
-        }
-
-        if (!is_dir($dir)) {
-            $dir = dirname($dir);
-        }
-
-        return $dir;
-    }
-
-    /**
-     * Finds the value of the CLI configuration option.
-     *
-     * PHPUnit will use the last configuration argument on the command line, so this only returns
-     * the last configuration argument.
-     *
-     * @return string The value of the PHPUnit CLI configuration option
-     *
-     * @deprecated since 3.4 and will be removed in 4.0.
-     */
-    private static function getPhpUnitCliConfigArgument()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        $dir = null;
-        $reversedArgs = array_reverse($_SERVER['argv']);
-        foreach ($reversedArgs as $argIndex => $testArg) {
-            if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
-                $dir = realpath($reversedArgs[$argIndex - 1]);
-                break;
-            } elseif (0 === strpos($testArg, '--configuration=')) {
-                $argPath = substr($testArg, strlen('--configuration='));
-                $dir = realpath($argPath);
-                break;
-            } elseif (0 === strpos($testArg, '-c')) {
-                $argPath = substr($testArg, strlen('-c'));
-                $dir = realpath($argPath);
-                break;
-            }
-        }
-
-        return $dir;
-    }
-
-    /**
-     * Attempts to guess the kernel location.
-     *
-     * When the Kernel is located, the file is required.
-     *
      * @return string The Kernel class name
      *
      * @throws \RuntimeException
+     * @throws \LogicException
      */
     protected static function getKernelClass()
     {
-        if (isset($_SERVER['KERNEL_CLASS'])) {
-            if (!class_exists($class = $_SERVER['KERNEL_CLASS'])) {
-                throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the %s::createKernel() method.', $class, static::class));
-            }
-
-            return $class;
-        } else {
-            @trigger_error(sprintf('Using the KERNEL_DIR environment variable or the automatic guessing based on the phpunit.xml / phpunit.xml.dist file location is deprecated since 3.4. Set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel instead. Not setting the KERNEL_CLASS environment variable will throw an exception on 4.0 unless you override the %1$::createKernel() or %1$::getKernelClass() method.', static::class), E_USER_DEPRECATED);
+        if (!isset($_SERVER['KERNEL_CLASS'])) {
+            throw new \LogicException(sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the %1$::createKernel() or %1$::getKernelClass() method.', static::class));
         }
 
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
-            }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
+        if (!class_exists($class = $_SERVER['KERNEL_CLASS'])) {
+            throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the %s::createKernel() method.', $class, static::class));
         }
-
-        $finder = new Finder();
-        $finder->name('*Kernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
-        }
-
-        $file = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
 
         return $class;
     }

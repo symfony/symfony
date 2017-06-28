@@ -108,14 +108,6 @@ class YamlDumper extends Dumper
             $code .= "        autowire: true\n";
         }
 
-        $autowiringTypesCode = '';
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $autowiringTypesCode .= sprintf("            - %s\n", $this->dumper->dump($autowiringType));
-        }
-        if ($autowiringTypesCode) {
-            $code .= sprintf("        autowiring_types:\n%s", $autowiringTypesCode);
-        }
-
         if ($definition->isLazy()) {
             $code .= "        lazy: true\n";
         }

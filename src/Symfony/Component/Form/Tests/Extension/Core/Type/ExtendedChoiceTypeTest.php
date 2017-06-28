@@ -19,26 +19,6 @@ use Symfony\Component\Form\Tests\Fixtures\LazyChoiceTypeExtension;
 class ExtendedChoiceTypeTest extends TestCase
 {
     /**
-     * @group legacy
-     * @dataProvider provideTestedTypes
-     */
-    public function testLegacyChoicesAreOverridden($type)
-    {
-        $factory = Forms::createFormFactoryBuilder()
-            ->addTypeExtension(new ChoiceTypeExtension($type))
-            ->getFormFactory()
-        ;
-
-        $choices = $factory->create($type)->createView()->vars['choices'];
-
-        $this->assertCount(2, $choices);
-        $this->assertSame('A', $choices[0]->label);
-        $this->assertSame('a', $choices[0]->value);
-        $this->assertSame('B', $choices[1]->label);
-        $this->assertSame('b', $choices[1]->value);
-    }
-
-    /**
      * @dataProvider provideTestedTypes
      */
     public function testChoicesAreOverridden($type)

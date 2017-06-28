@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  *
  * @final since version 3.3.
  */
-class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*/
+class ChainEncoder implements ContextAwareEncoderInterface
 {
     protected $encoders = array();
     protected $encoderByFormat = array();
@@ -43,10 +43,8 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format/*, array $context = array()*/)
+    public function supportsEncoding($format, array $context = array())
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
-
         try {
             $this->getEncoder($format, $context);
         } catch (RuntimeException $e) {
@@ -64,9 +62,8 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      *
      * @return bool
      */
-    public function needsNormalization($format/*, array $context = array()*/)
+    public function needsNormalization($format, array $context = array())
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
         $encoder = $this->getEncoder($format, $context);
 
         if (!$encoder instanceof NormalizationAwareInterface) {

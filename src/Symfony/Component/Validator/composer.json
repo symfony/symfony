@@ -16,28 +16,28 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^7.1.3",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation": "~2.8|~3.0|~4.0"
+        "symfony/translation": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "~2.8|~3.0|~4.0",
-        "symfony/http-kernel": "~2.8|~3.0|~4.0.0",
-        "symfony/var-dumper": "~3.3|~4.0.0",
-        "symfony/intl": "^2.8.18|^3.2.5|~4.0",
-        "symfony/yaml": "~3.3|~4.0",
-        "symfony/config": "~2.8|~3.0|~4.0",
-        "symfony/dependency-injection": "~3.3|~4.0",
-        "symfony/expression-language": "~2.8|~3.0|~4.0",
-        "symfony/cache": "~3.1|~4.0",
+        "symfony/http-foundation": "~3.4|~4.0",
+        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/var-dumper": "~3.4|~4.0",
+        "symfony/intl": "~3.4|~4.0",
+        "symfony/yaml": "~3.4|~4.0",
+        "symfony/config": "~3.4|~4.0",
+        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/expression-language": "~3.4|~4.0",
+        "symfony/cache": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
         "egulias/email-validator": "^1.2.8|~2.0"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
-        "symfony/dependency-injection": "<3.3",
-        "symfony/yaml": "<3.3"
+        "symfony/dependency-injection": "<3.4",
+        "symfony/yaml": "<3.4"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",
@@ -60,7 +60,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.0-dev"
         }
     }
 }

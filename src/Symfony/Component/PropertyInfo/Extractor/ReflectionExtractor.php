@@ -48,11 +48,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     public static $defaultArrayMutatorPrefixes = array('add', 'remove');
 
     /**
-     * @var bool
-     */
-    private $supportsParameterType;
-
-    /**
      * @var string[]
      */
     private $mutatorPrefixes;
@@ -74,7 +69,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {
-        $this->supportsParameterType = method_exists('ReflectionParameter', 'getType');
         $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
         $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::$defaultArrayMutatorPrefixes;
@@ -178,25 +172,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $reflectionParameters = $reflectionMethod->getParameters();
         $reflectionParameter = $reflectionParameters[0];
 
-        if ($this->supportsParameterType) {
-            if (!$reflectionType = $reflectionParameter->getType()) {
-                return;
-            }
-            $type = $this->extractFromReflectionType($reflectionType);
+        if (!$reflectionType = $reflectionParameter->getType()) {
+            return;
+        }
+        $type = $this->extractFromReflectionType($reflectionType);
 
-            // HHVM reports variadics with "array" but not builtin type hints
-            if (!$reflectionType->isBuiltin() && Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType()) {
-                return;
-            }
-        } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $reflectionParameter, $info)) {
-            if (Type::BUILTIN_TYPE_ARRAY === $info[1]) {
-                $type = new Type(Type::BUILTIN_TYPE_ARRAY, $reflectionParameter->allowsNull(), null, true);
-            } elseif (Type::BUILTIN_TYPE_CALLABLE === $info[1]) {
-                $type = new Type(Type::BUILTIN_TYPE_CALLABLE, $reflectionParameter->allowsNull());
-            } else {
-                $type = new Type(Type::BUILTIN_TYPE_OBJECT, $reflectionParameter->allowsNull(), $info[1]);
-            }
-        } else {
+        // HHVM reports variadics with "array" but not builtin type hints
+        if (!$reflectionType->isBuiltin() && Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType()) {
             return;
         }
 
@@ -222,7 +204,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return;
         }
 
-        if ($this->supportsParameterType && $reflectionType = $reflectionMethod->getReturnType()) {
+        if ($reflectionType = $reflectionMethod->getReturnType()) {
             return array($this->extractFromReflectionType($reflectionType));
         }
 
@@ -240,7 +222,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromReflectionType(\ReflectionType $reflectionType)
     {
-        $phpTypeOrClass = $reflectionType instanceof \ReflectionNamedType ? $reflectionType->getName() : $reflectionType->__toString();
+        $phpTypeOrClass = $reflectionType->getName();
         $nullable = $reflectionType->allowsNull();
 
         if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {

@@ -86,19 +86,8 @@ class ServiceReferenceGraph
      * @param string $reference
      * @param bool   $lazy
      */
-    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null/*, bool $lazy = false*/)
+    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null, bool $lazy = false)
     {
-        if (func_num_args() >= 6) {
-            $lazy = func_get_arg(5);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a 6th `bool $lazy = false` argument in version 4.0. Not defining it is deprecated since 3.3.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-            $lazy = false;
-        }
         $sourceNode = $this->createNode($sourceId, $sourceValue);
         $destNode = $this->createNode($destId, $destValue);
         $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy);

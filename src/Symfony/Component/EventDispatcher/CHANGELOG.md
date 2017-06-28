@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `ContainerAwareEventDispatcher` class
+
 3.3.0
 -----
 

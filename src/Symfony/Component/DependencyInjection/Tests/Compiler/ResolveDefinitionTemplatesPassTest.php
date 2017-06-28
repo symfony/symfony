@@ -324,32 +324,6 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testProcessMergeAutowiringTypes()
-    {
-        $container = new ContainerBuilder();
-
-        $container
-            ->register('parent')
-            ->addAutowiringType('Foo')
-        ;
-
-        $container
-            ->setDefinition('child', new ChildDefinition('parent'))
-            ->addAutowiringType('Bar')
-        ;
-
-        $this->process($container);
-
-        $childDef = $container->getDefinition('child');
-        $this->assertEquals(array('Foo', 'Bar'), $childDef->getAutowiringTypes());
-
-        $parentDef = $container->getDefinition('parent');
-        $this->assertSame(array('Foo'), $parentDef->getAutowiringTypes());
-    }
-
     public function testProcessResolvesAliases()
     {
         $container = new ContainerBuilder();

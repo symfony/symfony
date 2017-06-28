@@ -13,8 +13,12 @@ namespace Symfony\Component\Serializer;
 
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
+use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
+use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -37,7 +41,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
+class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
     /**
      * @var Encoder\ChainEncoder
@@ -53,20 +57,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @var array
      */
     protected $normalizers = array();
-
-    /**
-     * @var array
-     *
-     * @deprecated since 3.1 will be removed in 4.0
-     */
-    protected $normalizerCache = array();
-
-    /**
-     * @var array
-     *
-     * @deprecated since 3.1 will be removed in 4.0
-     */
-    protected $denormalizerCache = array();
 
     public function __construct(array $normalizers = array(), array $encoders = array())
     {
@@ -177,42 +167,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null/*, array $context = array()*/)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
-        if (func_num_args() > 2) {
-            $context = func_get_arg(2);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a third `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
-
         return null !== $this->getNormalizer($data, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
-        if (func_num_args() > 3) {
-            $context = func_get_arg(3);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a fourth `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
-
         return null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
@@ -298,42 +262,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format/*, array $context = array()*/)
+    public function supportsEncoding($format, array $context = array())
     {
-        if (func_num_args() > 1) {
-            $context = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
-
         return $this->encoder->supportsEncoding($format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format/*, array $context = array()*/)
+    public function supportsDecoding($format, array $context = array())
     {
-        if (func_num_args() > 1) {
-            $context = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = array();
-        }
-
         return $this->decoder->supportsDecoding($format, $context);
     }
 }

@@ -135,7 +135,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php7TypesProvider
-     * @requires PHP 7.0
      */
     public function testExtractPhp7Type($property, array $type = null)
     {
@@ -154,7 +153,6 @@ class ReflectionExtractorTest extends TestCase
 
     /**
      * @dataProvider php71TypesProvider
-     * @requires PHP 7.1
      */
     public function testExtractPhp71Type($property, array $type = null)
     {

@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Role;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Role implements RoleInterface
+class Role
 {
     private $role;
 
@@ -31,7 +31,9 @@ class Role implements RoleInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a string representation of the role.
+     *
+     * @return string
      */
     public function getRole()
     {

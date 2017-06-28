@@ -1,0 +1,11 @@
+services:
+    foo:
+        class: stdClass
+        public: false
+
+    bar:
+        alias: foo
+        public: true
+        # keys other than "alias" and "public" are invalid when defining an alias.
+        calls:
+            - [doSomething]

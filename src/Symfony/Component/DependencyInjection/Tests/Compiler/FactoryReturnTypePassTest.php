@@ -44,25 +44,16 @@ class FactoryReturnTypePassTest extends TestCase
         $pass = new FactoryReturnTypePass();
         $pass->process($container);
 
-        if (method_exists(\ReflectionMethod::class, 'getReturnType')) {
-            $this->assertEquals(FactoryDummy::class, $factory->getClass());
-            $this->assertEquals(\stdClass::class, $foo->getClass());
-        } else {
-            $this->assertNull($factory->getClass());
-            $this->assertNull($foo->getClass());
-        }
+        $this->assertEquals(FactoryDummy::class, $factory->getClass());
+        $this->assertEquals(\stdClass::class, $foo->getClass());
         $this->assertEquals(__CLASS__, $bar->getClass());
     }
 
     /**
      * @dataProvider returnTypesProvider
      */
-    public function testReturnTypes($factory, $returnType, $hhvmSupport = true)
+    public function testReturnTypes($factory, $returnType)
     {
-        if (!$hhvmSupport && defined('HHVM_VERSION')) {
-            $this->markTestSkipped('Scalar typehints not supported by hhvm.');
-        }
-
         $container = new ContainerBuilder();
 
         $service = $container->register('service');
@@ -71,18 +62,14 @@ class FactoryReturnTypePassTest extends TestCase
         $pass = new FactoryReturnTypePass();
         $pass->process($container);
 
-        if (method_exists(\ReflectionMethod::class, 'getReturnType')) {
-            $this->assertEquals($returnType, $service->getClass());
-        } else {
-            $this->assertNull($service->getClass());
-        }
+        $this->assertEquals($returnType, $service->getClass());
     }
 
     public function returnTypesProvider()
     {
         return array(
             // must be loaded before the function as they are in the same file
-            array(array(FactoryDummy::class, 'createBuiltin'), null, false),
+            array(array(FactoryDummy::class, 'createBuiltin'), null),
             array(array(FactoryDummy::class, 'createParent'), FactoryParent::class),
             array(array(FactoryDummy::class, 'createSelf'), FactoryDummy::class),
             array(factoryFunction::class, FactoryDummy::class),
@@ -107,7 +94,6 @@ class FactoryReturnTypePassTest extends TestCase
     }
 
     /**
-     * @requires function ReflectionMethod::getReturnType
      * @expectedDeprecation Relying on its factory's return-type to define the class of service "factory" is deprecated since Symfony 3.3 and won't work in 4.0. Set the "class" attribute to "Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy" on the service definition instead.
      */
     public function testCompile()

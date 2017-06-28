@@ -211,13 +211,7 @@ class OutputFormatter implements OutputFormatterInterface
                 preg_match_all('([^,;]+)', $match[1], $options);
                 $options = array_shift($options);
                 foreach ($options as $option) {
-                    try {
-                        $style->setOption($option);
-                    } catch (\InvalidArgumentException $e) {
-                        @trigger_error(sprintf('Unknown style options are deprecated since version 3.2 and will be removed in 4.0. Exception "%s".', $e->getMessage()), E_USER_DEPRECATED);
-
-                        return false;
-                    }
+                    $style->setOption($option);
                 }
             } else {
                 return false;

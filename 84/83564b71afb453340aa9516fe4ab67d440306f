@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T19:13:18Z
+
+tests are failing :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-26T08:05:33Z
+
+I have removed the sigchild compatibility part as I did not manage to make it work properly. If someone wants to give it a try, you can just base your work on this PR or create a new one.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-28T07:17:03Z
+
+Let's merge this one as is then.

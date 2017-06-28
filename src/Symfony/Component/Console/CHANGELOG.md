@@ -10,6 +10,7 @@ CHANGELOG
   `Application::setTerminalDimensions()/getTerminalDimensions()`
 * removed `ConsoleExceptionEvent`
 * removed `ConsoleEvents::EXCEPTION`
+* Added `$output->clear()` to flush the screen output.
 
 3.3.0
 -----

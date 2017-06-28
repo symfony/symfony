@@ -128,7 +128,7 @@ class Psr6SessionHandlerTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getItemMock(): \PHPUnit_Framework_MockObject_MockObject
+    private function getItemMock()
     {
         return $this->getMockBuilder(CacheItemInterface::class)
             ->setMethods(['isHit', 'getKey', 'get', 'set', 'expiresAt', 'expiresAfter'])

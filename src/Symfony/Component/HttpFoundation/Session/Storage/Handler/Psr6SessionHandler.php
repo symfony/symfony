@@ -21,33 +21,33 @@ use Psr\Cache\CacheItemPoolInterface;
 class Psr6SessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @type CacheItemPoolInterface
+     * @var CacheItemPoolInterface
      */
     private $cache;
 
     /**
-     * @type int Time to live in seconds
+     * @var int Time to live in seconds
      */
     private $ttl;
 
     /**
-     * @type string Key prefix for shared environments.
+     * @var string Key prefix for shared environments.
      */
     private $prefix;
 
     /**
      * List of available options:
      *  * prefix: The prefix to use for the cache keys in order to avoid collision
-     *  * ttl: The time to live in seconds
+     *  * ttl: The time to live in seconds.
      *
      * @param CacheItemPoolInterface $cache   A Cache instance
      * @param array                  $options An associative array of cache options
      */
-    public function __construct(CacheItemPoolInterface $cache, array $options = [])
+    public function __construct(CacheItemPoolInterface $cache, array $options = array())
     {
         $this->cache = $cache;
 
-        $this->ttl    = isset($options['ttl']) ? (int) $options['ttl'] : 86400;
+        $this->ttl = isset($options['ttl']) ? (int) $options['ttl'] : 86400;
         $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sfPsr6sess_';
     }
 

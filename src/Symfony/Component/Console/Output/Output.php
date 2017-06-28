@@ -129,6 +129,14 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
+    public function clear()
+    {
+        $this->write(sprintf("\033\143"));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function writeln($messages, $options = self::OUTPUT_NORMAL)
     {
         $this->write($messages, true, $options);

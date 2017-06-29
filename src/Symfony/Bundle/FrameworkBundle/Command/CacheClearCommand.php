@@ -77,7 +77,11 @@ EOF
         if ($input->getOption('no-warmup')) {
             $filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
-            @trigger_error('Calling cache:clear without the --no-warmup option is deprecated since version 3.3. Cache warmup should be done with the cache:warmup command instead.', E_USER_DEPRECATED);
+            $warning = 'Calling cache:clear without the --no-warmup option is deprecated since version 3.3. Cache warmup should be done with the cache:warmup command instead.';
+
+            @trigger_error($warning, E_USER_DEPRECATED);
+
+            $io->warning($warning);
 
             $this->warmupCache($input, $output, $realCacheDir, $oldCacheDir);
         }

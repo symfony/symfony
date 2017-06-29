@@ -8,7 +8,8 @@ CHANGELOG
    You should implement this method yourself in your concrete authenticator.
  * removed the `AccessDecisionManager::setVoters()` method
  * removed the `RoleInterface`
- * added a sixth `string $context` argument to`LogoutUrlGenerator::registerListener()`
+ * removed support for voters that don't implement the `VoterInterface`
+ * added a sixth `string $context` argument to `LogoutUrlGenerator::registerListener()`
 
 3.4.0
 -----

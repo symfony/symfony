@@ -1,0 +1,12 @@
+parameters:
+    secret(a/path): foo
+    bar: '%secret(a/path)%'
+    bat: '%env(FOO)%'
+
+services:
+    test:
+        class: '%secret(FOO)%'
+        arguments:
+            - '%secret(b/path)%'
+            - 'foo%bar%baz%bat%'
+            - '%secret(env(PATH))%'

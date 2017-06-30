@@ -334,6 +334,17 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
     }
 
+    public function testSecretParameter()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services34.yml');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services34.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      * @expectedExceptionMessage Environment variables "FOO" are never used. Please, check your container's configuration.

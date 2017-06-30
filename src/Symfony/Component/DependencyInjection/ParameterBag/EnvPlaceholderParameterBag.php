@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
@@ -20,6 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholders = array();
+    private $secretPlaceholders = array();
 
     /**
      * {@inheritdoc}
@@ -27,33 +29,41 @@ class EnvPlaceholderParameterBag extends ParameterBag
     public function get($name)
     {
         if (0 === strpos($name, 'env(') && ')' === substr($name, -1) && 'env()' !== $name) {
-            $env = substr($name, 4, -1);
+            return $this->doGet(false, $name, substr($name, 4, -1));
+        }
 
-            if (isset($this->envPlaceholders[$env])) {
-                foreach ($this->envPlaceholders[$env] as $placeholder) {
-                    return $placeholder; // return first result
-                }
-            }
-            if (preg_match('/\W/', $env)) {
-                throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
-            }
-
-            if ($this->has($name)) {
-                $defaultValue = parent::get($name);
-
-                if (null !== $defaultValue && !is_scalar($defaultValue)) {
-                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
-                }
-            }
-
-            $uniqueName = md5($name.uniqid(mt_rand(), true));
-            $placeholder = sprintf('env_%s_%s', $env, $uniqueName);
-            $this->envPlaceholders[$env][$placeholder] = $placeholder;
-
-            return $placeholder;
+        if (0 === strpos($name, 'secret(') && ')' === substr($name, -1) && 'secret()' !== $name) {
+            return $this->doGet(true, $name, substr($name, 7, -1));
         }
 
         return parent::get($name);
+    }
+
+    private function doGet($secret, $name, $value)
+    {
+        if (($secret && isset($this->secretPlaceholders[$value])) || isset($this->envPlaceholders[$value])) {
+            $placeholders = $secret ? $this->secretPlaceholders[$value] : $this->envPlaceholders[$value];
+            foreach ($placeholders as $placeholder) {
+                return $placeholder; // return first result
+            }
+        }
+        if (preg_match($secret ? '/[^a-zA-Z0-9)(~\.:_\/\\-]/' : '/\W/', $value)) {
+            throw new InvalidArgumentException(sprintf('Invalid %s name: only "%s" characters are allowed.', $name, $secret ? '[a-zA-Z0-9_\/\\-]' : 'word'));
+        }
+
+        if ($this->has($name)) {
+            $defaultValue = parent::get($name);
+
+            if (null !== $defaultValue && !is_scalar($defaultValue)) {
+                throw new RuntimeException(sprintf('The default value of an %s() parameter must be scalar or null, but "%s" given to "%s".', $secret ? 'secret' : 'env', gettype($defaultValue), $name));
+            }
+        }
+
+        $uniqueName = md5($name.uniqid(mt_rand(), true));
+        $placeholder = sprintf('%s_%s_%s', $secret ? 'secret' : 'env', $value, $uniqueName);
+        $secret ? $this->secretPlaceholders[$value][$placeholder] = $placeholder : $this->envPlaceholders[$value][$placeholder] = $placeholder;
+
+        return $placeholder;
     }
 
     /**
@@ -64,6 +74,16 @@ class EnvPlaceholderParameterBag extends ParameterBag
     public function getEnvPlaceholders()
     {
         return $this->envPlaceholders;
+    }
+
+    /**
+     * Returns the map of secret vars used in the resolved parameter values to their placeholders.
+     *
+     * @return string[][] A map of env var names to their placeholders
+     */
+    public function getSecretPlaceholders()
+    {
+        return $this->secretPlaceholders;
     }
 
     /**
@@ -81,6 +101,20 @@ class EnvPlaceholderParameterBag extends ParameterBag
     }
 
     /**
+     * Merges the secret placeholders of another EnvPlaceholderParameterBag.
+     */
+    public function mergeSecretPlaceholders(self $bag)
+    {
+        if ($newPlaceholders = $bag->getSecretPlaceholders()) {
+            $this->secretPlaceholders += $newPlaceholders;
+
+            foreach ($newPlaceholders as $secret => $placeholders) {
+                $this->secretPlaceholders[$secret] += $placeholders;
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function resolve()
@@ -90,14 +124,20 @@ class EnvPlaceholderParameterBag extends ParameterBag
         }
         parent::resolve();
 
-        foreach ($this->envPlaceholders as $env => $placeholders) {
-            if (!isset($this->parameters[$name = strtolower("env($env)")])) {
+        $this->doResolve($this->envPlaceholders, 'env');
+        $this->doResolve($this->secretPlaceholders, 'secret');
+    }
+
+    private function doResolve(array $placeholderList, $type)
+    {
+        foreach ($placeholderList as $envOrSecret => $placeholders) {
+            if (!isset($this->parameters[$name = strtolower("$type($envOrSecret)")])) {
                 continue;
             }
             if (is_numeric($default = $this->parameters[$name])) {
                 $this->parameters[$name] = (string) $default;
             } elseif (null !== $default && !is_scalar($default)) {
-                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, %s given.', $env, gettype($default)));
+                throw new RuntimeException(sprintf('The default value of %s parameter "%s" must be scalar or null, %s given.', $type, $envOrSecret, gettype($default)));
             }
         }
     }

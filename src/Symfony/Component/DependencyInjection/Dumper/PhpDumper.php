@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Exception\SecretParameterException;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -53,6 +54,11 @@ class PhpDumper extends Dumper
      * @var string
      */
     const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
+
+    /**
+     * @internal
+     */
+    const PARAMETER_PATTERN = "/\\\$this->(?:getEnv\('\w++'\)|getSecret\('[a-zA-Z0-9~\.:_\/\\)(-]++'\)|targetDirs\[\d++\])/";
 
     private $inlinedDefinitions;
     private $definitionVariables;
@@ -109,6 +115,7 @@ class PhpDumper extends Dumper
      * @return string A PHP class representing of the service container
      *
      * @throws EnvParameterException When an env var exists but has not been dumped
+     * @throws SecretParameterException When a secret var exists but has not been dumped
      */
     public function dump(array $options = array())
     {
@@ -175,6 +182,16 @@ class PhpDumper extends Dumper
         }
         if ($unusedEnvs) {
             throw new EnvParameterException($unusedEnvs, null, 'Environment variables "%s" are never used. Please, check your container\'s configuration.');
+        }
+
+        $unusedSecrets = array();
+        foreach ($this->container->getSecretCounters() as $secret => $use) {
+            if (!$use) {
+                $unusedSecrets[] = $secret;
+            }
+        }
+        if ($unusedSecrets) {
+            throw new SecretParameterException($unusedSecrets, null, 'Secret variables "%s" are never used. Please, check your container\'s configuration.');
         }
 
         return $code;
@@ -587,6 +604,7 @@ class PhpDumper extends Dumper
         $return = array();
 
         if ($class = $definition->getClass()) {
+            $class = $this->container->resolveSecretPlaceholders($class);
             $class = $this->container->resolveEnvPlaceholders($class);
             $return[] = sprintf('@return %s A %s instance', 0 === strpos($class, '%') ? 'object' : '\\'.ltrim($class, '\\'), ltrim($class, '\\'));
         } elseif ($definition->getFactory()) {
@@ -611,6 +629,7 @@ class PhpDumper extends Dumper
         }
 
         $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
+        $return = $this->container->resolveSecretPlaceholders($return);
         $return = $this->container->resolveEnvPlaceholders($return);
 
         $doc = '';
@@ -1031,13 +1050,16 @@ EOF;
         $dynamicPhp = array();
 
         foreach ($this->container->getParameterBag()->all() as $key => $value) {
+            if ($key !== $resolvedKey = $this->container->resolveSecretPlaceholders($key)) {
+                throw new InvalidArgumentException(sprintf('Parameter name cannot use secret parameters: %s.', $resolvedKey));
+            }
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
                 throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: %s.', $resolvedKey));
             }
             $export = $this->exportParameters(array($value));
             $export = explode('0 => ', substr(rtrim($export, " )\n"), 7, -1), 2);
 
-            if (preg_match("/\\\$this->(?:getEnv\('\w++'\)|targetDirs\[\d++\])/", $export[1])) {
+            if (preg_match(self::PARAMETER_PATTERN, $export[1])) {
                 $dynamicPhp[$key] = sprintf('%scase %s: $value = %s; break;', $export[0], $this->export($key), $export[1]);
             } else {
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
@@ -1587,7 +1609,7 @@ EOF;
                 return $dumpedValue;
             }
 
-            if (!preg_match("/\\\$this->(?:getEnv\('\w++'\)|targetDirs\[\d++\])/", $dumpedValue)) {
+            if (!preg_match(self::PARAMETER_PATTERN, $dumpedValue)) {
                 return sprintf("\$this->parameters['%s']", $name);
             }
         }
@@ -1772,7 +1794,7 @@ EOF;
     {
         $export = var_export($value, true);
 
-        if ("'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('%s').'")) {
+        if ("'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($this->container->resolveSecretPlaceholders($export, "'.\$this->getSecret('%s').'"), "'.\$this->getEnv('%s').'")) {
             $export = $resolvedExport;
             if ("'" === $export[1]) {
                 $export = substr($export, 3);

@@ -105,7 +105,7 @@ EOF
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
             if (E_USER_DEPRECATED === $level) {
-                throw new ParseException($message, $this->getParser()->getLastLineNumberBeforeDeprecation());
+                throw new ParseException($message, $this->getParser()->getRealCurrentLineNb() + 1);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;

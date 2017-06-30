@@ -497,6 +497,23 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getFoo());
     }
 
+    public function testHasGetterDenormalize()
+    {
+        $obj = $this->normalizer->denormalize(array('foo' => true), ObjectWithHasGetterDummy::class);
+        $this->assertTrue($obj->hasFoo());
+    }
+
+    public function testHasGetterNormalize()
+    {
+        $obj = new ObjectWithHasGetterDummy();
+        $obj->setFoo(true);
+
+        $this->assertEquals(
+            array('foo' => true),
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testMaxDepth()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -805,5 +822,20 @@ class ObjectWithJustStaticSetterDummy
     public static function setFoo($foo)
     {
         self::$foo = $foo;
+    }
+}
+
+class ObjectWithHasGetterDummy
+{
+    private $foo;
+
+    public function setFoo($foo)
+    {
+        $this->foo = $foo;
+    }
+
+    public function hasFoo()
+    {
+        return $this->foo;
     }
 }

@@ -453,9 +453,11 @@ class Parser
     /**
      * Returns the current line number (takes the offset into account).
      *
+     * @internal
+     *
      * @return int The current line number
      */
-    private function getRealCurrentLineNb()
+    public function getRealCurrentLineNb()
     {
         $realCurrentLineNumber = $this->currentLineNb + $this->offset;
 

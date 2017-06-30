@@ -145,7 +145,7 @@ EOF
         } catch (Error $e) {
             $twig->setLoader($realLoader);
 
-            return array('template' => $template, 'file' => $file, 'valid' => false, 'exception' => $e);
+            return array('template' => $template, 'file' => $file, 'line' => $e->getTemplateLine(), 'valid' => false, 'exception' => $e);
         }
 
         return array('template' => $template, 'file' => $file, 'valid' => true);

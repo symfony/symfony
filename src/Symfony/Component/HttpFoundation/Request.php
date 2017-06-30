@@ -783,10 +783,6 @@ class Request
      * being the original client, and each successive proxy that passed the request
      * adding the IP address where it received the request from.
      *
-     * If your reverse proxy uses a different header name than "X-Forwarded-For",
-     * ("Client-Ip" for instance), configure it via the $trustedHeaderSet
-     * argument of the Request::setTrustedProxies() method instead.
-     *
      * @return string|null The client IP address
      *
      * @see getClientIps()
@@ -889,10 +885,6 @@ class Request
      * when trusted proxies were set via "setTrustedProxies()".
      *
      * The "X-Forwarded-Port" header must contain the client port.
-     *
-     * If your reverse proxy uses a different header name than "X-Forwarded-Port",
-     * configure it via via the $trustedHeaderSet argument of the
-     * Request::setTrustedProxies() method instead.
      *
      * @return int|string can be a string if fetched from the server bag
      */
@@ -1108,10 +1100,6 @@ class Request
      *
      * The "X-Forwarded-Proto" header must contain the protocol: "https" or "http".
      *
-     * If your reverse proxy uses a different header name than "X-Forwarded-Proto"
-     * ("SSL_HTTPS" for instance), configure it via the $trustedHeaderSet
-     * argument of the Request::setTrustedProxies() method instead.
-     *
      * @return bool
      */
     public function isSecure()
@@ -1132,10 +1120,6 @@ class Request
      * when trusted proxies were set via "setTrustedProxies()".
      *
      * The "X-Forwarded-Host" header must contain the client host name.
-     *
-     * If your reverse proxy uses a different header name than "X-Forwarded-Host",
-     * configure it via the $trustedHeaderSet argument of the
-     * Request::setTrustedProxies() method instead.
      *
      * @return string
      *

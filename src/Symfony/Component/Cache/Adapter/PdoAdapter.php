@@ -195,7 +195,7 @@ class PdoAdapter extends AbstractAdapter
             foreach ($expired as $id) {
                 $stmt->bindValue(++$i, $id);
             }
-            $stmt->execute($expired);
+            $stmt->execute();
         }
     }
 

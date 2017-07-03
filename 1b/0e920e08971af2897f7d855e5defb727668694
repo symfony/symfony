@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-06-26T14:03:12Z
+
+I've just chatted with @chalasr about this. We broke slightly BC... as listeners with an identical priority are now registered in a different order than before. There are only 3 ways to fix this:
+
+A) This PR. It adds extra complexity, but truly re-adds the previous behavior.
+
+B) Changing the Firewall\ExceptionListener priority to a positive number. That's very risky: it will likely cause other BC breaks.
+
+C) Do nothing and expect the user to set their exception listener to a positive number. But going forward, this means that when a user creates an exception listener with no priority, they may break their security setup. That sucks :).
+
+I think we need @nicolas-grekas to tech review this, but I'm +1 on the concept.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-28T10:06:35Z
+
+If we were to not do this, is there a way to change the declaration order in our XML files to restore the original one?
+The issue here is that this binds the factory concept with the late-registration one. Thus the added complexity reduces the scope of the class...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-28T12:53:42Z
+
+Changing the order of the listeners declarations does not help. The firewall exception listener is registered at runtime ([not a service](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Http/Firewall.php#L64)). As said, changing priorities would probably cause more issues than it would solve.
+I don't have a better way to fix this reliably.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-28T14:55:09Z
+
+The right fix here is to increase the prirority of the firewall ExceptionListener (make it 1, so that it is still below other listeners registered with a priority).
+
+AFAIK, our promise for listeners having the same priority is that the order is totally undefined for them. The firewall was relying on an implementation detail here, and we should just make it defined properly. The Firewall expects its listener to run before the ExceptionListener from HttpKernel anyway (this is required for it to work), and priorities are the way to ensure that. We just had a broken usage of the dispatcher since years, which was hidden by the lazy registration previously (which actually means that projects not using our containerAwareEventDispatcher might have been affected before btw, so I would even consider fixing it in lower branches)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-28T14:55:47Z
+
+I put a -1 vote on the current implementation adding more complexity in the registration process
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-28T15:13:34Z
+
+Fine to me, hope it doesn't cause other troubles. PR updated

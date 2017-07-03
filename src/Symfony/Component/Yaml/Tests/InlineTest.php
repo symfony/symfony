@@ -703,4 +703,13 @@ class InlineTest extends TestCase
             'float' => array('{0.25: "foo"}', array('0.25' => 'foo')),
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Tags support is not enabled. You must use the `Yaml::PARSE_CUSTOM_TAGS` flag to use "!iterator" at line 1 (near "!iterator foo").
+     */
+    public function testCustomTagsDisabled()
+    {
+        Inline::parse('!iterator foo');
+    }
 }

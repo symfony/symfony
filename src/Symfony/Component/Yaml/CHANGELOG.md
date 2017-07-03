@@ -4,6 +4,9 @@ CHANGELOG
 4.0.0
 -----
 
+ * Inlined scalars starting with `!` will no longer be parsed as plain strings.
+   Use the `Yaml::PARSE_CUSTOM_TAGS` flag to parse them as `TaggedValue` objects.
+   Otherwise, detecting such strings will throw a `ParseException`.
  * The behavior of the non-specific tag `!` is changed and now forces
    non-evaluating your values.
  * complex mappings will throw a `ParseException`

@@ -153,4 +153,16 @@ class StopwatchTest extends TestCase
         $stopwatch = new Stopwatch();
         $stopwatch->openSection('section');
     }
+
+    public function testReset()
+    {
+        $stopwatch = new Stopwatch();
+
+        $stopwatch->openSection();
+        $stopwatch->start('foo', 'cat');
+
+        $stopwatch->reset();
+
+        $this->assertEquals(new Stopwatch(), $stopwatch);
+    }
 }

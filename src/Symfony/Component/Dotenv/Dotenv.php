@@ -216,6 +216,10 @@ final class Dotenv
             $notQuoted = true;
             $prevChr = $this->data[$this->cursor - 1];
             while ($this->cursor < $this->end && "\n" !== $this->data[$this->cursor] && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
+                if ('\\' === $this->data[$this->cursor] && isset($this->data[$this->cursor + 1]) && ('"' === $this->data[$this->cursor + 1] || "'" === $this->data[$this->cursor + 1])) {
+                    ++$this->cursor;
+                }
+
                 $value .= $prevChr = $this->data[$this->cursor];
                 ++$this->cursor;
             }

@@ -30,7 +30,7 @@ class Stopwatch
 
     public function __construct()
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
+        $this->reset();
     }
 
     /**
@@ -155,5 +155,13 @@ class Stopwatch
     public function getSectionEvents($id)
     {
         return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : array();
+    }
+
+    /**
+     * Resets the stopwatch to its original state.
+     */
+    public function reset()
+    {
+        $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
     }
 }

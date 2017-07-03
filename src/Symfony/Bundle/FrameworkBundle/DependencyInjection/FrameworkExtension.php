@@ -38,6 +38,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\Psr6SessionHandler;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
@@ -690,6 +691,13 @@ class FrameworkExtension extends Extension
             // Set the handler class to be null
             $container->getDefinition('session.storage.native')->replaceArgument(1, null);
             $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
+        } elseif ('session.handler.psr6' === $config['handler_id']) {
+            $container->register('session.handler.psr6', Psr6SessionHandler::class)
+                ->addArgument(new Reference($config['psr6_service']))
+                ->addArgument([
+                    'prefix' => $config['psr6_prefix'],
+                    'ttl' => $config['psr6_ttl'],
+                ]);
         } else {
             $handlerId = $config['handler_id'];
 

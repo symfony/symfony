@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
@@ -565,5 +566,17 @@ class PropertyAccessorTest extends TestCase
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
+    }
+
+    /**
+     * @requires PHP 7
+     *
+     * @expectedException \TypeError
+     */
+    public function testDoNotDiscardReturnTypeError()
+    {
+        $object = new ReturnTyped();
+
+        $this->propertyAccessor->setValue($object, 'foos', array(new \DateTime()));
     }
 }

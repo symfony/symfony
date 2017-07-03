@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T09:53:50Z
+
+Note: in sf 4.0, methods signatures should be more elegant with ``$filter`` as 3rd param:
+
+```php
+// sf 3.x
+public function assertDumpEquals($dump, $data, $message = '', $filter = 0)
+public function assertDumpMatchesFormat($dump, $data, $message = '', $filter = 0)
+
+// sf 4.0
+public function assertDumpEquals($dump, $data, $filter = 0, $message = '')
+public function assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '')
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T09:55:31Z
+
+That's not possible without an upgrade path: we don't do hard BC breaks without notices first in 3.4.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T10:20:34Z
+
+Like this?
+```php
+@trigger_error(sprintf('The $filter parameter of the %s() is deprecated since version 3.4 and will be moved at 3rd position in 4.0.', __METHOD__), E_USER_DEPRECATED);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-28T09:49:20Z
+
+@maidmaid you could detect when the type is int vs string and trigger a deprecation like in your example when relevant.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-30T09:48:55Z
+
+Ok @nicolas-grekas, I will do this in an other PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T13:50:03Z
+
+I'd prefer in the same PR, that's the same "unit of work" to me.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-06-05T21:17:36Z
+
+Deprecation added.

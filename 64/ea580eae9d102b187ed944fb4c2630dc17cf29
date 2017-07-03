@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-23T12:41:55Z
+
+shouldn't it use the `sfwdt{{ token }}` element instead of inserting a whole new div too ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-23T13:55:44Z
+
+> shouldn't it use the sfwdt{{ token }} element instead of inserting a whole new div too ?
+
+I think makes sense use the current elements to avoid empty div, respect the configured toolbar `position` and style mess, Updated!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-23T14:33:01Z
+
+Fixed position when the toolbar is configured to the `top`.
+
+Ready!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-23T16:23:26Z
+
+Well, after several adjustments the result remains the same (tested until version 3.4) :)
+
+@stof thanks! any other suggestions?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-23T16:51:44Z
+
+> btw, not having the sf-toolbar class means you also need to handle the case of the error toolbar separately in the print version.
+
+```css
+/***** Media query print: Do not print the Toolbar. *****/
+@media print {
+    .sf-toolbar {
+        display: none;
+        visibility: hidden;
+    }
+}
+```
+
+Btw, [this style is present in 2.7](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig#L436-L442) but [was removed since 2.8](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig) so the toolbar is displayed in the print version, maybe @javiereguiluz could validate those changes?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-25T20:36:47Z
+
+@yceruto I don't remember this change ... but thinking about this now, in my opinion is OK to print the debug toolbar ... if you want to print your web app, you probably display it in prod.  Being able to print the debug toolbar can be interesting in some scenarios (think about reports, audits, etc. to show the performance, number of database queries, etc.)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-26T11:26:05Z
+
+@javiereguiluz I agree with you.
+
+We're fine then, this PR is ready.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-26T11:53:44Z
+
+I don't agree about printing the debug toolbar. In most cases it does not make sense to me, and for the few case you'll need it, you can still create a new css rule or remove it using browser inspections.
+If you're doing PDF generation from an HTML view for instance, it does not make sense to include the toolbar in dev mode.
+
+I think it was simply forgotten [when redesigning the profiler](https://github.com/symfony/symfony/pull/15160)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-26T12:21:42Z
+
+@ogizanagi I agree with you too, I've opened an issue to discuss about it #23303 as this issue starts since 2.8 (no related to this PR) ;)

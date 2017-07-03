@@ -572,7 +572,7 @@ test: Various explicit families
 todo: true
 spec: 2.23
 yaml: |
-  not-date: !str 2002-04-28
+  not-date: !!str 2002-04-28
   picture: !binary |
    R0lGODlhDAAMAIQAAP//9/X
    17unp5WZmZgAAAOfn515eXv
@@ -911,7 +911,7 @@ test: Explicit typing
 yaml: |
    integer: 12
    no int: ! 12
-   string: !str 12
+   string: !!str 12
 php: |
    array( 'integer' => 12, 'no int' => '12', 'string' => '12' )
 ---
@@ -943,7 +943,7 @@ documents: 2
 test: Type family under yaml.org
 yaml: |
   # The URI is 'tag:yaml.org,2002:str'
-  - !str a Unicode string
+  - !!str a Unicode string
 php: |
   array( 'a Unicode string' )
 ---
@@ -1330,7 +1330,7 @@ yaml: |
 
    second: 12          ## This is an integer.
 
-   third: !str 12      ## This is a string.
+   third: !!str 12      ## This is a string.
 
    span: this contains
          six spaces
@@ -1399,7 +1399,7 @@ yaml: |
    # The following scalars
    # are loaded to the
    # string value '1' '2'.
-   - !str 12
+   - !!str 12
    - '12'
    - "12"
    - "\

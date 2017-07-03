@@ -116,7 +116,7 @@ class YamlFileLoader extends FileLoader
     private function parseFile($path)
     {
         try {
-            $classes = $this->yamlParser->parse(file_get_contents($path), Yaml::PARSE_KEYS_AS_STRINGS);
+            $classes = $this->yamlParser->parse(file_get_contents($path), Yaml::PARSE_KEYS_AS_STRINGS | Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
         }

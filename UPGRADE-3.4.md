@@ -61,5 +61,7 @@ Validator
 Yaml
 ----
 
+ * Support for the `!str` tag is deprecated, use the `!!str` tag instead.
+
  * Using the non-specific tag `!` is deprecated and will have a different
    behavior in 4.0. Use a plain integer or `!!float` instead.

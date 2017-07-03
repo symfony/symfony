@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-01T09:49:06Z
+
+Nope, this is just another edge case which I discovered while trying to fix #23306. But fixing #23306 is a bit more complex and I am not sure if I will find a good fix for it soon (or before someone else manages to do so). That's why I decided to open a PR with this patch.

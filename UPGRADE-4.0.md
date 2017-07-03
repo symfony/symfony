@@ -567,6 +567,39 @@ Validator
    changed to `true` as of 4.0. If you need the previous behaviour ensure to
    set the option to `false`.
 
+VarDumper
+---------
+
+ * The `VarDumperTestTrait::assertDumpEquals()` method expects a 3rd `$context = null`
+   argument and moves `$message = ''` argument at 4th position.
+
+   Before:
+
+   ```php
+   VarDumperTestTrait::assertDumpEquals($dump, $data, $message = '');
+   ```
+
+   After:
+
+   ```php
+   VarDumperTestTrait::assertDumpEquals($dump, $data, $filter = 0, $message = '');
+   ```
+
+ * The `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$context = null`
+   argument and moves `$message = ''` argument at 4th position.
+
+   Before:
+
+   ```php
+   VarDumperTestTrait::assertDumpMatchesFormat($dump, $data, $message = '');
+   ```
+
+   After:
+
+   ```php
+   VarDumperTestTrait::assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '');
+   ```
+
 Workflow
 --------
 

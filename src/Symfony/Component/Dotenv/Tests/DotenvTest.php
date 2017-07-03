@@ -94,6 +94,9 @@ class DotenvTest extends TestCase
             array('FOO="  "', array('FOO' => '  ')),
             array('PATH="c:\\\\"', array('PATH' => 'c:\\')),
             array("FOO=\"bar\nfoo\"", array('FOO' => "bar\nfoo")),
+            array('FOO=BAR\\"', array('FOO' => 'BAR"')),
+            array("FOO=BAR\\'BAZ", array('FOO' => "BAR'BAZ")),
+            array('FOO=\\"BAR', array('FOO' => '"BAR')),
 
             // concatenated values
 

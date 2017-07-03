@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-03T08:47:52Z
+
+Hi @mimol91, congrats for your first PR!
+Can you please rebase on branch 3.4, then change the base branch here on github (click on "Edit" near the title of the PR)
+
+---------------------------------------------------------------------------
+
+by mimol91 at 2017-06-03T18:01:07Z
+
+I am not sure about tests, because they are related to Yaml component. Should I remove them?

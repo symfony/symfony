@@ -85,7 +85,6 @@ class DotenvTest extends TestCase
             array("FOO='bar'\n", array('FOO' => 'bar')),
             array("FOO='bar\"foo'\n", array('FOO' => 'bar"foo')),
             array("FOO=\"bar\\\"foo\"\n", array('FOO' => 'bar"foo')),
-            array("FOO='bar''foo'\n", array('FOO' => 'bar\'foo')),
             array('FOO="bar\nfoo"', array('FOO' => "bar\nfoo")),
             array('FOO="bar\rfoo"', array('FOO' => "bar\rfoo")),
             array('FOO=\'bar\nfoo\'', array('FOO' => 'bar\nfoo')),
@@ -99,6 +98,10 @@ class DotenvTest extends TestCase
             array('FOO=\\"BAR', array('FOO' => '"BAR')),
 
             // concatenated values
+            array("FOO='bar''foo'\n", array('FOO' => 'barfoo')),
+            array("FOO='bar '' baz'", array('FOO' => 'bar  baz')),
+            array("FOO=bar\nBAR='baz'\"\$FOO\"", array('FOO' => 'bar', 'BAR' => 'bazbar')),
+            array("FOO='bar '\\'' baz'", array('FOO' => "bar ' baz")),
 
             // comments
             array("#FOO=bar\nBAR=foo", array('BAR' => 'foo')),

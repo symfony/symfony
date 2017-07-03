@@ -1,0 +1,139 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-06-20T18:04:27Z
+
+Isn't this missing `AbstractController` support?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-06-20T18:35:02Z
+
+IMO it should be the role of the DI component to call the `setContainer` method, maybe by adding this magic method call behind the `autoconfigure` option.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-06-20T18:36:41Z
+
+Why doesn't `AbstractController` implement `ContainerAwareInterface`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-20T18:56:50Z
+
+Because PSR 11 isn't compatible with it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-20T20:25:46Z
+
+The PR now handles the `AbstractController` class too now.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-20T21:01:27Z
+
+Have you already tried with the DI Extra Bundle ?
+I doubt it'll work (for those using the bundle. I don't really get other broken cases), unless I missed something, as it [replaces the controller resolver used](https://github.com/schmittjoh/JMSDiExtraBundle/blob/master/DependencyInjection/Compiler/IntegrationPass.php#L37) and the [implementation](https://github.com/schmittjoh/JMSDiExtraBundle/blob/master/HttpKernel/ControllerResolver.php) does not make use of the parent. Perhaps @bogdaniel or @trappar could confirm.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-06-21T04:47:18Z
+
+Why do we need to inject container if the controller is autowired? If one is changing the controllers to new autowired way it should expect to remove the direct access to the container along the way.
+IMO it this should be marked as deprecated since 3.4 and removed in 4.0
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-21T06:18:01Z
+
+I agree. It also feels weird injecting it at runtime in a service. In https://github.com/symfony/symfony/issues/23200#issuecomment-309032985 I suggested another fix allowing the `setContainer` call to be properly autowired, which I guess should also work for those using the JMSDIExtraBundle. Having a controller as service with the whole container injection kind of defeat the purpose of defining it as a service. Still, there are real issues which needs to be fixed, as proven in the related issues.
+
+---------------------------------------------------------------------------
+
+by vincentpazeller at 2017-06-21T07:48:12Z
+
+I think the container can still be useful in a controller even with autowiring. For instance autowiring cannot be used when the service to be called is only known at runtime (from the db for instance):
+
+```
+public function myAction(){
+$dynamicServiceName = ...
+$dynamicService = $this->container->get($dynamicServiceName)
+...
+}
+```
+
+Of course, using the container that way is not usually a good practice, but I believe that in some situations it can help reduce code size...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-21T08:46:19Z
+
+I just checked again and this is only an issue I was able to reproduce with routes registered by FOSRestBundle. The routes that are being registered then reference the controller with a pattern like `AppBundle\Controller\UserController:getAction` while routes registered with Symfony's annotation loader have two colons (and only in this case `instantiateController()` will be called and thus injecting the container).
+
+---------------------------------------------------------------------------
+
+by trappar at 2017-06-21T09:00:34Z
+
+@ogizanagi I am 99% sure you're right about this not fixing the issues with the DI Extra Bundle, but that's probably something that needs to be addressed in that bundle, not here.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-21T09:03:13Z
+
+yeah, if JMSDIExtraBundle replaces the whole resolver without reusing the Symfony implementation through decoration or inheritance, it means they have to update their bundle each time Symfony adds a new feature. This is their issue.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-21T09:06:58Z
+
+But the same goes for fos rest: is it normal to use the single colon notation usually used for controller as services ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-21T09:12:05Z
+
+@ogizanagi IIRC, maybe they wanted to define the route for container as a service.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-21T09:16:08Z
+
+@ogizanagi Actually it's one colon for services and two for controller classes that must be instantiated by the controller resolver.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-21T09:19:15Z
+
+@xabbuh no. 2 colons is not for services. It is for normal callables (as it is the syntax used for callables in PHP)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-21T09:19:43Z
+
+see FriendsOfSymfony/FOSRestBundle#1721 which *could* also be a fix
+
+However, I still think that the main inconsistency is that the `ControllerResolver` from the FrameworkBundle is sometimes calling `setContainer()` even if the controller is registered as a service, but that whether or not this is done depends on the notation of the `_controller` attribute.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-21T09:20:29Z
+
+@stof good catch, I fixed my comment accordingly
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-03T13:22:56Z
+
+hmm, actually, can we have a test covering this case to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-03T13:36:05Z
+
+I'll check
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-03T14:16:56Z
+
+tests added

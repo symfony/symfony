@@ -94,6 +94,9 @@ class DotenvTest extends TestCase
             array('FOO="  "', array('FOO' => '  ')),
             array('PATH="c:\\\\"', array('PATH' => 'c:\\')),
             array("FOO=\"bar\nfoo\"", array('FOO' => "bar\nfoo")),
+            array('FOO=BAR\\"', array('FOO' => 'BAR"')),
+            array("FOO=BAR\\'BAZ", array('FOO' => "BAR'BAZ")),
+            array('FOO=\\"BAR', array('FOO' => '"BAR')),
 
             // concatenated values
 
@@ -148,6 +151,13 @@ class DotenvTest extends TestCase
 
     public function testLoad()
     {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_SERVER['FOO']);
+        unset($_SERVER['BAR']);
+        putenv('FOO');
+        putenv('BAR');
+
         @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
 
         $path1 = tempnam($tmpdir, 'sf-');
@@ -158,14 +168,17 @@ class DotenvTest extends TestCase
 
         (new DotEnv())->load($path1, $path2);
 
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('BAZ', getenv('BAR'));
+        $foo = getenv('FOO');
+        $bar = getenv('BAR');
 
         putenv('FOO');
         putenv('BAR');
         unlink($path1);
         unlink($path2);
         rmdir($tmpdir);
+
+        $this->assertSame('BAR', $foo);
+        $this->assertSame('BAZ', $bar);
     }
 
     /**

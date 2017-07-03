@@ -69,7 +69,7 @@ class Filesystem
             }
 
             // Like `cp`, preserve executable permission bits
-            @chmod($targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
+            @chmod($targetFile, fileperms($targetFile) | (@fileperms($originFile) & 0111));
 
             if (stream_is_local($originFile) && $bytesCopied !== ($bytesOrigin = filesize($originFile))) {
                 throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);

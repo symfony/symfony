@@ -7,6 +7,36 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.30 (2017-07-03)
+
+ * bug #23341 [DoctrineBridge][Security][Validator] do not validate empty values (xabbuh)
+ * bug #23274 Display a better error design when the toolbar cannot be displayed (yceruto)
+ * bug #23333 [PropertyAccess] Fix TypeError discard (dunglas)
+ * bug #23345 [Console] fix description of INF default values (xabbuh)
+ * bug #23279 Don't call count on non countable object (pierredup)
+ * bug #23283 [TwigBundle] add back exception check (xabbuh)
+ * bug #23268 Show exception is checked twice in ExceptionController of twig (gmponos)
+ * bug #23266 Display a better error message when the toolbar cannot be displayed (javiereguiluz)
+ * bug #23271 [FrameworkBundle] allow SSI fragments configuration in XML files (xabbuh)
+ * bug #23254 [Form][TwigBridge] render hidden _method field in form_rest() (xabbuh)
+ * bug #23250 [Translation] return fallback locales whenever possible (xabbuh)
+ * bug #22732 [Security] fix switch user _exit without having current token (dmaicher)
+ * bug #22730 [FrameworkBundle] Sessions: configurable "use_strict_mode" option for NativeSessionStorage (MacDada)
+ * bug #23195 [FrameworkBundle] [Command] Clean bundle directory, fixes #23177 (NicolasPion)
+ * bug #23052 [TwigBundle] Add Content-Type header for exception response (rchoquet)
+ * bug #23199 Reset redirectCount when throwing exception (hvanoch)
+ * bug #23186 [TwigBundle] Move template.xml loading to a compiler pass (ogizanagi)
+ * bug #23130 Keep s-maxage when expiry and validation are used in combination (mpdude)
+ * bug #23129 Fix two edge cases in ResponseCacheStrategy (mpdude)
+ * feature #22636 [Routing] Expose request in route conditions, if needed and possible (ro0NL)
+ * bug #22636 [Routing] Expose request in route conditions, if needed and possible (ro0NL)
+ * bug #23057 [Translation][FrameworkBundle] Fix resource loading order inconsistency reported in #23034 (mpdude)
+ * bug #23092 [Filesystem] added workaround in Filesystem::rename for PHP bug (VolCh)
+ * bug #23128 [HttpFoundation] fix for Support for new 7.1 session options (vincentaubert)
+ * bug #23176 [VarDumper] fixes (nicolas-grekas)
+ * bug #23086 [FrameworkBundle] Fix perf issue in CacheClearCommand::warmup() (nicolas-grekas)
+ * bug #23098 Cache ipCheck (2.7) (gonzalovilaseca)
+
 * 2.7.29 (2017-06-07)
 
  * bug #23069 [SecurityBundle] Show unique Inherited roles in profile panel (yceruto)

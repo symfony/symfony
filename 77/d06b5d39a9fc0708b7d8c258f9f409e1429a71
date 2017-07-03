@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by szymach at 2017-06-30T22:28:04Z
+
+Very nice, but what about [UniqueEntityValidator](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php)? If the `$entity` variable is a `null`, Doctrine will throw an exception when attempting to [load metatada](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php#L79) for that value.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-01T09:15:44Z
+
+Will the `UniqueEntityValidator` ever be triggered in that case given that the `UniqueEntity` constraint is added to a class but not a single property?
+
+---------------------------------------------------------------------------
+
+by szymach at 2017-07-01T11:33:58Z
+
+@xabbuh Make a form with an entity as `data_class`, set the `UniqueEntityValidator` constraint in the form `constraints` option, then `empty_data` to `null` and it should fail.

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `DateCaster`
+
 2.7.0
 -----
 

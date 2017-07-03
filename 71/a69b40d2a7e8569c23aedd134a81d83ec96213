@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-03T08:01:44Z
+
+We could merge this as minor on the lowest branch where it applies, no need to consider it a new feature IMHO.
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2017-07-03T13:12:46Z
+
+Updated to lowest branch possible (2.7)

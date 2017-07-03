@@ -262,6 +262,10 @@ class TextDescriptor extends Descriptor
      */
     private function formatDefaultValue($default)
     {
+        if (INF === $default) {
+            return 'INF';
+        }
+
         if (is_string($default)) {
             $default = OutputFormatter::escape($default);
         } elseif (is_array($default)) {

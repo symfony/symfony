@@ -382,25 +382,14 @@ class ErrorHandler
 
         if (4 < $numArgs = func_num_args()) {
             $context = $scope ? (func_get_arg(4) ?: array()) : array();
-            $backtrace = 5 < $numArgs ? func_get_arg(5) : null; // defined on HHVM
         } else {
             $context = array();
-            $backtrace = null;
         }
 
         if (isset($context['GLOBALS']) && $scope) {
             $e = $context;                  // Whatever the signature of the method,
             unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
             $context = $e;
-        }
-
-        if (null !== $backtrace && $type & E_ERROR) {
-            // E_ERROR fatal errors are triggered on HHVM when
-            // hhvm.error_handling.call_user_handler_on_fatals=1
-            // which is the way to get their backtrace.
-            $this->handleFatalError(compact('type', 'message', 'file', 'line', 'backtrace'));
-
-            return true;
         }
 
         $logMessage = $this->levels[$type].': '.$message;
@@ -436,11 +425,12 @@ class ErrorHandler
 
             // Clean the trace by removing function arguments and the first frames added by the error handler itself.
             if ($throw || $this->tracedErrors & $type) {
-                $backtrace = $backtrace ?: $errorAsException->getTrace();
+                $backtrace = $errorAsException->getTrace();
                 $lightTrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
                 $this->traceReflector->setValue($errorAsException, $lightTrace);
             } else {
                 $this->traceReflector->setValue($errorAsException, array());
+                $backtrace = array();
             }
         }
 
@@ -454,32 +444,25 @@ class ErrorHandler
                         && ('trigger_error' === $backtrace[$i - 1]['function'] || 'user_error' === $backtrace[$i - 1]['function'])
                     ) {
                         // Here, we know trigger_error() has been called from __toString().
-                        // HHVM is fine with throwing from __toString() but PHP triggers a fatal error instead.
+                        // PHP triggers a fatal error when throwing from __toString().
                         // A small convention allows working around the limitation:
                         // given a caught $e exception in __toString(), quitting the method with
                         // `return trigger_error($e, E_USER_ERROR);` allows this error handler
                         // to make $e get through the __toString() barrier.
 
                         foreach ($context as $e) {
-                            if (($e instanceof \Exception || $e instanceof \Throwable) && $e->__toString() === $message) {
-                                if (1 === $i) {
-                                    // On HHVM
-                                    $errorAsException = $e;
-                                    break;
-                                }
+                            if ($e instanceof \Throwable && $e->__toString() === $message) {
                                 self::$toStringException = $e;
 
                                 return true;
                             }
                         }
 
-                        if (1 < $i) {
-                            // On PHP (not on HHVM), display the original error message instead of the default one.
-                            $this->handleException($errorAsException);
+                        // Display the original error message instead of the default one.
+                        $this->handleException($errorAsException);
 
-                            // Stop the process by giving back the error to the native handler.
-                            return false;
-                        }
+                        // Stop the process by giving back the error to the native handler.
+                        return false;
                     }
                 }
             }

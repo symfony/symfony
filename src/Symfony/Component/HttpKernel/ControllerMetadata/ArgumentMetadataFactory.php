@@ -52,12 +52,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         if (!$type = $parameter->getType()) {
             return;
         }
-        $typeName = $type->getName();
-        if ('array' === $typeName && !$type->isBuiltin()) {
-            // Special case for HHVM with variadics
-            return;
-        }
 
-        return $typeName;
+        return $type->getName();
     }
 }

@@ -34,7 +34,6 @@ class IntlBundleReader implements BundleReaderInterface
             // Never enable fallback. We want to know if a bundle cannot be found
             $bundle = new \ResourceBundle($locale, $path, false);
         } catch (\Exception $e) {
-            // HHVM compatibility: constructor throws on invalid resource
             $bundle = null;
         }
 

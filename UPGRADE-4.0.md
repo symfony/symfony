@@ -575,6 +575,8 @@ Workflow
 Yaml
 ----
 
+ * Support for the `!str` tag was removed, use the `!!str` tag instead.
+
  * Starting an unquoted string with a question mark followed by a space
    throws a `ParseException`.
 

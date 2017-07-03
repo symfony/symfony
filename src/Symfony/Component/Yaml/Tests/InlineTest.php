@@ -755,4 +755,13 @@ class InlineTest extends TestCase
             'float' => array('{0.25: "foo"}', array('0.25' => 'foo')),
         );
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Support for the !str tag is deprecated since version 3.4. Use the !!str tag instead.
+     */
+    public function testDeprecatedStrTag()
+    {
+        $this->assertSame(array('foo' => 'bar'), Inline::parse('{ foo: !str bar }'));
+    }
 }

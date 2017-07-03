@@ -245,7 +245,7 @@ class SecurityExtension extends Extension
         foreach ($providerIds as $userProviderId) {
             $userProviders[] = new Reference($userProviderId);
         }
-        $arguments[1] = $userProviders;
+        $arguments[1] = new IteratorArgument($userProviders);
         $definition->setArguments($arguments);
 
         $customUserChecker = false;
@@ -613,7 +613,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($name, new ChildDefinition('security.user.provider.chain'))
-                ->addArgument($providers);
+                ->addArgument(new IteratorArgument($providers));
 
             return $name;
         }

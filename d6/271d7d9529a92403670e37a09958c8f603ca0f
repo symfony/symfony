@@ -1,0 +1,482 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-14T14:51:49Z
+
+/cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-14T16:57:49Z
+
+Btw.. about the timezone. What about putting the offset in front? this is the part i usually care about...
+
+```
+timezone: '+02:00 (Europe/Amsterdam)'
+```
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-14T20:33:01Z
+
+![screenshot from 2017-04-14 22-30-46](https://cloud.githubusercontent.com/assets/4578773/25055279/1b570968-2162-11e7-8a33-68dc5c0da776.png)
+WDYT of this variant?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-16T08:30:39Z
+
+Not sure.. it looks a bit more chaotic imo (less raw).
+
+Compared to the first proposal, i think we should go with `datetime`, `timezone`, `Δnow` as a bare minimum. Ie. i could do without `literal` and `timestamp`.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-30T13:14:43Z
+
+Now, ``literal`` and ``timestamp`` are not visible if they are nested or if we flag with ``EXCLUDE_VERBOSE``. I have too add tests.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-04-30T16:15:52Z
+
+@maidmaid I was a fan of the first proposal. The unix time is almost always the most important field to me (though this could depend on the operating system one uses, I guess).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-01T14:08:19Z
+
+@robfrawley Yes, unix time can be usefull, but it's a machine format and we should favor human representation, IMO.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-01T14:12:04Z
+
+@maidmaid : It depends on the situation, but you might be happy to have the unix time while debugging. And I'm mainly using the var-dumper component for debugging purpose 😄 (I'd say I rather have the timestamp than the delta or literal version)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-01T19:04:20Z
+
+We have lots of different interesting opinions. @nicolas-grekas, can you give your opinion?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T10:11:33Z
+
+May I propose something different:
+always display a single line that represents 100% of the state of the objects: `'Y-m-d H:i:s.u e'`
+then lets provide more details on hover (... from now, literal, etc as a single "title" line).
+This is doable with a single virtual propery holding a ConstStub I think.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T10:42:04Z
+
+> then lets provide more details on hover
+
+But works it with ``CliDumper``?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T10:43:43Z
+
+CliDumper would display only `Y-m-d H:i:s.u e`, but this LGTM, that's still 100% of the state.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T10:57:34Z
+
+For the reader: when I saw that, I first thought "hey, this is hiding the actual internal structure of DateTime objects" (by not telling about these existing public props.)
+Then I ran this: https://3v4l.org/uWc54
+It looks like doing var_dump/array-cast actually *creates* the 3 props...
+So I'm even more in favor of doing something here, and I would add DateTimeZone, etc. to the list of classes that should display only virtual props.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T11:20:59Z
+
+When we var_dump a ``DateTime`` object, we can see 3 props in all but 2 distinct props: date and timezone. So, ``DateCaster`` should cast a ``date`` prop that represents 100% of date/time infos (with more details on hover), and a ``timezone`` prop that shows a ``DateTimeZone`` thanks to an other caster (that is already in WIP [here](https://github.com/maidmaid/symfony/compare/master...datecaster-datezone#diff-959db3511f6175d0172b859e897e62dbR113)). Right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T11:26:04Z
+
+worth a try yes :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T11:53:17Z
+
+As discussed:
+
+![screenshot from 2017-05-02 13-40-00](https://cloud.githubusercontent.com/assets/4578773/25616582/fd6129d6-2f3d-11e7-842c-d7f96fb39af5.png)
+
+My remarks: too bad it is not possible to copy timestamp and to see extra info in CLI with this version. More, I find it strange to use ``ConstStub`` to show extra in hover, it seems as a hack.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T12:02:45Z
+
+Personally, I like compact formats, that give me everything in a snap.
+I would also remove the timezone prop in fact, and add the "e" placeholder at the end of the date string.
+Nesting is an opportunity to be hit by depth limiting, better not.
+Copy/pasting the timestamp looks like something I wouldn't do very often to me (especially since it's destructive compared to a DateTime object).
+Of course, that's only my personal PoV :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T12:11:34Z
+
+What about displaying the timestamp next to the class name `DateTime @123456789 { ... }`? Should be just a matter of appending it to the `$stub->class` prop.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T14:04:44Z
+
+I putted timestamp in ``$stub->class`` and displayed timezone in ``date`` virtual prop (used ``P`` instead ``e`` because ``+02:00`` is more informative that ``Europe/Zurich``):
+
+![screenshot from 2017-05-02 15-56-31](https://cloud.githubusercontent.com/assets/4578773/25620953/49e8155a-2f50-11e7-9f73-d40ed0e0866e.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T14:09:40Z
+
+Do you like it? I think I do :)
+
+> used P instead e because +02:00 is more informative
+
+in fact, that's not true: `Europe/Zurich` contains geographical/political info that makes it very different from `+02:00`.
+See http://stackoverflow.com/questions/17694894/different-timezone-types-on-datetime-object
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T14:21:26Z
+
+Yes, I find this version quite elegant :)
+
+About timezone, I think that we have to know difference to GMT when we debug a date but not its geographical/political infos. Are you agree?
+
+My only little remark rests on ``ConstStub`` hack usage to showing extra infos when ``[ConstStub] Represents a PHP constant and its value``.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T14:27:18Z
+
+> know difference to GMT when we debug a date but not its geographical/political infos
+
+but this prevents knowing if the timezone of a DateTime is of type 3 or not. And since this is of significant importance (see SO), I think we should use "e".
+
+About ConstStub, I'd say we don't really care :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T14:41:32Z
+
+What about to have ``P (e)`` format, like ``+02:00 (Europe/Zurich)``? We have diff to GMT + geo info + type; everybody is happy like that :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T15:49:06Z
+
+Not sure:
+```php
+$a = new \DateTime('now');
+$a->setTimezone(new DateTimezone('GMT+2'));
+echo $a->format('P e');
+// output: +02:00 +02:00
+```
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-02T16:01:17Z
+
+This kind of notation (``GMT+n`` and others) is not recommanded by PHP; only the ``Europe/Zurich``-like is the good way. See warnings here http://php.net/manual/en/timezones.others.php. Following these recommendations, ``P (e)`` format displays fine all the time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T16:03:08Z
+
+But we don't code for the ideal case only :)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-05-02T17:39:07Z
+
+Can we not display `P (e)` when they are different and only `e` when the are the same value, thereby providing a more robust result if the `DateTime` object is a "type 3" and not showing duplicate values when it is a "type 1" or "type 2" (re [SO@17694894](http://stackoverflow.com/questions/17694894/different-timezone-types-on-datetime-object)).
+
+```php
+<?php
+
+function timezoneToString(\DateTime $dateTime)
+{
+    $p = $dateTime->format('P');
+    $e = $dateTime->format('e');
+
+    return $e === $p ? $e : sprintf('%s (%s)', $p, $e);
+}
+
+$date = new \DateTime('now', new DateTimezone('GMT+2'));
+echo timezoneToString($date);
+
+$date = new \DateTime('now', new \DateTimezone('America/New_York'));
+echo timezoneToString($date);
+```
+
+```
++02:00
+-04:00 (America/New_York)
+```
+
+As for the significance of each, having the integer offset is the most important for my workflow.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-02T17:41:56Z
+
+What about https://3v4l.org/uqc19 ?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-05-02T17:42:57Z
+
+@ogizanagi That looks great to me!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-02T17:54:32Z
+
+Agree. but i still prefer `P (e)` format though... https://3v4l.org/sWptM
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T18:08:06Z
+
+I like Maxime's output
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-02T18:09:40Z
+
+Alternatively, provide P on hover? (Only when different than e?)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-02T18:23:17Z
+
+for me the offset adds more value then a location name... hiding it on CLI sounds ike a bad idea :/ in that case i prefer @ogizanagi version as well. It's just a tiny detail after all.. :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-03T16:30:51Z
+
+Updated:
+
+![screenshot from 2017-05-03 18-27-01](https://cloud.githubusercontent.com/assets/4578773/25670826/3cf96c16-302e-11e7-86d6-7dee9ac6b3b1.png)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-03T16:35:02Z
+
+Convinced? I do :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-04T14:46:09Z
+
+Strange errors in tests... Could you help me?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-04T14:53:18Z
+
+I think you're applying a timezone conversion (from system value to Europe/Zurich). Meaning the timestamp is going to differ...?
+
+Just a guess :))
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-04T14:57:36Z
+
+```diff
+-DateTime @1493503200 {
+-  date: 2017-04-30 00:00:00.000000 +02:00
++DateTime @1493535600 {
++  date: 2017-04-30 09:00:00.000000 +02:00
+```
+
+i.e. a 9 hours difference..., on appvoyer the default TZ is America/Los_Angeles (utc-8), Europe/Zurich is utc+1..
+
+there's our 9 hours difference :)
+
+Note travis uses Europe/Paris :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-05-04T15:12:29Z
+
+Indeed @ro0NL is right. Just use the second `\DateTime::__construct()` argument to init the timezone (beware it will be ignore in case the time offset is already part of the provided string, like when providing a timestamp (http://php.net/manual/en/datetime.construct.php#refsect1-datetime.construct-parameters)).
+
+I like the new output 😃 , but I may advocate `e (P)` is probably better, because it allows to copy/paste the string (stopped just right before the first parenthesis) to re-create a `\DateTime` instance from it, without loosing information.
+I.e:
+
+```php
+>>> new \DateTime('2017-04-30 00:00:00.000000 Europe/Zurich'); # <-- 👍
+=> DateTime {#167
+     +"date": "2017-04-30 00:00:00.000000",
+     +"timezone_type": 3,
+     +"timezone": "Europe/Zurich",
+   }
+
+>>> new \DateTime('2017-04-30 00:00:00.000000 +02:00'); # <-- loosing the geo info
+=> DateTime {#171
+     +"date": "2017-04-30 00:00:00.000000",
+     +"timezone_type": 1,
+     +"timezone": "+02:00",
+   }
+
+>>> new \DateTime('2017-04-30 00:00:00.000000 Europe/Zurich (+02:00)'); # <-- doesn't even work
+Exception with message 'DateTime::__construct(): Failed to parse time string (2017-04-30 00:00:00.000000 Europe/Zurich (+02:00)) at position 41 ((): Unexpected character'
+```
+
+I guess it can be useful sometimes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-04T15:16:04Z
+
+Same opinion on e (P) :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-04T15:33:36Z
+
+Given we have a full date string now... :+1: for e (P). I liked the offset in front if prefixed by a `timezone:` key; the first proposal that is.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-04T15:49:42Z
+
+Green tests and `` e (P)`` used now :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-04T16:34:44Z
+
+May i do one last suggestion; in the tooltip inform about DST yes/no
+
+https://3v4l.org/BaOcs
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-05T09:13:21Z
+
+Added DST info:
+![screenshot from 2017-05-05 11-11-24](https://cloud.githubusercontent.com/assets/4578773/25739789/ba823522-3183-11e7-95b6-e4bd1759b5b9.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-05T11:13:14Z
+
+Just a few suggestions here: https://gist.github.com/nicolas-grekas/d645a474490b9b00a4f9a55b420ff8d2
+
+- display DST only for geographical times
+- tweak the title: remove "literal" and replace "Δnow" prefix by "from now" suffix
+- remove leading zeros from "from now"
+- add a test case for the title
+- (fix a bug in StubCaster found while doing so - separate PR coming)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-05T15:51:23Z
+
+Patched (thank you @nicolas-grekas):
+![screenshot from 2017-05-05 17-48-24](https://cloud.githubusercontent.com/assets/4578773/25753313/4b25c1ca-31bb-11e7-8804-cf282235e7d1.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-05T17:18:03Z
+
+Not sure about the literal format though.. shouldnt this show `Saturday, April 3, 2021`? ie. US standard.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-05T18:20:18Z
+
+Rigth about literal format. I will change that.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-05-05T19:16:55Z
+
+The US standard is the worst... and this is coming from a US citizen. Shouldn't we use what programmers prefer, which is what was already used, ie: `[day] [month] [year]`?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-07T09:19:56Z
+
+Not sure what programmers prefer.. :) tbh in programming im quite used to US standards.
+
+Note im fine either way.. i just mentioned it because i believe SF (and PHP) follow this locale in the codebase.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-08T15:30:09Z
+
+More, the plus-value of literal format is to show day of week and textual month. With U.S. standard, these 2 items are in the front.
+
+---------------------------------------------------------------------------
+
+by FabienPapet at 2017-05-08T18:30:51Z
+
+Shouldn't the 'from now' be 'from server time' , using 'now' can be confusing if the server time is not the developer time
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-08T19:09:35Z
+
+@FabienPapet I think that dump a date is in most cases a debug step that is realized on our local machine whose time we known.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-05-08T23:10:47Z
+
+@nicolas-grekas I think this version is quite conclusive. What about merge this and open new PR if we have tweaks?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-26T21:03:28Z
+
+This should be ready to be merged now :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-28T07:12:03Z
+
+If we want to support DateInterval, I think it should be done in this PR.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-06-28T12:24:42Z
+
+Ok, I added DateInterval caster.
+
+| Before        | After           |
+| ------------- | ------------- |
+| ![screenshot from 2017-06-28 14-17-40](https://user-images.githubusercontent.com/4578773/27636630-b14def4c-5c0c-11e7-895f-aff37abb13d8.png) | ![screenshot from 2017-06-28 14-17-54](https://user-images.githubusercontent.com/4578773/27636629-b14a4e8c-5c0c-11e7-86ca-61d27367f24d.png) |
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-03T07:16:24Z
+
+Hum, let's remove the DateInterval caster, at least from this PR. The issue I have is accuracy and teaching. Dump should be informational about how things actually works or can be used. On a DateInterval, the listed values are actual public properties. VarDumper is about showing actual facts about objects, not alternate ones ;)
+The concern does not exist with DateTime objects because there is no properties there.
+
+BTW, I agree with the comment on the name of the caster method: should be `castDateTime` also IMHO.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-03T08:10:01Z
+
+Ok, I removed DateInterval caster and I renamed caster method to ``castDateTime``.

@@ -1579,15 +1579,6 @@ YAML
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using the unquoted scalar value "!iterator foo" is deprecated since version 3.3 and will be considered as a tagged value in 4.0. You must quote it.
-     */
-    public function testUnsupportedTagWithScalar()
-    {
-        $this->assertEquals('!iterator foo', $this->parser->parse('!iterator foo'));
-    }
-
-    /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage The built-in tag "!!foo" is not implemented.
      */

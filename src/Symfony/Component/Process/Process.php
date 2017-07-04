@@ -64,7 +64,6 @@ class Process implements \IteratorAggregate
     private $outputDisabled = false;
     private $stdout;
     private $stderr;
-    private $enhanceSigchildCompatibility;
     private $process;
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset = 0;
@@ -165,7 +164,6 @@ class Process implements \IteratorAggregate
         $this->setTimeout($timeout);
         $this->useFileHandles = '\\' === DIRECTORY_SEPARATOR;
         $this->pty = false;
-        $this->enhanceSigchildCompatibility = '\\' !== DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
     }
 
     public function __destruct()
@@ -218,17 +216,12 @@ class Process implements \IteratorAggregate
      *
      * @return self
      *
-     * @throws RuntimeException       if PHP was compiled with --enable-sigchild and the enhanced sigchild compatibility mode is not enabled
      * @throws ProcessFailedException if the process didn't terminate successfully
      *
      * @final since version 3.3
      */
     public function mustRun(callable $callback = null, array $env = array())
     {
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
-        }
-
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
         }
@@ -297,7 +290,7 @@ class Process implements \IteratorAggregate
         if ('\\' === DIRECTORY_SEPARATOR) {
             $options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup, $env);
-        } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+        } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
 
@@ -665,15 +658,9 @@ class Process implements \IteratorAggregate
      * Returns the exit code returned by the process.
      *
      * @return null|int The exit status code, null if the Process is not terminated
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      */
     public function getExitCode()
     {
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
-        }
-
         $this->updateStatus(false);
 
         return $this->exitcode;
@@ -716,16 +703,11 @@ class Process implements \IteratorAggregate
      *
      * @return bool
      *
-     * @throws RuntimeException In case --enable-sigchild is activated
-     * @throws LogicException   In case the process is not terminated
+     * @throws LogicException In case the process is not terminated
      */
     public function hasBeenSignaled()
     {
         $this->requireProcessIsTerminated(__FUNCTION__);
-
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
-        }
 
         return $this->processInformation['signaled'];
     }
@@ -744,7 +726,7 @@ class Process implements \IteratorAggregate
     {
         $this->requireProcessIsTerminated(__FUNCTION__);
 
-        if ($this->isSigchildEnabled() && (!$this->enhanceSigchildCompatibility || -1 === $this->processInformation['termsig'])) {
+        if ($this->isSigchildEnabled() && -1 === $this->processInformation['termsig']) {
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
         }
 
@@ -1154,42 +1136,6 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Returns whether sigchild compatibility mode is activated or not.
-     *
-     * @return bool
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Sigchild compatibility will always be enabled.
-     */
-    public function getEnhanceSigchildCompatibility()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->enhanceSigchildCompatibility;
-    }
-
-    /**
-     * Activates sigchild compatibility mode.
-     *
-     * Sigchild compatibility mode is required to get the exit code and
-     * determine the success of a process when PHP has been compiled with
-     * the --enable-sigchild option
-     *
-     * @param bool $enhance
-     *
-     * @return self The current Process instance
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    public function setEnhanceSigchildCompatibility($enhance)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Sigchild compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->enhanceSigchildCompatibility = (bool) $enhance;
-
-        return $this;
-    }
-
-    /**
      * Sets whether environment variables will be inherited or not.
      *
      * @param bool $inheritEnv
@@ -1322,7 +1268,7 @@ class Process implements \IteratorAggregate
 
         $this->readPipes($running && $blocking, '\\' !== DIRECTORY_SEPARATOR || !$running);
 
-        if ($this->fallbackStatus && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+        if ($this->fallbackStatus && $this->isSigchildEnabled()) {
             $this->processInformation = $this->fallbackStatus + $this->processInformation;
         }
 
@@ -1431,7 +1377,7 @@ class Process implements \IteratorAggregate
             if ($this->processInformation['signaled'] && 0 < $this->processInformation['termsig']) {
                 // if process has been signaled, no exitcode but a valid termsig, apply Unix convention
                 $this->exitcode = 128 + $this->processInformation['termsig'];
-            } elseif ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            } elseif ($this->isSigchildEnabled()) {
                 $this->processInformation['signaled'] = true;
                 $this->processInformation['termsig'] = -1;
             }
@@ -1496,7 +1442,7 @@ class Process implements \IteratorAggregate
                 return false;
             }
         } else {
-            if (!$this->enhanceSigchildCompatibility || !$this->isSigchildEnabled()) {
+            if (!$this->isSigchildEnabled()) {
                 $ok = @proc_terminate($this->process, $signal);
             } elseif (function_exists('posix_kill')) {
                 $ok = @posix_kill($pid, $signal);

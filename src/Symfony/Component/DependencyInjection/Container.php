@@ -75,7 +75,6 @@ class Container implements ResettableContainerInterface
      */
     protected $normalizedIds = array();
 
-    private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
     private $envCache = array();
     private $compiled = false;
 

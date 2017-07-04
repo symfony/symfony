@@ -92,7 +92,9 @@ EOT
         $validAssetDirs = array();
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+                $assetDir = preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+                $targetDir = $bundlesDir.$assetDir;
+                $validAssetDirs[] = $assetDir;
 
                 $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
 
@@ -132,15 +134,12 @@ EOT
                 } else {
                     $this->hardCopy($originDir, $targetDir);
                 }
-                $validAssetDirs[] = $targetDir;
             }
         }
+
         // remove the assets of the bundles that no longer exist
-        foreach (new \FilesystemIterator($bundlesDir) as $dir) {
-            if (!in_array($dir, $validAssetDirs)) {
-                $filesystem->remove($dir);
-            }
-        }
+        $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
+        $filesystem->remove($dirsToRemove);
     }
 
     /**

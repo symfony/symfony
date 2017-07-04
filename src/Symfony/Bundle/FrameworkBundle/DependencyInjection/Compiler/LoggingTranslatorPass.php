@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
@@ -33,7 +32,6 @@ class LoggingTranslatorPass implements CompilerPassInterface
 
             if (is_subclass_of($class, 'Symfony\Component\Translation\TranslatorInterface') && is_subclass_of($class, 'Symfony\Component\Translation\TranslatorBagInterface')) {
                 $container->getDefinition('translator.logging')->setDecoratedService('translator');
-                $container->getDefinition('translation.warmer')->replaceArgument(0, new Reference('translator.logging.inner'));
             }
         }
     }

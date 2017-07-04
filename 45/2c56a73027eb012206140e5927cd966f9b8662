@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-04T09:04:10Z
+
+Imo this should become a service and get it injected, which solves the problem
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-04T09:16:21Z
+
+Sure, but making it a service in lower branches is a no-go I guess, as it'll require introducing new deprecations. But it can be done in 3.4.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-04T09:25:46Z
+
+It doesn't require any deprec to me, the router dependency must stay lazy, that gives a container aware command registered as a service. Not sure if it's worth it, but see https://github.com/symfony/symfony/pull/23371

@@ -30,6 +30,7 @@
         "symfony/dependency-injection": "~3.3|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
         "symfony/cache": "~3.1|~4.0",
+        "symfony/property-access": "~2.8|~3.0|~4.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
         "egulias/email-validator": "^1.2.8|~2.0"
@@ -48,6 +49,7 @@
         "symfony/yaml": "",
         "symfony/config": "",
         "egulias/email-validator": "Strict (RFC compliant) email validation",
+        "symfony/property-access": "For accessing properties within comparison constraints",
         "symfony/expression-language": "For using the Expression validator"
     },
     "autoload": {

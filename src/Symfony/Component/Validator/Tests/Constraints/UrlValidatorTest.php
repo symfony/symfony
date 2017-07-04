@@ -261,23 +261,6 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testCheckDnsWithBoolean()
-    {
-        DnsMock::withMockedHosts(array('example.com' => array(array('type' => 'A'))));
-
-        $constraint = new Url(array(
-            'checkDNS' => true,
-            'dnsMessage' => 'myMessage',
-        ));
-
-        $this->validator->validate('http://example.com', $constraint);
-
-        $this->assertNoViolation();
-    }
-
-    /**
      * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      */

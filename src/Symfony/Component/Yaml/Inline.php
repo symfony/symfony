@@ -581,8 +581,6 @@ class Inline
                         return (float) substr($scalar, 8);
                     case 0 === strpos($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
-                    default:
-                        @trigger_error(sprintf('Using the unquoted scalar value "%s" is deprecated since version 3.3 and will be considered as a tagged value in 4.0. You must quote it.', $scalar), E_USER_DEPRECATED);
                 }
 
             // Optimize for returning strings.

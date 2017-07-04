@@ -438,6 +438,8 @@ Process
 
  * Extending `Process::run()`, `Process::mustRun()` and `Process::restart()` is
    not supported anymore.
+   
+ * The `getEnhanceWindowsCompatibility()` and `setEnhanceWindowsCompatibility()` methods of the `Process` class have been removed.
 
 ProxyManager
 ------------

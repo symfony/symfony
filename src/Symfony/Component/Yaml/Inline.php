@@ -550,10 +550,6 @@ class Inline
                 return false;
             case $scalar[0] === '!':
                 switch (true) {
-                    case 0 === strpos($scalar, '!str'):
-                        @trigger_error('Support for the !str tag is deprecated since version 3.4. Use the !!str tag instead.', E_USER_DEPRECATED);
-
-                        return (string) substr($scalar, 5);
                     case 0 === strpos($scalar, '!!str '):
                         return (string) substr($scalar, 6);
                     case 0 === strpos($scalar, '! '):

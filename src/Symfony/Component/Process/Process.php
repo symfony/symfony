@@ -64,7 +64,6 @@ class Process implements \IteratorAggregate
     private $outputDisabled = false;
     private $stdout;
     private $stderr;
-    private $enhanceWindowsCompatibility = true;
     private $enhanceSigchildCompatibility;
     private $process;
     private $status = self::STATUS_READY;
@@ -295,7 +294,7 @@ class Process implements \IteratorAggregate
 
         $options = array('suppress_errors' => true);
 
-        if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup, $env);
         } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
@@ -1150,40 +1149,6 @@ class Process implements \IteratorAggregate
         }
 
         $this->input = ProcessUtils::validateInput(__METHOD__, $input);
-
-        return $this;
-    }
-
-    /**
-     * Gets whether or not Windows compatibility is enabled.
-     *
-     * This is true by default.
-     *
-     * @return bool
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Enhanced Windows compatibility will always be enabled.
-     */
-    public function getEnhanceWindowsCompatibility()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->enhanceWindowsCompatibility;
-    }
-
-    /**
-     * Sets whether or not Windows compatibility is enabled.
-     *
-     * @param bool $enhance
-     *
-     * @return self The current Process instance
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Enhanced Windows compatibility will always be enabled.
-     */
-    public function setEnhanceWindowsCompatibility($enhance)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->enhanceWindowsCompatibility = (bool) $enhance;
 
         return $this;
     }

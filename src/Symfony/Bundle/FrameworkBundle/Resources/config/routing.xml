@@ -98,5 +98,11 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
+
+        <service id="router.command.debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand" public="false">
+            <tag name="console.command" />
+            <argument type="service" id="controller_name_converter" />
+        </service>
+
     </services>
 </container>

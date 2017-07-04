@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -52,15 +53,16 @@ class RouterDebugCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $application = new Application($this->getKernel());
+        $application = new Application();
 
-        $command = new RouterDebugCommand();
+        $command = new RouterDebugCommand(new ControllerNameParser($this->getMockBuilder(KernelInterface::class)->getMock()));
+        $command->setContainer($this->getContainer());
         $application->add($command);
 
         return new CommandTester($application->find('debug:router'));
     }
 
-    private function getKernel()
+    private function getContainer()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -82,25 +84,14 @@ class RouterDebugCommandTest extends TestCase
             ->with('router')
             ->will($this->returnValue(true))
         ;
+
         $container
-            ->expects($this->any())
             ->method('get')
-            ->with('router')
-            ->willReturn($router)
-        ;
+            ->will($this->returnValueMap(array(
+                array('router', 1, $router),
+                array('controller_name_converter', 1, $loader),
+            )));
 
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
-        $kernel
-            ->expects($this->any())
-            ->method('getContainer')
-            ->willReturn($container)
-        ;
-        $kernel
-            ->expects($this->once())
-            ->method('getBundles')
-            ->willReturn(array())
-        ;
-
-        return $kernel;
+        return $container;
     }
 }

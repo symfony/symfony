@@ -29,6 +29,15 @@ use Symfony\Component\Routing\Route;
  */
 class RouterDebugCommand extends ContainerAwareCommand
 {
+    private $controllerNameParser;
+
+    public function __construct(ControllerNameParser $controllerNameParser = null)
+    {
+        parent::__construct();
+
+        $this->controllerNameParser = $controllerNameParser;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -110,10 +119,12 @@ EOF
 
     private function convertController(Route $route)
     {
-        $nameParser = new ControllerNameParser($this->getApplication()->getKernel());
         if ($route->hasDefault('_controller')) {
+            if (null === $this->controllerNameParser) {
+                $this->controllerNameParser = new ControllerNameParser($this->getApplication()->getKernel());
+            }
             try {
-                $route->setDefault('_controller', $nameParser->build($route->getDefault('_controller')));
+                $route->setDefault('_controller', $this->controllerNameParser->build($route->getDefault('_controller')));
             } catch (\InvalidArgumentException $e) {
             }
         }

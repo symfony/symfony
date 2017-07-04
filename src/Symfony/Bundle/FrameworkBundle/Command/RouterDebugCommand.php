@@ -137,7 +137,7 @@ EOF
             }
         }
 
-        $nameParser = $this->getContainer()->get('controller_name_converter');
+        $nameParser = new ControllerNameParser($this->getApplication()->getKernel());
         try {
             $shortNotation = $nameParser->build($controller);
             $route->setDefault('_controller', $shortNotation);

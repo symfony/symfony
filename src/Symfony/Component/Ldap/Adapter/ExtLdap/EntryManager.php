@@ -12,7 +12,6 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
-use Symfony\Component\Ldap\Adapter\RenameEntryInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
@@ -21,7 +20,7 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
  * @author Charles Sarrazin <charles@sarraz.in>
  * @author Bob van de Vijver <bobvandevijver@hotmail.com>
  */
-class EntryManager implements EntryManagerInterface, RenameEntryInterface
+class EntryManager implements EntryManagerInterface
 {
     private $connection;
 

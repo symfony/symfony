@@ -24,7 +24,7 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!class_exists(Symfony\Component\Asset\Packages::class)) {
+        if (!class_exists(\Symfony\Component\Asset\Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
         }
 

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-04T15:07:04Z
+
+The changes look good at a first glance, but the tests are failing.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-04T15:12:39Z
+
+:+1: confirmed this solves the issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-04T15:21:20Z
+
+Tests back to green.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-04T19:49:41Z
+
+Will test this patch tomorrow to see if it works for my case

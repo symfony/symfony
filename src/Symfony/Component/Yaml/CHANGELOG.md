@@ -23,6 +23,7 @@ CHANGELOG
    the parser and dumper is no longer supported, pass bitmask flags instead
  * the constructor arguments of the `Parser` class have been removed
  * the `Inline` class is internal and no longer part of the BC promise
+ * removed support for the `!str` tag, use the `!!str` tag instead
 
 3.4.0
 -----

@@ -628,6 +628,16 @@ class ObjectNormalizerTest extends TestCase
         $serializer->denormalize(array('inners' => array('a' => array('foo' => 1))), ObjectOuter::class);
     }
 
+    public function testDoNotRejectInvalidTypeOnDisableTypeEnforcementContextOption()
+    {
+        $extractor = new PropertyInfoExtractor(array(), array(new PhpDocExtractor()));
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer(array($normalizer));
+        $context = array(ObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true);
+
+        $this->assertSame('foo', $serializer->denormalize(array('number' => 'foo'), JsonNumber::class, null, $context)->number);
+    }
+
     public function testExtractAttributesRespectsFormat()
     {
         $normalizer = new FormatAndContextAwareNormalizer();

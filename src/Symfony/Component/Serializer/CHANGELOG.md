@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT` context option
+   to disable throwing an `UnexpectedValueException` on a type mismatch
+
 3.3.0
 -----
 

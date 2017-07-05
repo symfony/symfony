@@ -91,7 +91,7 @@ EOF
      */
     public function isEnabled()
     {
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
+        if (!class_exists(Translator::class)) {
             return false;
         }
 

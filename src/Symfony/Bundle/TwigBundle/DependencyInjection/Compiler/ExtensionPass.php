@@ -24,22 +24,22 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!class_exists('Symfony\Component\Asset\Packages')) {
+        if (!class_exists(Symfony\Component\Asset\Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
         }
 
-        if (!class_exists('Symfony\Component\ExpressionLanguage\Expression')) {
+        if (!class_exists(\Symfony\Component\ExpressionLanguage\Expression::class)) {
             $container->removeDefinition('twig.extension.expression');
         }
 
-        if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
+        if (!interface_exists(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)) {
             $container->removeDefinition('twig.extension.routing');
         }
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
+        if (!interface_exists(\Symfony\Component\Translation\TranslatorInterface::class)) {
             $container->removeDefinition('twig.extension.trans');
         }
 
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
+        if (!class_exists(\Symfony\Component\Yaml\Yaml::class)) {
             $container->removeDefinition('twig.extension.yaml');
         }
 
@@ -100,7 +100,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
         }
 
-        if (class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
+        if (class_exists(\Symfony\Component\Stopwatch\Stopwatch::class)) {
             $container->getDefinition('twig.extension.debug.stopwatch')->addTag('twig.extension');
         }
 

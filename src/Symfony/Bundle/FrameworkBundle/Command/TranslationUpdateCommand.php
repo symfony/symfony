@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Translator;
 
 /**
  * A command that parses templates to extract translation messages and adds them
@@ -72,7 +73,7 @@ EOF
      */
     public function isEnabled()
     {
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
+        if (!class_exists(Translator::class)) {
             return false;
         }
 

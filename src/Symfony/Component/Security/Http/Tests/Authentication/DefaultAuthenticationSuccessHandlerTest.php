@@ -129,9 +129,13 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
         $this->request->headers->expects($this->once())
             ->method('get')->with('Referer')
-            ->will($this->returnValue('/dashboard'));
+            ->will($this->returnValue('http://example.com/dashboard'));
 
-        $response = $this->expectRedirectResponse('/dashboard');
+        $this->httpUtils->expects($this->once())
+            ->method('generateUri')->with($this->request, '/login')
+            ->will($this->returnValue('http://example.com/login'));
+
+        $response = $this->expectRedirectResponse('http://example.com/dashboard');
 
         $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
@@ -145,11 +149,11 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
         $this->request->headers->expects($this->any())
             ->method('get')->with('Referer')
-            ->will($this->returnValue('/login'));
+            ->will($this->returnValue('http://example.com/login'));
 
         $this->httpUtils->expects($this->once())
             ->method('generateUri')->with($this->request, '/login')
-            ->will($this->returnValue('/login'));
+            ->will($this->returnValue('http://example.com/login'));
 
         $response = $this->expectRedirectResponse('/');
 
@@ -165,11 +169,11 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
         $this->request->headers->expects($this->any())
             ->method('get')->with('Referer')
-            ->will($this->returnValue('/subfolder/login?t=1&p=2'));
+            ->will($this->returnValue('http://example.com/subfolder/login?t=1&p=2'));
 
         $this->httpUtils->expects($this->once())
             ->method('generateUri')->with($this->request, '/login')
-            ->will($this->returnValue('/subfolder/login'));
+            ->will($this->returnValue('http://example.com/subfolder/login'));
 
         $response = $this->expectRedirectResponse('/');
 

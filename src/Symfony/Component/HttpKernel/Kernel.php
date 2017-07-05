@@ -551,7 +551,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                         return;
                     }
 
-                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
                     // Clean the trace by removing first frames added by the error handler itself.
                     for ($i = 0; isset($backtrace[$i]); ++$i) {
                         if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {

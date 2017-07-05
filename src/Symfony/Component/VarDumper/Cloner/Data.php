@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data implements \ArrayAccess, \Countable, \IteratorAggregate
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializable
 {
     private $data;
     private $position = 0;
@@ -279,6 +279,57 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
+     * @internal
+     */
+    public function serialize()
+    {
+        $data = $this->data;
+
+        foreach ($data as $i => $values) {
+            foreach ($values as $k => $v) {
+                if ($v instanceof Stub) {
+                    if (Stub::TYPE_ARRAY === $v->type) {
+                        $v = self::mapStubConsts($v, false);
+                        $data[$i][$k] = array($v->class, $v->position, $v->cut);
+                    } else {
+                        $v = self::mapStubConsts($v, false);
+                        $data[$i][$k] = array($v->class, $v->position, $v->cut, $v->type, $v->value, $v->handle, $v->refCount, $v->attr);
+                    }
+                }
+            }
+        }
+
+        return serialize(array($data, $this->position, $this->key, $this->maxDepth, $this->maxItemsPerDepth, $this->useRefHandles));
+    }
+
+    /**
+     * @internal
+     */
+    public function unserialize($serialized)
+    {
+        list($data, $this->position, $this->key, $this->maxDepth, $this->maxItemsPerDepth, $this->useRefHandles) = unserialize($serialized);
+
+        foreach ($data as $i => $values) {
+            foreach ($values as $k => $v) {
+                if ($v && is_array($v)) {
+                    $s = new Stub();
+                    if (3 === count($v)) {
+                        $s->type = Stub::TYPE_ARRAY;
+                        $s = self::mapStubConsts($s, false);
+                        list($s->class, $s->position, $s->cut) = $v;
+                        $s->value = $s->cut + count($data[$s->position]);
+                    } else {
+                        list($s->class, $s->position, $s->cut, $s->type, $s->value, $s->handle, $s->refCount, $s->attr) = $v;
+                    }
+                    $data[$i][$k] = self::mapStubConsts($s, true);
+                }
+            }
+        }
+
+        $this->data = $data;
+    }
+
+    /**
      * Depth-first dumping of items.
      *
      * @param DumperInterface $dumper The dumper being used for dumping
@@ -405,5 +456,24 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         }
 
         return $hashCut;
+    }
+
+    private static function mapStubConsts(Stub $stub, $resolve)
+    {
+        static $stubConstIndexes, $stubConstValues;
+
+        if (null === $stubConstIndexes) {
+            $r = new \ReflectionClass(Stub::class);
+            $stubConstIndexes = array_flip(array_values($r->getConstants()));
+            $stubConstValues = array_flip($stubConstIndexes);
+        }
+
+        $map = $resolve ? $stubConstValues : $stubConstIndexes;
+
+        $stub = clone $stub;
+        $stub->type = $map[$stub->type];
+        $stub->class = isset($map[$stub->class]) ? $map[$stub->class] : $stub->class;
+
+        return $stub;
     }
 }

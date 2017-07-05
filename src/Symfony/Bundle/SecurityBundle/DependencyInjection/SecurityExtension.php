@@ -74,7 +74,7 @@ class SecurityExtension extends Extension
             $loader->load('security_debug.xml');
         }
 
-        if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+        if (!class_exists(\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
         }
@@ -737,7 +737,7 @@ class SecurityExtension extends Extension
     private function getExpressionLanguage()
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            if (!class_exists(\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage();

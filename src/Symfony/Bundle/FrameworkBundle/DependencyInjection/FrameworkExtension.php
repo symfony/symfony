@@ -11,11 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\CacheProvider;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
+use Symfony\Component\Asset\Package;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
@@ -38,6 +41,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -51,6 +55,7 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -62,10 +67,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * FrameworkExtension.
@@ -139,15 +148,15 @@ class FrameworkExtension extends Extension
         // default in the Form and Validator component). If disabled, an identity
         // translator will be used and everything will still work as expected.
         if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['translator'])) {
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
             }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['form'])) {
                 throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
             }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['validation'])) {
                 throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
             }
 
@@ -199,7 +208,7 @@ class FrameworkExtension extends Extension
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
 
-            if (!class_exists('Symfony\Component\Validator\Validation')) {
+            if (!class_exists(Validation::class)) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
         }
@@ -207,7 +216,7 @@ class FrameworkExtension extends Extension
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
-            if (!class_exists('Symfony\Component\Asset\Package')) {
+            if (!class_exists(Package::class)) {
                 throw new LogicException('Asset support cannot be enabled as the Asset component is not installed.');
             }
 
@@ -215,7 +224,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['templating'])) {
-            if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
+            if (!class_exists(PhpEngine::class)) {
                 throw new LogicException('Templating support cannot be enabled as the Templating component is not installed.');
             }
 
@@ -1042,18 +1051,18 @@ class FrameworkExtension extends Extension
 
         // Discover translation directories
         $dirs = array();
-        if (class_exists('Symfony\Component\Validator\Validation')) {
+        if (class_exists(Validation::class)) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
             $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists('Symfony\Component\Form\Form')) {
+        if (class_exists(Form::class)) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
             $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
-            $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        if (class_exists(\Symfony\Component\Security\Core\Exception\AuthenticationException::class)) {
+            $r = new \ReflectionClass(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
 
             $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
@@ -1122,7 +1131,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Symfony\Component\Validator\Validation')) {
+        if (!class_exists(Validation::class)) {
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
         }
 
@@ -1237,14 +1246,14 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Doctrine\Common\Annotations\Annotation')) {
+        if (!class_exists(Annotation::class)) {
             throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
         }
 
         $loader->load('annotations.xml');
 
         if ('none' !== $config['cache']) {
-            if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
+            if (!class_exists(CacheProvider::class)) {
                 throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
             }
 
@@ -1314,7 +1323,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
+        if (!class_exists(CsrfToken::class)) {
             throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed.');
         }
 
@@ -1335,28 +1344,28 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
+        if (class_exists(\Symfony\Component\Serializer\Normalizer\DataUriNormalizer::class)) {
             // Run after serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -920));
         }
 
-        if (class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
+        if (class_exists(\Symfony\Component\Serializer\Normalizer\DateTimeNormalizer::class)) {
             // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -910));
         }
 
-        if (class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
+        if (class_exists(\Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer::class)) {
             // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -900));
         }
 
-        if (class_exists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+        if (class_exists(YamlEncoder::class) && defined(Yaml::DUMP_OBJECT)) {
             $definition = $container->register('serializer.encoder.yaml', YamlEncoder::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.encoder');

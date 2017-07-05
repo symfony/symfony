@@ -23,6 +23,7 @@
     },
     "require-dev": {
         "symfony/amqp": "^3.4",
+        "symfony/console": "^3.0",
         "symfony/phpunit-bridge": "^3.2"
     },
     "autoload": {

@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="amqp.broker_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+            <argument type="collection">
+                <argument key="Symfony\Component\Amqp\Broker" type="service" id="amqp.broker" />
+            </argument>
+        </service>
+
+        <service id="amqp.command.move" class="Symfony\Component\Amqp\Command\AmqpMoveCommand">
+            <tag name="console.command" />
+            <argument type="service" id="amqp.broker_locator" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+    </services>
+</container>

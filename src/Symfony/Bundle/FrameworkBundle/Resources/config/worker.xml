@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="worker.worker_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+            <argument type="collection" /> <!-- worker services keyed by names -->
+        </service>
+
+        <service id="worker.command.list" class="Symfony\Component\Worker\Command\WorkerListCommand">
+            <tag name="console.command" />
+            <argument /> <!-- worker names -->
+        </service>
+
+        <service id="worker.command.run" class="Symfony\Component\Worker\Command\WorkerRunCommand">
+            <tag name="console.command" />
+            <argument type="service" id="worker.worker_locator" />
+            <argument /> <!-- process title prefix -->
+            <argument /> <!-- worker names -->
+        </service>
+
+    </services>
+</container>

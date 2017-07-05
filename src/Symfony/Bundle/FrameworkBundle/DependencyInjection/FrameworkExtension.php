@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -241,9 +242,9 @@ class FrameworkExtension extends Extension
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
         if (isset($config['amqp'])) {
-            $this->registerAmqpConfiguration($config['amqp'], $container);
+            $this->registerAmqpConfiguration($config['amqp'], $container, $loader);
         }
-        $this->registerWorkerConfiguration($config['worker'], $container);
+        $this->registerWorkerConfiguration($config['worker'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
@@ -1305,8 +1306,10 @@ class FrameworkExtension extends Extension
         ;
     }
 
-    private function registerAmqpConfiguration(array $config, ContainerBuilder $container)
+    private function registerAmqpConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        $loader->load('amqp.xml');
+
         $defaultConnectionName = null;
         if (isset($config['default_connection'])) {
             $defaultConnectionName = $config['default_connection'];
@@ -1336,10 +1339,11 @@ class FrameworkExtension extends Extension
         $container->setAlias('amqp.broker', sprintf('amqp.broker.%s', $defaultConnectionName));
     }
 
-    private function registerWorkerConfiguration(array $config, ContainerBuilder $container)
+    private function registerWorkerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $fetchers = array();
+        $loader->load('worker.xml');
 
+        $fetchers = array();
         foreach ($config['fetchers']['amqps'] as $name => $fetcher) {
             if (isset($fetchers[$name])) {
                 throw new \InvalidArgumentException(sprintf('A fetcher named "%s" already exist.', $name));
@@ -1453,11 +1457,15 @@ class FrameworkExtension extends Extension
                 ->addArgument($name)
             ;
 
-            $workers[$name] = $id;
+            $workers[$name] = new TypedReference($id, Worker\Loop\Loop::class);
         }
 
-        $container->setParameter('worker.cli_title_prefix', trim($config['cli_title_prefix'], '_'));
-        $container->setParameter('worker.workers', $workers);
+        $container->getDefinition('worker.command.list')->replaceArgument(0, $workerNames = array_keys($workers));
+        $container->getDefinition('worker.worker_locator')->replaceArgument(0, $workers);
+        $container
+            ->getDefinition('worker.command.run')
+            ->replaceArgument(1, trim($config['cli_title_prefix'], '_'))
+            ->replaceArgument(2, $workerNames);
     }
 
     /**

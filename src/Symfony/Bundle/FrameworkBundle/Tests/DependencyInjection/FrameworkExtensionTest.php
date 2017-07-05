@@ -1039,9 +1039,6 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWorkerEmpty()
     {
         $container = $this->createContainerFromFile('worker_empty');
-
-        $this->assertSame('app', $container->getParameter('worker.cli_title_prefix'));
-        $this->assertSame(array(), $container->getParameter('worker.workers'));
     }
 
     public function testWorkerFull()
@@ -1137,14 +1134,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(Reference::class, $worker->getArgument(2));
         $this->assertSame('logger', (string) $worker->getArgument(2));
         $this->assertSame('worker_service_a', $worker->getArgument(3));
-
-        /* Global configuration */
-        $this->assertSame('foobar', $container->getParameter('worker.cli_title_prefix'));
-        $workers = array(
-            'worker_d' => 'worker.worker.worker_d',
-            'worker_service_a' => 'worker.worker.worker_service_a',
-        );
-        $this->assertSame($workers, $container->getParameter('worker.workers'));
     }
 
     protected function createContainer(array $data = array())

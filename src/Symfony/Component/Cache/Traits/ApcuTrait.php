@@ -52,7 +52,7 @@ trait ApcuTrait
     protected function doFetch(array $ids)
     {
         try {
-            return apcu_fetch($ids);
+            return apcu_fetch($ids) ?: array();
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         }
@@ -94,7 +94,11 @@ trait ApcuTrait
     protected function doSave(array $values, $lifetime)
     {
         try {
-            return array_keys(apcu_store($values, null, $lifetime));
+            if (false === $failures = apcu_store($values, null, $lifetime)) {
+                $failures = $values;
+            }
+
+            return array_keys($failures);
         } catch (\Error $e) {
         } catch (\Exception $e) {
         }

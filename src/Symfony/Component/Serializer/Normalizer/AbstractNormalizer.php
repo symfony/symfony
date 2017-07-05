@@ -195,7 +195,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return call_user_func($this->circularReferenceHandler, $object);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
+        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', get_class($object), $this->circularReferenceLimit));
     }
 
     /**

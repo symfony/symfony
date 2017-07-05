@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\AbstractTrait;
@@ -101,7 +102,9 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         }
 
         $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
-        if (null !== $logger) {
+        if ('cli' === PHP_SAPI && !ini_get('apc.enable_cli')) {
+            $apcu->setLogger(new NullLogger());
+        } elseif (null !== $logger) {
             $apcu->setLogger($logger);
         }
 

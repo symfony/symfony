@@ -770,7 +770,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
-        if (!$this->submitted) {
+        if (!$this->submitted || $this->transformationFailure) {
             return false;
         }
 

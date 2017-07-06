@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T09:39:19Z
+
+missing CHANGELOG updates in components (please check any your other PRs also if any)
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-20T11:47:10Z
+
+@nicolas-grekas note added
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-25T08:51:34Z
+
+@GuilhemN Can you rebase here now that #22770 is merged?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-25T09:47:32Z
+
+done

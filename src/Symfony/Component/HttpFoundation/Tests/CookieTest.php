@@ -197,6 +197,15 @@ class CookieTest extends TestCase
         $this->assertEquals(new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true, true, true), $cookie);
 
         $cookie = Cookie::fromString('foo=bar', true);
-        $this->assertEquals(new Cookie('foo', 'bar'), $cookie);
+        $this->assertEquals(new Cookie('foo', 'bar', 0, '/', null, false, false), $cookie);
+    }
+
+    public function testFromStringWithHttpOnly()
+    {
+        $cookie = Cookie::fromString('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure; httponly');
+        $this->assertTrue($cookie->isHttpOnly());
+
+        $cookie = Cookie::fromString('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure');
+        $this->assertFalse($cookie->isHttpOnly());
     }
 }

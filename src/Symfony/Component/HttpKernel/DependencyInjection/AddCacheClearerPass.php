@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -22,20 +22,29 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddCacheClearerPass implements CompilerPassInterface
 {
+    private $cacheClearerId;
+    private $cacheClearerTag;
+
+    public function __construct($cacheClearerId = 'cache_clearer', $cacheClearerTag = 'kernel.cache_clearer')
+    {
+        $this->cacheClearerId = $cacheClearerId;
+        $this->cacheClearerTag = $cacheClearerTag;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('cache_clearer')) {
+        if (!$container->hasDefinition($this->cacheClearerId)) {
             return;
         }
 
         $clearers = array();
-        foreach ($container->findTaggedServiceIds('kernel.cache_clearer', true) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->cacheClearerTag, true) as $id => $attributes) {
             $clearers[] = new Reference($id);
         }
 
-        $container->getDefinition('cache_clearer')->replaceArgument(0, $clearers);
+        $container->getDefinition($this->cacheClearerId)->replaceArgument(0, $clearers);
     }
 }

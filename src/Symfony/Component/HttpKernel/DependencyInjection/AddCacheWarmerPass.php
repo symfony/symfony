@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,21 +24,30 @@ class AddCacheWarmerPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    private $cacheWarmerId;
+    private $cacheWarmerTag;
+
+    public function __construct($cacheWarmerId = 'cache_warmer', $cacheWarmerTag = 'kernel.cache_warmer')
+    {
+        $this->cacheWarmerId = $cacheWarmerId;
+        $this->cacheWarmerTag = $cacheWarmerTag;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('cache_warmer')) {
+        if (!$container->hasDefinition($this->cacheWarmerId)) {
             return;
         }
 
-        $warmers = $this->findAndSortTaggedServices('kernel.cache_warmer', $container);
+        $warmers = $this->findAndSortTaggedServices($this->cacheWarmerTag, $container);
 
         if (empty($warmers)) {
             return;
         }
 
-        $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
+        $container->getDefinition($this->cacheWarmerId)->replaceArgument(0, $warmers);
     }
 }

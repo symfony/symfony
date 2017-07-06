@@ -70,6 +70,8 @@ Debug
  * `FlattenException::getTrace()` now returns additional type descriptions
    `integer` and `float`.
 
+ * Support for stacked errors in the `ErrorHandler` has been removed
+
 DependencyInjection
 -------------------
 
@@ -348,6 +350,24 @@ FrameworkBundle
  * The `--no-prefix` option of the `translation:update` command has
    been removed.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed. 
+   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed. 
+   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
+
 HttpFoundation
 --------------
 
@@ -420,7 +440,7 @@ HttpKernel
 Ldap
 ----
 
- * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`
+ * The `RenameEntryInterface` has been removed, and merged with `EntryManagerInterface`
 
 Process
 -------

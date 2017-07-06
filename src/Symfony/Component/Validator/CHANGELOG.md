@@ -15,7 +15,9 @@ CHANGELOG
 
  * not setting the `strict` option of the `Choice` constraint to `true` is
    deprecated and will throw an exception in Symfony 4.0
- * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of constant values and will throw an exception in Symfony 4.0
+ * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of
+   the `Url::CHECK_DNS_TYPE_*` constants values and will throw an exception in Symfony 4.0
+ * added min/max amount of pixels check to `Image` constraint via `minPixels` and `maxPixels`
 
 3.3.0
 -----

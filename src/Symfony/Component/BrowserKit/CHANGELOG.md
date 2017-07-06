@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * [BC BREAK] Client will skip redirects during history navigation
+   (back and forward calls) according to W3C Browsers recommendation
+
 3.3.0
 -----
 

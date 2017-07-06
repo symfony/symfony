@@ -21,12 +21,14 @@
     },
     "require-dev": {
         "symfony/config": "~3.4|~4.0",
+        "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/intl": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "psr/log": "~1.0"
     },
     "conflict": {
         "symfony/config": "<3.4",
+        "symfony/dependency-injection": "<3.4",
         "symfony/yaml": "<3.4"
     },
     "suggest": {

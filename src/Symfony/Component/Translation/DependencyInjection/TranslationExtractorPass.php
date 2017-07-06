@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\Translation\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,15 +21,24 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class TranslationExtractorPass implements CompilerPassInterface
 {
+    private $extractorServiceId;
+    private $extractorTag;
+
+    public function __construct($extractorServiceId = 'translation.extractor', $extractorTag = 'translation.extractor')
+    {
+        $this->extractorServiceId = $extractorServiceId;
+        $this->extractorTag = $extractorTag;
+    }
+
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('translation.extractor')) {
+        if (!$container->hasDefinition($this->extractorServiceId)) {
             return;
         }
 
-        $definition = $container->getDefinition('translation.extractor');
+        $definition = $container->getDefinition($this->extractorServiceId);
 
-        foreach ($container->findTaggedServiceIds('translation.extractor', true) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->extractorTag, true) as $id => $attributes) {
             if (!isset($attributes[0]['alias'])) {
                 throw new RuntimeException(sprintf('The alias for the tag "translation.extractor" of service "%s" must be set.', $id));
             }

@@ -6,6 +6,13 @@ CHANGELOG
 
  * removed the backup feature of the `FileDumper` class
 
+3.4.0
+-----
+
+ * Added `TranslationDumperPass`
+ * Added `TranslationExtractorPass`
+ * Added `TranslatorPass`
+
 3.2.0
 -----
 

@@ -13,7 +13,6 @@ namespace Symfony\Component\Debug;
 
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
@@ -415,11 +414,7 @@ class ErrorHandler
                 return;
             }
         } else {
-            if ($scope) {
-                $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
-            } else {
-                $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
-            }
+            $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
 
             // Clean the trace by removing function arguments and the first frames added by the error handler itself.
             if ($throw || $this->tracedErrors & $type) {

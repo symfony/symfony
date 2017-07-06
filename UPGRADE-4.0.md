@@ -498,6 +498,14 @@ TwigBundle
 TwigBridge
 ----------
 
+ * Removed the `TwigRendererInterface` interface.
+
+ * Removed the `TwigRendererEngineInterface` interface.
+
+ * Required an Twig Environment as the second argument for the `TwigRendererEngine`constructor.
+
+ * Removed the `renderer` property of the `FormExtension` class.
+
  * Removed the possibility to inject the Form `TwigRenderer` into the `FormExtension`.
    Upgrade Twig to `^1.30`, inject the `Twig_Environment` into the `TwigRendererEngine` and load
    the `TwigRenderer` using the `Twig_FactoryRuntimeLoader` instead.

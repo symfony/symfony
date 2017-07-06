@@ -351,7 +351,7 @@ final class Dotenv
             }
 
             $name = $matches[3];
-            $value = isset($this->values[$name]) ? $this->values[$name] : (isset($_ENV[$name]) ? isset($_ENV[$name]) : (string) getenv($name));
+            $value = isset($this->values[$name]) ? $this->values[$name] : (isset($_ENV[$name]) ? $_ENV[$name] : (string) getenv($name));
 
             if (!$matches[2] && isset($matches[4])) {
                 $value .= '}';

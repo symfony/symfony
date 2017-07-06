@@ -53,15 +53,33 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithAHandlingListener()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
             $event->setResponse(new Response($event->getException()->getMessage()));
         });
 
-        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException('foo'); });
+        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException('exception'); });
         $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
 
         $this->assertEquals('500', $response->getStatusCode());
-        $this->assertEquals('foo', $response->getContent());
+        $this->assertEquals('exception', $response->getContent());
+    }
+
+    public function testHandleWhenControllerThrowsAnErrorAndCatchIsTrueWithAHandlingListener()
+    {
+        if (!class_exists('Error', false)) {
+            $this->markTestSkipped('PHP 7 Error required');
+        }
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
+            $event->setResponse(new Response($event->getException()->getMessage()));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \Error('error'); });
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+
+        $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals('error', $response->getContent());
     }
 
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithANonHandlingListener()

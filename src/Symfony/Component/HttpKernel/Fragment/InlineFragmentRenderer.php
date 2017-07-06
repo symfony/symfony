@@ -84,30 +84,32 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         try {
             return $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
-            // we dispatch the exception event to trigger the logging
-            // the response that comes back is simply ignored
-            if (isset($options['ignore_errors']) && $options['ignore_errors'] && $this->dispatcher) {
-                $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
-
-                $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
-            }
-
-            // let's clean up the output buffers that were created by the sub-request
-            Response::closeOutputBuffers($level, false);
-
-            if (isset($options['alt'])) {
-                $alt = $options['alt'];
-                unset($options['alt']);
-
-                return $this->render($alt, $request, $options);
-            }
-
-            if (!isset($options['ignore_errors']) || !$options['ignore_errors']) {
-                throw $e;
-            }
-
-            return new Response();
+        } catch (\Throwable $e) {
         }
+
+        // we dispatch the exception event to trigger the logging
+        // the response that comes back is simply ignored
+        if (isset($options['ignore_errors']) && $options['ignore_errors'] && $this->dispatcher) {
+            $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
+
+            $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+        }
+
+        // let's clean up the output buffers that were created by the sub-request
+        Response::closeOutputBuffers($level, false);
+
+        if (isset($options['alt'])) {
+            $alt = $options['alt'];
+            unset($options['alt']);
+
+            return $this->render($alt, $request, $options);
+        }
+
+        if (!isset($options['ignore_errors']) || !$options['ignore_errors']) {
+            throw $e;
+        }
+
+        return new Response();
     }
 
     protected function createSubRequest($uri, Request $request)

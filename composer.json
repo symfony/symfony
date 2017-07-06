@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
+        "ext-xml": "*",
         "doctrine/common": "~2.4",
         "paragonie/random_compat": "~1.0",
         "symfony/polyfill-apcu": "~1.1",

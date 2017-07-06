@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-07-06T09:02:09Z
+
+Suggested commit message:
+
+```
+Preserve HttpOnly value when deserializing a header
+
+The specification states that the cookie should be considered http only if and
+only if the flag is present.
+See https://www.owasp.org/index.php/HttpOnly
+```
+
+---------------------------------------------------------------------------
+
+by Toflar at 2017-07-06T09:04:58Z
+
+Updated commit message accordingly :)

@@ -622,7 +622,8 @@ VarDumper
 WebProfilerBundle
 -----------------
 
- * Removed the `getTemplates()` method of the `TemplateManager` class in favor of the ``getNames()`` method.
+ * Removed the `getTemplates()` method of the `TemplateManager` class in favor
+   of the `getNames()` method
 
 Workflow
 --------

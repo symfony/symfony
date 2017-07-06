@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by sustmi at 2017-04-14T19:06:09Z
+
+Wait, I found that the problem with wrapping long lines shown here: https://github.com/symfony/symfony/pull/20951#issuecomment-292201983 still happens.
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-04-14T19:12:51Z
+
+Wrapping is fixed in the new commit.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-04-14T19:13:43Z
+
+Personally, I preferred the less dense "double line" of the original.
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-04-14T19:25:03Z
+
+@robfrawley, do you think that with single line spacing the code is harder to read?
+I guess that single line spacing is the most common setting in IDEs and editors (I have never seen anybody use double line spacing for PHP) and therefore I consider single line spacing more natural for reading PHP code (it should create less cognitive load).
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-04-14T21:47:49Z
+
+> file context increased from 3 to 10 lines (it helps me to better orientate in the code)
+
+👎 on that one as it then dominates the average developer's screen completely. And you can just middle/right click the filename above the snippet to see the full scrollable context if you really need it.
+
+Totally down with bringing the line spacing down though, just tried it and yes it reads more like actual code. And it does give room to increase the context to 5 without sacrificing call stack.
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-04-15T14:16:02Z
+
+OK, I lowered the file excerpt line context to 5. You can see the difference here:
+
+10 lines | 5 lines
+--- | ---
+![10-line-context](https://cloud.githubusercontent.com/assets/885946/25064233/8a6a0b5e-21f6-11e7-97a1-373b87efa408.png) | ![5-line-context](https://cloud.githubusercontent.com/assets/885946/25064234/9199f880-21f6-11e7-9d8a-e594a70f4953.png)
+
+Now it has approximately the same height as the 3-line context with double line spacing.
+What do you think?
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-04-15T23:21:32Z
+
+Rebased to the current master to rerun Travis CI.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-05-31T19:17:44Z
+
+I'm sorry I didn't review this on time for 3.3.0 ... I even thought this was merged! There are some things that I'm not sure about ... but others that I like. Tomorrow I'll add more details. Thanks!
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2017-06-01T08:54:59Z
+
+About the issues with the line count in the code excerpts… how about the way Github does this?
+
+![2017-06-01 at 10 54](https://cloud.githubusercontent.com/assets/1032411/26672237/b9b0c3c6-46b8-11e7-905c-5072ae02b5c8.png)
+
+Or would this be overkill?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-01T09:01:13Z
+
+@apfelbox IMO, this is overkill. You have access to the full file anyway if you want.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-01T09:02:12Z
+
+@sustmi can you rebase this on top of the Symfony 3.4 branch to fix conflicts ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-02T21:28:52Z
+
+As I said in https://github.com/symfony/symfony/pull/22971#issuecomment-305913262, I'd love to see this merged in 3.3 as a bug fix rather than in 3.4. There is no DX nor feature to me, just UI/UX improvements and fixes for minor but annoying behavior issues. :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-02T22:17:45Z
+
+@sustmi would you mind rebasing please?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-06-02T22:19:22Z
+
+I second the 3.3.1 vote. It's not a feature, just an improvement on 3.3-introduced behavior. DX/UX improvements have always been allowed in patch releases, no reason to postpone it.
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-06-04T01:32:33Z
+
+I rebased the PR to 3.4 as @stof adviced. Is that all right?
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-06-04T02:22:32Z
+
+I just noticed the discussion in https://github.com/symfony/symfony/pull/22971#issuecomment-305913262 so I guess you actually wanted me to rebase it to 3.3.
+So I rebased it to 3.3 and I also removed commit `remove double line spacing to make it more compact and similar to IDEs` as @ogizanagi already changed line-spacing from 10px to 5px in https://github.com/symfony/symfony/pull/22971 and @nicolas-grekas seemed to like it in https://github.com/symfony/symfony/pull/22971#issuecomment-305876918 as it is consistent with GitHub look.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-04T16:09:08Z
+
+You also need to change the target to 3.3.
+
+---------------------------------------------------------------------------
+
+by sustmi at 2017-06-04T20:25:05Z
+
+Oh, thanks for the notice. Done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-09T00:43:17Z
+
+@javiereguiluz Is it ready to merge or do you need more time to review?

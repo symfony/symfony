@@ -64,12 +64,6 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             }
         }
 
-        if ($this->container->has('service_container.resources')) {
-            foreach ($this->container->get('service_container.resources') as $resource) {
-                $collection->addResource($resource);
-            }
-        }
-
         return $collection;
     }
 

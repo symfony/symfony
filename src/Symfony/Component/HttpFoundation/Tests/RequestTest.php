@@ -2195,7 +2195,7 @@ class RequestTest extends TestCase
     public function testProtocolVersion($serverProtocol, $trustedProxy, $via, $expected)
     {
         if ($trustedProxy) {
-            Request::setTrustedProxies(array('1.1.1.1'));
+            Request::setTrustedProxies(array('1.1.1.1'), -1);
         }
 
         $request = new Request();

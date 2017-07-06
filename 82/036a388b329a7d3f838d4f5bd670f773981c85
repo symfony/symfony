@@ -1,0 +1,143 @@
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-19T09:56:50Z
+
+while i do really like the idea, it's bc breaker, as proven
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-19T09:57:55Z
+
+@keradus it's a BC break ... that's why I submitted to 3.4 branch ... should I submit it instead to 4.0?
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-19T10:32:59Z
+
+3.4 is for features, not bc breakers, isn't it ?
+i would go either with clean solution for 4.0, or future-compat layer on 3.4
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-19T10:33:42Z
+
+> BC breaks?	no?
+
+vs
+
+> it's a BC break ... that's why ....
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-19T13:48:42Z
+
+We cannot break BC in 4.0 without a migration path from 3.4. So target master would not change anything. What we need to do instead is to add an argument to those methods to get the value as a float and return a casted int if not.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-19T13:51:15Z
+
+that's why I requested future-compat layer :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-19T15:47:55Z
+
+I've made some changes. Please tell me if I'm going in the right direction. Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-19T18:53:51Z
+
+LGTM but as is, it does not really help as the profiling still won't get the more precise time, right?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-19T18:57:03Z
+
+Not sure if this is what was asked for in #18756 ... but the screenshots in the PR are real: now we see details for < 0ms events.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-19T19:04:29Z
+
+How does it work? Where are you passing `true` to get sub-millisecond precision? Default is `false`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-19T19:32:10Z
+
+@fabpot I understand your comment now. I had forgotten to commit the change that enables more precision 😊
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-03T10:07:02Z
+
+Approval dismissed, sorry :)
+I'm not sure we should really care about the "BC break". Let's return float all the time, WDYT?
+
+*IF* we happen to really want to have the "BC" flag, then the implementation is partial: we cannot have these hardcoded `true` when instantiating StopwatchPeriod. StopwatchEvent must also have the flag, etc. transitively.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-03T10:13:55Z
+
+> I'm not sure we should really care about the "BC break". Let's return float all the time, WDYT?
+
+and that's the bc breaker, and I show how it breaks my code. please **do** respect SEMVER or officially say project is no longer following it.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-03T11:49:22Z
+
+@keradus The "BC break" is limited to use of `declare(strict_types=1);`, correct? Why can't we just change to `float` returns for this component for the `4.x` release?
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-03T12:11:52Z
+
+not, it's not only limited to `declare(strict_types=1)`, one could also check the types himself in php5 as well, eg using https://github.com/webmozart/assert
+
+Changing return type in 4.0 is fine, as 4.0 is not yet released and 4.0 is dedicated place for BC breakers.
+Changing return type in non-MAJOR release is BC breaker.
+
+----------------------
+
+http://symfony.com/doc/current/contributing/code/bc.html
+> Change return type	**No**
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-03T13:09:14Z
+
+~~Why would you be making type assertions against external (non-project) code?~~ Anyway, as I said: I think we should change the return type for `4.x` and leave as-is for the `3.x` releases without any of these precision flags adding complexity to the code.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-03T13:32:13Z
+
+@robfrawley assertion could be on the argument of one of your methods, and you could be using the output of the component as input for your code.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-03T21:10:44Z
+
+@robfrawley , exactly as @stof said
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-06T07:40:57Z
+
+I've updated this PR to follow @ogizanagi's comments.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-06T08:14:51Z
+
+After discussing it with @nicolas-grekas, we're proposing a different implementation for this feature.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-06T08:24:47Z
+
+The issue I see with this new implementation over the flag in getters is that you'll probably update the `debug.stopwatch` service to use it, making it always return `float`, while someone might have reused this in it's own classes, with strict types enabled. So that's still a (edge but still) BC break to me.

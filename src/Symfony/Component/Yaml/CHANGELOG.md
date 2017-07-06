@@ -24,6 +24,12 @@ CHANGELOG
  * the constructor arguments of the `Parser` class have been removed
  * the `Inline` class is internal and no longer part of the BC promise
  * removed support for the `!str` tag, use the `!!str` tag instead
+ * added support for tagged scalars.
+
+   ```yml
+   Yaml::parse('!foo bar', Yaml::PARSE_CUSTOM_TAGS);
+   // returns TaggedValue('foo', 'bar');
+   ```
 
 3.4.0
 -----

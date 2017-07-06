@@ -21,8 +21,8 @@ class StopwatchPeriodTest extends TestCase
      */
     public function testGetStartTime($start, $useMorePrecision, $expected)
     {
-        $period = new StopwatchPeriod($start, $start, $useMorePrecision);
-        $this->assertSame($expected, $period->getStartTime());
+        $period = new StopwatchPeriod($start, $start);
+        $this->assertSame($expected, $period->getStartTime($useMorePrecision));
     }
 
     /**
@@ -30,8 +30,8 @@ class StopwatchPeriodTest extends TestCase
      */
     public function testGetEndTime($end, $useMorePrecision, $expected)
     {
-        $period = new StopwatchPeriod($end, $end, $useMorePrecision);
-        $this->assertSame($expected, $period->getEndTime());
+        $period = new StopwatchPeriod($end, $end);
+        $this->assertSame($expected, $period->getEndTime($useMorePrecision));
     }
 
     /**
@@ -39,8 +39,8 @@ class StopwatchPeriodTest extends TestCase
      */
     public function testGetDuration($start, $end, $useMorePrecision, $duration)
     {
-        $period = new StopwatchPeriod($start, $end, $useMorePrecision);
-        $this->assertSame($duration, $period->getDuration());
+        $period = new StopwatchPeriod($start, $end);
+        $this->assertSame($duration, $period->getDuration($useMorePrecision));
     }
 
     public function provideTimeValues()
@@ -61,7 +61,7 @@ class StopwatchPeriodTest extends TestCase
         yield array(0.0, 0.0, true, 0.0);
         yield array(2, 3.14, false, 1);
         yield array(2, 3.14, true, 1.14);
-        yield array(2.71, 3.14, false, 1);
+        yield array(2.71, 3.14, false, 0);
         yield array(2.71, 3.14, true, 0.43);
     }
 }

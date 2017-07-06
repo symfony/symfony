@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 // Detect if we're loaded by an actual run of phpunit
@@ -19,10 +18,6 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Comman
 
 // Enforce a consistent locale
 setlocale(LC_ALL, 'C');
-
-if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
-    AnnotationRegistry::registerLoader('class_exists');
-}
 
 if ('disabled' !== getenv('SYMFONY_DEPRECATIONS_HELPER')) {
     DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));

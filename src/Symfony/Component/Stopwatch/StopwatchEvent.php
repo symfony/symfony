@@ -52,7 +52,7 @@ class StopwatchEvent
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */
-    public function __construct($origin, $category = null, /* bool */ $morePrecision = false)
+    public function __construct($origin, $category = null, $morePrecision = false)
     {
         $this->origin = $this->formatTime($origin);
         $this->category = is_string($category) ? $category : 'default';

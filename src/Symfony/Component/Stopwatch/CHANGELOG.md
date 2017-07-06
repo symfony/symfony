@@ -5,5 +5,5 @@ CHANGELOG
 -----
 
  * added the `Stopwatch::reset()` method
- * allowed to measure sub-millisecond times by introducing a third argument to
-   the constructor of `StopwatchPeriod`
+ * allowed to measure sub-millisecond times by introducing an argument to the
+   constructor of `Stopwatch`

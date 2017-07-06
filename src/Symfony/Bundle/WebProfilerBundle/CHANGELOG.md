@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed the `WebProfilerExtension::dumpValue()` method
+ * removed the `getTemplates()` method of the `TemplateManager` class in favor of the ``getNames()`` method
 
 3.1.0
 -----

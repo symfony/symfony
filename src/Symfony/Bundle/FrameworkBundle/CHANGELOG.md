@@ -10,6 +10,8 @@ CHANGELOG
    require symfony/stopwatch` in your `dev` environment.
  * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+ * Deprecated `AddCacheClearerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` instead.
+ * Deprecated `AddCacheWarmerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` instead.
 
 3.3.0
 -----

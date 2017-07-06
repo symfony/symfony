@@ -38,6 +38,14 @@ FrameworkBundle
    will be removed in 4.0. Use the `--prefix` option with an empty string as value
    instead (e.g. `--prefix=""`)
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+  
 Process
 -------
 

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed the `LdapClient` class and the `LdapClientInterface`
+ * removed the `RenameEntryInterface` interface and merged with `EntryManagerInterface`
 
 3.1.0
 -----

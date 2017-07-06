@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-18T16:54:09Z
+
+@lepiaf The 3.4 branch has been created and is the one that this PR should target (changing the based branch and rebase).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-05-19T06:03:48Z
+
+You should also rebase instead of merging.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-27T10:57:10Z
+
+This makes tests fail for now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-21T09:32:29Z
+
+@lepiaf Would you mind rebasing so we can look if tests are still failing (fixing them if needed)? Otherwise I can take this over so we can close #21284
+
+---------------------------------------------------------------------------
+
+by lepiaf at 2017-06-21T11:13:08Z
+
+@chalasr sure, I will do it now

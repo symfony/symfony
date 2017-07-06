@@ -619,6 +619,11 @@ VarDumper
    VarDumperTestTrait::assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '');
    ```
 
+WebProfilerBundle
+-----------------
+
+ * Removed the `getTemplates()` method of the `TemplateManager` class in favor of the ``getNames()`` method.
+
 Workflow
 --------
 

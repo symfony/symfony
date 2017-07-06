@@ -12,6 +12,12 @@ CHANGELOG
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
  * Deprecated `AddCacheClearerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` instead.
  * Deprecated `AddCacheWarmerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` instead.
+ * Deprecated `TranslationDumperPass`, use 
+   `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` instead
+ * Deprecated `TranslationExtractorPass`, use 
+   `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` instead
+ * Deprecated `TranslatorPass`, use 
+   `Symfony\Component\Translation\DependencyInjection\TranslatorPass` instead
 
 3.3.0
 -----

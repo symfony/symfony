@@ -47,7 +47,7 @@
         "symfony/security-csrf": "~2.8|~3.0|~4.0",
         "symfony/serializer": "~3.3|~4.0",
         "symfony/stopwatch": "~2.8|~3.0|~4.0",
-        "symfony/translation": "~3.2|~4.0",
+        "symfony/translation": "~3.4|~4.0",
         "symfony/templating": "~2.8|~3.0|~4.0",
         "symfony/validator": "~3.4|~4.0",
         "symfony/var-dumper": "~3.3|~4.0",
@@ -69,7 +69,7 @@
         "symfony/http-kernel": "<3.4",
         "symfony/property-info": "<3.3",
         "symfony/serializer": "<3.3",
-        "symfony/translation": "<3.2",
+        "symfony/translation": "<3.4",
         "symfony/validator": "<3.4",
         "symfony/workflow": "<3.3"
     },

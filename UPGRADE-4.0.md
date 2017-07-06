@@ -354,6 +354,18 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed. 
    Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
+
 HttpFoundation
 --------------
 

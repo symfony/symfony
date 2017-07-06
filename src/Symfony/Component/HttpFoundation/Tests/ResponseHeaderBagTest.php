@@ -241,12 +241,12 @@ class ResponseHeaderBagTest extends TestCase
     {
         $bag = new ResponseHeaderBag();
         $bag->set('set-cookie', 'foo=bar');
-        $this->assertEquals(array(new Cookie('foo', 'bar', 0, '/', null, false, true, true)), $bag->getCookies());
+        $this->assertEquals(array(new Cookie('foo', 'bar', 0, '/', null, false, false, true)), $bag->getCookies());
 
         $bag->set('set-cookie', 'foo2=bar2', false);
         $this->assertEquals(array(
-            new Cookie('foo', 'bar', 0, '/', null, false, true, true),
-            new Cookie('foo2', 'bar2', 0, '/', null, false, true, true),
+            new Cookie('foo', 'bar', 0, '/', null, false, false, true),
+            new Cookie('foo2', 'bar2', 0, '/', null, false, false, true),
         ), $bag->getCookies());
 
         $bag->remove('set-cookie');

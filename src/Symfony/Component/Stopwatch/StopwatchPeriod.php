@@ -29,10 +29,10 @@ class StopwatchPeriod
      * @param int|float $end           The relative time of the end of the period (in milliseconds)
      * @param bool      $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct($start, $end)
+    public function __construct($start, $end, /* bool */ $morePrecision = false)
     {
-        $this->start = $start;
-        $this->end = $end;
+        $this->start = $morePrecision ? $start : (int) $start;
+        $this->end = $morePrecision ? $end : (int) $end;
         $this->memory = memory_get_usage(true);
     }
 
@@ -41,13 +41,9 @@ class StopwatchPeriod
      *
      * @return int|float The time (in milliseconds)
      */
-    public function getStartTime(/*bool $morePrecision = false*/)
+    public function getStartTime()
     {
-        if (func_num_args() > 0 && true === func_get_arg(0)) {
-            return $this->start;
-        }
-
-        return (int) $this->start;
+        return $this->start;
     }
 
     /**
@@ -55,13 +51,9 @@ class StopwatchPeriod
      *
      * @return int|float The time (in milliseconds)
      */
-    public function getEndTime(/*bool $morePrecision = false*/)
+    public function getEndTime()
     {
-        if (func_num_args() > 0 && true === func_get_arg(0)) {
-            return $this->end;
-        }
-
-        return (int) $this->end;
+        return $this->end;
     }
 
     /**
@@ -69,15 +61,9 @@ class StopwatchPeriod
      *
      * @return int|float The period duration (in milliseconds)
      */
-    public function getDuration(/*bool $morePrecision = false*/)
+    public function getDuration()
     {
-        $duration = $this->end - $this->start;
-
-        if (func_num_args() > 0 && true === func_get_arg(0)) {
-            return $duration;
-        }
-
-        return (int) $duration;
+        return $this->end - $this->start;
     }
 
     /**

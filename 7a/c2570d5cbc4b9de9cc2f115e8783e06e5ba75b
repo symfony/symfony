@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T06:53:10Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by mbabker at 2017-07-05T14:57:12Z
+
+FWIW I spent a little bit yesterday trying to figure out a way to get this failing test to work (https://github.com/mbabker/symfony/commit/fde02c6c5832da44e56d9b5d10f079c8f3b08e9a and https://github.com/mbabker/symfony/commit/0e8798692791c881b486a1a7df680337d95edc76 being failed solutions, actually they caused PHP 5.6 to start erroring on [my Travis builds](https://travis-ci.org/mbabker/symfony/builds)).  The only other option I can come up with right now is to just drop it, I don't know what's triggering a parse error but it clearly isn't happening with the stacking gone.

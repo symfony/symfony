@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2017-07-06T09:05:42Z
+
+Why exclude TwigBundle and WebProfilerBundle?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-07-06T09:06:37Z
+
+Nvm, meant to be optional apparently.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-06T09:11:08Z
+
+@Tobion TwigBundle and WebProfilerBundle are used by Silex without the Symfony container.

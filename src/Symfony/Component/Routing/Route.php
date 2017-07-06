@@ -149,14 +149,15 @@ class Route implements \Serializable
      * This method implements a fluent interface.
      *
      * @param string $pattern The path pattern
+     * @param bool   $trim    whether or not to trim and format the $pattern.
      *
      * @return $this
      */
-    public function setPath($pattern)
+    public function setPath($pattern, $trim = true)
     {
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
-        $this->path = '/'.ltrim(trim($pattern), '/');
+        $this->path = $trim ? '/'.ltrim(trim($pattern), '/') : $pattern;
         $this->compiled = null;
 
         return $this;

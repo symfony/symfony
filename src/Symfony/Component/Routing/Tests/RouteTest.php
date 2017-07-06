@@ -255,4 +255,17 @@ class RouteTest extends TestCase
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
     }
+
+    /**
+     * Tests that the setPath trim flag can be changed to allow non-trimming
+     * of routes.
+     */
+    public function testSetPathTrimFlag()
+    {
+        $route = new Route('/');
+        $path = ' path ';
+        $route->setPath($path, false);
+
+        $this->assertEquals($path, $route->getPath());
+    }
 }

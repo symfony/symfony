@@ -652,7 +652,7 @@ class FrameworkExtension extends Extension
         $loader->load('debug_prod.xml');
 
         if (class_exists(Stopwatch::class)) {
-            $container->register('debug.stopwatch', Stopwatch::class);
+            $container->register('debug.stopwatch', Stopwatch::class)->addArgument('true');
             $container->setAlias(Stopwatch::class, 'debug.stopwatch');
         }
 

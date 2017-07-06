@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-07T13:48:44Z
+
+As this is a new feature please rebase this on the master and change the pull-request target. Also this is missing some tests.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-04-07T13:53:49Z
+
+@sstok , thanks for your comment. PR target is changed to master.
+
+as for tests - I'm waiting for implementation review/approval. if it's done correctly I will add missing tests
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-04-07T15:19:48Z
+
+I'd like to ask if this is something that browsers do contrary to the standard ... or if this is the behavior proposed by the related standard. That way we'll know if this is a new feature or a bug. Thanks!
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-04-08T18:09:30Z
+
+@javiereguiluz , maybe we can check this document: https://www.w3.org/TR/html5/browsers.html#history
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-04-09T09:05:37Z
+
+Assuming the BrowserKit client should conform to that standard it's a bug, as [`history.back()`](https://www.w3.org/TR/html5/browsers.html#history) is defined to:
+
+> Goes back one step in the joint session history.
+>
+> If there is no previous page, does nothing.
+
+[Joint session history](https://www.w3.org/TR/html5/browsers.html#joint-session-history) is defined as (emphasis moved):
+
+> The joint session history of a top-level browsing context is the union of all the session histories of all browsing contexts of **all the fully active Document objects that share that top-level browsing context**, with all the entries that are current entries in their respective session histories removed except for the current entry of the joint session history.
+
+As a redirect is no fully active Document object navigation should bypass it, hence it's a bug.
+
+But also a BC breaking bug as there may be tons of tests out there explicitly going back twice in history to circumvent this behavior.
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-04-09T11:10:07Z
+
+@curry684 , thanks for you findings! Sine this is a bugfix should I rebase this PR to 2.7 branch?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-09T14:23:03Z
+
+As it might break existing tests, I think this needs to be merged in master, even if this is a bug fix.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-04-09T15:07:29Z
+
+Given the possibly severe BC breaks I'd also recommend considering this a functionality change, hence master.
+
+---------------------------------------------------------------------------
+
+by e-moe at 2017-04-10T07:43:16Z
+
+Tests and docs added, comments applied.
+
+Also, I changed `spl_object_hash` to `serialize` due to `clone` usage in History object: hashes was new all the time (see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/BrowserKit/History.php#L68)
+
+---------------------------------------------------------------------------
+
+by willemstuursma at 2017-06-06T13:49:36Z
+
+Anything I can do to make this go forward?

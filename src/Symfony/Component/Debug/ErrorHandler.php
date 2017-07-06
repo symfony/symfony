@@ -414,7 +414,7 @@ class ErrorHandler
                 $errorAsException = self::$silencedErrorCache[$message];
                 ++$errorAsException->count;
             } else {
-                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $type, $file, $line, false) : array();
+                $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3), $type, $file, $line, false) : array();
                 $errorAsException = new SilencedErrorContext($type, $file, $line, $lightTrace);
             }
 

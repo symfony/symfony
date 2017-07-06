@@ -12,9 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -51,16 +52,15 @@ class RouterDebugCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $application = new Application();
+        $application = new Application($this->getKernel());
 
         $command = new RouterDebugCommand();
-        $command->setContainer($this->getContainer());
         $application->add($command);
 
         return new CommandTester($application->find('debug:router'));
     }
 
-    private function getContainer()
+    private function getKernel()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -82,14 +82,25 @@ class RouterDebugCommandTest extends TestCase
             ->with('router')
             ->will($this->returnValue(true))
         ;
-
         $container
+            ->expects($this->any())
             ->method('get')
-            ->will($this->returnValueMap(array(
-                array('router', 1, $router),
-                array('controller_name_converter', 1, $loader),
-            )));
+            ->with('router')
+            ->willReturn($router)
+        ;
 
-        return $container;
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->expects($this->any())
+            ->method('getContainer')
+            ->willReturn($container)
+        ;
+        $kernel
+            ->expects($this->once())
+            ->method('getBundles')
+            ->willReturn(array())
+        ;
+
+        return $kernel;
     }
 }

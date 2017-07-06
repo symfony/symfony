@@ -121,7 +121,9 @@ EOT
                 continue;
             }
 
-            $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+            $assetDir = preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+            $targetDir = $bundlesDir.$assetDir;
+            $validAssetDirs[] = $assetDir;
 
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $message = sprintf("%s\n-> %s", $bundle->getName(), $targetDir);
@@ -153,14 +155,10 @@ EOT
                 $exitCode = 1;
                 $rows[] = array(sprintf('<fg=red;options=bold>%s</>', '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage());
             }
-            $validAssetDirs[] = $targetDir;
         }
         // remove the assets of the bundles that no longer exist
-        foreach (new \FilesystemIterator($bundlesDir) as $dir) {
-            if (!in_array($dir, $validAssetDirs)) {
-                $this->filesystem->remove($dir);
-            }
-        }
+        $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
+        $this->filesystem->remove($dirsToRemove);
 
         $io->table(array('', 'Bundle', 'Method / Error'), $rows);
 

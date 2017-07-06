@@ -46,7 +46,7 @@ class Cookie
             'path' => '/',
             'domain' => null,
             'secure' => false,
-            'httponly' => true,
+            'httponly' => false,
             'raw' => !$decode,
             'samesite' => null,
         );

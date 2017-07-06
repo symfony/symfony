@@ -6,6 +6,11 @@ DependencyInjection
 
  * Top-level anonymous services in XML are deprecated and will throw an exception in Symfony 4.0.
 
+Debug
+-----
+
+ * Support for stacked errors in the `ErrorHandler` is deprecated and will be removed in Symfony 4.0.
+
 Finder
 ------
 

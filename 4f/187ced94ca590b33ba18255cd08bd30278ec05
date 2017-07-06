@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-31T12:30:43Z
+
+The other methods that use `isFromTrustedProxy` don't have the "Original" keyword in their name. What about just `getProtocolVersion()`?
+Is there anything else that could be relevant in the "Via" header? Do you have any link documenting its value?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-02T13:59:28Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-11T11:51:03Z
+
+Security issue: why should "Via" be trusted?
+Any RFC that defines the semantic of the header?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-11T12:54:10Z
+
+@nicolas-grekas https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.45
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2017-02-13T08:03:15Z
+
+@nicolas-grekas I used the term 'original' to distinguish the request that the user originally made (to some proxy) with the one that PHP has received. Happy to rename if there's a more suitable term.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-13T11:58:37Z
+
+We don't make any distinction for "original" host/ip/proto/port. I don't see why this shouldn't be the same for the version of the proto.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2017-02-13T16:11:44Z
+
+The response should be the protocol version used by the proxy, not the original client, so they need to be kept separate.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-13T16:15:59Z
+
+Maybe can we add a method to parse the `Via` header, with a shortcut to only retrieve the value of the first (original) protocol and version used?
+
+It may be interesting to know the original protocol version (for instance to add `Link` HTTP headers depending of the client capabilities).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-14T12:50:01Z
+
+> The response should be the protocol version used by the proxy, not the original client, so they need to be kept separate.
+
+that's exactly my point yes: getHost, isSecure, getPort all return the info as used by the client - not the proxy. This should be the same here to me.
+If one wants to get access to the protocol used by the proxy, just call `$request->server->get('SERVER_PROTOCOL')`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T19:15:53Z
+
+:-1: Your application is talking to the proxy, so we should return the HTTP protocol of the proxy, not the one used between the client and the proxy. I understand the use case, but that should be done in your application, not in Symfony.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2017-03-28T07:23:36Z
+
+The protocol version isn't being changed in the response.

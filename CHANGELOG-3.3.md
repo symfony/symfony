@@ -7,6 +7,14 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.4 (2017-07-05)
+
+ * bug #23413 [VarDumper] Reduce size of serialized Data objects (nicolas-grekas)
+ * bug #23385 [DoctrineBridge] Fix resetting entity managers with case sensitive id (chalasr)
+ * bug #23390 [Cache] Handle APCu failures gracefully (nicolas-grekas)
+ * bug #23371 [FrameworkBundle] 3.3: Don't get() private services from debug:router (ogizanagi)
+ * bug #23378 [FrameworkBundle] Do not remove files from assets dir (1ed)
+
 * 3.3.3 (2017-07-04)
 
  * bug #23366 [FrameworkBundle] Don't get() private services from debug:router (chalasr)

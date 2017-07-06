@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-07-05T20:21:49Z
+
+The `CacheItemPoolInterface` typehint should be added when merging in master. Or I can open another PR for that if you prefer.

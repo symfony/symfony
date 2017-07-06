@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by jordscream at 2017-06-30T14:43:29Z
+
+@Aliance , I stole you this mini practice to exercise my Symfony PR ;-) (I'm a newbie)
+I will be very interresting if you can comment this PR
+Note: For unit test, I did not want to change the existing unit test to add has test method. I prefered to create new unit test with new class
+
+---------------------------------------------------------------------------
+
+by jordscream at 2017-07-05T19:49:43Z
+
+@dunglas , you can check :-)

@@ -402,7 +402,7 @@ HttpKernel
 Ldap
 ----
 
- * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`
+ * The `RenameEntryInterface` has been removed, and merged with `EntryManagerInterface`
 
 Process
 -------

@@ -7,6 +7,11 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.11 (2017-07-05)
+
+ * bug #23390 [Cache] Handle APCu failures gracefully (nicolas-grekas)
+ * bug #23378 [FrameworkBundle] Do not remove files from assets dir (1ed)
+
 * 3.2.10 (2017-07-04)
 
  * bug #23366 [FrameworkBundle] Don't get() private services from debug:router (chalasr)

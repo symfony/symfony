@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-22T09:16:33Z
+
+would be great to check if the Link URL resolution in DomCrawler suffers from the same issue
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2017-06-22T09:26:34Z
+
+@stoff Looks good there but seems we need to handle `#` also correctly in the absolute_url. https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/AbstractUriElement.php#L100
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2017-06-22T11:32:16Z
+
+will change the base to 2.7 think thats the oldest supported version?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2017-06-22T15:55:52Z
+
+I'm not sure why php7 keeps failing on travis
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-07-05T22:08:27Z
+
+👍

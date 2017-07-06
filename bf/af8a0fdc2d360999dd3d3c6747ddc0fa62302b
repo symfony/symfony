@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-03T12:02:19Z
+
+The fixed ticket would not be fixed actually, HttpKernel passes are still missing.
+
+---------------------------------------------------------------------------
+
+by lepiaf at 2017-05-03T12:17:08Z
+
+@chalasr I'm currently working in another pr to move HttpKernel passes
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-03T12:34:00Z
+
+@lepiaf thanks for working on this.
+
+---------------------------------------------------------------------------
+
+by lepiaf at 2017-05-05T11:37:32Z
+
+I did all requested changes. I will add new test for moved class.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-27T07:21:17Z
+
+@lepiaf `3.3` and `3.4` branches are a thing now. Can you rebase here?
+
+---------------------------------------------------------------------------
+
+by lepiaf at 2017-05-27T10:08:03Z
+
+tests are failing but I don't know why. Is `symfony/var-dumper` missing in composer for frameworkbundle ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-21T12:35:01Z
+
+ping deciders

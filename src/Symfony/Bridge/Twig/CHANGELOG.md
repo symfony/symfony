@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `TwigRendererInterface` interface
+ * removed the `TwigRendererEngineInterface` interface
+ * required an Twig Environment as the second argument for the `TwigRendererEngine` constructor
+ * removed the `renderer` property of the `FormExtension` class
+ 
 3.3.0
 -----
 

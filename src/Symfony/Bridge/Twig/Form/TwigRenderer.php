@@ -12,31 +12,11 @@
 namespace Symfony\Bridge\Twig\Form;
 
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Twig\Environment;
+use Symfony\Component\Form\FormRendererInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TwigRenderer extends FormRenderer implements TwigRendererInterface
+class TwigRenderer extends FormRenderer implements FormRendererInterface
 {
-    /**
-     * @var TwigRendererEngineInterface
-     */
-    private $engine;
-
-    public function __construct(TwigRendererEngineInterface $engine, CsrfTokenManagerInterface $csrfTokenManager = null)
-    {
-        parent::__construct($engine, $csrfTokenManager);
-
-        $this->engine = $engine;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnvironment(Environment $environment)
-    {
-        $this->engine->setEnvironment($environment);
-    }
 }

@@ -12,8 +12,10 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\Factory\SomePostAuthenticationFactory;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -119,7 +121,34 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
-    protected function getRawContainer()
+    public function testAddPostAuthenticationFirewallListener()
+    {
+        $container = $this->getRawContainer(array(new SomePostAuthenticationFactory()));
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'anonymous' => null,
+                    'some_post_authentication_plugin' => null,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition(SomePostAuthenticationFactory::DUMMY_ID));
+    }
+
+    /**
+     * @param SecurityFactoryInterface[] $factories
+     *
+     * @return ContainerBuilder
+     */
+    protected function getRawContainer(array $factories = array())
     {
         $container = new ContainerBuilder();
         $security = new SecurityExtension();
@@ -127,6 +156,10 @@ class SecurityExtensionTest extends TestCase
 
         $bundle = new SecurityBundle();
         $bundle->build($container);
+
+        foreach ($factories as $factory) {
+            $security->addSecurityListenerFactory($factory);
+        }
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());

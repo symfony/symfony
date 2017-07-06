@@ -28,6 +28,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFor
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\LdapFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AnonymousAuthenticationFactory;
 
 /**
  * Bundle.
@@ -53,6 +54,7 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new SimplePreAuthenticationFactory());
         $extension->addSecurityListenerFactory(new SimpleFormFactory());
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
+        $extension->addSecurityListenerFactory(new AnonymousAuthenticationFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());

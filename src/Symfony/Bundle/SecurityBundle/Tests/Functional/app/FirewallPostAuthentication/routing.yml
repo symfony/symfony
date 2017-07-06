@@ -1,0 +1,3 @@
+secure_resource:
+  path: /secure
+  defaults:  { _controller: FirewallPostAuthenticationBundle:Secure:index }

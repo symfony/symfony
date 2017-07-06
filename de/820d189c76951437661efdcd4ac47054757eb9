@@ -1,0 +1,205 @@
+---------------------------------------------------------------------------
+
+by syrm at 2017-03-31T09:32:51Z
+
+Exceptions are a BC Break.
+Imagine, i using an object which implements NormalizerInterface, i never implemented a try catch, because interface don't throw exception.
+
+Some implementations of the interface may have returned a null or empty value because exceptions are not allowed. Suddenly a new version allow exception in interface, so lots of implementations can change their mind and throw an exception. That break my code.
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-03-31T12:15:54Z
+
+This PR doesn't actually break backward compatibility, it just fix the PHPDoc.
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-03-31T12:54:32Z
+
+You fix the PHPDoc on an interface, so my comment is valid.
+You add a new output (exception).
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-02T17:26:19Z
+
+A user shouldn't catch LogicExceptions, so you should not need to document them: they are sign that you need to fix something in your code (usually configuration related).
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-02T17:44:11Z
+
+Arguments is in interface ?
+Yes.
+Because you must can call any implementation of interface without change your code.
+
+Return is in interface ?
+Yes.
+Because you must can get result of any implementation of interface without change your code.
+
+We have put return in PHPDoc ?
+Yes.
+Because before PHP7 it's impossible to know the return of interface without PHPDoc
+With PHP7 you can ommit this because you can put the return in the code of interface.
+
+Why exceptions must be un PHPDoc for an interface so ?
+Because :
+You can't put them in the code (like Java).
+You should manage any exception throw pas any implementation of interface without change your code.
+But :
+An implementation have no obligation to throw any exception that was in interface
+But :
+An implementation must not throw any exception not declared in interface, that's gonna break code.
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-02T18:08:43Z
+
+@theofidry that's not always true.
+Imagine you're on a website and on the right column you have secondary information. When the database for this right column is temporary down you get the exception "DatabaseDown" you still want render the page and you put for the right column "Not available" instead of making an error 500. But a new implementation throw sometimes "DatabaseOffline" you code don't know that, that was not on interface and you get suddenly an error 500.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-02T18:54:08Z
+
+@syrm which is why `PDOException` is a `RuntimeException`, not a `LogicException`: failure to connect to a database may be an acceptable scenario for which your application should not crash.
+
+It's not an absolute rule, but if you were to compare it to Java that's the would somewhat translate to a compilation error and runtime errors. It's just that in PHP we don't have this compilation step.
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-02T20:49:58Z
+
+DatabaseOffline can be a LogicException, you don't know.
+Look here : https://www.reddit.com/r/PHP/comments/63119v/exception_should_always_be_documented_with_phpdoc/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T08:13:36Z
+
+To me, we just need a single line in the phpdoc, using a `use` statement of course:
+`@throws \Symfony\Component\Serializer\Exception\ExceptionInterface`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T08:14:09Z
+
+Should be applied on 2.7 also.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-03T11:15:24Z
+
+If you are going to add them then you are missing a few places:
+
+- src/Symfony/Component/Serializer/Encoder/DecoderInterface.php
+- src/Symfony/Component/Serializer/Encoder/EncoderInterface.php
+- src/Symfony/Component/Serializer/Normalizer/DenormalizableInterface.php
+- src/Symfony/Component/Serializer/Normalizer/NormalizableInterface.php
+- src/Symfony/Component/Serializer/SerializerInterface.php
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-03T21:20:46Z
+
++1 for @nicolas-grekas' solution
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-03T22:47:49Z
+
+What would be the benefit to add those generic exceptions? I'm 👎
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-04T09:37:41Z
+
+If you don't want a generic exception you should rewrite the existing exception because they're very specialized :
+
+```diff
++     * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
++     * @throws \Symfony\Component\Serializer\Exception\ExtraAttributesException
++     * @throws \Symfony\Component\Serializer\Exception\LogicException
++     * @throws \Symfony\Component\Serializer\Exception\RuntimeException
+```
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-04-09T11:15:12Z
+
+@nicolas-grekas disagree. Most of the classes I modify doesn't even exist in 2.7. I also disagree with adding a standard exception in phpdoc because to me the PHPDoc would be useless (and this PR would also be). You can choose to just close it if you think so.
+
+I fixed the FQCN, and added a note for cases when exceptions are throw.
+
+_Please notice that there is a problem of coherence of throwed exceptions..._
+
+---------------------------------------------------------------------------
+
+by NoiseByNorthwest at 2017-04-21T13:46:40Z
+
+@syrm unrecoverable exceptions (i.e. without code patch) like Runtime|Logic hierarchies or implementation specific exceptions should not be part of the interface IMHO
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-21T13:49:02Z
+
+It should @NoiseByNorthwest INPUT/OUTPUT is the part of contract.
+
+---------------------------------------------------------------------------
+
+by NoiseByNorthwest at 2017-04-21T14:03:20Z
+
+@syrm have fun with all of your interfaces bloated with irrelevant Runtime|Logic like exceptions....
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-21T14:11:46Z
+
+@NoiseByNorthwest so interface are bad written and we should continue like this ?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-21T14:57:21Z
+
+@syrm what's the point of documenting an exception that is only here to tell you you didn't configure something properly? Your application should not have to deal with them, only you. If you have an edge case where you need that, they you can always catch `\Exception` or `\Throwable` and do what you want. As it would probably be something very specific it's likely to be dependent of the implementation, hence you check the actual code behind not a contract that anyone can violate.
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-21T15:27:22Z
+
+You know the contract of an interface can't be incomplete because you think there is not interest to have a complete contract.
+
+And as a developer I won't put a try catch \Exception everywhere because developer are too lazy to describe the contract of interface fully.
+
+Then, a wrong configuration can happen only on production and when it's an optional part a webpage you don't want crash the full page.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-04-21T15:53:40Z
+
+It's not a lack of interest in a complete contract, it's that it's different contracts for different targets. A `\RuntimeException` is for the application, which may handle it whereas `\LogicException` is for you as a developer. Ensuring that you don't get a `\LogicException` when running your application in production is your responsibility.
+
+So it's not laziness in the contract description, it's you trying to tweak the contract to use it differently than it's meant to be. You're free to add yourself more work and ensure to have contracts which can be tweaked that way, but don't blame people if they want to be more pragmatic and not take care of this.
+
+But if you're not sensible to those arguments let's change the angle and see it the other way around: bring a case where adding those elements to the contract are meaningful. If there is a point, I'm sure no one here will disagree with adding those exceptions to the doc. It's just that as it is now it doesn't provide anything than additional noise and/or confusion.
+
+---------------------------------------------------------------------------
+
+by syrm at 2017-04-21T16:02:16Z
+
+RuntimeException is also for developer. Throw new RuntimeException("can't connect to database myprivatedatabase"). When you don't catch this sensitive information can be shown on you page. Every exception is for developer because it can crash your application when you don't handle it.
+
+Add these information don't add additional noise or confusion. And when it add noise or confusion that mean this exception is useless or not specific. So you should rethink your interface to remove these exception or rewrite them.
+
+---------------------------------------------------------------------------
+
+by NoiseByNorthwest at 2017-04-21T17:27:13Z
+
+Here is the problem, you dont get RuntimeException semantic. A database connection error is not a RuntimeException because its origin is not necessarily a program flaw.
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-04-25T05:51:25Z
+
+@xabbuh 👍

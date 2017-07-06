@@ -13,7 +13,6 @@ namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\DebugClassLoader;
-use Symfony\Component\Debug\ErrorHandler;
 
 class DebugClassLoaderTest extends TestCase
 {
@@ -57,38 +56,6 @@ class DebugClassLoaderTest extends TestCase
         }
 
         $this->fail('DebugClassLoader did not register');
-    }
-
-    public function testStacking()
-    {
-        // the ContextErrorException must not be loaded to test the workaround
-        // for https://bugs.php.net/65322.
-        if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
-            $this->markTestSkipped('The ContextErrorException class is already loaded.');
-        }
-
-        ErrorHandler::register();
-
-        try {
-            // Trigger autoloading + E_STRICT at compile time
-            // which in turn triggers $errorHandler->handle()
-            // that again triggers autoloading for ContextErrorException.
-            // Error stacking works around the bug above and everything is fine.
-
-            eval('
-                namespace '.__NAMESPACE__.';
-                class ChildTestingStacking extends TestingStacking { function foo($bar) {} }
-            ');
-            $this->fail('ContextErrorException expected');
-        } catch (\ErrorException $exception) {
-            // if an exception is thrown, the test passed
-            $this->assertStringStartsWith(__FILE__, $exception->getFile());
-            $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
-            $this->assertEquals(E_WARNING, $exception->getSeverity());
-        } finally {
-            restore_error_handler();
-            restore_exception_handler();
-        }
     }
 
     /**

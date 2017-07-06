@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
@@ -213,13 +212,13 @@ class NativeSessionStorage implements SessionStorageInterface
     {
         // Register custom error handler to catch a possible failure warning during session write
         set_error_handler(function ($errno, $errstr, $errfile, $errline, $errcontext) {
-            throw new ContextErrorException($errstr, $errno, E_WARNING, $errfile, $errline, $errcontext);
+            throw new \ErrorException($errstr, $errno, E_WARNING, $errfile, $errline, $errcontext);
         }, E_WARNING);
 
         try {
             session_write_close();
             restore_error_handler();
-        } catch (ContextErrorException $e) {
+        } catch (\ErrorException $e) {
             // The default PHP error message is not very helpful, as it does not give any information on the current save handler.
             // Therefore, we catch this error and trigger a warning with a better error message
             $handler = $this->getSaveHandler();

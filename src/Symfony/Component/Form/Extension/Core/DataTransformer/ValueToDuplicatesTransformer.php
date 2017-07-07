@@ -66,12 +66,12 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
         foreach ($this->keys as $key) {
             if (isset($array[$key]) && '' !== $array[$key] && false !== $array[$key] && array() !== $array[$key]) {
                 if (is_object($array[$key]) && is_object($result)) {
-                    if ((string)$array[$key] !== (string)$result) {
+                    if ((string) $array[$key] !== (string) $result) {
                         throw new TransformationFailedException(
                             'All values in the array should be the same'
                         );
                     }
-                } else if ($array[$key] !== $result) {
+                } elseif ($array[$key] !== $result) {
                     throw new TransformationFailedException(
                         'All values in the array should be the same'
                     );

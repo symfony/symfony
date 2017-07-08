@@ -28,8 +28,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * Parameter keys are case insensitive.
  *
- * A service id can contain letters, digits, underscores, and dots.
- *
  * The container can have three possible behaviors when a service does not exist:
  *
  *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception (the default)

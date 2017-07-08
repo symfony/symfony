@@ -15,12 +15,37 @@ use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ * @author Rob Frawley 2nd <rmf@src.run>
  *
  * @internal
  */
 trait FilesystemTrait
 {
     use FilesystemCommonTrait;
+
+    /**
+     * @return bool
+     */
+    public function prune()
+    {
+        $time = time();
+        $pruned = true;
+
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+            if (!$h = @fopen($file, 'rb')) {
+                continue;
+            }
+
+            if ($time >= (int) $expiresAt = fgets($h)) {
+                fclose($h);
+                $pruned = isset($expiresAt[0]) && @unlink($file) && !file_exists($file) && $pruned;
+            } else {
+                fclose($h);
+            }
+        }
+
+        return $pruned;
+    }
 
     /**
      * {@inheritdoc}

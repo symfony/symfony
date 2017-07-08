@@ -12,9 +12,19 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Cache\IntegrationTests\SimpleCacheTest;
+use Symfony\Component\Cache\PruneableInterface;
 
 abstract class CacheTestCase extends SimpleCacheTest
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        if (!array_key_exists('testPrune', $this->skippedTests) && !$this->createSimpleCache() instanceof PruneableInterface) {
+            $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
+        }
+    }
+
     public static function validKeys()
     {
         if (defined('HHVM_VERSION')) {
@@ -58,6 +68,48 @@ abstract class CacheTestCase extends SimpleCacheTest
         foreach ($cache->getMultiple(array('foo')) as $value) {
         }
         $this->assertNull($value);
+    }
+
+    public function testPrune()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        if (!method_exists($this, 'isPruned')) {
+            $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
+        }
+
+        $cache = $this->createSimpleCache();
+
+        $cache->set('foo', 'foo-val');
+        $cache->set('bar', 'bar-val', new \DateInterval('PT20S'));
+        $cache->set('baz', 'baz-val', new \DateInterval('PT40S'));
+        $cache->set('qux', 'qux-val', new \DateInterval('PT80S'));
+
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertFalse($this->isPruned($cache, 'bar'));
+        $this->assertFalse($this->isPruned($cache, 'baz'));
+        $this->assertFalse($this->isPruned($cache, 'qux'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'bar'));
+        $this->assertFalse($this->isPruned($cache, 'baz'));
+        $this->assertFalse($this->isPruned($cache, 'qux'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'baz'));
+        $this->assertFalse($this->isPruned($cache, 'qux'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'qux'));
     }
 }
 

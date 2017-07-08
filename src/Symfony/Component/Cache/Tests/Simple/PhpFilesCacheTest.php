@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\PhpFilesCache;
 
 /**
@@ -29,5 +30,13 @@ class PhpFilesCacheTest extends CacheTestCase
         }
 
         return new PhpFilesCache('sf-cache');
+    }
+
+    protected function isPruned(CacheInterface $cache, $name)
+    {
+        $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
+        $getFileMethod->setAccessible(true);
+
+        return !file_exists($getFileMethod->invoke($cache, $name));
     }
 }

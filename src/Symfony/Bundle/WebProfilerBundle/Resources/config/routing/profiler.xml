@@ -16,10 +16,6 @@
         <default key="_controller">web_profiler.controller.profiler:searchBarAction</default>
     </route>
 
-    <route id="_profiler_info" path="/info/{about}">
-        <default key="_controller">web_profiler.controller.profiler:infoAction</default>
-    </route>
-
     <route id="_profiler_phpinfo" path="/phpinfo">
         <default key="_controller">web_profiler.controller.profiler:phpinfoAction</default>
     </route>

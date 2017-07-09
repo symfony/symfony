@@ -150,6 +150,26 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('name', $options['autoescape']);
     }
 
+    /**
+     * @dataProvider getFormats
+     */
+    public function testLoadCustomDateFormats($fileFormat)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'formats', $fileFormat);
+        $this->compileContainer($container);
+
+        $environmentConfigurator = $container->getDefinition('twig.configurator.environment');
+
+        $this->assertSame('Y-m-d', $environmentConfigurator->getArgument(0));
+        $this->assertSame('%d', $environmentConfigurator->getArgument(1));
+        $this->assertSame('Europe/Berlin', $environmentConfigurator->getArgument(2));
+        $this->assertSame(2, $environmentConfigurator->getArgument(3));
+        $this->assertSame(',', $environmentConfigurator->getArgument(4));
+        $this->assertSame('.', $environmentConfigurator->getArgument(5));
+    }
+
     public function testGlobalsWithDifferentTypesAndValues()
     {
         $globals = array(

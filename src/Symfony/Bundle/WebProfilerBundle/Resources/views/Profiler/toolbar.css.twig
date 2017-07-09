@@ -527,3 +527,11 @@
     padding: 5px 0;
     margin-right: 10px;
 }
+
+/***** Media query print: Do not print the Toolbar. *****/
+@media print {
+    .sf-toolbar, .sf-error-toolbar {
+        display: none;
+        visibility: hidden;
+    }
+}

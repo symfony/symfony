@@ -71,16 +71,20 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function set($id, $translation, $domain = 'messages')
+    public function set($id, $translation, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
+
         $this->add(array($id => $translation), $domain);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function has($id, $domain = 'messages')
+    public function has($id, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
+
         if (isset($this->messages[$domain][$id])) {
             return true;
         }
@@ -95,16 +99,20 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function defines($id, $domain = 'messages')
+    public function defines($id, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
+
         return isset($this->messages[$domain][$id]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($id, $domain = 'messages')
+    public function get($id, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
+
         if (isset($this->messages[$domain][$id])) {
             return $this->messages[$domain][$id];
         }
@@ -119,8 +127,9 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function replace($messages, $domain = 'messages')
+    public function replace($messages, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
         $this->messages[$domain] = array();
 
         $this->add($messages, $domain);
@@ -129,8 +138,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function add($messages, $domain = 'messages')
+    public function add($messages, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
+
         if (!isset($this->messages[$domain])) {
             $this->messages[$domain] = $messages;
         } else {
@@ -220,11 +231,13 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($key = '', $domain = 'messages')
+    public function getMetadata($key = '', $domain = null)
     {
         if ('' == $domain) {
             return $this->metadata;
         }
+
+        $domain = $this->getDefaultDomain($domain);
 
         if (isset($this->metadata[$domain])) {
             if ('' == $key) {
@@ -240,19 +253,26 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function setMetadata($key, $value, $domain = 'messages')
+    public function setMetadata($key, $value, $domain = null)
     {
+        $domain = $this->getDefaultDomain($domain);
         $this->metadata[$domain][$key] = $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteMetadata($key = '', $domain = 'messages')
+    public function deleteMetadata($key = '', $domain = null)
     {
         if ('' == $domain) {
             $this->metadata = array();
-        } elseif ('' == $key) {
+
+            return;
+        }
+
+        $domain = $this->getDefaultDomain($domain);
+
+        if ('' == $key) {
             unset($this->metadata[$domain]);
         } else {
             unset($this->metadata[$domain][$key]);
@@ -271,5 +291,17 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
                 $this->setMetadata($key, $value, $domain);
             }
         }
+    }
+
+    /**
+     * Get default domain.
+     *
+     * @param string $domain
+     *
+     * @return string
+     */
+    private function getDefaultDomain($domain)
+    {
+        return $domain ?? TranslatorInterface::DEFAULT_DOMAIN;
     }
 }

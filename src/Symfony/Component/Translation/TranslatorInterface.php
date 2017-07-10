@@ -20,6 +20,8 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
  */
 interface TranslatorInterface
 {
+    public const DEFAULT_DOMAIN = 'messages';
+
     /**
      * Translates the given message.
      *

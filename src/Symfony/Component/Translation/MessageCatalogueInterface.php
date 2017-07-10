@@ -39,7 +39,7 @@ interface MessageCatalogueInterface
      *
      * If $domain is null, it returns all messages.
      *
-     * @param string $domain The domain name
+     * @param string|null $domain The domain name
      *
      * @return array An array of messages
      */
@@ -48,57 +48,57 @@ interface MessageCatalogueInterface
     /**
      * Sets a message translation.
      *
-     * @param string $id          The message id
-     * @param string $translation The messages translation
-     * @param string $domain      The domain name
+     * @param string      $id          The message id
+     * @param string      $translation The messages translation
+     * @param string|null $domain      The domain name
      */
-    public function set($id, $translation, $domain = 'messages');
+    public function set($id, $translation, $domain = null);
 
     /**
      * Checks if a message has a translation.
      *
-     * @param string $id     The message id
-     * @param string $domain The domain name
+     * @param string      $id     The message id
+     * @param string|null $domain The domain name
      *
      * @return bool true if the message has a translation, false otherwise
      */
-    public function has($id, $domain = 'messages');
+    public function has($id, $domain = null);
 
     /**
      * Checks if a message has a translation (it does not take into account the fallback mechanism).
      *
-     * @param string $id     The message id
-     * @param string $domain The domain name
+     * @param string      $id     The message id
+     * @param string|null $domain The domain name
      *
      * @return bool true if the message has a translation, false otherwise
      */
-    public function defines($id, $domain = 'messages');
+    public function defines($id, $domain = null);
 
     /**
      * Gets a message translation.
      *
-     * @param string $id     The message id
-     * @param string $domain The domain name
+     * @param string      $id     The message id
+     * @param string|null $domain The domain name
      *
      * @return string The message translation
      */
-    public function get($id, $domain = 'messages');
+    public function get($id, $domain = null);
 
     /**
      * Sets translations for a given domain.
      *
-     * @param array  $messages An array of translations
-     * @param string $domain   The domain name
+     * @param array       $messages An array of translations
+     * @param string|null $domain   The domain name
      */
-    public function replace($messages, $domain = 'messages');
+    public function replace($messages, $domain = null);
 
     /**
      * Adds translations for a given domain.
      *
-     * @param array  $messages An array of translations
-     * @param string $domain   The domain name
+     * @param array       $messages An array of translations
+     * @param string|null $domain   The domain name
      */
-    public function add($messages, $domain = 'messages');
+    public function add($messages, $domain = null);
 
     /**
      * Merges translations from the given Catalogue into the current one.

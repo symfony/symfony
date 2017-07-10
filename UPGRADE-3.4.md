@@ -77,6 +77,11 @@ SecurityBundle
 
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
 
+Translator
+----------
+
+ * Change default value to `$domain = null` in all method of `MessageCatalogueInterface`
+
 Validator
 ---------
 

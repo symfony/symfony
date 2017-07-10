@@ -11,6 +11,7 @@ framework:
             cache.baz:
                 adapter: cache.adapter.filesystem
                 default_lifetime: 7
+                namespace: qux
             cache.foobar:
                 adapter: cache.adapter.psr6
                 default_lifetime: 10

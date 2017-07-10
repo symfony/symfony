@@ -58,7 +58,7 @@ class Cookie
     public function __construct($name, $value, $expires = null, $path = null, $domain = '', $secure = false, $httponly = true, $encodedValue = false)
     {
         if ($encodedValue) {
-            $this->value = rawurldecode($value);
+            $this->value = urldecode($value);
             $this->rawValue = $value;
         } else {
             $this->value = $value;

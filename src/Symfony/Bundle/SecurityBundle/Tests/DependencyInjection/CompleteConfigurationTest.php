@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
@@ -57,10 +58,10 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertEquals(array(), array_diff($providers, $expectedProviders));
 
         // chain provider
-        $this->assertEquals(array(array(
+        $this->assertEquals(array(new IteratorArgument(array(
             new Reference('security.user.provider.concrete.service'),
             new Reference('security.user.provider.concrete.basic'),
-        )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
+        ))), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
     public function testFirewalls()

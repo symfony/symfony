@@ -1440,7 +1440,7 @@ EOF;
 
         $class = substr(str_replace('\\\\', '\\', $class), 1, -1);
 
-        return '\\' === substr($class, 0, 1) ? $class : '\\'.$class;
+        return 0 === strpos($class, '\\') ? $class : '\\'.$class;
     }
 
     /**

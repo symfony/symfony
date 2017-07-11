@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -70,7 +71,7 @@ class CachePoolPass implements CompilerPassInterface
             }
             $i = 0;
             foreach ($attributes as $attr) {
-                if (isset($tags[0][$attr])) {
+                if (isset($tags[0][$attr]) && ('namespace' !== $attr || ArrayAdapter::class !== $adapter->getClass())) {
                     $pool->replaceArgument($i++, $tags[0][$attr]);
                 }
                 unset($tags[0][$attr]);

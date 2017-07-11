@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-10T10:05:58Z
+
+Cookie in BrowserKit has the same issue isn't it?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-10T10:34:08Z
+
+@nicolas-grekas I've made that change too. However, when copying the `testToString()` test from HttpFoundation, I needed to fix all tests because the results are pretty different from the HttpFoundation tests. Are those differences expected?
+
+Examples:
+
+```php
+$cookie = new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);
+
+// in HttpFoundation
+(string) $cookie = 'foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; domain=.myfoodomain.com; path=/; secure; httponly'
+
+// in BrowserKit
+(string) $cookie = 'foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure; httponly'
+```
+
+```php
+$cookie = new Cookie('foo', 'bar', 0, '/', '');
+
+// in HttpFoundation
+(string) $cookie = 'foo=bar; path=/; httponly'
+
+// in BrowserKit
+(string) $cookie = 'foo=bar; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; httponly'
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-10T10:42:18Z
+
+@javiereguiluz your first example outputs the same cookie. Attributes are just given in a different order. But order is not meaningful.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-10T10:46:49Z
+
+@stof yes, the first example is the same, but with a different ordering. But I think it should be exactly the same. The attention a project pays to details like this says a lot about a project 😄

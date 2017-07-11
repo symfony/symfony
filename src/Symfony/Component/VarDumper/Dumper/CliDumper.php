@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Cursor;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * CliDumper dumps variables for command line output.
@@ -52,6 +53,26 @@ class CliDumper extends AbstractDumper
     );
 
     /**
+     * @var HtmlDumper
+     */
+    private $htmlDumper;
+
+    /**
+     * @var bool
+     */
+    private $htmlDumpEnabled;
+
+    /**
+     * @var string|null
+     */
+    private $htmlDumpDirectoryPath;
+
+    /**
+     * @var string|null
+     */
+    private $htmlDumpBaseUrl;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($output = null, $charset = null, $flags = 0)
@@ -72,6 +93,9 @@ class CliDumper extends AbstractDumper
                 'index' => '34',
             ));
         }
+
+        $this->htmlDumper = new HtmlDumper($output, $charset, $flags);
+        $this->htmlDumpEnabled = false;
     }
 
     /**
@@ -285,6 +309,91 @@ class CliDumper extends AbstractDumper
         $this->dumpEllipsis($cursor, $hasChild, $cut);
         $this->line .= Cursor::HASH_OBJECT === $type ? '}' : (Cursor::HASH_RESOURCE !== $type ? ']' : ($hasChild ? '}' : ''));
         $this->endValue($cursor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dump(Data $data, $output = null)
+    {
+        $result = parent::dump($data, $output);
+
+        if (!$this->htmlDumpEnabled) {
+            return $result;
+        }
+
+        // prevent infinite loop and segmentation fault because HtmlDumper extends CliDumper
+        if (CliDumper::class !== get_called_class()) {
+            return $result;
+        }
+
+        if (null === $this->htmlDumpDirectoryPath) {
+            throw new \RuntimeException('The directory path used to store html dumps was not set.');
+        }
+
+        if (!is_dir($this->htmlDumpDirectoryPath)) {
+            throw new \RuntimeException('The directory path used to store html dumps does not exist.');
+        }
+
+        if (null === $this->htmlDumpBaseUrl) {
+            throw new \RuntimeException('The base url used to view html dumps was not set.');
+        }
+
+        $dumpFilename = sprintf('%s.html', uniqid('dump_'));
+        if (false === file_put_contents(sprintf('%s/%s', $this->htmlDumpDirectoryPath, $dumpFilename), $this->htmlDumper->dump($data, true))) {
+            throw new \RuntimeException(sprintf('The html dump could not be saved in the "%s" directory path.', $this->htmlDumpDirectoryPath));
+        }
+
+        $this->line = sprintf("\n\033[38m%s\033[m", sprintf("HTML dump url :\n%s/%s\n", $this->htmlDumpBaseUrl, $dumpFilename));
+        parent::dumpLine(0);
+
+        return $result;
+    }
+
+    /**
+     * @param string|null $htmlDumpDirectoryPath
+     * @param string|null $htmlDumpBaseUrl
+     */
+    public function enableHtmlDump($htmlDumpDirectoryPath = null, $htmlDumpBaseUrl = null)
+    {
+        $this->htmlDumpEnabled = true;
+
+        if (null !== $htmlDumpDirectoryPath) {
+            $this->setHtmlDumpDirectoryPath($htmlDumpDirectoryPath);
+        }
+
+        if (null !== $htmlDumpBaseUrl) {
+            $this->setHtmlDumpBaseUrl($htmlDumpBaseUrl);
+        }
+    }
+
+    public function disableHtmlDump()
+    {
+        $this->htmlDumpEnabled = false;
+    }
+
+    /**
+     * @param string $htmlDumpDirectoryPath
+     */
+    public function setHtmlDumpDirectoryPath($htmlDumpDirectoryPath)
+    {
+        if (!is_string($htmlDumpDirectoryPath)) {
+            throw new \InvalidArgumentException('The html dump directory path must be a string.');
+        }
+
+        $this->htmlDumpDirectoryPath = $htmlDumpDirectoryPath;
+    }
+
+    /**
+     * @param string $htmlDumpBaseUrl
+     */
+    public function setHtmlDumpBaseUrl($htmlDumpBaseUrl)
+    {
+        if (!is_string($htmlDumpBaseUrl)) {
+            throw new \InvalidArgumentException('The html dump base url must be a string.');
+        }
+
+        $this->htmlDumpBaseUrl = $htmlDumpBaseUrl;
     }
 
     /**

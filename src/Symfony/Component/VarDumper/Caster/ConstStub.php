@@ -30,4 +30,37 @@ class ConstStub extends Stub
     {
         return (string) $this->value;
     }
+
+    /**
+     * Creates ConstStub from bitfield flag.
+     *
+     * @param int    $value  The value of bitfield flag
+     * @param string $prefix The prefix filter applied on constant names
+     *
+     * @return self
+     */
+    public static function fromFlag($value, $prefix)
+    {
+        $constants = get_defined_constants();
+        foreach ($constants as $c => $v) {
+            // checks prefix + single bit (power of 2) + flagged bit
+            if ('' !== $prefix && 0 !== strpos($c, $prefix) || 0 !== ($v & ($v - 1)) || ($value & $v) !== $v) {
+                unset($constants[$c]);
+            }
+        }
+
+        // checks extra bits
+        if (array_sum($constants) !== $value) {
+            for ($i = 0; ($v = 1 << $i) <= $value; ++$i) {
+                if (($value & $v) === $v && !in_array($v, $constants)) {
+                    $constants[$v] = $v;
+                }
+            }
+        }
+
+        asort($constants);
+        $name = implode(' | ', array_keys($constants)) ?: 0;
+
+        return new self($name, $value);
+    }
 }

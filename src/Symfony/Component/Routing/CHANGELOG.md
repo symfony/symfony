@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added support for prioritized routing loaders.
+ * Add matched and default parameters to redirect responses
 
 3.3.0
 -----

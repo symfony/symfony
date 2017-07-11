@@ -24,6 +24,8 @@ use Symfony\Component\Intl\ResourceBundle\LocaleBundle;
 use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\RegionBundle;
 use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\TimezoneBundle;
+use Symfony\Component\Intl\ResourceBundle\TimezoneBundleInterface;
 
 /**
  * Gives access to internationalization data.
@@ -64,6 +66,11 @@ final class Intl
     const REGION_DIR = 'regions';
 
     /**
+     * The directory name of the timezone data.
+     */
+    const TIMEZONE_DIR = 'timezones';
+
+    /**
      * @var ResourceBundle\CurrencyBundleInterface
      */
     private static $currencyBundle;
@@ -82,6 +89,11 @@ final class Intl
      * @var ResourceBundle\RegionBundleInterface
      */
     private static $regionBundle;
+
+    /**
+     * @var ResourceBundle\TimezoneBundleInterface
+     */
+    private static $timezoneBundle;
 
     /**
      * @var string|bool|null
@@ -181,6 +193,24 @@ final class Intl
         }
 
         return self::$regionBundle;
+    }
+
+    /**
+     * Returns the bundle containing timezone information.
+     *
+     * @return TimezoneBundleInterface The timezone resource bundle.
+     */
+    public static function getTimezoneBundle()
+    {
+        if (null === self::$timezoneBundle) {
+            self::$timezoneBundle = new TimezoneBundle(
+                self::getDataDirectory().'/'.self::TIMEZONE_DIR,
+                self::getEntryReader(),
+                self::getLocaleBundle()
+            );
+        }
+
+        return self::$timezoneBundle;
     }
 
     /**

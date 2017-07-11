@@ -17,6 +17,7 @@ use Symfony\Component\Intl\Data\Generator\LanguageDataGenerator;
 use Symfony\Component\Intl\Data\Generator\LocaleDataGenerator;
 use Symfony\Component\Intl\Data\Generator\RegionDataGenerator;
 use Symfony\Component\Intl\Data\Generator\ScriptDataGenerator;
+use Symfony\Component\Intl\Data\Generator\TimezoneDataGenerator;
 use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
 use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
@@ -254,6 +255,14 @@ $generator = new LocaleDataGenerator(
     new ScriptDataProvider($jsonDir.'/'.Intl::SCRIPT_DIR, $reader),
     new RegionDataProvider($jsonDir.'/'.Intl::REGION_DIR, $reader)
 );
+
+$generator->generateData($config);
+
+echo "Generating timezone data...\n";
+
+$reader = new BundleEntryReader(new JsonBundleReader());
+
+$generator = new TimezoneDataGenerator($compiler, Intl::TIMEZONE_DIR);
 
 $generator->generateData($config);
 

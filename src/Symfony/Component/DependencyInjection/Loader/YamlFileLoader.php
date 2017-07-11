@@ -177,7 +177,10 @@ class YamlFileLoader extends FileLoader
         $defaultDirectory = dirname($file);
         foreach ($content['imports'] as $import) {
             if (!is_array($import)) {
-                throw new InvalidArgumentException(sprintf('The values in the "imports" key should be arrays in %s. Check your YAML syntax.', $file));
+                $import = array('resource' => $import);
+            }
+            if (!isset($import['resource'])) {
+                throw new InvalidArgumentException(sprintf('An import should provide a resource in %s. Check your YAML syntax.', $file));
             }
 
             $this->setCurrentDir($defaultDirectory);

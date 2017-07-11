@@ -27,12 +27,11 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         parent::__construct(new ParameterBag($this->getDefaultParameters()));
-        $this->normalizedIds = array(
-            'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
-            'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
-        );
         $this->methodMap = array(
-            'bar' => 'getBarService',
+            'BAR' => 'getBARService',
+            'BAR2' => 'getBAR2Service',
+            'bar' => 'getBar3Service',
+            'bar2' => 'getBar22Service',
             'baz' => 'getBazService',
             'configurator_service' => 'getConfiguratorServiceService',
             'configurator_service_simple' => 'getConfiguratorServiceSimpleService',
@@ -73,6 +72,36 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'BAR' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getBARService()
+    {
+        $this->services['BAR'] = $instance = new \stdClass();
+
+        $instance->bar = ($this->services['bar'] ?? $this->get('bar'));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'BAR2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getBAR2Service()
+    {
+        return $this->services['BAR2'] = new \stdClass();
+    }
+
+    /**
      * Gets the 'bar' service.
      *
      * This service is shared.
@@ -80,7 +109,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass A Bar\FooClass instance
      */
-    protected function getBarService()
+    protected function getBar3Service()
     {
         $a = ($this->services['foo.baz'] ?? $this->get('foo.baz'));
 
@@ -89,6 +118,19 @@ class ProjectServiceContainer extends Container
         $a->configure($instance);
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'bar2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getBar22Service()
+    {
+        return $this->services['bar2'] = new \stdClass();
     }
 
     /**

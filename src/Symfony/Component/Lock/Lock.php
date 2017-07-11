@@ -32,34 +32,35 @@ final class Lock implements LockInterface, LoggerAwareInterface
     private $store;
     private $key;
     private $ttl;
+    private $autoRelease;
     private $dirty = false;
 
     /**
-     * @param Key            $key   Resource to lock
-     * @param StoreInterface $store Store used to handle lock persistence
-     * @param float|null     $ttl   Maximum expected lock duration in seconds
+     * @param Key            $key         Resource to lock
+     * @param StoreInterface $store       Store used to handle lock persistence
+     * @param float|null     $ttl         Maximum expected lock duration in seconds
+     * @param bool           $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
-    public function __construct(Key $key, StoreInterface $store, $ttl = null)
+    public function __construct(Key $key, StoreInterface $store, $ttl = null, $autoRelease = true)
     {
         $this->store = $store;
         $this->key = $key;
         $this->ttl = $ttl;
+        $this->autoRelease = (bool) $autoRelease;
 
         $this->logger = new NullLogger();
     }
 
     /**
-     * Automatically release the underlying lock when the object is destructed.
+     * Automatically releases the underlying lock when the object is destructed.
      */
     public function __destruct()
     {
-        try {
-            if ($this->dirty && $this->isAcquired()) {
-                $this->release();
-            }
-        } catch (\Throwable $e) {
-        } catch (\Exception $e) {
+        if (!$this->autoRelease || !$this->dirty || !$this->isAcquired()) {
+            return;
         }
+
+        $this->release();
     }
 
     /**

@@ -139,5 +139,11 @@ $container
     ->register('lazy_context_ignore_invalid_ref', 'LazyContext')
     ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))), new IteratorArgument(array())))
 ;
+$container
+    ->register('BAR', 'stdClass')
+    ->setProperty('bar', new Reference('bar'))
+;
+$container->register('bar2', 'stdClass');
+$container->register('BAR2', 'stdClass');
 
 return $container;

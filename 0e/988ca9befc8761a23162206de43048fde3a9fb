@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-08T18:51:02Z
+
+:-1: As you mentioned, this takes the user outside of the profiler environment. Most importantly, this removes the relevant links in the left menu that provide quick access to "Last 10", "Latest", "Search", etc. These allow you to quickly get back to a working profile, instead of having to manually remove the token from the URL in the browser window.
+
+Previous behavior:
+![symfony_token-not-found-error](https://user-images.githubusercontent.com/3967713/27989113-99f4f958-63ff-11e7-84e3-4ca2aa442c11.png)
+
+PR behavior:
+![symfony_token-not-found-exception](https://user-images.githubusercontent.com/3967713/27989116-9e1cae54-63ff-11e7-93e5-e19b3353a113.png)
+
+I'll often have a profile open that I've been looking at while going back and forth between some code, and then at some point it will have been cleaned up and removed, so when I reload the page or navigate elsewhere in the profiler it won't exist any longer, and I *regularly utilize the left navigation to get back to a sane page*.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-08T19:13:36Z
+
+Fixed then :+1:

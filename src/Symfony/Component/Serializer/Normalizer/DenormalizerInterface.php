@@ -11,6 +11,13 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\BadMethodCallException;
+use Symfony\Component\Serializer\Exception\ExtraAttributesException;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 /**
  * Defines the interface of denormalizers.
  *
@@ -27,6 +34,13 @@ interface DenormalizerInterface
      * @param array  $context options available to the denormalizer
      *
      * @return object
+     *
+     * @throws BadMethodCallException   Occurs when the normalizer is not called in an expected context
+     * @throws InvalidArgumentException Occurs when the arguments are not coherent or not supported
+     * @throws UnexpectedValueException Occurs when the item cannot be hydrated with the given data
+     * @throws ExtraAttributesException Occurs when the item doesn't have attribute to receive given data
+     * @throws LogicException           Occurs when the normalizer is not supposed to denormalize
+     * @throws RuntimeException         Occurs if the class cannot be instantiated
      */
     public function denormalize($data, $class, $format = null, array $context = array());
 

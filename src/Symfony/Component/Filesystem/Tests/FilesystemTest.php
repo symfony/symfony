@@ -1009,6 +1009,36 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals('\\' === DIRECTORY_SEPARATOR ? realpath($sourcePath.'\nested') : 'nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
+    public function testMirrorContentsWithSameNameAsSourceOrTarget()
+    {
+        $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
+
+        $oldPath = getcwd();
+        chdir($this->workspace);
+
+        mkdir($sourcePath);
+        touch($sourcePath.'source');
+		touch($sourcePath.'target');
+
+        $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror('source', $targetPath);
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertFileExists($targetPath.'source');
+        $this->assertFileExists($targetPath.'target');
+
+		unlink($sourcePath.'target');
+
+        $this->filesystem->mirror('source', 'target', null, array('delete' => true));
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertFileExists($targetPath.'source');
+        $this->assertFileNotExists($targetPath.'target');
+
+        chdir($oldPath);
+	}
+
     /**
      * @dataProvider providePathsForIsAbsolutePath
      */

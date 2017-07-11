@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T06:46:31Z
+
+I think this applies to 2.7. Can you please rebase/retarget this for the lowest branch where it can go?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-11T09:08:53Z
+
+The ``EXCLUDE_*`` filter argument used for this tests have been added in 3.4 (see https://github.com/symfony/symfony/pull/22588).

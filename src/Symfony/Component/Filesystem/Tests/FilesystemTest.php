@@ -1018,7 +1018,7 @@ class FilesystemTest extends FilesystemTestCase
 
         mkdir($sourcePath);
         touch($sourcePath.'source');
-		touch($sourcePath.'target');
+        touch($sourcePath.'target');
 
         $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
 
@@ -1028,7 +1028,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($targetPath.'source');
         $this->assertFileExists($targetPath.'target');
 
-		unlink($sourcePath.'target');
+        unlink($sourcePath.'target');
 
         $this->filesystem->mirror('source', 'target', null, array('delete' => true));
 
@@ -1037,7 +1037,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileNotExists($targetPath.'target');
 
         chdir($oldPath);
-	}
+    }
 
     /**
      * @dataProvider providePathsForIsAbsolutePath

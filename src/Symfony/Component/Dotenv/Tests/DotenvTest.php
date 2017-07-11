@@ -63,6 +63,7 @@ class DotenvTest extends TestCase
     public function getEnvData()
     {
         putenv('LOCAL=local');
+        $_ENV['REMOTE'] = 'remote';
 
         $tests = array(
             // spaces
@@ -134,6 +135,7 @@ class DotenvTest extends TestCase
             array('FOO=" \\$ "', array('FOO' => ' $ ')),
             array('FOO=" $ "', array('FOO' => ' $ ')),
             array('BAR=$LOCAL', array('BAR' => 'local')),
+            array('BAR=$REMOTE', array('BAR' => 'remote')),
             array('FOO=$NOTDEFINED', array('FOO' => '')),
         );
 

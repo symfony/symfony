@@ -9,6 +9,8 @@
 
     <xsd:complexType name="config">
         <xsd:sequence>
+            <xsd:element name="date" type="date" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="number-format" type="number_format" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form-theme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="path" type="path" minOccurs="0" maxOccurs="unbounded" />
@@ -24,6 +26,18 @@
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="strict-variables" type="xsd:string" />
         <xsd:attribute name="exception-controller" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="date">
+        <xsd:attribute name="format" type="xsd:string" />
+        <xsd:attribute name="interval-format" type="xsd:string" />
+        <xsd:attribute name="timezone" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="number_format">
+        <xsd:attribute name="decimals" type="xsd:integer" />
+        <xsd:attribute name="decimal-point" type="xsd:string" />
+        <xsd:attribute name="thousands-separator" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="path" mixed="true">

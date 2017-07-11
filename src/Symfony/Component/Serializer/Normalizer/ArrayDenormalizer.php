@@ -33,8 +33,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
 
     /**
      * {@inheritdoc}
-     *
-     * @throws UnexpectedValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {

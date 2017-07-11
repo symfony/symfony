@@ -587,10 +587,6 @@ Validator
    }
    ```
 
- * The default value of the strict option of the `Choice` Constraint has been
-   changed to `true` as of 4.0. If you need the previous behaviour ensure to
-   set the option to `false`.
-
  * Setting the `checkDNS` option of the `Url` constraint to `true` is dropped
    in favor of `Url::CHECK_DNS_TYPE_*` constants values.
 

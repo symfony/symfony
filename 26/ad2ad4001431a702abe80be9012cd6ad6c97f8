@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-07-10T09:36:05Z
+
+Actually, the issue is that the media query hiding the whole toolbar (error one or normal one) is missing now.
+the 2.7 branch has this code before the error toolbar:
+
+```css
+/***** Media query print: Do not print the Toolbar. *****/
+@media print {
+    .sf-toolbar {
+        display: none;
+        visibility: hidden;
+    }
+}
+```
+
+But the 2.8 branch does not seem to have it anymore.
+
+I suspect a bad conflict resolution when merging branches

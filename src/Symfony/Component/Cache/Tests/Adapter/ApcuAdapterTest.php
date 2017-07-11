@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 
 class ApcuAdapterTest extends AdapterTestCase
@@ -23,8 +24,13 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        if (!function_exists('apcu_fetch') || !ini_get('apc.enabled') || ('cli' === PHP_SAPI && !ini_get('apc.enable_cli'))) {
+        if (!function_exists('apcu_fetch') || !ini_get('apc.enabled')) {
             $this->markTestSkipped('APCu extension is required.');
+        }
+        if ('cli' === PHP_SAPI && !ini_get('apc.enable_cli')) {
+            if ('testWithCliSapi' !== $this->getName()) {
+                $this->markTestSkipped('APCu extension is required.');
+            }
         }
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Fails transiently on Windows.');
@@ -69,5 +75,25 @@ class ApcuAdapterTest extends AdapterTestCase
         $item = $pool1->getItem('foo');
         $this->assertFalse($item->isHit());
         $this->assertNull($item->get());
+    }
+
+    public function testWithCliSapi()
+    {
+        try {
+            // disable PHPUnit error handler to mimic a production environment
+            $isCalled = false;
+            set_error_handler(function () use (&$isCalled) {
+                $isCalled = true;
+            });
+            $pool = new ApcuAdapter(str_replace('\\', '.', __CLASS__));
+            $pool->setLogger(new NullLogger());
+
+            $item = $pool->getItem('foo');
+            $item->isHit();
+            $pool->save($item->set('bar'));
+            $this->assertFalse($isCalled);
+        } finally {
+            restore_error_handler();
+        }
     }
 }

@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-21T13:52:24Z
+
+I think we need a proper behavior + test when two services are defined (ie pre-compile, using ContainerBuilder) and they have an id that differs only by the case: either it works properly (does it already?) or fail early (might be more DX friendly?)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-21T15:22:53Z
+
+method map seems prepared :)
+
+```diff
+         $this->methodMap = array(
+-            'bar' => 'getBarService',
++            'BAR' => 'getBARService',
++            'BAR2' => 'getBAR2Service',
++            'bar' => 'getBar3Service',
++            'bar2' => 'getBar22Service',
+```
+
+will add one more test for PhpDumper :) but i think it works properly :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-21T16:30:18Z
+
+@nicolas-grekas geen! new tests are proper imo. and allows for future edge cases to be added. I think we should at least try out this behavior on master =/
+
+Changes to `Container.php` best reviewed at https://github.com/symfony/symfony/pull/22811/files?w=1#diff-1df5b32be44d0f592ec285c6bbf386bb
+
+fabbot.io failure seems unrelated :)
+
+Ready for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T06:56:45Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-26T18:10:30Z
+
+should i remove the (deprecated) `FactoryReturnTypePass` while at it? removing the strtolower calls breaks test :)
+
+cc @GuilhemN
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-26T19:40:46Z
+
+> method map seems prepared :)
+
+https://github.com/symfony/symfony/pull/18167 indeed added support for sensitivity while fixing the PhpDumper for non alphanumeric ids.
+
+> should i remove the (deprecated) FactoryReturnTypePass while at it?
+
+I think it would be easier to review if it was done in another PR. Nothing would prevent you from merging this PR here though.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-29T09:05:31Z
+
+Reverted compiler passes, they need to have a look though :) as well as the `Container::$underscoreMap` thingy.
+
+Other then that, i think this is ready :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-06T07:15:37Z
+
+@ro0NL What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-06T07:58:17Z
+
+@fabpot i should rebase at least :) let me have a look tomorrow evening / saturday.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-07T18:06:41Z
+
+@fabpot looks good to me :+1:
+
+[`?w=1`](https://github.com/symfony/symfony/pull/22811/files?w=1)
+
+Status: needs review

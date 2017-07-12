@@ -25,6 +25,10 @@ class RedirectableUrlMatcherTest extends TestCase
         $coll->add('foo', new Route('/foo/'));
 
         $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $parameters = $matcher->match('/foo');
+        if ('foo' === $parameters['_route']) {
+            $parameters['_route'] = null; // FC with behavior on 3.4
+        }
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -35,7 +39,7 @@ class RedirectableUrlMatcherTest extends TestCase
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => null,
             ),
-            $matcher->match('/foo')
+            $parameters
         );
     }
 

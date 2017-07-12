@@ -29,7 +29,7 @@
         "symfony/dependency-injection": "~3.3|~4.0",
         "symfony/config": "~2.7|~3.0|~4.0",
         "symfony/http-foundation": "~2.8|~3.0|~4.0",
-        "symfony/http-kernel": "~2.8|~3.0|~4.0",
+        "symfony/http-kernel": "^3.3.5|~4.0",
         "symfony/security-csrf": "~2.8|~3.0|~4.0",
         "symfony/translation": "~2.8|~3.0|~4.0",
         "symfony/var-dumper": "~3.3|~4.0"
@@ -39,8 +39,8 @@
         "symfony/dependency-injection": "<3.3",
         "symfony/doctrine-bridge": "<2.7",
         "symfony/framework-bundle": "<2.7",
-        "symfony/twig-bridge": "<2.7",
-        "symfony/var-dumper": "<3.3"
+        "symfony/http-kernel": "<3.3.5",
+        "symfony/twig-bridge": "<2.7"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

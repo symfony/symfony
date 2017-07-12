@@ -1,0 +1,316 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2017-05-18T18:41:03Z
+
+Wouldn't an alternative be to make an abstract static function `getName(): string` which could be called without instantiating the command? This would be a simpler solution and avoid the need to sync the command name from the tag and the code, although it would require to change the way we currently give the names to the commands.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-18T19:05:52Z
+
+@theofidry I thought about it.
+First, making `getName()` static would forbid having several commands for the same class, that is a valid use case to me (https://github.com/symfony/symfony/commit/2b82fcb437f42b1072afd16b7372762456e190eb).
+It would also be hard to achieve from a BC pov (actually, I don't see any smooth upgrade path for making a method static).
+Lastly, this is mostly about commands registered as services (with dependencies), the current implementation doesn't require any change for basic command which are still in majority.
+So I think the static alternative would be a too big step for the need that this is trying to solve.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-18T19:08:56Z
+
+> sync the command name from the tag and the code
+
+Note that when using this feature, you don't need to set the name in your command. It is automatically set when the command is loaded. Same for aliases.
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-05-19T08:25:16Z
+
+This implementation looks better than previous
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-05-19T08:41:44Z
+
+>Note that when using this feature, you don't need to set the name in your command. It is automatically set when the command is loaded.
+
+Perfect then 👌
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-22T18:00:10Z
+
+@chalasr Thanks for this! There is one practical problem: it will kill autoconfigure for commands :) ... which works *really* well right now. Wdyt?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-22T19:06:52Z
+
+@weaverryan You're right, this kills autoconfigure for commands.
+
+To me, there are two different approaches for using console commands:
+1) Your command has no explicit dependency (it is container aware or has no dependency at all) and you don't care about laziness for the command itself
+2) Your command has explicit dependencies (constructor or setters) and you want it lazy
+
+For 1, you probably rely on the fact that  all commands present in the `Command` directory of each bundle are automatically added to the application. Even if doing so doesn't harm, there is no need for registering those as services.
+
+For 2, you actually need to configure your service explicitly (still using `autowire`, `defaults`  and other features that help simplifying service configuration), and you have to use this tag.
+
+Also I must say that I'm very happy to deprecate the way commands services are currently added to the application, iterating over the ugly `console.command.ids` parameter for loading them all on the first run, that actually defeats the purpose of registering commands as services, losing laziness provided by container aware in favour of good design provided by explicit dependencies.
+
+Considering that container aware stuff are far from ideal (since we push toward explicit deps and _types_, see also https://github.com/symfony/symfony/issues/21623), and that complex console commands do exist (more and more), I think we can safely kill it.
+
+The other alternative is to make this optional, keeping the current way of registering command services (which, as said, is not DI-friendly at all and quite ugly), that would add some complexity to the "command as service" feature.
+
+So... worth it? :) Wdyt?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-22T21:57:34Z
+
+Deprecation removed. If you want a command to be lazy then set the `command`  attribute, and autoconfigure keeps working.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-23T09:47:22Z
+
+@chalasr With the new PSR4 loader - and especially the fact that there won't be any bundles in Flex - command in the future will all need to be registered as services. I think - either official or in practice - the old way will go away. Then, the issue is just if we let `autoconfigure` continue to work for commands, and I hope we can :).
+
+I actually like your latest change: autoconfigured commands still work, just aren't lazy. All course commands would of course be lazy. I was also thinking about a new, optional interface - e.g. `NamedCommandInterface` with a `static public function getCommandName()`. If you implemented this, it would be lazy without needing the tag (but you could also still tag of course). The idea is that end-users would typically use this. Wdyt?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-23T09:58:41Z
+
+> the old way will go away.
+
+I agree, I was about to open an issue proposing to deprecate the convention-based bundle registration, in fact this is the ugly (reflection based) thing.
+
+> NamedCommandInterface with a static public function getCommandName(). If you implemented this, it would be lazy without needing the tag (but you could also still tag of course).
+
+I like that, that feels more "robust" than using tag attributes and consistent with event/service subscribers. It should make the feature simpler to understand also (removing the complexity around the tag). Let's go for an interface with static `getCommandName()/getCommandAliases()`
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-23T10:15:06Z
+
+@weaverryan if we want to make the old way go away, we need to make all shared bundles go away. Flex does not make bundle disappear. It only removes *project-specific* bundles.
+
+@chalasr please don't make things static. This is even worse for configurability, as you cannot make the name configurable anymore in commands (while it is currently), except by using some global static state (which is very bad), and only if you don't register the same command class multiple times with different names (and different instances of your deps, which is the use case for registering multiple times)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-23T10:17:27Z
+
+Thus, it will be almost impossible to write a good migration path for this: you cannot make the default implementation of the static method call the existing code, as static cannot call non-static code; so it means you still have to allow commands not implementing this static-based interface everywhere in the code.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-23T10:19:53Z
+
+@stof I think the idea was for the interface with static methods to be optional. I agree we also need to have the tags way for the reasons you mentioned. That should give us the flexibility needed... but if you don't need that flexibility (most of the time you don't in end-user code), you have the static option.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-23T10:51:13Z
+
+@weaverryan Given the cons of the static api and the limitations that come with and although "implement this interface" feels better than "add this tag with this attribute" to me, I think we would better stick to the tag attribute only. I'm not fond of having two ways of doing the same thing, especially when one of them has limitations that the other has not, it makes it harder to understand.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-05-23T10:55:58Z
+
+@chalasr That's fine :). We can always consider it later. Unless I'm mistaken, with your current implementation, `autoconfigure` will still work... those commands just won't be lazy. That's a great step forward (and we can build on that if we want to).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-23T11:03:22Z
+
+> Unless I'm mistaken, with your current implementation, autoconfigure will still work
+
+yes it does :) I also think that's a good thing because as you said, it works very well.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-01T15:28:13Z
+
+rebased and green, ready to review
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2017-06-10T20:50:39Z
+
+This seems extremely complex. Given that you already know all the dependencies of all commands from the container, wouldn't it be easier to mark those services as "lazy" (where applicable) in a compiler pass and be done with it?
+
+The same behavior of this patch can be achieved with just the compiler pass then.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-06-11T01:24:37Z
+
+Aren't the proxies initialised because you call one of their function,
+making lazy useless in this situation?
+
+On Sat, 10 Jun 2017 at 21:50, Marco Pivetta <notifications@github.com>
+wrote:
+
+> This seems extremely complex. Given that you already know all the
+> dependencies of all commands from the container, wouldn't it be easier to
+> mark those services as "lazy" (where applicable) in a compiler pass and be
+> done with it?
+>
+> The same behavior of this patch can be achieved with just the compiler
+> pass then.
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/22734#issuecomment-307589503>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AE76ge2KgZ0tjpTFVEXsIRWvLWA6qZYTks5sCwGrgaJpZM4Neeqc>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2017-06-11T05:38:23Z
+
+The dependencies are usually only used in a command's `execute`.
+
+The patch above goes great lengths to make some lightweight command object replacement, but that's a lot of wasted effort, as the commamd itself is generally a very lightweight object.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-11T11:05:51Z
+
+Even if used in `execute`, dependencies are loaded at command construction, we can't assume that those are all "lazy" (symfony core and third party bundles services aren't). Commands can be heavy to instantiate (e.g. workers). Effort isn't wasted.
+
+The goal is to provide a built-in way for lazy commands, no matter where their dependencies come from.
+About complexity, this doesn't require more than adding the `lazy` attribute using the fullstack, and still no more than using proxy-manager with the console only.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2017-06-11T11:07:40Z
+
+The Console component is probably the most widely used Symfony component, often with a different DI container.
+
+Any solution that would depend on the Symfony DI, as opposed to the current one, would be useless to a lot of people.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-06-11T13:09:28Z
+
+@chalasr on another hand if you only need to add `lazy` to commands and install proxy manager, I'm not sure it's worth trying to add another way to do the lazy.
+
+>we can't assume that those are all "lazy"
+
+I would argue that:
+
+- It's trivial to make all commands lazy with a Compiler pass if you really need lazyness
+- I don't think lazyness is required by default. I mean it _is_ nice, but it's only needed on commands that requires things like database connection like in FosUserBundle (and that's where extra effort to ensure they are lazy even with the proxy manager have already been done) and workers which are arguably no so common (and when you have any and get annoyed by the slowness or care enough about, finding a solution which is making them lazy is relatively easy)
+- If Symfony really wants to try harder to make things lazy, the first point would be one easy solution
+
+So whilst I do appreciate the PR, if there's already a solution that is good enough I don't really see the point to add extra code for another solution.
+
+@skalpa if you need lazyness with the Console component and a different DI container, IMO the way to go is either take advantage of the DI container capacities in question (so here in FrameworkBundle the Symfony DIC) and not the Console component itself, and otherwise pursue something like https://github.com/symfony/symfony/issues/20656 with a PSR-11 container or use directly ocramius/proxy-manager.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-11T13:36:32Z
+
+@theofidry proxy-manager is optional and will remain as is. Providing laziness in the core has been decided already, this just makes the console able to leverage it like others do (twig runtimes for instance).
+Having a compiler pass looking at all the dependencies of a command to flag them and all their dependencies as "lazy" is not an option to me, especially because it requires both the symfony dic and proxy-manager, that would prevent making core commands lazy.
+Having a component able to provide laziness is the proposed approach and I think is the way to go, we did it for a number of them already.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2017-06-11T14:08:01Z
+
+@theofidry  I think you're missing an important point. The console application needs to call the commands' `getName()` to retrieve their name.
+
+Thus, just proxying the commands would have absolutely no benefit: you'd just delay the instantiation a bit, until their `getName()` is called, and would still end up instantiating every single command all the time.
+
+This PR is not just about making the commands lazy, it's also about solving this problem while keeping BC.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2017-06-11T14:24:08Z
+
+We are talking about proxying the command ctor arguments, not thr command
+itself (which is always lightweight, unless the author did a mistake)
+
+On 11 Jun 2017 17:08, "Pascal Luna" <notifications@github.com> wrote:
+
+> @theofidry <https://github.com/theofidry> I think you're missing an
+> important point. The console application needs to call the commands'
+> getName() to retrieve their name.
+>
+> Thus, just proxying the commands would have absolutely no benefit: you'd
+> just delay the instantiation a bit, until their getName() is called, and
+> would still end up instantiating every single command all the time.
+>
+> This PR is not just about making the commands lazy, it's also about
+> solving this problem while keeping BC.
+>
+> —
+> You are receiving this because you commented.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/22734#issuecomment-307631338>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAJakGkE_rla4zzyoWkF-pxfDlPEcqShks5sC_TOgaJpZM4Neeqc>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by gnugat at 2017-06-12T07:39:03Z
+
+> @Ocramius: The dependencies are usually only used in a command's `execute`.
+
+_Usually_ is highly subjective, there are some use cases for using dependencies in the `help` method too, or example to show default values for options that might be configured from the database.
+
+I'm gonna reference here a comment I've made on the previous Pull Request:
+
+> I'd like to also highlight the following use case: displaying help using database (for example to set an option's default value).
+> This is currently impossible in a symfony full stack application, as it would prevent it from being installed: in order to create the database and the schema, we need to run some console commands, which means loading all commands including the one which tries to make a database query to set the default value of an option.
+>
+> [original comment](https://github.com/symfony/symfony/issues/12063#issuecomment-73492594)
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2017-06-12T07:40:56Z
+
+ > *Usually* is highly subjective, there are some use cases for using dependencies in the `help` method too, or example to show default values for options that might be configured from the database.
+
+Assuming that command names are constant is also highly subjective ;-)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-12T08:45:23Z
+
+Both aren't common use cases, but tags can still be set/altered through extensions/compiler passes.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-07-06T14:52:43Z
+
+❤️  This is very interesting!
+
++1000 with the argument that this solution is good for Symfony fullstack *as well as outside of Symfony*. The Console is a component used a lot outside of Symfony and this is important to find a solution that works in both contexts.
+
+---------------------------------------------------------------------------
+
+by sepehr at 2017-07-11T14:57:06Z
+
+This is a very good news for a lot of people around the world! Thanks.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-12T09:24:04Z
+
+@nicolas-grekas :
+
+> In a future PR, I think CommandLoaderInterface could be replaced by a more generic interface in the DI component, which would be an extension of PSR11 and would add a "getProvidedServiceIds" to it. But that's to be discussed in another PR :)
+
+I think we should avoid replacing `CommandLoaderInterface` completely, which would mean tying this to the DI component. In a simple CLI application, you probably won't require `symfony/dependency-injection` but simply create your own implementation instead.
+BTW, I'd like to suggest a simple factory based implementation in another PR (similar to DI component's `ServiceLocator`).

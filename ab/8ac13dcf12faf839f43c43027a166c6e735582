@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-28T15:02:41Z
+
+`propertyPath`?
+
+edit; perhaps for sake of the explicitness `valuePropertyPath` :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-04-28T15:08:24Z
+
+@ro0NL: I hesitated. It should be obvious it's the property path to the value to use in comparison, and not anything else. I can't really explain why I had some reservations on this naming. Let's see what people do prefer.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-25T16:35:48Z
+
+Updated to use back `propertyPath` for the new option name, as it's the common naming we've got in the core for this (original proposition was `valuePath`). Unless there is a debate about another naming, this should be ready.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-29T07:59:08Z
+
+Can you add a new entry to the changelog please?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-03T18:01:21Z
+
+Rebased and green.

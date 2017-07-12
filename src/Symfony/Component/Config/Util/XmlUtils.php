@@ -18,9 +18,12 @@ namespace Symfony\Component\Config\Util;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
+ * @author Ole Rößner <ole@roessner.it>
  */
 class XmlUtils
 {
+    const XML_IS_NOT_VALID_MESSAGE = 'The XML is not valid.';
+
     /**
      * This class should not be instantiated.
      */
@@ -29,22 +32,17 @@ class XmlUtils
     }
 
     /**
-     * Loads an XML file.
+     * Parses an XML string.
      *
-     * @param string               $file             An XML file path
+     * @param string               $content          An XML string
      * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @return \DOMDocument
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
-    public static function loadFile($file, $schemaOrCallable = null)
+    public static function parse($content, $schemaOrCallable = null)
     {
-        $content = @file_get_contents($file);
-        if ('' === trim($content)) {
-            throw new \InvalidArgumentException(sprintf('File %s does not contain valid XML, it is empty.', $file));
-        }
-
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
@@ -91,7 +89,7 @@ class XmlUtils
             if (!$valid) {
                 $messages = static::getXmlErrors($internalErrors);
                 if (empty($messages)) {
-                    $messages = array(sprintf('The XML file "%s" is not valid.', $file));
+                    $messages = array(self::XML_IS_NOT_VALID_MESSAGE);
                 }
                 throw new \InvalidArgumentException(implode("\n", $messages), 0, $e);
             }
@@ -101,6 +99,34 @@ class XmlUtils
         libxml_use_internal_errors($internalErrors);
 
         return $dom;
+    }
+
+    /**
+     * Loads an XML file.
+     *
+     * @param string               $file             An XML file path
+     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
+     *
+     * @return \DOMDocument
+     *
+     * @throws \InvalidArgumentException When loading of XML file returns error
+     */
+    public static function loadFile($file, $schemaOrCallable = null)
+    {
+        $content = @file_get_contents($file);
+        if ('' === trim($content)) {
+            throw new \InvalidArgumentException(sprintf('File %s does not contain valid XML, it is empty.', $file));
+        }
+
+        try {
+            return static::parse($content, $schemaOrCallable);
+        } catch (\InvalidArgumentException $ex) {
+            throw new \InvalidArgumentException(
+                str_replace(self::XML_IS_NOT_VALID_MESSAGE, sprintf('The XML file "%s" is not valid.', $file), $ex->getMessage()),
+                $ex->getCode(),
+                $ex->getPrevious()
+            );
+        }
     }
 
     /**

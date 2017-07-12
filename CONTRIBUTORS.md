@@ -1743,4 +1743,3 @@ Symfony is the result of the work of many people who made the code better
  - Thomas BERTRAND (sevrahk)
  - Matej Žilák (teo_sk)
  - Vladislav Vlastovskiy (vlastv)
- - Ole Rößner (basster)

@@ -16,40 +16,50 @@ use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlUtilsTest extends TestCase
 {
-    /**
-     * @dataProvider provideDataForTestLoadFileExceptions
-     */
-    public function testLoadFileExceptions($fileName, $expectedMessagePattern, $schemaOrCallable = null)
-    {
-        $this->expectException('\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp($expectedMessagePattern);
-
-        XmlUtils::loadFile($fileName, $schemaOrCallable);
-    }
-
-    public function testLoadWithValidator()
+    public function testLoadFile()
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
-        $mock = $this->createValidatorMock(true);
+        try {
+            XmlUtils::loadFile($fixtures.'invalid.xml');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertContains('ERROR 77', $e->getMessage());
+        }
+
+        try {
+            XmlUtils::loadFile($fixtures.'document_type.xml');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertContains('Document types are not allowed', $e->getMessage());
+        }
+
+        try {
+            XmlUtils::loadFile($fixtures.'invalid_schema.xml', $fixtures.'schema.xsd');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertContains('ERROR 1845', $e->getMessage());
+        }
+
+        try {
+            XmlUtils::loadFile($fixtures.'invalid_schema.xml', 'invalid_callback_or_file');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertContains('XSD file or callable', $e->getMessage());
+        }
+
+        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
+        $mock->expects($this->exactly(2))->method('validate')->will($this->onConsecutiveCalls(false, true));
+
+        try {
+            XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate'));
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertRegExp('/The XML file "[\w:\/\\\.]+" is not valid\./', $e->getMessage());
+        }
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate')));
         $this->assertSame(array(), libxml_get_errors());
-    }
-
-    public function provideDataForTestLoadFileExceptions()
-    {
-        $fixtures = __DIR__.'/../Fixtures/Util/';
-
-        $mock = $this->createValidatorMock(false);
-
-        return array(
-            'invalid' => array($fixtures.'invalid.xml', '/ERROR 77/'),
-            'document_type' => array($fixtures.'document_type.xml', '/Document types are not allowed/'),
-            'invalid_schema' => array($fixtures.'schema.xsd', '/ERROR 1845/', $fixtures.'schema.xsd'),
-            'invalid_callback_or_file' => array($fixtures.'invalid_schema.xml', '/XSD file or callable/', 'invalid_callback_or_file'),
-            'invalid_callback_validator' => array($fixtures.'valid.xml', '/The XML file "[\w:\/\\\.]+" is not valid\./', array($mock, 'validate')),
-        );
     }
 
     /**
@@ -60,7 +70,8 @@ class XmlUtilsTest extends TestCase
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
-        $mock = $this->createValidatorMock(false);
+        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
+        $mock->expects($this->once())->method('validate')->willReturn(false);
 
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), array($mock, 'validate'));
     }
@@ -197,19 +208,6 @@ class XmlUtilsTest extends TestCase
 
         // should not throw an exception
         XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/valid.xml', __DIR__.'/../Fixtures/Util/schema.xsd');
-    }
-
-    /**
-     * @param $returnValue
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createValidatorMock($returnValue)
-    {
-        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
-        $mock->expects($this->once())->method('validate')->willReturn($returnValue);
-
-        return $mock;
     }
 }
 

@@ -77,10 +77,15 @@ class RouterDebugCommandTest extends TestCase
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('has')
-            ->with('router')
-            ->will($this->returnValue(true))
+            ->will($this->returnCallback(function ($id) {
+                if ('console.command_loader' === $id) {
+                    return false;
+                }
+
+                return true;
+            }))
         ;
         $container
             ->expects($this->any())

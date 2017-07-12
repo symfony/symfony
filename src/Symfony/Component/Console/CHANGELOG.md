@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `CommandLoaderInterface` and PSR-11 `ContainerCommandLoader`
+
 3.3.0
 -----
 

@@ -34,7 +34,7 @@ class XmlUtilsTest extends TestCase
         $mock = $this->createValidatorMock(true);
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate')));
-        $this->assertSame([], libxml_get_errors());
+        $this->assertSame(array(), libxml_get_errors());
     }
 
     public function provideDataForTestLoadFileExceptions()
@@ -44,9 +44,9 @@ class XmlUtilsTest extends TestCase
         $mock = $this->createValidatorMock(false);
 
         return array(
-            'invalid' => array($fixtures . 'invalid.xml', '/ERROR 77/'),
-            'document_type' => array($fixtures. 'document_type.xml', '/Document types are not allowed/'),
-            'invalid_schema' => array($fixtures . 'schema.xsd', '/ERROR 1845/',$fixtures.'schema.xsd'),
+            'invalid' => array($fixtures.'invalid.xml', '/ERROR 77/'),
+            'document_type' => array($fixtures.'document_type.xml', '/Document types are not allowed/'),
+            'invalid_schema' => array($fixtures.'schema.xsd', '/ERROR 1845/', $fixtures.'schema.xsd'),
             'invalid_callback_or_file' => array($fixtures.'invalid_schema.xml', '/XSD file or callable/', 'invalid_callback_or_file'),
             'invalid_callback_validator' => array($fixtures.'valid.xml', '/The XML file "[\w:\/\\\.]+" is not valid\./', array($mock, 'validate')),
         );

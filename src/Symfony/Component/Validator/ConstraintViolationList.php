@@ -178,4 +178,14 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
         return new static($violations);
     }
+
+    /**
+     * Returns whether this object contains violations.
+     *
+     * @return bool
+     */
+    public function hasViolations()
+    {
+        return (bool) $this->violations;
+    }
 }

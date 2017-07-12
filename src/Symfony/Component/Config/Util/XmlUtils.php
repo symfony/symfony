@@ -22,8 +22,6 @@ namespace Symfony\Component\Config\Util;
  */
 class XmlUtils
 {
-    const XML_IS_NOT_VALID_MESSAGE = 'The XML is not valid.';
-
     /**
      * This class should not be instantiated.
      */
@@ -94,7 +92,7 @@ class XmlUtils
             if (!$valid) {
                 $messages = static::getXmlErrors($internalErrors);
                 if (empty($messages)) {
-                    $messages = array(self::XML_IS_NOT_VALID_MESSAGE);
+                    $messages = array('The XML is not valid.');
                 }
                 throw new \InvalidArgumentException(implode("\n", $messages), 0, $e);
             }
@@ -128,7 +126,7 @@ class XmlUtils
             return static::parse($content, $schemaOrCallable);
         } catch (\InvalidArgumentException $ex) {
             throw new \InvalidArgumentException(
-                str_replace(self::XML_IS_NOT_VALID_MESSAGE, sprintf('The XML file "%s" is not valid.', $file), $ex->getMessage()),
+                str_replace('The XML is not valid.', sprintf('The XML file "%s" is not valid.', $file), $ex->getMessage()),
                 $ex->getCode(),
                 $ex->getPrevious()
             );

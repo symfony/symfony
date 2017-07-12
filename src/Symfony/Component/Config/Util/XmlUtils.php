@@ -42,7 +42,7 @@ class XmlUtils
      * @throws \InvalidArgumentException When loading of XML file returns error
      * @throws \RuntimeException         When DOM extension is missing
      */
-    public static function load($content, $schemaOrCallable = null)
+    public static function parse($content, $schemaOrCallable = null)
     {
         if (!extension_loaded('dom')) {
             throw new \RuntimeException('Extension DOM is required.');
@@ -125,7 +125,7 @@ class XmlUtils
         }
 
         try {
-            return static::load($content, $schemaOrCallable);
+            return static::parse($content, $schemaOrCallable);
         } catch (\InvalidArgumentException $ex) {
             throw new \InvalidArgumentException(
                 str_replace(self::XML_IS_NOT_VALID_MESSAGE, sprintf('The XML file "%s" is not valid.', $file), $ex->getMessage()),

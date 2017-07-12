@@ -62,7 +62,7 @@ class XmlUtilsTest extends TestCase
         $this->assertSame(array(), libxml_get_errors());
     }
 
-    public function testLoad()
+    public function testParse()
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
@@ -70,7 +70,7 @@ class XmlUtilsTest extends TestCase
         $mock->expects($this->once())->method('validate')->will($this->onConsecutiveCalls(false, true));
 
         try {
-            XmlUtils::load(file_get_contents($fixtures.'valid.xml'), array($mock, 'validate'));
+            XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), array($mock, 'validate'));
             $this->fail();
         } catch (\InvalidArgumentException $e) {
             $this->assertContains('The XML is not valid', $e->getMessage());

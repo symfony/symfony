@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Hanmac at 2017-05-12T07:24:41Z
+
+i just wonder if the new types should add more  `DBALType::` constants too?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-12T09:10:34Z
+
+@Hanmac we can't use the constants for the new types if we want to stay compatible with `doctrine/dbal` < 2.6 where they don't exists.
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2017-05-12T09:26:06Z
+
+@jvasseur ah i thought the constants where in our part too.
+then i am okay with that.
+
+we might use the constants when we drop the support for the older versions.
+
+are the DBAL Type objects itself useful for this? i think no, but i am not sure
+
+PS: in the Guesser should `'Symfony\Component\Form\Extension\Core\Type\CollectionType'` be replaced with `CollectionType::class` ?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-12T09:35:07Z
+
+The Type objects are not used by the guesser/property extractor, the decision is only done based on the name of the type.
+
+I'm :-1: for using `::class` in the Guesser. It would mean that if we do that for all the types (only possible after 2.8 end of support) the class will have a lot of use at the start of the file just for this.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-05-15T09:41:07Z
+
+The Form component supports reading immutable DateTime instances
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-05-15T15:43:53Z
+
+@stof but it can't write back `DateTimeImmutable` instances meaning that you would have to do the conversion from a `DateTime` instance into a `DateTimeImmutable` in your setter.
+
+I prefer to wait for proper support for `DateTimeImmutable` in the form component to add it to the guesser.

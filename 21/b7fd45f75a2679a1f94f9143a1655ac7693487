@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-12-28T21:48:19Z
+
+If this feature will be merged, is it a good idea to register this processor in ``MonologBundle`` for all logs? Or else, maybe simply write a doc that explains its registration (containing something like [this](https://github.com/maidmaid/monolog-bundle/commit/b8341bdec47dfea0f590d9b2b87bd1d8369da409))?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-12-29T12:13:33Z
+
+Would this add the token to every log line? Because I don't want to see the token added 10x if my log contains 10 log lines to be honest.
+
+The idea is great though, I'm using a custom formatter for the logging at the moment and I rather have this in the core.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-29T13:08:59Z
+
+@iltar Yes it will. That's how processor works.
+
+But:
+
+* This processor is not enabled by default
+* You can add process on specific channel and/or handler.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-12-29T15:01:15Z
+
+I have improved token normalization that now is more json-like/readable:
+
+```
+[2016-12-29 14:48:09] app.INFO: admin connected! [] {"token":{
+    "username":"admin",
+    "auth.":true,
+    "roles":["ROLE_ADMIN"]}
+}
+```
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-12-30T10:05:31Z
+
+Thank you for your review @fabpot and @iltar. Changes are done.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-10T18:04:40Z
+
+You need to add the `security/core` package as a dependency to the `require-dev` section in the `composer.json` file of MonologBridge.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-01-10T20:02:09Z
+
+I updated the ``composer.json`` @xabbuh.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-04-03T08:36:50Z
+
+AppVeyor break tests are related?
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-07T15:03:17Z
+
+AppVeyor Failure seems unrelated.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T10:31:57Z
+
+PR ready to merge since some time :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-12T12:39:56Z
+
+:+1:

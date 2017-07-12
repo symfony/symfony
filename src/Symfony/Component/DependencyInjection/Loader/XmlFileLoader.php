@@ -395,7 +395,7 @@ class XmlFileLoader extends FileLoader
                     $node->setAttribute('id', $id);
                     $node->setAttribute('service', $id);
 
-                    $definitions[$id] = array($services[0], $file, false);
+                    $definitions[$id] = array($services[0], $file);
                     $services[0]->setAttribute('id', $id);
 
                     // anonymous services are always private
@@ -408,26 +408,15 @@ class XmlFileLoader extends FileLoader
         // anonymous services "in the wild"
         if (false !== $nodes = $xpath->query('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
-                @trigger_error(sprintf('Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %s at line %d.', $file, $node->getLineNo()), E_USER_DEPRECATED);
-
-                // give it a unique name
-                $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
-                $node->setAttribute('id', $id);
-                $definitions[$id] = array($node, $file, true);
+                throw new InvalidArgumentException(sprintf('Top-level services must have "id" attribute, none found in %s at line %d.', $file, $node->getLineNo()));
             }
         }
 
         // resolve definitions
         uksort($definitions, 'strnatcmp');
-        foreach (array_reverse($definitions) as $id => list($domElement, $file, $wild)) {
-            if (null !== $definition = $this->parseDefinition($domElement, $file, $wild ? $defaults : array())) {
+        foreach (array_reverse($definitions) as $id => list($domElement, $file)) {
+            if (null !== $definition = $this->parseDefinition($domElement, $file, array())) {
                 $this->setDefinition($id, $definition);
-            }
-
-            if (true === $wild) {
-                $tmpDomElement = new \DOMElement('_services', null, self::NS);
-                $domElement->parentNode->replaceChild($tmpDomElement, $domElement);
-                $tmpDomElement->setAttribute('id', $id);
             }
         }
     }
@@ -480,9 +469,6 @@ class XmlFileLoader extends FileLoader
                 case 'service':
                     if (!$arg->getAttribute('id')) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service" has no or empty "id" attribute in "%s".', $name, $file));
-                    }
-                    if ($arg->hasAttribute('strict')) {
-                        @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since version 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), E_USER_DEPRECATED);
                     }
 
                     $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
@@ -619,13 +605,13 @@ EOF
     {
         foreach ($alias->attributes as $name => $node) {
             if (!in_array($name, array('alias', 'id', 'public'))) {
-                @trigger_error(sprintf('Using the attribute "%s" is deprecated for the service "%s" which is defined as an alias in "%s". Allowed attributes for service aliases are "alias", "id" and "public". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $name, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+                throw new InvalidArgumentException(sprintf('Invalid attribute "%s" defined for alias "%s" in "%s".', $name, $alias->getAttribute('id'), $file));
             }
         }
 
         foreach ($alias->childNodes as $child) {
             if ($child instanceof \DOMElement && $child->namespaceURI === self::NS) {
-                @trigger_error(sprintf('Using the element "%s" is deprecated for the service "%s" which is defined as an alias in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+                throw new InvalidArgumentException(sprintf('Invalid child element "%s" defined for alias "%s" in "%s".', $child->localName, $alias->getAttribute('id'), $file));
             }
         }
     }

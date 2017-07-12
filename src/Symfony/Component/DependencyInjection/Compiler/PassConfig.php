@@ -41,7 +41,7 @@ class PassConfig
 
         $this->beforeOptimizationPasses = array(
             100 => array(
-                $resolveClassPass = new ResolveClassPass(),
+                new ResolveClassPass(),
                 new ResolveInstanceofConditionalsPass(),
             ),
         );
@@ -53,7 +53,6 @@ class PassConfig
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(false),
             new ResolveFactoryClassPass(),
-            new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),

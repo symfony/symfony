@@ -18,8 +18,5 @@
       </property>
     </service>
     <service id="bar" parent="foo" />
-    <service id="biz" class="BizClass">
-        <tag name="biz_tag" />
-    </service>
   </services>
 </container>

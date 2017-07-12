@@ -203,7 +203,6 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
-    <xsd:attribute name="strict" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">
@@ -216,7 +215,6 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
-    <xsd:attribute name="strict" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="call">

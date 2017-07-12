@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
@@ -65,30 +64,6 @@ class AutowirePass extends AbstractRecursivePass
             $this->ambiguousServiceTypes = array();
             $this->autowired = array();
         }
-    }
-
-    /**
-     * Creates a resource to help know if this service has changed.
-     *
-     * @param \ReflectionClass $reflectionClass
-     *
-     * @return AutowireServiceResource
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.
-     */
-    public static function createResourceForClass(\ReflectionClass $reflectionClass)
-    {
-        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
-
-        $metadata = array();
-
-        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            if (!$reflectionMethod->isStatic()) {
-                $metadata[$reflectionMethod->name] = self::getResourceMetadataForMethod($reflectionMethod);
-            }
-        }
-
-        return new AutowireServiceResource($reflectionClass->name, $reflectionClass->getFileName(), $metadata);
     }
 
     /**
@@ -323,24 +298,15 @@ class AutowirePass extends AbstractRecursivePass
             return $reference;
         }
 
+        if (!$reference->canBeAutoregistered()) {
+            return;
+        }
+
         if (null === $this->types) {
             $this->populateAvailableTypes();
         }
 
-        if (isset($this->types[$type])) {
-            $message = 'Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0.';
-            if ($aliasSuggestion = $this->getAliasesSuggestionForType($type = $reference->getType(), $deprecationMessage)) {
-                $message .= ' '.$aliasSuggestion;
-            } else {
-                $message .= sprintf(' You should %s the "%s" service to "%s" instead.', isset($this->types[$this->types[$type]]) ? 'alias' : 'rename (or alias)', $this->types[$type], $type);
-            }
-
-            @trigger_error($message, E_USER_DEPRECATED);
-
-            return new TypedReference($this->types[$type], $type);
-        }
-
-        if (!$reference->canBeAutoregistered() || isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
+        if (isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
             return;
         }
 
@@ -497,30 +463,6 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
-    }
-
-    /**
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    private static function getResourceMetadataForMethod(\ReflectionMethod $method)
-    {
-        $methodArgumentsMetadata = array();
-        foreach ($method->getParameters() as $parameter) {
-            try {
-                $class = $parameter->getClass();
-            } catch (\ReflectionException $e) {
-                // type-hint is against a non-existent class
-                $class = false;
-            }
-
-            $methodArgumentsMetadata[] = array(
-                'class' => $class,
-                'isOptional' => $parameter->isOptional(),
-                'defaultValue' => ($parameter->isOptional() && !$parameter->isVariadic()) ? $parameter->getDefaultValue() : null,
-            );
-        }
-
-        return $methodArgumentsMetadata;
     }
 
     private function getAliasesSuggestionForType($type, $extraContext = null)

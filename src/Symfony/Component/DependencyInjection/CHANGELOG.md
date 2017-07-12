@@ -4,6 +4,7 @@ CHANGELOG
 4.0.0
 -----
 
+ * removed autowiring services based on the types they implement
  * added a third `$methodName` argument to the `getProxyFactoryCode()` method
    of the `DumperInterface`
  * removed support for autowiring types
@@ -11,6 +12,13 @@ CHANGELOG
  * removed support for dumping an ucompiled container in `PhpDumper`
  * removed support for generating a dumped `Container` without populating the method map
  * removed support for case insensitive service identifiers
+ * removed the `DefinitionDecorator` class, replaced by `ChildDefinition`
+ * removed the `AutowireServiceResource` class and related `AutowirePass::createResourceForClass()` method
+ * removed `LoggingFormatter`, `Compiler::getLoggingFormatter()` and `addLogMessage()` class and methods, use the `ContainerBuilder::log()` method instead
+ * removed `FactoryReturnTypePass`
+ * removed `ContainerBuilder::addClassResource()`, use the `addObjectResource()` or the `getReflectionClass()` method instead.
+ * removed support for top-level anonymous services
+ * removed silent behavior for unused attributes and elements
 
 3.4.0
 -----

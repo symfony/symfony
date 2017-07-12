@@ -712,32 +712,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAddClassResource()
-    {
-        $container = new ContainerBuilder();
-
-        $container->setResourceTracking(false);
-        $container->addClassResource(new \ReflectionClass('BarClass'));
-
-        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
-
-        $container->setResourceTracking(true);
-        $container->addClassResource(new \ReflectionClass('BarClass'));
-
-        $resources = $container->getResources();
-
-        $this->assertCount(2, $resources, '2 resources were registered');
-
-        /* @var $resource \Symfony\Component\Config\Resource\FileResource */
-        $resource = end($resources);
-
-        $this->assertInstanceOf('Symfony\Component\Config\Resource\FileResource', $resource);
-        $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
-    }
-
     public function testGetReflectionClass()
     {
         $container = new ContainerBuilder();

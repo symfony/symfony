@@ -1418,7 +1418,7 @@ class Request
     {
         if (!func_num_args() || func_get_arg(0)) {
             // setting $andCacheable to false should be deprecated in 4.1
-            throw new \BadMethodCallException('Checking only for cacheable HTTP methods with Symfony\Component\HttpFoundation\Request::isMethodSafe() is not supported.', E_USER_DEPRECATED);
+            throw new \BadMethodCallException('Checking only for cacheable HTTP methods with Symfony\Component\HttpFoundation\Request::isMethodSafe() is not supported.');
         }
 
         return in_array($this->getMethod(), array('GET', 'HEAD', 'OPTIONS', 'TRACE'));

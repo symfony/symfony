@@ -48,7 +48,7 @@ interface UserProviderInterface
     public function loadUserByUsername($username);
 
     /**
-     * Refreshes the user for the account interface.
+     * Refreshes the user.
      *
      * It is up to the implementation to decide if the user data should be
      * totally reloaded (e.g. from the database), or if the UserInterface
@@ -59,7 +59,7 @@ interface UserProviderInterface
      *
      * @return UserInterface
      *
-     * @throws UnsupportedUserException if the account is not supported
+     * @throws UnsupportedUserException if the user is not supported
      */
     public function refreshUser(UserInterface $user);
 

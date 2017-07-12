@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added support for doctrine/dbal v2.6 types
+
 3.1.0
 -----
 

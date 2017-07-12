@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-12T06:57:00Z
+
+I just realised that @hhamon suggested almost the same years ago (see #942) which was closed in favour of creating more specialised access decision managers (though that never happened). What do you think about that idea? Should we create one class per access decision strategy instead and then make it easier to inject your own access decision manager by introducing a new config option in the SecurityBundle?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-23T12:04:07Z
+
+@symfony/deciders What are your thoughts on this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T12:10:18Z
+
+Not sure if we need to create classes for existing strategies, we could keep them inline as today. If not, I would make those classes final.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-07-02T18:09:21Z
+
+I like the idea of having all strategies in seperate classes and configuring the service ID of the strategy to use (with a shortcut for `security.strategy.%s` IDs, so `affirmative` will set the `security.strategy.affirmative` service and `app.custom_strategy` will use that ID).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-07-02T18:09:28Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-04T07:38:27Z
+
+> I like the idea of having all strategies in seperate classes and configuring the service ID of the strategy to use [...]
+
+@WouterJ My main concern is if we really need to go the way of custom strategies then or if it wasn't enough to configure a service implementing the `AuthenticationManagerInterface` and then making it easy to change that service?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-09T23:40:54Z
+
+@xabbuh Any interest in finishing this one by taking into account comments?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-10T08:40:27Z
+
+Well, we should first decide which way we would like to go (i.e. making the vote strategy configurable or making it possible to configure the access decision manager like suggested in #942). I think my favourite solution is to keep the separated vote strategies for greater flexibility (as they are now in this PR), but remove the StrategyAwareAccessDecisionManager and instead allow just configure the access decision manager service in the SecurityBundle (you will only be able to configure either the access decision manager or the vote strategy). What do you think?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-11-10T22:13:44Z
+
+On second thought, I think we should remove the strategy stuff and just allow to configure the AccessDecisionManager service ID. With the VoteStrategyInterface, we add an extra layer of complexity for almost nothing. The AccessDecisionManager simply only proxies it's `decide()` call to the VoteStrategy and there is no other code in the manager.
+
+So simply creating a custom manager and setting it through a service should be more than enough.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-28T08:35:49Z
+
+I pushed an update that reverts the changes made to the `AccessDecisionManager`, but makes it possible to configure a service providing an `AccessDecisionManagerInterface` implementation.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-14T20:49:22Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-17T10:56:56Z
+
+Does it make sense to keep the strategy configurable for a custom access decision manager as a service?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-17T20:53:14Z
+
+@HeahDude I first thought when I introduced the `VoteStrategyInterface`. But thinking about it again I don't think there's much value in having reusable voting strategies. Reusing them wouldn't be much different from using the built-in access decision manager IMO.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-27T10:48:21Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-28T16:09:06Z
+
+Moving to milestone as this is not a blocker for 3.3. If you don't agree, please explain why.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-03T07:55:33Z
+
+PR description updated to match the actual state of this PR (the idea of a `VoteStrategyInterface` was dropped in favour of being able to configure your own `AccessDecisionManager` service).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T07:40:26Z
+
+ping @symfony/deciders

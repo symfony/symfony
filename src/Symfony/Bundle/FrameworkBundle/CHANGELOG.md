@@ -18,6 +18,8 @@ CHANGELOG
    `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` instead
  * Deprecated `TranslatorPass`, use 
    `Symfony\Component\Translation\DependencyInjection\TranslatorPass` instead
+ * Added `command` attribute to the `console.command` tag which takes the command
+   name as value, using it makes the command lazy
 
 3.3.0
 -----

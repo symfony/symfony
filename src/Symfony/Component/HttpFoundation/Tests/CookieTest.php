@@ -174,7 +174,7 @@ class CookieTest extends TestCase
     {
         $cookie = new Cookie('foo', 'b a r', 0, '/', null, false, false);
         $this->assertFalse($cookie->isRaw());
-        $this->assertEquals('foo=b+a+r; path=/', (string) $cookie);
+        $this->assertEquals('foo=b%20a%20r; path=/', (string) $cookie);
 
         $cookie = new Cookie('foo', 'b+a+r', 0, '/', null, false, false, true);
         $this->assertTrue($cookie->isRaw());

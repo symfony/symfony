@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-04T13:57:46Z
+
+Could you help me to fix tests?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-04T14:08:45Z
+
+I am afraid I will not be of much help here (I tried to do that before in #22836 but then excluded this part as I didn't manage to make the tests pass)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-04T14:21:51Z
+
+Ok, I see your previous comment here https://github.com/symfony/symfony/pull/22836#issuecomment-310990838. I'll try more...
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-11T10:14:12Z
+
+Tests are failing because half of the places removing the usage of the field in conditionals performed the wrong replacement, making the code equivalent to *disabling* enhanced compat all the time instead of enabling it all the time.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T13:02:04Z
+
+Green tests!

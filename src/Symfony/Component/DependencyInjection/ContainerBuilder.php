@@ -317,22 +317,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Adds the given class hierarchy as resources.
-     *
-     * @param \ReflectionClass $class
-     *
-     * @return $this
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use addObjectResource() or getReflectionClass() instead.
-     */
-    public function addClassResource(\ReflectionClass $class)
-    {
-        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use the addObjectResource() or the getReflectionClass() method instead.', E_USER_DEPRECATED);
-
-        return $this->addObjectResource($class->name);
-    }
-
-    /**
      * Retrieves the requested reflection class and registers it for resource tracking.
      *
      * @param string $class

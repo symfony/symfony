@@ -53,24 +53,6 @@ class Compiler
     }
 
     /**
-     * Returns the logging formatter which can be used by compilation passes.
-     *
-     * @return LoggingFormatter
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use the ContainerBuilder::log() method instead.
-     */
-    public function getLoggingFormatter()
-    {
-        if (null === $this->loggingFormatter) {
-            @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the ContainerBuilder::log() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-            $this->loggingFormatter = new LoggingFormatter();
-        }
-
-        return $this->loggingFormatter;
-    }
-
-    /**
      * Adds a pass to the PassConfig.
      *
      * @param CompilerPassInterface $pass     A compiler pass
@@ -80,20 +62,6 @@ class Compiler
     public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
         $this->passConfig->addPass($pass, $type, $priority);
-    }
-
-    /**
-     * Adds a log message.
-     *
-     * @param string $string The log message
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use the ContainerBuilder::log() method instead.
-     */
-    public function addLogMessage($string)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the ContainerBuilder::log() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->log[] = $string;
     }
 
     /**

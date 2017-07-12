@@ -121,5 +121,3 @@ class ChildDefinition extends Definition
         throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
     }
 }
-
-class_alias(ChildDefinition::class, DefinitionDecorator::class);

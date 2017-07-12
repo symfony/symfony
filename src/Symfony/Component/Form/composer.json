@@ -39,8 +39,8 @@
         "symfony/dependency-injection": "<3.4",
         "symfony/doctrine-bridge": "<3.4",
         "symfony/framework-bundle": "<3.4",
-        "symfony/twig-bridge": "<3.4",
-        "symfony/var-dumper": "<3.4"
+        "symfony/http-kernel": "<3.4",
+        "symfony/twig-bridge": "<3.4"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

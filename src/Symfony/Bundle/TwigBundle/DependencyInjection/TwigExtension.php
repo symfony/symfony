@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Twig\Extension\ExtensionInterface;
+use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
 
 /**
@@ -150,6 +151,7 @@ class TwigExtension extends Extension
         $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(LoaderInterface::class)->addTag('twig.loader');
+        $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');
     }
 
     private function getBundleHierarchy(ContainerBuilder $container)

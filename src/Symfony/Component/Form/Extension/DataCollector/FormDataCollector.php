@@ -19,11 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
-use Symfony\Component\VarDumper\Caster\CutStub;
-use Symfony\Component\VarDumper\Cloner\ClonerInterface;
-use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * Data collector for {@link FormInterface} instances.
@@ -70,11 +66,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      * @var array
      */
     private $formsByView;
-
-    /**
-     * @var ClonerInterface
-     */
-    private $cloner;
 
     public function __construct(FormDataExtractorInterface $dataExtractor)
     {
@@ -248,49 +239,33 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    protected function cloneVar($var, $isClass = false)
+    protected function getCasters()
     {
-        if ($var instanceof Data) {
-            return $var;
-        }
-        if (null === $this->cloner) {
-            $this->cloner = new VarCloner();
-            $this->cloner->setMaxItems(-1);
-            $this->cloner->addCasters(array(
-                '*' => function ($v, array $a, Stub $s, $isNested) {
-                    foreach ($a as &$v) {
-                        if (is_object($v) && !$v instanceof \DateTimeInterface) {
-                            $v = new CutStub($v);
-                        }
-                    }
-
-                    return $a;
-                },
-                \Exception::class => function (\Exception $e, array $a, Stub $s) {
-                    if (isset($a[$k = "\0Exception\0previous"])) {
+        return parent::getCasters() + array(
+            \Exception::class => function (\Exception $e, array $a, Stub $s) {
+                foreach (array("\0Exception\0previous", "\0Exception\0trace") as $k) {
+                    if (isset($a[$k])) {
                         unset($a[$k]);
                         ++$s->cut;
                     }
+                }
 
-                    return $a;
-                },
-                FormInterface::class => function (FormInterface $f, array $a) {
-                    return array(
-                        Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                        Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
-                    );
-                },
-                ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
-                    return array(
-                        Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
-                        Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
-                        Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
-                    );
-                },
-            ));
-        }
-
-        return $this->cloner->cloneVar($var, Caster::EXCLUDE_VERBOSE);
+                return $a;
+            },
+            FormInterface::class => function (FormInterface $f, array $a) {
+                return array(
+                    Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
+                );
+            },
+            ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
+                return array(
+                    Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
+                    Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
+                    Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
+                );
+            },
+        );
     }
 
     private function &recursiveBuildPreliminaryFormTree(FormInterface $form, array &$outputByHash)

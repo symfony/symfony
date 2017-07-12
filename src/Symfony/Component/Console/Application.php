@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
@@ -63,6 +64,7 @@ class Application
     private $runningCommand;
     private $name;
     private $version;
+    private $commandLoader;
     private $catchExceptions = true;
     private $autoExit = true;
     private $definition;
@@ -93,6 +95,11 @@ class Application
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setCommandLoader(CommandLoaderInterface $commandLoader)
+    {
+        $this->commandLoader = $commandLoader;
     }
 
     /**
@@ -423,6 +430,10 @@ class Application
             throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
         }
 
+        if (!$command->getName()) {
+            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($command)));
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
@@ -443,11 +454,15 @@ class Application
      */
     public function get($name)
     {
-        if (!isset($this->commands[$name])) {
+        if (isset($this->commands[$name])) {
+            $command = $this->commands[$name];
+        } elseif ($this->commandLoader && $this->commandLoader->has($name)) {
+            $command = $this->commandLoader->get($name);
+            $command->setName($name);
+            $this->add($command);
+        } else {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
-
-        $command = $this->commands[$name];
 
         if ($this->wantHelps) {
             $this->wantHelps = false;
@@ -470,7 +485,7 @@ class Application
      */
     public function has($name)
     {
-        return isset($this->commands[$name]);
+        return isset($this->commands[$name]) || ($this->commandLoader && $this->commandLoader->has($name));
     }
 
     /**
@@ -547,7 +562,7 @@ class Application
      */
     public function find($name)
     {
-        $allCommands = array_keys($this->commands);
+        $allCommands = $this->commandLoader ? array_merge($this->commandLoader->getNames(), array_keys($this->commands)) : array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
 
@@ -573,12 +588,12 @@ class Application
 
         // filter out aliases for commands which are already on the list
         if (count($commands) > 1) {
-            $commandList = $this->commands;
-            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
-                $commandName = $commandList[$nameOrAlias]->getName();
+            $commandList = $this->commandLoader ? array_merge(array_flip($this->commandLoader->getNames()), $this->commands) : $this->commands;
+            $commands = array_unique(array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+                $commandName = $commandList[$nameOrAlias] instanceof Command ? $commandList[$nameOrAlias]->getName() : $nameOrAlias;
 
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands);
-            });
+            }));
         }
 
         $exact = in_array($name, $commands, true);
@@ -590,6 +605,9 @@ class Application
                 $maxLen = max(Helper::strlen($abbrev), $maxLen);
             }
             $abbrevs = array_map(function ($cmd) use ($commandList, $usableWidth, $maxLen) {
+                if (!$commandList[$cmd] instanceof Command) {
+                    return $cmd;
+                }
                 $abbrev = str_pad($cmd, $maxLen, ' ').' '.$commandList[$cmd]->getDescription();
 
                 return Helper::strlen($abbrev) > $usableWidth ? Helper::substr($abbrev, 0, $usableWidth - 3).'...' : $abbrev;
@@ -614,13 +632,32 @@ class Application
     public function all($namespace = null)
     {
         if (null === $namespace) {
-            return $this->commands;
+            if (!$this->commandLoader) {
+                return $this->commands;
+            }
+
+            $commands = $this->commands;
+            foreach ($this->commandLoader->getNames() as $name) {
+                if (!isset($commands[$name])) {
+                    $commands[$name] = $this->commandLoader->get($name);
+                }
+            }
+
+            return $commands;
         }
 
         $commands = array();
         foreach ($this->commands as $name => $command) {
             if ($namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
                 $commands[$name] = $command;
+            }
+        }
+
+        if ($this->commandLoader) {
+            foreach ($this->commandLoader->getNames() as $name) {
+                if (!isset($commands[$name]) && $namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
+                    $commands[$name] = $this->commandLoader->get($name);
+                }
             }
         }
 

@@ -23,6 +23,7 @@
     "require-dev": {
         "symfony/console": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
+        "symfony/security-core": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0"
     },
     "conflict": {

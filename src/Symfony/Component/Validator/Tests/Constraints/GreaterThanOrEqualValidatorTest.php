@@ -57,6 +57,17 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
     /**
      * {@inheritdoc}
      */
+    public function provideValidComparisonsToPropertyPath()
+    {
+        return array(
+            array(5),
+            array(6),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function provideInvalidComparisons()
     {
         return array(

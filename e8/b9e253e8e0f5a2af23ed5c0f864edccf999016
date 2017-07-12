@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-12T19:01:24Z
+
+No, the `XmlFileLoader` use the absolute path of the XML files when generating the internal id. But that made me think we should probably just do the same here (code updated accordingly).

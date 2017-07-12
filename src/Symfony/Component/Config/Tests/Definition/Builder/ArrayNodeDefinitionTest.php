@@ -294,6 +294,8 @@ class ArrayNodeDefinitionTest extends TestCase
             ->integerPrototype();
 
         $node->getNode()->finalize(array(1));
+
+        $this->addToAssertionCount(1);
     }
 
     /**

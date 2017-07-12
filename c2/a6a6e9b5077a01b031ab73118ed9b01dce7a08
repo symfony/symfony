@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-04T19:51:15Z
+
+This changes the behaviour of when you have more than one authentication provider and one of them throws an `AccountStatusException`. Before, the other authentication providers wouldn't have been caught and access would have been denied. Now, other providers could grant access.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-05T12:02:47Z
+
+@xabbuh indeed, fixed

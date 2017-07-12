@@ -18,6 +18,7 @@ CHANGELOG
    `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` instead
  * Deprecated `TranslatorPass`, use 
    `Symfony\Component\Translation\DependencyInjection\TranslatorPass` instead
+ * Added `namespace` as a cache pool configuration option.
 
 3.3.0
 -----

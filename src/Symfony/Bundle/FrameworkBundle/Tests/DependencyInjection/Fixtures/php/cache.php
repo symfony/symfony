@@ -15,6 +15,7 @@ $container->loadFromExtension('framework', array(
             'cache.baz' => array(
                 'adapter' => 'cache.adapter.filesystem',
                 'default_lifetime' => 7,
+                'namespace' => 'qux',
             ),
             'cache.foobar' => array(
                 'adapter' => 'cache.adapter.psr6',

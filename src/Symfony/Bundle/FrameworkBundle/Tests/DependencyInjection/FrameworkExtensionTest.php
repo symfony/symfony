@@ -966,7 +966,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foo', 'cache.adapter.apcu', 30);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.bar', 'cache.adapter.doctrine', 5);
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7, 'qux');
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
     }
@@ -1045,7 +1045,7 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
-    private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $id, $adapter, $defaultLifetime)
+    private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $id, $adapter, $defaultLifetime, $namespace = null)
     {
         $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $adapter));
 
@@ -1059,6 +1059,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $tag = $poolDefinition->getTag('cache.pool');
         $this->assertTrue(isset($tag[0]['default_lifetime']), 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
         $this->assertSame($defaultLifetime, $tag[0]['default_lifetime'], 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
+
+        if ($namespace) {
+            $this->assertTrue(isset($tag[0]['namespace']), 'The namespace is stored as an attribute of the "cache.pool" tag.');
+            $this->assertSame($namespace, $tag[0]['namespace'], 'The namespace is stored as an attribute of the "cache.pool" tag.');
+        } else {
+            $this->assertFalse(isset($tag[0]['namespace']), 'No namespace is stored as an attribute of the "cache.pool" tag.');
+        }
 
         $parentDefinition = $poolDefinition;
         do {

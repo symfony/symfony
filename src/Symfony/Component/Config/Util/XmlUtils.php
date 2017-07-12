@@ -120,8 +120,7 @@ class XmlUtils
 
         try {
             return static::load($content, $schemaOrCallable);
-        }
-        catch (\InvalidArgumentException $ex) {
+        } catch (\InvalidArgumentException $ex) {
             throw new \InvalidArgumentException(
                 str_replace(self::XML_IS_NOT_VALID_MESSAGE, sprintf('The XML file "%s" is not valid.', $file), $ex->getMessage()),
                 $ex->getCode(),

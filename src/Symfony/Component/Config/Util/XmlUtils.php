@@ -41,7 +41,7 @@ class XmlUtils
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
-    public static function load($content, $schemaOrCallable = null)
+    public static function parse($content, $schemaOrCallable = null)
     {
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
@@ -119,7 +119,7 @@ class XmlUtils
         }
 
         try {
-            return static::load($content, $schemaOrCallable);
+            return static::parse($content, $schemaOrCallable);
         } catch (\InvalidArgumentException $ex) {
             throw new \InvalidArgumentException(
                 str_replace(self::XML_IS_NOT_VALID_MESSAGE, sprintf('The XML file "%s" is not valid.', $file), $ex->getMessage()),

@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 
 /**
@@ -28,8 +29,9 @@ class GuardListener
     private $authenticationChecker;
     private $trustResolver;
     private $roleHierarchy;
+    private $validator;
 
-    public function __construct($configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct($configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authenticationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
         $this->configuration = $configuration;
         $this->expressionLanguage = $expressionLanguage;
@@ -37,6 +39,7 @@ class GuardListener
         $this->authenticationChecker = $authenticationChecker;
         $this->trustResolver = $trustResolver;
         $this->roleHierarchy = $roleHierarchy;
+        $this->validator = $validator;
     }
 
     public function onTransition(GuardEvent $event, $eventName)
@@ -72,6 +75,8 @@ class GuardListener
             'auth_checker' => $this->authenticationChecker,
             // needed for the is_* expression function
             'trust_resolver' => $this->trustResolver,
+            // needed for the is_valid expression function
+            'validator' => $this->validator,
         );
 
         return $variables;

@@ -210,4 +210,17 @@ class ProcessBuilderTest extends TestCase
         $builder = ProcessBuilder::create();
         $builder->setInput(array());
     }
+
+    public function testDoesNotPrefixExec()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot run on Windows.');
+        }
+
+        $builder = ProcessBuilder::create(array('command', '-v', 'ls'));
+        $process = $builder->getProcess();
+        $process->run();
+
+        $this->assertTrue($process->isSuccessful());
+    }
 }

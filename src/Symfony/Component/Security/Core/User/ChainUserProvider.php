@@ -51,6 +51,8 @@ class ChainUserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
+        $e = null;
+
         foreach ($this->providers as $provider) {
             try {
                 return $provider->loadUserByUsername($username);
@@ -59,7 +61,7 @@ class ChainUserProvider implements UserProviderInterface
             }
         }
 
-        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
+        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username), 0, $e);
         $ex->setUsername($username);
         throw $ex;
     }
@@ -70,24 +72,26 @@ class ChainUserProvider implements UserProviderInterface
     public function refreshUser(UserInterface $user)
     {
         $supportedUserFound = false;
+        $unsupportedUserException = null;
+        $usernameNotFoundException = null;
 
         foreach ($this->providers as $provider) {
             try {
                 return $provider->refreshUser($user);
-            } catch (UnsupportedUserException $e) {
+            } catch (UnsupportedUserException $unsupportedUserException) {
                 // try next one
-            } catch (UsernameNotFoundException $e) {
+            } catch (UsernameNotFoundException $usernameNotFoundException) {
                 $supportedUserFound = true;
                 // try next one
             }
         }
 
         if ($supportedUserFound) {
-            $e = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
+            $e = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()), 0, $usernameNotFoundException);
             $e->setUsername($user->getUsername());
             throw $e;
         } else {
-            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)), 0, $unsupportedUserException);
         }
     }
 

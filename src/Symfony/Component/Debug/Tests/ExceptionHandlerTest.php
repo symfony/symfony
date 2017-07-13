@@ -14,6 +14,7 @@ namespace Symfony\Component\Debug\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
+use Symfony\Component\Debug\Formatter\TextFormatter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -54,7 +55,20 @@ class ExceptionHandlerTest extends TestCase
 
     public function testStatusCode()
     {
-        $handler = new ExceptionHandler(false, 'iso8859-1');
+        $handler = new ExceptionHandler(false, 'iso-8859-1');
+
+        ob_start();
+        $handler->sendPhpResponse(new \RuntimeException('Foo'));
+        $response = ob_get_clean();
+
+        $this->assertContains('Whoops, looks like something went wrong.', $response);
+
+        $expectedHeaders = array(
+            array('HTTP/1.0 500', true, null),
+            array('Content-Type: text/html; charset=iso-8859-1', true, null),
+        );
+
+        $this->assertSame($expectedHeaders, testHeader());
 
         ob_start();
         $handler->sendPhpResponse(new NotFoundHttpException('Foo'));
@@ -64,15 +78,43 @@ class ExceptionHandlerTest extends TestCase
 
         $expectedHeaders = array(
             array('HTTP/1.0 404', true, null),
-            array('Content-Type: text/html; charset=iso8859-1', true, null),
+            array('Content-Type: text/html; charset=iso-8859-1', true, null),
         );
 
         $this->assertSame($expectedHeaders, testHeader());
     }
 
+    public function testContentType()
+    {
+        $handler = new ExceptionHandler(false, 'iso-8859-1');
+
+        ob_start();
+        $handler->sendPhpResponse(new \RuntimeException('Foo'));
+        $response = ob_get_clean();
+
+        $this->assertContains(array('Content-Type: text/html; charset=iso-8859-1', true, null), testHeader());
+
+        $handler->getFormatter()->setCharset('ISO-8859-1');
+
+        ob_start();
+        $handler->sendPhpResponse(new \RuntimeException('Foo'));
+        $response = ob_get_clean();
+
+        $this->assertContains(array('Content-Type: text/html; charset=ISO-8859-1', true, null), testHeader());
+
+        $handler = new ExceptionHandler(false, 'iso-8859-15');
+        $handler->setFormatter(new TextFormatter());
+
+        ob_start();
+        $handler->sendPhpResponse(new \RuntimeException('Foo'));
+        $response = ob_get_clean();
+
+        $this->assertContains(array('Content-Type: text/plain; charset=iso-8859-15', true, null), testHeader());
+    }
+
     public function testHeaders()
     {
-        $handler = new ExceptionHandler(false, 'iso8859-1');
+        $handler = new ExceptionHandler(false, 'iso-8859-1');
 
         ob_start();
         $handler->sendPhpResponse(new MethodNotAllowedHttpException(array('POST')));
@@ -81,7 +123,7 @@ class ExceptionHandlerTest extends TestCase
         $expectedHeaders = array(
             array('HTTP/1.0 405', true, null),
             array('Allow: POST', false, null),
-            array('Content-Type: text/html; charset=iso8859-1', true, null),
+            array('Content-Type: text/html; charset=iso-8859-1', true, null),
         );
 
         $this->assertSame($expectedHeaders, testHeader());

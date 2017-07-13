@@ -294,12 +294,12 @@ class Container implements ResettableContainerInterface
             return false;
         }
 
-        if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-        }
-
         if (isset($this->privates[$id])) {
             @trigger_error(sprintf('Checking for the initialization of the "%s" private service is deprecated since Symfony 3.4 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+        }
+
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
         }
 
         return isset($this->services[$id]);

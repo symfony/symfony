@@ -30,6 +30,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -42,6 +43,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+use Symfony\Component\Worker\Loop\Loop;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -981,6 +983,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasAlias('amqp.broker'));
         $this->assertSame('amqp.broker.default', (string) $container->getAlias('amqp.broker'));
+        $this->assertEquals(new Reference('amqp.broker'), $container->getDefinition('amqp.command.move')->getArgument(0));
     }
 
     public function testAmqpFull()
@@ -1034,11 +1037,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasAlias('amqp.broker'));
         $this->assertSame('amqp.broker.queue_prod', (string) $container->getAlias('amqp.broker'));
+        $this->assertEquals(new Reference('amqp.broker'), $container->getDefinition('amqp.command.move')->getArgument(0));
     }
 
     public function testWorkerEmpty()
     {
         $container = $this->createContainerFromFile('worker_empty');
+
+        $this->assertSame(array(), $container->getDefinition('worker.command.list')->getArgument(0));
     }
 
     public function testWorkerFull()
@@ -1134,6 +1140,17 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertInstanceOf(Reference::class, $worker->getArgument(2));
         $this->assertSame('logger', (string) $worker->getArgument(2));
         $this->assertSame('worker_service_a', $worker->getArgument(3));
+        $workerLocator = $container->getDefinition('worker.worker_locator');
+        $this->assertEquals(array('worker_d' => new TypedReference('worker.worker.worker_d', Loop::class), 'worker_service_a' => new TypedReference('worker.worker.worker_service_a', Loop::class)), $workerLocator->getArgument(0));
+
+        /* worker:list command */
+        $this->assertSame(array('worker_d', 'worker_service_a'), $container->getDefinition('worker.command.list')->getArgument(0));
+
+        /* worker:run command */
+        $workerRunCommand = $container->getDefinition('worker.command.run');
+        $this->assertEquals(new Reference('worker.worker_locator'), $workerRunCommand->getArgument(0));
+        $this->assertEquals('foobar', $workerRunCommand->getArgument(1), 'worker:run expects the "worker.cli_title_prefix" config value as 2nd argument');
+        $this->assertSame(array('worker_d', 'worker_service_a'), $workerRunCommand->getArgument(2));
     }
 
     protected function createContainer(array $data = array())

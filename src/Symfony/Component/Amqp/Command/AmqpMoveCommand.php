@@ -17,18 +17,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AmqpMoveCommand extends Command
 {
-    private $container;
+    private $broker;
     private $logger;
 
-    /**
-     * @param ContainerInterface $container A PSR11 container from which to load the Broker service
-     * @param LoggerInterface|null $logger
-     */
-    public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
+    public function __construct(Broker $broker, LoggerInterface $logger = null)
     {
         parent::__construct();
 
-        $this->container = $container;
+        $this->broker = $broker;
         $this->logger = $logger;
     }
 
@@ -46,13 +42,11 @@ class AmqpMoveCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var Broker $broker */
-        $broker = $this->container->get(Broker::class);
         $io = new SymfonyStyle($input, $output);
         $from = $input->getArgument('from');
         $to = $input->getArgument('to');
 
-        while (false !== $message = $broker->get($from)) {
+        while (false !== $message = $this->broker->get($from)) {
             $io->comment("Moving a message from $from to $to...");
 
             if (null !== $this->logger) {
@@ -62,8 +56,8 @@ class AmqpMoveCommand extends Command
                 ));
             }
 
-            $broker->move($message, $to);
-            $broker->ack($message);
+            $this->broker->move($message, $to);
+            $this->broker->ack($message);
 
             if ($output->isDebug()) {
                 $io->comment("...message moved from $from to $to.");

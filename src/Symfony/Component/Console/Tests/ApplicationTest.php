@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -35,7 +35,6 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApplicationTest extends TestCase
@@ -129,10 +128,9 @@ class ApplicationTest extends TestCase
         $commands = $application->all('foo');
         $this->assertCount(1, $commands, '->all() takes a namespace as its first argument');
 
-        $application->setCommandLoader(new ContainerCommandLoader(
-            new ServiceLocator(array('foo-bar' => function () { return new \Foo1Command(); })),
-            array('foo:bar1' => 'foo-bar')
-        ));
+        $application->setCommandLoader(new FactoryCommandLoader(array(
+            'foo:bar1' => function () { return new \Foo1Command(); },
+        )));
         $commands = $application->all('foo');
         $this->assertCount(2, $commands, '->all() takes a namespace as its first argument');
         $this->assertInstanceOf(\FooCommand::class, $commands['foo:bar'], '->all() returns the registered commands');
@@ -202,9 +200,9 @@ class ApplicationTest extends TestCase
         $this->assertEquals($foo, $application->get('foo:bar'), '->get() returns a command by name');
         $this->assertEquals($foo, $application->get('afoobar'), '->get() returns a command by alias');
 
-        $application->setCommandLoader(new ContainerCommandLoader(new ServiceLocator(array(
-            'foo-bar' => function () { return new \Foo1Command(); },
-        )), array('foo:bar1' => 'foo-bar', 'afoobar1' => 'foo-bar')));
+        $application->setCommandLoader(new FactoryCommandLoader(array(
+            'foo:bar1' => function () { return new \Foo1Command(); },
+        )));
 
         $this->assertTrue($application->has('afoobar'), '->has() returns true if an instance is registered for an alias even with command loader');
         $this->assertEquals($foo, $application->get('foo:bar'), '->get() returns an instance by name even with command loader');
@@ -321,9 +319,9 @@ class ApplicationTest extends TestCase
     public function testFindWithCommandLoader()
     {
         $application = new Application();
-        $application->setCommandLoader(new ContainerCommandLoader(new ServiceLocator(array(
-            'foo-bar' => $f = function () { return new \FooCommand(); },
-        )), array('foo:bar' => 'foo-bar')));
+        $application->setCommandLoader(new FactoryCommandLoader(array(
+            'foo:bar' => $f = function () { return new \FooCommand(); },
+        )));
 
         $this->assertInstanceOf('FooCommand', $application->find('foo:bar'), '->find() returns a command if its name exists');
         $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $application->find('h'), '->find() returns a command if its name exists');

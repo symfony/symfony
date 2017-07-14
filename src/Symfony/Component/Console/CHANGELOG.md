@@ -4,7 +4,8 @@ CHANGELOG
 3.4.0
 -----
 
- * added `CommandLoaderInterface` and PSR-11 `ContainerCommandLoader`
+ * added `CommandLoaderInterface`, `FactoryCommandLoader` and PSR-11
+   `ContainerCommandLoader` for commands lazy-loading
 
 3.3.0
 -----

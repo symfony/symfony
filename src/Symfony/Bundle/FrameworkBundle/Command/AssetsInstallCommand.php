@@ -46,16 +46,16 @@ class AssetsInstallCommand extends ContainerAwareCommand
         $this
             ->setName('assets:install')
             ->setDefinition(array(
-                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'web'),
+                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'public'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
-            ->setDescription('Installs bundles web assets under a public web directory')
+            ->setDescription('Installs bundles web assets under a public directory')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command installs bundle assets into a given
-directory (e.g. the <comment>web</comment> directory).
+directory (e.g. the <comment>public</comment> directory).
 
-  <info>php %command.full_name% web</info>
+  <info>php %command.full_name% public</info>
 
 A "bundles" directory will be created inside the target directory and the
 "Resources/public" directory of each bundle will be copied into it.
@@ -63,11 +63,11 @@ A "bundles" directory will be created inside the target directory and the
 To create a symlink to each bundle instead of copying its assets, use the
 <info>--symlink</info> option (will fall back to hard copies when symbolic links aren't possible:
 
-  <info>php %command.full_name% web --symlink</info>
+  <info>php %command.full_name% public --symlink</info>
 
 To make symlink relative, add the <info>--relative</info> option:
 
-  <info>php %command.full_name% web --symlink --relative</info>
+  <info>php %command.full_name% public --symlink --relative</info>
 
 EOT
             )
@@ -85,7 +85,13 @@ EOT
             $targetArg = $this->getContainer()->getParameter('kernel.project_dir').'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
-                throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                // deprecated, logic to be removed in 4.0
+                // this allows the commands to work out of the box with web/ and public/
+                if (is_dir(dirname($targetArg).'/web')) {
+                    $targetArg = dirname($targetArg).'/web';
+                } else {
+                    throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                }
             }
         }
 

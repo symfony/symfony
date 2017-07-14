@@ -88,9 +88,10 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*');
 
         $this->assertEquals(
-            array('service_container', Bar::class),
+            array('service_container', Bar::class.'.prototype'),
             array_keys($container->getDefinitions())
         );
+        $this->assertSame(Bar::class.'.prototype', (string) $container->getAlias(Bar::class));
     }
 
     public function testRegisterClassesWithExclude()

@@ -204,6 +204,12 @@ class IntegrationTest extends TestCase
             'child_service',
             'child_service_expected',
         );
+
+        yield array(
+            'psr4_prototype_parent_child',
+            'child_service',
+            'child_service_expected',
+        );
     }
 }
 

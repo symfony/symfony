@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -58,12 +59,14 @@ abstract class FileLoader extends BaseFileLoader
             throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: %s.', $namespace));
         }
 
+        $public = $prototype->isPublic();
         $classes = $this->findClasses($namespace, $resource, $exclude);
         // prepare for deep cloning
         $prototype = serialize($prototype);
 
         foreach ($classes as $class) {
-            $this->setDefinition($class, unserialize($prototype));
+            $this->setDefinition("$class.prototype", unserialize($prototype)->setClass($class)->setPublic(false));
+            $this->container->setAlias($class, new Alias("$class.prototype", $public));
         }
     }
 

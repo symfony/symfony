@@ -1,0 +1,7 @@
+services:
+    child_service_expected:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
+        autoconfigure: false
+        autowire: true
+        public: true
+        arguments: ['dummy_arg']

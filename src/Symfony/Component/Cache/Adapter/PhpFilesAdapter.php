@@ -29,6 +29,13 @@ class PhpFilesAdapter extends AbstractAdapter
         return function_exists('opcache_invalidate') && ini_get('opcache.enable');
     }
 
+    /**
+     * @param string      $namespace
+     * @param int         $defaultLifetime
+     * @param string|null $directory
+     *
+     * @throws CacheException if OPcache is not enabled
+     */
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
         if (!static::isSupported()) {

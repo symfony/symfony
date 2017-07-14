@@ -39,6 +39,10 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
      */
     protected $maxIdLength;
 
+    /**
+     * @param string $namespace
+     * @param int    $defaultLifetime
+     */
     protected function __construct($namespace = '', $defaultLifetime = 0)
     {
         $this->namespace = '' === $namespace ? '' : $this->getId($namespace).':';
@@ -81,6 +85,15 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         );
     }
 
+    /**
+     * @param string               $namespace
+     * @param int                  $defaultLifetime
+     * @param string               $version
+     * @param string               $directory
+     * @param LoggerInterface|null $logger
+     *
+     * @return AdapterInterface
+     */
     public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
     {
         if (null === self::$apcuSupported) {
@@ -139,7 +152,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     /**
      * Deletes all items in the pool.
      *
-     * @param string The prefix used for all identifiers managed by this pool
+     * @param string $namespace The prefix used for all identifiers managed by this pool
      *
      * @return bool True if the pool was successfully cleared, false otherwise
      */

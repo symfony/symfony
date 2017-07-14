@@ -23,7 +23,6 @@ class Compiler
 {
     private $passConfig;
     private $log = array();
-    private $loggingFormatter;
     private $serviceReferenceGraph;
 
     public function __construct()

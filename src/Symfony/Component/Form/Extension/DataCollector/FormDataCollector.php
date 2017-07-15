@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
@@ -67,11 +66,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      * @var array
      */
     private $formsByView;
-
-    /**
-     * @var ValueExporter
-     */
-    private $valueExporter;
 
     private $hasVarDumper;
 

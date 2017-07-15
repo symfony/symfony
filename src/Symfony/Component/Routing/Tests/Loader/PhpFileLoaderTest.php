@@ -80,4 +80,14 @@ class PhpFileLoaderTest extends TestCase
             (string) $fileResource
         );
     }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessageRegExp /^PHP routing configuration must return a RouteCollection, got "array" in ".+invalid_return\.php"\.$/
+     */
+    public function testInvalidReturn()
+    {
+        $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('invalid_return.php');
+    }
 }

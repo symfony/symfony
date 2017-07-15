@@ -61,6 +61,12 @@ class PhpFileLoader extends FileLoader
      */
     private static function includeFile($file, PhpFileLoader $loader)
     {
-        return include $file;
+        $collection = include $file;
+
+        if (!$collection instanceof RouteCollection) {
+            throw new \UnexpectedValueException(sprintf('PHP routing configuration must return a RouteCollection, got "%s" in "%s".', is_object($collection) ? get_class($collection) : gettype($collection), $file));
+        }
+
+        return $collection;
     }
 }

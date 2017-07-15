@@ -466,7 +466,6 @@ class Application
             $command = $this->commands[$name];
         } elseif ($this->commandLoader && $this->commandLoader->has($name)) {
             $command = $this->commandLoader->get($name);
-            $command->setName($name);
             $this->add($command);
         } else {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
@@ -647,7 +646,7 @@ class Application
             $commands = $this->commands;
             foreach ($this->commandLoader->getNames() as $name) {
                 if (!isset($commands[$name])) {
-                    $commands[$name] = $this->commandLoader->get($name);
+                    $commands[$name] = $this->get($name);
                 }
             }
 
@@ -664,7 +663,7 @@ class Application
         if ($this->commandLoader) {
             foreach ($this->commandLoader->getNames() as $name) {
                 if (!isset($commands[$name]) && $namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
-                    $commands[$name] = $this->commandLoader->get($name);
+                    $commands[$name] = $this->get($name);
                 }
             }
         }

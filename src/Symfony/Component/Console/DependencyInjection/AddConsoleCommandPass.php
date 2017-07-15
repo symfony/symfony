@@ -87,6 +87,8 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 }
             }
 
+            $definition->addMethodCall('setName', array($commandName));
+
             if ($aliases) {
                 $definition->addMethodCall('setAliases', array($aliases));
             }

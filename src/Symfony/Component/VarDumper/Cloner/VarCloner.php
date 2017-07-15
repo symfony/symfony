@@ -26,7 +26,7 @@ class VarCloner extends AbstractCloner
     {
         $useExt = $this->useExt;
         $len = 1;                       // Length of $queue
-        $pos = 0;                       // Number of cloned items past the first level
+        $pos = 0;                       // Number of cloned items past the minimum depth
         $refsCounter = 0;               // Hard references counter
         $queue = array(array($var));    // This breadth-first queue is the return value
         $arrayRefs = array();           // Map of queue indexes to stub array objects
@@ -36,6 +36,10 @@ class VarCloner extends AbstractCloner
         $values = array();              // Map of stub objects' hashes to original values
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
+        $minDepth = $this->minDepth;
+        $currentDepth = 0;              // Current tree depth
+        $currentDepthFinalIndex = 0;    // Final $queue index for current tree depth
+        $minimumDepthReached = $minDepth === 0; // Becomes true when minimum tree depth has been reached
         $cookie = (object) array();     // Unique object used to detect hard references
         $gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
         $a = null;                      // Array cast for nested structures
@@ -57,6 +61,15 @@ class VarCloner extends AbstractCloner
         $hashOffset = self::$hashOffset;
 
         for ($i = 0; $i < $len; ++$i) {
+            // Detect when we move on to the next tree depth
+            if ($i > $currentDepthFinalIndex) {
+                ++$currentDepth;
+                $currentDepthFinalIndex = $len - 1;
+                if ($currentDepth >= $minDepth) {
+                    $minimumDepthReached = true;
+                }
+            }
+
             $indexed = true;            // Whether the currently iterated array is numerically indexed or not
             $j = -1;                    // Position in the currently iterated array
             $fromObjCast = array_keys($queue[$i]);
@@ -166,7 +179,7 @@ class VarCloner extends AbstractCloner
                                 $stub->handle = $h;
                             }
                             $stub->value = null;
-                            if (0 <= $maxItems && $maxItems <= $pos) {
+                            if (0 <= $maxItems && $maxItems <= $pos && $minimumDepthReached) {
                                 $stub->cut = count($a);
                                 $a = null;
                             }
@@ -193,7 +206,7 @@ class VarCloner extends AbstractCloner
                             $stub->handle = $h;
                             $a = $this->castResource($stub, 0 < $i);
                             $stub->value = null;
-                            if (0 <= $maxItems && $maxItems <= $pos) {
+                            if (0 <= $maxItems && $maxItems <= $pos && $minimumDepthReached) {
                                 $stub->cut = count($a);
                                 $a = null;
                             }
@@ -226,7 +239,7 @@ class VarCloner extends AbstractCloner
                     }
 
                     if ($a) {
-                        if ($i && 0 <= $maxItems) {
+                        if ($minimumDepthReached && 0 <= $maxItems) {
                             $k = count($a);
                             if ($pos < $maxItems) {
                                 if ($maxItems < $pos += $k) {

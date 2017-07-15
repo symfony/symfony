@@ -129,6 +129,7 @@ abstract class AbstractCloner implements ClonerInterface
 
     protected $maxItems = 2500;
     protected $maxString = -1;
+    protected $minDepth = 1;
     protected $useExt;
 
     private $casters = array();
@@ -168,7 +169,7 @@ abstract class AbstractCloner implements ClonerInterface
     }
 
     /**
-     * Sets the maximum number of items to clone past the first level in nested structures.
+     * Sets the maximum number of items to clone past the minimum depth in nested structures.
      *
      * @param int $maxItems
      */
@@ -185,6 +186,17 @@ abstract class AbstractCloner implements ClonerInterface
     public function setMaxString($maxString)
     {
         $this->maxString = (int) $maxString;
+    }
+
+    /**
+     * Sets the minimum tree depth where we are guaranteed to clone all the items.  After this
+     * depth is reached, only setMaxItems items will be cloned.
+     *
+     * @param int $minDepth
+     */
+    public function setMinDepth($minDepth)
+    {
+        $this->minDepth = (int) $minDepth;
     }
 
     /**

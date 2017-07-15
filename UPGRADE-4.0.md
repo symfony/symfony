@@ -511,6 +511,10 @@ TwigBundle
 * The `ContainerAwareRuntimeLoader` class has been removed. Use the
   Twig `Twig_ContainerRuntimeLoader` class instead.
 
+ * Removed `DebugCommand` in favor of `Symfony\Bridge\Twig\Command\DebugCommand`.
+
+ * Removed `ContainerAwareInterface` implementation in `Symfony\Bundle\TwigBundle\Command\LintCommand`.
+
 TwigBridge
 ----------
 
@@ -550,6 +554,12 @@ TwigBridge
 
  * The `TwigRendererEngine::setEnvironment()` method has been removed.
    Pass the Twig Environment as second argument of the constructor instead.
+   
+ * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability 
+   to pass a command name as first argument.
+ 
+ * Removed `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability
+   to pass a command name as first argument.
 
 Validator
 ---------

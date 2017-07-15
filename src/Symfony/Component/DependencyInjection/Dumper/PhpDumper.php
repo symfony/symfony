@@ -120,7 +120,6 @@ class PhpDumper extends Dumper
             'debug' => true,
         ), $options);
 
-        $this->classResources = array();
         $this->initializeMethodNamesMap($options['base_class']);
 
         $this->docStar = $options['debug'] ? '*' : '';

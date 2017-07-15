@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
@@ -307,10 +308,21 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyContextService()
     {
-        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
+        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function ($k, $b = false) {
+            switch ($k) {
+                case 'k1': $o = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}; break;
+                case 'k2': $o = $this; break;
+            }
+            if ($b) { return isset($o); }
+            if (isset($o)) { return $o; }
+            throw new ServiceNotFoundException($k, null, null, array(0 => 'k1', 1 => 'k2'));
+        }, function() {
             yield 'k1' => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
             yield 'k2' => $this;
-        }, 2), new RewindableGenerator(function () {
+        }, 2), new RewindableGenerator(function ($k, $b = false) {
+            if ($b) { return false; }
+            throw new ServiceNotFoundException($k);
+        }, function() {
             return new \EmptyIterator();
         }, 0));
     }
@@ -325,9 +337,19 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyContextIgnoreInvalidRefService()
     {
-        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
+        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function ($k, $b = false) {
+            switch ($k) {
+                case 0: $o = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}; break;
+            }
+            if ($b) { return isset($o); }
+            if (isset($o)) { return $o; }
+            throw new ServiceNotFoundException($k, null, null, array(0 => 0));
+        }, function() {
             yield 0 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
-        }, 1), new RewindableGenerator(function () {
+        }, 1), new RewindableGenerator(function ($k, $b = false) {
+            if ($b) { return false; }
+            throw new ServiceNotFoundException($k);
+        }, function() {
             return new \EmptyIterator();
         }, 0));
     }

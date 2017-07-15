@@ -18,14 +18,16 @@ class RewindableGeneratorTest extends TestCase
 {
     public function testImplementsCountable()
     {
-        $this->assertInstanceOf(\Countable::class, new RewindableGenerator(function () {
+        $this->assertInstanceOf(\Countable::class, new RewindableGenerator(function ($k, $b = false) {
+        }, function () {
             yield 1;
         }, 1));
     }
 
     public function testCountUsesProvidedValue()
     {
-        $generator = new RewindableGenerator(function () {
+        $generator = new RewindableGenerator(function ($k, $b = false) {
+        }, function () {
             yield 1;
         }, 3);
 
@@ -35,7 +37,8 @@ class RewindableGeneratorTest extends TestCase
     public function testCountUsesProvidedValueAsCallback()
     {
         $called = 0;
-        $generator = new RewindableGenerator(function () {
+        $generator = new RewindableGenerator(function ($k, $b = false) {
+        }, function () {
             yield 1;
         }, function () use (&$called) {
             ++$called;
@@ -49,5 +52,19 @@ class RewindableGeneratorTest extends TestCase
         count($generator);
 
         $this->assertSame(1, $called, 'Count callback is called only once');
+    }
+
+    public function testPsrContainer()
+    {
+        $generator = new RewindableGenerator(function ($k, $b = false) {
+            return $b ? 'a' === $k : ('a' === $k ? 0 : 1);
+        }, function () {
+            yield 'a' => 0;
+        }, 1);
+
+        $this->assertTrue($generator->has('a'));
+        $this->assertFalse($generator->has('b'));
+        $this->assertSame(0, $generator->get('a'));
+        $this->assertSame(1, $generator->get('b'));
     }
 }

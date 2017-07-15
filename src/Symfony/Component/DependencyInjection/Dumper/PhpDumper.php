@@ -784,6 +784,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 $bagClass
 
 /*{$this->docStar}
@@ -1430,26 +1431,38 @@ EOF;
                 if ($value instanceof IteratorArgument) {
                     $operands = array(0);
                     $code = array();
-                    $code[] = 'new RewindableGenerator(function () {';
+                    $code[] = 'new RewindableGenerator(function ($k, $b = false) {';
 
                     if (!$values = $value->getValues()) {
+                        $code[] = '            if ($b) { return false; }';
+                        $code[] = '            throw new ServiceNotFoundException($k);';
+                        $code[] = '        }, function() {';
                         $code[] = '            return new \EmptyIterator();';
                     } else {
-                        $countCode = array();
-                        $countCode[] = 'function () {';
+                        $code[] = '            switch ($k) {';
+                        $genCode = array();
+                        $countCode = array('function () {');
 
                         foreach ($values as $k => $v) {
                             ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
-                            $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
+                            $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $vDump = $this->dumpValue($v, $interpolate)));
+                            $code[] = sprintf('                case %s: $o = %s; break;', $this->dumpValue($k, false), $vDump);
                             foreach (explode("\n", $v) as $v) {
                                 if ($v) {
-                                    $code[] = '    '.$v;
+                                    $genCode[] = '    '.$v;
                                 }
                             }
                         }
 
                         $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
                         $countCode[] = '        }';
+
+                        $code[] = '            }';
+                        $code[] = '            if ($b) { return isset($o); }';
+                        $code[] = '            if (isset($o)) { return $o; }';
+                        $code[] = sprintf('            throw new ServiceNotFoundException($k, null, null, %s);', $this->dumpValue(array_keys($values), false));
+                        $code[] = '        }, function() {';
+                        $code[] = implode("\n", $genCode);
                     }
 
                     $code[] = sprintf('        }, %s)', count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);

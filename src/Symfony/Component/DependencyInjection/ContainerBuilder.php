@@ -1132,7 +1132,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $this->resolveServices($reference);
             };
         } elseif ($value instanceof IteratorArgument) {
-            $value = new RewindableGenerator(function () use ($value) {
+            $value = new RewindableGenerator(function ($k, $bool = false) use ($value) {
+                $values = $value->getValues();
+                if (!isset($values[$k])) {
+                    if ($bool) {
+                        return false;
+                    }
+
+                    throw new ServiceNotFoundException($k, null, null, array_keys($values));
+                }
+                if ($bool) {
+                    return true;
+                }
+                if (true === $v = $values[$k]) {
+                    throw new ServiceCircularReferenceException($k, array($k, $k));
+                }
+                $values[$k] = true;
+                try {
+                    return $this->resolveServices($v);
+                } finally {
+                    $values[$k] = $v;
+                }
+            }, function () use ($value) {
                 foreach ($value->getValues() as $k => $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
                         if (!$this->has($s)) {

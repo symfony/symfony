@@ -37,6 +37,10 @@ class PhpFileLoader extends ArrayLoader
 
         $messages = require $resource;
 
+        if (!is_array($messages)) {
+            throw new \UnexpectedValueException(sprintf('PHP translation files must return an array, got "%s" in "%s".', is_object($messages) ? get_class($messages) : gettype($messages), $resource));
+        }
+
         $catalogue = parent::load($messages, $locale, $domain);
 
         if (class_exists('Symfony\Component\Config\Resource\FileResource')) {

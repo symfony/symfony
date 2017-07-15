@@ -47,4 +47,14 @@ class PhpFileLoaderTest extends TestCase
         $resource = 'http://example.com/resources.php';
         $loader->load($resource, 'en', 'domain1');
     }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessageRegExp /^PHP translation files must return an array, got "stdClass" in ".+invalid-return\.php"\.$/
+     */
+    public function testInvalidReturn()
+    {
+        $loader = new PhpFileLoader();
+        $loader->load(__DIR__.'/../fixtures/invalid-return.php', 'en');
+    }
 }

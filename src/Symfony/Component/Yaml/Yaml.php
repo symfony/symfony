@@ -83,6 +83,23 @@ class Yaml
     }
 
     /**
+     * Parses YAML file into a PHP value.
+     *
+     * @param string $filePath A path to a file containing YAML
+     * @param int    $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
+     *
+     * @return mixed The YAML converted to a PHP value
+     */
+    public static function parseFile($filePath, $flags = 0)
+    {
+        if (is_file($filePath) && is_readable($filePath)) {
+            return static::parse(file_get_contents($filePath), $flags);
+        }
+
+        throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $filePath));
+    }
+
+    /**
      * Dumps a PHP value to a YAML string.
      *
      * The dump method, when supplied with an array, will do its best

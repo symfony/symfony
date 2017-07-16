@@ -9,6 +9,20 @@ CHANGELOG
  * Deprecated using the non-specific tag `!` as its behavior will change in 4.0.
    It will force non-evaluating your values in 4.0. Use plain integers or `!!float` instead.
 
+ * Added `Yaml::parseFile`:
+ 
+   Before:
+   
+   ```php
+   Yaml::parse(file_get_contents($path));
+   ```
+   
+   After:
+   
+   ```php
+   Yaml::parseFile($path);
+   ```
+
 3.3.0
 -----
 

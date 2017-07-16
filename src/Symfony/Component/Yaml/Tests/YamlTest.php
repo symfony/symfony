@@ -41,4 +41,19 @@ class YamlTest extends TestCase
     {
         Yaml::dump(array('lorem' => 'ipsum', 'dolor' => 'sit'), 2, -4);
     }
+
+    public function testParseFile()
+    {
+        $path = __DIR__.'/Fixtures/booleanMappingKeys.yml';
+        $this->assertEquals(Yaml::parse(file_get_contents($path)), Yaml::parseFile($path));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage file is not readable.
+     */
+    public function testParseFileException()
+    {
+        Yaml::parseFile('file/which/does/not/exist.yml');
+    }
 }

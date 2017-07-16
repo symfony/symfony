@@ -38,8 +38,8 @@ class Stopwatch
      */
     public function __construct($morePrecision = false)
     {
-        $this->reset();
         $this->morePrecision = $morePrecision;
+        $this->reset();
     }
 
     /**

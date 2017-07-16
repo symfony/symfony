@@ -8,13 +8,13 @@
         <defaults public="false" />
 
         <service id="web_server.command.server_run" class="Symfony\Bundle\WebServerBundle\Command\ServerRunCommand">
-            <argument>%kernel.project_dir%/web</argument>
+            <argument>%kernel.project_dir%/public</argument>
             <argument>%kernel.environment%</argument>
             <tag name="console.command" />
         </service>
 
         <service id="web_server.command.server_start" class="Symfony\Bundle\WebServerBundle\Command\ServerStartCommand">
-            <argument>%kernel.project_dir%/web</argument>
+            <argument>%kernel.project_dir%/public</argument>
             <argument>%kernel.environment%</argument>
             <tag name="console.command" />
         </service>

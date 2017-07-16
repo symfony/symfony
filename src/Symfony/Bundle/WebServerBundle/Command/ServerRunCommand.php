@@ -88,6 +88,12 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
+        // deprecated, logic to be removed in 4.0
+        // this allows the commands to work out of the box with web/ and public/
+        if ($this->documentRoot && !is_dir($this->documentRoot) && is_dir(dirname($this->documentRoot).'/web')) {
+            $this->documentRoot = dirname($this->documentRoot).'/web';
+        }
+
         if (null === $documentRoot = $input->getOption('docroot')) {
             if (!$this->documentRoot) {
                 $io->error('The document root directory must be either passed as first argument of the constructor or through the "--docroot" input option.');

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-16T09:32:48Z
+
+So is it a bugfix (2.7) or a new feature (3.4)? 2.7 seems fine or do you have legacy projects running onn 3.4? ;-)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-16T09:47:38Z
+
+I don't think this is worth it. What does it solve?
+
+---------------------------------------------------------------------------
+
+by jnvsor at 2017-07-16T09:49:30Z
+
+It removes the second-long white page with redirect notice if headers have already been sent. I'm not sure whether that's a bug or a feature, but it's an improvement either way I think.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-16T09:50:30Z
+
+In theory, using `1` is a bug if we want to redirect immediately. MDN for example [mentions this](https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections):
+
+> The content attribute starts with a number indicating how many seconds the browser should wait before redirecting to the given URL. Always set it to 0, for better accessibility.

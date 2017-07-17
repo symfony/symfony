@@ -144,8 +144,8 @@ class ContainerTest extends TestCase
     public function testSet()
     {
         $sc = new Container();
-        $sc->set('foo', $foo = new \stdClass());
-        $this->assertSame($foo, $sc->get('foo'), '->set() sets a service');
+        $sc->set('._. \\o/', $foo = new \stdClass());
+        $this->assertSame($foo, $sc->get('._. \\o/'), '->set() sets a service');
     }
 
     public function testSetWithNullResetTheService()

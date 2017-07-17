@@ -19,8 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Validator\Validator\TraceableValidator;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
-use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
@@ -28,7 +27,6 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 class ValidatorDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $validator;
-    private $cloner;
 
     public function __construct(TraceableValidator $validator)
     {
@@ -77,29 +75,26 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         return 'validator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function cloneVar($var)
+    protected function getCasters()
     {
-        if ($var instanceof Data) {
-            return $var;
-        }
+        return parent::getCasters() + array(
+            \Exception::class => function (\Exception $e, array $a, Stub $s) {
+                foreach (array("\0Exception\0previous", "\0Exception\0trace") as $k) {
+                    if (isset($a[$k])) {
+                        unset($a[$k]);
+                        ++$s->cut;
+                    }
+                }
 
-        if (null === $this->cloner) {
-            $this->cloner = new VarCloner();
-            $this->cloner->setMaxItems(-1);
-            $this->cloner->addCasters(array(
-                FormInterface::class => function (FormInterface $f, array $a) {
-                    return array(
-                        Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                        Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
-                        Caster::PREFIX_VIRTUAL.'data' => $f->getData(),
-                    );
-                },
-            ));
-        }
-
-        return $this->cloner->cloneVar($var, Caster::EXCLUDE_VERBOSE);
+                return $a;
+            },
+            FormInterface::class => function (FormInterface $f, array $a) {
+                return array(
+                    Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
+                    Caster::PREFIX_VIRTUAL.'data' => $f->getData(),
+                );
+            },
+        );
     }
 }

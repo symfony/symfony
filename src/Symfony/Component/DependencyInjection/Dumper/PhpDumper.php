@@ -401,7 +401,7 @@ class PhpDumper extends Dumper
         $instantiation = '';
 
         if (!$isProxyCandidate && $definition->isShared()) {
-            $instantiation = "\$this->services['$id'] = ".($isSimpleInstance ? '' : '$instance');
+            $instantiation = sprintf('$this->%s[\'%s\'] = %s', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $id, $isSimpleInstance ? '' : '$instance');
         } elseif (!$isSimpleInstance) {
             $instantiation = '$instance';
         }
@@ -646,7 +646,7 @@ EOF;
 
         // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
-        $visibility = $isProxyCandidate ? 'public' : 'protected';
+        $visibility = $isProxyCandidate ? 'public' : ($definition->isPublic() ? 'protected' : 'private');
         $methodName = $this->generateMethodName($id);
         $code = <<<EOF
 
@@ -792,6 +792,7 @@ class $class extends $baseClass
 {
     private \$parameters;
     private \$targetDirs = array();
+    private \$privates = array();
 
 EOF;
     }
@@ -818,9 +819,8 @@ EOF;
             $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
         }
 
-        $code .= "\n        \$this->services = array();\n";
+        $code .= "\n        \$this->services = \$this->privates = array();\n";
         $code .= $this->addMethodMap();
-        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -886,40 +886,12 @@ EOF;
         $code = "        \$this->methodMap = array(\n";
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            $code .= '            '.$this->export($id).' => '.$this->export($this->generateMethodName($id)).",\n";
-        }
-
-        return $code."        );\n";
-    }
-
-    /**
-     * Adds the privates property definition.
-     *
-     * @return string
-     */
-    private function addPrivateServices()
-    {
-        if (!$definitions = $this->container->getDefinitions()) {
-            return '';
-        }
-
-        $code = '';
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
-            if (!$definition->isPublic()) {
-                $code .= '            '.$this->export($id)." => true,\n";
+            if ($definition->isPublic()) {
+                $code .= '            '.$this->export($id).' => '.$this->export($this->generateMethodName($id)).",\n";
             }
         }
 
-        if (empty($code)) {
-            return '';
-        }
-
-        $out = "        \$this->privates = array(\n";
-        $out .= $code;
-        $out .= "        );\n";
-
-        return $out;
+        return $code."        );\n";
     }
 
     /**
@@ -1535,8 +1507,12 @@ EOF;
             return '$this';
         }
 
-        if ($this->container->hasDefinition($id) && !$this->container->getDefinition($id)->isPublic()) {
+        if ($this->container->hasDefinition($id)) {
             $code = sprintf('$this->%s()', $this->generateMethodName($id));
+
+            if ($this->container->getDefinition($id)->isShared()) {
+                $code = sprintf('($this->%s[\'%s\'] ?? %s)', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $id, $code);
+            }
         } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
@@ -1545,10 +1521,6 @@ EOF;
             }
 
             $code = sprintf('$this->get(\'%s\')', $id);
-        }
-
-        if ($this->container->hasDefinition($id) && $this->container->getDefinition($id)->isShared()) {
-            $code = "(\$this->services['$id'] ?? $code)";
         }
 
         return $code;

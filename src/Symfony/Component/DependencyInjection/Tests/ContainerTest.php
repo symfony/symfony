@@ -134,7 +134,7 @@ class ContainerTest extends TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('service_container', 'internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
+        $this->assertEquals(array('service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -340,26 +340,6 @@ class ContainerTest extends TestCase
         $this->assertTrue($clone->isPrivate());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage You cannot set the private service "internal".
-     */
-    public function testUnsetInternalPrivateService()
-    {
-        $c = new ProjectServiceContainer();
-        $c->set('internal', null);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage You cannot set the private service "internal".
-     */
-    public function testChangeInternalPrivateService()
-    {
-        $c = new ProjectServiceContainer();
-        $c->set('internal', new \stdClass());
-    }
-
     public function testCheckExistenceOfAnInternalPrivateService()
     {
         $c = new ProjectServiceContainer();
@@ -396,7 +376,6 @@ class ProjectServiceContainer extends Container
     public $__foo_baz;
     public $__internal;
     protected $methodMap = array(
-        'internal' => 'getInternalService',
         'bar' => 'getBarService',
         'foo_bar' => 'getFooBarService',
         'foo.baz' => 'getFoo_BazService',
@@ -414,13 +393,13 @@ class ProjectServiceContainer extends Container
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
         $this->__internal = new \stdClass();
-        $this->privates = array('internal' => true);
+        $this->privates = array();
         $this->aliases = array('alias' => 'bar');
     }
 
     protected function getInternalService()
     {
-        return $this->services['internal'] = $this->__internal;
+        return $this->privates['internal'] = $this->__internal;
     }
 
     protected function getBarService()
@@ -459,7 +438,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['internal_dependency'] = $instance = new \stdClass();
 
-        $instance->internal = isset($this->services['internal']) ? $this->services['internal'] : $this->getInternalService();
+        $instance->internal = $this->privates['internal'] ?? $this->getInternalService();
 
         return $instance;
     }

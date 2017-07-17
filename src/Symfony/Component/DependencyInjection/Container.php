@@ -50,11 +50,6 @@ class Container implements ResettableContainerInterface
     protected $aliases = array();
     protected $loading = array();
 
-    /**
-     * @internal
-     */
-    protected $privates = array();
-
     private $envCache = array();
     private $compiled = false;
 
@@ -155,10 +150,6 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (isset($this->privates[$id])) {
-            throw new InvalidArgumentException(sprintf('You cannot set the private service "%s".', $id));
-        }
-
         if (isset($this->methodMap[$id])) {
             throw new InvalidArgumentException(sprintf('You cannot set the pre-defined service "%s".', $id));
         }
@@ -185,9 +176,6 @@ class Container implements ResettableContainerInterface
      */
     public function has($id)
     {
-        if (isset($this->privates[$id])) {
-            return false;
-        }
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
         }
@@ -224,13 +212,6 @@ class Container implements ResettableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if (isset($this->privates[$id])) {
-            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                throw new ServiceNotFoundException($id);
-            }
-
-            return;
-        }
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
         }
@@ -293,10 +274,6 @@ class Container implements ResettableContainerInterface
      */
     public function initialized($id)
     {
-        if (isset($this->privates[$id])) {
-            return false;
-        }
-
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
         }

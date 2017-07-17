@@ -62,7 +62,7 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
         }
 
         $adapter = new PhpArrayAdapter($this->phpArrayFile, $this->fallbackPool);
-        $arrayPool = new ArrayAdapter(0, false);
+        $arrayPool = new ArrayAdapter(0);
 
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), new Psr6Cache($arrayPool));
@@ -86,7 +86,10 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
             spl_autoload_unregister(array($adapter, 'throwOnRequiredClass'));
         }
 
-        $values = $arrayPool->getValues();
+        // the ArrayAdapter stores the values serialized as the MetaData objects
+        // are mutated inside LazyLoadingMetadataFactory after being written into the cache
+        // so here we un-serialize the values first
+        $values = array_map(function ($val) { return unserialize($val); }, $arrayPool->getValues());
         $adapter->warmUp(array_filter($values));
 
         foreach ($values as $k => $v) {

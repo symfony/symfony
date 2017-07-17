@@ -24,6 +24,13 @@ class ApcuAdapter extends AbstractAdapter
         return function_exists('apcu_fetch') && ini_get('apc.enabled');
     }
 
+    /**
+     * @param string      $namespace
+     * @param int         $defaultLifetime
+     * @param string|null $version
+     *
+     * @throws CacheException if APCu is not enabled
+     */
     public function __construct($namespace = '', $defaultLifetime = 0, $version = null)
     {
         if (!static::isSupported()) {

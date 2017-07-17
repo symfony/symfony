@@ -33,11 +33,6 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     private $mergeByLifetime;
 
     /**
-     * @var int|null The maximum length to enforce for identifiers or null when no limit applies
-     */
-    protected $maxIdLength;
-
-    /**
      * @param string $namespace
      * @param int    $defaultLifetime
      */

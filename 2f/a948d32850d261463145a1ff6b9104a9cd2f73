@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-17T12:27:07Z
+
+PR updated so that Application doesn't set command names.

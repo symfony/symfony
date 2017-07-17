@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-15T06:27:22Z
+
+This will break applications that are using the old directory structure and just update their dependencies using `composer update`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-15T11:55:45Z
+
+@xabbuh right, but this is about default value for default directory structure 4.0, still you can use the `target` argument for old structures, no? or this kind of BC break is not allowed for 4.0?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-15T12:56:25Z
+
+Upgrade note added.
+
+But still I'm not sure if we should add a warning messages on 3.4 on `assets:install`, WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-15T19:16:11Z
+
+4.0 can provide the target path as well ;-) it's not like we _must_ update on this side.
+
+It does makes sense though :) however you need to trigger a deprecation in 3.4 first (if the argument is not given) i guess.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-16T13:11:28Z
+
+What about doing something similar to what I did in #23535?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-16T14:32:17Z
+
+@fabpot I've rebased to `3.3` base branch as a bugfix, also added BC for web directory :) thanks!

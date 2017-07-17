@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-17T15:36:42Z
+
+The PR related to this behaviour change is phpDocumentor/ReflectionDocBlock#89 (note the change regular expression). I guess that this should be solved in the the `phpdocumentor/reflection-docblock` package (e.g. by ignoring "invalid" tags or so).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-17T16:36:41Z
+
+@xabbuh Do we need to open an issue on the upstream repo about this BC break?

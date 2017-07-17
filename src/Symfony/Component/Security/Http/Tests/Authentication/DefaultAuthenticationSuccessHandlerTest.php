@@ -142,13 +142,12 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
     public function getReferrerList()
     {
         return array(
-            "absolute referrer URL" => array("http://domain.com/app_base_path/login?t=1&p=2", "http://domain.com/app_base_path/login?t=1&p=2", 1),
-            "absolute referrer path" => array("/app_base_path/login?t=1&p=2", "/app_base_path/login?t=1&p=2", 1),
-            "referrer is the same as login route" => array("/login", "/login", 1),
-            "no referrer" => array("", "/", 0),
+            'absolute referrer URL' => array('http://domain.com/app_base_path/login?t=1&p=2', 'http://domain.com/app_base_path/login?t=1&p=2', 1),
+            'absolute referrer path' => array('/app_base_path/login?t=1&p=2', '/app_base_path/login?t=1&p=2', 1),
+            'referrer is the same as login route' => array('/login', '/login', 1),
+            'no referrer' => array('', '/', 0),
         );
     }
-
 
     /**
      * @dataProvider getReferrerList

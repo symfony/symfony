@@ -32,6 +32,15 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     private $createCacheItem;
     private $mergeByLifetime;
 
+    /**
+     * @var int|null The maximum length to enforce for identifiers or null when no limit applies
+     */
+    protected $maxIdLength;
+
+    /**
+     * @param string $namespace
+     * @param int    $defaultLifetime
+     */
     protected function __construct($namespace = '', $defaultLifetime = 0)
     {
         $this->namespace = '' === $namespace ? '' : $this->getId($namespace).':';
@@ -74,6 +83,15 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         );
     }
 
+    /**
+     * @param string               $namespace
+     * @param int                  $defaultLifetime
+     * @param string               $version
+     * @param string               $directory
+     * @param LoggerInterface|null $logger
+     *
+     * @return AdapterInterface
+     */
     public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
     {
         if (null === self::$apcuSupported) {

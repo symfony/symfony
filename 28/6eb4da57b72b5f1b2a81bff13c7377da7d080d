@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T14:01:34Z
+
+> privates should be excluded from getServiceIds
+
+right, private are "invisible"
+
+> did we forget to deprecate checking privates with initialized
+
+looks like so, we have to do it in 3.4
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-20T14:16:20Z
+
+3.3 no? the sooner the better right; given 3.3 is still in RC fase, cant we push it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-20T14:17:40Z
+
+3.4 is fine, 3.3 is closed for "features" (deprecations are)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T06:59:11Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-22T07:29:13Z
+
+Can't we merge all your DI related PRs into one big PR that removes all deprecated code paths for that component? That would be easier to review IMO.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-22T07:31:58Z
+
+Not sure.. if it's OK i'd like to do it per feature :) prepared the PR's pretty well, and like to test/rebase after each update.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-05-22T07:40:47Z
+
+so, you can rebase again
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T14:01:18Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-17T07:28:13Z
+
+ping @ro0NL do you need help for this one? would be great to finish it before working on your other ones :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-17T08:21:49Z
+
+@nicolas-grekas rebased. To me it's ready.. :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-17T11:40:36Z
+
+Perhaps something to start thinking about; are we allowed to break alias chains?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-17T11:43:32Z
+
+ie? isn't that something already handled by some compiler pass (resolving aliases?)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-17T11:53:30Z
+
+Hm, if you have `public_service > some_alias > private_service`, i believe doing `$container->set('some_alias', $newService)` at any point after compilation, happily unsets the alias and sets a new service in between.
+
+Not really played with it yet, just looking at the code path :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-17T11:55:35Z
+
+What I said: this is already resolved by a compiler pass so it cannot happen in practice.

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-15T17:01:54Z
+
+The deprecation path and wording here was not as obvious as usual to me, so it might need clarifications indeed. To answer your questions:
+
+-
+    > in 4.0 it will simply extend Command right.. wdyt?
+
+    Yes. But what it extends is not the point. The removed public API is. You shouldn't rely anymore on the fact the container is injected in the command because it implements `CommandAwareInterface`, that's the point.
+    That's why I chose to mention the interface over the `ContainerAwareCommand` class in the deprecation message... but `getContainer()` is not part of the interface so it may look a bit weird...
+   The related CHANGELOG entry I added about this is:
+   > Deprecated `UserPasswordEncoderCommand::getContainer()` and relying on the `ContainerAwareInterface` interface for this command.
+
+   which tries to indicate both the `UserPasswordEncoderCommand::getContainer()` method AND relying on the `ContainerAwareInterface` is deprecated. That's two deprecations at once actually.
+
+-
+    > Also we dont deprecate setContainer is that intentional?
+
+    It was intentional, to not trigger the same deprecation twice and mostly because `setContainer()` will still be called by the `Application` until the `ContainerAwareInterface` is removed.
+
+Anyway, I'm 👍 for your changes if it clarifies anything to you.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-15T17:41:03Z
+
+Well.. if we can skip the hassle of deprecating both set/get individually this way, that's fine i guess :+1:
+
+I just thought it should mention `ContainerAwareCommand` because it implies `ContainerAwareInterface` and thus mentions both.
+
+edit: updated to explicitly mention both :)

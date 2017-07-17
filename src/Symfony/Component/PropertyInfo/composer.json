@@ -33,7 +33,7 @@
         "doctrine/annotations": "~1.0"
     },
     "conflict": {
-        "phpdocumentor/reflection-docblock": "<3.0",
+        "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0",
         "phpdocumentor/type-resolver": "<0.2.0"
     },
     "suggest": {

@@ -1431,8 +1431,9 @@ class ApplicationTest extends TestCase
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container
             ->register('lazy-command', LazyCommand::class)
-            ->addTag('console.command', array('command' => 'lazy:command', 'alias' => 'lazy:alias'))
-            ->addTag('console.command', array('command' => 'lazy:command', 'alias' => 'lazy:alias2'));
+            ->addTag('console.command', array('command' => 'lazy:command'))
+            ->addTag('console.command', array('command' => 'lazy:alias'))
+            ->addTag('console.command', array('command' => 'lazy:alias2'));
         $container->compile();
 
         $application = new Application();

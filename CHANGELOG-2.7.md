@@ -7,6 +7,17 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.32 (2017-07-17)
+
+ * security #23507 [Security] validate empty passwords again (xabbuh)
+ * bug #23526 [HttpFoundation] Set meta refresh time to 0 in RedirectResponse content (jnvsor)
+ * bug #23468 [DI] Handle root namespace in service definitions (ro0NL)
+ * bug #23256 [Security] Fix authentication.failure event not dispatched on AccountStatusException (chalasr)
+ * bug #23461 Use rawurlencode() to transform the Cookie into a string (javiereguiluz)
+ * bug #23459 [TwigBundle] allow to configure custom formats in XML configs (xabbuh)
+ * bug #23261 Fixed absolute url generation for query strings and hash urls (alexander-schranz)
+ * bug #23398 [Filesystem] Dont copy perms when origin is remote (nicolas-grekas)
+
 * 2.7.31 (2017-07-05)
 
  * bug #23378 [FrameworkBundle] Do not remove files from assets dir (1ed)

@@ -147,6 +147,7 @@ class ContainerTest extends TestCase
     public function testSetWithNullResetTheService()
     {
         $sc = new Container();
+        $sc->set('foo', new \stdClass());
         $sc->set('foo', null);
         $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
     }
@@ -157,22 +158,6 @@ class ContainerTest extends TestCase
 
         $c->set('alias', $foo = new \stdClass());
         $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Unsetting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
-     */
-    public function testSetWithNullResetPredefinedService()
-    {
-        $sc = new Container();
-        $sc->set('foo', new \stdClass());
-        $sc->set('foo', null);
-        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
-
-        $sc = new ProjectServiceContainer();
-        $sc->set('bar', null);
-        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
     public function testGet()
@@ -275,15 +260,11 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Checking for the initialization of the "internal" private service is deprecated since Symfony 3.4 and won't be supported anymore in Symfony 4.0.
-     */
     public function testInitializedWithPrivateService()
     {
         $sc = new ProjectServiceContainer();
         $sc->get('internal_dependency');
-        $this->assertTrue($sc->initialized('internal'));
+        $this->assertFalse($sc->initialized('internal'));
     }
 
     public function testReset()
@@ -360,42 +341,37 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Unsetting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage You cannot set the private service "internal".
      */
-    public function testUnsetInternalPrivateServiceIsDeprecated()
+    public function testUnsetInternalPrivateService()
     {
         $c = new ProjectServiceContainer();
         $c->set('internal', null);
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Setting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage You cannot set the private service "internal".
      */
-    public function testChangeInternalPrivateServiceIsDeprecated()
+    public function testChangeInternalPrivateService()
     {
         $c = new ProjectServiceContainer();
-        $c->set('internal', $internal = new \stdClass());
-        $this->assertSame($c->get('internal'), $internal);
+        $c->set('internal', new \stdClass());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Checking for the existence of the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     */
-    public function testCheckExistenceOfAnInternalPrivateServiceIsDeprecated()
+    public function testCheckExistenceOfAnInternalPrivateService()
     {
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
-        $this->assertTrue($c->has('internal'));
+        $this->assertFalse($c->has('internal'));
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Requesting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent service "internal".
      */
-    public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
+    public function testRequestAnInternalSharedPrivateService()
     {
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
@@ -403,16 +379,13 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage You cannot set the pre-defined service "bar".
      */
-    public function testReplacingAPreDefinedServiceIsDeprecated()
+    public function testReplacingAPreDefinedService()
     {
         $c = new ProjectServiceContainer();
         $c->set('bar', new \stdClass());
-        $c->set('bar', $bar = new \stdClass());
-
-        $this->assertSame($bar, $c->get('bar'), '->set() replaces a pre-defined service');
     }
 }
 

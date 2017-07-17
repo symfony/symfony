@@ -267,8 +267,8 @@ class PhpDumperTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage You cannot set the pre-defined service "bar".
      */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
@@ -277,25 +277,6 @@ class PhpDumperTest extends TestCase
 
         $container = new \ProjectServiceContainer();
         $container->set('bar', $bar = new \stdClass());
-        $container->setParameter('foo_bar', 'foo_bar');
-
-        $this->assertSame($bar, $container->get('bar'), '->set() overrides an already defined service');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
-     */
-    public function testOverrideServiceWhenUsingADumpedContainerAndServiceIsUsedFromAnotherOne()
-    {
-        require_once self::$fixturesPath.'/php/services9.php';
-        require_once self::$fixturesPath.'/includes/foo.php';
-        require_once self::$fixturesPath.'/includes/classes.php';
-
-        $container = new \ProjectServiceContainer();
-        $container->set('bar', $bar = new \stdClass());
-
-        $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
     }
 
     /**

@@ -19,6 +19,8 @@ CHANGELOG
  * removed `ContainerBuilder::addClassResource()`, use the `addObjectResource()` or the `getReflectionClass()` method instead.
  * removed support for top-level anonymous services
  * removed silent behavior for unused attributes and elements
+ * removed support for setting and accessing private services in `Container`
+ * removed support for setting pre-defined services in `Container`
 
 3.4.0
 -----

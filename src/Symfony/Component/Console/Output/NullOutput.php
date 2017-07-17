@@ -108,8 +108,12 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, $options = self::OUTPUT_NORMAL)
+    public function writeln($messages /* = '' */, $options = self::OUTPUT_NORMAL)
     {
+        if (func_num_args() === 1 && '' === $messages) {
+            @trigger_error('Passing an empty message to write a newline is deprecated since version 3.4 because the default argument value will be an empty string in 4.0.', E_USER_DEPRECATED);
+        }
+
         // do nothing
     }
 

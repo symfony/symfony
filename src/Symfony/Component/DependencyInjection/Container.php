@@ -30,16 +30,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * Parameter and service keys are case insensitive.
  *
- * A service id can contain lowercased letters, digits, underscores, and dots.
- * Underscores are used to separate words, and dots to group services
- * under namespaces:
- *
- * <ul>
- *   <li>request</li>
- *   <li>mysql_session_storage</li>
- *   <li>symfony.mysql_session_storage</li>
- * </ul>
- *
  * A service can also be defined by creating a method named
  * getXXXService(), where XXX is the camelized version of the id:
  *

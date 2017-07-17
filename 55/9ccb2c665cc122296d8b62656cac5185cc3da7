@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by szymach at 2017-07-14T14:09:54Z
+
+But this can cause a warning in sf2.8+ and break your app if you provide an empty string. If this needs to work as previously, why not simply change this to:
+
+```php
+if (null === $password || '' === $password) {
+    // add violation that the password cannot be empty
+    return;
+}
+```
+That way there is no exception and no security issue.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-07-15T12:23:52Z
+
+> That way there is no exception and no security issue.
+
+WAT 😐 this means that when you provide an empty string it's considered valid, which is not the case at all. When you use this constraint you want to check if the provided password matches the current one. Leaving this empty means the user is bypassing security!
+
+If you want to make this optional use validation-groups.
+
+---------------------------------------------------------------------------
+
+by szymach at 2017-07-15T16:01:36Z
+
+@sstok I am not sure we both understand each other, but my proposition is to automatically put a constraint violation if the password is empty. In newer implementations of the password checker, a `null` value raises a warning and thus breaks the app, hence why ignoring empty passwords was done in the first place.
+
+EDIT To clarify - initially the PR simply removed the `if` statement, so it would not work properly still. It has been changed since then and all is OK now.

@@ -98,12 +98,6 @@ EOF
             $documentRoot = $this->documentRoot;
         }
 
-        if (!is_dir($documentRoot)) {
-            $io->error(sprintf('The document root directory "%s" does not exist.', $documentRoot));
-
-            return 1;
-        }
-
         if (!$env = $this->environment) {
             if ($input->hasOption('env') && !$env = $input->getOption('env')) {
                 $io->error('The environment must be either passed as second argument of the constructor or through the "--env" input option.');

@@ -18,7 +18,7 @@
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.form.renderer" class="Symfony\Bridge\Twig\Form\TwigRenderer" public="true">
+        <service id="twig.form.renderer" class="Symfony\Component\Form\FormRenderer" public="true">
             <argument type="service" id="twig.form.engine" />
             <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
             <tag name="twig.runtime" />

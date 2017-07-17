@@ -12,6 +12,11 @@ CHANGELOG
  * the `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$context = null`
    argument and moves `$message = ''` argument at 4th position.
 
+3.4.0
+-----
+
+ * added `AbstractCloner::setMinDepth()` function to ensure minimum tree depth
+
 2.7.0
 -----
 

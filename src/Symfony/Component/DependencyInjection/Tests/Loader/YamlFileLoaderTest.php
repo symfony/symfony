@@ -470,7 +470,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter "tags" must be an array for service "Foo\Bar" in services31_invalid_tags.yml. Check your YAML syntax.
+     * @expectedExceptionMessageRegExp /Parameter "tags" must be an array for service "Foo\\Bar" in .+services31_invalid_tags\.yml\. Check your YAML syntax./
      */
     public function testInvalidTagsWithDefaults()
     {
@@ -503,7 +503,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(1, $args);
         $this->assertInstanceOf(Reference::class, $args[0]);
         $this->assertTrue($container->has((string) $args[0]));
-        $this->assertStringStartsWith('2', (string) $args[0]);
+        $this->assertRegExp('/^\d+_[A-Za-z0-9]{64}$/', (string) $args[0]);
 
         $anonymous = $container->getDefinition((string) $args[0]);
         $this->assertEquals('Bar', $anonymous->getClass());
@@ -515,13 +515,26 @@ class YamlFileLoaderTest extends TestCase
         $this->assertInternalType('array', $factory);
         $this->assertInstanceOf(Reference::class, $factory[0]);
         $this->assertTrue($container->has((string) $factory[0]));
-        $this->assertStringStartsWith('1', (string) $factory[0]);
+        $this->assertRegExp('/^\d+_[A-Za-z0-9]{64}$/', (string) $factory[0]);
         $this->assertEquals('constructFoo', $factory[1]);
 
         $anonymous = $container->getDefinition((string) $factory[0]);
         $this->assertEquals('Quz', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
         $this->assertFalse($anonymous->isAutowired());
+    }
+
+    public function testAnonymousServicesInDifferentFilesWithSameNameDoNotConflict()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml/foo'));
+        $loader->load('services.yml');
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml/bar'));
+        $loader->load('services.yml');
+
+        $this->assertCount(5, $container->getDefinitions());
     }
 
     public function testAnonymousServicesInInstanceof()
@@ -551,7 +564,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Creating an alias using the tag "!service" is not allowed in "anonymous_services_alias.yml".
+     * @expectedExceptionMessageRegExp /Creating an alias using the tag "!service" is not allowed in ".+anonymous_services_alias\.yml"\./
      */
     public function testAnonymousServicesWithAliases()
     {
@@ -562,7 +575,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Using an anonymous service in a parameter is not allowed in "anonymous_services_in_parameters.yml".
+     * @expectedExceptionMessageRegExp /Using an anonymous service in a parameter is not allowed in ".+anonymous_services_in_parameters\.yml"\./
      */
     public function testAnonymousServicesInParameters()
     {
@@ -583,7 +596,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Service "_defaults" key must be an array, "NULL" given in "bad_empty_defaults.yml".
+     * @expectedExceptionMessageRegExp /Service "_defaults" key must be an array, "NULL" given in ".+bad_empty_defaults\.yml"\./
      */
     public function testEmptyDefaultsThrowsClearException()
     {
@@ -594,7 +607,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Service "_instanceof" key must be an array, "NULL" given in "bad_empty_instanceof.yml".
+     * @expectedExceptionMessageRegExp /Service "_instanceof" key must be an array, "NULL" given in ".+bad_empty_instanceof\.yml"\./
      */
     public function testEmptyInstanceofThrowsClearException()
     {

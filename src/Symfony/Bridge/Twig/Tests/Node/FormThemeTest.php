@@ -52,7 +52,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -64,7 +64,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->setTheme(%s, "tpl1");',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->setTheme(%s, "tpl1");',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
+
 3.3.0
 -----
 

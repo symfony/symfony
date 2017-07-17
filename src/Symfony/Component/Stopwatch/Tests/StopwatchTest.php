@@ -100,6 +100,18 @@ class StopwatchTest extends TestCase
         $stopwatch->stop('foo');
     }
 
+    public function testMorePrecision()
+    {
+        $stopwatch = new Stopwatch(true);
+
+        $stopwatch->start('foo');
+        $event = $stopwatch->stop('foo');
+
+        $this->assertInternalType('float', $event->getStartTime());
+        $this->assertInternalType('float', $event->getEndTime());
+        $this->assertInternalType('float', $event->getDuration());
+    }
+
     public function testSection()
     {
         $stopwatch = new Stopwatch();

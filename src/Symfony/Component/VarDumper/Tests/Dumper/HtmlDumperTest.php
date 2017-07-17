@@ -161,4 +161,29 @@ EOTXT
             $out
         );
     }
+
+    public function testMarkHeaderAsDumped()
+    {
+        $out = fopen('php://memory', 'r+b');
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dumper->setOutput($out);
+        $dumper->markHeaderAsDumped();
+        $cloner = new VarCloner();
+
+        $dumper->dump($cloner->cloneVar(123));
+
+        $out = stream_get_contents($out, -1, 0);
+
+        $this->assertSame(<<<'EOTXT'
+<bar><span class=sf-dump-num>123</span>
+</bar>
+
+EOTXT
+            ,
+            $out
+        );
+    }
 }

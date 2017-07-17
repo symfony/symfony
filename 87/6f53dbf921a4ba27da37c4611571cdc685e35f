@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-17T10:39:36Z
+
+During the last few years, we've tried to not add unneeded phpdocs. We also learned that maintaining this information requires a lot of effort. Some added phpdocs seem useless to me.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-17T11:13:13Z
+
+In general I do agree with you. But it looks like some users do have problems to infer the right type to pass from the code that we currently have (see the linked issue). And since we don't add any further information besides the type information it's IMO not very likely that this gets outdated soon.
+
+By the way, these places are also good candidates for scalar type hints in Symfony 4.

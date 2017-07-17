@@ -249,15 +249,15 @@ class Container implements IntrospectableContainerInterface
         // this method can be called thousands of times during a request, avoid
         // calling strtolower() unless necessary.
         for ($i = 2;;) {
-            if ('service_container' === $id) {
-                return $this;
-            }
             if (isset($this->aliases[$id])) {
                 $id = $this->aliases[$id];
             }
             // Re-use shared service instance if it exists.
             if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
                 return $this->services[$id];
+            }
+            if ('service_container' === $id) {
+                return $this;
             }
 
             if (isset($this->loading[$id])) {
@@ -328,14 +328,14 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
+
         if ('service_container' === $id) {
             // BC: 'service_container' was a synthetic service previously.
             // @todo Change to false in next major release.
             return true;
-        }
-
-        if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
         }
 
         return isset($this->services[$id]) || array_key_exists($id, $this->services);

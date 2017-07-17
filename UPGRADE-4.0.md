@@ -223,8 +223,6 @@ Form
 FrameworkBundle
 ---------------
 
- * The `assets:install` command does not install assets into `web` directory by default, but into `public` directory.
-
  * The `cache:clear` command does not warmup the cache anymore. Warmup should
    be done via the `cache:warmup` command.
 

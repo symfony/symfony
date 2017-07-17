@@ -11,7 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Symfony\Bridge\Twig\Form\TwigRenderer;
+use Symfony\Component\Form\FormRenderer;
 use Twig\Compiler;
+use Twig\Error\RuntimeError;
 use Twig\Node\Node;
 
 /**
@@ -26,9 +29,18 @@ class FormThemeNode extends Node
 
     public function compile(Compiler $compiler)
     {
+        try {
+            $compiler->getEnvironment()->getRuntime(FormRenderer::class);
+            $renderer = FormRenderer::class;
+        } catch (RuntimeError $e) {
+            $renderer = TwigRenderer::class;
+        }
+
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->setTheme(')
+            ->write('$this->env->getRuntime(')
+            ->string($renderer)
+            ->raw(')->setTheme(')
             ->subcompile($this->getNode('form'))
             ->raw(', ')
             ->subcompile($this->getNode('resources'))

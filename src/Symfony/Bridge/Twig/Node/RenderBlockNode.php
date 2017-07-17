@@ -28,7 +28,7 @@ class RenderBlockNode extends FunctionExpression
     {
         $compiler->addDebugInfo($this);
         $arguments = iterator_to_array($this->getNode('arguments'));
-        $compiler->write('$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->renderBlock(');
+        $compiler->write('$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->renderBlock(');
 
         if (isset($arguments[0])) {
             $compiler->subcompile($arguments[0]);

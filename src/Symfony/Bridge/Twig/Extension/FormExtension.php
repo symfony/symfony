@@ -84,7 +84,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
             new TwigFunction('form', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
             new TwigFunction('form_start', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
             new TwigFunction('form_end', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('csrf_token', array('Symfony\Bridge\Twig\Form\TwigRenderer', 'renderCsrfToken')),
+            new TwigFunction('csrf_token', array('Symfony\Component\Form\FormRenderer', 'renderCsrfToken')),
         );
     }
 
@@ -94,7 +94,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function getFilters()
     {
         return array(
-            new TwigFilter('humanize', array('Symfony\Bridge\Twig\Form\TwigRenderer', 'humanize')),
+            new TwigFilter('humanize', array('Symfony\Component\Form\FormRenderer', 'humanize')),
         );
     }
 

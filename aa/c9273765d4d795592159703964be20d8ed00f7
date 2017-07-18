@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-17T09:43:22Z
+
+@xabbuh would be great to finish this one, that's one of the two last PR removing deprecated features. Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-17T11:15:12Z
+
+@nicolas-grekas I think we should wait for #23437 to be able to remove the `TwigRenderer` class too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-17T12:26:15Z
+
+#23437 merged now :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-17T15:37:59Z
+
+rebase unlocked :)

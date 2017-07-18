@@ -23,8 +23,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  */
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
-    protected $phpArrayFile;
-    protected $fallbackPool;
+    private $phpArrayFile;
+    private $fallbackPool;
 
     /**
      * @param string                 $phpArrayFile The PHP file where metadata are cached

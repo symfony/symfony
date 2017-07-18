@@ -31,7 +31,7 @@ class WebProfilerExtensionTest extends TestCase
     {
         $errors = array();
         foreach ($container->getServiceIds() as $id) {
-            if (in_array($id, $knownPrivates, true)) { // to be removed in 4.0
+            if (in_array($id, $knownPrivates, true)) { // for BC with 3.4
                 continue;
             }
             try {

@@ -47,7 +47,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         $annotatedClassPatterns = $cacheDir.'/annotations.map';
 
         if (!is_file($annotatedClassPatterns)) {
-            return;
+            return true;
         }
 
         $annotatedClasses = include $annotatedClassPatterns;
@@ -69,6 +69,8 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
                  */
             }
         }
+
+        return true;
     }
 
     private function readAllComponents(Reader $reader, $class)

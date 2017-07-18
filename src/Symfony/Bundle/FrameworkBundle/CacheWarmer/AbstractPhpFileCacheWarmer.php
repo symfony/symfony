@@ -52,21 +52,23 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $phpArrayAdapter = new PhpArrayAdapter($this->phpArrayFile, $this->fallbackPool);
         $arrayAdapter = new ArrayAdapter();
 
-        spl_autoload_register(array($phpArrayAdapter, 'throwOnRequiredClass'));
+        spl_autoload_register(array(PhpArrayAdapter::class, 'throwOnRequiredClass'));
         try {
-            $this->doWarmUp($cacheDir, $arrayAdapter);
+            if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
+                return;
+            }
         } finally {
-            spl_autoload_unregister(array($phpArrayAdapter, 'throwOnRequiredClass'));
+            spl_autoload_unregister(array(PhpArrayAdapter::class, 'throwOnRequiredClass'));
         }
 
         // the ArrayAdapter stores the values serialized
         // to avoid mutation of the data after it was written to the cache
         // so here we un-serialize the values first
         $values = array_map(function ($val) { return null !== $val ? unserialize($val) : null; }, $arrayAdapter->getValues());
-        $this->warmUpPhpArrayAdapter($phpArrayAdapter, $values);
+
+        $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, $this->fallbackPool), $values);
 
         foreach ($values as $k => $v) {
             $item = $this->fallbackPool->getItem($k);
@@ -83,6 +85,8 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     /**
      * @param string       $cacheDir
      * @param ArrayAdapter $arrayAdapter
+     *
+     * @return bool false if there is nothing to warm-up
      */
     abstract protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter);
 }

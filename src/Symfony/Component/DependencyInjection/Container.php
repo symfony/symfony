@@ -253,9 +253,6 @@ class Container implements ResettableContainerInterface
             if (isset($this->privates[$id])) {
                 @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
-            if ('service_container' === $id) {
-                return $this;
-            }
             if (isset($this->aliases[$id])) {
                 $id = $this->aliases[$id];
             }
@@ -263,6 +260,9 @@ class Container implements ResettableContainerInterface
             // Re-use shared service instance if it exists.
             if (isset($this->services[$id])) {
                 return $this->services[$id];
+            }
+            if ('service_container' === $id) {
+                return $this;
             }
 
             if (isset($this->loading[$id])) {
@@ -326,12 +326,12 @@ class Container implements ResettableContainerInterface
     {
         $id = strtolower($id);
 
-        if ('service_container' === $id) {
-            return false;
-        }
-
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
+        }
+
+        if ('service_container' === $id) {
+            return false;
         }
 
         return isset($this->services[$id]);

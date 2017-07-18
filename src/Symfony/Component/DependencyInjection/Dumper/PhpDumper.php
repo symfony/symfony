@@ -1482,6 +1482,10 @@ EOF;
      */
     private function getServiceCall($id, Reference $reference = null)
     {
+        while ($this->container->hasAlias($id)) {
+            $id = (string) $this->container->getAlias($id);
+        }
+
         if ('service_container' === $id) {
             return '$this';
         }
@@ -1493,10 +1497,6 @@ EOF;
         }
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
-        }
-
-        if ($this->container->hasAlias($id)) {
-            $id = (string) $this->container->getAlias($id);
         }
 
         return sprintf('$this->get(\'%s\')', $id);

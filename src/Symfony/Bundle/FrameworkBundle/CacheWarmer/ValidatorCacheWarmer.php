@@ -46,10 +46,10 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
+    protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter)
     {
         if (!method_exists($this->validatorBuilder, 'getLoaders')) {
-            return false;
+            return;
         }
 
         $loaders = $this->validatorBuilder->getLoaders();

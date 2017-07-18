@@ -16,7 +16,6 @@ use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
 
 /**
@@ -43,14 +42,12 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
+    protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter)
     {
         $annotatedClassPatterns = $cacheDir.'/annotations.map';
 
         if (!is_file($annotatedClassPatterns)) {
-            $phpArrayAdapter->warmUp(array());
-
-            return false;
+            return;
         }
 
         $annotatedClasses = include $annotatedClassPatterns;

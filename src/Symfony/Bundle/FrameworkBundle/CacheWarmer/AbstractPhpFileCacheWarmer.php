@@ -57,9 +57,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 
         spl_autoload_register(array($phpArrayAdapter, 'throwOnRequiredClass'));
         try {
-            if (false === $this->doWarmUp($cacheDir, $phpArrayAdapter, $arrayAdapter)) {
-                return;
-            }
+            $this->doWarmUp($cacheDir, $arrayAdapter);
         } finally {
             spl_autoload_unregister(array($phpArrayAdapter, 'throwOnRequiredClass'));
         }
@@ -83,11 +81,8 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * @param string          $cacheDir
-     * @param PhpArrayAdapter $phpArrayAdapter
-     * @param ArrayAdapter    $arrayAdapter
-     *
-     * @return bool|void false if there is nothing to warm-up
+     * @param string       $cacheDir
+     * @param ArrayAdapter $arrayAdapter
      */
-    abstract protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter);
+    abstract protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter);
 }

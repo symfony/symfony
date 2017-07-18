@@ -63,10 +63,10 @@ class XmlUtilsTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Config\Util\Exception\InvalidXmlException
      * @expectedExceptionMessage The XML is not valid
      */
-    public function testParse()
+    public function testParseWithInvalidValidatorCallable()
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 

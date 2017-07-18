@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Config\Util;
 
+use Symfony\Component\Config\Util\Exception\InvalidXmlException;
+use Symfony\Component\Config\Util\Exception\XmlParsingException;
+
 /**
  * XMLUtils is a bunch of utility methods to XML operations.
  *
@@ -37,7 +40,8 @@ class XmlUtils
      *
      * @return \DOMDocument
      *
-     * @throws \InvalidArgumentException When loading of XML file returns error
+     * @throws \Symfony\Component\Config\Util\Exception\XmlParsingException When parsing of XML file returns error
+     * @throws \Symfony\Component\Config\Util\Exception\InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
      * @throws \RuntimeException         When DOM extension is missing
      */
     public static function parse($content, $schemaOrCallable = null)
@@ -55,7 +59,7 @@ class XmlUtils
         if (!$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new \InvalidArgumentException(implode("\n", static::getXmlErrors($internalErrors)));
+            throw new XmlParsingException(implode("\n", static::getXmlErrors($internalErrors)));
         }
 
         $dom->normalizeDocument();
@@ -65,7 +69,7 @@ class XmlUtils
 
         foreach ($dom->childNodes as $child) {
             if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
+                throw new XmlParsingException('Document types are not allowed.');
             }
         }
 
@@ -86,15 +90,15 @@ class XmlUtils
             } else {
                 libxml_use_internal_errors($internalErrors);
 
-                throw new \InvalidArgumentException('The schemaOrCallable argument has to be a valid path to XSD file or callable.');
+                throw new XmlParsingException('The schemaOrCallable argument has to be a valid path to XSD file or callable.');
             }
 
             if (!$valid) {
                 $messages = static::getXmlErrors($internalErrors);
                 if (empty($messages)) {
-                    $messages = array('The XML is not valid.');
+                    throw new InvalidXmlException('The XML is not valid.', 0, $e);
                 }
-                throw new \InvalidArgumentException(implode("\n", $messages), 0, $e);
+                throw new XmlParsingException(implode("\n", $messages), 0, $e);
             }
         }
 
@@ -113,6 +117,7 @@ class XmlUtils
      * @return \DOMDocument
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
+     * @throws \Symfony\Component\Config\Util\Exception\XmlParsingException When XML parsing returns any errors.
      * @throws \RuntimeException         When DOM extension is missing
      */
     public static function loadFile($file, $schemaOrCallable = null)
@@ -124,11 +129,8 @@ class XmlUtils
 
         try {
             return static::parse($content, $schemaOrCallable);
-        } catch (\InvalidArgumentException $e) {
-            if ('The XML is not valid.' !== $e->getMessage()) {
-                throw $e;
-            }
-            throw new \InvalidArgumentException(sprintf('The XML file "%s" is not valid.', $file), 0, $e->getPrevious());
+        } catch (InvalidXmlException $e) {
+            throw new XmlParsingException(sprintf('The XML file "%s" is not valid.', $file), 0, $e->getPrevious());
         }
     }
 

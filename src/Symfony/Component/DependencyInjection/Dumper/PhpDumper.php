@@ -1618,10 +1618,6 @@ EOF;
         } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
-            if ($this->container->hasAlias($id)) {
-                $id = (string) $this->container->getAlias($id);
-            }
-
             $code = sprintf('$this->get(\'%s\')', $id);
         }
 

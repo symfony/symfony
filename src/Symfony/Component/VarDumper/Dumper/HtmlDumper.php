@@ -118,11 +118,22 @@ class HtmlDumper extends CliDumper
     }
 
     /**
-     * Dumps the HTML header.
+     * Marks the HTML header for the current output stream as dumped, so it is not later
+     * automatically dumped when dump() or dumpLine() is called.  Note that this flag is reset to
+     * false if the output stream is changed (e.g. if a new output stream is provided to the dump()
+     * function).
      */
-    protected function getDumpHeader()
+    public function markHeaderAsDumped()
     {
         $this->headerIsDumped = null !== $this->outputStream ? $this->outputStream : $this->lineDumper;
+    }
+
+    /**
+     * Dumps the HTML header.
+     */
+    public function getDumpHeader()
+    {
+        $this->markHeaderAsDumped();
 
         if (null !== $this->dumpHeader) {
             return $this->dumpHeader;

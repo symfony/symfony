@@ -47,9 +47,13 @@ class Container implements ResettableContainerInterface
 
     protected $services = array();
     protected $methodMap = array();
-    protected $privates = array();
     protected $aliases = array();
     protected $loading = array();
+
+    /**
+     * @internal
+     */
+    protected $privates = array();
 
     private $envCache = array();
     private $compiled = false;
@@ -184,13 +188,13 @@ class Container implements ResettableContainerInterface
         if (isset($this->privates[$id])) {
             return false;
         }
-        if ('service_container' === $id) {
-            return true;
-        }
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
         }
         if (isset($this->services[$id])) {
+            return true;
+        }
+        if ('service_container' === $id) {
             return true;
         }
 
@@ -227,9 +231,6 @@ class Container implements ResettableContainerInterface
 
             return;
         }
-        if ('service_container' === $id) {
-            return $this;
-        }
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
         }
@@ -237,6 +238,9 @@ class Container implements ResettableContainerInterface
         // Re-use shared service instance if it exists.
         if (isset($this->services[$id])) {
             return $this->services[$id];
+        }
+        if ('service_container' === $id) {
+            return $this;
         }
 
         if (isset($this->loading[$id])) {
@@ -289,16 +293,16 @@ class Container implements ResettableContainerInterface
      */
     public function initialized($id)
     {
-        if ('service_container' === $id) {
-            return false;
-        }
-
         if (isset($this->privates[$id])) {
             return false;
         }
 
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
+        }
+
+        if ('service_container' === $id) {
+            return false;
         }
 
         return isset($this->services[$id]);

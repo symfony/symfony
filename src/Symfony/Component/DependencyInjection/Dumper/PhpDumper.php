@@ -1527,6 +1527,10 @@ EOF;
      */
     private function getServiceCall($id, Reference $reference = null)
     {
+        while ($this->container->hasAlias($id)) {
+            $id = (string) $this->container->getAlias($id);
+        }
+
         if ('service_container' === $id) {
             return '$this';
         }
@@ -1543,7 +1547,7 @@ EOF;
             $code = sprintf('$this->get(\'%s\')', $id);
         }
 
-        if ($this->container->hasDefinition($id) && (!$this->container->getDefinition($id)->isPublic() || $this->container->getDefinition($id)->isShared())) {
+        if ($this->container->hasDefinition($id) && $this->container->getDefinition($id)->isShared()) {
             $code = "(\$this->services['$id'] ?? $code)";
         }
 

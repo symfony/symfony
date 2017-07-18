@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
- * @internal This class is meant for internal use only.
+ * @internal
  */
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {

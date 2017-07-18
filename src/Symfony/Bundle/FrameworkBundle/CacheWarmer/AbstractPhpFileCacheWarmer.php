@@ -18,6 +18,9 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
+/**
+ * @internal This class is meant for internal use only.
+ */
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
     protected $phpArrayFile;
@@ -34,6 +37,14 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
             $fallbackPool = new ProxyAdapter($fallbackPool);
         }
         $this->fallbackPool = $fallbackPool;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOptional()
+    {
+        return true;
     }
 
     /**
@@ -56,14 +67,19 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         // the ArrayAdapter stores the values serialized
         // to avoid mutation of the data after it was written to the cache
         // so here we un-serialize the values first
-        $values = array_map(function ($val) { return unserialize($val); }, array_filter($arrayAdapter->getValues()));
-        $phpArrayAdapter->warmUp($values);
+        $values = array_map(function ($val) { return null !== $val ? unserialize($val) : null; }, $arrayAdapter->getValues());
+        $this->warmUpPhpArrayAdapter($phpArrayAdapter, $values);
 
         foreach ($values as $k => $v) {
             $item = $this->fallbackPool->getItem($k);
             $this->fallbackPool->saveDeferred($item->set($v));
         }
         $this->fallbackPool->commit();
+    }
+
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    {
+        $phpArrayAdapter->warmUp($values);
     }
 
     /**

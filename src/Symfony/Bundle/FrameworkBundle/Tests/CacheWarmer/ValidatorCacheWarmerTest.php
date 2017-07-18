@@ -79,8 +79,9 @@ class ValidatorCacheWarmerTest extends TestCase
         $values = $fallbackPool->getValues();
 
         $this->assertInternalType('array', $values);
-        $this->assertCount(1, $values);
+        $this->assertCount(2, $values);
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category', $values);
+        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.SubCategory', $values);
     }
 
     public function testWarmUpWithoutLoader()

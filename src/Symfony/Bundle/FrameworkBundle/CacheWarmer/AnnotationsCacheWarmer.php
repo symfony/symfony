@@ -43,14 +43,6 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
     {
         $annotatedClassPatterns = $cacheDir.'/annotations.map';

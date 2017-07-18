@@ -46,14 +46,6 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
     {
         if (!method_exists($this->validatorBuilder, 'getLoaders')) {
@@ -76,6 +68,12 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
                 }
             }
         }
+    }
+
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    {
+        // make sure we don't cache null values
+        parent::warmUpPhpArrayAdapter($phpArrayAdapter, array_filter($values));
     }
 
     /**

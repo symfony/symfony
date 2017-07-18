@@ -45,14 +45,6 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
     {
         if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {

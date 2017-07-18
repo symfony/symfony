@@ -279,29 +279,40 @@ class Table
      */
     public function render()
     {
-        $this->calculateNumberOfColumns();
-        $rows = $this->buildTableRows($this->rows);
-        $headers = $this->buildTableRows($this->headers);
+        $rows = array_merge($this->headers, array($divider = new TableSeparator()), $this->rows);
+        $this->calculateNumberOfColumns($rows);
 
-        $this->calculateColumnsWidth(array_merge($headers, $rows));
+        $rows = $this->buildTableRows($rows);
+        $this->calculateColumnsWidth($rows);
 
-        $this->renderRowSeparator();
-        if (!empty($headers)) {
-            foreach ($headers as $header) {
-                $this->renderRow($header, $this->style->getCellHeaderFormat());
-                $this->renderRowSeparator();
-            }
-        }
+        $isHeader = true;
+        $isFirstRow = false;
         foreach ($rows as $row) {
+            if ($divider === $row) {
+                $isHeader = false;
+                $isFirstRow = true;
+
+                continue;
+            }
             if ($row instanceof TableSeparator) {
                 $this->renderRowSeparator();
-            } else {
-                $this->renderRow($row, $this->style->getCellRowFormat());
+
+                continue;
             }
+            if (!$row) {
+                continue;
+            }
+
+            if ($isHeader || $isFirstRow) {
+                $this->renderRowSeparator();
+                if ($isFirstRow) {
+                    $isFirstRow = false;
+                }
+            }
+
+            $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
         }
-        if (!empty($rows)) {
-            $this->renderRowSeparator();
-        }
+        $this->renderRowSeparator();
 
         $this->cleanup();
     }
@@ -347,10 +358,6 @@ class Table
      */
     private function renderRow(array $row, $cellFormat)
     {
-        if (empty($row)) {
-            return;
-        }
-
         $rowContent = $this->renderColumnSeparator();
         foreach ($this->getRowColumns($row) as $column) {
             $rowContent .= $this->renderCell($row, $column, $cellFormat);
@@ -397,14 +404,10 @@ class Table
     /**
      * Calculate number of columns for this table.
      */
-    private function calculateNumberOfColumns()
+    private function calculateNumberOfColumns($rows)
     {
-        if (null !== $this->numberOfColumns) {
-            return;
-        }
-
         $columns = array(0);
-        foreach (array_merge($this->headers, $this->rows) as $row) {
+        foreach ($rows as $row) {
             if ($row instanceof TableSeparator) {
                 continue;
             }
@@ -440,15 +443,17 @@ class Table
             }
         }
 
-        $tableRows = array();
-        foreach ($rows as $rowKey => $row) {
-            $tableRows[] = $this->fillCells($row);
-            if (isset($unmergedRows[$rowKey])) {
-                $tableRows = array_merge($tableRows, $unmergedRows[$rowKey]);
-            }
-        }
+        return new TableRows(function () use ($rows, $unmergedRows) {
+            foreach ($rows as $rowKey => $row) {
+                yield $this->fillCells($row);
 
-        return $tableRows;
+                if (isset($unmergedRows[$rowKey])) {
+                    foreach ($unmergedRows[$rowKey] as $row) {
+                        yield $row;
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -588,8 +593,6 @@ class Table
 
     /**
      * Calculates columns widths.
-     *
-     * @param array $rows
      */
     private function calculateColumnsWidth($rows)
     {

@@ -56,9 +56,13 @@ class Container implements ResettableContainerInterface
 
     protected $services = array();
     protected $methodMap = array();
-    protected $privates = array();
     protected $aliases = array();
     protected $loading = array();
+
+    /**
+     * @internal
+     */
+    protected $privates = array();
 
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
     private $envCache = array();

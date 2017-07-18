@@ -13,11 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\Adapter\ProxyAdapter;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Validator\Mapping\Cache\Psr6Cache;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
@@ -31,11 +28,9 @@ use Symfony\Component\Validator\ValidatorBuilderInterface;
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
-class ValidatorCacheWarmer implements CacheWarmerInterface
+class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     private $validatorBuilder;
-    private $phpArrayFile;
-    private $fallbackPool;
 
     /**
      * @param ValidatorBuilderInterface $validatorBuilder
@@ -44,59 +39,8 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
      */
     public function __construct(ValidatorBuilderInterface $validatorBuilder, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
+        parent::__construct($phpArrayFile, $fallbackPool);
         $this->validatorBuilder = $validatorBuilder;
-        $this->phpArrayFile = $phpArrayFile;
-        if (!$fallbackPool instanceof AdapterInterface) {
-            $fallbackPool = new ProxyAdapter($fallbackPool);
-        }
-        $this->fallbackPool = $fallbackPool;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function warmUp($cacheDir)
-    {
-        if (!method_exists($this->validatorBuilder, 'getLoaders')) {
-            return;
-        }
-
-        $adapter = new PhpArrayAdapter($this->phpArrayFile, $this->fallbackPool);
-        $arrayPool = new ArrayAdapter(0);
-
-        $loaders = $this->validatorBuilder->getLoaders();
-        $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), new Psr6Cache($arrayPool));
-
-        spl_autoload_register(array($adapter, 'throwOnRequiredClass'));
-        try {
-            foreach ($this->extractSupportedLoaders($loaders) as $loader) {
-                foreach ($loader->getMappedClasses() as $mappedClass) {
-                    try {
-                        if ($metadataFactory->hasMetadataFor($mappedClass)) {
-                            $metadataFactory->getMetadataFor($mappedClass);
-                        }
-                    } catch (\ReflectionException $e) {
-                        // ignore failing reflection
-                    } catch (AnnotationException $e) {
-                        // ignore failing annotations
-                    }
-                }
-            }
-        } finally {
-            spl_autoload_unregister(array($adapter, 'throwOnRequiredClass'));
-        }
-
-        // the ArrayAdapter stores the values serialized as the MetaData objects
-        // are mutated inside LazyLoadingMetadataFactory after being written into the cache
-        // so here we un-serialize the values first
-        $values = array_map(function ($val) { return unserialize($val); }, $arrayPool->getValues());
-        $adapter->warmUp(array_filter($values));
-
-        foreach ($values as $k => $v) {
-            $item = $this->fallbackPool->getItem($k);
-            $this->fallbackPool->saveDeferred($item->set($v));
-        }
-        $this->fallbackPool->commit();
     }
 
     /**
@@ -105,6 +49,33 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
+    {
+        if (!method_exists($this->validatorBuilder, 'getLoaders')) {
+            return false;
+        }
+
+        $loaders = $this->validatorBuilder->getLoaders();
+        $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), new Psr6Cache($arrayAdapter));
+
+        foreach ($this->extractSupportedLoaders($loaders) as $loader) {
+            foreach ($loader->getMappedClasses() as $mappedClass) {
+                try {
+                    if ($metadataFactory->hasMetadataFor($mappedClass)) {
+                        $metadataFactory->getMetadataFor($mappedClass);
+                    }
+                } catch (\ReflectionException $e) {
+                    // ignore failing reflection
+                } catch (AnnotationException $e) {
+                    // ignore failing annotations
+                }
+            }
+        }
     }
 
     /**

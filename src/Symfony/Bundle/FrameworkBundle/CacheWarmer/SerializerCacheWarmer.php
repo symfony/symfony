@@ -13,11 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\Adapter\ProxyAdapter;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
@@ -30,11 +27,9 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
-class SerializerCacheWarmer implements CacheWarmerInterface
+class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     private $loaders;
-    private $phpArrayFile;
-    private $fallbackPool;
 
     /**
      * @param LoaderInterface[]      $loaders      The serializer metadata loaders
@@ -43,53 +38,8 @@ class SerializerCacheWarmer implements CacheWarmerInterface
      */
     public function __construct(array $loaders, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
+        parent::__construct($phpArrayFile, $fallbackPool);
         $this->loaders = $loaders;
-        $this->phpArrayFile = $phpArrayFile;
-        if (!$fallbackPool instanceof AdapterInterface) {
-            $fallbackPool = new ProxyAdapter($fallbackPool);
-        }
-        $this->fallbackPool = $fallbackPool;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function warmUp($cacheDir)
-    {
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            return;
-        }
-
-        $adapter = new PhpArrayAdapter($this->phpArrayFile, $this->fallbackPool);
-        $arrayPool = new ArrayAdapter(0, false);
-
-        $metadataFactory = new CacheClassMetadataFactory(new ClassMetadataFactory(new LoaderChain($this->loaders)), $arrayPool);
-
-        spl_autoload_register(array($adapter, 'throwOnRequiredClass'));
-        try {
-            foreach ($this->extractSupportedLoaders($this->loaders) as $loader) {
-                foreach ($loader->getMappedClasses() as $mappedClass) {
-                    try {
-                        $metadataFactory->getMetadataFor($mappedClass);
-                    } catch (\ReflectionException $e) {
-                        // ignore failing reflection
-                    } catch (AnnotationException $e) {
-                        // ignore failing annotations
-                    }
-                }
-            }
-        } finally {
-            spl_autoload_unregister(array($adapter, 'throwOnRequiredClass'));
-        }
-
-        $values = $arrayPool->getValues();
-        $adapter->warmUp($values);
-
-        foreach ($values as $k => $v) {
-            $item = $this->fallbackPool->getItem($k);
-            $this->fallbackPool->saveDeferred($item->set($v));
-        }
-        $this->fallbackPool->commit();
     }
 
     /**
@@ -98,6 +48,30 @@ class SerializerCacheWarmer implements CacheWarmerInterface
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doWarmUp($cacheDir, PhpArrayAdapter $phpArrayAdapter, ArrayAdapter $arrayAdapter)
+    {
+        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
+            return false;
+        }
+
+        $metadataFactory = new CacheClassMetadataFactory(new ClassMetadataFactory(new LoaderChain($this->loaders)), $arrayAdapter);
+
+        foreach ($this->extractSupportedLoaders($this->loaders) as $loader) {
+            foreach ($loader->getMappedClasses() as $mappedClass) {
+                try {
+                    $metadataFactory->getMetadataFor($mappedClass);
+                } catch (\ReflectionException $e) {
+                    // ignore failing reflection
+                } catch (AnnotationException $e) {
+                    // ignore failing annotations
+                }
+            }
+        }
     }
 
     /**

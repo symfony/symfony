@@ -154,9 +154,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
             $extensions[] = new PreloadedExtension($this->types, $this->typeExtensions, $typeGuesser);
         }
 
-        $resolvedTypeFactory = $this->resolvedTypeFactory ?: new ResolvedFormTypeFactory();
-        $registry = new FormRegistry($extensions, $resolvedTypeFactory);
+        $registry = new FormRegistry($extensions, $this->resolvedTypeFactory ?: new ResolvedFormTypeFactory());
 
-        return new FormFactory($registry, $resolvedTypeFactory);
+        return new FormFactory($registry);
     }
 }

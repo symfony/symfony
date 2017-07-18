@@ -1,14 +1,25 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
+
+3.3.0
+-----
+
+ * added a `workflow_has_marked_place` function
+ * added a `workflow_marked_places` function
+
 3.2.0
 -----
 
  * added `AppVariable::getToken()`
  * Deprecated the possibility to inject the Form `TwigRenderer` into the `FormExtension`.
- * [BC BREAK] Registering the `FormExtension` without configuring a runtime loader for the `TwigRenderer` 
+ * [BC BREAK] Registering the `FormExtension` without configuring a runtime loader for the `TwigRenderer`
    doesn't work anymore.
-   
+
    Before:
 
    ```php
@@ -36,6 +47,7 @@ CHANGELOG
    $twig->addExtension(new FormExtension());
    ```
  * Deprecated the `TwigRendererEngineInterface` interface.
+ * added WorkflowExtension (provides `workflow_can` and `workflow_transitions`)
 
 2.7.0
 -----

@@ -45,15 +45,10 @@ class IniFileLoaderTest extends TestCase
 
     /**
      * @dataProvider getTypeConversions
-     * @requires PHP 5.6.1
      * This test illustrates where our conversions differs from INI_SCANNER_TYPED introduced in PHP 5.6.1
      */
     public function testTypeConversionsWithNativePhp($key, $value, $supported)
     {
-        if (defined('HHVM_VERSION_ID')) {
-            return $this->markTestSkipped();
-        }
-
         if (!$supported) {
             $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }
@@ -127,6 +122,7 @@ class IniFileLoaderTest extends TestCase
         $loader = new IniFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        $this->assertTrue($loader->supports('with_wrong_ext.yml', 'ini'), '->supports() returns true if the resource with forced type is loadable');
     }
 }

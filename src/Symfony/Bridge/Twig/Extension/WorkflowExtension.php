@@ -35,6 +35,8 @@ class WorkflowExtension extends AbstractExtension
         return array(
             new TwigFunction('workflow_can', array($this, 'canTransition')),
             new TwigFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
+            new TwigFunction('workflow_has_marked_place', array($this, 'hasMarkedPlace')),
+            new TwigFunction('workflow_marked_places', array($this, 'getMarkedPlaces')),
         );
     }
 
@@ -63,6 +65,40 @@ class WorkflowExtension extends AbstractExtension
     public function getEnabledTransitions($subject, $name = null)
     {
         return $this->workflowRegistry->get($subject, $name)->getEnabledTransitions($subject);
+    }
+
+    /**
+     * Returns true if the place is marked.
+     *
+     * @param object $subject   A subject
+     * @param string $placeName A place name
+     * @param string $name      A workflow name
+     *
+     * @return bool true if the transition is enabled
+     */
+    public function hasMarkedPlace($subject, $placeName, $name = null)
+    {
+        return $this->workflowRegistry->get($subject, $name)->getMarking($subject)->has($placeName);
+    }
+
+    /**
+     * Returns marked places.
+     *
+     * @param object $subject        A subject
+     * @param string $placesNameOnly If true, returns only places name. If false returns the raw representation
+     * @param string $name           A workflow name
+     *
+     * @return string[]|int[]
+     */
+    public function getMarkedPlaces($subject, $placesNameOnly = true, $name = null)
+    {
+        $places = $this->workflowRegistry->get($subject, $name)->getMarking($subject)->getPlaces();
+
+        if ($placesNameOnly) {
+            return array_keys($places);
+        }
+
+        return $places;
     }
 
     public function getName()

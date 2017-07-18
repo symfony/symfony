@@ -80,24 +80,14 @@ class ProxyDumperTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Missing name of method to call to construct the service "foo".
      */
-    public function testGetProxyFactoryCode()
+    public function testGetProxyFactoryCodeWithoutCustomMethod()
     {
         $definition = new Definition(__CLASS__);
-
         $definition->setLazy(true);
-
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo');
-
-        $this->assertStringMatchesFormat(
-            '%wif ($lazyLoad) {%wreturn $this->services[\'foo\'] =%s'
-            .'SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest_%s(%wfunction '
-            .'(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {'
-            .'%w$wrappedInstance = $this->getFooService(false);%w$proxy->setProxyInitializer(null);'
-            .'%wreturn true;%w}%w);%w}%w',
-            $code
-        );
+        $this->dumper->getProxyFactoryCode($definition, 'foo');
     }
 
     /**

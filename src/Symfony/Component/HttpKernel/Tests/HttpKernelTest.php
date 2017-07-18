@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -110,23 +111,6 @@ class HttpKernelTest extends TestCase
         $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
-    /**
-     * @dataProvider getStatusCodes
-     */
-    public function testHandleWhenAnExceptionIsHandledWithASpecificStatusCode($responseStatusCode, $expectedStatusCode)
-    {
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) use ($responseStatusCode, $expectedStatusCode) {
-            $event->setResponse(new Response('', $responseStatusCode, array('X-Status-Code' => $expectedStatusCode)));
-        });
-
-        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException(); });
-        $response = $kernel->handle(new Request());
-
-        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
-        $this->assertFalse($response->headers->has('X-Status-Code'));
-    }
-
     public function getStatusCodes()
     {
         return array(
@@ -134,6 +118,32 @@ class HttpKernelTest extends TestCase
             array(404, 200),
             array(301, 200),
             array(500, 200),
+        );
+    }
+
+    /**
+     * @dataProvider getSpecificStatusCodes
+     */
+    public function testHandleWhenAnExceptionIsHandledWithASpecificStatusCode($expectedStatusCode)
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) use ($expectedStatusCode) {
+            $event->allowCustomResponseCode();
+            $event->setResponse(new Response('', $expectedStatusCode));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException(); });
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+    }
+
+    public function getSpecificStatusCodes()
+    {
+        return array(
+            array(200),
+            array(302),
+            array(403),
         );
     }
 
@@ -309,7 +319,7 @@ class HttpKernelTest extends TestCase
     public function testInconsistentClientIpsOnMasterRequests()
     {
         $request = new Request();
-        $request->setTrustedProxies(array('1.1.1.1'), -1);
+        $request->setTrustedProxies(array('1.1.1.1'), Request::HEADER_X_FORWARDED_FOR | Request::HEADER_FORWARDED);
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $request->headers->set('FORWARDED', 'for=2.2.2.2');
         $request->headers->set('X_FORWARDED_FOR', '3.3.3.3');

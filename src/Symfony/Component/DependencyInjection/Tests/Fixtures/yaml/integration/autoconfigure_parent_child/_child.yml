@@ -1,0 +1,3 @@
+services:
+    child_service:
+        parent: parent_service

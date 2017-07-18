@@ -5,7 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="fragment.listener" class="Symfony\Component\HttpKernel\EventListener\FragmentListener">
+        <defaults public="false" />
+
+        <service id="fragment.listener" class="Symfony\Component\HttpKernel\EventListener\FragmentListener" public="true">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="uri_signer" />
             <argument>%fragment.path%</argument>

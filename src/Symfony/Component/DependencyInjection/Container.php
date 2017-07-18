@@ -26,16 +26,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * Services and parameters are simple key/pair stores.
  *
- * Parameter and service keys are case insensitive.
- *
- * A service can also be defined by creating a method named
- * getXXXService(), where XXX is the camelized version of the id:
- *
- * <ul>
- *   <li>request -> getRequestService()</li>
- *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
- *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
- * </ul>
+ * Parameter keys are case insensitive.
  *
  * The container can have three possible behaviors when a service does not exist:
  *
@@ -64,8 +55,8 @@ class Container implements ResettableContainerInterface
      */
     protected $privates = array();
 
-    private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
     private $envCache = array();
+    private $compiled = false;
 
     /**
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
@@ -88,16 +79,18 @@ class Container implements ResettableContainerInterface
         $this->parameterBag->resolve();
 
         $this->parameterBag = new FrozenParameterBag($this->parameterBag->all());
+
+        $this->compiled = true;
     }
 
     /**
-     * Returns true if the container parameter bag are frozen.
+     * Returns true if the container is compiled.
      *
-     * @return bool true if the container parameter bag are frozen, false otherwise
+     * @return bool
      */
-    public function isFrozen()
+    public function isCompiled()
     {
-        return $this->parameterBag instanceof FrozenParameterBag;
+        return $this->compiled;
     }
 
     /**
@@ -158,30 +151,29 @@ class Container implements ResettableContainerInterface
      */
     public function set($id, $service)
     {
-        $id = strtolower($id);
-
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
+        }
+
+        if (isset($this->privates[$id])) {
+            throw new InvalidArgumentException(sprintf('You cannot set the private service "%s".', $id));
+        }
+
+        if (isset($this->methodMap[$id])) {
+            throw new InvalidArgumentException(sprintf('You cannot set the pre-defined service "%s".', $id));
         }
 
         if (isset($this->aliases[$id])) {
             unset($this->aliases[$id]);
         }
 
-        $this->services[$id] = $service;
-
         if (null === $service) {
             unset($this->services[$id]);
+
+            return;
         }
 
-        if (isset($this->privates[$id])) {
-            if (null === $service) {
-                @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-                unset($this->privates[$id]);
-            } else {
-                @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.', $id), E_USER_DEPRECATED);
-            }
-        }
+        $this->services[$id] = $service;
     }
 
     /**
@@ -193,37 +185,24 @@ class Container implements ResettableContainerInterface
      */
     public function has($id)
     {
-        for ($i = 2;;) {
-            if (isset($this->privates[$id])) {
-                @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-            }
-
-            if ('service_container' === $id
-                || isset($this->aliases[$id])
-                || isset($this->services[$id])
-            ) {
-                return true;
-            }
-
-            if (isset($this->methodMap[$id])) {
-                return true;
-            }
-
-            if (--$i && $id !== $lcId = strtolower($id)) {
-                $id = $lcId;
-                continue;
-            }
-
-            // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-            // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-            if (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service')) {
-                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-
-                return true;
-            }
-
+        if (isset($this->privates[$id])) {
             return false;
         }
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
+        if (isset($this->services[$id])) {
+            return true;
+        }
+        if ('service_container' === $id) {
+            return true;
+        }
+
+        if (isset($this->methodMap[$id])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -245,74 +224,64 @@ class Container implements ResettableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        // Attempt to retrieve the service by checking first aliases then
-        // available services. Service IDs are case insensitive, however since
-        // this method can be called thousands of times during a request, avoid
-        // calling strtolower() unless necessary.
-        for ($i = 2;;) {
-            if (isset($this->privates[$id])) {
-                @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-            }
-            if (isset($this->aliases[$id])) {
-                $id = $this->aliases[$id];
+        if (isset($this->privates[$id])) {
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                throw new ServiceNotFoundException($id);
             }
 
-            // Re-use shared service instance if it exists.
-            if (isset($this->services[$id])) {
-                return $this->services[$id];
-            }
-            if ('service_container' === $id) {
-                return $this;
-            }
+            return;
+        }
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
 
-            if (isset($this->loading[$id])) {
-                throw new ServiceCircularReferenceException($id, array_keys($this->loading));
-            }
+        // Re-use shared service instance if it exists.
+        if (isset($this->services[$id])) {
+            return $this->services[$id];
+        }
+        if ('service_container' === $id) {
+            return $this;
+        }
 
-            if (isset($this->methodMap[$id])) {
-                $method = $this->methodMap[$id];
-            } elseif (--$i && $id !== $lcId = strtolower($id)) {
-                $id = $lcId;
-                continue;
-            } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
-                // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-                // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-                // $method is set to the right value, proceed
-            } else {
-                if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                    if (!$id) {
-                        throw new ServiceNotFoundException($id);
-                    }
+        if (isset($this->loading[$id])) {
+            throw new ServiceCircularReferenceException($id, array_keys($this->loading));
+        }
 
-                    $alternatives = array();
-                    foreach ($this->getServiceIds() as $knownId) {
-                        $lev = levenshtein($id, $knownId);
-                        if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
-                            $alternatives[] = $knownId;
-                        }
-                    }
-
-                    throw new ServiceNotFoundException($id, null, null, $alternatives);
+        if (isset($this->methodMap[$id])) {
+            $method = $this->methodMap[$id];
+        } else {
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                if (!$id) {
+                    throw new ServiceNotFoundException($id);
                 }
 
-                return;
+                $alternatives = array();
+                foreach ($this->getServiceIds() as $knownId) {
+                    $lev = levenshtein($id, $knownId);
+                    if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                        $alternatives[] = $knownId;
+                    }
+                }
+
+                throw new ServiceNotFoundException($id, null, null, $alternatives);
             }
 
-            $this->loading[$id] = true;
-
-            try {
-                $service = $this->$method();
-            } catch (\Exception $e) {
-                unset($this->services[$id]);
-
-                throw $e;
-            } finally {
-                unset($this->loading[$id]);
-            }
-
-            return $service;
+            return;
         }
+
+        $this->loading[$id] = true;
+
+        try {
+            $service = $this->$method();
+        } catch (\Exception $e) {
+            unset($this->services[$id]);
+
+            throw $e;
+        } finally {
+            unset($this->loading[$id]);
+        }
+
+        return $service;
     }
 
     /**
@@ -324,7 +293,9 @@ class Container implements ResettableContainerInterface
      */
     public function initialized($id)
     {
-        $id = strtolower($id);
+        if (isset($this->privates[$id])) {
+            return false;
+        }
 
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
@@ -352,22 +323,7 @@ class Container implements ResettableContainerInterface
      */
     public function getServiceIds()
     {
-        $ids = array();
-
-        if (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class) {
-            // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-            // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-            @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-
-            foreach (get_class_methods($this) as $method) {
-                if (preg_match('/^get(.+)Service$/', $method, $match)) {
-                    $ids[] = self::underscore($match[1]);
-                }
-            }
-        }
-        $ids[] = 'service_container';
-
-        return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->services)));
+        return array_unique(array_merge(array('service_container'), array_keys($this->methodMap), array_keys($this->services)));
     }
 
     /**

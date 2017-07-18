@@ -5,11 +5,23 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader" public="false">
-            <autowiring-type>Doctrine\Common\Annotations\Reader</autowiring-type>
+        <defaults public="false" />
+
+        <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader">
+            <call method="addGlobalIgnoredName">
+                <argument>required</argument>
+                <argument type="service">
+                    <!-- dummy arg to register class_exists as annotation loader only when required -->
+                    <service class="Doctrine\Common\Annotations\AnnotationRegistry">
+                        <call method="registerLoader">
+                            <argument>class_exists</argument>
+                        </call>
+                    </service>
+                </argument>
+            </call>
         </service>
 
-        <service id="annotations.cached_reader" class="Doctrine\Common\Annotations\CachedReader" public="false">
+        <service id="annotations.cached_reader" class="Doctrine\Common\Annotations\CachedReader">
             <argument type="service" id="annotations.reader" />
             <argument type="service">
                 <service class="Doctrine\Common\Cache\ArrayCache" />
@@ -17,17 +29,17 @@
             <argument /><!-- Debug-Flag -->
         </service>
 
-        <service id="annotations.filesystem_cache" class="Doctrine\Common\Cache\FilesystemCache" public="false">
+        <service id="annotations.filesystem_cache" class="Doctrine\Common\Cache\FilesystemCache">
             <argument /><!-- Cache-Directory -->
         </service>
 
-        <service id="annotations.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" public="false">
+        <service id="annotations.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer">
             <argument type="service" id="annotations.reader" />
             <argument>%kernel.cache_dir%/annotations.php</argument>
             <argument type="service" id="cache.annotations" />
         </service>
 
-        <service id="annotations.cache" class="Symfony\Component\Cache\DoctrineProvider" public="false">
+        <service id="annotations.cache" class="Symfony\Component\Cache\DoctrineProvider">
             <argument type="service">
                 <service class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
                     <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
@@ -37,6 +49,7 @@
             </argument>
         </service>
 
-        <service id="annotation_reader" alias="annotations.reader" />
+        <service id="annotation_reader" alias="annotations.reader" public="true" />
+        <service id="Doctrine\Common\Annotations\Reader" alias="annotation_reader" />
     </services>
 </container>

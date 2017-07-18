@@ -46,24 +46,34 @@ class DefinitionBuilder
 
     /**
      * Clear all data in the builder.
+     *
+     * @return $this
      */
     public function reset()
     {
         $this->places = array();
         $this->transitions = array();
         $this->initialPlace = null;
+
+        return $this;
     }
 
     /**
      * @param string $place
+     *
+     * @return $this
      */
     public function setInitialPlace($place)
     {
         $this->initialPlace = $place;
+
+        return $this;
     }
 
     /**
      * @param string $place
+     *
+     * @return $this
      */
     public function addPlace($place)
     {
@@ -76,30 +86,45 @@ class DefinitionBuilder
         }
 
         $this->places[$place] = $place;
+
+        return $this;
     }
 
     /**
      * @param string[] $places
+     *
+     * @return $this
      */
     public function addPlaces(array $places)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
         }
+
+        return $this;
     }
 
     /**
      * @param Transition[] $transitions
+     *
+     * @return $this
      */
     public function addTransitions(array $transitions)
     {
         foreach ($transitions as $transition) {
             $this->addTransition($transition);
         }
+
+        return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function addTransition(Transition $transition)
     {
         $this->transitions[] = $transition;
+
+        return $this;
     }
 }

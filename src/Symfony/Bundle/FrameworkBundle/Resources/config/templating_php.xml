@@ -5,7 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="templating.engine.php" class="Symfony\Bundle\FrameworkBundle\Templating\PhpEngine" public="false">
+        <defaults public="false" />
+
+        <service id="templating.engine.php" class="Symfony\Bundle\FrameworkBundle\Templating\PhpEngine">
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />
@@ -13,68 +15,68 @@
             <call method="setCharset"><argument>%kernel.charset%</argument></call>
         </service>
 
-        <service id="templating.helper.slots" class="Symfony\Component\Templating\Helper\SlotsHelper">
+        <service id="templating.helper.slots" class="Symfony\Component\Templating\Helper\SlotsHelper" public="true">
             <tag name="templating.helper" alias="slots" />
         </service>
 
-        <service id="templating.helper.request" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper">
+        <service id="templating.helper.request" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper" public="true">
             <tag name="templating.helper" alias="request" />
             <argument type="service" id="request_stack" />
         </service>
 
-        <service id="templating.helper.session" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper">
+        <service id="templating.helper.session" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper" public="true">
             <tag name="templating.helper" alias="session" />
             <argument type="service" id="request_stack" />
         </service>
 
-        <service id="templating.helper.router" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper">
+        <service id="templating.helper.router" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper" public="true">
             <tag name="templating.helper" alias="router" />
             <argument type="service" id="router" />
         </service>
 
-        <service id="templating.helper.assets" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper">
+        <service id="templating.helper.assets" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper" public="true">
             <tag name="templating.helper" alias="assets" />
             <argument /> <!-- packages -->
         </service>
 
-        <service id="templating.helper.actions" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper">
+        <service id="templating.helper.actions" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper" public="true">
             <tag name="templating.helper" alias="actions" />
             <argument type="service" id="fragment.handler" />
         </service>
 
-        <service id="templating.helper.code" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper">
+        <service id="templating.helper.code" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper" public="true">
             <tag name="templating.helper" alias="code" />
             <argument type="service" id="debug.file_link_formatter"></argument>
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>
 
-        <service id="templating.helper.translator" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper">
+        <service id="templating.helper.translator" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper" public="true">
             <tag name="templating.helper" alias="translator" />
             <argument type="service" id="translator" />
         </service>
 
-        <service id="templating.helper.form" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper">
+        <service id="templating.helper.form" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper" public="true">
             <tag name="templating.helper" alias="form" />
             <argument type="service" id="templating.form.renderer" />
         </service>
 
-        <service id="templating.helper.stopwatch" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper">
+        <service id="templating.helper.stopwatch" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper" public="true">
             <tag name="templating.helper" alias="stopwatch" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
         </service>
 
-        <service id="templating.form.engine" class="Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine" public="false">
+        <service id="templating.form.engine" class="Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine">
             <argument type="service" id="templating.engine.php" />
             <argument>%templating.helper.form.resources%</argument>
         </service>
 
-        <service id="templating.form.renderer" class="Symfony\Component\Form\FormRenderer" public="false">
+        <service id="templating.form.renderer" class="Symfony\Component\Form\FormRenderer">
             <argument type="service" id="templating.form.engine" />
             <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
         </service>
 
-        <service id="templating.globals" class="Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables">
+        <service id="templating.globals" class="Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables" public="true">
             <argument type="service" id="service_container" />
         </service>
     </services>

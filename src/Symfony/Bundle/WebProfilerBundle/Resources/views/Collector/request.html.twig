@@ -143,16 +143,6 @@
                     {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestattributes }, with_context = false) }}
                 {% endif %}
 
-                <h3>Cookies</h3>
-
-                {% if collector.requestcookies.all is empty %}
-                    <div class="empty">
-                        <p>No cookies</p>
-                    </div>
-                {% else %}
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
-                {% endif %}
-
                 <h3>Request Headers</h3>
                 {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders, labels: ['Header', 'Value'], maxDepth: 1 }, with_context = false) }}
 
@@ -184,6 +174,32 @@
                 <h3>Response Headers</h3>
 
                 {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'], maxDepth: 1 }, with_context = false) }}
+            </div>
+        </div>
+
+        <div class="tab {{ collector.requestcookies.all is empty and collector.responsecookies.all is empty ? 'disabled' }}">
+            <h3 class="tab-title">Cookies</h3>
+
+            <div class="tab-content">
+                <h3>Request Cookies</h3>
+
+                {% if collector.requestcookies.all is empty %}
+                    <div class="empty">
+                        <p>No request cookies</p>
+                    </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
+                {% endif %}
+
+                <h3>Response Cookies</h3>
+
+                {% if collector.responsecookies.all is empty %}
+                    <div class="empty">
+                        <p>No response cookies</p>
+                    </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responsecookies }, with_context = true) }}
+                {% endif %}
             </div>
         </div>
 

@@ -12,3 +12,15 @@ ou: Maintainers
 ou: Founder
 givenName: Fabien Potencier
 description: Founder and project lead @Symfony
+
+dn: ou=Components,dc=symfony,dc=com
+objectclass: organizationalunit
+ou: Components
+
+dn: ou=Ldap,ou=Components,dc=symfony,dc=com
+objectclass: organizationalunit
+ou: Ldap
+
+dn: ou=Ldap scoping,ou=Ldap,ou=Components,dc=symfony,dc=com
+objectclass: organizationalunit
+ou: Ldap scoping

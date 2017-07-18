@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
+    /** @var TokenProviderInterface */
     private $tokenProvider;
 
     /**

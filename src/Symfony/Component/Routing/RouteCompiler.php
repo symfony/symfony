@@ -103,8 +103,7 @@ class RouteCompiler implements RouteCompilerInterface
         $needsUtf8 = $route->getOption('utf8');
 
         if (!$needsUtf8 && $useUtf8 && preg_match('/[\x80-\xFF]/', $pattern)) {
-            $needsUtf8 = true;
-            @trigger_error(sprintf('Using UTF-8 route patterns without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for pattern "%s".', $pattern), E_USER_DEPRECATED);
+            throw new \LogicException(sprintf('Cannot use UTF-8 route patterns without setting the "utf8" option for route "%s".', $route->getPath()));
         }
         if (!$useUtf8 && $needsUtf8) {
             throw new \LogicException(sprintf('Cannot mix UTF-8 requirements with non-UTF-8 pattern "%s".', $pattern));
@@ -176,8 +175,7 @@ class RouteCompiler implements RouteCompilerInterface
                 if (!preg_match('//u', $regexp)) {
                     $useUtf8 = false;
                 } elseif (!$needsUtf8 && preg_match('/[\x80-\xFF]|(?<!\\\\)\\\\(?:\\\\\\\\)*+(?-i:X|[pP][\{CLMNPSZ]|x\{[A-Fa-f0-9]{3})/', $regexp)) {
-                    $needsUtf8 = true;
-                    @trigger_error(sprintf('Using UTF-8 route requirements without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for variable "%s" in pattern "%s".', $varName, $pattern), E_USER_DEPRECATED);
+                    throw new \LogicException(sprintf('Cannot use UTF-8 route requirements without setting the "utf8" option for variable "%s" in pattern "%s".', $varName, $pattern));
                 }
                 if (!$useUtf8 && $needsUtf8) {
                     throw new \LogicException(sprintf('Cannot mix UTF-8 requirement with non-UTF-8 charset for variable "%s" in pattern "%s".', $varName, $pattern));
@@ -223,11 +221,34 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         return array(
-            'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
+            'staticPrefix' => self::determineStaticPrefix($route, $tokens),
             'regex' => $regexp,
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );
+    }
+
+    /**
+     * Determines the longest static prefix possible for a route.
+     *
+     * @param Route $route
+     * @param array $tokens
+     *
+     * @return string The leading static part of a route's path
+     */
+    private static function determineStaticPrefix(Route $route, array $tokens)
+    {
+        if ('text' !== $tokens[0][0]) {
+            return ($route->hasDefault($tokens[0][3]) || '/' === $tokens[0][1]) ? '' : $tokens[0][1];
+        }
+
+        $prefix = $tokens[0][1];
+
+        if (isset($tokens[1][1]) && '/' !== $tokens[1][1] && false === $route->hasDefault($tokens[1][3])) {
+            $prefix .= $tokens[1][1];
+        }
+
+        return $prefix;
     }
 
     /**

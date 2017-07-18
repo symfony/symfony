@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 
 class KernelTest extends TestCase
 {
@@ -86,17 +88,6 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
-    public function testClassCacheIsLoaded()
-    {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
-        $kernel->loadClassCache('name', '.extension');
-        $kernel->expects($this->once())
-            ->method('doLoadClassCache')
-            ->with('name', '.extension');
-
-        $kernel->boot();
-    }
-
     public function testClassCacheIsNotLoadedByDefault()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
@@ -104,14 +95,6 @@ class KernelTest extends TestCase
             ->method('doLoadClassCache');
 
         $kernel->boot();
-    }
-
-    public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
-    {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
-        $kernel->loadClassCache();
-        $kernel->expects($this->never())
-            ->method('doLoadClassCache');
     }
 
     public function testEnvParametersResourceIsAdded()
@@ -719,6 +702,14 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
+    public function testKernelWithoutBundles()
+    {
+        $kernel = new KernelWithoutBundles('test', true);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
+    }
+
     public function testKernelRootDirNameStartingWithANumber()
     {
         $dir = __DIR__.'/Fixtures/123';
@@ -821,5 +812,36 @@ class TestKernel implements HttpKernelInterface
 
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+    }
+}
+
+class CustomProjectDirKernel extends Kernel
+{
+    private $baseDir;
+
+    public function __construct()
+    {
+        parent::__construct('test', false);
+
+        $this->baseDir = 'foo';
+    }
+
+    public function registerBundles()
+    {
+        return array();
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+
+    public function getProjectDir()
+    {
+        return $this->baseDir;
+    }
+
+    public function getRootDir()
+    {
+        return __DIR__.'/Fixtures';
     }
 }

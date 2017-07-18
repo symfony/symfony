@@ -73,7 +73,8 @@ class CompiledRoute implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
+        $data = unserialize($serialized, array('allowed_classes' => false));
+
         $this->variables = $data['vars'];
         $this->staticPrefix = $data['path_prefix'];
         $this->regex = $data['path_regex'];

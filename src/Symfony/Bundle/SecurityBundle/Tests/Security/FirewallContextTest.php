@@ -22,12 +22,7 @@ class FirewallContextTest extends TestCase
     public function testGetters()
     {
         $config = new FirewallConfig('main', 'user_checker', 'request_matcher');
-
-        $exceptionListener = $this
-            ->getMockBuilder(ExceptionListener::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $exceptionListener = $this->getExceptionListenerMock();
         $listeners = array(
             $this
                 ->getMockBuilder(ListenerInterface::class)
@@ -37,7 +32,16 @@ class FirewallContextTest extends TestCase
 
         $context = new FirewallContext($listeners, $exceptionListener, $config);
 
-        $this->assertEquals(array($listeners, $exceptionListener), $context->getContext());
+        $this->assertEquals($listeners, $context->getListeners());
+        $this->assertEquals($exceptionListener, $context->getExceptionListener());
         $this->assertEquals($config, $context->getConfig());
+    }
+
+    private function getExceptionListenerMock()
+    {
+        return $this
+            ->getMockBuilder(ExceptionListener::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

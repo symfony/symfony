@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class RedisAdapterTest extends AbstractRedisAdapterTest
@@ -18,8 +19,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = new \Redis();
-        self::$redis->connect(getenv('REDIS_HOST'));
+        self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
     }
 
     public function testCreateConnection()

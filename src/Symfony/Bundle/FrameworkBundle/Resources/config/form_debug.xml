@@ -5,7 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="form.resolved_type_factory" class="Symfony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy">
+        <defaults public="false" />
+
+        <service id="form.resolved_type_factory" class="Symfony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy" public="true">
             <argument type="service">
                 <service class="Symfony\Component\Form\ResolvedFormTypeFactory" />
             </argument>
@@ -19,9 +21,9 @@
         </service>
 
         <!-- DataCollector -->
-        <service id="data_collector.form.extractor" class="Symfony\Component\Form\Extension\DataCollector\FormDataExtractor" />
+        <service id="data_collector.form.extractor" class="Symfony\Component\Form\Extension\DataCollector\FormDataExtractor" public="true" />
 
-        <service id="data_collector.form" class="Symfony\Component\Form\Extension\DataCollector\FormDataCollector">
+        <service id="data_collector.form" class="Symfony\Component\Form\Extension\DataCollector\FormDataCollector" public="true">
             <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="310" />
             <argument type="service" id="data_collector.form.extractor" />
         </service>

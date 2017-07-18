@@ -10,7 +10,6 @@ $container->loadFromExtension('framework', array(
         ),
     ),
     'http_method_override' => false,
-    'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
     'esi' => array(
         'enabled' => true,
     ),

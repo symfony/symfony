@@ -252,17 +252,25 @@
     line-height: 17px;
 }
 
+.sf-toolbar-block-ajax .sf-toolbar-icon {
+    cursor: pointer;
+}
+
 .sf-toolbar-status-green .sf-toolbar-label,
 .sf-toolbar-status-yellow .sf-toolbar-label,
 .sf-toolbar-status-red .sf-toolbar-label {
     color: #FFF;
 }
 .sf-toolbar-status-green svg path,
+.sf-toolbar-status-green svg .sf-svg-path,
 .sf-toolbar-status-red svg path,
-.sf-toolbar-status-yellow svg path {
+.sf-toolbar-status-red svg .sf-svg-path,
+.sf-toolbar-status-yellow svg path,
+.sf-toolbar-status-yellow svg .sf-svg-path {
     fill: #FFF;
 }
-.sf-toolbar-block-config svg path {
+.sf-toolbar-block-config svg path,
+.sf-toolbar-block-config svg .sf-svg-path {
     fill: #FFF;
 }
 
@@ -291,15 +299,18 @@
     margin-left: 4px;
 }
 
-.sf-toolbar-block:hover {
+.sf-toolbar-block:hover,
+.sf-toolbar-block.hover {
     position: relative;
 }
-.sf-toolbar-block:hover .sf-toolbar-icon {
+.sf-toolbar-block:hover .sf-toolbar-icon,
+.sf-toolbar-block.hover .sf-toolbar-icon {
     background-color: #444;
     position: relative;
     z-index: 10002;
 }
-.sf-toolbar-block:hover .sf-toolbar-info {
+.sf-toolbar-block:hover .sf-toolbar-info,
+.sf-toolbar-block.hover .sf-toolbar-info {
     display: block;
     padding: 10px;
     max-width: 480px;
@@ -386,6 +397,13 @@
 }
 .sf-toolbar-block-dump pre.sf-dump:last-child {
     margin-bottom: 0;
+}
+.sf-toolbar-block-dump pre.sf-dump .sf-dump-search-wrapper {
+    margin-bottom: 5px;
+}
+.sf-toolbar-block-dump pre.sf-dump span.sf-dump-search-count {
+    color: #333;
+    font-size: 12px;
 }
 .sf-toolbar-block-dump .sf-toolbar-info-piece {
     display: block;

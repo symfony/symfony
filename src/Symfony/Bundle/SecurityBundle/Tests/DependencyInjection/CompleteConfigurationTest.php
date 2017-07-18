@@ -12,10 +12,12 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
@@ -57,10 +59,10 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertEquals(array(), array_diff($providers, $expectedProviders));
 
         // chain provider
-        $this->assertEquals(array(array(
+        $this->assertEquals(array(new IteratorArgument(array(
             new Reference('security.user.provider.concrete.service'),
             new Reference('security.user.provider.concrete.basic'),
-        )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
+        ))), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
     public function testFirewalls()
@@ -69,10 +71,10 @@ abstract class CompleteConfigurationTest extends TestCase
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $listeners = array();
         $configs = array();
-        foreach (array_keys($arguments[1]) as $contextId) {
+        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']);
+            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
 
             $configDef = $container->getDefinition((string) $arguments['index_2']);
             $configs[] = array_values($configDef->getArguments());
@@ -107,6 +109,10 @@ abstract class CompleteConfigurationTest extends TestCase
                     'remember_me',
                     'anonymous',
                 ),
+                array(
+                    'parameter' => '_switch_user',
+                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                ),
             ),
             array(
                 'host',
@@ -123,6 +129,7 @@ abstract class CompleteConfigurationTest extends TestCase
                     'http_basic',
                     'anonymous',
                 ),
+                null,
             ),
             array(
                 'with_user_checker',
@@ -139,6 +146,7 @@ abstract class CompleteConfigurationTest extends TestCase
                     'http_basic',
                     'anonymous',
                 ),
+                null,
             ),
         ), $configs);
 
@@ -172,6 +180,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.access_listener',
             ),
         ), $listeners);
+
+        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
     }
 
     public function testFirewallRequestMatchers()
@@ -181,7 +191,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $matchers = array();
 
-        foreach ($arguments[1] as $reference) {
+        foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
                 $definition = $container->getDefinition((string) $reference);
                 $matchers[] = $definition->getArguments();
@@ -198,6 +208,14 @@ abstract class CompleteConfigurationTest extends TestCase
                 array('GET', 'POST'),
             ),
         ), $matchers);
+    }
+
+    public function testUserCheckerAliasIsRegistered()
+    {
+        $container = $this->getContainer('no_custom_user_checker');
+
+        $this->assertTrue($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'Alias for user checker is registered when no custom user checker service is registered'));
+        $this->assertFalse($container->getAlias('Symfony\Component\Security\Core\User\UserCheckerInterface')->isPublic());
     }
 
     public function testAccess()
@@ -333,6 +351,34 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testUserCheckerConfigWithNoCheckers()
     {
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
+    }
+
+    public function testUserPasswordEncoderCommandIsRegistered()
+    {
+        $this->assertTrue($this->getContainer('remember_me_options')->has('security.console.user_password_encoder_command'));
+    }
+
+    public function testDefaultAccessDecisionManagerStrategyIsAffirmative()
+    {
+        $container = $this->getContainer('access_decision_manager_default_strategy');
+
+        $this->assertSame(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $container->getDefinition('security.access.decision_manager')->getArgument(1), 'Default vote strategy is affirmative');
+    }
+
+    public function testCustomAccessDecisionManagerService()
+    {
+        $container = $this->getContainer('access_decision_manager_service');
+
+        $this->assertSame('app.access_decision_manager', (string) $container->getAlias('security.access.decision_manager'), 'The custom access decision manager service is aliased');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "strategy" and "service" cannot be used together.
+     */
+    public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
+    {
+        $container = $this->getContainer('access_decision_manager_service_and_strategy');
     }
 
     protected function getContainer($file)

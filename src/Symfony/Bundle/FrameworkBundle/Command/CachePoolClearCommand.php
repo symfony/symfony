@@ -55,16 +55,21 @@ EOF
         $clearers = array();
         $container = $this->getContainer();
         $cacheDir = $container->getParameter('kernel.cache_dir');
+        $globalClearer = $container->get('cache.global_clearer');
 
         foreach ($input->getArgument('pools') as $id) {
-            $pool = $container->get($id);
-
-            if ($pool instanceof CacheItemPoolInterface) {
-                $pools[$id] = $pool;
-            } elseif ($pool instanceof Psr6CacheClearer) {
-                $clearers[$id] = $pool;
+            if ($globalClearer->hasPool($id)) {
+                $pools[$id] = $id;
             } else {
-                throw new \InvalidArgumentException(sprintf('"%s" is not a cache pool nor a cache clearer.', $id));
+                $pool = $container->get($id);
+
+                if ($pool instanceof CacheItemPoolInterface) {
+                    $pools[$id] = $pool;
+                } elseif ($pool instanceof Psr6CacheClearer) {
+                    $clearers[$id] = $pool;
+                } else {
+                    throw new \InvalidArgumentException(sprintf('"%s" is not a cache pool nor a cache clearer.', $id));
+                }
             }
         }
 
@@ -75,7 +80,12 @@ EOF
 
         foreach ($pools as $id => $pool) {
             $io->comment(sprintf('Clearing cache pool: <info>%s</info>', $id));
-            $pool->clear();
+
+            if ($pool instanceof CacheItemPoolInterface) {
+                $pool->clear();
+            } else {
+                $globalClearer->clearPool($id);
+            }
         }
 
         $io->success('Cache was successfully cleared.');

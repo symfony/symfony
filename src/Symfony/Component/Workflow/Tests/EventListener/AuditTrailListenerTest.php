@@ -31,9 +31,9 @@ class AuditTrailListenerTest extends TestCase
         $workflow->apply($object, 't1');
 
         $expected = array(
-            'Leaving "a" for subject of class "stdClass".',
-            'Transition "t1" for subject of class "stdClass".',
-            'Entering "b" for subject of class "stdClass".',
+            'Leaving "a" for subject of class "stdClass" in workflow "unnamed".',
+            'Transition "t1" for subject of class "stdClass" in workflow "unnamed".',
+            'Entering "b" for subject of class "stdClass" in workflow "unnamed".',
         );
 
         $this->assertSame($expected, $logger->logs);

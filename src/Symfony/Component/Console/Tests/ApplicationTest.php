@@ -13,6 +13,9 @@ namespace Symfony\Component\Console\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -27,8 +30,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApplicationTest extends TestCase
@@ -112,6 +118,26 @@ class ApplicationTest extends TestCase
         $this->assertCount(1, $commands, '->all() takes a namespace as its first argument');
     }
 
+    public function testAllWithCommandLoader()
+    {
+        $application = new Application();
+        $commands = $application->all();
+        $this->assertInstanceOf('Symfony\\Component\\Console\\Command\\HelpCommand', $commands['help'], '->all() returns the registered commands');
+
+        $application->add(new \FooCommand());
+        $commands = $application->all('foo');
+        $this->assertCount(1, $commands, '->all() takes a namespace as its first argument');
+
+        $application->setCommandLoader(new ContainerCommandLoader(
+            new ServiceLocator(array('foo-bar' => function () { return new \Foo1Command(); })),
+            array('foo:bar1' => 'foo-bar')
+        ));
+        $commands = $application->all('foo');
+        $this->assertCount(2, $commands, '->all() takes a namespace as its first argument');
+        $this->assertInstanceOf(\FooCommand::class, $commands['foo:bar'], '->all() returns the registered commands');
+        $this->assertInstanceOf(\Foo1Command::class, $commands['foo:bar1'], '->all() returns the registered commands');
+    }
+
     public function testRegister()
     {
         $application = new Application();
@@ -164,6 +190,30 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $command, '->get() returns the help command if --help is provided as the input');
     }
 
+    public function testHasGetWithCommandLoader()
+    {
+        $application = new Application();
+        $this->assertTrue($application->has('list'), '->has() returns true if a named command is registered');
+        $this->assertFalse($application->has('afoobar'), '->has() returns false if a named command is not registered');
+
+        $application->add($foo = new \FooCommand());
+        $this->assertTrue($application->has('afoobar'), '->has() returns true if an alias is registered');
+        $this->assertEquals($foo, $application->get('foo:bar'), '->get() returns a command by name');
+        $this->assertEquals($foo, $application->get('afoobar'), '->get() returns a command by alias');
+
+        $application->setCommandLoader(new ContainerCommandLoader(new ServiceLocator(array(
+            'foo-bar' => function () { return new \Foo1Command(); },
+        )), array('foo:bar1' => 'foo-bar', 'afoobar1' => 'foo-bar')));
+
+        $this->assertTrue($application->has('afoobar'), '->has() returns true if an instance is registered for an alias even with command loader');
+        $this->assertEquals($foo, $application->get('foo:bar'), '->get() returns an instance by name even with command loader');
+        $this->assertEquals($foo, $application->get('afoobar'), '->get() returns an instance by alias even with command loader');
+        $this->assertTrue($application->has('foo:bar1'), '->has() returns true for commands registered in the loader');
+        $this->assertInstanceOf(\Foo1Command::class, $foo1 = $application->get('foo:bar1'), '->get() returns a command by name from the command loader');
+        $this->assertTrue($application->has('afoobar1'), '->has() returns true for commands registered in the loader');
+        $this->assertEquals($foo1, $application->get('afoobar1'), '->get() returns a command by name from the command loader');
+    }
+
     public function testSilentHelp()
     {
         $application = new Application();
@@ -212,16 +262,22 @@ class ApplicationTest extends TestCase
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns commands even if the commands are only contained in subnamespaces');
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Console\Exception\CommandNotFoundException
-     * @expectedExceptionMessage The namespace "f" is ambiguous (foo, foo1).
-     */
     public function testFindAmbiguousNamespace()
     {
         $application = new Application();
         $application->add(new \BarBucCommand());
         $application->add(new \FooCommand());
         $application->add(new \Foo2Command());
+
+        $expectedMsg = "The namespace \"f\" is ambiguous.\nDid you mean one of these?\n    foo\n    foo1";
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(CommandNotFoundException::class);
+            $this->expectExceptionMessage($expectedMsg);
+        } else {
+            $this->setExpectedException(CommandNotFoundException::class, $expectedMsg);
+        }
+
         $application->findNamespace('f');
     }
 
@@ -261,6 +317,20 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('FooCommand', $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
     }
 
+    public function testFindWithCommandLoader()
+    {
+        $application = new Application();
+        $application->setCommandLoader(new ContainerCommandLoader(new ServiceLocator(array(
+            'foo-bar' => $f = function () { return new \FooCommand(); },
+        )), array('foo:bar' => 'foo-bar')));
+
+        $this->assertInstanceOf('FooCommand', $application->find('foo:bar'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $application->find('h'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf('FooCommand', $application->find('f:bar'), '->find() returns a command if the abbreviation for the namespace exists');
+        $this->assertInstanceOf('FooCommand', $application->find('f:b'), '->find() returns a command if the abbreviation for the namespace and the command name exist');
+        $this->assertInstanceOf('FooCommand', $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
+    }
+
     /**
      * @dataProvider provideAmbiguousAbbreviations
      */
@@ -285,8 +355,20 @@ class ApplicationTest extends TestCase
     {
         return array(
             array('f', 'Command "f" is not defined.'),
-            array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
-            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1 and 1 more).'),
+            array(
+                'a',
+                "Command \"a\" is ambiguous.\nDid you mean one of these?\n".
+                "    afoobar  The foo:bar command\n".
+                "    afoobar1 The foo:bar1 command\n".
+                '    afoobar2 The foo1:bar command',
+            ),
+            array(
+                'foo:b',
+                "Command \"foo:b\" is ambiguous.\nDid you mean one of these?\n".
+                "    foo:bar  The foo:bar command\n".
+                "    foo:bar1 The foo:bar1 command\n".
+                '    foo1:bar The foo1:bar command',
+            ),
         );
     }
 
@@ -455,6 +537,36 @@ class ApplicationTest extends TestCase
             $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo"');
             $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo1"');
             $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo3"');
+        }
+    }
+
+    public function testFindAlternativesOutput()
+    {
+        $application = new Application();
+
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+        $application->add(new \Foo3Command());
+
+        $expectedAlternatives = array(
+            'afoobar',
+            'afoobar1',
+            'afoobar2',
+            'foo1:bar',
+            'foo3:bar',
+            'foo:bar',
+            'foo:bar1',
+        );
+
+        try {
+            $application->find('foo');
+            $this->fail('->find() throws a CommandNotFoundException if command is not defined');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command is not defined');
+            $this->assertSame($expectedAlternatives, $e->getAlternatives());
+
+            $this->assertRegExp('/Command "foo" is not defined\..*Did you mean one of these\?.*/Ums', $e->getMessage());
         }
     }
 
@@ -935,7 +1047,7 @@ class ApplicationTest extends TestCase
 
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage caught
+     * @expectedExceptionMessage error
      */
     public function testRunWithExceptionAndDispatcher()
     {
@@ -966,7 +1078,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertContains('before.foo.caught.after.', $tester->getDisplay());
+        $this->assertContains('before.foo.error.after.', $tester->getDisplay());
     }
 
     public function testRunDispatchesAllEventsWithExceptionInListener()
@@ -986,7 +1098,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertContains('before.caught.after.', $tester->getDisplay());
+        $this->assertContains('before.error.after.', $tester->getDisplay());
     }
 
     public function testRunWithError()
@@ -1011,9 +1123,76 @@ class ApplicationTest extends TestCase
         }
     }
 
+    public function testRunAllowsErrorListenersToSilenceTheException()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            $event->getOutput()->write('silenced.');
+
+            $event->setExitCode(0);
+        });
+
+        $dispatcher->addListener('console.command', function () {
+            throw new \RuntimeException('foo');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.error.silenced.after.', $tester->getDisplay());
+        $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $tester->getStatusCode());
+    }
+
+    public function testConsoleErrorEventIsTriggeredOnCommandNotFound()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            $this->assertNull($event->getCommand());
+            $this->assertInstanceOf(CommandNotFoundException::class, $event->getError());
+            $event->getOutput()->write('silenced command not found');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'unknown'));
+        $this->assertContains('silenced command not found', $tester->getDisplay());
+        $this->assertEquals(1, $tester->getStatusCode());
+    }
+
+    public function testErrorIsRethrownIfNotHandledByConsoleErrorEvent()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->setDispatcher(new EventDispatcher());
+
+        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
+            new \UnknownClass();
+        });
+
+        $tester = new ApplicationTester($application);
+
+        try {
+            $tester->run(array('command' => 'dym'));
+            $this->fail('->run() should rethrow PHP errors if not handled via ConsoleErrorEvent.');
+        } catch (\Error $e) {
+            $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
+        }
+    }
+
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage caught
+     * @expectedExceptionMessage error
      */
     public function testRunWithErrorAndDispatcher()
     {
@@ -1030,7 +1209,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'dym'));
-        $this->assertContains('before.dym.caught.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+        $this->assertContains('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
     }
 
     public function testRunDispatchesAllEventsWithError()
@@ -1047,7 +1226,7 @@ class ApplicationTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'dym'));
-        $this->assertContains('before.dym.caught.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+        $this->assertContains('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
     }
 
     public function testRunWithErrorFailingStatusCode()
@@ -1140,24 +1319,6 @@ class ApplicationTest extends TestCase
         $this->assertEquals('some test value', $extraValue);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testTerminalDimensions()
-    {
-        $application = new Application();
-        $originalDimensions = $application->getTerminalDimensions();
-        $this->assertCount(2, $originalDimensions);
-
-        $width = 80;
-        if ($originalDimensions[0] == $width) {
-            $width = 100;
-        }
-
-        $application->setTerminalDimensions($width, 80);
-        $this->assertSame(array($width, 80), $application->getTerminalDimensions());
-    }
-
     public function testSetRunCustomDefaultCommand()
     {
         $command = new \FooCommand();
@@ -1215,6 +1376,35 @@ class ApplicationTest extends TestCase
         $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
     }
 
+    public function testRunLazyCommandService()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new AddConsoleCommandPass());
+        $container
+            ->register('lazy-command', LazyCommand::class)
+            ->addTag('console.command', array('command' => 'lazy:command', 'alias' => 'lazy:alias'))
+            ->addTag('console.command', array('command' => 'lazy:command', 'alias' => 'lazy:alias2'));
+        $container->compile();
+
+        $application = new Application();
+        $application->setCommandLoader($container->get('console.command_loader'));
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(array('command' => 'lazy:command'));
+        $this->assertSame("lazy-command called\n", $tester->getDisplay(true));
+
+        $tester->run(array('command' => 'lazy:alias'));
+        $this->assertSame("lazy-command called\n", $tester->getDisplay(true));
+
+        $tester->run(array('command' => 'lazy:alias2'));
+        $this->assertSame("lazy-command called\n", $tester->getDisplay(true));
+
+        $command = $application->get('lazy:command');
+        $this->assertSame(array('lazy:alias', 'lazy:alias2'), $command->getAliases());
+    }
+
     protected function getDispatcher($skipCommand = false)
     {
         $dispatcher = new EventDispatcher();
@@ -1232,18 +1422,15 @@ class ApplicationTest extends TestCase
                 $event->setExitCode(ConsoleCommandEvent::RETURN_CODE_DISABLED);
             }
         });
-        $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
-            $event->getOutput()->write('caught.');
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            $event->getOutput()->write('error.');
 
-            $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));
+            $event->setError(new \LogicException('error.', $event->getExitCode(), $event->getError()));
         });
 
         return $dispatcher;
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testErrorIsRethrownIfNotHandledByConsoleErrorEventWithCatchingEnabled()
     {
         $application = new Application();
@@ -1300,5 +1487,13 @@ class CustomDefaultCommandApplication extends Application
         $command = new \FooCommand();
         $this->add($command);
         $this->setDefaultCommand($command->getName());
+    }
+}
+
+class LazyCommand extends Command
+{
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('lazy-command called');
     }
 }

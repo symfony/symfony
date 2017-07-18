@@ -16,14 +16,10 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
-use Symfony\Component\VarDumper\Cloner\ClonerInterface;
-use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * Data collector for {@link FormInterface} instances.
@@ -71,19 +67,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     private $formsByView;
 
-    /**
-     * @var ValueExporter
-     */
-    private $valueExporter;
-
-    /**
-     * @var ClonerInterface
-     */
-    private $cloner;
-    private $clonerCache = array();
-
     public function __construct(FormDataExtractorInterface $dataExtractor)
     {
+        if (!class_exists(ClassStub::class)) {
+            throw new \LogicException(sprintf('The VarDumper component is needed for using the %s class. Install symfony/var-dumper version 3.4 or above.', __CLASS__));
+        }
+
         $this->dataExtractor = $dataExtractor;
         $this->data = array(
             'forms' => array(),
@@ -238,116 +227,45 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function serialize()
     {
-        $cloneVar = array($this, 'cloneVar');
-
         foreach ($this->data['forms_by_hash'] as &$form) {
-            foreach ($form as $k => $v) {
-                switch ($k) {
-                    case 'type_class':
-                        $form[$k] = $cloneVar($v, true);
-                        break;
-                    case 'synchronized':
-                        $form[$k] = $cloneVar($v);
-                        break;
-                    case 'view_vars':
-                    case 'passed_options':
-                    case 'resolved_options':
-                    case 'default_data':
-                    case 'submitted_data':
-                        if ($v && is_array($v)) {
-                            $form[$k] = array_map($cloneVar, $v);
-                        }
-                        break;
-                    case 'errors':
-                        foreach ($v as $i => $e) {
-                            if (!empty($e['trace'])) {
-                                $form['errors'][$i]['trace'] = array_map($cloneVar, $e['trace']);
-                            }
-                        }
-                        break;
-                }
+            if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
+                $form['type_class'] = new ClassStub($form['type_class']);
             }
         }
 
-        return serialize($this->data);
+        return serialize($this->cloneVar($this->data));
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function cloneVar($var, $isClass = false)
+    protected function getCasters()
     {
-        if ($var instanceof Data) {
-            return $var;
-        }
-        if (null === $this->cloner) {
-            if (class_exists(ClassStub::class)) {
-                $this->cloner = new VarCloner();
-                $this->cloner->setMaxItems(25);
-                $this->cloner->addCasters(array(
-                    '*' => function ($v, array $a, Stub $s, $isNested) {
-                        if ($isNested && !$v instanceof \DateTimeInterface) {
-                            $s->cut = -1;
-                            $a = array();
-                        }
+        return parent::getCasters() + array(
+            \Exception::class => function (\Exception $e, array $a, Stub $s) {
+                foreach (array("\0Exception\0previous", "\0Exception\0trace") as $k) {
+                    if (isset($a[$k])) {
+                        unset($a[$k]);
+                        ++$s->cut;
+                    }
+                }
 
-                        return $a;
-                    },
-                    \Exception::class => function (\Exception $e, array $a, Stub $s) {
-                        if (isset($a[$k = "\0Exception\0previous"])) {
-                            unset($a[$k]);
-                            ++$s->cut;
-                        }
-
-                        return $a;
-                    },
-                    FormInterface::class => function (FormInterface $f, array $a) {
-                        return array(
-                            Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
-                            Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
-                        );
-                    },
-                    ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
-                        return array(
-                            Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
-                            Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
-                            Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
-                        );
-                    },
-                ));
-            } else {
-                @trigger_error(sprintf('Using the %s() method without the VarDumper component is deprecated since version 3.2 and won\'t be supported in 4.0. Install symfony/var-dumper version 3.2 or above.', __METHOD__), E_USER_DEPRECATED);
-                $this->cloner = false;
-            }
-        }
-        if (false === $this->cloner) {
-            if (null === $this->valueExporter) {
-                $this->valueExporter = new ValueExporter();
-            }
-
-            return $this->valueExporter->exportValue($var);
-        }
-        if (null === $var) {
-            $type = $hash = 'null';
-        } elseif (array() === $var) {
-            $type = $hash = 'array';
-        } elseif ('object' === $type = gettype($var)) {
-            $hash = spl_object_hash($var);
-        } elseif ('double' === $type) {
-            $hash = (string) $var;
-        } elseif ('integer' === $type || 'string' === $type) {
-            $hash = $var;
-        } else {
-            $type = null;
-        }
-        if (null !== $type && null !== $cache = &$this->clonerCache[$type][$hash]) {
-            return $cache;
-        }
-        if ($isClass) {
-            return $cache = $this->cloner->cloneVar(array(new ClassStub($var)))->seek(0);
-        }
-
-        return $cache = $this->cloner->cloneVar($var);
+                return $a;
+            },
+            FormInterface::class => function (FormInterface $f, array $a) {
+                return array(
+                    Caster::PREFIX_VIRTUAL.'name' => $f->getName(),
+                    Caster::PREFIX_VIRTUAL.'type_class' => new ClassStub(get_class($f->getConfig()->getType()->getInnerType())),
+                );
+            },
+            ConstraintViolationInterface::class => function (ConstraintViolationInterface $v, array $a) {
+                return array(
+                    Caster::PREFIX_VIRTUAL.'root' => $v->getRoot(),
+                    Caster::PREFIX_VIRTUAL.'path' => $v->getPropertyPath(),
+                    Caster::PREFIX_VIRTUAL.'value' => $v->getInvalidValue(),
+                );
+            },
+        );
     }
 
     private function &recursiveBuildPreliminaryFormTree(FormInterface $form, array &$outputByHash)

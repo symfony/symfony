@@ -46,6 +46,7 @@ class TranslationWriter
      */
     public function disableBackup()
     {
+        // to be deprecated in 4.1
         foreach ($this->dumpers as $dumper) {
             if (method_exists($dumper, 'setBackup')) {
                 $dumper->setBackup(false);

@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -92,6 +94,9 @@ class TextDescriptor extends Descriptor
             array('Defaults', $this->formatRouterConfig($route->getDefaults())),
             array('Options', $this->formatRouterConfig($route->getOptions())),
         );
+        if (isset($options['callable'])) {
+            $tableRows[] = array('Callable', $options['callable']);
+        }
 
         $table = new Table($this->getOutput());
         $table->setHeaders($tableHeaders)->setRows($tableRows);
@@ -136,14 +141,14 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $options);
+            $this->describeContainerAlias($service, $options, $builder);
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $options);
         } else {
@@ -180,6 +185,10 @@ class TextDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $maxTags = array();
 
+        if (isset($options['filter'])) {
+            $serviceIds = array_filter($serviceIds, $options['filter']);
+        }
+
         foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
@@ -201,6 +210,11 @@ class TextDescriptor extends Descriptor
                         }
                     }
                 }
+            } elseif ($definition instanceof Alias) {
+                if (!$showPrivate && !$definition->isPublic()) {
+                    unset($serviceIds[$key]);
+                    continue;
+                }
             }
         }
 
@@ -209,8 +223,10 @@ class TextDescriptor extends Descriptor
 
         $tableHeaders = array_merge(array('Service ID'), $tagsNames, array('Class name'));
         $tableRows = array();
+        $rawOutput = isset($options['raw_text']) && $options['raw_text'];
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
+            $styledServiceId = $rawOutput ? $serviceId : sprintf('<fg=cyan>%s</fg=cyan>', $serviceId);
             if ($definition instanceof Definition) {
                 if ($showTag) {
                     foreach ($definition->getTag($showTag) as $key => $tag) {
@@ -225,13 +241,13 @@ class TextDescriptor extends Descriptor
                         }
                     }
                 } else {
-                    $tableRows[] = array($serviceId, $definition->getClass());
+                    $tableRows[] = array($styledServiceId, $definition->getClass());
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $tableRows[] = array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
+                $tableRows[] = array_merge(array($styledServiceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
             } else {
-                $tableRows[] = array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
+                $tableRows[] = array_merge(array($styledServiceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
             }
         }
 
@@ -252,8 +268,9 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Service ID', isset($options['id']) ? $options['id'] : '-');
         $tableRows[] = array('Class', $definition->getClass() ?: '-');
 
-        if ($tags = $definition->getTags()) {
-            $tagInformation = '';
+        $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
+        if (!$omitTags && ($tags = $definition->getTags())) {
+            $tagInformation = array();
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {
                     $parameters = array_map(function ($key, $value) {
@@ -262,12 +279,13 @@ class TextDescriptor extends Descriptor
                     $parameters = implode(', ', $parameters);
 
                     if ('' === $parameters) {
-                        $tagInformation .= sprintf('%s', $tagName);
+                        $tagInformation[] = sprintf('%s', $tagName);
                     } else {
-                        $tagInformation .= sprintf('%s (%s)', $tagName, $parameters);
+                        $tagInformation[] = sprintf('%s (%s)', $tagName, $parameters);
                     }
                 }
             }
+            $tagInformation = implode("\n", $tagInformation);
         } else {
             $tagInformation = '-';
         }
@@ -288,9 +306,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Shared', $definition->isShared() ? 'yes' : 'no');
         $tableRows[] = array('Abstract', $definition->isAbstract() ? 'yes' : 'no');
         $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
-
-        $autowiringTypes = $definition->getAutowiringTypes();
-        $tableRows[] = array('Autowiring Types', $autowiringTypes ? implode(', ', $autowiringTypes) : '-');
+        $tableRows[] = array('Autoconfigured', $definition->isAutoconfigured() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');
@@ -311,15 +327,42 @@ class TextDescriptor extends Descriptor
             }
         }
 
+        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
+        $argumentsInformation = array();
+        if ($showArguments && ($arguments = $definition->getArguments())) {
+            foreach ($arguments as $argument) {
+                if ($argument instanceof ServiceClosureArgument) {
+                    $argument = $argument->getValues()[0];
+                }
+                if ($argument instanceof Reference) {
+                    $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
+                } elseif ($argument instanceof IteratorArgument) {
+                    $argumentsInformation[] = sprintf('Iterator (%d element(s))', count($argument->getValues()));
+                } elseif ($argument instanceof Definition) {
+                    $argumentsInformation[] = 'Inlined Service';
+                } else {
+                    $argumentsInformation[] = is_array($argument) ? sprintf('Array (%d element(s))', count($argument)) : $argument;
+                }
+            }
+
+            $tableRows[] = array('Arguments', implode("\n", $argumentsInformation));
+        }
+
         $options['output']->table($tableHeaders, $tableRows);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
         $options['output']->comment(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias));
+
+        if (!$builder) {
+            return;
+        }
+
+        return $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, array('id' => (string) $alias)));
     }
 
     /**

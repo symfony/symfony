@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StreamableInputInterface;
@@ -69,51 +68,19 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Sets the input stream to read from when interacting with the user.
-     *
-     * This is mainly useful for testing purpose.
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Use
-     *             StreamableInputInterface::setStream() instead.
-     *
-     * @param resource $stream The input stream
-     *
-     * @throws InvalidArgumentException In case the stream is not a resource
-     */
-    public function setInputStream($stream)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
-
-        if (!is_resource($stream)) {
-            throw new InvalidArgumentException('Input stream must be a valid resource.');
-        }
-
-        $this->inputStream = $stream;
-    }
-
-    /**
-     * Returns the helper's input stream.
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Use
-     *             StreamableInputInterface::getStream() instead.
-     *
-     * @return resource
-     */
-    public function getInputStream()
-    {
-        if (0 === func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
-        }
-
-        return $this->inputStream;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getName()
     {
         return 'question';
+    }
+
+    /**
+     * Prevents usage of stty.
+     */
+    public static function disableStty()
+    {
+        self::$stty = false;
     }
 
     /**

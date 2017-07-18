@@ -144,6 +144,28 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
     }
 
+    public function testEncodeRemovingEmptyTags()
+    {
+        $array = array('person' => array('firstname' => 'Peter', 'lastname' => null));
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n";
+
+        $context = array('remove_empty_tags' => true);
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
+    }
+
+    public function testEncodeNotRemovingEmptyTags()
+    {
+        $array = array('person' => array('firstname' => 'Peter', 'lastname' => null));
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname><lastname/></person></response>'."\n";
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
+    }
+
     public function testContext()
     {
         $array = array('person' => array('name' => 'George Abitbol'));
@@ -260,6 +282,28 @@ XML;
 XML;
 
         $this->assertSame(array('@index' => -12.11, '#' => 'Name'), $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testNoTypeCastAttribute()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document a="018" b="-12.11">
+    <node a="018" b="-12.11"/>
+</document>
+XML;
+
+        $data = $this->encoder->decode($source, 'xml', array('xml_type_cast_attributes' => false));
+        $expected = array(
+            '@a' => '018',
+            '@b' => '-12.11',
+            'node' => array(
+                '@a' => '018',
+                '@b' => '-12.11',
+                '#' => '',
+            ),
+        );
+        $this->assertSame($expected, $data);
     }
 
     public function testEncode()

@@ -96,7 +96,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function getProfile()
     {
         if (null === $this->profile) {
-            $this->profile = unserialize($this->data['profile']);
+            $this->profile = unserialize($this->data['profile'], array('allowed_classes' => array('Twig_Profiler_Profile', 'Twig\Profiler\Profile')));
         }
 
         return $this->profile;

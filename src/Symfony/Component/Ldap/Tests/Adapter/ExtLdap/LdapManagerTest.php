@@ -147,4 +147,49 @@ class LdapManagerTest extends LdapTestCase
 
         return $results;
     }
+
+    /**
+     * @group functional
+     */
+    public function testLdapRename()
+    {
+        $result = $this->executeSearchQuery(1);
+
+        $entry = $result[0];
+
+        $entryManager = $this->adapter->getEntryManager();
+        $entryManager->rename($entry, 'cn=Kevin');
+
+        $result = $this->executeSearchQuery(1);
+        $renamedEntry = $result[0];
+        $this->assertEquals($renamedEntry->getAttribute('cn')[0], 'Kevin');
+
+        $oldRdn = $entry->getAttribute('cn')[0];
+        $entryManager->rename($renamedEntry, 'cn='.$oldRdn);
+        $this->executeSearchQuery(1);
+    }
+
+    /**
+     * @group functional
+     */
+    public function testLdapRenameWithoutRemovingOldRdn()
+    {
+        $result = $this->executeSearchQuery(1);
+
+        $entry = $result[0];
+
+        $entryManager = $this->adapter->getEntryManager();
+        $entryManager->rename($entry, 'cn=Kevin', false);
+
+        $result = $this->executeSearchQuery(1);
+
+        $newEntry = $result[0];
+        $originalCN = $entry->getAttribute('cn')[0];
+
+        $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
+
+        $entryManager->rename($newEntry, 'cn='.$originalCN);
+
+        $this->executeSearchQuery(1);
+    }
 }

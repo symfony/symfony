@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
@@ -77,11 +78,25 @@ Closure {
     \$b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "67 to 67"
+  line: "68 to 68"
 }
 EOTXT
             , $var
         );
+    }
+
+    public function testClosureCasterExcludingVerbosity()
+    {
+        $var = function () {};
+
+        $expectedDump = <<<EOTXT
+Closure {
+  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
+  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+}
+EOTXT;
+
+        $this->assertDumpEquals($expectedDump, $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()
@@ -101,9 +116,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testReflectionParameterScalar()
     {
         $f = eval('return function (int $a) {};');
@@ -121,9 +133,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testReturnType()
     {
         $f = eval('return function ():int {};');
@@ -143,9 +152,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testGenerator()
     {
         if (extension_loaded('xdebug')) {

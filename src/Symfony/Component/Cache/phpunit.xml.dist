@@ -11,6 +11,7 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <env name="REDIS_HOST" value="localhost" />
+        <env name="MEMCACHED_HOST" value="localhost" />
     </php>
 
     <testsuites>
@@ -37,6 +38,8 @@
                         <array>
                             <element><string>Cache\IntegrationTests</string></element>
                             <element><string>Doctrine\Common\Cache</string></element>
+                            <element><string>Symfony\Component\Cache</string></element>
+                            <element><string>Symfony\Component\Cache\Traits</string></element>
                         </array>
                     </element>
                 </array>

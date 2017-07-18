@@ -449,10 +449,6 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('chmod() changes permissions even when passing invalid modes on HHVM');
-        }
-
         $dir = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($dir);
 
@@ -1426,10 +1422,6 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testDumpFileWithFileScheme()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM does not handle the file:// scheme correctly');
-        }
-
         $scheme = 'file://';
         $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
 
@@ -1448,6 +1440,77 @@ class FilesystemTest extends FilesystemTestCase
 
         // Zlib stat uses file:// wrapper so remove scheme
         $this->assertFileExists(str_replace($scheme, '', $filename));
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    public function testAppendToFile()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.txt';
+
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $oldMask = umask(0002);
+        }
+
+        $this->filesystem->dumpFile($filename, 'foo');
+
+        $this->filesystem->appendToFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('foobar', file_get_contents($filename));
+
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(664, $filename, 'The written file should keep the same permissions as before.');
+            umask($oldMask);
+        }
+    }
+
+    public function testAppendToFileWithScheme()
+    {
+        $scheme = 'file://';
+        $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+        $this->filesystem->dumpFile($filename, 'foo');
+
+        $this->filesystem->appendToFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('foobar', file_get_contents($filename));
+    }
+
+    public function testAppendToFileWithZlibScheme()
+    {
+        $scheme = 'compress.zlib://';
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+        $this->filesystem->dumpFile($filename, 'foo');
+
+        // Zlib stat uses file:// wrapper so remove it
+        $this->assertSame('foo', file_get_contents(str_replace($scheme, '', $filename)));
+
+        $this->filesystem->appendToFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('foobar', file_get_contents($filename));
+    }
+
+    public function testAppendToFileCreateTheFileIfNotExists()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.txt';
+
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $oldMask = umask(0002);
+        }
+
+        $this->filesystem->appendToFile($filename, 'bar');
+
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(664, $filename);
+            umask($oldMask);
+        }
+
+        $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
     }
 

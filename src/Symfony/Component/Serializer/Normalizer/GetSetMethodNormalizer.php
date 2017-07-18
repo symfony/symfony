@@ -87,7 +87,8 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
             !$method->isStatic() &&
             (
                 ((0 === strpos($method->name, 'get') && 3 < $methodLength) ||
-                (0 === strpos($method->name, 'is') && 2 < $methodLength)) &&
+                (0 === strpos($method->name, 'is') && 2 < $methodLength) ||
+                (0 === strpos($method->name, 'has') && 3 < $methodLength)) &&
                 0 === $method->getNumberOfRequiredParameters()
             )
         ;
@@ -132,6 +133,11 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $isser = 'is'.$ucfirsted;
         if (is_callable(array($object, $isser))) {
             return $object->$isser();
+        }
+
+        $haser = 'has'.$ucfirsted;
+        if (is_callable(array($object, $haser))) {
+            return $object->$haser();
         }
     }
 

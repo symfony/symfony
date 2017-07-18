@@ -60,11 +60,7 @@ class ClientTest extends TestCase
         $m = $r->getMethod('filterResponse');
         $m->setAccessible(true);
 
-        $expected31 = array(
-            'foo=bar; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly',
-            'foo1=bar1; expires=Sun, 15 Feb 2009 20:00:00 GMT; domain=http://example.com; path=/foo; secure; httponly',
-        );
-        $expected33 = array(
+        $expected = array(
             'foo=bar; expires=Sun, 15-Feb-2009 20:00:00 GMT; max-age='.(strtotime('Sun, 15-Feb-2009 20:00:00 GMT') - time()).'; path=/foo; domain=http://example.com; secure; httponly',
             'foo1=bar1; expires=Sun, 15-Feb-2009 20:00:00 GMT; max-age='.(strtotime('Sun, 15-Feb-2009 20:00:00 GMT') - time()).'; path=/foo; domain=http://example.com; secure; httponly',
         );
@@ -72,32 +68,14 @@ class ClientTest extends TestCase
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        try {
-            $this->assertEquals($expected31[0], $domResponse->getHeader('Set-Cookie'));
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $this->assertEquals($expected33[0], $domResponse->getHeader('Set-Cookie'));
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $this->assertEquals($expected33[0], $domResponse->getHeader('Set-Cookie'));
-        }
+        $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
 
         $response = new Response();
         $response->headers->setCookie(new Cookie('foo', 'bar', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $response->headers->setCookie(new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
-        try {
-            $this->assertEquals($expected31[0], $domResponse->getHeader('Set-Cookie'));
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $this->assertEquals($expected33[0], $domResponse->getHeader('Set-Cookie'));
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $this->assertEquals($expected33[0], $domResponse->getHeader('Set-Cookie'));
-        }
-        try {
-            $this->assertEquals($expected31, $domResponse->getHeader('Set-Cookie', false));
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $this->assertEquals($expected33, $domResponse->getHeader('Set-Cookie', false));
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $this->assertEquals($expected33, $domResponse->getHeader('Set-Cookie', false));
-        }
+        $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
+        $this->assertEquals($expected, $domResponse->getHeader('Set-Cookie', false));
     }
 
     public function testFilterResponseSupportsStreamedResponses()

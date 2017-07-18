@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,10 +45,12 @@ class ContainerDebugCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
+                new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
+                new InputOption('types', null, InputOption::VALUE_NONE, 'Displays types (classes/interfaces) available in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
@@ -60,6 +63,10 @@ The <info>%command.name%</info> command displays all configured <comment>public<
 To get specific information about a service, specify its name:
 
   <info>php %command.full_name% validator</info>
+
+To see available types that can be used for autowiring, use the <info>--types</info> flag:
+
+  <info>php %command.full_name% --types</info>
 
 By default, private services are hidden. You can display all services by
 using the <info>--show-private</info> flag:
@@ -93,10 +100,15 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $errorIo = $io->getErrorStyle();
+
         $this->validateInput($input);
         $object = $this->getContainerBuilder();
 
-        if ($input->getOption('parameters')) {
+        if ($input->getOption('types')) {
+            $options = array('show_private' => true);
+            $options['filter'] = array($this, 'filterToServiceTypes');
+        } elseif ($input->getOption('parameters')) {
             $parameters = array();
             foreach ($object->getParameterBag()->all() as $k => $v) {
                 $parameters[$k] = $object->resolveEnvPlaceholders($v);
@@ -110,7 +122,7 @@ EOF
         } elseif ($tag = $input->getOption('tag')) {
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
-            $name = $this->findProperServiceName($input, $io, $object, $name);
+            $name = $this->findProperServiceName($input, $errorIo, $object, $name);
             $options = array('id' => $name);
         } else {
             $options = array('show_private' => $input->getOption('show-private'));
@@ -118,17 +130,18 @@ EOF
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
+        $options['show_arguments'] = $input->getOption('show-arguments');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $helper->describe($output, $object, $options);
+        $helper->describe($io, $object, $options);
 
         if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && $input->isInteractive()) {
             if ($input->getOption('tags')) {
-                $io->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
+                $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
             } elseif ($input->getOption('parameters')) {
-                $io->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
+                $errorIo->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
             } else {
-                $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
+                $errorIo->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
             }
         }
     }
@@ -172,18 +185,16 @@ EOF
             return $this->containerBuilder;
         }
 
-        if (!$this->getApplication()->getKernel()->isDebug()) {
-            throw new \LogicException('Debug information about the container is only available in debug mode.');
+        $kernel = $this->getApplication()->getKernel();
+
+        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
+            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, get_class($kernel));
+            $container = $buildContainer();
+            $container->getCompilerPassConfig()->setRemovingPasses(array());
+            $container->compile();
+        } else {
+            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
         }
-
-        if (!is_file($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
-            throw new \LogicException('Debug information about the container could not be found. Please clear the cache and try again.');
-        }
-
-        $container = new ContainerBuilder();
-
-        $loader = new XmlFileLoader($container, new FileLocator());
-        $loader->load($cachedFile);
 
         return $this->containerBuilder = $container;
     }
@@ -217,5 +228,19 @@ EOF
         }
 
         return $foundServiceIds;
+    }
+
+    /**
+     * @internal
+     */
+    public function filterToServiceTypes($serviceId)
+    {
+        // filter out things that could not be valid class names
+        if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $serviceId)) {
+            return false;
+        }
+
+        // see if the class exists (only need to trigger autoload once)
+        return class_exists($serviceId) || interface_exists($serviceId, false);
     }
 }

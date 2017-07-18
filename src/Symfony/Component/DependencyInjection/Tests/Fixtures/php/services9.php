@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -12,6 +13,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
  */
 class ProjectServiceContainer extends Container
 {
@@ -25,7 +28,10 @@ class ProjectServiceContainer extends Container
     {
         parent::__construct(new ParameterBag($this->getDefaultParameters()));
         $this->methodMap = array(
-            'bar' => 'getBarService',
+            'BAR' => 'getBARService',
+            'BAR2' => 'getBAR2Service',
+            'bar' => 'getBar3Service',
+            'bar2' => 'getBar22Service',
             'baz' => 'getBazService',
             'configurator_service' => 'getConfiguratorServiceService',
             'configurator_service_simple' => 'getConfiguratorServiceSimpleService',
@@ -43,10 +49,11 @@ class ProjectServiceContainer extends Container
             'foo_bar' => 'getFooBarService',
             'foo_with_inline' => 'getFooWithInlineService',
             'inlined' => 'getInlinedService',
+            'lazy_context' => 'getLazyContextService',
+            'lazy_context_ignore_invalid_ref' => 'getLazyContextIgnoreInvalidRefService',
             'method_call1' => 'getMethodCall1Service',
             'new_factory' => 'getNewFactoryService',
             'new_factory_service' => 'getNewFactoryServiceService',
-            'request' => 'getRequestService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
         );
         $this->privates = array(
@@ -57,9 +64,41 @@ class ProjectServiceContainer extends Container
             'new_factory' => true,
         );
         $this->aliases = array(
+            'Psr\\Container\\ContainerInterface' => 'service_container',
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => 'service_container',
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
         );
+    }
+
+    /**
+     * Gets the 'BAR' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getBARService()
+    {
+        $this->services['BAR'] = $instance = new \stdClass();
+
+        $instance->bar = ($this->services['bar'] ?? $this->get('bar'));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'BAR2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getBAR2Service()
+    {
+        return $this->services['BAR2'] = new \stdClass();
     }
 
     /**
@@ -70,15 +109,28 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass A Bar\FooClass instance
      */
-    protected function getBarService()
+    protected function getBar3Service()
     {
-        $a = $this->get('foo.baz');
+        $a = ($this->services['foo.baz'] ?? $this->get('foo.baz'));
 
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
         $a->configure($instance);
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'bar2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getBar22Service()
+    {
+        return $this->services['bar2'] = new \stdClass();
     }
 
     /**
@@ -93,7 +145,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo($this->get('foo_with_inline'));
+        $instance->setFoo(($this->services['foo_with_inline'] ?? $this->get('foo_with_inline')));
 
         return $instance;
     }
@@ -110,7 +162,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configured_service'] = $instance = new \stdClass();
 
-        ${($_ = isset($this->services['configurator_service']) ? $this->services['configurator_service'] : $this->getConfiguratorServiceService()) && false ?: '_'}->configureStdClass($instance);
+        ($this->services['configurator_service'] ?? $this->getConfiguratorServiceService())->configureStdClass($instance);
 
         return $instance;
     }
@@ -127,7 +179,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configured_service_simple'] = $instance = new \stdClass();
 
-        ${($_ = isset($this->services['configurator_service_simple']) ? $this->services['configurator_service_simple'] : $this->getConfiguratorServiceSimpleService()) && false ?: '_'}->configureStdClass($instance);
+        ($this->services['configurator_service_simple'] ?? $this->getConfiguratorServiceSimpleService())->configureStdClass($instance);
 
         return $instance;
     }
@@ -198,7 +250,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceService()
     {
-        return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
+        return $this->services['factory_service'] = ($this->services['foo.baz'] ?? $this->get('foo.baz'))->getInstance();
     }
 
     /**
@@ -211,7 +263,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = ${($_ = isset($this->services['factory_simple']) ? $this->services['factory_simple'] : $this->getFactorySimpleService()) && false ?: '_'}->getInstance();
+        return $this->services['factory_service_simple'] = ($this->services['factory_simple'] ?? $this->getFactorySimpleService())->getInstance();
     }
 
     /**
@@ -224,14 +276,14 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        $a = $this->get('foo.baz');
+        $a = ($this->services['foo.baz'] ?? $this->get('foo.baz'));
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')), true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
-        $instance->setBar($this->get('bar'));
+        $instance->setBar(($this->services['bar'] ?? $this->get('bar')));
         $instance->initialize();
         sc_configure($instance);
 
@@ -279,9 +331,49 @@ class ProjectServiceContainer extends Container
     {
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
-        $instance->setBar(${($_ = isset($this->services['inlined']) ? $this->services['inlined'] : $this->getInlinedService()) && false ?: '_'});
+        $instance->setBar(($this->services['inlined'] ?? $this->getInlinedService()));
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'lazy_context' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \LazyContext A LazyContext instance
+     */
+    protected function getLazyContextService()
+    {
+        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
+            yield 'k1' => ($this->services['foo.baz'] ?? $this->get('foo.baz'));
+            yield 'k2' => $this;
+        }, 2), new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
+    }
+
+    /**
+     * Gets the 'lazy_context_ignore_invalid_ref' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \LazyContext A LazyContext instance
+     */
+    protected function getLazyContextIgnoreInvalidRefService()
+    {
+        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
+            yield 0 => ($this->services['foo.baz'] ?? $this->get('foo.baz'));
+            if ($this->has('invalid')) {
+                yield 1 => $this->get('invalid', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+            }
+        }, function () {
+            return 1 + (int) ($this->has('invalid'));
+        }), new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
     }
 
     /**
@@ -298,7 +390,7 @@ class ProjectServiceContainer extends Container
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar($this->get('foo'));
+        $instance->setBar(($this->services['foo'] ?? $this->get('foo')));
         $instance->setBar($this->get('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         if ($this->has('foo3')) {
             $instance->setBar($this->get('foo3', ContainerInterface::NULL_ON_INVALID_REFERENCE));
@@ -321,24 +413,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getNewFactoryServiceService()
     {
-        $this->services['new_factory_service'] = $instance = ${($_ = isset($this->services['new_factory']) ? $this->services['new_factory'] : $this->getNewFactoryService()) && false ?: '_'}->getInstance();
+        $this->services['new_factory_service'] = $instance = ($this->services['new_factory'] ?? $this->getNewFactoryService())->getInstance();
 
         $instance->foo = 'bar';
 
         return $instance;
-    }
-
-    /**
-     * Gets the 'request' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @throws RuntimeException always since this service is expected to be injected dynamically
-     */
-    protected function getRequestService()
-    {
-        throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
     }
 
     /**
@@ -370,7 +449,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configurator_service'] = $instance = new \ConfClass();
 
-        $instance->setFoo($this->get('baz'));
+        $instance->setFoo(($this->services['baz'] ?? $this->get('baz')));
 
         return $instance;
     }
@@ -426,7 +505,7 @@ class ProjectServiceContainer extends Container
         $this->services['inlined'] = $instance = new \Bar();
 
         $instance->pub = 'pub';
-        $instance->setBaz($this->get('baz'));
+        $instance->setBaz(($this->services['baz'] ?? $this->get('baz')));
 
         return $instance;
     }

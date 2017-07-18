@@ -68,6 +68,6 @@ class WebTestCase extends BaseWebTestCase
 
     protected static function getVarDir()
     {
-        return substr(strrchr(get_called_class(), '\\'), 1);
+        return 'FB'.substr(strrchr(get_called_class(), '\\'), 1);
     }
 }

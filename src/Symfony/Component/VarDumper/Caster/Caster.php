@@ -17,6 +17,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * Helper for filtering out properties in casters.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final
  */
 class Caster
 {
@@ -38,14 +40,15 @@ class Caster
     /**
      * Casts objects to arrays and adds the dynamic property prefix.
      *
-     * @param object           $obj       The object to cast
-     * @param \ReflectionClass $reflector The class reflector to use for inspecting the object definition
+     * @param object $obj          The object to cast
+     * @param string $class        The class of the object
+     * @param bool   $hasDebugInfo Whether the __debugInfo method exists on $obj or not
      *
      * @return array The array-cast of the object, with prefixed dynamic properties
      */
-    public static function castObject($obj, \ReflectionClass $reflector)
+    public static function castObject($obj, $class, $hasDebugInfo = false)
     {
-        if ($reflector->hasMethod('__debugInfo')) {
+        if ($hasDebugInfo) {
             $a = $obj->__debugInfo();
         } elseif ($obj instanceof \Closure) {
             $a = array();
@@ -57,19 +60,31 @@ class Caster
         }
 
         if ($a) {
-            $combine = false;
-            $p = array_keys($a);
-            foreach ($p as $i => $k) {
-                if (isset($k[0]) && "\0" !== $k[0] && !$reflector->hasProperty($k)) {
-                    $combine = true;
-                    $p[$i] = self::PREFIX_DYNAMIC.$k;
+            static $publicProperties = array();
+
+            $i = 0;
+            $prefixedKeys = array();
+            foreach ($a as $k => $v) {
+                if (isset($k[0]) && "\0" !== $k[0]) {
+                    if (!isset($publicProperties[$class])) {
+                        foreach (get_class_vars($class) as $prop => $v) {
+                            $publicProperties[$class][$prop] = true;
+                        }
+                    }
+                    if (!isset($publicProperties[$class][$k])) {
+                        $prefixedKeys[$i] = self::PREFIX_DYNAMIC.$k;
+                    }
                 } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
-                    $combine = true;
-                    $p[$i] = "\0".$reflector->getParentClass().'@anonymous'.strrchr($k, "\0");
+                    $prefixedKeys[$i] = "\0".get_parent_class($class).'@anonymous'.strrchr($k, "\0");
                 }
+                ++$i;
             }
-            if ($combine) {
-                $a = array_combine($p, $a);
+            if ($prefixedKeys) {
+                $keys = array_keys($a);
+                foreach ($prefixedKeys as $i => $k) {
+                    $keys[$i] = $k;
+                }
+                $a = array_combine($keys, $a);
             }
         }
 

@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -12,6 +13,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
  */
 class ProjectServiceContainer extends Container
 {
@@ -38,13 +41,13 @@ class ProjectServiceContainer extends Container
      */
     public function compile()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isFrozen()
+    public function isCompiled()
     {
         return true;
     }
@@ -69,10 +72,12 @@ class ProjectServiceContainer extends Container
      */
     public function getParameter($name)
     {
-        $name = strtolower($name);
+        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
+            $name = strtolower($name);
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]))) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
+                throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+            }
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -88,7 +93,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
+        return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
     /**

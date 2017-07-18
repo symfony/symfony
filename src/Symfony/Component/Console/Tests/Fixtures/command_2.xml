@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<command id="descriptor:command2" name="descriptor:command2">
+<command id="descriptor:command2" name="descriptor:command2" hidden="0">
   <usages>
     <usage>descriptor:command2 [-o|--option_name] [--] &lt;argument_name&gt;</usage>
     <usage>descriptor:command2 -o|--option_name &lt;argument_name&gt;</usage>

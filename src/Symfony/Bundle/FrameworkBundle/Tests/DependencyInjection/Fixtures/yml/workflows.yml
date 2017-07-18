@@ -28,7 +28,6 @@ framework:
                     from: [approved_by_journalist, approved_by_spellchecker]
                     to: [published]
         pull_request:
-            type: state_machine
             marking_store:
                 type: single_state
             supports:
@@ -64,6 +63,7 @@ framework:
                     from: closed
                     to: review
         service_marking_store_workflow:
+            type: workflow
             marking_store:
                 service: workflow_service
             supports:

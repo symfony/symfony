@@ -40,12 +40,12 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     private $userChecker;
 
     /**
-     * @param GuardAuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
-     * @param UserProviderInterface         $userProvider        The user provider
-     * @param string                        $providerKey         The provider (i.e. firewall) key
-     * @param UserCheckerInterface          $userChecker
+     * @param iterable|GuardAuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
+     * @param UserProviderInterface                  $userProvider        The user provider
+     * @param string                                 $providerKey         The provider (i.e. firewall) key
+     * @param UserCheckerInterface                   $userChecker
      */
-    public function __construct(array $guardAuthenticators, UserProviderInterface $userProvider, $providerKey, UserCheckerInterface $userChecker)
+    public function __construct($guardAuthenticators, UserProviderInterface $userProvider, $providerKey, UserCheckerInterface $userChecker)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;

@@ -610,6 +610,12 @@ class ResponseTest extends ResponseTestCase
         $response->setCache(array('private' => false));
         $this->assertTrue($response->headers->hasCacheControlDirective('public'));
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('immutable' => true));
+        $this->assertTrue($response->headers->hasCacheControlDirective('immutable'));
+
+        $response->setCache(array('immutable' => false));
+        $this->assertFalse($response->headers->hasCacheControlDirective('immutable'));
     }
 
     public function testSendContent()
@@ -629,6 +635,22 @@ class ResponseTest extends ResponseTestCase
 
         $this->assertTrue($response->headers->hasCacheControlDirective('public'));
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testSetImmutable()
+    {
+        $response = new Response();
+        $response->setImmutable();
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('immutable'));
+    }
+
+    public function testIsImmutable()
+    {
+        $response = new Response();
+        $response->setImmutable();
+
+        $this->assertTrue($response->isImmutable());
     }
 
     public function testSetExpires()
@@ -853,19 +875,6 @@ class ResponseTest extends ResponseTestCase
         // we just need to ensure that subclasses of Response can be created without any deprecations
         // being triggered if the subclass does not override any final methods
         $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::getDate() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
-     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::setLastModified() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
-     */
-    public function testDeprecations()
-    {
-        new ExtendedResponse();
-
-        // Deprecations should not be triggered twice
-        new ExtendedResponse();
     }
 
     public function validContentProvider()

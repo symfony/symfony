@@ -90,9 +90,15 @@ class ArrayInputTest extends TestCase
                 '->parse() parses long options with a default value',
             ),
             array(
-                array('--foo' => null),
+                array(),
                 array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
                 array('foo' => 'default'),
+                '->parse() uses the default value for long options with value optional which are not passed',
+            ),
+            array(
+                array('--foo' => null),
+                array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
+                array('foo' => null),
                 '->parse() parses long options with a default value',
             ),
             array(

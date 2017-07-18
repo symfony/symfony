@@ -6,7 +6,7 @@
     "shared": true,
     "abstract": false,
     "autowire": false,
-    "autowiring_types": [],
+    "autoconfigure": false,
     "file": "\/path\/to\/file",
     "factory_service": "factory.service",
     "factory_method": "get",

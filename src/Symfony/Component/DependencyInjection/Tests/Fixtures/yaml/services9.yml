@@ -4,6 +4,9 @@ parameters:
     foo: bar
 
 services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        synthetic: true
     foo:
         class: Bar\FooClass
         tags:
@@ -107,5 +110,24 @@ services:
     factory_service_simple:
         class: Bar
         factory: ['@factory_simple', getInstance]
+    lazy_context:
+        class: LazyContext
+        arguments: [!iterator {'k1': '@foo.baz', 'k2': '@service_container'}, !iterator []]
+    lazy_context_ignore_invalid_ref:
+        class: LazyContext
+        arguments: [!iterator ['@foo.baz', '@?invalid'], !iterator []]
+    BAR:
+        class: stdClass
+        properties: { bar: '@bar' }
+    bar2:
+        class: stdClass
+    BAR2:
+        class: stdClass
     alias_for_foo: '@foo'
     alias_for_alias: '@foo'
+    Psr\Container\ContainerInterface:
+        alias: service_container
+        public: false
+    Symfony\Component\DependencyInjection\ContainerInterface:
+        alias: service_container
+        public: false

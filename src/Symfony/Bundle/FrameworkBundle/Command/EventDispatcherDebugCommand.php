@@ -65,7 +65,7 @@ EOF
         $options = array();
         if ($event = $input->getArgument('event')) {
             if (!$dispatcher->hasListeners($event)) {
-                $io->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+                $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
                 return;
             }

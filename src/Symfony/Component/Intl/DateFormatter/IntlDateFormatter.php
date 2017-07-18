@@ -541,7 +541,7 @@ class IntlDateFormatter
         // Get an Etc/GMT time zone that is accepted for \DateTimeZone
         if ('GMT' !== $timeZoneId && 0 === strpos($timeZoneId, 'GMT')) {
             try {
-                $timeZoneId = DateFormat\TimeZoneTransformer::getEtcTimeZoneId($timeZoneId);
+                $timeZoneId = DateFormat\TimezoneTransformer::getEtcTimeZoneId($timeZoneId);
             } catch (\InvalidArgumentException $e) {
                 // Does nothing, will fallback to UTC
             }

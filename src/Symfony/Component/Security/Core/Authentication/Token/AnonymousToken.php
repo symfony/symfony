@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * AnonymousToken represents an anonymous token.
@@ -25,9 +25,9 @@ class AnonymousToken extends AbstractToken
     /**
      * Constructor.
      *
-     * @param string          $secret A secret used to make sure the token is created by the app and not by a malicious client
-     * @param string|object   $user   The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
-     * @param RoleInterface[] $roles  An array of roles
+     * @param string        $secret A secret used to make sure the token is created by the app and not by a malicious client
+     * @param string|object $user   The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
+     * @param Role[]        $roles  An array of roles
      */
     public function __construct($secret, $user, array $roles = array())
     {

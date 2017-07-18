@@ -41,11 +41,6 @@ class FormFactoryTest extends TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $resolvedTypeFactory;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     private $builder;
 
     /**
@@ -55,12 +50,11 @@ class FormFactoryTest extends TestCase
 
     protected function setUp()
     {
-        $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')->getMock();
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
-        $this->factory = new FormFactory($this->registry, $this->resolvedTypeFactory);
+        $this->factory = new FormFactory($this->registry);
 
         $this->registry->expects($this->any())
             ->method('getTypeGuesser')
@@ -245,7 +239,7 @@ class FormFactoryTest extends TestCase
         $registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
         $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods(array('createNamedBuilder'))
-            ->setConstructorArgs(array($registry, $this->resolvedTypeFactory))
+            ->setConstructorArgs(array($registry))
             ->getMock();
 
         $factory->expects($this->once())
@@ -475,7 +469,7 @@ class FormFactoryTest extends TestCase
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->registry, $this->resolvedTypeFactory))
+            ->setConstructorArgs(array($this->registry))
             ->getMock();
     }
 

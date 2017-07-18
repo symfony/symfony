@@ -2,6 +2,6 @@
 [message] {{ exception.message }}
 {% for i, e in exception.toarray %}
 [{{ i + 1 }}] {{ e.class }}: {{ e.message }}
-{% include '@Twig/Exception/traces.txt.twig' with { 'exception': e } only %}
+{{ include('@Twig/Exception/traces.txt.twig', { exception: e }, with_context = false) }}
 
 {% endfor %}

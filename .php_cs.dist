@@ -37,5 +37,7 @@ return PhpCsFixer\Config::create()
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
             // explicit heredoc test
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Resources/views/translation.html.php')
+            // purposefully invalid JSON
+            ->notPath('Symfony/Component/Asset/Tests/fixtures/manifest-invalid.json')
     )
 ;

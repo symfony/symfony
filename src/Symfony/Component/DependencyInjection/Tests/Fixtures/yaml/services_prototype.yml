@@ -1,0 +1,4 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        exclude: '../Prototype/{OtherDir}'

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
@@ -34,7 +35,7 @@ use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -63,6 +64,7 @@ class Application
     private $runningCommand;
     private $name;
     private $version;
+    private $commandLoader;
     private $catchExceptions = true;
     private $autoExit = true;
     private $definition;
@@ -93,6 +95,11 @@ class Application
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setCommandLoader(CommandLoaderInterface $commandLoader)
+    {
+        $this->commandLoader = $commandLoader;
     }
 
     /**
@@ -193,9 +200,23 @@ class Application
             $input = new ArrayInput(array('command' => $this->defaultCommand));
         }
 
-        $this->runningCommand = null;
-        // the command name MUST be the first element of the input
-        $command = $this->find($name);
+        try {
+            $this->runningCommand = null;
+            // the command name MUST be the first element of the input
+            $command = $this->find($name);
+        } catch (\Throwable $e) {
+            if (null !== $this->dispatcher) {
+                $event = new ConsoleErrorEvent($input, $output, $e);
+                $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+                $e = $event->getError();
+
+                if (0 === $event->getExitCode()) {
+                    return 0;
+                }
+            }
+
+            throw $e;
+        }
 
         $this->runningCommand = $command;
         $exitCode = $this->doRunCommand($command, $input, $output);
@@ -409,6 +430,10 @@ class Application
             throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
         }
 
+        if (!$command->getName()) {
+            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($command)));
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
@@ -429,11 +454,14 @@ class Application
      */
     public function get($name)
     {
-        if (!isset($this->commands[$name])) {
+        if (isset($this->commands[$name])) {
+            $command = $this->commands[$name];
+        } elseif ($this->commandLoader && $this->commandLoader->has($name)) {
+            $command = $this->commandLoader->get($name);
+            $this->add($command);
+        } else {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
-
-        $command = $this->commands[$name];
 
         if ($this->wantHelps) {
             $this->wantHelps = false;
@@ -456,7 +484,7 @@ class Application
      */
     public function has($name)
     {
-        return isset($this->commands[$name]);
+        return isset($this->commands[$name]) || ($this->commandLoader && $this->commandLoader->has($name));
     }
 
     /**
@@ -513,7 +541,7 @@ class Application
 
         $exact = in_array($namespace, $namespaces, true);
         if (count($namespaces) > 1 && !$exact) {
-            throw new CommandNotFoundException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
+            throw new CommandNotFoundException(sprintf("The namespace \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -533,7 +561,7 @@ class Application
      */
     public function find($name)
     {
-        $allCommands = array_keys($this->commands);
+        $allCommands = $this->commandLoader ? array_merge($this->commandLoader->getNames(), array_keys($this->commands)) : array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
 
@@ -559,19 +587,33 @@ class Application
 
         // filter out aliases for commands which are already on the list
         if (count($commands) > 1) {
-            $commandList = $this->commands;
-            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
-                $commandName = $commandList[$nameOrAlias]->getName();
+            $commandList = $this->commandLoader ? array_merge(array_flip($this->commandLoader->getNames()), $this->commands) : $this->commands;
+            $commands = array_unique(array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+                $commandName = $commandList[$nameOrAlias] instanceof Command ? $commandList[$nameOrAlias]->getName() : $nameOrAlias;
 
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands);
-            });
+            }));
         }
 
         $exact = in_array($name, $commands, true);
         if (count($commands) > 1 && !$exact) {
-            $suggestions = $this->getAbbreviationSuggestions(array_values($commands));
+            $usableWidth = $this->terminal->getWidth() - 10;
+            $abbrevs = array_values($commands);
+            $maxLen = 0;
+            foreach ($abbrevs as $abbrev) {
+                $maxLen = max(Helper::strlen($abbrev), $maxLen);
+            }
+            $abbrevs = array_map(function ($cmd) use ($commandList, $usableWidth, $maxLen) {
+                if (!$commandList[$cmd] instanceof Command) {
+                    return $cmd;
+                }
+                $abbrev = str_pad($cmd, $maxLen, ' ').' '.$commandList[$cmd]->getDescription();
 
-            throw new CommandNotFoundException(sprintf('Command "%s" is ambiguous (%s).', $name, $suggestions), array_values($commands));
+                return Helper::strlen($abbrev) > $usableWidth ? Helper::substr($abbrev, 0, $usableWidth - 3).'...' : $abbrev;
+            }, array_values($commands));
+            $suggestions = $this->getAbbreviationSuggestions($abbrevs);
+
+            throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
         }
 
         return $this->get($exact ? $name : reset($commands));
@@ -589,13 +631,32 @@ class Application
     public function all($namespace = null)
     {
         if (null === $namespace) {
-            return $this->commands;
+            if (!$this->commandLoader) {
+                return $this->commands;
+            }
+
+            $commands = $this->commands;
+            foreach ($this->commandLoader->getNames() as $name) {
+                if (!isset($commands[$name])) {
+                    $commands[$name] = $this->get($name);
+                }
+            }
+
+            return $commands;
         }
 
         $commands = array();
         foreach ($this->commands as $name => $command) {
             if ($namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
                 $commands[$name] = $command;
+            }
+        }
+
+        if ($this->commandLoader) {
+            foreach ($this->commandLoader->getNames() as $name) {
+                if (!isset($commands[$name]) && $namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
+                    $commands[$name] = $this->get($name);
+                }
             }
         }
 
@@ -642,10 +703,6 @@ class Application
             $len = Helper::strlen($title);
 
             $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
-            // HHVM only accepts 32 bits integer in str_split, even when PHP_INT_MAX is a 64 bit integer: https://github.com/facebook/hhvm/issues/1327
-            if (defined('HHVM_VERSION') && $width > 1 << 31) {
-                $width = 1 << 31;
-            }
             $lines = array();
             foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
                 foreach ($this->splitStringByWidth($line, $width - 4) as $line) {
@@ -701,70 +758,6 @@ class Application
     }
 
     /**
-     * Tries to figure out the terminal width in which this application runs.
-     *
-     * @return int|null
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
-     */
-    protected function getTerminalWidth()
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->terminal->getWidth();
-    }
-
-    /**
-     * Tries to figure out the terminal height in which this application runs.
-     *
-     * @return int|null
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
-     */
-    protected function getTerminalHeight()
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->terminal->getHeight();
-    }
-
-    /**
-     * Tries to figure out the terminal dimensions based on the current environment.
-     *
-     * @return array Array containing width and height
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
-     */
-    public function getTerminalDimensions()
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return array($this->terminal->getWidth(), $this->terminal->getHeight());
-    }
-
-    /**
-     * Sets terminal dimensions.
-     *
-     * Can be useful to force terminal dimensions for functional tests.
-     *
-     * @param int $width  The width
-     * @param int $height The height
-     *
-     * @return $this
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Set the COLUMNS and LINES env vars instead.
-     */
-    public function setTerminalDimensions($width, $height)
-    {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Set the COLUMNS and LINES env vars instead.', __METHOD__), E_USER_DEPRECATED);
-
-        putenv('COLUMNS='.$width);
-        putenv('LINES='.$height);
-
-        return $this;
-    }
-
-    /**
      * Configures the input and output instances based on the user arguments and options.
      *
      * @param InputInterface  $input  An InputInterface instance
@@ -785,12 +778,6 @@ class Application
 
             if ($input instanceof StreamableInputInterface) {
                 $inputStream = $input->getStream();
-            }
-
-            // This check ensures that calling QuestionHelper::setInputStream() works
-            // To be removed in 4.0 (in the same time as QuestionHelper::setInputStream)
-            if (!$inputStream && $this->getHelperSet()->has('question')) {
-                $inputStream = $this->getHelperSet()->get('question')->getInputStream(false);
             }
 
             if (!@posix_isatty($inputStream) && false === getenv('SHELL_INTERACTIVE')) {
@@ -855,25 +842,17 @@ class Application
             } else {
                 $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             }
-        } catch (\Exception $e) {
         } catch (\Throwable $e) {
-        }
-        if (null !== $e) {
-            $x = $e instanceof \Exception ? $e : new FatalThrowableError($e);
-            $event = new ConsoleExceptionEvent($command, $input, $output, $x, $x->getCode());
-            $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
+            $event = new ConsoleErrorEvent($input, $output, $e, $command);
+            $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+            $e = $event->getError();
 
-            if ($x !== $event->getException()) {
-                $e = $event->getException();
+            if (0 !== $exitCode = $event->getExitCode()) {
+                throw $e;
             }
-            $exitCode = $e->getCode();
-        }
-
-        $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
-        $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
-
-        if (null !== $e) {
-            throw $e;
+        } finally {
+            $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
+            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
         }
 
         return $event->getExitCode();
@@ -945,7 +924,7 @@ class Application
      */
     private function getAbbreviationSuggestions($abbrevs)
     {
-        return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
+        return '    '.implode("\n    ", $abbrevs);
     }
 
     /**
@@ -1012,7 +991,7 @@ class Application
         }
 
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        asort($alternatives);
+        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }

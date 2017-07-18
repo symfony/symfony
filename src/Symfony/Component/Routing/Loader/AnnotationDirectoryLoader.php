@@ -40,7 +40,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
         $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
         $files = iterator_to_array(new \RecursiveIteratorIterator(
             new \RecursiveCallbackFilterIterator(
-                new \RecursiveDirectoryIterator($dir),
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                 function (\SplFileInfo $current) {
                     return '.' !== substr($current->getBasename(), 0, 1);
                 }

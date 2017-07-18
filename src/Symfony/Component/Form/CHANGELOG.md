@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * using the `choices` option in `CountryType`, `CurrencyType`, `LanguageType`,
+   `LocaleType`, and `TimezoneType` when the `choice_loader` option is not `null`
+   is not supported anymore and the configured choices will be ignored
+ * callable strings that are passed to the options of the `ChoiceType` are
+   treated as property paths
+ * the `choices_as_values` option of the `ChoiceType` has been removed
+ * removed the support for caching loaded choice lists in `LazyChoiceList`,
+   cache the choice list in the used `ChoiceLoaderInterface` implementation
+   instead
+ * removed the support for objects implementing both `\Traversable` and `\ArrayAccess` in `ResizeFormListener::preSubmit()`
+ * removed the ability to use `FormDataCollector` without the `symfony/var-dumper` component
+ * removed passing a `ValueExporter` instance to the `FormDataExtractor::__construct()` method
+ * removed passing guesser services ids as the fourth argument of `DependencyInjectionExtension::__construct()`
+ * removed the ability to validate an unsubmitted form.
+
+3.3.0
+-----
+
+ * deprecated using "choices" option in ``CountryType``, ``CurrencyType``, ``LanguageType``, ``LocaleType``, and
+   ``TimezoneType`` when "choice_loader" is not ``null``
+ * added `Symfony\Component\Form\FormErrorIterator::findByCodes()`
+ * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
+ * added `FormPass`
+
 3.2.0
 -----
 

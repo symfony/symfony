@@ -13,14 +13,22 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use DummyProxyDumper;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -37,7 +45,9 @@ class PhpDumperTest extends TestCase
 
     public function testDump()
     {
-        $dumper = new PhpDumper(new ContainerBuilder());
+        $container = new ContainerBuilder();
+        $container->compile();
+        $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
@@ -96,7 +106,9 @@ class PhpDumperTest extends TestCase
      */
     public function testExportParameters($parameters)
     {
-        $dumper = new PhpDumper(new ContainerBuilder(new ParameterBag($parameters)));
+        $container = new ContainerBuilder(new ParameterBag($parameters));
+        $container->compile();
+        $dumper = new PhpDumper($container);
         $dumper->dump();
     }
 
@@ -113,25 +125,32 @@ class PhpDumperTest extends TestCase
     public function testAddParameters()
     {
         $container = include self::$fixturesPath.'/containers/container8.php';
+        $container->compile();
         $dumper = new PhpDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services8.php', $dumper->dump(), '->dump() dumps parameters');
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage Cannot dump an uncompiled container.
+     */
+    public function testAddServiceWithoutCompilation()
+    {
+        $container = include self::$fixturesPath.'/containers/container9.php';
+        new PhpDumper($container);
+    }
+
     public function testAddService()
     {
-        // without compilation
-        $container = include self::$fixturesPath.'/containers/container9.php';
-        $dumper = new PhpDumper($container);
-        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
-
-        // with compilation
         $container = include self::$fixturesPath.'/containers/container9.php';
         $container->compile();
         $dumper = new PhpDumper($container);
         $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9_compiled.php')), $dumper->dump(), '->dump() dumps services');
 
-        $dumper = new PhpDumper($container = new ContainerBuilder());
+        $container = new ContainerBuilder();
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
+        $container->compile();
+        $dumper = new PhpDumper($container);
         try {
             $dumper->dump();
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
@@ -144,6 +163,7 @@ class PhpDumperTest extends TestCase
     public function testServicesWithAnonymousFactories()
     {
         $container = include self::$fixturesPath.'/containers/container19.php';
+        $container->compile();
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
@@ -155,6 +175,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('bar$', 'FooClass');
         $container->register('bar$!', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => $class)));
 
@@ -168,6 +189,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo_bar', 'FooClass');
         $container->register('foobar', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => $class)));
 
@@ -181,6 +203,7 @@ class PhpDumperTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('bar', 'FooClass');
         $container->register('foo_bar', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array(
             'class' => $class,
@@ -202,6 +225,7 @@ class PhpDumperTest extends TestCase
         $def = new Definition('stdClass');
         $def->setFactory($factory);
         $container->setDefinition('bar', $def);
+        $container->compile();
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }
@@ -219,13 +243,13 @@ class PhpDumperTest extends TestCase
     public function testAliases()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->setParameter('foo_bar', 'foo_bar');
         $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Aliases')));
 
         $container = new \Symfony_DI_PhpDumper_Test_Aliases();
-        $container->set('foo', $foo = new \stdClass());
-        $this->assertSame($foo, $container->get('foo'));
+        $foo = $container->get('foo');
         $this->assertSame($foo, $container->get('alias_for_foo'));
         $this->assertSame($foo, $container->get('alias_for_alias'));
     }
@@ -242,6 +266,10 @@ class PhpDumperTest extends TestCase
         $this->assertFalse($container->has('foo'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage You cannot set the pre-defined service "bar".
+     */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
         require_once self::$fixturesPath.'/php/services9.php';
@@ -249,21 +277,6 @@ class PhpDumperTest extends TestCase
 
         $container = new \ProjectServiceContainer();
         $container->set('bar', $bar = new \stdClass());
-        $container->setParameter('foo_bar', 'foo_bar');
-
-        $this->assertSame($bar, $container->get('bar'), '->set() overrides an already defined service');
-    }
-
-    public function testOverrideServiceWhenUsingADumpedContainerAndServiceIsUsedFromAnotherOne()
-    {
-        require_once self::$fixturesPath.'/php/services9.php';
-        require_once self::$fixturesPath.'/includes/foo.php';
-        require_once self::$fixturesPath.'/includes/classes.php';
-
-        $container = new \ProjectServiceContainer();
-        $container->set('bar', $bar = new \stdClass());
-
-        $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
     }
 
     /**
@@ -284,6 +297,7 @@ class PhpDumperTest extends TestCase
     public function testDumpAutowireData()
     {
         $container = include self::$fixturesPath.'/containers/container24.php';
+        $container->compile();
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services24.php', $dumper->dump());
@@ -395,6 +409,58 @@ class PhpDumperTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testLazyArgumentProvideGenerator()
+    {
+        require_once self::$fixturesPath.'/includes/classes.php';
+
+        $container = new ContainerBuilder();
+        $container->register('lazy_referenced', 'stdClass');
+        $container
+            ->register('lazy_context', 'LazyContext')
+            ->setArguments(array(
+                new IteratorArgument(array('k1' => new Reference('lazy_referenced'), 'k2' => new Reference('service_container'))),
+                new IteratorArgument(array()),
+            ))
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator();
+        $lazyContext = $container->get('lazy_context');
+
+        $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyValues);
+        $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyEmptyValues);
+        $this->assertCount(2, $lazyContext->lazyValues);
+        $this->assertCount(0, $lazyContext->lazyEmptyValues);
+
+        $i = -1;
+        foreach ($lazyContext->lazyValues as $k => $v) {
+            switch (++$i) {
+                case 0:
+                    $this->assertEquals('k1', $k);
+                    $this->assertInstanceOf('stdCLass', $v);
+                    break;
+                case 1:
+                    $this->assertEquals('k2', $k);
+                    $this->assertInstanceOf('Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator', $v);
+                    break;
+            }
+        }
+
+        $this->assertEmpty(iterator_to_array($lazyContext->lazyEmptyValues));
+    }
+
+    public function testNormalizedId()
+    {
+        $container = include self::$fixturesPath.'/containers/container33.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services33.php', $dumper->dump());
+    }
+
     public function testDumpContainerBuilderWithFrozenConstructorIncludingPrivateServices()
     {
         $container = new ContainerBuilder();
@@ -408,6 +474,79 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_private_frozen.php', $dumper->dump());
     }
 
+    public function testServiceLocator()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', ServiceLocator::class)
+            ->addArgument(array(
+                'bar' => new ServiceClosureArgument(new Reference('bar_service')),
+                'baz' => new ServiceClosureArgument(new TypedReference('baz_service', 'stdClass')),
+                'nil' => $nil = new ServiceClosureArgument(new Reference('nil')),
+            ))
+        ;
+
+        // no method calls
+        $container->register('translator.loader_1', 'stdClass');
+        $container->register('translator.loader_1_locator', ServiceLocator::class)
+            ->setPublic(false)
+            ->addArgument(array(
+                'translator.loader_1' => new ServiceClosureArgument(new Reference('translator.loader_1')),
+            ));
+        $container->register('translator_1', StubbedTranslator::class)
+            ->addArgument(new Reference('translator.loader_1_locator'));
+
+        // one method calls
+        $container->register('translator.loader_2', 'stdClass');
+        $container->register('translator.loader_2_locator', ServiceLocator::class)
+            ->setPublic(false)
+            ->addArgument(array(
+                'translator.loader_2' => new ServiceClosureArgument(new Reference('translator.loader_2')),
+            ));
+        $container->register('translator_2', StubbedTranslator::class)
+            ->addArgument(new Reference('translator.loader_2_locator'))
+            ->addMethodCall('addResource', array('db', new Reference('translator.loader_2'), 'nl'));
+
+        // two method calls
+        $container->register('translator.loader_3', 'stdClass');
+        $container->register('translator.loader_3_locator', ServiceLocator::class)
+            ->setPublic(false)
+            ->addArgument(array(
+                'translator.loader_3' => new ServiceClosureArgument(new Reference('translator.loader_3')),
+            ));
+        $container->register('translator_3', StubbedTranslator::class)
+            ->addArgument(new Reference('translator.loader_3_locator'))
+            ->addMethodCall('addResource', array('db', new Reference('translator.loader_3'), 'nl'))
+            ->addMethodCall('addResource', array('db', new Reference('translator.loader_3'), 'en'));
+
+        $nil->setValues(array(null));
+        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
+        $container->register('baz_service', 'stdClass')->setPublic(false);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator.php', $dumper->dump());
+    }
+
+    public function testServiceSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', TestServiceSubscriber::class)
+            ->setAutowired(true)
+            ->addArgument(new Reference(ContainerInterface::class))
+            ->addTag('container.service_subscriber', array(
+                'key' => 'bar',
+                'id' => TestServiceSubscriber::class,
+            ))
+        ;
+        $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_subscriber.php', $dumper->dump());
+    }
+
     public function testPrivateWithIgnoreOnInvalidReference()
     {
         require_once self::$fixturesPath.'/includes/classes.php';
@@ -416,7 +555,8 @@ class PhpDumperTest extends TestCase
         $container->register('not_invalid', 'BazClass')
             ->setPublic(false);
         $container->register('bar', 'BarClass')
-            ->addMethodCall('setBaz', array(new Reference('not_invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+            ->addMethodCall('setBaz', array(new Reference('not_invalid', SymfonyContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+        $container->compile();
 
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference')));
@@ -425,10 +565,25 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf('BazClass', $container->get('bar')->getBaz());
     }
 
+    public function testArrayParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('array_1', array(123));
+        $container->setParameter('array_2', array(__DIR__));
+        $container->register('bar', 'BarClass')
+            ->addMethodCall('setBaz', array('%array_1%', '%array_2%', '%%array_1%%'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace('\\\\Dumper', '/Dumper', $dumper->dump(array('file' => self::$fixturesPath.'/php/services_array_params.php'))));
+    }
+
     public function testDumpHandlesLiteralClassWithRootNamespace()
     {
         $container = new ContainerBuilder();
         $container->register('foo', '\\stdClass');
+        $container->compile();
 
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Literal_Class_With_Root_Namespace')));

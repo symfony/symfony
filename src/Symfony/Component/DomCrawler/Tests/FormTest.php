@@ -321,6 +321,12 @@ class FormTest extends TestCase
         $this->assertEquals('PATCH', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
     }
 
+    public function testGetMethodWithOverride()
+    {
+        $form = $this->createForm('<form method="get"><input type="submit" formmethod="post" /></form>');
+        $this->assertEquals('POST', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
+    }
+
     public function testGetSetValue()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
@@ -526,6 +532,12 @@ class FormTest extends TestCase
     {
         $form = $this->createForm('<form><input type="submit" /></form>', null, 'http://localhost/foo/bar');
         $this->assertEquals('http://localhost/foo/bar', $form->getUri(), '->getUri() returns path if no action defined');
+    }
+
+    public function testGetUriWithActionOverride()
+    {
+        $form = $this->createForm('<form action="/foo"><button type="submit" formaction="/bar" /></form>', null, 'http://localhost/foo/');
+        $this->assertEquals('http://localhost/bar', $form->getUri(), '->getUri() returns absolute URIs');
     }
 
     public function provideGetUriValues()

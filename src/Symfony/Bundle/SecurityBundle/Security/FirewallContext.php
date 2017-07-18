@@ -25,7 +25,7 @@ class FirewallContext
     private $exceptionListener;
     private $config;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
+    public function __construct(iterable $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
@@ -37,8 +37,13 @@ class FirewallContext
         return $this->config;
     }
 
-    public function getContext()
+    public function getListeners(): iterable
     {
-        return array($this->listeners, $this->exceptionListener);
+        return $this->listeners;
+    }
+
+    public function getExceptionListener()
+    {
+        return $this->exceptionListener;
     }
 }

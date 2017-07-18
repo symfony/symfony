@@ -21,8 +21,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  * Denormalizes arrays of objects.
  *
  * @author Alexander M. Turek <me@derrabus.de>
+ *
+ * @final since version 3.3.
  */
-class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterface
+class ArrayDenormalizer implements ContextAwareDenormalizerInterface, SerializerAwareInterface
 {
     /**
      * @var SerializerInterface|DenormalizerInterface
@@ -62,10 +64,10 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return substr($type, -2) === '[]'
-            && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format);
+            && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }
 
     /**

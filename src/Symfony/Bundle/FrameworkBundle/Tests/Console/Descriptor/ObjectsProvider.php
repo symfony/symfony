@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -105,6 +106,18 @@ class ObjectsProvider
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
+                ->addArgument(new Reference('definition2'))
+                ->addArgument('%parameter%')
+                ->addArgument(new Definition('inline_service', array('arg1', 'arg2')))
+                ->addArgument(array(
+                    'foo',
+                    new Reference('definition2'),
+                    new Definition('inline_service'),
+                ))
+                ->addArgument(new IteratorArgument(array(
+                    new Reference('definition_1'),
+                    new Reference('definition_2'),
+                )))
                 ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
             'definition_2' => $definition2
                 ->setPublic(false)

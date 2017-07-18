@@ -159,7 +159,7 @@ EOF
                 $outputMessage .= sprintf(' and domain "%s"', $domain);
             }
 
-            $io->warning($outputMessage);
+            $io->getErrorStyle()->warning($outputMessage);
 
             return;
         }

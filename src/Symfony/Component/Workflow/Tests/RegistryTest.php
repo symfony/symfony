@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class RegistryTest extends TestCase
@@ -15,13 +16,11 @@ class RegistryTest extends TestCase
 
     protected function setUp()
     {
-        $workflows = array();
-
         $this->registry = new Registry();
 
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), Subject1::class);
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), Subject2::class);
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), Subject2::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->createSupportStrategy(Subject2::class));
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createSupportStrategy(Subject2::class));
     }
 
     protected function tearDown()
@@ -64,6 +63,17 @@ class RegistryTest extends TestCase
         $w1 = $this->registry->get(new \stdClass());
         $this->assertInstanceOf(Workflow::class, $w1);
         $this->assertSame('workflow1', $w1->getName());
+    }
+
+    private function createSupportStrategy($supportedClassName)
+    {
+        $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
+        $strategy->expects($this->any())->method('supports')
+            ->will($this->returnCallback(function ($workflow, $subject) use ($supportedClassName) {
+                return $subject instanceof $supportedClassName;
+            }));
+
+        return $strategy;
     }
 }
 

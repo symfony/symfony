@@ -44,6 +44,8 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
         $this->data = $this->computeCount($messages);
         $this->data['messages'] = $messages;
+
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**
@@ -101,12 +103,12 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
             if (!isset($result[$messageId])) {
                 $message['count'] = 1;
-                $message['parameters'] = !empty($message['parameters']) ? array($this->cloneVar($message['parameters'])) : array();
+                $message['parameters'] = !empty($message['parameters']) ? array($message['parameters']) : array();
                 $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
                 $result[$messageId] = $message;
             } else {
                 if (!empty($message['parameters'])) {
-                    $result[$messageId]['parameters'][] = $this->cloneVar($message['parameters']);
+                    $result[$messageId]['parameters'][] = $message['parameters'];
                 }
 
                 ++$result[$messageId]['count'];

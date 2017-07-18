@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
@@ -97,6 +98,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid "invalid locale" locale.
      */
     public function testTransWithCachingWithInvalidLocale()
     {
@@ -123,15 +125,8 @@ class TranslatorTest extends TestCase
 
     public function testGetDefaultLocale()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container
-            ->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.default_locale')
-            ->will($this->returnValue('en'))
-        ;
-
-        $translator = new Translator($container, new MessageSelector());
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $translator = new Translator($container, new MessageSelector(), 'en');
 
         $this->assertSame('en', $translator->getLocale());
     }
@@ -144,7 +139,7 @@ class TranslatorTest extends TestCase
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
-        (new Translator($container, new MessageSelector(), [], ['foo' => 'bar']));
+        (new Translator($container, new MessageSelector(), 'en', array(), array('foo' => 'bar')));
     }
 
     /** @dataProvider getDebugModeAndCacheDirCombinations */
@@ -275,9 +270,9 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    public function getTranslator($loader, $options = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $defaultLocale = 'en')
     {
-        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat);
+        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale);
 
         if ('loader' === $loaderFomat) {
             $translator->addResource('loader', 'foo', 'fr');
@@ -317,11 +312,21 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader')
+    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader', $defaultLocale = 'en')
     {
+        if (null === $defaultLocale) {
+            return new $translatorClass(
+                $this->getContainer($loader),
+                new MessageSelector(),
+                array($loaderFomat => array($loaderFomat)),
+                $options
+            );
+        }
+
         return new $translatorClass(
             $this->getContainer($loader),
             new MessageSelector(),
+            $defaultLocale,
             array($loaderFomat => array($loaderFomat)),
             $options
         );

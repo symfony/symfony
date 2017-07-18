@@ -68,6 +68,18 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function rename(Entry $entry, $newRdn, $removeOldRdn = true)
+    {
+        $con = $this->getConnectionResource();
+
+        if (!@ldap_rename($con, $entry->getDn(), $newRdn, null, $removeOldRdn)) {
+            throw new LdapException(sprintf('Could not rename entry "%s" to "%s": %s', $entry->getDn(), $newRdn, ldap_error($con)));
+        }
+    }
+
+    /**
      * Get the connection resource, but first check if the connection is bound.
      */
     private function getConnectionResource()

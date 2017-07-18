@@ -58,22 +58,18 @@ class Process implements \IteratorAggregate
     private $lastOutputTime;
     private $timeout;
     private $idleTimeout;
-    private $options;
     private $exitcode;
     private $fallbackStatus = array();
     private $processInformation;
     private $outputDisabled = false;
     private $stdout;
     private $stderr;
-    private $enhanceWindowsCompatibility = true;
-    private $enhanceSigchildCompatibility;
     private $process;
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset = 0;
     private $incrementalErrorOutputOffset = 0;
     private $tty;
     private $pty;
-    private $inheritEnv = false;
 
     private $useFileHandles = false;
     /** @var PipesInterface */
@@ -136,16 +132,15 @@ class Process implements \IteratorAggregate
     /**
      * Constructor.
      *
-     * @param string         $commandline The command line to run
+     * @param string|array   $commandline The command line to run
      * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process
      * @param mixed|null     $input       The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout     The timeout in seconds or null to disable
-     * @param array          $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
+    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
     {
         if (!function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -169,8 +164,6 @@ class Process implements \IteratorAggregate
         $this->setTimeout($timeout);
         $this->useFileHandles = '\\' === DIRECTORY_SEPARATOR;
         $this->pty = false;
-        $this->enhanceSigchildCompatibility = '\\' !== DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
-        $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
     public function __destruct()
@@ -195,16 +188,19 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @return int The exit status code
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process stopped after receiving signal
      * @throws LogicException   In case a callback is provided and output has been disabled
+     *
+     * @final since version 3.3
      */
-    public function run($callback = null)
+    public function run($callback = null, array $env = array())
     {
-        $this->start($callback);
+        $this->start($callback, $env);
 
         return $this->wait();
     }
@@ -216,19 +212,17 @@ class Process implements \IteratorAggregate
      * exits with a non-zero exit code.
      *
      * @param callable|null $callback
+     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @return self
      *
-     * @throws RuntimeException       if PHP was compiled with --enable-sigchild and the enhanced sigchild compatibility mode is not enabled
      * @throws ProcessFailedException if the process didn't terminate successfully
+     *
+     * @final since version 3.3
      */
-    public function mustRun(callable $callback = null)
+    public function mustRun(callable $callback = null, array $env = array())
     {
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
-        }
-
-        if (0 !== $this->run($callback)) {
+        if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
         }
 
@@ -249,12 +243,13 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null)
+    public function start(callable $callback = null, array $env = array())
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -265,39 +260,42 @@ class Process implements \IteratorAggregate
         $this->callback = $this->buildCallback($callback);
         $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
-        $inheritEnv = $this->inheritEnv;
 
-        $commandline = $this->commandline;
+        if (is_array($commandline = $this->commandline)) {
+            $commandline = implode(' ', array_map(array($this, 'escapeArgument'), $commandline));
 
-        $env = $this->env;
-        $envBackup = array();
-        if (null !== $env && $inheritEnv) {
-            if ('\\' === DIRECTORY_SEPARATOR && !empty($this->options['bypass_shell']) && !$this->enhanceWindowsCompatibility) {
-                throw new LogicException('The "bypass_shell" option must be false to inherit environment variables while enhanced Windows compatibility is off');
+            if ('\\' !== DIRECTORY_SEPARATOR) {
+                // exec is mandatory to deal with sending a signal to the process
+                $commandline = 'exec '.$commandline;
             }
+        }
 
+        if (null === $env) {
+            $env = $this->env;
+        } elseif ($this->env) {
+            $env += $this->env;
+        }
+
+        $envBackup = array();
+        if (null !== $env) {
             foreach ($env as $k => $v) {
                 $envBackup[$k] = getenv($k);
                 putenv(false === $v || null === $v ? $k : "$k=$v");
             }
             $env = null;
         }
-        if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /D /C "('.$commandline.')';
-            foreach ($this->processPipes->getFiles() as $offset => $filename) {
-                $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
-            }
-            $commandline .= '"';
 
-            if (!isset($this->options['bypass_shell'])) {
-                $this->options['bypass_shell'] = true;
-            }
-        } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+        $options = array('suppress_errors' => true);
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $options['bypass_shell'] = true;
+            $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup, $env);
+        } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
 
             // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
-            $commandline = '{ ('.$this->commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
+            $commandline = '{ ('.$commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
             $commandline .= 'pid=$!; echo $pid >&3; wait $pid; code=$?; echo $code >&3; exit $code';
 
             // Workaround for the bug, when PTS functionality is enabled.
@@ -305,7 +303,7 @@ class Process implements \IteratorAggregate
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $this->options);
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $options);
 
         foreach ($envBackup as $k => $v) {
             putenv(false === $v ? $k : "$k=$v");
@@ -335,6 +333,7 @@ class Process implements \IteratorAggregate
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * @param array         $env      An array of additional env vars to set when running the process
      *
      * @return $this
      *
@@ -342,15 +341,17 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException When process is already running
      *
      * @see start()
+     *
+     * @final since version 3.3
      */
-    public function restart(callable $callback = null)
+    public function restart(callable $callback = null, array $env = array())
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
         }
 
         $process = clone $this;
-        $process->start($callback);
+        $process->start($callback, $env);
 
         return $process;
     }
@@ -657,15 +658,9 @@ class Process implements \IteratorAggregate
      * Returns the exit code returned by the process.
      *
      * @return null|int The exit status code, null if the Process is not terminated
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      */
     public function getExitCode()
     {
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
-        }
-
         $this->updateStatus(false);
 
         return $this->exitcode;
@@ -708,16 +703,11 @@ class Process implements \IteratorAggregate
      *
      * @return bool
      *
-     * @throws RuntimeException In case --enable-sigchild is activated
-     * @throws LogicException   In case the process is not terminated
+     * @throws LogicException In case the process is not terminated
      */
     public function hasBeenSignaled()
     {
         $this->requireProcessIsTerminated(__FUNCTION__);
-
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
-        }
 
         return $this->processInformation['signaled'];
     }
@@ -736,7 +726,7 @@ class Process implements \IteratorAggregate
     {
         $this->requireProcessIsTerminated(__FUNCTION__);
 
-        if ($this->isSigchildEnabled() && (!$this->enhanceSigchildCompatibility || -1 === $this->processInformation['termsig'])) {
+        if ($this->isSigchildEnabled() && -1 === $this->processInformation['termsig']) {
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
         }
 
@@ -903,13 +893,13 @@ class Process implements \IteratorAggregate
      */
     public function getCommandLine()
     {
-        return $this->commandline;
+        return is_array($this->commandline) ? implode(' ', array_map(array($this, 'escapeArgument'), $this->commandline)) : $this->commandline;
     }
 
     /**
      * Sets the command line to be executed.
      *
-     * @param string $commandline The command to execute
+     * @param string|array $commandline The command to execute
      *
      * @return self The current Process instance
      */
@@ -1091,6 +1081,8 @@ class Process implements \IteratorAggregate
      *
      * An environment variable value should be a string.
      * If it is an array, the variable is ignored.
+     * If it is false or null, it will be removed when
+     * env vars are otherwise inherited.
      *
      * That happens in PHP when 'argv' is registered into
      * the $_ENV array for instance.
@@ -1144,84 +1136,6 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Gets the options for proc_open.
-     *
-     * @return array The current options
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Sets the options for proc_open.
-     *
-     * @param array $options The new options
-     *
-     * @return self The current Process instance
-     */
-    public function setOptions(array $options)
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * Gets whether or not Windows compatibility is enabled.
-     *
-     * This is true by default.
-     *
-     * @return bool
-     */
-    public function getEnhanceWindowsCompatibility()
-    {
-        return $this->enhanceWindowsCompatibility;
-    }
-
-    /**
-     * Sets whether or not Windows compatibility is enabled.
-     *
-     * @param bool $enhance
-     *
-     * @return self The current Process instance
-     */
-    public function setEnhanceWindowsCompatibility($enhance)
-    {
-        $this->enhanceWindowsCompatibility = (bool) $enhance;
-
-        return $this;
-    }
-
-    /**
-     * Returns whether sigchild compatibility mode is activated or not.
-     *
-     * @return bool
-     */
-    public function getEnhanceSigchildCompatibility()
-    {
-        return $this->enhanceSigchildCompatibility;
-    }
-
-    /**
-     * Activates sigchild compatibility mode.
-     *
-     * Sigchild compatibility mode is required to get the exit code and
-     * determine the success of a process when PHP has been compiled with
-     * the --enable-sigchild option
-     *
-     * @param bool $enhance
-     *
-     * @return self The current Process instance
-     */
-    public function setEnhanceSigchildCompatibility($enhance)
-    {
-        $this->enhanceSigchildCompatibility = (bool) $enhance;
-
-        return $this;
-    }
-
-    /**
      * Sets whether environment variables will be inherited or not.
      *
      * @param bool $inheritEnv
@@ -1230,19 +1144,11 @@ class Process implements \IteratorAggregate
      */
     public function inheritEnvironmentVariables($inheritEnv = true)
     {
-        $this->inheritEnv = (bool) $inheritEnv;
+        if (!$inheritEnv) {
+            throw new InvalidArgumentException('Not inheriting environment variables is not supported.');
+        }
 
         return $this;
-    }
-
-    /**
-     * Returns whether environment variables will be inherited or not.
-     *
-     * @return bool
-     */
-    public function areEnvironmentVariablesInherited()
-    {
-        return $this->inheritEnv;
     }
 
     /**
@@ -1362,7 +1268,7 @@ class Process implements \IteratorAggregate
 
         $this->readPipes($running && $blocking, '\\' !== DIRECTORY_SEPARATOR || !$running);
 
-        if ($this->fallbackStatus && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+        if ($this->fallbackStatus && $this->isSigchildEnabled()) {
             $this->processInformation = $this->fallbackStatus + $this->processInformation;
         }
 
@@ -1382,7 +1288,7 @@ class Process implements \IteratorAggregate
             return self::$sigchild;
         }
 
-        if (!function_exists('phpinfo') || defined('HHVM_VERSION')) {
+        if (!function_exists('phpinfo')) {
             return self::$sigchild = false;
         }
 
@@ -1471,7 +1377,7 @@ class Process implements \IteratorAggregate
             if ($this->processInformation['signaled'] && 0 < $this->processInformation['termsig']) {
                 // if process has been signaled, no exitcode but a valid termsig, apply Unix convention
                 $this->exitcode = 128 + $this->processInformation['termsig'];
-            } elseif ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            } elseif ($this->isSigchildEnabled()) {
                 $this->processInformation['signaled'] = true;
                 $this->processInformation['termsig'] = -1;
             }
@@ -1536,7 +1442,7 @@ class Process implements \IteratorAggregate
                 return false;
             }
         } else {
-            if (!$this->enhanceSigchildCompatibility || !$this->isSigchildEnabled()) {
+            if (!$this->isSigchildEnabled()) {
                 $ok = @proc_terminate($this->process, $signal);
             } elseif (function_exists('posix_kill')) {
                 $ok = @posix_kill($pid, $signal);
@@ -1558,6 +1464,58 @@ class Process implements \IteratorAggregate
         $this->fallbackStatus['termsig'] = $this->latestSignal;
 
         return true;
+    }
+
+    private function prepareWindowsCommandLine($cmd, array &$envBackup, array &$env = null)
+    {
+        $uid = uniqid('', true);
+        $varCount = 0;
+        $varCache = array();
+        $cmd = preg_replace_callback(
+            '/"(?:(
+                [^"%!^]*+
+                (?:
+                    (?: !LF! | "(?:\^[%!^])?+" )
+                    [^"%!^]*+
+                )++
+            ) | [^"]*+ )"/x',
+            function ($m) use (&$envBackup, &$env, &$varCache, &$varCount, $uid) {
+                if (!isset($m[1])) {
+                    return $m[0];
+                }
+                if (isset($varCache[$m[0]])) {
+                    return $varCache[$m[0]];
+                }
+                if (false !== strpos($value = $m[1], "\0")) {
+                    $value = str_replace("\0", '?', $value);
+                }
+                if (false === strpbrk($value, "\"%!\n")) {
+                    return '"'.$value.'"';
+                }
+
+                $value = str_replace(array('!LF!', '"^!"', '"^%"', '"^^"', '""'), array("\n", '!', '%', '^', '"'), $value);
+                $value = '"'.preg_replace('/(\\\\*)"/', '$1$1\\"', $value).'"';
+                $var = $uid.++$varCount;
+
+                if (null === $env) {
+                    putenv("$var=$value");
+                } else {
+                    $env[$var] = $value;
+                }
+
+                $envBackup[$var] = false;
+
+                return $varCache[$m[0]] = '!'.$var.'!';
+            },
+            $cmd
+        );
+
+        $cmd = 'cmd /V:ON /E:ON /D /C ('.str_replace("\n", ' ', $cmd).')';
+        foreach ($this->processPipes->getFiles() as $offset => $filename) {
+            $cmd .= ' '.$offset.'>"'.$filename.'"';
+        }
+
+        return $cmd;
     }
 
     /**
@@ -1586,5 +1544,31 @@ class Process implements \IteratorAggregate
         if (!$this->isTerminated()) {
             throw new LogicException(sprintf('Process must be terminated before calling %s.', $functionName));
         }
+    }
+
+    /**
+     * Escapes a string to be used as a shell argument.
+     *
+     * @param string $argument The argument that will be escaped
+     *
+     * @return string The escaped argument
+     */
+    private function escapeArgument($argument)
+    {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            return "'".str_replace("'", "'\\''", $argument)."'";
+        }
+        if ('' === $argument = (string) $argument) {
+            return '""';
+        }
+        if (false !== strpos($argument, "\0")) {
+            $argument = str_replace("\0", '?', $argument);
+        }
+        if (!preg_match('/[\/()%!^"<>&|\s]/', $argument)) {
+            return $argument;
+        }
+        $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
+
+        return '"'.str_replace(array('"', '^', '%', '!', "\n"), array('""', '"^^"', '"^%"', '"^!"', '!LF!'), $argument).'"';
     }
 }

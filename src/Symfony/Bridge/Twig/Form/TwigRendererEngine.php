@@ -19,7 +19,7 @@ use Twig\Template;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererEngineInterface
+class TwigRendererEngine extends AbstractRendererEngine
 {
     /**
      * @var Environment
@@ -31,21 +31,9 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     private $template;
 
-    public function __construct(array $defaultThemes = array(), Environment $environment = null)
+    public function __construct(array $defaultThemes, Environment $environment)
     {
-        if (null === $environment) {
-            @trigger_error(sprintf('Not passing a Twig Environment as the second argument for "%s" constructor is deprecated since version 3.2 and won\'t be possible in 4.0.', static::class), E_USER_DEPRECATED);
-        }
-
         parent::__construct($defaultThemes);
-        $this->environment = $environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnvironment(Environment $environment)
-    {
         $this->environment = $environment;
     }
 

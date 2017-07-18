@@ -15,15 +15,6 @@ use Cache\IntegrationTests\CachePoolTest;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (!array_key_exists('testDeferredSaveWithoutCommit', $this->skippedTests) && defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Destructors are called late on HHVM.';
-        }
-    }
-
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

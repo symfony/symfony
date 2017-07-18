@@ -15,20 +15,11 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class FormFactory implements FormFactoryInterface
 {
-    /**
-     * @var FormRegistryInterface
-     */
     private $registry;
 
-    /**
-     * @var ResolvedFormTypeFactoryInterface
-     */
-    private $resolvedTypeFactory;
-
-    public function __construct(FormRegistryInterface $registry, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
+    public function __construct(FormRegistryInterface $registry)
     {
         $this->registry = $registry;
-        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
     /**

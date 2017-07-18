@@ -303,6 +303,73 @@ abstract class AbstractEventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners('foo'));
         $this->assertFalse($this->dispatcher->hasListeners());
     }
+
+    public function testHasListenersIsLazy()
+    {
+        $called = 0;
+        $listener = array(function () use (&$called) { ++$called; }, 'onFoo');
+        $this->dispatcher->addListener('foo', $listener);
+        $this->assertTrue($this->dispatcher->hasListeners());
+        $this->assertTrue($this->dispatcher->hasListeners('foo'));
+        $this->assertSame(0, $called);
+    }
+
+    public function testDispatchLazyListener()
+    {
+        $called = 0;
+        $factory = function () use (&$called) {
+            ++$called;
+
+            return new TestWithDispatcher();
+        };
+        $this->dispatcher->addListener('foo', array($factory, 'foo'));
+        $this->assertSame(0, $called);
+        $this->dispatcher->dispatch('foo', new Event());
+        $this->dispatcher->dispatch('foo', new Event());
+        $this->assertSame(1, $called);
+    }
+
+    public function testRemoveFindsLazyListeners()
+    {
+        $test = new TestWithDispatcher();
+        $factory = function () use ($test) { return $test; };
+
+        $this->dispatcher->addListener('foo', array($factory, 'foo'));
+        $this->assertTrue($this->dispatcher->hasListeners('foo'));
+        $this->dispatcher->removeListener('foo', array($test, 'foo'));
+        $this->assertFalse($this->dispatcher->hasListeners('foo'));
+
+        $this->dispatcher->addListener('foo', array($test, 'foo'));
+        $this->assertTrue($this->dispatcher->hasListeners('foo'));
+        $this->dispatcher->removeListener('foo', array($factory, 'foo'));
+        $this->assertFalse($this->dispatcher->hasListeners('foo'));
+    }
+
+    public function testPriorityFindsLazyListeners()
+    {
+        $test = new TestWithDispatcher();
+        $factory = function () use ($test) { return $test; };
+
+        $this->dispatcher->addListener('foo', array($factory, 'foo'), 3);
+        $this->assertSame(3, $this->dispatcher->getListenerPriority('foo', array($test, 'foo')));
+        $this->dispatcher->removeListener('foo', array($factory, 'foo'));
+
+        $this->dispatcher->addListener('foo', array($test, 'foo'), 5);
+        $this->assertSame(5, $this->dispatcher->getListenerPriority('foo', array($factory, 'foo')));
+    }
+
+    public function testGetLazyListeners()
+    {
+        $test = new TestWithDispatcher();
+        $factory = function () use ($test) { return $test; };
+
+        $this->dispatcher->addListener('foo', array($factory, 'foo'), 3);
+        $this->assertSame(array(array($test, 'foo')), $this->dispatcher->getListeners('foo'));
+
+        $this->dispatcher->removeListener('foo', array($test, 'foo'));
+        $this->dispatcher->addListener('bar', array($factory, 'foo'), 3);
+        $this->assertSame(array('bar' => array(array($test, 'foo'))), $this->dispatcher->getListeners());
+    }
 }
 
 class CallableClass

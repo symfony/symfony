@@ -63,54 +63,13 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($savedParsedExpression, $parsedExpression);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCachedParseWithDeprecatedParserCacheInterface()
-    {
-        $cacheMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
-
-        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
-        $savedParsedExpression = null;
-        $expressionLanguage = new ExpressionLanguage($cacheMock);
-
-        $cacheMock
-            ->expects($this->exactly(1))
-            ->method('fetch')
-            ->with('1%20%2B%201%2F%2F')
-            ->willReturn($savedParsedExpression)
-        ;
-
-        $cacheMock
-            ->expects($this->exactly(1))
-            ->method('save')
-            ->with('1%20%2B%201%2F%2F', $this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($key, $expression) use (&$savedParsedExpression) {
-                $savedParsedExpression = $expression;
-            }))
-        ;
-
-        $parsedExpression = $expressionLanguage->parse('1 + 1', array());
-        $this->assertSame($savedParsedExpression, $parsedExpression);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cache argument has to implement Psr\Cache\CacheItemPoolInterface.
-     */
-    public function testWrongCacheImplementation()
-    {
-        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemSpoolInterface')->getMock();
-        $expressionLanguage = new ExpressionLanguage($cacheMock);
-    }
-
     public function testConstantFunction()
     {
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
 
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+        $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
     }
 
     public function testProviders()
@@ -118,6 +77,12 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage = new ExpressionLanguage(null, array(new TestProvider()));
         $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
         $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
+        $this->assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
+        $this->assertEquals('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
+        $this->assertEquals('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
+        $this->assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
+        $this->assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
+        $this->assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
     }
 
     /**

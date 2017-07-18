@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 class CodeExtensionTest extends TestCase
 {
-    protected $helper;
-
     public function testFormatFile()
     {
         $expected = sprintf('<a href="proto://foobar%s#&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', substr(__FILE__, 5), __FILE__);

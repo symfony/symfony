@@ -99,8 +99,10 @@ class DateIntervalType extends AbstractType
             $childOptions = array();
             foreach ($this->timeParts as $part) {
                 if ($options['with_'.$part]) {
-                    $childOptions[$part] = array();
-                    $childOptions[$part]['error_bubbling'] = true;
+                    $childOptions[$part] = array(
+                        'error_bubbling' => true,
+                        'label' => $options['labels'][$part],
+                    );
                     if ('choice' === $options['widget']) {
                         $childOptions[$part]['choice_translation_domain'] = false;
                         $childOptions[$part]['choices'] = $options[$part];
@@ -131,6 +133,7 @@ class DateIntervalType extends AbstractType
             }
             if ($options['with_invert']) {
                 $builder->add('invert', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', array(
+                    'label' => $options['labels']['invert'],
                     'error_bubbling' => true,
                     'required' => false,
                     'translation_domain' => $options['translation_domain'],
@@ -192,6 +195,21 @@ class DateIntervalType extends AbstractType
             return array_fill_keys($timeParts, $placeholder);
         };
 
+        $labelsNormalizer = function (Options $options, array $labels) {
+            return array_replace(array(
+                'years' => null,
+                'months' => null,
+                'days' => null,
+                'weeks' => null,
+                'hours' => null,
+                'minutes' => null,
+                'seconds' => null,
+                'invert' => 'Negative interval',
+            ), array_filter($labels, function ($label) {
+                return null !== $label;
+            }));
+        };
+
         $resolver->setDefaults(
             array(
                 'with_years' => true,
@@ -220,9 +238,11 @@ class DateIntervalType extends AbstractType
                 // this option.
                 'data_class' => null,
                 'compound' => $compound,
+                'labels' => array(),
             )
         );
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('labels', $labelsNormalizer);
 
         $resolver->setAllowedValues(
             'input',
@@ -260,6 +280,7 @@ class DateIntervalType extends AbstractType
         $resolver->setAllowedTypes('with_minutes', 'bool');
         $resolver->setAllowedTypes('with_seconds', 'bool');
         $resolver->setAllowedTypes('with_invert', 'bool');
+        $resolver->setAllowedTypes('labels', 'array');
     }
 
     /**

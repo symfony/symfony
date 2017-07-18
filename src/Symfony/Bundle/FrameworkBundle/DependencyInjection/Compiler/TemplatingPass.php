@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
@@ -25,13 +26,13 @@ class TemplatingPass implements CompilerPassInterface
         }
 
         if ($container->hasAlias('templating')) {
-            $definition = $container->findDefinition('templating');
-            $definition->setAutowiringTypes(array(ComponentEngineInterface::class, FrameworkBundleEngineInterface::class));
+            $container->setAlias(ComponentEngineInterface::class, new Alias('templating', false));
+            $container->setAlias(FrameworkBundleEngineInterface::class, new Alias('templating', false));
         }
 
         if ($container->hasDefinition('templating.engine.php')) {
             $helpers = array();
-            foreach ($container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
+            foreach ($container->findTaggedServiceIds('templating.helper', true) as $id => $attributes) {
                 if (isset($attributes[0]['alias'])) {
                     $helpers[$attributes[0]['alias']] = $id;
                 }

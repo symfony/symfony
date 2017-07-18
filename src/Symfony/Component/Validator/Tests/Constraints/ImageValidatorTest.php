@@ -164,6 +164,42 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testPixelsTooFew()
+    {
+        $constraint = new Image(array(
+            'minPixels' => 5,
+            'minPixelsMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ pixels }}', '4')
+            ->setParameter('{{ min_pixels }}', '5')
+            ->setParameter('{{ height }}', '2')
+            ->setParameter('{{ width }}', '2')
+            ->setCode(Image::TOO_FEW_PIXEL_ERROR)
+            ->assertRaised();
+    }
+
+    public function testPixelsTooMany()
+    {
+        $constraint = new Image(array(
+            'maxPixels' => 3,
+            'maxPixelsMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ pixels }}', '4')
+            ->setParameter('{{ max_pixels }}', '3')
+            ->setParameter('{{ height }}', '2')
+            ->setParameter('{{ width }}', '2')
+            ->setCode(Image::TOO_MANY_PIXEL_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
@@ -207,6 +243,30 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Image(array(
             'maxHeight' => '1abc',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testInvalidMinPixels()
+    {
+        $constraint = new Image(array(
+            'minPixels' => '1abc',
+        ));
+
+        $this->validator->validate($this->image, $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testInvalidMaxPixels()
+    {
+        $constraint = new Image(array(
+            'maxPixels' => '1abc',
         ));
 
         $this->validator->validate($this->image, $constraint);

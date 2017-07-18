@@ -1,7 +1,12 @@
 {
+    "application": {
+        "name": "My Symfony application",
+        "version": "v1.0"
+    },
     "commands": [
         {
             "name": "help",
+            "hidden": false,
             "usage": [
                 "help [--format FORMAT] [--raw] [--] [<command_name>]"
             ],
@@ -104,6 +109,7 @@
         },
         {
             "name": "list",
+            "hidden": false,
             "usage": [
                 "list [--raw] [--format FORMAT] [--] [<namespace>]"
             ],
@@ -143,6 +149,7 @@
         },
         {
             "name": "descriptor:command1",
+            "hidden": false,
             "usage": [
                 "descriptor:command1",
                 "alias1",
@@ -221,6 +228,7 @@
         },
         {
             "name": "descriptor:command2",
+            "hidden": false,
             "usage": [
                 "descriptor:command2 [-o|--option_name] [--] <argument_name>",
                 "descriptor:command2 -o|--option_name <argument_name>",
@@ -313,6 +321,162 @@
                     }
                 }
             }
+        },
+        {
+            "name": "descriptor:command3",
+            "hidden": true,
+            "usage": [
+                "descriptor:command3"
+            ],
+            "description": "command 3 description",
+            "help": "command 3 help",
+            "definition": {
+                "arguments": {},
+                "options": {
+                    "help": {
+                        "name": "--help",
+                        "shortcut": "-h",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this help message",
+                        "default": false
+                    },
+                    "quiet": {
+                        "name": "--quiet",
+                        "shortcut": "-q",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
+                    "verbose": {
+                        "name": "--verbose",
+                        "shortcut": "-v|-vv|-vvv",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
+                        "default": false
+                    },
+                    "version": {
+                        "name": "--version",
+                        "shortcut": "-V",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this application version",
+                        "default": false
+                    },
+                    "ansi": {
+                        "name": "--ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Force ANSI output",
+                        "default": false
+                    },
+                    "no-ansi": {
+                        "name": "--no-ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable ANSI output",
+                        "default": false
+                    },
+                    "no-interaction": {
+                        "name": "--no-interaction",
+                        "shortcut": "-n",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not ask any interactive question",
+                        "default": false
+                    }
+                }
+            }
+        },
+        {
+            "name": "descriptor:command4",
+            "hidden": false,
+            "usage": [
+                "descriptor:command4",
+                "descriptor:alias_command4",
+                "command4:descriptor"
+            ],
+            "description": null,
+            "help": "",
+            "definition": {
+                "arguments": {},
+                "options": {
+                    "help": {
+                        "name": "--help",
+                        "shortcut": "-h",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this help message",
+                        "default": false
+                    },
+                    "quiet": {
+                        "name": "--quiet",
+                        "shortcut": "-q",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not output any message",
+                        "default": false
+                    },
+                    "verbose": {
+                        "name": "--verbose",
+                        "shortcut": "-v|-vv|-vvv",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
+                        "default": false
+                    },
+                    "version": {
+                        "name": "--version",
+                        "shortcut": "-V",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Display this application version",
+                        "default": false
+                    },
+                    "ansi": {
+                        "name": "--ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Force ANSI output",
+                        "default": false
+                    },
+                    "no-ansi": {
+                        "name": "--no-ansi",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Disable ANSI output",
+                        "default": false
+                    },
+                    "no-interaction": {
+                        "name": "--no-interaction",
+                        "shortcut": "-n",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "Do not ask any interactive question",
+                        "default": false
+                    }
+                }
+            }
         }
     ],
     "namespaces": [
@@ -326,10 +490,19 @@
             ]
         },
         {
+            "id": "command4",
+            "commands": [
+                "command4:descriptor"
+            ]
+        },
+        {
             "id": "descriptor",
             "commands": [
+                "descriptor:alias_command4",
                 "descriptor:command1",
-                "descriptor:command2"
+                "descriptor:command2",
+                "descriptor:command3",
+                "descriptor:command4"
             ]
         }
     ]

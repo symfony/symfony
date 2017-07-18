@@ -5,9 +5,11 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="esi" class="Symfony\Component\HttpKernel\HttpCache\Esi" />
+        <defaults public="false" />
 
-        <service id="esi_listener" class="Symfony\Component\HttpKernel\EventListener\SurrogateListener">
+        <service id="esi" class="Symfony\Component\HttpKernel\HttpCache\Esi" public="true" />
+
+        <service id="esi_listener" class="Symfony\Component\HttpKernel\EventListener\SurrogateListener" public="true">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="esi" on-invalid="ignore" />
         </service>

@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
@@ -268,30 +267,28 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function detectMetadataDriver($dir, ContainerBuilder $container)
     {
-        // add the closest existing directory as a resource
         $configPath = $this->getMappingResourceConfigDirectory();
-        $resource = $dir.'/'.$configPath;
-        while (!is_dir($resource)) {
-            $resource = dirname($resource);
-        }
-
-        $container->addResource(new FileResource($resource));
-
         $extension = $this->getMappingResourceExtension();
-        if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && count($files)) {
-            return 'xml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.yml')) && count($files)) {
-            return 'yml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.php')) && count($files)) {
-            return 'php';
-        }
 
-        // add the directory itself as a resource
-        $container->addResource(new FileResource($dir));
+        if (glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) {
+            $driver = 'xml';
+        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.yml')) {
+            $driver = 'yml';
+        } elseif (glob($dir.'/'.$configPath.'/*.'.$extension.'.php')) {
+            $driver = 'php';
+        } else {
+            // add the closest existing directory as a resource
+            $resource = $dir.'/'.$configPath;
+            while (!is_dir($resource)) {
+                $resource = dirname($resource);
+            }
+            $container->fileExists($resource, false);
 
-        if (is_dir($dir.'/'.$this->getMappingObjectDefaultName())) {
-            return 'annotation';
+            return $container->fileExists($dir.'/'.$this->getMappingObjectDefaultName(), false) ? 'annotation' : null;
         }
+        $container->fileExists($dir.'/'.$configPath, false);
+
+        return $driver;
     }
 
     /**

@@ -117,6 +117,15 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 case DBALType::TIME:
                     return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime'));
 
+                case 'date_immutable':
+                case 'datetime_immutable':
+                case 'datetimetz_immutable':
+                case 'time_immutable':
+                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable'));
+
+                case 'dateinterval':
+                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval'));
+
                 case DBALType::TARRAY:
                     return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true));
 

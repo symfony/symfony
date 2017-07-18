@@ -21,7 +21,7 @@ class Marking
     private $places = array();
 
     /**
-     * @param string[] $representation Keys are the place name and values should be 1
+     * @param int[] $representation Keys are the place name and values should be 1
      */
     public function __construct(array $representation = array())
     {

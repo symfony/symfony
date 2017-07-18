@@ -2,18 +2,21 @@
 
 namespace Symfony\Component\DependencyInjection\Dump;
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
  * Container.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
  */
 class Container extends AbstractContainer
 {
@@ -25,6 +28,24 @@ class Container extends AbstractContainer
      */
     public function __construct()
     {
-        parent::__construct();
+        $this->services = array();
+
+        $this->aliases = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isCompiled()
+    {
+        return true;
     }
 }

@@ -1,0 +1,10 @@
+services:
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Loader\FooInterface:
+            autowire: true
+            lazy: true
+            tags:
+                - { name: foo }
+                - { name: bar }
+
+    Symfony\Component\DependencyInjection\Tests\Loader\Foo: ~

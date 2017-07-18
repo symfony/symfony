@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Tests;
 
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
+use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\LdapInterface;
@@ -76,5 +77,38 @@ class AdapterTest extends LdapTestCase
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
         $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array());
         $query->execute();
+    }
+
+    public function testLdapQueryScopeBase()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
+
+        $query = $ldap->createQuery('cn=Fabien Potencier,dc=symfony,dc=com', '(objectclass=*)', array(
+           'scope' => Query::SCOPE_BASE,
+        ));
+        $result = $query->execute();
+
+        $entry = $result[0];
+        $this->assertEquals($result->count(), 1);
+        $this->assertEquals(array('Fabien Potencier'), $entry->getAttribute('cn'));
+    }
+
+    public function testLdapQueryScopeOneLevel()
+    {
+        $ldap = new Adapter($this->getLdapConfig());
+
+        $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
+
+        $one_level_result = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)', array(
+            'scope' => Query::SCOPE_ONE,
+        ))->execute();
+
+        $subtree_count = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)')->execute()->count();
+
+        $this->assertNotEquals($one_level_result->count(), $subtree_count);
+        $this->assertEquals($one_level_result->count(), 1);
+        $this->assertEquals($one_level_result[0]->getAttribute('ou'), array('Ldap'));
     }
 }

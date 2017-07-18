@@ -98,10 +98,10 @@ abstract class AbstractDescriptorTest extends TestCase
         return $data;
     }
 
-    protected function assertDescription($expectedDescription, $describedObject)
+    protected function assertDescription($expectedDescription, $describedObject, array $options = array())
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $this->getDescriptor()->describe($output, $describedObject, array('raw_output' => true));
+        $this->getDescriptor()->describe($output, $describedObject, $options + array('raw_output' => true));
         $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
     }
 }

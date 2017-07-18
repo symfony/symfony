@@ -562,6 +562,46 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World', $this->response->getContent());
     }
 
+    public function testDegradationWhenCacheLocked()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 10;
+
+        // The prescence of Last-Modified makes this cacheable (because Response::isValidateable() then).
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=5', 'Last-Modified' => 'some while ago'), 'Old response');
+        $this->request('GET', '/'); // warm the cache
+
+        // Now, lock the cache
+        $concurrentRequest = Request::create('/', 'GET');
+        $this->store->lock($concurrentRequest);
+
+        /*
+         *  After 10s, the cached response has become stale. Yet, we're still within the "stale_while_revalidate"
+         *  timeout so we may serve the stale response.
+         */
+        sleep(10);
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertTraceContains('stale-while-revalidate');
+        $this->assertEquals('Old response', $this->response->getContent());
+
+        /*
+         * Another 10s later, stale_while_revalidate is over. Resort to serving the old response, but
+         * do so with a "server unavailable" message.
+         */
+        sleep(10);
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertEquals(503, $this->response->getStatusCode());
+        $this->assertEquals('Old response', $this->response->getContent());
+    }
+
     public function testHitsCachedResponseWithSMaxAgeDirective()
     {
         $time = \DateTime::createFromFormat('U', time() - 5);
@@ -1218,7 +1258,7 @@ class HttpCacheTest extends HttpCacheTestCase
      */
     public function testHttpCacheIsSetAsATrustedProxy(array $existing, array $expected)
     {
-        Request::setTrustedProxies($existing, -1);
+        Request::setTrustedProxies($existing, Request::HEADER_X_FORWARDED_ALL);
 
         $this->setNextResponse();
         $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));

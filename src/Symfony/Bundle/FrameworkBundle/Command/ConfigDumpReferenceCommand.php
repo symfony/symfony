@@ -37,6 +37,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
             ->setName('config:dump-reference')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
+                new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
             ))
             ->setDescription('Dumps the default configuration for an extension')
@@ -55,6 +56,10 @@ When the option is not provided, <comment>yaml</comment> is used.
 
   <info>php %command.full_name% FrameworkBundle --format=xml</info>
 
+For dumping a specific option, add its path as second argument (only available for the yaml format):
+
+  <info>php %command.full_name% framework profiler.matcher</info>
+
 EOF
             )
         ;
@@ -68,10 +73,14 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $errorIo = $io->getErrorStyle();
 
         if (null === $name = $input->getArgument('name')) {
-            $this->listBundles($io);
-            $io->comment('Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)');
+            $this->listBundles($errorIo);
+            $errorIo->comment(array(
+                'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
+                'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle profiler.matcher</comment> to dump the <comment>framework.profiler.matcher</comment> configuration)',
+            ));
 
             return;
         }
@@ -82,13 +91,26 @@ EOF
 
         $this->validateConfiguration($extension, $configuration);
 
+        $format = $input->getOption('format');
+        $path = $input->getArgument('path');
+
+        if ($path !== null && 'yaml' !== $format) {
+            $errorIo->error('The "path" option is only available for the "yaml" format.');
+
+            return 1;
+        }
+
         if ($name === $extension->getAlias()) {
             $message = sprintf('Default configuration for extension with alias: "%s"', $name);
         } else {
             $message = sprintf('Default configuration for "%s"', $name);
         }
 
-        switch ($input->getOption('format')) {
+        if ($path !== null) {
+            $message .= sprintf(' at path "%s"', $path);
+        }
+
+        switch ($format) {
             case 'yaml':
                 $io->writeln(sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
@@ -102,6 +124,6 @@ EOF
                 throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
         }
 
-        $io->writeln($dumper->dump($configuration, $extension->getNamespace()));
+        $io->writeln(null === $path ? $dumper->dump($configuration, $extension->getNamespace()) : $dumper->dumpAtPath($configuration, $path));
     }
 }

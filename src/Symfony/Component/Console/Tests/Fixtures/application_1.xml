@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symfony>
   <commands>
-    <command id="help" name="help">
+    <command id="help" name="help" hidden="0">
       <usages>
         <usage>help [--format FORMAT] [--raw] [--] [&lt;command_name&gt;]</usage>
       </usages>
@@ -56,7 +56,7 @@
         </option>
       </options>
     </command>
-    <command id="list" name="list">
+    <command id="list" name="list" hidden="0">
       <usages>
         <usage>list [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]</usage>
       </usages>

@@ -116,7 +116,7 @@ class XmlUtils
      *
      * @return \DOMDocument
      *
-     * @throws \InvalidArgumentException When loading of XML file returns error
+     * @throws \InvalidArgumentException                                    When loading of XML file returns error
      * @throws \Symfony\Component\Config\Util\Exception\XmlParsingException When XML parsing returns any errors.
      * @throws \RuntimeException         When DOM extension is missing
      */

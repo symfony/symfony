@@ -66,7 +66,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         $instanceofTags = array();
 
         foreach ($conditionals as $interface => $instanceofDefs) {
-            if ($interface !== $class && (!$container->getReflectionClass($class))) {
+            if ($interface !== $class && (!$container->getReflectionClass($class, false))) {
                 continue;
             }
 

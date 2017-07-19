@@ -139,39 +139,36 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function testRefererHasToBeDifferentThanLoginUrl()
+    public function getReferrerList()
     {
-        $options = array('use_referer' => true);
-
-        $this->request->headers->expects($this->any())
-            ->method('get')->with('Referer')
-            ->will($this->returnValue('/login'));
-
-        $this->httpUtils->expects($this->once())
-            ->method('generateUri')->with($this->request, '/login')
-            ->will($this->returnValue('/login'));
-
-        $response = $this->expectRedirectResponse('/');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
-        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
-
-        $this->assertSame($response, $result);
+        return array(
+            'absolute referrer URL' => array('http://domain.com/app_base_path/login?t=1&p=2', 'http://domain.com/app_base_path/login?t=1&p=2', 1),
+            'absolute referrer path' => array('/app_base_path/login?t=1&p=2', '/app_base_path/login?t=1&p=2', 1),
+            'referrer is the same as login route' => array('/login', '/login', 1),
+            'no referrer' => array('', '/', 0),
+        );
     }
 
-    public function testRefererWithoutParametersHasToBeDifferentThanLoginUrl()
+    /**
+     * @dataProvider getReferrerList
+     *
+     * @param string $referrer
+     * @param string $expectedRedirectionTarget
+     * @param int    $generateUriCallCount
+     */
+    public function testRefererWithoutParametersHasToBeDifferentThanLoginUrl($referrer, $expectedRedirectionTarget, $generateUriCallCount)
     {
         $options = array('use_referer' => true);
 
         $this->request->headers->expects($this->any())
             ->method('get')->with('Referer')
-            ->will($this->returnValue('/subfolder/login?t=1&p=2'));
+            ->will($this->returnValue($referrer));
 
-        $this->httpUtils->expects($this->once())
+        $this->httpUtils->expects($this->exactly($generateUriCallCount))
             ->method('generateUri')->with($this->request, '/login')
-            ->will($this->returnValue('/subfolder/login'));
+            ->will($this->returnValue('/app_base_path/login'));
 
-        $response = $this->expectRedirectResponse('/');
+        $response = $this->expectRedirectResponse($expectedRedirectionTarget);
 
         $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);

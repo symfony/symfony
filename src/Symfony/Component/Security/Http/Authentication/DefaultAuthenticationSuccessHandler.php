@@ -122,7 +122,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $targetUrl;
         }
 
-        if ($this->options['use_referer'] && ($targetUrl = $request->headers->get('Referer')) && parse_url($targetUrl, PHP_URL_PATH) !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
+        // Validate that we've got a valid referer URL and that it differs from the absolute URL generated for our (default) login_path
+        if ($this->options['use_referer'] && ($targetUrl = $request->headers->get('Referer')) && !empty($targetUrl) && false !== parse_url($targetUrl, PHP_URL_PATH) && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
             return $targetUrl;
         }
 

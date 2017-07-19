@@ -1,0 +1,203 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-03T11:32:40Z
+
+First proposal:
+
+- the main public properties (``y``, ``m``, ``d``, ``h``, ``i``, ``s``, and ``f`` on PHP 7.1) are merged in oneline ``interval`` virtual property;
+- the others public properties (``invert`` and ``days``) are unmodified;
+- and the public properties not officially documentated (``weekday``, ``weekday_behavior``, ``first_last_day_of``, ``special_type``, ``special_amount``, ``have_weekday_relative`` and ``have_special_relative``) are removed (see the [Class synopsis](http://php.net/manual/en/class.dateinterval.php#dateinterval.synopsis)).
+
+| Before        | After           |
+| ------------- | ------------- |
+| ![](https://user-images.githubusercontent.com/4578773/27791061-8e85424a-5ff3-11e7-8c1d-525a30c3defd.png) | ![](https://user-images.githubusercontent.com/4578773/27791062-8e85538e-5ff3-11e7-8eb1-bd7c8b5681f2.png) |
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-04T18:44:15Z
+
+I agree with @nicolas-grekas's original comment (https://github.com/symfony/symfony/pull/22431#issuecomment-312567747), so I'm not convinced by the new suggested output.
+Perhaps we could just exclude non-officially documented public properties and add your `interval` virtual property. Then, potentially exclude public properties merged in the `interval` virtual properties when used with the `EXCLUDE_VERBOSE` filter, so it won't be shown within the form and validator data collectors for instance, but still shown when dumping around elsewhere.
+
+Also, why showing the `invert` field when it's already part of the `interval`? According to the above suggestions, I'll hide it too when using `EXCLUDE_VERBOSE`.
+
+Would it be interesting to also output it as the [time_interval spec](http://php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters)?
+https://github.com/jaroslavtyc/granam-date-interval/blob/master/Granam/DateInterval/DateInterval.php#L175-L200
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-04T20:00:27Z
+
+Thank you for your thoughts @ogizanagi. I would say this:
+
+- Why do not you like removing time properties? This deletion is in favor of ``interval`` that is a full representation of this props.
+- About ``invert`` prop, you are right.
+- About ``time_interval`` spec, I think that ``interval`` virtual prop is a good replacement and more intuitive to read (``P1Y2M3DT4H5M6S`` vs ``+ 1y 2m 3d 04:05:06``). Moreover, it does not handle milliseconds and the negative intervals.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-04T20:14:36Z
+
+> Why do not you like removing time properties? This deletion is in favor of interval that is a full representation of this props.
+
+Just quoting @nicolas-grekas:
+
+> Dump should be informational about how things actually works or can be used. On a DateInterval, the listed values are actual public properties. VarDumper is about showing actual facts about objects, not alternate ones
+
+I'm using [psysh](http://psysh.org/) quite often, to quickly test or demonstrate things, and despite built-in introspection/doc commands like `ls -al`, `show`, `doc`, ... I like the usage of the var-dumper component to output everything and the fact it shows real internals, not representations. I wish it'd stay this way, but I'm not against adding some helpful representations in addition.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T06:29:43Z
+
+Same opinion as @ogizanagi.
+Maybe display the short output when the EXCLUDE_VERBOSE flag is set (the default on psysh)?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-11T10:24:34Z
+
+Ok, here the new result according to your comments:
+
+| normal        | ``EXCLUDE_VERBOSE``           |
+| ------------- | ------------- |
+| ![](https://user-images.githubusercontent.com/4578773/28063954-333052ea-6633-11e7-903e-fcfe19897798.png) | ![](https://user-images.githubusercontent.com/4578773/28063953-332d4488-6633-11e7-91ea-7d1a6cdf18e3.png) |
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T13:39:11Z
+
+"normal" should display all existing properties, even undocumented ones. Also, why keep "days" in compact mode?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-11T17:08:59Z
+
+It's updated: "normal" displays all, and only ``interval`` prop is kept in compact mode.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T10:19:59Z
+
+How to fix kind of HHVM failure?
+```
+1) Symfony\Component\VarDumper\Tests\Caster\DateCasterTest::testDumpInterval with data set #0 ('PT0S', 0, '0s', '0s')
+Failed asserting that format description matches text.
+--- Expected
++++ Actual
+@@ @@
+ DateInterval {
+   interval: 0s
+ }
+-}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T11:17:21Z
+
+```diff
+diff --git a/src/Symfony/Component/VarDumper/Caster/DateCaster.php b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
+index c9edc10..1ecd962 100644
+--- a/src/Symfony/Component/VarDumper/Caster/DateCaster.php
++++ b/src/Symfony/Component/VarDumper/Caster/DateCaster.php
+@@ -58,7 +58,7 @@ class DateCaster
+             .($i->d ? '%dd ' : '')
+         ;
+
+-        if (\PHP_VERSION_ID >= 70100) {
++        if (isset($i->f)) {
+             $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:%S.%F' : '';
+         } else {
+             $format .= $i->h || $i->i || $i->s ? '%H:%I:%S' : '';
+diff --git a/src/Symfony/Component/VarDumper/Tests/Caster/DateCasterTest.php b/src/Symfony/Component/VarDumper/Tests/Caster/DateCasterTest.php
+index 9db333e..c4c1263 100644
+--- a/src/Symfony/Component/VarDumper/Tests/Caster/DateCasterTest.php
++++ b/src/Symfony/Component/VarDumper/Tests/Caster/DateCasterTest.php
+@@ -97,8 +97,7 @@ EODUMP;
+         $xDump = <<<EODUMP
+ DateInterval {
+   interval: $expected
+-%a
+-}
++%A}
+ EODUMP;
+
+         $this->assertDumpMatchesFormat($xDump, $interval);
+@@ -162,7 +161,8 @@ EODUMP;
+
+     public function provideIntervals()
+     {
+-        $ms = \PHP_VERSION_ID >= 70100 ? '.000000' : '';
++        $interval = new \DateInterval('PT0S');
++        $ms = isset($interval->f);
+
+         return array(
+             array('PT0S', 0, '0s', '0s'),
+```
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T12:50:14Z
+
+Mmh, ``isset($interval->f)`` triggers a notice in 7.0, see https://3v4l.org/hJB5A. I use ``PHP_VERSION_ID``?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T12:53:07Z
+
+but my HHVM fails when PHP_VERSION_ID is used...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T12:53:28Z
+
+you should report the notice as a bug I guess
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T12:55:08Z
+
+using both PHP_VERSION_ID and the isset check should do it
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T13:59:33Z
+
+There was no error related with ``PHP_VERSION_ID`` [previously](https://github.com/symfony/symfony/pull/23357#issuecomment-314719651). Tests seem fine now (failure seems unrelated).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T14:03:32Z
+
+> you should report the notice as a bug
+
+https://bugs.php.net/bug.php?id=74911 ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T14:16:30Z
+
+> was no error related with PHP_VERSION_ID previously
+
+that's because the behavior of hhvm changes from version to version and Travis doesn't have the latest. But trust me, this check is not enough, you need the isset one also :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T14:16:51Z
+
+(or install hhvm to see by yourself ;) )
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-12T18:03:20Z
+
+Updated: used ``PHP_VERSION_ID`` + the isset check.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-18T09:08:21Z
+
+Time to merge? :)

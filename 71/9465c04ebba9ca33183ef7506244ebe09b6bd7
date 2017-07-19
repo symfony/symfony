@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by james-johnston-thumbtack at 2017-07-17T16:29:53Z
+
+It seems Travis failed due to unrelated breakage on the 3.4 branch.  I can't see how it's related to this PR.  This unrelated PR failed with the same errors: https://github.com/symfony/symfony/pull/23548
+
+    1) Symfony\Bridge\Twig\Tests\Node\FormThemeTest::testCompile
+    Failed asserting that two strings are equal.
+    --- Expected
+    +++ Actual
+    @@ @@
+    -'$this->env->getRuntime('Symfony\Component\Form\FormRenderer')->setTheme(($context["form"] ?? null), array(0 => "tpl1", 1 => "tpl2"));'
+    +'$this->env->getRuntime("Symfony\\Bridge\\Twig\\Form\\TwigRenderer")->setTheme(($context["form"] ?? null), array(0 => "tpl1", 1 => "tpl2"));'
+    /home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php:58
+    /home/travis/build/symfony/symfony/.phpunit/phpunit-6.0/phpunit:5
+    /home/travis/build/symfony/symfony/vendor/symfony/phpunit-bridge/bin/simple-phpunit:192

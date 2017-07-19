@@ -28,6 +28,7 @@
     },
     "suggest": {
         "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
+        "ext-intl": "To show region name in time zone dump",
         "ext-symfony_debug": ""
     },
     "autoload": {

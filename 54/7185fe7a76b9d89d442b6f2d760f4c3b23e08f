@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-18T15:21:30Z
+
+I've tested this and it's better ... but it doesn't solve the issue for me yet.
+
+### Original error message
+
+![before](https://user-images.githubusercontent.com/73419/28325168-6d95a0de-6bdd-11e7-9b19-c03762e9c628.png)
+
+### Error message after this PR
+
+![after](https://user-images.githubusercontent.com/73419/28325176-72715044-6bdd-11e7-80f0-d9eb38398fae.png)
+
+### Expected error message that would help me a lot
+
+![expected](https://user-images.githubusercontent.com/73419/28325200-7d1ed764-6bdd-11e7-9c74-e87acf3e41cd.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-18T16:21:55Z
+
+Can you check the "previous" exceptions?
+This altered error message is due to https://github.com/symfony/symfony/blob/3.3/src/Symfony/Component/Config/Loader/FileLoader.php#L179
+which turns the original exception into something else.
+
+Basically, this may be fixed by reverting the order of displayed exceptions (or any other way to make previous exceptions more visible). But for another PR then.

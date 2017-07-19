@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-19T06:18:25Z
+
+:+1:
+
+> The first two commits refactors tests (using mocks for data objects is a bad idea and using too many mocks actually makes tests test nothing).
+
+cant agree more :)

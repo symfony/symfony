@@ -126,7 +126,7 @@ class Cookie
         $this->httpOnly = (bool) $httpOnly;
         $this->raw = (bool) $raw;
 
-        if (!is_null($sameSite)) {
+        if (null !== $sameSite) {
             $sameSite = strtolower($sameSite);
         }
 

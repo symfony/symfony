@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\HttpUtils;
 
@@ -24,7 +23,9 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
      */
     public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
-        $httpUtils = new HttpUtils();
+        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
+        $urlGenerator->expects($this->any())->method('generate')->will($this->returnValue('http://localhost/login'));
+        $httpUtils = new HttpUtils($urlGenerator);
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
         if ($request->hasSession()) {
@@ -73,23 +74,28 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
                 '/admin/dashboard',
             ),
             'target path as referer' => array(
-                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/dashboard')),
+                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/dashboard')),
                 array('use_referer' => true),
                 '/dashboard',
             ),
             'target path as referer is ignored if not configured' => array(
-                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/dashboard')),
+                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/dashboard')),
                 array(),
                 '/',
             ),
             'target path should be different than login URL' => array(
-                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/login')),
+                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login')),
                 array('use_referer' => true, 'login_path' => '/login'),
                 '/',
             ),
             'target path should be different than login URL (query string does not matter)' => array(
-                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/login?t=1&p=2')),
+                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login?t=1&p=2')),
                 array('use_referer' => true, 'login_path' => '/login'),
+                '/',
+            ),
+            'target path should be different than login URL (login_path as a route)' => array(
+                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login?t=1&p=2')),
+                array('use_referer' => true, 'login_path' => 'login_route'),
                 '/',
             ),
         );

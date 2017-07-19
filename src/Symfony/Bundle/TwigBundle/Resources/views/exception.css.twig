@@ -79,7 +79,8 @@ header .container { display: flex; justify-content: space-between; }
 .exception-hierarchy .icon { margin: 0 3px; opacity: .7; }
 .exception-hierarchy .icon svg { height: 13px; width: 13px; vertical-align: -2px; }
 
-.exception-message-wrapper { display: flex; align-items: flex-start; min-height: 70px; padding: 10px 0 8px; }
+.exception-without-message .exception-message-wrapper { display: none; }
+.exception-message-wrapper .container { display: flex; align-items: flex-start; min-height: 70px; padding: 10px 0 8px; }
 .exception-message { flex-grow: 1; }
 .exception-message, .exception-message a { color: #FFF; font-size: 21px; font-weight: 400; margin: 0; }
 .exception-message.long { font-size: 18px; }

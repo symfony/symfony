@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\DateCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -82,6 +83,105 @@ EODUMP;
         return array(
             array('2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.000000 Europe/Zurich (+02:00)'),
             array('2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.000000 +02:00'),
+        );
+    }
+
+    /**
+     * @dataProvider provideIntervals
+     */
+    public function testDumpInterval($intervalSpec, $invert, $expected)
+    {
+        $interval = new \DateInterval($intervalSpec);
+        $interval->invert = $invert;
+
+        $xDump = <<<EODUMP
+DateInterval {
+  interval: $expected
+%A}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $interval);
+    }
+
+    /**
+     * @dataProvider provideIntervals
+     */
+    public function testDumpIntervalExcludingVerbosity($intervalSpec, $invert, $expected)
+    {
+        $interval = new \DateInterval($intervalSpec);
+        $interval->invert = $invert;
+
+        $xDump = <<<EODUMP
+DateInterval {
+  interval: $expected
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $interval, Caster::EXCLUDE_VERBOSE);
+    }
+
+    /**
+     * @dataProvider provideIntervals
+     */
+    public function testCastInterval($intervalSpec, $invert, $xInterval, $xSeconds)
+    {
+        $interval = new \DateInterval($intervalSpec);
+        $interval->invert = $invert;
+        $stub = new Stub();
+
+        $cast = DateCaster::castInterval($interval, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
+
+        $xDump = <<<EODUMP
+array:1 [
+  "\\x00~\\x00interval" => $xInterval
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $cast);
+
+        if (null === $xSeconds) {
+            return;
+        }
+
+        $xDump = <<<EODUMP
+Symfony\Component\VarDumper\Caster\ConstStub {
+  +type: "ref"
+  +class: "$xInterval"
+  +value: "$xSeconds"
+  +cut: 0
+  +handle: 0
+  +refCount: 0
+  +position: 0
+  +attr: []
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $cast["\0~\0interval"]);
+    }
+
+    public function provideIntervals()
+    {
+        $i = new \DateInterval('PT0S');
+        $ms = \PHP_VERSION_ID >= 70100 && isset($i->f) ? '.000000' : '';
+
+        return array(
+            array('PT0S', 0, '0s', '0s'),
+            array('PT1S', 0, '+ 00:00:01'.$ms, '1s'),
+            array('PT2M', 0, '+ 00:02:00'.$ms, '120s'),
+            array('PT3H', 0, '+ 03:00:00'.$ms, '10 800s'),
+            array('P4D', 0, '+ 4d', '345 600s'),
+            array('P5M', 0, '+ 5m', null),
+            array('P6Y', 0, '+ 6y', null),
+            array('P1Y2M3DT4H5M6S', 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
+
+            array('PT0S', 1, '0s', '0s'),
+            array('PT1S', 1, '- 00:00:01'.$ms, '-1s'),
+            array('PT2M', 1, '- 00:02:00'.$ms, '-120s'),
+            array('PT3H', 1, '- 03:00:00'.$ms, '-10 800s'),
+            array('P4D', 1, '- 4d', '-345 600s'),
+            array('P5M', 1, '- 5m', null),
+            array('P6Y', 1, '- 6y', null),
+            array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06'.$ms, null),
         );
     }
 }

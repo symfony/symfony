@@ -169,7 +169,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
         $this->httpUtils->expects($this->once())
             ->method('generateUri')->with($this->request, '/login')
-            ->will($this->returnValue('/subfolder/login'));
+            ->will($this->returnValue('http://localhost/subfolder/login'));
 
         $response = $this->expectRedirectResponse('/');
 

@@ -124,8 +124,8 @@ class AutowirePass extends AbstractRecursivePass
         if (!$value instanceof Definition || !$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
             return $value;
         }
-        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
-            $this->container->log($this, sprintf('Skipping service "%s": Class or interface "%s" does not exist.', $this->currentId, $value->getClass()));
+        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass(), false)) {
+            $this->container->log($this, sprintf('Skipping service "%s": Class or interface "%s" cannot be loaded.', $this->currentId, $value->getClass()));
 
             return $value;
         }
@@ -388,7 +388,7 @@ class AutowirePass extends AbstractRecursivePass
             unset($this->ambiguousServiceTypes[$type]);
         }
 
-        if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass())) {
+        if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), false)) {
             return;
         }
 
@@ -444,7 +444,7 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function createAutowiredDefinition($type)
     {
-        if (!($typeHint = $this->container->getReflectionClass($type)) || !$typeHint->isInstantiable()) {
+        if (!($typeHint = $this->container->getReflectionClass($type, false)) || !$typeHint->isInstantiable()) {
             return;
         }
 
@@ -478,8 +478,8 @@ class AutowirePass extends AbstractRecursivePass
 
     private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
-        if (!$r = $this->container->getReflectionClass($type = $reference->getType())) {
-            $message = sprintf('has type "%s" but this class does not exist.', $type);
+        if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
+            $message = sprintf('has type "%s" but this class cannot be loaded.', $type);
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));

@@ -26,7 +26,7 @@ trait PriorityTaggedServiceTrait
      *
      * The order of additions must be respected for services having the same priority,
      * and knowing that the \SplPriorityQueue class does not respect the FIFO method,
-     * we should not use this class.
+     * we should not use that class.
      *
      * @see https://bugs.php.net/bug.php?id=53710
      * @see https://bugs.php.net/bug.php?id=60926

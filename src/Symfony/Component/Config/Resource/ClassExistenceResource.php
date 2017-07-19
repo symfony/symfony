@@ -149,7 +149,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
             $props = array(
                 'file' => $trace[$i]['file'],
                 'line' => $trace[$i]['line'],
-                'trace' => array_slice($trace, 0, 1 + $i),
+                'trace' => array_slice($trace, 1 + $i),
             );
 
             foreach ($props as $p => $v) {

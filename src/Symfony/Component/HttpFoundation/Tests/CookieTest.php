@@ -180,4 +180,10 @@ class CookieTest extends TestCase
         $this->assertTrue($cookie->isRaw());
         $this->assertEquals('foo=b+a+r; path=/', (string) $cookie);
     }
+
+    public function testSameSiteAttributeIsCaseInsensitive()
+    {
+        $cookie = new Cookie('foo', 'bar', 0, '/', null, false, true, false, 'Lax');
+        $this->assertEquals('lax', $cookie->getSameSite());
+    }
 }

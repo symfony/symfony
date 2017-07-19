@@ -29,22 +29,25 @@ class HttpUtils
 {
     private $urlGenerator;
     private $urlMatcher;
+    private $domainRegexp;
 
     /**
      * Constructor.
      *
      * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The URL or Request matcher
+     * @param string|null                                 $domainRegexp A regexp that the target of HTTP redirections must match, scheme included
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null, $domainRegexp = null)
     {
         $this->urlGenerator = $urlGenerator;
         if ($urlMatcher !== null && !$urlMatcher instanceof UrlMatcherInterface && !$urlMatcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
         }
         $this->urlMatcher = $urlMatcher;
+        $this->domainRegexp = $domainRegexp;
     }
 
     /**
@@ -58,6 +61,10 @@ class HttpUtils
      */
     public function createRedirectResponse(Request $request, $path, $status = 302)
     {
+        if (null !== $this->domainRegexp && preg_match('#^https?://[^/]++#i', $path, $host) && !preg_match(sprintf($this->domainRegexp, preg_quote($request->getHttpHost())), $host[0])) {
+            $path = '/';
+        }
+
         return new RedirectResponse($this->generateUri($request, $path), $status);
     }
 

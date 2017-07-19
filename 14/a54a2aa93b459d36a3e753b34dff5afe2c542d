@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-06-29T20:39:33Z
+
+After some more investigations, it seems it doesn't happen on a fresh install. It happens on symfony-demo. The cause seems to be a conflict somewhere with bootstrap-sass, as removing it solves the issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-03T05:47:47Z
+
+ping @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-19T17:43:47Z
+
+@javiereguiluz : What do you think about merging this one? It's not ideal, because I didn't really identify the conflicting css rules leading to this strange behavior, but at least this patch has been proven effective for everyone in the referenced issue.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-19T17:48:04Z
+
+@ogizanagi you are right. Let's merge this. Thanks!

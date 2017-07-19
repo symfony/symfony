@@ -29,7 +29,7 @@ class DebugCommand extends Command
     private $twig;
 
     /**
-     * @param Environment $name
+     * @param Environment $twig
      */
     public function __construct($name = 'debug:twig')
     {

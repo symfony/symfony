@@ -34,7 +34,7 @@ class LintCommand extends Command
     private $twig;
 
     /**
-     * @param Environment $name
+     * @param Environment $twig
      */
     public function __construct($name = 'lint:twig')
     {

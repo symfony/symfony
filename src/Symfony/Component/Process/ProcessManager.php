@@ -169,8 +169,8 @@ class ProcessManager
      */
     protected function stop()
     {
-        foreach ($this->procs as $proc) {
-            $proc->stop();
+        foreach ($this->procs as $process) {
+            $process->stop();
         }
 
         $this->clear();

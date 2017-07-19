@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        autoconfigure: true
+        autowire: true
+        public: false
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\:
+        resource: '../../../Prototype/Sub'
+        arguments: ['dummy_arg']
+
+    child_service:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
+        parent: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar.prototype
+        public: true
+        autowire: true
+        autoconfigure: false

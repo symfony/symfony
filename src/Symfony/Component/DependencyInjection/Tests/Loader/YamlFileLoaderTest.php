@@ -376,7 +376,9 @@ class YamlFileLoaderTest extends TestCase
 
         $ids = array_keys($container->getDefinitions());
         sort($ids);
-        $this->assertSame(array(Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'), $ids);
+        $this->assertSame(array(Prototype\Foo::class.'.prototype', Prototype\Sub\Bar::class.'.prototype', 'service_container'), $ids);
+        $this->assertSame(Prototype\Foo::class.'.prototype', (string) $container->getAlias(Prototype\Foo::class));
+        $this->assertSame(Prototype\Sub\Bar::class.'.prototype', (string) $container->getAlias(Prototype\Sub\Bar::class));
 
         $resources = $container->getResources();
 

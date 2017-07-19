@@ -77,6 +77,12 @@ SecurityBundle
 
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
 
+TwigBridge
+----------
+
+ * deprecated the `Symfony\Bridge\Twig\Form\TwigRenderer` class, use the `FormRenderer`
+   class from the Form component instead
+
 Validator
 ---------
 

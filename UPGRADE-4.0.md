@@ -514,6 +514,9 @@ TwigBundle
 TwigBridge
 ----------
 
+ * removed the `Symfony\Bridge\Twig\Form\TwigRenderer` class, use the `FormRenderer`
+   class from the Form component instead
+
  * Removed the possibility to inject the Form `TwigRenderer` into the `FormExtension`.
    Upgrade Twig to `^1.30`, inject the `Twig_Environment` into the `TwigRendererEngine` and load
    the `TwigRenderer` using the `Twig_FactoryRuntimeLoader` instead.

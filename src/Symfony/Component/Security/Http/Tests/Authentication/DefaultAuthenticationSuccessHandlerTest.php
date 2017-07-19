@@ -15,138 +15,83 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class DefaultAuthenticationSuccessHandlerTest extends TestCase
 {
-    private $httpUtils = null;
-    private $token = null;
-
-    protected function setUp()
+    /**
+     * @dataProvider getRequestRedirections
+     */
+    public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
-        $this->httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
-        $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $httpUtils = new HttpUtils();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
+        if ($request->hasSession()) {
+            $handler->setProviderKey('admin');
+        }
+        $this->assertSame('http://localhost'.$redirectedUrl, $handler->onAuthenticationSuccess($request, $token)->getTargetUrl());
     }
 
-    public function testRequestIsRedirected()
-    {
-        $request = Request::create('/');
-        $response = $this->expectRedirectResponse($request, '/');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testDefaultTargetPathCanBeForced()
-    {
-        $options = array(
-            'always_use_default_target_path' => true,
-            'default_target_path' => '/dashboard',
-        );
-
-        $request = Request::create('/');
-        $response = $this->expectRedirectResponse($request, '/dashboard');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testTargetPathIsPassedWithRequest()
-    {
-        $request = Request::create('/?_target_path=/dashboard');
-        $response = $this->expectRedirectResponse($request, '/dashboard');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testTargetPathParameterIsCustomised()
-    {
-        $options = array('target_path_parameter' => '_my_target_path');
-        $request = Request::create('/?_my_target_path=/dashboard');
-        $response = $this->expectRedirectResponse($request, '/dashboard');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testTargetPathIsTakenFromTheSession()
+    public function getRequestRedirections()
     {
         $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
-        $session->expects($this->once())
-            ->method('get')->with('_security.admin.target_path')
-            ->will($this->returnValue('/admin/dashboard'));
-        $session->expects($this->once())
-            ->method('remove')->with('_security.admin.target_path');
+        $session->expects($this->once())->method('get')->with('_security.admin.target_path')->will($this->returnValue('/admin/dashboard'));
+        $session->expects($this->once())->method('remove')->with('_security.admin.target_path');
+        $requestWithSession = Request::create('/');
+        $requestWithSession->setSession($session);
 
-        $request = Request::create('/?_my_target_path=/dashboard');
-        $request->setSession($session);
-        $response = $this->expectRedirectResponse($request, '/admin/dashboard');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
-        $handler->setProviderKey('admin');
-
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testTargetPathIsPassedAsReferer()
-    {
-        $options = array('use_referer' => true);
-        $request = Request::create('/');
-        $request->headers->set('Referer', '/dashboard');
-        $response = $this->expectRedirectResponse($request, '/dashboard');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testRefererHasToBeDifferentThatLoginUrl()
-    {
-        $options = array('use_referer' => true);
-        $request = Request::create('/');
-        $request->headers->set('Referer', '/login');
-        $this->httpUtils->expects($this->once())
-            ->method('generateUri')->with($request, '/login')
-            ->will($this->returnValue('/login'));
-
-        $response = $this->expectRedirectResponse($request, '/');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    public function testRefererTargetPathIsIgnoredByDefault()
-    {
-        $request = Request::create('/');
-        $response = $this->expectRedirectResponse($request, '/');
-
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
-        $result = $handler->onAuthenticationSuccess($request, $this->token);
-
-        $this->assertSame($response, $result);
-    }
-
-    private function expectRedirectResponse(Request $request, $path)
-    {
-        $response = new Response();
-        $this->httpUtils->expects($this->once())
-            ->method('createRedirectResponse')
-            ->with($request, $path)
-            ->will($this->returnValue($response));
-
-        return $response;
+        return array(
+            'default' => array(
+                Request::create('/'),
+                array(),
+                '/',
+            ),
+            'forced target path' => array(
+                Request::create('/'),
+                array('always_use_default_target_path' => true, 'default_target_path' => '/dashboard'),
+                '/dashboard',
+            ),
+            'target path as query string' => array(
+                Request::create('/?_target_path=/dashboard'),
+                array(),
+                '/dashboard',
+            ),
+            'target path name as query string is customized' => array(
+                Request::create('/?_my_target_path=/dashboard'),
+                array('target_path_parameter' => '_my_target_path'),
+                '/dashboard',
+            ),
+            'target path name as query string is customized and nested' => array(
+                Request::create('/?_target_path[value]=/dashboard'),
+                array('target_path_parameter' => '_target_path[value]'),
+                '/dashboard',
+            ),
+            'target path in session' => array(
+                $requestWithSession,
+                array(),
+                '/admin/dashboard',
+            ),
+            'target path as referer' => array(
+                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/dashboard')),
+                array('use_referer' => true),
+                '/dashboard',
+            ),
+            'target path as referer is ignored if not configured' => array(
+                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/dashboard')),
+                array(),
+                '/',
+            ),
+            'target path should be different than login URL' => array(
+                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/login')),
+                array('use_referer' => true, 'login_path' => '/login'),
+                '/',
+            ),
+            'target path should be different than login URL (query string does not matter)' => array(
+                Request::create('/', 'GET', array(),  array(),  array(),  array('HTTP_REFERER' => 'http://localhost/login?t=1&p=2')),
+                array('use_referer' => true, 'login_path' => '/login'),
+                '/',
+            ),
+        );
     }
 }

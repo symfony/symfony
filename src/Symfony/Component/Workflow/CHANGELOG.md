@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * Added support for `Event::getWorkflowName()` for "announce" events.
+
 3.3.0
 -----
 

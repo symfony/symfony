@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -98,6 +99,10 @@ class RememberMeListener implements ListenerInterface
                    .' AuthenticationManager rejected the AuthenticationToken returned'
                    .' by the RememberMeServices.', array('exception' => $e)
                 );
+            }
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN_FAILURE, new InteractiveLoginFailureEvent($request, $e));
             }
 
             $this->rememberMeServices->loginFail($request, $e);

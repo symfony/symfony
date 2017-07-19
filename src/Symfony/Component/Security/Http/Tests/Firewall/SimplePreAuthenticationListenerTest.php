@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener;
 use Symfony\Component\Security\Http\SecurityEvents;
 
@@ -86,6 +87,14 @@ class SimplePreAuthenticationListenerTest extends TestCase
             ->method('createToken')
             ->with($this->equalTo($this->request), $this->equalTo('secured_area'))
             ->will($this->returnValue($this->token))
+        ;
+
+        $loginFailureEvent = new InteractiveLoginFailureEvent($this->request, $exception);
+
+        $this->dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->equalTo(SecurityEvents::INTERACTIVE_LOGIN_FAILURE), $this->equalTo($loginFailureEvent))
         ;
 
         $listener = new SimplePreAuthenticationListener($this->tokenStorage, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);

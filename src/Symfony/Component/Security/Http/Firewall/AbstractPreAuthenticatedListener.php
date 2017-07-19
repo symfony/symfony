@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Psr\Log\LoggerInterface;
@@ -92,6 +93,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             }
         } catch (AuthenticationException $e) {
             $this->clearToken($e);
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN_FAILURE, new InteractiveLoginFailureEvent($request, $e));
+            }
         }
     }
 

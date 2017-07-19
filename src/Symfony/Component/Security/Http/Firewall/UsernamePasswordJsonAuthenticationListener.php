@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityEvents;
 
@@ -170,6 +171,10 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $token = $this->tokenStorage->getToken();
         if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
             $this->tokenStorage->setToken(null);
+        }
+
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN_FAILURE, new InteractiveLoginFailureEvent($request, $failed));
         }
 
         if (!$this->failureHandler) {

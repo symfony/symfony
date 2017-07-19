@@ -23,11 +23,11 @@ class AuthenticationFailureEvent extends AuthenticationEvent
 {
     private $authenticationException;
 
-    public function __construct(TokenInterface $token, AuthenticationException $ex)
+    public function __construct(TokenInterface $token, AuthenticationException $authenticationException)
     {
         parent::__construct($token);
 
-        $this->authenticationException = $ex;
+        $this->authenticationException = $authenticationException;
     }
 
     public function getAuthenticationException()

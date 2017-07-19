@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-18T08:21:31Z
+
+Good catch!
+I think we should do the same in AnnotationsCacheWarmer and in SerializerCacheWarmer.
+There is also one thing to fix: the array_filter should happen *before* the array_map (misses are stored as `null`, which can't "unserialized" and shouldn't be cached.)
+Dunno about patching LazyLoadingMetadataFactory, but anyway, I'm sure this one is needed :)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-07-18T20:51:17Z
+
+@nicolas-grekas changes done :+1:

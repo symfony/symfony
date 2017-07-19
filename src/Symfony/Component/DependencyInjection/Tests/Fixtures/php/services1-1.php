@@ -22,13 +22,14 @@ class Container extends AbstractContainer
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->services = array();
+        $this->services = $this->privates = array();
 
         $this->aliases = array();
     }

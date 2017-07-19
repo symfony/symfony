@@ -20,20 +20,17 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->services = array();
+        $this->services = $this->privates = array();
         $this->methodMap = array(
             'bar_service' => 'getBarServiceService',
-            'baz_service' => 'getBazServiceService',
             'foo_service' => 'getFooServiceService',
-        );
-        $this->privates = array(
-            'baz_service' => true,
         );
 
         $this->aliases = array();
@@ -65,7 +62,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarServiceService()
     {
-        return $this->services['bar_service'] = new \stdClass(($this->services['baz_service'] ?? $this->getBazServiceService()));
+        return $this->services['bar_service'] = new \stdClass(($this->privates['baz_service'] ?? $this->getBazServiceService()));
     }
 
     /**
@@ -78,7 +75,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooServiceService()
     {
-        return $this->services['foo_service'] = new \stdClass(($this->services['baz_service'] ?? $this->getBazServiceService()));
+        return $this->services['foo_service'] = new \stdClass(($this->privates['baz_service'] ?? $this->getBazServiceService()));
     }
 
     /**
@@ -93,8 +90,8 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass A stdClass instance
      */
-    protected function getBazServiceService()
+    private function getBazServiceService()
     {
-        return $this->services['baz_service'] = new \stdClass();
+        return $this->privates['baz_service'] = new \stdClass();
     }
 }

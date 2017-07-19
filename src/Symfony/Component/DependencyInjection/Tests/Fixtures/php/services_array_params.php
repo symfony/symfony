@@ -20,6 +20,7 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
     /**
      * Constructor.
@@ -32,7 +33,7 @@ class ProjectServiceContainer extends Container
         }
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = array();
+        $this->services = $this->privates = array();
         $this->methodMap = array(
             'bar' => 'getBarService',
         );

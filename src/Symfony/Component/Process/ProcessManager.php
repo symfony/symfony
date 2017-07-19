@@ -17,7 +17,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Manages running multiple processes
+ * Manages running processes in parallel
  *
  * @author John Nickell <email@johnnickell.com>
  */
@@ -77,7 +77,7 @@ class ProcessManager
     }
 
     /**
-     * Attaches a process
+     * Adds a process
      *
      * The callback receives the type of output (out or err) and some bytes from
      * the output in real-time while writing the standard input to the process.
@@ -87,7 +87,7 @@ class ProcessManager
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      */
-    public function attach(Process $process, callable $callback = null)
+    public function add(Process $process, callable $callback = null)
     {
         $this->queue->enqueue([$process, $callback]);
     }
@@ -170,7 +170,7 @@ class ProcessManager
     protected function stop()
     {
         foreach ($this->procs as $process) {
-            $process->stop();
+            $process->stop(0);
         }
 
         $this->clear();

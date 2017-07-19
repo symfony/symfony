@@ -337,12 +337,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Retrieves the requested reflection class and registers it for resource tracking.
      *
      * @param string $class
+     * @param bool   $throw
      *
      * @return \ReflectionClass|null
      *
+     * @throws \ReflectionException when a parent class/interface/trait is not found and $throw is true
+     *
      * @final
      */
-    public function getReflectionClass($class)
+    public function getReflectionClass($class, $throw = true)
     {
         if (!$class = $this->getParameterBag()->resolveValue($class)) {
             return;
@@ -357,6 +360,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
             }
         } catch (\ReflectionException $e) {
+            if ($throw) {
+                throw $e;
+            }
             $classReflector = false;
         }
 

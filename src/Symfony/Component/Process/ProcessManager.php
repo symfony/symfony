@@ -48,13 +48,6 @@ class ProcessManager
     protected $queue;
 
     /**
-     * Active pids
-     *
-     * @var array
-     */
-    protected $pids;
-
-    /**
      * Active processes
      *
      * @var array
@@ -72,7 +65,6 @@ class ProcessManager
         $this->maxConcurrent = $maxConcurrent;
         $this->usleepDelay = $usleepDelay;
         $this->queue = new SplQueue();
-        $this->pids = [];
         $this->procs = [];
     }
 
@@ -106,7 +98,6 @@ class ProcessManager
     public function clear()
     {
         $this->queue = new SplQueue();
-        $this->pids = [];
         $this->procs = [];
     }
 
@@ -124,33 +115,20 @@ class ProcessManager
     {
         while (!$this->queue->isEmpty()) {
             $this->init();
-            $this->tick();
-            $this->clean($errorBehavior);
+            $this->tick($errorBehavior);
         }
 
         while (count($this->procs)) {
-            $this->tick();
-            $this->clean($errorBehavior);
+            $this->tick($errorBehavior);
         }
 
-        $this->clear();
-    }
-
-    /**
-     * Stop running processes
-     */
-    protected function stop()
-    {
-        foreach ($this->procs as $proc) {
-            $proc->stop;
-        }
         $this->clear();
     }
 
     /**
      * Starts a process if possible
      */
-    private function init()
+    protected function init()
     {
         if ($this->maxConcurrent === 0 || count($this->procs) < $this->maxConcurrent) {
             $next = $this->queue->dequeue();
@@ -161,44 +139,40 @@ class ProcessManager
 
             $process->start($callback);
 
-            $pid = $process->getPid();
-            $this->pids[$pid] = true;
-            $this->procs[$pid] = $process;
+            $this->procs[$process->getPid()] = $process;
         }
     }
 
     /**
      * Performs running checks on processes
-     */
-    private function tick()
-    {
-        usleep($this->usleepDelay);
-        foreach ($this->procs as $pid => $process) {
-            $process->checkTimeout();
-            if (!$process->isRunning()) {
-                $this->pids[$pid] = false;
-            }
-        }
-    }
-
-    /**
-     * Checks and cleans completed processes
      *
      * @param int $errorBehavior The behavior when a process fails
      *
      * @throws ProcessFailedException When a process fails
      */
-    private function clean($errorBehavior)
+    protected function tick($errorBehavior)
     {
-        foreach ($this->pids as $pid => $running) {
-            if (!$running) {
-                $process = $this->procs[$pid];
+        usleep($this->usleepDelay);
+        foreach ($this->procs as $pid => $process) {
+            $process->checkTimeout();
+            if (!$process->isRunning()) {
                 if (!$process->isSuccessful() && $errorBehavior === self::EXCEPTION_ON_ERROR) {
                     throw new ProcessFailedException($process);
                 }
-                unset($this->pids[$pid]);
                 unset($this->procs[$pid]);
             }
         }
+    }
+
+    /**
+     * Stop running processes
+     */
+    protected function stop()
+    {
+        foreach ($this->procs as $proc) {
+            $proc->stop();
+        }
+
+        $this->clear();
     }
 }

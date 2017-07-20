@@ -512,6 +512,23 @@ class AutowirePassTest extends TestCase
         );
     }
 
+    public function testOptionalArgsNoRequiredForCoreClasses()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('pdo_service', \PDO::class)
+            ->addArgument('sqlite:/foo.db')
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('pdo_service');
+        $this->assertEquals(
+            array('sqlite:/foo.db'),
+            $definition->getArguments()
+        );
+    }
+
     public function testSetterInjection()
     {
         $container = new ContainerBuilder();

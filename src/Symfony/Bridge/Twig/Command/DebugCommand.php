@@ -31,14 +31,14 @@ class DebugCommand extends Command
     /**
      * @param Environment $twig
      */
-    public function __construct($name = 'debug:twig')
+    public function __construct($twig = null)
     {
         parent::__construct();
 
         if (!$name instanceof Environment) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
-            $this->setName($name);
+            $this->setName(null === $name ? 'debug:twig' : $name);
 
             return;
         }

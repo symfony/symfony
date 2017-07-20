@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-19T11:36:59Z
+
+Cant/shouldnt we patch this in `Cookie::fromString`, thats what ResponseHeaderBag is using.
+
+Doing it in __construct doesnt sound right to me. Then again, this is defined per spec... fine either way i guess.
+
+:+1:

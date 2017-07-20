@@ -18,6 +18,7 @@ CHANGELOG
 * deprecated console.exception event in favor of console.error
 * added ability to handle `CommandNotFoundException` through the 
  `console.error` event
+* deprecated default validation in `SymfonyQuestionHelper::ask`
 
 3.2.0
 ------

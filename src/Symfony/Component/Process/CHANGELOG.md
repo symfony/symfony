@@ -15,12 +15,13 @@ CHANGELOG
  * support for passing `proc_open()` options has been removed
  * removed the `ProcessBuilder` class, use the `Process` class instead
  * removed the `getEnhanceWindowsCompatibility()` and `setEnhanceWindowsCompatibility()` methods of the `Process` class
- * added the `ProcessManager` class
 
 3.4.0
 -----
 
  * deprecated the ProcessBuilder class
+ * added the `ProcessRunnerInterface` interface
+ * added the `ParallelProcessRunner` class
 
 3.3.0
 -----

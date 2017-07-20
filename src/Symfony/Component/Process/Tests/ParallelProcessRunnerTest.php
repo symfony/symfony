@@ -14,12 +14,12 @@ namespace Symfony\Component\Process\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessManager;
+use Symfony\Component\Process\ParallelProcessRunner;
 
 /**
  * @author John Nickell <email@johnnickell.com>
  */
-class ProcessManagerTest extends TestCase
+class ParallelProcessRunnerTest extends TestCase
 {
     private static $phpBin;
 
@@ -36,10 +36,10 @@ class ProcessManagerTest extends TestCase
             $output[] = $data;
         };
 
-        $processManager = new ProcessManager(1);
-        $processManager->add($this->getProcessForCode('usleep(10000); echo "foo";'), $callback);
-        $processManager->add($this->getProcessForCode('usleep(10000); echo "bar";'), $callback);
-        $processManager->run();
+        $processRunner = new ParallelProcessRunner(1);
+        $processRunner->add($this->getProcessForCode('usleep(10000); echo "foo";'), $callback);
+        $processRunner->add($this->getProcessForCode('usleep(10000); echo "bar";'), $callback);
+        $processRunner->run();
 
         $this->assertSame(array('foo', 'bar'), $output);
     }
@@ -51,10 +51,10 @@ class ProcessManagerTest extends TestCase
             $output[] = $data;
         };
 
-        $processManager = new ProcessManager(2);
-        $processManager->add($this->getProcessForCode('echo "foo";'), $callback);
-        $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
-        $processManager->run();
+        $processRunner = new ParallelProcessRunner(2);
+        $processRunner->add($this->getProcessForCode('echo "foo";'), $callback);
+        $processRunner->add($this->getProcessForCode('echo "bar";'), $callback);
+        $processRunner->run();
 
         // cannot guarantee order
         $this->assertContains('bar', $output);
@@ -63,10 +63,10 @@ class ProcessManagerTest extends TestCase
 
     public function testThatFailedProcessesCanBeIgnored()
     {
-        $processManager = new ProcessManager();
+        $processRunner = new ParallelProcessRunner();
         $process = $this->getProcessForCode('throw new Exception();');
-        $processManager->add($process);
-        $processManager->run(ProcessManager::IGNORE_ON_ERROR);
+        $processRunner->add($process);
+        $processRunner->run(ParallelProcessRunner::IGNORE_ON_ERROR);
 
         $this->assertFalse($process->isSuccessful());
     }
@@ -76,9 +76,9 @@ class ProcessManagerTest extends TestCase
      */
     public function testThatFailedProcessesThrowException()
     {
-        $processManager = new ProcessManager();
-        $processManager->add($this->getProcessForCode('throw new Exception();'));
-        $processManager->run();
+        $processRunner = new ParallelProcessRunner();
+        $processRunner->add($this->getProcessForCode('throw new Exception();'));
+        $processRunner->run();
     }
 
     /**

@@ -37,8 +37,8 @@ class ProcessManagerTest extends TestCase
         };
 
         $processManager = new ProcessManager(1);
-        $processManager->add($this->getProcessForCode('echo "foo";'), $callback);
-        $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
+        $processManager->add($this->getProcessForCode('usleep(10000); echo "foo";'), $callback);
+        $processManager->add($this->getProcessForCode('usleep(10000); echo "bar";'), $callback);
         $processManager->run();
 
         $this->assertSame(array('foo', 'bar'), $output);

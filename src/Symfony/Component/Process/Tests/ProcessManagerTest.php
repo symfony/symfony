@@ -37,7 +37,7 @@ class ProcessManagerTest extends TestCase
         };
 
         $processManager = new ProcessManager(1);
-        $processManager->add($this->getProcessForCode('usleep(10000); echo "foo";'), $callback);
+        $processManager->add($this->getProcessForCode('usleep(100000); echo "foo";'), $callback);
         $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
         $processManager->run();
 
@@ -52,7 +52,7 @@ class ProcessManagerTest extends TestCase
         };
 
         $processManager = new ProcessManager(2);
-        $processManager->add($this->getProcessForCode('usleep(10000); echo "foo";'), $callback);
+        $processManager->add($this->getProcessForCode('usleep(100000); echo "foo";'), $callback);
         $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
         $processManager->run();
 

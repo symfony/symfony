@@ -31,7 +31,7 @@ class ProcessManagerTest extends TestCase
 
     public function testRunningProcessesInSequence()
     {
-        $output = [];
+        $output = array();
         $callback = function ($type, $data) use (&$output) {
             $output[] = $data;
         };
@@ -41,12 +41,12 @@ class ProcessManagerTest extends TestCase
         $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
         $processManager->run();
 
-        $this->assertSame(['foo', 'bar'], $output);
+        $this->assertSame(array('foo', 'bar'), $output);
     }
 
     public function testRunningProcessesInParallel()
     {
-        $output = [];
+        $output = array();
         $callback = function ($type, $data) use (&$output) {
             $output[] = $data;
         };
@@ -56,7 +56,7 @@ class ProcessManagerTest extends TestCase
         $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
         $processManager->run();
 
-        $this->assertSame(['bar', 'foo'], $output);
+        $this->assertSame(array('bar', 'foo'), $output);
     }
 
     public function testThatFailedProcessesCanBeIgnored()

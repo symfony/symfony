@@ -17,7 +17,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Manages running processes in parallel
+ * Manages running processes in parallel.
  *
  * @author John Nickell <email@johnnickell.com>
  */
@@ -27,28 +27,28 @@ class ProcessManager
     const IGNORE_ON_ERROR = 1;
 
     /**
-     * Max concurrent processes
+     * Max concurrent processes.
      *
      * @var int
      */
     protected $maxConcurrent;
 
     /**
-     * Delay used with usleep
+     * Delay used with usleep.
      *
      * @var int
      */
     protected $usleepDelay;
 
     /**
-     * Process queue
+     * Process queue.
      *
      * @var SplQueue
      */
     protected $queue;
 
     /**
-     * Active processes
+     * Active processes.
      *
      * @var array
      */
@@ -65,7 +65,7 @@ class ProcessManager
         $this->maxConcurrent = $maxConcurrent;
         $this->usleepDelay = $usleepDelay;
         $this->queue = new SplQueue();
-        $this->procs = [];
+        $this->procs = array();
     }
 
     /**
@@ -77,7 +77,7 @@ class ProcessManager
     }
 
     /**
-     * Adds a process
+     * Adds a process.
      *
      * The callback receives the type of output (out or err) and some bytes from
      * the output in real-time while writing the standard input to the process.
@@ -89,20 +89,20 @@ class ProcessManager
      */
     public function add(Process $process, callable $callback = null)
     {
-        $this->queue->enqueue([$process, $callback]);
+        $this->queue->enqueue(array($process, $callback));
     }
 
     /**
-     * Clears attached processes
+     * Clears attached processes.
      */
     public function clear()
     {
         $this->queue = new SplQueue();
-        $this->procs = [];
+        $this->procs = array();
     }
 
     /**
-     * Runs the attached processes
+     * Runs the attached processes.
      *
      * @param int $errorBehavior The behavior when a process fails
      *
@@ -126,7 +126,7 @@ class ProcessManager
     }
 
     /**
-     * Starts a process if possible
+     * Starts a process if possible.
      */
     protected function init()
     {
@@ -144,7 +144,7 @@ class ProcessManager
     }
 
     /**
-     * Performs running checks on processes
+     * Performs running checks on processes.
      *
      * @param int $errorBehavior The behavior when a process fails
      *
@@ -165,7 +165,7 @@ class ProcessManager
     }
 
     /**
-     * Stop running processes
+     * Stop running processes.
      */
     protected function stop()
     {

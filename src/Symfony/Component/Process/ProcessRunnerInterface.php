@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException;
+
 /**
  * @author John Nickell <email@johnnickell.com>
  */

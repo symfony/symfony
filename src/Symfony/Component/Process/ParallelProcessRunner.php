@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Process;
 
-use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Manages running processes in parallel.

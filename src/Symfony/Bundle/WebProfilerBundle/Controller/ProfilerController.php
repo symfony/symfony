@@ -17,7 +17,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -37,6 +39,7 @@ class ProfilerController
     private $toolbarPosition;
     private $cspHandler;
     private $baseDir;
+    private $kernel;
 
     /**
      * Constructor.
@@ -48,8 +51,9 @@ class ProfilerController
      * @param string                       $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      * @param ContentSecurityPolicyHandler $cspHandler      The Content-Security-Policy handler
      * @param string                       $baseDir         The project root directory
+     * @param KernelInterface              $kernel          The kernel
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, $toolbarPosition = 'bottom', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, $toolbarPosition = 'bottom', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null, KernelInterface $kernel = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -58,6 +62,7 @@ class ProfilerController
         $this->toolbarPosition = $toolbarPosition;
         $this->cspHandler = $cspHandler;
         $this->baseDir = $baseDir;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -124,8 +129,57 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
+            'can_replay' => null !== $this->kernel,
             'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
         )), 200, array('Content-Type' => 'text/html'));
+    }
+
+    /**
+     * Replays an action.
+     *
+     * @param Request $request The current HTTP Request
+     * @param string  $token   The profiler token
+     *
+     * @return Response
+     */
+    public function replayAction(Request $request, $token)
+    {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
+        if (null === $this->kernel) {
+            throw new NotFoundHttpException('The kernel must be defined.');
+        }
+
+        if (!$profile = $this->profiler->loadProfile($token)) {
+            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token, 'request' => $request)), 200, array('Content-Type' => 'text/html'));
+        }
+
+        /** @var RequestDataCollector $collector */
+        $collector = $profile->getCollector('request');
+        $replayed = new Request(
+            $collector->getRequestQuery(true)->all(),
+            $collector->getRequestRequest(true)->all(),
+            array(),
+            $collector->getRequestCookies(true)->all(),
+            array(),
+            $collector->getRequestServer(true)->all(),
+            $collector->getContent()
+        );
+
+        // replay
+        $kernel = clone $this->kernel;
+        $kernel->boot();
+        $profiler = $kernel->getContainer()->get('profiler');
+        $profiler->enable();
+        $response = $kernel->handle($replayed);
+        $kernel->terminate($request, $response);
+
+        return new RedirectResponse($this->generator->generate('_profiler', array(
+            'token' => $profiler->loadProfileFromResponse($response)->getToken(),
+            'panel' => $request->query->get('panel', 'request'),
+        )), 302, array('Content-Type' => 'text/html'));
     }
 
     /**

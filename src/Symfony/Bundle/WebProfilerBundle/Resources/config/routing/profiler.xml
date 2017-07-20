@@ -32,6 +32,10 @@
         <default key="_controller">web_profiler.controller.profiler:panelAction</default>
     </route>
 
+    <route id="_profiler_replay" path="/{token}/replay" methods="POST">
+        <default key="_controller">web_profiler.controller.profiler:replayAction</default>
+    </route>
+
     <route id="_profiler_router" path="/{token}/router">
         <default key="_controller">web_profiler.controller.router:panelAction</default>
     </route>

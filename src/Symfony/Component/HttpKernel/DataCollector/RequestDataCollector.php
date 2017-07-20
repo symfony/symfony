@@ -166,14 +166,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return $this->data['path_info'];
     }
 
-    public function getRequestRequest()
+    public function getRequestRequest($raw = false)
     {
-        return new ParameterBag($this->data['request_request']->getValue());
+        return new ParameterBag($this->data['request_request']->getValue($raw));
     }
 
-    public function getRequestQuery()
+    public function getRequestQuery($raw = false)
     {
-        return new ParameterBag($this->data['request_query']->getValue());
+        return new ParameterBag($this->data['request_query']->getValue($raw));
     }
 
     public function getRequestHeaders()

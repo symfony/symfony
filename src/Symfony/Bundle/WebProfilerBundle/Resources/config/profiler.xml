@@ -15,6 +15,7 @@
             <argument>%web_profiler.debug_toolbar.position%</argument>
             <argument type="service" id="web_profiler.csp.handler" />
             <argument>null</argument>
+            <argument type="service" id="kernel" />
         </service>
 
         <service id="web_profiler.controller.router" class="Symfony\Bundle\WebProfilerBundle\Controller\RouterController" public="true">

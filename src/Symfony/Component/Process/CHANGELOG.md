@@ -20,6 +20,8 @@ CHANGELOG
 -----
 
  * deprecated the ProcessBuilder class
+ * added the `ProcessRunnerInterface` interface
+ * added the `ParallelProcessRunner` class
 
 3.3.0
 -----

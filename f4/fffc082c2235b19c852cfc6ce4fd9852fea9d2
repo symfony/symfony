@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by keradus at 2017-06-21T05:55:56Z
+
+utests are missing
+
+---------------------------------------------------------------------------
+
+by gsdevme at 2017-06-21T07:16:12Z
+
+They are not missing, they are not written to test this. I take it from that you wish a unit test to assert this. I will write a test for it and also fix the base branch to 2.8
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-03T09:18:45Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by gsdevme at 2017-07-19T12:47:01Z
+
+Sure, I will try to get around to it tonight.
+
+---------------------------------------------------------------------------
+
+by gsdevme at 2017-07-19T22:49:48Z
+
+@fabian Test added to assert not passing the `_route` doesn't cause issues and returns false.
+
+```bash
+Testing src/Symfony/Component/Security/Http/Tests
+...............................................................  63 / 245 ( 25%)
+............................................................... 126 / 245 ( 51%)
+.........................................................E..... 189 / 245 ( 77%)
+......................................................S.        245 / 245 (100%)
+
+Time: 577 ms, Memory: 14.00MB
+
+There was 1 error:
+
+1) Symfony\Component\Security\Http\Tests\HttpUtilsTest::testCheckPathWithoutRouteParam
+Undefined index: _route
+
+/Users/gavin/Sites/symfony/src/Symfony/Component/Security/Http/HttpUtils.php:115
+/Users/gavin/Sites/symfony/src/Symfony/Component/Security/Http/Tests/HttpUtilsTest.php:235
+/Users/gavin/Sites/symfony/vendor/symfony/phpunit-bridge/bin/.phpunit/phpunit-5.7/phpunit:5
+```
+
+Test before I made it green with the change.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-20T07:30:13Z
+
+Should be merged into the `2.7` branch, right?

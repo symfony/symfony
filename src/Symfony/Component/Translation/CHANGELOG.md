@@ -12,6 +12,7 @@ CHANGELOG
  * Added `TranslationDumperPass`
  * Added `TranslationExtractorPass`
  * Added `TranslatorPass`
+ * Change default value to `$domain = null` in all method of `MessageCatalogueInterface`
 
 3.2.0
 -----

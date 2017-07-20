@@ -12,12 +12,15 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
 
 /**
  * @group time-sensitive
  */
 class PdoAdapterTest extends AdapterTestCase
 {
+    use PdoPruneableTrait;
+
     protected static $dbFile;
 
     public static function setupBeforeClass()

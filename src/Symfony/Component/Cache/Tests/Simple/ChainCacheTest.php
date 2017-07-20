@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Cache\Simple\ChainCache;
 use Symfony\Component\Cache\Simple\FilesystemCache;
@@ -40,6 +42,75 @@ class ChainCacheTest extends CacheTestCase
      */
     public function testInvalidCacheException()
     {
-        new Chaincache(array(new \stdClass()));
+        new ChainCache(array(new \stdClass()));
     }
+
+    public function testPrune()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = new ChainCache(array(
+            $this->getPruneableMock(),
+            $this->getNonPruneableMock(),
+            $this->getPruneableMock(),
+        ));
+        $this->assertTrue($cache->prune());
+
+        $cache = new ChainCache(array(
+            $this->getPruneableMock(),
+            $this->getFailingPruneableMock(),
+            $this->getPruneableMock(),
+        ));
+        $this->assertFalse($cache->prune());
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     */
+    private function getPruneableMock()
+    {
+        $pruneable = $this
+            ->getMockBuilder(PruneableCacheInterface::class)
+            ->getMock();
+
+        $pruneable
+            ->expects($this->atLeastOnce())
+            ->method('prune')
+            ->will($this->returnValue(true));
+
+        return $pruneable;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     */
+    private function getFailingPruneableMock()
+    {
+        $pruneable = $this
+            ->getMockBuilder(PruneableCacheInterface::class)
+            ->getMock();
+
+        $pruneable
+            ->expects($this->atLeastOnce())
+            ->method('prune')
+            ->will($this->returnValue(false));
+
+        return $pruneable;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|CacheInterface
+     */
+    private function getNonPruneableMock()
+    {
+        return $this
+            ->getMockBuilder(CacheInterface::class)
+            ->getMock();
+    }
+}
+
+interface PruneableCacheInterface extends PruneableInterface, CacheInterface
+{
 }

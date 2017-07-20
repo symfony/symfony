@@ -13,12 +13,15 @@ namespace Symfony\Component\Cache\Tests\Simple;
 
 use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Cache\Simple\PdoCache;
+use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
 
 /**
  * @group time-sensitive
  */
 class PdoDbalCacheTest extends CacheTestCase
 {
+    use PdoPruneableTrait;
+
     protected static $dbFile;
 
     public static function setupBeforeClass()

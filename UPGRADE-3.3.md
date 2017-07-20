@@ -72,6 +72,8 @@ Console
    have been deprecated in favor of the `console.error` event and the `ConsoleErrorEvent`
    class. The deprecated event and class will be removed in 4.0.
 
+ * The `SymfonyQuestionHelper::ask` default validation has been deprecated and will be removed in 4.0. Apply validation using `Question::setValidator` instead.
+
 Debug
 -----
 

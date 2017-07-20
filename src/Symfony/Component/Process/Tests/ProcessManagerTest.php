@@ -37,7 +37,7 @@ class ProcessManagerTest extends TestCase
         };
 
         $processManager = new ProcessManager(1);
-        $processManager->add($this->getProcessForCode('usleep(100000); echo "foo";'), $callback);
+        $processManager->add($this->getProcessForCode('echo "foo";'), $callback);
         $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
         $processManager->run();
 
@@ -52,11 +52,13 @@ class ProcessManagerTest extends TestCase
         };
 
         $processManager = new ProcessManager(2);
-        $processManager->add($this->getProcessForCode('usleep(100000); echo "foo";'), $callback);
+        $processManager->add($this->getProcessForCode('echo "foo";'), $callback);
         $processManager->add($this->getProcessForCode('echo "bar";'), $callback);
         $processManager->run();
 
-        $this->assertSame(array('bar', 'foo'), $output);
+        // cannot guarantee order
+        $this->assertContains('bar', $output);
+        $this->assertContains('foo', $output);
     }
 
     public function testThatFailedProcessesCanBeIgnored()

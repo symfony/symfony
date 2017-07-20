@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2017-07-17T22:43:39Z
+
+Now if you have something like the following, the second `command: bar` is ignored, right? So it still depends on the order of the command tags, but magically ignores stuff. This is worse IMO.
+
+```yaml
+tags:
+    - { name: console.command, command: foo }
+    - { name: console.command, command: bar, alias: foobar }
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-18T09:31:34Z
+
+Right, it's worse. The command must have only one command name and may have aliases, we need a rule that doesn't feel magic for determining it.
+
+Updated this, now your example would throw:
+
+> Service "foobar" has multiple "console.command" tags with a different value for the "command" attribute, but the command must have only one name. Use the "alias" attribute instead.
+
+The first `command` attribute found is the real command name. Better?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-18T19:09:15Z
+
+I tend to agree now that getting rid of the `alias` attribute and simply repeating the tag with a different command name would be better. In the case of commands registered in a command loader, the way to provide aliases for commands already is to register the same command with a different name.
+With command loaders, aliases defined in the command itself already are almost just part of the command description. So it won't disturb me not reusing this term in the DI configuration. (Btw when documenting the lazy-commands feature, we should really highlight `Command::$aliases` is not used when using command loaders, appart by descriptors or once the command is ~instantiated~ loaded for the first time by the `Application`)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-19T09:09:14Z
+
+Updated for @Tobion suggestion.

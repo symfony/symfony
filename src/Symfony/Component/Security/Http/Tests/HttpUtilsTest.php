@@ -221,6 +221,19 @@ class HttpUtilsTest extends TestCase
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
+    public function testCheckPathWithoutRouteParam()
+    {
+        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $urlMatcher
+            ->expects($this->any())
+            ->method('match')
+            ->willReturn(array('_controller' => 'PathController'))
+        ;
+
+        $utils = new HttpUtils(null, $urlMatcher);
+        $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Matcher must either implement UrlMatcherInterface or RequestMatcherInterface

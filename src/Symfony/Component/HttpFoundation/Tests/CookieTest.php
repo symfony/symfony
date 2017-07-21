@@ -214,4 +214,10 @@ class CookieTest extends TestCase
         $cookie = Cookie::fromString('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure');
         $this->assertFalse($cookie->isHttpOnly());
     }
+
+    public function testSameSiteAttributeIsCaseInsensitive()
+    {
+        $cookie = new Cookie('foo', 'bar', 0, '/', null, false, true, false, 'Lax');
+        $this->assertEquals('lax', $cookie->getSameSite());
+    }
 }

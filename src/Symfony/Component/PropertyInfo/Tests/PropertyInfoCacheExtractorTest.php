@@ -61,29 +61,4 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
         parent::testGetProperties();
         parent::testGetProperties();
     }
-
-    /**
-     * @dataProvider escapeDataProvider
-     */
-    public function testEscape($toEscape, $expected)
-    {
-        $reflectionMethod = new \ReflectionMethod($this->propertyInfo, 'escape');
-        $reflectionMethod->setAccessible(true);
-
-        $this->assertSame($expected, $reflectionMethod->invoke($this->propertyInfo, $toEscape));
-    }
-
-    public function escapeDataProvider()
-    {
-        return array(
-            array('foo_bar', 'foo_95bar'),
-            array('foo_95bar', 'foo_9595bar'),
-            array('foo{bar}', 'foo_123bar_125'),
-            array('foo(bar)', 'foo_40bar_41'),
-            array('foo/bar', 'foo_47bar'),
-            array('foo\bar', 'foo_92bar'),
-            array('foo@bar', 'foo_64bar'),
-            array('foo:bar', 'foo_58bar'),
-        );
-    }
 }

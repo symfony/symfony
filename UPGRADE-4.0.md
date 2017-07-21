@@ -511,7 +511,9 @@ TwigBundle
 * The `ContainerAwareRuntimeLoader` class has been removed. Use the
   Twig `Twig_ContainerRuntimeLoader` class instead.
 
- * Removed `ContainerAwareInterface` implementation in `Symfony\Bundle\TwigBundle\Command\LintCommand`
+ * Removed `DebugCommand` in favor of `Symfony\Bridge\Twig\Command\DebugCommand`.
+
+ * Removed `ContainerAwareInterface` implementation in `Symfony\Bundle\TwigBundle\Command\LintCommand`.
 
 TwigBridge
 ----------

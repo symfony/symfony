@@ -118,7 +118,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
 
             //Extended country list
             //http://www.nordea.com/Our+services/International+products+and+services/Cash+Management/IBAN+countries/908462.html
-            // http://www.swift.com/dsp/resources/documents/IBAN_Registry.pdf
+            // https://www.swift.com/sites/default/files/resources/iban_registry.pdf
             array('AO06000600000100037131174'), //Angola
             array('AZ21NABZ00000000137010001944'), //Azerbaijan
             array('BH29BMAG1299123456BH00'), //Bahrain
@@ -156,6 +156,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('TL380080012345678910157'), //Timor-Leste
             array('TN5914207207100707129648'), //Tunisia
             array('TR330006100519786457841326'), //Turkey
+            array('UA213223130000026007233566001'), //Ukraine
             array('AE260211000000230064016'), //United Arab Emirates
         );
     }
@@ -268,6 +269,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('TL3800800123456789101571'), //Timor-Leste
             array('TN59142072071007071296481'), //Tunisia
             array('TR3300061005197864578413261'), //Turkey
+            array('UA21AAAA1300000260072335660012'), //Ukraine
             array('AE2602110000002300640161'), //United Arab Emirates
         );
     }
@@ -377,6 +379,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('TL380080012345678910158'), //Timor-Leste
             array('TN5914207207100707129649'), //Tunisia
             array('TR330006100519786457841327'), //Turkey
+            array('UA213223130000026007233566002'), //Ukraine
             array('AE260211000000230064017'), //United Arab Emirates
         );
     }

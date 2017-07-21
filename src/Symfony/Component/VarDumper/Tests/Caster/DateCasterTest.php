@@ -177,4 +177,97 @@ EODUMP;
             array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06.000000', null),
         );
     }
+
+    /**
+     * @dataProvider provideTimeZones
+     */
+    public function testDumpTimeZone($timezone, $expected)
+    {
+        $timezone = new \DateTimeZone($timezone);
+
+        $xDump = <<<EODUMP
+DateTimeZone {
+  timezone: $expected
+%A}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $timezone);
+    }
+
+    /**
+     * @dataProvider provideTimeZones
+     */
+    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected)
+    {
+        $timezone = new \DateTimeZone($timezone);
+
+        $xDump = <<<EODUMP
+DateTimeZone {
+  timezone: $expected
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $timezone, Caster::EXCLUDE_VERBOSE);
+    }
+
+    /**
+     * @dataProvider provideTimeZones
+     */
+    public function testCastTimeZone($timezone, $xTimezone, $xRegion)
+    {
+        $timezone = new \DateTimeZone($timezone);
+        $stub = new Stub();
+
+        $cast = DateCaster::castTimeZone($timezone, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
+
+        $xDump = <<<EODUMP
+array:1 [
+  "\\x00~\\x00timezone" => $xTimezone
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $cast);
+
+        $xDump = <<<EODUMP
+Symfony\Component\VarDumper\Caster\ConstStub {
+  +type: "ref"
+  +class: "$xTimezone"
+  +value: "$xRegion"
+  +cut: 0
+  +handle: 0
+  +refCount: 0
+  +position: 0
+  +attr: []
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $cast["\0~\0timezone"]);
+    }
+
+    public function provideTimeZones()
+    {
+        $xRegion = extension_loaded('intl') ? '%s' : '';
+
+        return array(
+            // type 1 (UTC offset)
+            array('-12:00', '-12:00', ''),
+            array('+00:00', '+00:00', ''),
+            array('+14:00', '+14:00', ''),
+
+            // type 2 (timezone abbreviation)
+            array('GMT', '+00:00', ''),
+            array('a', '+01:00', ''),
+            array('b', '+02:00', ''),
+            array('z', '+00:00', ''),
+
+            // type 3 (timezone identifier)
+            array('Africa/Tunis', 'Africa/Tunis (+01:00)', $xRegion),
+            array('America/Panama', 'America/Panama (-05:00)', $xRegion),
+            array('Asia/Jerusalem', 'Asia/Jerusalem (+03:00)', $xRegion),
+            array('Atlantic/Canary', 'Atlantic/Canary (+01:00)', $xRegion),
+            array('Australia/Perth', 'Australia/Perth (+08:00)', $xRegion),
+            array('Europe/Zurich', 'Europe/Zurich (+02:00)', $xRegion),
+            array('Pacific/Tahiti', 'Pacific/Tahiti (-10:00)', $xRegion),
+        );
+    }
 }

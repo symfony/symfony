@@ -27,7 +27,8 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
     },
     "suggest": {
-        "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used)."
+        "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
+        "ext-intl": "To show region name in time zone dump"
     },
     "autoload": {
         "files": [ "Resources/functions/dump.php" ],

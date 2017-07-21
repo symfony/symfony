@@ -157,27 +157,24 @@ EODUMP;
 
     public function provideIntervals()
     {
-        $i = new \DateInterval('PT0S');
-        $ms = \PHP_VERSION_ID >= 70100 && isset($i->f) ? '.000000' : '';
-
         return array(
             array('PT0S', 0, '0s', '0s'),
-            array('PT1S', 0, '+ 00:00:01'.$ms, '1s'),
-            array('PT2M', 0, '+ 00:02:00'.$ms, '120s'),
-            array('PT3H', 0, '+ 03:00:00'.$ms, '10 800s'),
+            array('PT1S', 0, '+ 00:00:01.000000', '1s'),
+            array('PT2M', 0, '+ 00:02:00.000000', '120s'),
+            array('PT3H', 0, '+ 03:00:00.000000', '10 800s'),
             array('P4D', 0, '+ 4d', '345 600s'),
             array('P5M', 0, '+ 5m', null),
             array('P6Y', 0, '+ 6y', null),
-            array('P1Y2M3DT4H5M6S', 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
+            array('P1Y2M3DT4H5M6S', 0, '+ 1y 2m 3d 04:05:06.000000', null),
 
             array('PT0S', 1, '0s', '0s'),
-            array('PT1S', 1, '- 00:00:01'.$ms, '-1s'),
-            array('PT2M', 1, '- 00:02:00'.$ms, '-120s'),
-            array('PT3H', 1, '- 03:00:00'.$ms, '-10 800s'),
+            array('PT1S', 1, '- 00:00:01.000000', '-1s'),
+            array('PT2M', 1, '- 00:02:00.000000', '-120s'),
+            array('PT3H', 1, '- 03:00:00.000000', '-10 800s'),
             array('P4D', 1, '- 4d', '-345 600s'),
             array('P5M', 1, '- 5m', null),
             array('P6Y', 1, '- 6y', null),
-            array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06'.$ms, null),
+            array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06.000000', null),
         );
     }
 }

@@ -56,13 +56,8 @@ class DateCaster
             .($i->y ? '%yy ' : '')
             .($i->m ? '%mm ' : '')
             .($i->d ? '%dd ' : '')
+            .($i->h || $i->i || $i->s || $i->f ? '%H:%I:%S.%F' : '')
         ;
-
-        if (\PHP_VERSION_ID >= 70100 && isset($i->f)) {
-            $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:%S.%F' : '';
-        } else {
-            $format .= $i->h || $i->i || $i->s ? '%H:%I:%S' : '';
-        }
 
         $format = '%R ' === $format ? '0s' : $format;
 

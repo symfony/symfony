@@ -56,13 +56,14 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(array($alias => $id), $container->getParameter('console.command.ids'));
     }
 
-    public function testProcessRegisterLazyCommands()
+    public function testProcessRegistersLazyCommands()
     {
         $container = new ContainerBuilder();
-        $container
+        $command = $container
             ->register('my-command', MyCommand::class)
             ->setPublic(false)
-            ->addTag('console.command', array('command' => 'my:command', 'alias' => 'my:alias'))
+            ->addTag('console.command', array('command' => 'my:command'))
+            ->addTag('console.command', array('command' => 'my:alias'))
         ;
 
         (new AddConsoleCommandPass())->process($container);
@@ -74,6 +75,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(array('my:command' => 'my-command', 'my:alias' => 'my-command'), $commandLoader->getArgument(1));
         $this->assertEquals(array(array('my-command' => new ServiceClosureArgument(new TypedReference('my-command', MyCommand::class)))), $commandLocator->getArguments());
         $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_mycommand' => false), $container->getParameter('console.command.ids'));
+        $this->assertSame(array(array('setName', array('my:command')), array('setAliases', array(array('my:alias')))), $command->getMethodCalls());
     }
 
     public function visibilityProvider()

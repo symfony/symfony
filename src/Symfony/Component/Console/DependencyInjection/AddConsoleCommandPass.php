@@ -70,20 +70,15 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
             $serviceIds[$commandId] = false;
             $commandName = $tags[0]['command'];
+            unset($tags[0]);
             $lazyCommandMap[$commandName] = $id;
             $lazyCommandRefs[$id] = new TypedReference($id, $class);
             $aliases = array();
 
             foreach ($tags as $tag) {
-                if (!isset($tag['command'])) {
-                    throw new InvalidArgumentException(sprintf('Missing "command" attribute on tag "%s" for service "%s".', $this->commandTag, $id));
-                }
-                if ($commandName !== $tag['command']) {
-                    throw new InvalidArgumentException(sprintf('The "command" attribute must be the same on each "%s" tag for service "%s".', $this->commandTag, $id));
-                }
-                if (isset($tag['alias'])) {
-                    $aliases[] = $tag['alias'];
-                    $lazyCommandMap[$tag['alias']] = $id;
+                if (isset($tag['command'])) {
+                    $aliases[] = $tag['command'];
+                    $lazyCommandMap[$tag['command']] = $id;
                 }
             }
 

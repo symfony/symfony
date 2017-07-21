@@ -37,6 +37,7 @@ class DebugExtension extends Extension
 
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems', array($config['max_items']))
+            ->addMethodCall('setMinDepth', array($config['min_depth']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
 
         if (null !== $config['dump_destination']) {

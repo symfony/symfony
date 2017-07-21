@@ -75,4 +75,11 @@ class ParentDummy
     public function removeF(\DateTime $f)
     {
     }
+
+    /**
+     * @return bool|null
+     */
+    public function hasG()
+    {
+    }
 }

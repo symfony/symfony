@@ -40,7 +40,7 @@ class ReflectionExtractorTest extends TestCase
                 'collection',
                 'B',
                 'Guid',
-                'g',
+                'array',
                 'emptyVar',
                 'foo',
                 'foo2',
@@ -56,6 +56,7 @@ class ReflectionExtractorTest extends TestCase
                 'd',
                 'e',
                 'f',
+                'g',
             ),
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
@@ -196,9 +197,11 @@ class ReflectionExtractorTest extends TestCase
             array('d', true),
             array('e', false),
             array('f', false),
+            array('g', true),
             array('Id', true),
             array('id', true),
             array('Guid', true),
+            array('guid', false),
             array('guid', false),
         );
     }
@@ -226,6 +229,7 @@ class ReflectionExtractorTest extends TestCase
             array('d', false),
             array('e', true),
             array('f', true),
+            array('g', false),
             array('Id', false),
             array('Guid', true),
             array('guid', false),

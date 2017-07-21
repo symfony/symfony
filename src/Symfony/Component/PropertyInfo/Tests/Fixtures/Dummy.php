@@ -66,7 +66,7 @@ class Dummy extends ParentDummy
      *
      * @var array|null
      */
-    public $g;
+    public $array;
 
     public static function getStatic()
     {

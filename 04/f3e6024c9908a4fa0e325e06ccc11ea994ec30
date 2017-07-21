@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-19T13:34:47Z
+
+Proposal (exlude verbose mode):
+
+![screenshot from 2017-07-19 15-31-17](https://user-images.githubusercontent.com/4578773/28369340-9213d1d2-6c97-11e7-8f16-8b6c21862fcd.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-19T14:37:04Z
+
+(but tests are red)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-19T14:42:35Z
+
+hhvm being weird :) `Locale::getDisplayRegion() expects exactly 2 parameters, 1 given`
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-19T14:44:51Z
+
+I hate you hhvm! I add a 2nd ``null`` arg.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-19T14:45:57Z
+
+Agree :) this is insane.
+
+I believe windows was failing due missing intl =/ lets see :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-19T14:59:33Z
+
+On AppVeyor, Intl component takes over and [this throws an exception](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Intl/Locale/Locale.php#L170). How fix this?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-19T15:04:21Z
+
+try/catch it? Ideally it would be implemented for `en` locale i guess.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-20T11:17:44Z
+
+Tests are green :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-21T12:49:45Z
+
+Time to merge?

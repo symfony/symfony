@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-06-01T21:40:30Z
+
+Suddenly I faced another problem with embeddables.
+
+When an entity has properties with embeddables, `Doctrine\Common\Persistence\Mapping\ClassMetadata::getFieldNames()` returns property paths for them. Example:
+
+```php
+/**
+ * @ORM\Entity
+ */
+class DoctrineWithEmbedded
+{
+    /**
+     * @Id
+     * @Column(type="smallint")
+     */
+    public $id;
+
+    /**
+     * @Embedded(class="DoctrineEmbeddable")
+     */
+    protected $embedded;
+}
+
+/**
+ * @ORM\Embeddable
+ */
+class DoctrineEmbeddable
+{
+    /**
+     * @Column(type="string")
+     */
+    protected $field;
+}
+
+$container->get('doctrine.orm.default_entity_manager.metadata_factory')
+    ->getMetadataFor('DoctrineWithEmbedded')
+    ->getFieldNames();
+
+// returns
+[
+    'id',
+    'embedded.field',
+];
+```
+
+Fixed `DoctrineExtractor::getProperties()` in the next commit.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-06-11T14:38:45Z
+
+@nicolas-grekas, anything else needed here? could it be merged?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-06-14T18:30:56Z
+
+This should be merged in 3.4 (it's a new feature, not a bug fix).
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-06-14T18:55:29Z
+
+@dunglas, the problem is that now when you do
+```php
+$container
+    ->get('doctrine.orm.default_entity_manager.property_info_extractor')
+    ->getProperties(DoctrineWithEmbedded::class); // the class from my example above
+```
+you receive
+```php
+[
+    'id',
+    'embedded.field', // but not `embedded`
+];
+```
+which is not what developer might expect.
+
+So it appears that currently 2.8 doesn't fully support ORM, which might lead to unexpected behaviour. Isn't it a bug?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-06-29T12:17:50Z
+
+Ok to consider it a bug fix then. 👍
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-07-13T12:42:48Z
+
+anything else needed here?

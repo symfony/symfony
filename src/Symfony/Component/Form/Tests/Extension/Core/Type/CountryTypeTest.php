@@ -56,4 +56,17 @@ class CountryTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, '');
     }
+
+    public function testCustomLocale()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('locale' => 'ru'))
+            ->createView()->vars['choices'];
+
+        // Don't check objects for identity
+        $this->assertContains(new ChoiceView('DE', 'DE', 'Германия'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'GB', 'Великобритания'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('US', 'US', 'Соединенные Штаты'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('FR', 'FR', 'Франция'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('MY', 'MY', 'Малайзия'), $choices, '', false, false);
+    }
 }

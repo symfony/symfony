@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+* Added `flatText` method to get node value with spaces and newlines normalized.
+
 3.1.0
 -----
 

@@ -572,6 +572,25 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns the flattened node value of the first node of the list.
+     *
+     * Surrounding spaces/newlines are removed,
+     * and consecutive spaces/newlines are reduced to one space.
+     *
+     * @return string The flattened node value
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function flatText()
+    {
+        if (!$this->nodes) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        return trim(preg_replace('/\s+/', ' ', $this->getNode(0)->nodeValue));
+    }
+
+    /**
      * Returns the first node of the list as HTML.
      *
      * @return string The node html

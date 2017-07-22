@@ -25,6 +25,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 {
     private $logger;
     private $containerPathPrefix;
+    private static $serializeData;
 
     public function __construct($logger = null, $containerPathPrefix = null)
     {
@@ -46,9 +47,21 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
+    public function serialize()
+    {
+        if (null === self::$serializeData) {
+            self::$serializeData = serialize($this->data);
+        }
+
+        return self::$serializeData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function lateCollect()
     {
-        if (null !== $this->logger) {
+        if (null !== $this->logger && null === self::$serializeData) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
             $this->data = $this->computeErrorsCount($containerDeprecationLogs);
             $this->data['compiler_logs'] = $this->getContainerCompilerLogs();

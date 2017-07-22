@@ -16,6 +16,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -26,6 +27,18 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class AboutCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -45,7 +58,7 @@ class AboutCommand extends ContainerAwareCommand
         $io = new SymfonyStyle($input, $output);
 
         /** @var $kernel KernelInterface */
-        $kernel = $this->getContainer()->get('kernel');
+        $kernel = $this->getApplication()->getKernel();
 
         $io->table(array(), array(
             array('<info>Symfony</>'),

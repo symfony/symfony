@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -26,6 +27,38 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EventDispatcherDebugCommand extends ContainerAwareCommand
 {
+    private $dispatcher;
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct($dispatcher = null)
+    {
+        parent::__construct();
+
+        if (!$dispatcher instanceof EventDispatcherInterface) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $dispatcher ? 'debug:event-dispatcher' : $dispatcher);
+
+            return;
+        }
+
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -59,12 +92,24 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (__CLASS__ !== get_class($this)) {
+            $r = new \ReflectionMethod($this, 'getEventDispatcher');
+            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                @trigger_error(sprintf('Usage of method "%s" is deprecated since version 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', get_class($this).'::getEventDispatcher'), E_USER_DEPRECATED);
+
+                $this->dispatcher = $this->getEventDispatcher();
+            }
+        }
+        if (null === $this->dispatcher) {
+            $this->dispatcher = parent::getContainer()->get('event_dispatcher');
+        }
+
         $io = new SymfonyStyle($input, $output);
-        $dispatcher = $this->getEventDispatcher();
 
         $options = array();
         if ($event = $input->getArgument('event')) {
-            if (!$dispatcher->hasListeners($event)) {
+            if (!$this->dispatcher->hasListeners($event)) {
                 $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
                 return;
@@ -77,16 +122,20 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $helper->describe($io, $dispatcher, $options);
+        $helper->describe($io, $this->dispatcher, $options);
     }
 
     /**
      * Loads the Event Dispatcher from the container.
      *
      * @return EventDispatcherInterface
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
      */
     protected function getEventDispatcher()
     {
-        return $this->getContainer()->get('event_dispatcher');
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
+        return parent::getContainer()->get('event_dispatcher');
     }
 }

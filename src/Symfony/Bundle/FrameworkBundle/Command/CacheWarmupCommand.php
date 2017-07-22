@@ -15,6 +15,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 
 /**
  * Warmup the cache.
@@ -23,6 +25,41 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class CacheWarmupCommand extends ContainerAwareCommand
 {
+    private $cacheWarmer;
+    private $cacheDir;
+
+    /**
+     * @param CacheWarmerAggregate $cacheWarmer
+     * @param string|null          $cacheDir
+     */
+    public function __construct($cacheWarmer = null, $cacheDir = null)
+    {
+        parent::__construct();
+
+        if (!$cacheWarmer instanceof CacheWarmerAggregate) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $cacheWarmer ? 'cache:warmup' : $cacheWarmer);
+
+            return;
+        }
+
+        $this->cacheWarmer = $cacheWarmer;
+        $this->cacheDir = $cacheDir;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -54,18 +91,24 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-
-        $kernel = $this->getContainer()->get('kernel');
-        $io->comment(sprintf('Warming up the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-
-        $warmer = $this->getContainer()->get('cache_warmer');
-
-        if (!$input->getOption('no-optional-warmers')) {
-            $warmer->enableOptionalWarmers();
+        // BC to be removed in 4.0
+        if (null === $this->cacheWarmer) {
+            $this->cacheWarmer = parent::getContainer()->get('cache_warmer');
+        }
+        if (null === $this->cacheDir) {
+            $this->cacheDir = parent::getContainer()->getParameter('kernel.cache_dir');
         }
 
-        $warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
+        $io = new SymfonyStyle($input, $output);
+
+        $kernel = $this->getApplication()->getKernel();
+        $io->comment(sprintf('Warming up the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+
+        if (!$input->getOption('no-optional-warmers')) {
+            $this->cacheWarmer->enableOptionalWarmers();
+        }
+
+        $this->cacheWarmer->warmUp(null === $this->cacheDir ? $kernel->getCacheDir() : $this->cacheDir);
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully warmed.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }

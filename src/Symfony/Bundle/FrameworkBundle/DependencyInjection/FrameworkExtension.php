@@ -231,11 +231,7 @@ class FrameworkExtension extends Extension
         $this->registerCacheConfiguration($config['cache'], $container);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
-
-        if ($this->isConfigEnabled($container, $config['router'])) {
-            $this->registerRouterConfiguration($config['router'], $container, $loader);
-        }
-
+        $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
 
@@ -519,6 +515,10 @@ class FrameworkExtension extends Extension
     private function registerWorkflowConfiguration(array $workflows, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$workflows) {
+            if (!class_exists(Workflow\Workflow::class)) {
+                $container->removeDefinition('console.command.workflow_dump');
+            }
+
             return;
         }
 
@@ -695,6 +695,13 @@ class FrameworkExtension extends Extension
      */
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if (!$this->isConfigEnabled($container, $config)) {
+            $container->removeDefinition('console.command.router_debug');
+            $container->removeDefinition('console.command.router_match');
+
+            return;
+        }
+
         $loader->load('routing.xml');
 
         $container->setParameter('router.resource', $config['resource']);
@@ -1028,6 +1035,9 @@ class FrameworkExtension extends Extension
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
+            $container->removeDefinition('console.command.translation_debug');
+            $container->removeDefinition('console.command.translation_update');
+
             return;
         }
 

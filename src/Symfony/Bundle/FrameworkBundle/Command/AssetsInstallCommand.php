@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -33,10 +34,40 @@ class AssetsInstallCommand extends ContainerAwareCommand
     const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
-    /**
-     * @var Filesystem
-     */
+    private $baseDir;
     private $filesystem;
+
+    /**
+     * @param string          $baseDir
+     * @param Filesystem|null $filesystem
+     */
+    public function __construct($baseDir = null, Filesystem $filesystem = null /**, $newApi = false*/)
+    {
+        parent::__construct();
+
+        if (!func_get_arg(2)) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $baseDir ? 'assets:install' : $baseDir);
+
+            return;
+        }
+
+        $this->baseDir = $baseDir;
+        $this->filesystem = $filesystem ?: new Filesystem();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
 
     /**
      * {@inheritdoc}
@@ -79,10 +110,18 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->baseDir) {
+            $this->baseDir = parent::getContainer()->getParameter('kernel.project_dir');
+        }
+        if (null === $this->filesystem) {
+            $this->filesystem = parent::getContainer()->get('filesystem');
+        }
+
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!is_dir($targetArg)) {
-            $targetArg = $this->getContainer()->getParameter('kernel.project_dir').'/'.$targetArg;
+            $targetArg = $this->baseDir.'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
                 // deprecated, logic to be removed in 4.0
@@ -94,8 +133,6 @@ EOT
                 }
             }
         }
-
-        $this->filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
         $bundlesDir = $targetArg.'/bundles/';
@@ -122,7 +159,7 @@ EOT
         $exitCode = 0;
         $validAssetDirs = array();
         /** @var BundleInterface $bundle */
-        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 continue;
             }

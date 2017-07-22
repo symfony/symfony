@@ -23,9 +23,22 @@ use Symfony\Component\Workflow\Marking;
  */
 class WorkflowDumpCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
+
     public function isEnabled()
     {
-        return $this->getContainer()->has('workflow.registry');
+        // BC to be removed in 4.0
+        return parent::getContainer()->has('workflow.registry');
     }
 
     /**
@@ -56,7 +69,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $container = $this->getApplication()->getKernel()->getContainer();
         $serviceId = $input->getArgument('name');
         if ($container->has('workflow.'.$serviceId)) {
             $workflow = $container->get('workflow.'.$serviceId);

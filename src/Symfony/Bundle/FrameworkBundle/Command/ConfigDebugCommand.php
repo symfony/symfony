@@ -111,7 +111,7 @@ EOF
 
     private function compileContainer()
     {
-        $kernel = clone $this->getContainer()->get('kernel');
+        $kernel = clone $this->getApplication()->getKernel();
         $kernel->boot();
 
         $method = new \ReflectionMethod($kernel, 'buildContainer');

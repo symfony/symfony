@@ -307,7 +307,7 @@ EOF;
                 if (in_array('GET', $methods)) {
                     // Since we treat HEAD requests like GET requests we don't need to match it.
                     $methodVariable = 'canonicalMethod';
-                    $methods = array_filter($methods, function ($method) { return 'HEAD' !== $method; });
+                    $methods = array_values(array_filter($methods, function ($method) { return 'HEAD' !== $method; }));
                 }
 
                 if (1 === count($methods)) {

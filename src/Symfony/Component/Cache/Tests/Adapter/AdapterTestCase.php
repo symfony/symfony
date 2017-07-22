@@ -12,9 +12,19 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
+use Symfony\Component\Cache\PruneableInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        if (!array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
+            $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
+        }
+    }
+
     public function testDefaultLifeTime()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
@@ -57,6 +67,59 @@ abstract class AdapterTestCase extends CachePoolTest
         foreach ($cache->getItems(array('foo')) as $item) {
         }
         $this->assertFalse($item->isHit());
+    }
+
+    public function testPrune()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        if (!method_exists($this, 'isPruned')) {
+            $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
+        }
+
+        $cache = $this->createCachePool();
+
+        $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {
+            $item = $cache->getItem($name);
+            $item->set($value);
+
+            if ($expiresAfter) {
+                $item->expiresAfter($expiresAfter);
+            }
+
+            $cache->save($item);
+        };
+
+        $doSet('foo', 'foo-val');
+        $doSet('bar', 'bar-val', new \DateInterval('PT20S'));
+        $doSet('baz', 'baz-val', new \DateInterval('PT40S'));
+        $doSet('qux', 'qux-val', new \DateInterval('PT80S'));
+
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertFalse($this->isPruned($cache, 'bar'));
+        $this->assertFalse($this->isPruned($cache, 'baz'));
+        $this->assertFalse($this->isPruned($cache, 'qux'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'bar'));
+        $this->assertFalse($this->isPruned($cache, 'baz'));
+        $this->assertFalse($this->isPruned($cache, 'qux'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'baz'));
+        $this->assertFalse($this->isPruned($cache, 'qux'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertFalse($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'qux'));
     }
 }
 

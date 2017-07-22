@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 /**
@@ -34,5 +35,13 @@ class PhpFilesAdapterTest extends AdapterTestCase
     public static function tearDownAfterClass()
     {
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+    }
+
+    protected function isPruned(CacheItemPoolInterface $cache, $name)
+    {
+        $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
+        $getFileMethod->setAccessible(true);
+
+        return !file_exists($getFileMethod->invoke($cache, $name));
     }
 }

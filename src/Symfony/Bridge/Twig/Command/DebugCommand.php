@@ -29,15 +29,27 @@ class DebugCommand extends Command
     private $twig;
 
     /**
-     * {@inheritdoc}
+     * @param Environment $twig
      */
-    public function __construct($name = 'debug:twig')
+    public function __construct($twig = null)
     {
-        parent::__construct($name);
+        parent::__construct();
+
+        if (!$twig instanceof Environment) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $twig ? 'debug:twig' : $twig);
+
+            return;
+        }
+
+        $this->twig = $twig;
     }
 
     public function setTwigEnvironment(Environment $twig)
     {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         $this->twig = $twig;
     }
 
@@ -46,12 +58,15 @@ class DebugCommand extends Command
      */
     protected function getTwigEnvironment()
     {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->twig;
     }
 
     protected function configure()
     {
         $this
+            ->setName('debug:twig')
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
@@ -80,9 +95,17 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $twig = $this->getTwigEnvironment();
 
-        if (null === $twig) {
+        // BC to be removed in 4.0
+        if (__CLASS__ !== get_class($this)) {
+            $r = new \ReflectionMethod($this, 'getTwigEnvironment');
+            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                @trigger_error(sprintf('Usage of method "%s" is deprecated since version 3.4 and will no longer be supported in 4.0.', get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
+
+                $this->twig = $this->getTwigEnvironment();
+            }
+        }
+        if (null === $this->twig) {
             throw new \RuntimeException('The Twig environment needs to be set.');
         }
 
@@ -91,7 +114,7 @@ EOF
         if ($input->getOption('format') === 'json') {
             $data = array();
             foreach ($types as $type) {
-                foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
+                foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                     $data[$type][$name] = $this->getMetadata($type, $entity);
                 }
             }
@@ -105,7 +128,7 @@ EOF
 
         foreach ($types as $index => $type) {
             $items = array();
-            foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
+            foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
                 }

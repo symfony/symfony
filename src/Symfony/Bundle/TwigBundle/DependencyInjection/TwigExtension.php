@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -47,6 +48,10 @@ class TwigExtension extends Extension
 
         if (interface_exists('Symfony\Component\Templating\EngineInterface')) {
             $loader->load('templating.xml');
+        }
+
+        if (class_exists(Application::class)) {
+            $loader->load('console.xml');
         }
 
         if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {

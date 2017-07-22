@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\FilesystemTrait;
 
-class FilesystemAdapter extends AbstractAdapter
+class FilesystemAdapter extends AbstractAdapter implements PruneableInterface
 {
     use FilesystemTrait;
 

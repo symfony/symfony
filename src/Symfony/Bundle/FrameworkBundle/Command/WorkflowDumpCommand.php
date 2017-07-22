@@ -20,9 +20,16 @@ use Symfony\Component\Workflow\Marking;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since version 3.4
  */
 class WorkflowDumpCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
+     */
     public function isEnabled()
     {
         return $this->getContainer()->has('workflow.registry');
@@ -56,7 +63,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $container = $this->getApplication()->getKernel()->getContainer();
         $serviceId = $input->getArgument('name');
         if ($container->has('workflow.'.$serviceId)) {
             $workflow = $container->get('workflow.'.$serviceId);

@@ -27,14 +27,41 @@ use Symfony\Component\Routing\Route;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @final since version 3.4
  */
 class RouterDebugCommand extends ContainerAwareCommand
 {
+    private $router;
+
+    /**
+     * @param RouterInterface $router
+     */
+    public function __construct($router = null)
+    {
+        parent::__construct();
+
+        if (!$router instanceof RouterInterface) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $router ? 'debug:router' : $router);
+
+            return;
+        }
+
+        $this->router = $router;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
+        if (null !== $this->router) {
+            return parent::isEnabled();
+        }
         if (!$this->getContainer()->has('router')) {
             return false;
         }
@@ -77,10 +104,15 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->router) {
+            $this->router = $this->getContainer()->get('router');
+        }
+
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper();
-        $routes = $this->getContainer()->get('router')->getRouteCollection();
+        $routes = $this->router->getRouteCollection();
 
         if ($name) {
             if (!$route = $routes->get($name)) {
@@ -132,7 +164,7 @@ EOF
         if (1 === substr_count($controller, ':')) {
             list($service, $method) = explode(':', $controller);
             try {
-                return sprintf('%s::%s', get_class($this->getContainer()->get($service)), $method);
+                return sprintf('%s::%s', get_class($this->getApplication()->getKernel()->getContainer()->get($service)), $method);
             } catch (ServiceNotFoundException $e) {
             }
         }

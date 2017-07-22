@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginFactory;
+use Symfony\Component\Console\Application;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
@@ -57,5 +58,10 @@ class SecurityBundle extends Bundle
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());
+    }
+
+    public function registerCommands(Application $application)
+    {
+        // noop
     }
 }

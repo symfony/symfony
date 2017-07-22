@@ -15,6 +15,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -23,9 +25,34 @@ use Symfony\Component\Finder\Finder;
  *
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
 class CacheClearCommand extends ContainerAwareCommand
 {
+    private $cacheClearer;
+    private $filesystem;
+
+    /**
+     * @param CacheClearerInterface $cacheClearer
+     * @param Filesystem|null       $filesystem
+     */
+    public function __construct($cacheClearer = null, Filesystem $filesystem = null)
+    {
+        parent::__construct();
+
+        if (!$cacheClearer instanceof CacheClearerInterface) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $cacheClearer ? 'cache:clear' : $cacheClearer);
+
+            return;
+        }
+
+        $this->cacheClearer = $cacheClearer;
+        $this->filesystem = $filesystem ?: new Filesystem();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -54,28 +81,34 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->cacheClearer) {
+            $this->cacheClearer = $this->getContainer()->get('cache_clearer');
+            $this->filesystem = $this->getContainer()->get('filesystem');
+            $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+        }
+
         $io = new SymfonyStyle($input, $output);
 
-        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+        $kernel = $this->getApplication()->getKernel();
+        $realCacheDir = isset($realCacheDir) ? $realCacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir');
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
         $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
-        $filesystem = $this->getContainer()->get('filesystem');
 
         if (!is_writable($realCacheDir)) {
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
-        if ($filesystem->exists($oldCacheDir)) {
-            $filesystem->remove($oldCacheDir);
+        if ($this->filesystem->exists($oldCacheDir)) {
+            $this->filesystem->remove($oldCacheDir);
         }
 
-        $kernel = $this->getContainer()->get('kernel');
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
+        $this->cacheClearer->clear($realCacheDir);
 
         if ($input->getOption('no-warmup')) {
-            $filesystem->rename($realCacheDir, $oldCacheDir);
+            $this->filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
             $warning = 'Calling cache:clear without the --no-warmup option is deprecated since version 3.3. Cache warmup should be done with the cache:warmup command instead.';
 
@@ -90,7 +123,7 @@ EOF
             $io->comment('Removing old cache directory...');
         }
 
-        $filesystem->remove($oldCacheDir);
+        $this->filesystem->remove($oldCacheDir);
 
         if ($output->isVerbose()) {
             $io->comment('Finished');
@@ -101,7 +134,6 @@ EOF
 
     private function warmupCache(InputInterface $input, OutputInterface $output, $realCacheDir, $oldCacheDir)
     {
-        $filesystem = $this->getContainer()->get('filesystem');
         $io = new SymfonyStyle($input, $output);
 
         // the warmup cache dir name must have the same length than the real one
@@ -109,11 +141,11 @@ EOF
         $realCacheDir = realpath($realCacheDir);
         $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
 
-        if ($filesystem->exists($warmupDir)) {
+        if ($this->filesystem->exists($warmupDir)) {
             if ($output->isVerbose()) {
                 $io->comment('Clearing outdated warmup directory...');
             }
-            $filesystem->remove($warmupDir);
+            $this->filesystem->remove($warmupDir);
         }
 
         if ($output->isVerbose()) {
@@ -121,11 +153,11 @@ EOF
         }
         $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
-        $filesystem->rename($realCacheDir, $oldCacheDir);
+        $this->filesystem->rename($realCacheDir, $oldCacheDir);
         if ('\\' === DIRECTORY_SEPARATOR) {
             sleep(1);  // workaround for Windows PHP rename bug
         }
-        $filesystem->rename($warmupDir, $realCacheDir);
+        $this->filesystem->rename($warmupDir, $realCacheDir);
     }
 
     /**
@@ -138,7 +170,7 @@ EOF
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
         // create a temporary kernel
-        $realKernel = $this->getContainer()->get('kernel');
+        $realKernel = $this->getApplication()->getKernel();
         $realKernelClass = get_class($realKernel);
         $namespace = '';
         if (false !== $pos = strrpos($realKernelClass, '\\')) {
@@ -274,7 +306,7 @@ namespace $namespace
     }
 }
 EOF;
-        $this->getContainer()->get('filesystem')->mkdir($warmupDir);
+        $this->filesystem->mkdir($warmupDir);
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
         $class = "$namespace\\$class";

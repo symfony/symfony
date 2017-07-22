@@ -100,7 +100,7 @@ EOF
         if (__CLASS__ !== get_class($this)) {
             $r = new \ReflectionMethod($this, 'getTwigEnvironment');
             if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Usage of method "%s" is deprecated since version 3.4 and will no longer be supported in 4.0.', get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Usage of method "%s" is deprecated since version 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
 
                 $this->twig = $this->getTwigEnvironment();
             }

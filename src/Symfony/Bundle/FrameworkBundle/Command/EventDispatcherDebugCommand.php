@@ -23,9 +23,31 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * A console command for retrieving information about event dispatcher.
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
+ *
+ * @final since version 3.4
  */
 class EventDispatcherDebugCommand extends ContainerAwareCommand
 {
+    private $dispatcher;
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct($dispatcher = null)
+    {
+        parent::__construct();
+
+        if (!$dispatcher instanceof EventDispatcherInterface) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $dispatcher ? 'debug:event-dispatcher' : $dispatcher);
+
+            return;
+        }
+
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -59,12 +81,16 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->dispatcher) {
+            $this->dispatcher = $this->getEventDispatcher();
+        }
+
         $io = new SymfonyStyle($input, $output);
-        $dispatcher = $this->getEventDispatcher();
 
         $options = array();
         if ($event = $input->getArgument('event')) {
-            if (!$dispatcher->hasListeners($event)) {
+            if (!$this->dispatcher->hasListeners($event)) {
                 $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
                 return;
@@ -77,11 +103,13 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $helper->describe($io, $dispatcher, $options);
+        $helper->describe($io, $this->dispatcher, $options);
     }
 
     /**
      * Loads the Event Dispatcher from the container.
+     *
+     * BC to removed in 4.0
      *
      * @return EventDispatcherInterface
      */

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
@@ -18,16 +19,49 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Writer\TranslationWriter;
 
 /**
  * A command that parses templates to extract translation messages and adds them
  * into the translation files.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @final since version 3.4
  */
 class TranslationUpdateCommand extends ContainerAwareCommand
 {
+    private $writer;
+    private $loader;
+    private $extractor;
+    private $defaultLocale;
+
+    /**
+     * @param TranslationWriter  $writer
+     * @param TranslationLoader  $loader
+     * @param ExtractorInterface $extractor
+     * @param string             $defaultLocale
+     */
+    public function __construct($writer = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
+    {
+        parent::__construct();
+
+        if (!$writer instanceof TranslationWriter) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $writer ? 'translation:update' : $writer);
+
+            return;
+        }
+
+        $this->writer = $writer;
+        $this->loader = $loader;
+        $this->extractor = $extractor;
+        $this->defaultLocale = $defaultLocale;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -69,9 +103,14 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
+        if (null !== $this->writer) {
+            return parent::isEnabled();
+        }
         if (!class_exists('Symfony\Component\Translation\Translator')) {
             return false;
         }
@@ -84,6 +123,14 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->writer) {
+            $this->writer = $this->getContainer()->get('translation.writer');
+            $this->loader = $this->getContainer()->get('translation.loader');
+            $this->extractor = $this->getContainer()->get('translation.extractor');
+            $this->defaultLocale = $this->getContainer()->getParameter('kernel.default_locale');
+        }
+
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
@@ -95,14 +142,13 @@ EOF
         }
 
         // check format
-        $writer = $this->getContainer()->get('translation.writer');
-        $supportedFormats = $writer->getFormats();
+        $supportedFormats = $this->writer->getFormats();
         if (!in_array($input->getOption('output-format'), $supportedFormats)) {
             $errorIo->error(array('Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.'));
 
             return 1;
         }
-        $kernel = $this->getContainer()->get('kernel');
+        $kernel = $this->getApplication()->getKernel();
 
         // Define Root Path to App folder
         $transPaths = array($kernel->getRootDir().'/Resources/');
@@ -134,29 +180,27 @@ EOF
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $errorIo->comment('Parsing templates...');
-        $extractor = $this->getContainer()->get('translation.extractor');
         $prefix = $input->getOption('prefix');
         // @deprecated since version 3.4, to be removed in 4.0 along with the --no-prefix option
         if ($input->getOption('no-prefix')) {
             @trigger_error('The "--no-prefix" option is deprecated since version 3.4 and will be removed in 4.0. Use the "--prefix" option with an empty string as value instead.', E_USER_DEPRECATED);
             $prefix = '';
         }
-        $extractor->setPrefix($prefix);
+        $this->extractor->setPrefix($prefix);
         foreach ($transPaths as $path) {
             $path .= 'views';
             if (is_dir($path)) {
-                $extractor->extract($path, $extractedCatalogue);
+                $this->extractor->extract($path, $extractedCatalogue);
             }
         }
 
         // load any existing messages from the translation files
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $errorIo->comment('Loading translation files...');
-        $loader = $this->getContainer()->get('translation.loader');
         foreach ($transPaths as $path) {
             $path .= 'translations';
             if (is_dir($path)) {
-                $loader->loadMessages($path, $currentCatalogue);
+                $this->loader->loadMessages($path, $currentCatalogue);
             }
         }
 
@@ -213,7 +257,7 @@ EOF
         }
 
         if ($input->getOption('no-backup') === true) {
-            $writer->disableBackup();
+            $this->writer->disableBackup();
         }
 
         // save the files
@@ -232,7 +276,7 @@ EOF
                 $bundleTransPath = end($transPaths).'translations';
             }
 
-            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
+            $this->writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

@@ -61,7 +61,7 @@ class ConfigDebugCommandTest extends WebTestCase
     public function testDumpUndefinedBundleOption()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'TestBundle', 'path' => 'foo'));
+        $tester->execute(array('name' => 'TestBundle', 'path' => 'foo'));
 
         $this->assertContains('Unable to find configuration for "test.foo"', $tester->getDisplay());
     }

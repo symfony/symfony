@@ -1,6 +1,11 @@
 UPGRADE FROM 3.3 to 3.4
 =======================
 
+Console
+-------
+
+  * Default validation in `SymfonyQuestionHelper::ask` has been deprecated and will be removed in 4.0. Apply validation using `Question::setValidator` instead.
+
 DependencyInjection
 -------------------
 

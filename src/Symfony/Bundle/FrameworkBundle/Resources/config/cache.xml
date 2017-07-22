@@ -100,6 +100,11 @@
             </call>
         </service>
 
+        <service id="cache.command.pool_pruner" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand">
+            <argument type="iterator" />
+            <tag name="console.command" command="cache:pool:prune" />
+        </service>
+
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" public="true">
             <tag name="kernel.cache_clearer" />
         </service>

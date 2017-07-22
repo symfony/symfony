@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-18T17:31:39Z
+
+Legacy test added. @chalasr seems we dont _have_ to make registerCommands a noop. It works as expected, the legacy command is not auto-discovered due its public service id.
+
+This should be good to go :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-19T11:37:49Z
+
+Done. Tedious job, that is :)

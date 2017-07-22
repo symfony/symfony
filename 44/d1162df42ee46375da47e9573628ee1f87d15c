@@ -1,0 +1,263 @@
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-08T18:22:25Z
+
+@nicolas-grekas Just noticed https://github.com/symfony/symfony/issues/21764#issuecomment-284322178 where you mentioned adding a `PruneableInterface` to the cache component: is this something I should include in this PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-10T16:04:11Z
+
+@robfrawley yes please do, that would ease writting the command to prune (all prunable) pools.
+But definitely the $time arg should not be in the interface to me.
+If you could add the command into that PR, that'd be awesome.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-10T16:35:42Z
+
+@nicolas-grekas What bundle should the command exist in?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-10T16:37:30Z
+
+FrameworkBundle since that's where the other cache:pool commands are I'd say.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-10T16:52:46Z
+
+Re: the command. Do you want a complex implementation with a compiler pass that assigns all specially tagged services to a "global cache pruner" abstraction that is then consumed by the command (like the "cache clearer" implementation) or do you want a simple command that just consumes a list of cache pools, grabs 'em from the container, ensures they implement the prunable interface, and calls `prune()`?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-10T16:54:21Z
+
+The latter would just look like:
+
+```php
+namespace Symfony\Bundle\FrameworkBundle\Command;
+
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+/**
+ * Cache pool pruner command.
+ */
+final class CachePoolPruneCommand extends ContainerAwareCommand
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        $this
+            ->setName('cache:pool:prune')
+            ->addArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools')
+            ->setDescription('Prune cache pools')
+            ->setHelp(<<<'EOF'
+The <info>%command.name%</info> command prunes the given cache pools.
+
+    %command.full_name% <cache pool 1> [...<cache pool N>]
+EOF
+            )
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $io = new SymfonyStyle($input, $output);
+        $container = $this->getContainer();
+
+        foreach ($input->getArgument('pools') as $id) {
+            if (!$container->has($id)) {
+                throw new \InvalidArgumentException(sprintf('"%s" cache pool not found in container.', $id));
+            }
+
+            if (!($pool = $container->get($id)) instanceof PruneableInterface) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a prunable cache pool.', $id));
+            }
+
+            $io->comment(sprintf('Pruning cache pool: <info>%s</info>', $id));
+            $pool->prune();
+        }
+
+        $io->success('Cache was successfully pruned.');
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-10T17:01:29Z
+
+See the cache pool clearer pass and command, it should be similar I guess
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-11T21:14:08Z
+
+@nicolas-grekas Is the most recent commit the direction you want this to go in? Just want to confirm before finishing up the implementation and ensuring all the required tests are present.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T21:45:14Z
+
+instead of a tag, what about constructing a service locator + array or ids (the pool services), that would be given to the command? I'm not sure I see the need for an intermediary pruner service, WDYT?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-12T00:24:49Z
+
+That sounds reasonable. The PR implementation went in this direction as you mentioned mirroring how the "cache clear" functionality was implemented. Having said that, I absolutely agree that a simpler approach would be preferable and that an intermediary pruner service is unnecessary.
+
+But, I'm not intimately familiar with service locators or their best practices. I get the basic concept, that you define a locator, specifying the services it should contain, and then use it like a `psr/container`. What I'm unsure of is the most appropriate way to dynamically ensure the locator is provided the required arguments (the purgeable pools). Should a compiler pass set the arguments for the service locator? And how does the compiler pass find the pools if not for tags? Is there another way to ensure the locator is passed all purgeable pools?
+
+*Basically, how should the service locator be defined to allow dynamically passing all prunable pools to it?*
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T06:19:35Z
+
+Do we need the command to be able to prune *one* specific pool given as argument? Or is pruning all prunable pools enough? I might think "all of them" is enough, because pruning does remove things that are stale only.
+If you agree, then we might use an iterator instead of a locator (`new IteratorArgument($listOfPools)`).
+`$listOfPools` should be computed by looking at all pools in the compiler pass (via the cache.pool tag) and checking if they implement that interface.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-12T23:01:05Z
+
+Give the latest changes a quick once-over. Some items still need to be cleaned up, but I think this is the direction you described. As for passing pools as arguments and using an argument iterator, I don't think those two have to be mutually exclusive. See the command implementation that optionally allows passing pool names. Thoughts? I don't have a strong opinion if you think we should remove the option to do so.
+
+Also, right now the command filters the pools implementing the correct interface; I couldn't figure out how to filter pools during the compiler pass without reflection. If you think that's okay, the logic can be moved to the compiler pass by replacing `getCachePoolsIterator` with:
+
+```php
+/**
+ * @param ContainerBuilder $container
+ *
+ * @return IteratorArgument
+ */
+private function getCachePoolsIterator(ContainerBuilder $container)
+{
+    $services = array_filter($this->getConcreteCachePoolServices($container), function ($name) use ($container) {
+        $reflection = new \ReflectionClass($container->getDefinition($name)->getClass());
+
+        return $reflection->implementsInterface(PruneableInterface::class);
+    });
+
+    return new IteratorArgument(array_combine($services, array_map(function ($id) {
+        return new Reference($id);
+    }, $services)));
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-13T14:19:43Z
+
+PhpFilesTrait could also benefit from pruning (should use unlink+opcache_invalidate)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-13T14:33:18Z
+
+To check if a class implements some interface at compile time, you need to use `$container->getReflectionClass($class)`, see eg RegisterControllerArgumentLocatorsPass
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-18T18:31:53Z
+
+Anyone have any idea why the `PruneableInterface` cannot be found on PHP `7.0` and `7.1` builds? See https://travis-ci.org/symfony/symfony/jobs/254946073#L2502. Interestingly, I am running both PHP versions on my local machine and the tests complete successfully locally...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-18T20:44:05Z
+
+> why the PruneableInterface cannot be found on PHP 7.0 and 7.1
+
+for deps=low line, look at the installed composer deps: Cache is 3.3, which cannot work since the interface is only in your PR. You need to update the lowest dep to 3.4 in fwb.
+The other one installs master, which doesn't have the interface yet. It'll be green when the PR will be merged.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-18T21:00:16Z
+
+Got it; thanks. I do have one concern about the prune implementations, but it relies on the answer to the following question: "Do we allow the use of different adapters at the same root path?" For example, do we support instantiating a `PhpFilesAdapter` and `FilesystemAdapter` with the same `directory` value?
+
+If so, the `prune` logic needs to check if the file found meets the format requirements of the specific adapter, otherwise reading the expiration will fail ([here](https://github.com/symfony/symfony/pull/23451/files#diff-9f5aec4225d61147061d9617681a4e74R35) and [here](https://github.com/symfony/symfony/pull/23451/files#diff-44745b984bf9578ef8f00218a3eadd05R46)) when a file from a different adapter is encountered.
+
+The `PhpFilesTrait::prune()` method has an [initial implementation](https://github.com/symfony/symfony/pull/23451/files#diff-44745b984bf9578ef8f00218a3eadd05R37), which seems to work appropriately.
+
+Otherwise, I think I've addressed the majority of concerns/questions/etc above. One outlier is the prune command itself, which I'm not entirely positive as to the best implementation. I guess it would be way simpler if we just prune all pools and don't allow specifying specific pool service ids... thoughts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-18T21:07:14Z
+
+let's prune all pools :)
+> Do we allow the use of different adapters at the same root path
+
+that's unsupported, each pool must have a separate namespace, ie the type of adapter should *not* be considered as an implicit namespace
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-18T22:39:33Z
+
+@nicolas-grekas Great; thanks for the clarification.
+
+Before your most-recent reply, I actually implemented a version of this pull request with a service locator that still allowed for passing specific pools to the command (see https://github.com/robfrawley/symfony/commit/301ee4a83b7bd30098e99d7a6decebd39f9beba0). It added a bit of complexity, but not too much.
+
+I don't have any strong feeling about which is best, so unless you say otherwise, we'll go with simply pruning all pools, as seen in the most-recent commit here.
+
+This is one of the larger PRs I've contributed to Symfony, but I *think* this is ready to be reviewed, at your convenience.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-19T22:08:45Z
+
+Ok; comments addressed. Let me know if there are any additional changes required, or if I should squash the commits or anything else I can contribute.
+
+Also, is the [`$container->getDefinition($id)->isAbstract()` check](https://github.com/symfony/symfony/pull/23451/files#diff-b66c2265ca4c725133c3d2077e8670a4R57) still required now, with the updated location of the compiler pass and the amended `PassConfig::TYPE_AFTER_REMOVING` type passed?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-20T14:23:35Z
+
+@nicolas-grekas Ok; I think I properly addressed your comments. One additional question, now that `isPruned($cache, $name)` has been moved to the concrete test classes, should the `testPrune()` methods check for the existance of the `isPruned()` method and skip if it doesn't exist, [here](https://github.com/symfony/symfony/pull/23451/files#diff-e1e3d11734b8bdf5026e2b467821639aR78).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-20T14:26:02Z
+
+> check for the existance of the isPruned() method and skip if it doesn't exist
+
+I think it should not skip, a hard fail would be the best in fact, to force an pool author to implement this method for pruneable pools
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-20T15:03:23Z
+
+Additional changes pushed. If it's an okay time to squash the commits made for your comments into the original commit, let me know (don't want to do so before you can confirm the changes, as it would be harder to do so when squashed, obviously). Thanks for taking the time to so thoroughly review this PR!
+
+Not for this PR, but more generally out of interest (and possibly submission of additional PRs), you've mentioned that other PSR-(6|16) implementations may benefit from implementing `PruneableInterface`: which ones come to mind for you as benefitting most?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-20T15:15:54Z
+
+> which ones come to mind for you as benefitting most?
+
+the PdoAdapter first, then maybe ChainAdapter could propagate, and last to my mind comes the ApcuAdapter, looking for items that have an old `$version.'@'.$namespace` (but not sure about it esp. since this will be unusable from the command because of different shared memory segments used by the webserver/FPM)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-22T03:10:24Z
+
+@nicolas-grekas I know #23603 is still fluid and unreviewed, but for the purpose of the documentation PR I am working on symfony/symfony-docs#8209, everything in **this** PR should be fairly solid at this point without any drastic changes, right?

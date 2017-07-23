@@ -269,15 +269,15 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     }
 
     /**
-     * @dataProvider argumentNameProvider
+     * @dataProvider provideBindings
      */
-    public function testBindings($argumentName)
+    public function testBindings($bindingName)
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
 
         $container->register('foo', RegisterTestController::class)
-            ->setBindings(array($argumentName => new Reference('foo')))
+            ->setBindings(array($bindingName => new Reference('foo')))
             ->addTag('controller.service_arguments');
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -291,7 +291,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function argumentNameProvider()
+    public function provideBindings()
     {
         return array(array(ControllerDummy::class), array('$bar'));
     }

@@ -166,9 +166,7 @@ class XmlFileLoader extends FileLoader
         }
         $defaults = array(
             'tags' => $this->getChildren($defaultsNode, 'tag'),
-            'bind' => array_map(function ($v) {
-                return new BoundArgument($v);
-            }, $this->getArgumentsAsPhp($defaultsNode, 'bind', $file)),
+            'bind' => array_map(function ($v) { return new BoundArgument($v); }, $this->getArgumentsAsPhp($defaultsNode, 'bind', $file)),
         );
 
         foreach ($defaults['tags'] as $tag) {
@@ -358,6 +356,8 @@ class XmlFileLoader extends FileLoader
 
         $bindings = $this->getArgumentsAsPhp($service, 'bind', $file);
         if (isset($defaults['bind'])) {
+            // deep clone, to avoid multiple process of the same instance in the
+            // passes
             $bindings = array_merge(unserialize(serialize($defaults['bind'])), $bindings);
         }
         if ($bindings) {

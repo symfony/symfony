@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Argument;
  */
 final class BoundArgument implements ArgumentInterface
 {
-    private static $count = 0;
+    private static $sequence = 0;
 
     private $value;
     private $identifier;
@@ -25,7 +25,7 @@ final class BoundArgument implements ArgumentInterface
     public function __construct($value)
     {
         $this->value = $value;
-        $this->identifier = ++self::$count;
+        $this->identifier = ++self::$sequence;
     }
 
     /**

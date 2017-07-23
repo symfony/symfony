@@ -294,9 +294,7 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('Parameter "bind" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
             }
 
-            $defaults['bind'] = array_map(function ($v) {
-                return new BoundArgument($v);
-            }, $this->resolveServices($defaults['bind'], $file));
+            $defaults['bind'] = array_map(function ($v) { return new BoundArgument($v); }, $this->resolveServices($defaults['bind'], $file));
         }
 
         return $defaults;
@@ -537,7 +535,10 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($defaults['bind']) || isset($service['bind'])) {
+            // deep clone, to avoid multiple process of the same instance in the
+            // passes
             $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : array();
+
             if (isset($service['bind'])) {
                 if (!is_array($service['bind'])) {
                     throw new InvalidArgumentException(sprintf('Parameter "bind" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));

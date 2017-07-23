@@ -37,6 +37,18 @@ class LanguageTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('my', 'my', 'Burmese'), $choices, '', false, false);
     }
 
+    public function testCustomLocale()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('locale' => 'ru'))
+            ->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('en', 'en', 'Английский'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'Британский английский'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_US', 'en_US', 'Американский английский'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('fr', 'fr', 'Французский'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('my', 'my', 'Бирманский'), $choices, '', false, false);
+    }
+
     public function testMultipleLanguagesIsNotIncluded()
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'language')

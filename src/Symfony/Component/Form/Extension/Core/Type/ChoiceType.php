@@ -116,6 +116,10 @@ class ChoiceType extends AbstractType
                 // Reconstruct the data as mapping from child names to values
                 $data = array();
 
+                if (!$form instanceof \IteratorAggregate) {
+                    @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+                }
+
                 foreach ($form as $child) {
                     $value = $child->getConfig()->getOption('value');
 

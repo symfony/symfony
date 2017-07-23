@@ -18,6 +18,12 @@ Finder
    deprecated and will be removed in 4.0 as it used to fix a bug which existed
    before version 5.5.23/5.6.7.
 
+Form
+------
+
+ * Support if the `\Iterator` in implementations of `Symfony\Component\Form\FormInterface` now are deprecated. 
+   `Symfony\Component\Form\FormInterface` will extends `\IteratorAggregate` in Symfony 4.0.
+
 FrameworkBundle
 ---------------
 

@@ -111,6 +111,10 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             $this->dataExtractor->extractConfiguration($form)
         );
 
+        if (!$form instanceof \IteratorAggregate) {
+            @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+        }
+
         foreach ($form as $child) {
             $this->collectConfiguration($child);
         }
@@ -131,6 +135,10 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             $this->dataByForm[$hash],
             $this->dataExtractor->extractDefaultData($form)
         );
+
+        if (!$form instanceof \IteratorAggregate) {
+            @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+        }
 
         foreach ($form as $child) {
             $this->collectDefaultData($child);
@@ -158,6 +166,10 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         // Count errors
         if (isset($this->dataByForm[$hash]['errors'])) {
             $this->data['nb_errors'] += count($this->dataByForm[$hash]['errors']);
+        }
+
+        if (!$form instanceof \IteratorAggregate) {
+            @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
         }
 
         foreach ($form as $child) {
@@ -279,6 +291,10 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             : array();
 
         $output['children'] = array();
+
+        if (!$form instanceof \IteratorAggregate) {
+            @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+        }
 
         foreach ($form as $name => $child) {
             $output['children'][$name] = &$this->recursiveBuildPreliminaryFormTree($child, $outputByHash);

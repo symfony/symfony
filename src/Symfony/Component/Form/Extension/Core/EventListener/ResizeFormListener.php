@@ -84,6 +84,10 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
+        if (!$form instanceof \IteratorAggregate) {
+            @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+        }
+
         // First remove all rows
         foreach ($form as $name => $child) {
             $form->remove($name);
@@ -108,6 +112,10 @@ class ResizeFormListener implements EventSubscriberInterface
 
         if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             $data = array();
+        }
+
+        if (!$form instanceof \IteratorAggregate) {
+            @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
         }
 
         // Remove all empty rows
@@ -150,6 +158,9 @@ class ResizeFormListener implements EventSubscriberInterface
 
         if ($this->deleteEmpty) {
             $previousData = $event->getForm()->getData();
+            if (!$form instanceof \IteratorAggregate) {
+                @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+            }
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
 

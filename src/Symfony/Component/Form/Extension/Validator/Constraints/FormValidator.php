@@ -78,6 +78,10 @@ class FormValidator extends ConstraintValidator
         } else {
             $childrenSynchronized = true;
 
+            if (!$form instanceof \IteratorAggregate) {
+                @trigger_error(sprintf('The %s class must implements \IteratorAggregate since 3.4. Support of \Iterator would be removed in 4.0.', get_class($form)), E_USER_DEPRECATED);
+            }
+
             foreach ($form as $child) {
                 if (!$child->isSynchronized()) {
                     $childrenSynchronized = false;

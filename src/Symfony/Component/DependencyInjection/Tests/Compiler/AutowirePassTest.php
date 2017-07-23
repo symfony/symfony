@@ -516,15 +516,15 @@ class AutowirePassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('pdo_service', \PDO::class)
-            ->addArgument('sqlite:/foo.db')
+        $container->register('foo', \SplFileObject::class)
+            ->addArgument('foo.txt')
             ->setAutowired(true);
 
         (new AutowirePass())->process($container);
 
-        $definition = $container->getDefinition('pdo_service');
+        $definition = $container->getDefinition('foo');
         $this->assertEquals(
-            array('sqlite:/foo.db'),
+            array('foo.txt'),
             $definition->getArguments()
         );
     }

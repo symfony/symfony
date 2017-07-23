@@ -33,39 +33,11 @@ class LintCommand extends Command
 {
     private $twig;
 
-    /**
-     * @param Environment $twig
-     */
-    public function __construct($twig = null)
+    public function __construct(Environment $twig)
     {
         parent::__construct();
 
-        if (!$twig instanceof Environment) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            $this->setName(null === $twig ? 'lint:twig' : $twig);
-
-            return;
-        }
-
         $this->twig = $twig;
-    }
-
-    public function setTwigEnvironment(Environment $twig)
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->twig = $twig;
-    }
-
-    /**
-     * @return Environment $twig
-     */
-    protected function getTwigEnvironment()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->twig;
     }
 
     protected function configure()
@@ -100,20 +72,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-
-        // BC to be removed in 4.0
-        if (__CLASS__ !== get_class($this)) {
-            $r = new \ReflectionMethod($this, 'getTwigEnvironment');
-            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Usage of method "%s" is deprecated since version 3.4 and will no longer be supported in 4.0.', get_class($this).'::getTwigEnvironment'), E_USER_DEPRECATED);
-
-                $this->twig = $this->getTwigEnvironment();
-            }
-        }
-        if (null === $this->twig) {
-            throw new \RuntimeException('The Twig environment needs to be set.');
-        }
-
         $filenames = $input->getArgument('filename');
 
         if (0 === count($filenames)) {

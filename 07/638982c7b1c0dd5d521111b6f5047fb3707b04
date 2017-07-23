@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-20T08:20:28Z
+
+@lyrixx thanks for this feature. I like it a lot. However, I don't like the way links are displayed, each one in its own line:
+
+![before-log](https://user-images.githubusercontent.com/73419/28407546-ca1bead6-6d34-11e7-97ef-41006fae16b3.png)
+
+I prefer to put those links in a single line, like the database panel:
+
+![db-panel](https://user-images.githubusercontent.com/73419/28407551-d34910d4-6d34-11e7-9d35-ec0404b3f874.png)
+
+I've made some changes in the Twig macro to display them like this:
+
+![after-log](https://user-images.githubusercontent.com/73419/28407564-dba2888c-6d34-11e7-8453-7abc01f8476f.png)
+
+And this is with both links expanded:
+
+![all-expanded](https://user-images.githubusercontent.com/73419/28407575-e34e6e34-6d34-11e7-8353-52fc4ac82933.png)
+
+If you like this too, this is the full Twig macro code:
+
+```twig
+{% macro render_log_message(category, log_index, log) %}
+    {% set has_context = log.context is defined and log.context is not empty %}
+    {% set has_trace = log.context.exception.trace is defined %}
+
+    {% if not has_context and not has_trace %}
+        {{ profiler_dump_log(log.message) }}
+    {% else %}
+        {{ profiler_dump_log(log.message, log.context) }}
+
+        <div class="text-small font-normal">
+            {% if has_context %}
+                {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
+                <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+
+                &nbsp;&nbsp;
+            {% endif %}
+
+            {% if has_trace %}
+                {% set trace_id = 'trace-' ~ category ~ '-' ~ log_index %}
+                <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
+            {% endif %}
+        </div>
+
+        {% if has_context %}
+            <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.context, maxDepth=1) }}
+            </div>
+        {% endif %}
+
+        {% if has_trace %}
+            <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                {{ profiler_dump(log.context.exception.trace, maxDepth=1) }}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-20T14:53:38Z
+
+Not sure to get it: what does the context have when an exception is collected and the trace is displayed?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-20T16:23:50Z
+
+> Not sure to get it: what does the context have when an exception is collected and the trace is displayed?
+
+I don't know. I guess the exception has nothing. In my case, it was a simple line log with a context. BTW I don't know from where the trace came. I guess it's because the context contained an exception, but I really don't know. Anyway it was not fun to don't see the context.
+
+---
+
+Any way, I going to use the patch from @javiereguiluz  ; Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-20T16:26:29Z
+
+OK, got it, a simple log line with an exception, and other things in the context :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-20T17:04:10Z
+
+I updated the PR with the @javiereguiluz' patch. Thanks. Actually he did all the job.

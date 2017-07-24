@@ -100,7 +100,9 @@
         "symfony/phpunit-bridge": "~3.2",
         "symfony/polyfill-apcu": "~1.1",
         "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection-docblock": "^3.0"
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "queue-interop/queue-interop": "^0.5",
+        "queue-interop/amqp-interop": "dev-master"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
@@ -136,5 +138,11 @@
         "branch-alias": {
             "dev-master": "3.4-dev"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:queue-interop/amqp-interop.git"
+        }
+    ]
 }

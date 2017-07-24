@@ -74,6 +74,38 @@ Finder
    deprecated and will be removed in 4.0 as it used to fix a bug which existed
    before version 5.5.23/5.6.7.
 
+Form
+----
+
+ * Deprecated `ChoiceLoaderInterface` implementation in `TimezoneType`. Use the "choice_loader" option instead.
+
+   Before:
+   ```php
+   class MyTimezoneType extends TimezoneType
+   {
+       public function loadChoices()
+       {
+           // override the method
+       }
+   }
+   ```
+
+   After:
+   ```php
+   class MyTimezoneType extends AbstractType
+   {
+       public function. getParent()
+       {
+           return TimezoneType::class;
+       }
+
+       public function configureOptions(OptionsResolver $resolver)
+       {
+           $resolver->setDefault('choice_loader', ...); // override the option instead
+       }
+   }
+   ```
+
 FrameworkBundle
 ---------------
 

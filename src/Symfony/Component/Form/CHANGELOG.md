@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added `DebugCommand`
+ * deprecated `ChoiceLoaderInterface` implementation in `TimezoneType`
+ * added options "input" and "regions" to `TimezoneType`
 
 3.3.0
 -----

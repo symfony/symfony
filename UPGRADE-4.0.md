@@ -326,8 +326,8 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass` class
    has been removed. Use the `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass`
    class instead.
-   
- * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed. 
+
+ * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
    Use `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
 HttpFoundation
@@ -555,8 +555,8 @@ Yaml
    throws a `ParseException`.
 
  * Removed support for implicitly parsing non-string mapping keys as strings.
-   Mapping keys that are no strings will result in a `ParseException`. Use the
-   `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as strings.
+   Mapping keys that are no strings will result in a `ParseException`. Use
+   quotes to opt-in for keys to be parsed as strings.
 
    Before:
 
@@ -564,7 +564,6 @@ Yaml
    $yaml = <<<YAML
    null: null key
    true: boolean true
-   1: integer key
    2.0: float key
    YAML;
 
@@ -576,13 +575,12 @@ Yaml
    ```php
 
    $yaml = <<<YAML
-   null: null key
-   true: boolean true
-   1: integer key
-   2.0: float key
+   "null": null key
+   "true": boolean true
+   "2.0": float key
    YAML;
 
-   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   Yaml::parse($yaml);
    ```
 
  * Omitting the key of a mapping is not supported anymore and throws a `ParseException`.

@@ -68,8 +68,9 @@ class CacheClearCommandTest extends TestCase
         }
 
         // check that app kernel file present in meta file of container's cache
-        $containerRef = new \ReflectionObject($this->kernel->getContainer());
-        $containerFile = $containerRef->getFileName();
+        $containerClass = $this->kernel->getContainer()->getParameter('kernel.container_class');
+        $containerRef = new \ReflectionClass($containerClass);
+        $containerFile = dirname(dirname($containerRef->getFileName())).'/'.$containerClass.'.php';
         $containerMetaFile = $containerFile.'.meta';
         $kernelRef = new \ReflectionObject($this->kernel);
         $kernelFile = $kernelRef->getFileName();
@@ -83,6 +84,12 @@ class CacheClearCommandTest extends TestCase
             }
         }
         $this->assertTrue($found, 'Kernel file should present as resource');
-        $this->assertRegExp(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', get_class($this->kernel->getContainer())), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
+
+        if (defined('HHVM_VERSION')) {
+            return;
+        }
+        $containerRef = new \ReflectionClass(require $containerFile);
+        $containerFile = str_replace('tes_'.DIRECTORY_SEPARATOR, 'test'.DIRECTORY_SEPARATOR, $containerRef->getFileName());
+        $this->assertRegExp(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
     }
 }

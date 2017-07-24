@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -125,6 +126,9 @@ EOF
 
         $this->filesystem->remove($oldCacheDir);
 
+        // The current event dispatcher is stale, let's not use it anymore
+        $this->getApplication()->setDispatcher(new EventDispatcher());
+
         if ($output->isVerbose()) {
             $io->comment('Finished');
         }
@@ -213,12 +217,18 @@ EOF
         }
 
         // fix references to container's class
-        $tempContainerClass = get_class($tempKernel->getContainer());
-        $realContainerClass = get_class($realKernel->getContainer());
+        $tempContainerClass = $tempKernel->getContainerClass();
+        $realContainerClass = $tempKernel->getRealContainerClass();
         foreach (Finder::create()->files()->depth('<2')->name($tempContainerClass.'*')->in($warmupDir) as $file) {
             $content = str_replace($tempContainerClass, $realContainerClass, file_get_contents($file));
             file_put_contents($file, $content);
             rename($file, str_replace(DIRECTORY_SEPARATOR.$tempContainerClass, DIRECTORY_SEPARATOR.$realContainerClass, $file));
+        }
+        if (is_dir($tempContainerDir = $warmupDir.'/'.get_class($tempKernel->getContainer()))) {
+            foreach (Finder::create()->files()->in($tempContainerDir) as $file) {
+                $content = str_replace($tempContainerClass, $realContainerClass, file_get_contents($file));
+                file_put_contents($file, $content);
+            }
         }
 
         // remove temp kernel file after cache warmed up
@@ -245,7 +255,9 @@ EOF
         // to avoid the many problems in serialized resources files
         $class = substr($parentClass, 0, -1).'_';
         // the temp container class must be changed too
-        $containerClass = var_export(substr(get_class($parent->getContainer()), 0, -1).'_', true);
+        $container = $parent->getContainer();
+        $realContainerClass = var_export($container->hasParameter('kernel.container_class') ? $container->getParameter('kernel.container_class') : get_class($parent->getContainer()), true);
+        $containerClass = substr_replace($realContainerClass, '_', -2, 1);
 
         if (method_exists($parent, 'getProjectDir')) {
             $projectDir = var_export(realpath($parent->getProjectDir()), true);
@@ -281,7 +293,12 @@ namespace $namespace
             return $logDir;
         }
 
-        protected function getContainerClass()
+        public function getRealContainerClass()
+        {
+            return $realContainerClass;
+        }
+
+        public function getContainerClass()
         {
             return $containerClass;
         }

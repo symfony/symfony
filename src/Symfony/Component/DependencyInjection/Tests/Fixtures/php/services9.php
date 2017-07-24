@@ -238,7 +238,7 @@ class ProjectServiceContainer extends Container
     {
         $class = $this->getParameter('foo_class');
 
-        return new $class();
+        return new $class(${($_ = isset($this->services['deprecated_service']) ? $this->services['deprecated_service'] : $this->get('deprecated_service')) && false ?: '_'});
     }
 
     /**

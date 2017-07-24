@@ -239,7 +239,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooBarService()
     {
-        return new \Bar\FooClass();
+        return new \Bar\FooClass(${($_ = isset($this->services['deprecated_service']) ? $this->services['deprecated_service'] : $this->get('deprecated_service')) && false ?: '_'});
     }
 
     /**

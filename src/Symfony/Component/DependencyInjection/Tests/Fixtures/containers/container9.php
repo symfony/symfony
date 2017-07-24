@@ -34,6 +34,7 @@ $container
 ;
 $container
     ->register('foo_bar', '%foo_class%')
+    ->addArgument(new Reference('deprecated_service'))
     ->setShared(false)
 ;
 $container->getParameterBag()->clear();

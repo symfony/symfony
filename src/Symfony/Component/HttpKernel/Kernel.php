@@ -671,9 +671,29 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $dumper->setProxyDumper(new ProxyDumper(md5($cache->getPath())));
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath(), 'debug' => $this->debug));
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath(), 'as_files' => true, 'debug' => $this->debug));
 
-        $cache->write($content, $container->getResources());
+        if (is_array($content)) {
+            foreach ($content as $file => $code) {
+                $cache->write($code, $container->getResources());
+                unset($content[$file]);
+                break;
+            }
+            if (!$content) {
+                return;
+            }
+            $dir = dirname($cache->getPath()).'/'.substr($file, 0, -4);
+            if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf("Unable to create the container directory (%s)\n", $dir));
+            }
+            $dir = dirname($dir).'/';
+            foreach ($content as $file => $code) {
+                file_put_contents($dir.$file, $code);
+            }
+        } else {
+            // BC with di v3.4
+            $cache->write($content, $container->getResources());
+        }
     }
 
     /**

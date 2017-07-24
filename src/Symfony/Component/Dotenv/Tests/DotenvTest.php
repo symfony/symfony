@@ -195,6 +195,13 @@ class DotenvTest extends TestCase
         $dotenv->load(__DIR__);
     }
 
+    public function testSilentlyIgnoreMissingFiles()
+    {
+        $dotenv = new Dotenv();
+        $dotenv->load('nothing-to-see-here');
+        $this->assertTrue(true); //no exception was thrown
+    }
+
     public function testServerSuperglobalIsNotOverriden()
     {
         $originalValue = $_SERVER['argc'];

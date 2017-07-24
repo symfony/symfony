@@ -213,7 +213,7 @@ abstract class AbstractCloner implements ClonerInterface
             gc_disable();
         }
         try {
-            $data = $this->doClone($var);
+            return new Data($this->doClone($var));
         } finally {
             if ($gc) {
                 gc_enable();
@@ -221,8 +221,6 @@ abstract class AbstractCloner implements ClonerInterface
             restore_error_handler();
             $this->prevErrorHandler = null;
         }
-
-        return new Data($data);
     }
 
     /**

@@ -1597,7 +1597,15 @@ EOF;
                 throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $providers = $this->container->getExpressionLanguageProviders();
-            $this->expressionLanguage = new ExpressionLanguage(null, $providers);
+            $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
+                $id = '""' === substr_replace($arg, '', 1, -1) ? stripcslashes(substr($arg, 1, -1)) : null;
+
+                if (null !== $id && ($this->container->hasAlias($id) || $this->container->hasDefinition($id))) {
+                    return $this->getServiceCall($id);
+                }
+
+                return sprintf('$this->get(%s)', $arg);
+            });
 
             if ($this->container->isTrackingResources()) {
                 foreach ($providers as $provider) {

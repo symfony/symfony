@@ -128,6 +128,13 @@ SecurityBundle
 
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
 
+Translation
+-----------
+
+ * `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations` has been deprecated 
+   and will be removed in 4.0, use `Symfony\Component\Translation\Writer\TranslationWriter::write` 
+   instead. 
+
 TwigBridge
 ----------
 

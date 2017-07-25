@@ -259,7 +259,8 @@
                 {% set label = name|humanize %}
             {%- endif -%}
         {%- endif -%}
-        <label{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</label>
+        {%- set label_tag = label_tag|default('label') -%}
+        <{{ label_tag }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</{{ label_tag }}>
     {%- endif -%}
 {%- endblock form_label -%}
 
@@ -292,6 +293,18 @@
 {%- block hidden_row -%}
     {{ form_widget(form) }}
 {%- endblock hidden_row -%}
+
+{% block fieldset_row %}
+    <fieldset {{ block('widget_container_attributes') }}>
+        {%- set label_tag = label_tag|default('legend') %}
+        {{- block('form_label') -}}
+        {%- if form.parent is empty -%}
+            {{ form_errors(form) }}
+        {%- endif -%}
+        {{- block('form_rows') -}}
+        {{- form_rest(form) -}}
+    </fieldset>
+{% endblock %}
 
 {# Misc #}
 

@@ -96,7 +96,10 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class);
-        $this->addCompilerPassIfExists($container, TranslatorPass::class);
+        if (class_exists(TranslatorPass::class)) {
+            // Arguments to be removed in 4.0, relying on the default values
+            $container->addCompilerPass(new TranslatorPass('translator.default', 'translation.loader'));
+        }
         $container->addCompilerPass(new LoggingTranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
         $container->addCompilerPass(new AddCacheClearerPass());

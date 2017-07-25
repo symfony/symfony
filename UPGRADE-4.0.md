@@ -414,7 +414,13 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass`
    class has been removed. Use the
    `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
+ 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Reader\TranslationReader` class instead.
 
+ * The `translation.loader` service has been deprecated and will be removed in 4.0. Use the `translation.reader` service instead.
+ 
 HttpFoundation
 --------------
 
@@ -580,6 +586,8 @@ Translation
 -----------
 
  * Removed the backup feature from the file dumper classes.
+ 
+ * The default value of the `$readerServiceId` argument of `TranslatorPass::__construct()` has been changed to `"translation.reader"`.
  
  * Removed `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations`, 
    use `Symfony\Component\Translation\Writer\TranslationWriter::write` instead. 

@@ -1000,7 +1000,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $container->getCompilerPassConfig()->setOptimizationPasses(array());
             $container->getCompilerPassConfig()->setRemovingPasses(array());
         }
-        $container->getCompilerPassConfig()->setBeforeRemovingPasses(array(new AddAnnotationsCachedReaderPass(), new AddConstraintValidatorsPass(), new TranslatorPass()));
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses(array(new AddAnnotationsCachedReaderPass(), new AddConstraintValidatorsPass(), new TranslatorPass('translator.default', 'translation.reader')));
         $container->compile();
 
         return self::$containerCache[$cacheKey] = $container;

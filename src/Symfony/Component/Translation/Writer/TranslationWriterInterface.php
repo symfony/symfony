@@ -14,7 +14,6 @@ namespace Symfony\Component\Translation\Writer;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\MessageCatalogue;
 
-
 /**
  * TranslationWriter writes translation messages.
  *
@@ -26,8 +25,8 @@ interface TranslationWriterInterface
      * Writes translation from the catalogue according to the selected format.
      *
      * @param MessageCatalogue $catalogue The message catalogue to dump
-     * @param string $format The format to use to dump the messages
-     * @param array $options Options that are passed to the dumper
+     * @param string           $format    The format to use to dump the messages
+     * @param array            $options   Options that are passed to the dumper
      *
      * @throws InvalidArgumentException
      */

@@ -7,6 +7,7 @@ CHANGELOG
  * Added `TranslationDumperPass`
  * Added `TranslationExtractorPass`
  * Added `TranslatorPass`
+ * Added `TranslationWriterInterface`
 
 3.2.0
 -----

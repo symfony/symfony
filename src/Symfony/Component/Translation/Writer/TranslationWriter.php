@@ -21,7 +21,7 @@ use Symfony\Component\Translation\Exception\RuntimeException;
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
-class TranslationWriter
+class TranslationWriter implements TranslationWriterInterface
 {
     /**
      * Dumpers used for export.

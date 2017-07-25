@@ -153,6 +153,7 @@ class PhpDumper extends Dumper
         $code =
             $this->startClass($options['class'], $options['base_class'], $options['namespace']).
             $this->addConstructor().
+            $this->addReset().
             $this->addCompile().
             $this->addIsCompiled().
             $this->addServices().
@@ -829,6 +830,27 @@ EOF;
 EOF;
 
         return $code;
+    }
+
+    /**
+     * Adds the reset method for a compiled container.
+     *
+     * @return string
+     */
+    private function addReset()
+    {
+        return <<<EOF
+
+    /*{$this->docStar}
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        \$this->privates = array();
+        parent::reset();
+    }
+
+EOF;
     }
 
     /**

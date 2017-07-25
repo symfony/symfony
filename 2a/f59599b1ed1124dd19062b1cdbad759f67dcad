@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-24T17:41:44Z
+
+ping @HeahDude @ogizanagi
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-24T17:59:45Z
+
+This looks good to me appart from @xabbuh's minor suggestion which I think should be fixed despite `form_widget_compound`. Congrats on your first PR @fmarchalemisys !
+
+---------------------------------------------------------------------------
+
+by fmarchalemisys at 2017-07-25T06:31:41Z
+
+I made the requested change i.e. replace "is empty" with "is null".
+
+BTW, I ran the test suite against Symfony 3.3.5, not against Symfony 2.7 which is the target of this PR. Should I change the "Test pass?" entry in the PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-25T06:38:09Z
+
+Thanks for your nice first contribution! And no, changing that line is not necessary. As you can see tests on AppVeyor (for Windows) and Travis CI (testing different PHP and dependency versions) all pass. So that's still true. :)

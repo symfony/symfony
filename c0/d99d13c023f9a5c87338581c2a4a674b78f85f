@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by Koc at 2016-11-12T10:55:42Z
+
+@HeahDude done. Also I've changed the test for better description of this new feature.
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-26T10:50:15Z
+
+can anybody review and merge?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-26T11:04:05Z
+
+Some may have some concern about the naming of this option, for me it's a 👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-08T11:21:42Z
+
+I agree with the implementation, but the option name doesn't sound good. For example, we don't check if the whole collection is empty, but only check for each submitted entry if it should be ignored. Can we think of a better name?
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-02-08T11:29:05Z
+
+give some examples of a better name, I'll rename it
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-08T17:01:05Z
+
+What about something like `filter_entry` as we are basically filter our collection entries inside the callback?
+
+---------------------------------------------------------------------------
+
+by murilolobato at 2017-03-17T03:25:20Z
+
+If `is_empty_callback` is a option, I would rename it to just `is_empty`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-22T17:57:45Z
+
+@Koc What about @xabbuh suggestion for the name?
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-03-23T11:26:25Z
+
+@fabpot done, except I prefer `entry_filter` to be consistent with other options like `entry_type`/`entry_options`. Callable should return true for leave entry in collection.
+
+Test failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-03-23T16:01:32Z
+
+IMHO, the option should be the same `delete_empty`, accepting bool or callable. Use `true` to delete empty (non-compound) entries, and use a callable function to delete empty (compound with or without `data_class`)  entries like `Author(null)` or `array('firstName' => '')`.
+
+In case of compound entries with `data_class`:
+```php
+'delete_empty' => function (Author $author = null) {
+    return null === $author || empty($author->firstName);
+},
+```
+In case of compound entries without `data_class`:
+```php
+'delete_empty' => function ($author) {
+    return empty($author['firstName']);
+},
+```
+Thus, we avoid problems to use a new option `entry_filter` (learning curve!!) which will depend of `delete_empty = true` also.
+
+---------------------------------------------------------------------------
+
+by murilolobato at 2017-03-23T16:14:29Z
+
+When the property gets renamed, I can add the test I've made in #22014
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-03-23T20:47:01Z
+
+@yceruto interesting idea, will implement it tomorrow
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-06-04T20:25:48Z
+
+Should be rebased to 3.4 branch?
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-07-23T00:09:31Z
+
+@yceruto done
+@ogizanagi please review
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-07-23T10:09:11Z
+
+@ogizanagi updated again :), now all green

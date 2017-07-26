@@ -425,6 +425,22 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf('BazClass', $container->get('bar')->getBaz());
     }
 
+    public function testExpressionReferencingPrivateService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('private_bar', 'stdClass')
+            ->setPublic(false);
+        $container->register('private_foo', 'stdClass')
+            ->setPublic(false);
+        $container->register('public_foo', 'stdClass')
+            ->addArgument(new Expression('service("private_foo")'));
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_private_in_expression.php', $dumper->dump());
+    }
+
     public function testDumpHandlesLiteralClassWithRootNamespace()
     {
         $container = new ContainerBuilder();

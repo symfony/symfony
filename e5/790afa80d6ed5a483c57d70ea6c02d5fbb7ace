@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-07-25T14:42:31Z
+
+@nicolas-grekas I suggest adding `nightly` on Travis (as an allowed failure). This would already give us regular feedback on support for PHP's master branch (currently the 7.2 development version)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-25T15:01:34Z
+
+I think we have a policy of not adding anything to allowed failures, because that consumes a Travis job, and nobody cares checking what's there. In the past, I usually opened a PR adding that kind of line *and* fixing the code to make it green, and maintained that PR until it was ready for merge as a non-allowed-failure line (which is not something I'd like to do with this PR :) .)

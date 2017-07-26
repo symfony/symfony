@@ -13,8 +13,10 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Run this pass before passes that need to know more about the relation of
@@ -32,6 +34,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     private $repeatedPass;
     private $onlyConstructorArguments;
     private $lazy;
+    private $expressionLanguage;
 
     /**
      * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
@@ -76,6 +79,11 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
             $this->lazy = true;
             parent::processValue($value->getValues());
             $this->lazy = $lazy;
+
+            return $value;
+        }
+        if ($value instanceof Expression) {
+            $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
 
             return $value;
         }
@@ -142,5 +150,28 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         }
 
         return $id;
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            $providers = $this->container->getExpressionLanguageProviders();
+            $this->expressionLanguage = new ExpressionLanguage(null, $providers, function ($arg) {
+                if ('""' === substr_replace($arg, '', 1, -1)) {
+                    $id = stripcslashes(substr($arg, 1, -1));
+
+                    $this->graph->connect(
+                        $this->currentId,
+                        $this->currentDefinition,
+                        $this->getDefinitionId($id),
+                        $this->getDefinition($id)
+                    );
+                }
+
+                return sprintf('$this->get(%s)', $arg);
+            });
+        }
+
+        return $this->expressionLanguage;
     }
 }

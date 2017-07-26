@@ -70,10 +70,6 @@ class RouterMatchCommandTest extends TestCase
             ->will($this->returnValue($requestContext))
         ;
 
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->atLeastOnce())

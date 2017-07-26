@@ -66,13 +66,13 @@ class TranslationWriter implements TranslationWriterInterface
     /**
      * Writes translation from the catalogue according to the selected format.
      *
-     * @param MessageCatalogue $catalogue The message catalogue to dump
+     * @param MessageCatalogue $catalogue The message catalogue to write
      * @param string           $format    The format to use to dump the messages
      * @param array            $options   Options that are passed to the dumper
      *
      * @throws InvalidArgumentException
      */
-    public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
+    public function write(MessageCatalogue $catalogue, $format, $options = array())
     {
         if (!isset($this->dumpers[$format])) {
             throw new InvalidArgumentException(sprintf('There is no dumper associated with format "%s".', $format));
@@ -87,5 +87,20 @@ class TranslationWriter implements TranslationWriterInterface
 
         // save
         $dumper->dump($catalogue, $options);
+    }
+
+    /**
+     * @param MessageCatalogue $catalogue The message catalogue to write
+     * @param string           $format    The format to use to dump the messages
+     * @param array            $options   Options that are passed to the dumper
+     *
+     * @throws InvalidArgumentException
+     *
+     * @deprecated since 3.4 will be removed in 4.0. Use write instead.
+     */
+    public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
+    {
+        @trigger_error('Method writeTranslations() is deprecated. Use write() instead.', E_USER_DEPRECATED);
+        $this->write($catalogue, $format, $options);
     }
 }

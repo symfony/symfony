@@ -24,11 +24,11 @@ interface TranslationWriterInterface
     /**
      * Writes translation from the catalogue according to the selected format.
      *
-     * @param MessageCatalogue $catalogue The message catalogue to dump
+     * @param MessageCatalogue $catalogue The message catalogue to write
      * @param string           $format    The format to use to dump the messages
      * @param array            $options   Options that are passed to the dumper
      *
      * @throws InvalidArgumentException
      */
-    public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array());
+    public function write(MessageCatalogue $catalogue, $format, $options = array());
 }

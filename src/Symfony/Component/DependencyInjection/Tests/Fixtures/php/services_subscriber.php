@@ -70,12 +70,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber' service.
+     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber A Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber instance
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
      */
     protected function getSymfony_Component_DependencyInjection_Tests_Fixtures_TestServiceSubscriberService()
     {
@@ -83,14 +80,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'foo_service' service.
+     * Gets the public 'foo_service' shared autowired service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * This service is autowired.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber A Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber instance
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
      */
     protected function getFooServiceService()
     {
@@ -106,18 +98,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'autowired.Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition' service.
+     * Gets the private 'autowired.Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition' shared autowired service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * This service is private.
-     * If you want to be able to request this service from the container directly,
-     * make it public, otherwise you might end up with broken code.
-     *
-     * This service is autowired.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition A Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition instance
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition
      */
     protected function getAutowired_Symfony_Component_DependencyInjection_Tests_Fixtures_CustomDefinitionService()
     {

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-07-26T07:35:24Z
+
+No change in fixtures files ? This let's me think that all the logic you changed in the dumper may not be tested properly
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-26T07:42:55Z
+
+@stof you're right :)

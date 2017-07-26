@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-25T11:44:26Z
+
+In fact, the remaining issue is now fixed in this very PR, as bug fix: private services used only in expressions are now considered when building the service dependency graph.

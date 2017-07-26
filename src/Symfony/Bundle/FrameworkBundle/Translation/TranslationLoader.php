@@ -18,6 +18,6 @@ class TranslationLoader extends \Symfony\Component\Translation\Loader\Translatio
 {
     public function __construct()
     {
-        @trigger_error(sprintf('The class "%s" has been deprecated. Use "%s" instead. ', TranslationLoader::class, \Symfony\Component\Translation\Loader\TranslationLoader::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The class "%s" has been deprecated. Use "%s" instead. ', self::class, \Symfony\Component\Translation\Loader\TranslationLoader::class), E_USER_DEPRECATED);
     }
 }

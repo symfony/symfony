@@ -74,7 +74,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarServiceService()
     {
-        return $this->services['bar_service'] = new \stdClass(($this->privates['baz_service'] ?? $this->getBazServiceService()));
+        return $this->services['bar_service'] = new \stdClass(($this->privates['baz_service'] ?? ($this->privates['baz_service'] = new \stdClass())));
     }
 
     /**
@@ -87,7 +87,7 @@ class ProjectServiceContainer extends Container
         return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('bar' => function () {
             return ($this->services['bar_service'] ?? $this->getBarServiceService());
         }, 'baz' => function (): \stdClass {
-            return ($this->privates['baz_service'] ?? $this->getBazServiceService());
+            return ($this->privates['baz_service'] ?? ($this->privates['baz_service'] = new \stdClass()));
         }, 'nil' => function () {
             return NULL;
         }));
@@ -168,15 +168,5 @@ class ProjectServiceContainer extends Container
         $instance->addResource('db', $a, 'en');
 
         return $instance;
-    }
-
-    /**
-     * Gets the private 'baz_service' shared service.
-     *
-     * @return \stdClass
-     */
-    private function getBazServiceService()
-    {
-        return $this->privates['baz_service'] = new \stdClass();
     }
 }

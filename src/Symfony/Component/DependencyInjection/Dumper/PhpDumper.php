@@ -447,6 +447,50 @@ class PhpDumper extends Dumper
     }
 
     /**
+     * Checks if the definition is a trivial instance.
+     *
+     * @param Definition $definition
+     *
+     * @return bool
+     */
+    private function isTrivialInstance(Definition $definition)
+    {
+        if ($definition->isPublic() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
+            return false;
+        }
+        if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < count($definition->getArguments())) {
+            return false;
+        }
+
+        foreach ($definition->getArguments() as $arg) {
+            if (!$arg || ($arg instanceof Reference && 'service_container' !== (string) $arg)) {
+                continue;
+            }
+            if (is_array($arg) && 3 >= count($arg)) {
+                foreach ($arg as $k => $v) {
+                    if ($this->dumpValue($k) !== $this->dumpValue($k, false)) {
+                        return false;
+                    }
+                    if (!$v || ($v instanceof Reference && 'service_container' !== (string) $v)) {
+                        continue;
+                    }
+                    if (!is_scalar($v) || $this->dumpValue($v) !== $this->dumpValue($v, false)) {
+                        return false;
+                    }
+                }
+            } elseif (!is_scalar($arg) || $this->dumpValue($arg) !== $this->dumpValue($arg, false)) {
+                return false;
+            }
+        }
+
+        if (false !== strpos($this->dumpLiteralClass($this->dumpValue($definition->getClass())), '$')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Adds method calls to a service definition.
      *
      * @param string     $id
@@ -675,7 +719,7 @@ EOF;
         foreach ($definitions as $id => $definition) {
             if ($definition->isPublic()) {
                 $publicServices .= $this->addService($id, $definition);
-            } else {
+            } elseif (!$this->isTrivialInstance($definition)) {
                 $privateServices .= $this->addService($id, $definition);
             }
         }
@@ -1504,10 +1548,18 @@ EOF;
         }
 
         if ($this->container->hasDefinition($id)) {
-            $code = sprintf('$this->%s()', $this->generateMethodName($id));
+            $definition = $this->container->getDefinition($id);
 
-            if ($this->container->getDefinition($id)->isShared()) {
-                $code = sprintf('($this->%s[\'%s\'] ?? %s)', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $id, $code);
+            if ($definition->isPublic() || !$this->isTrivialInstance($definition)) {
+                $code = sprintf('$this->%s()', $this->generateMethodName($id));
+            } else {
+                $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
+                if ($definition->isShared()) {
+                    $code = sprintf('($this->privates[\'%s\'] = %s)', $id, $code);
+                }
+            }
+            if ($definition->isShared()) {
+                $code = sprintf('($this->%s[\'%s\'] ?? %s)', $definition->isPublic() ? 'services' : 'privates', $id, $code);
             }
         } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);

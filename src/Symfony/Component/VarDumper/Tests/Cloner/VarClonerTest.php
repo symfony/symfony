@@ -33,19 +33,9 @@ Symfony\Component\VarDumper\Cloner\Data Object
         (
             [0] => Array
                 (
-                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                    [0] => Array
                         (
-                            [type] => array
-                            [class] => assoc
-                            [value] => 1
-                            [cut] => 0
-                            [handle] => 0
-                            [refCount] => 0
-                            [position] => 1
-                            [attr] => Array
-                                (
-                                )
-
+                            [1] => 1
                         )
 
                 )
@@ -84,7 +74,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                 (
                     [0] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
-                            [type] => object
+                            [type] => 4
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
@@ -103,7 +93,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                 (
                     [\000+\0001] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
-                            [type] => object
+                            [type] => 4
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
@@ -118,7 +108,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
                     [\000+\0002] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
-                            [type] => object
+                            [type] => 4
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
@@ -174,24 +164,9 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
     [0]=>
     array(1) {
       [0]=>
-      object(Symfony\Component\VarDumper\Cloner\Stub)#%i (8) {
-        ["type"]=>
-        string(5) "array"
-        ["class"]=>
-        string(5) "assoc"
-        ["value"]=>
+      array(1) {
+        [1]=>
         int(1)
-        ["cut"]=>
-        int(0)
-        ["handle"]=>
-        int(0)
-        ["refCount"]=>
-        int(0)
-        ["position"]=>
-        int(1)
-        ["attr"]=>
-        array(0) {
-        }
       }
     }
     [1]=>
@@ -199,7 +174,7 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
       ["1"]=>
       object(Symfony\Component\VarDumper\Cloner\Stub)#%i (8) {
         ["type"]=>
-        string(6) "object"
+        int(4)
         ["class"]=>
         string(8) "stdClass"
         ["value"]=>
@@ -259,7 +234,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                 (
                     [0] => Symfony\Component\VarDumper\Cloner\Stub Object
                         (
-                            [type] => object
+                            [type] => 4
                             [class] => %s
                             [value] => 
                             [cut] => 0

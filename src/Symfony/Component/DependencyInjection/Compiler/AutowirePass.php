@@ -246,6 +246,12 @@ class AutowirePass extends AbstractRecursivePass
 
                 // no default value? Then fail
                 if (!$parameter->isDefaultValueAvailable()) {
+                    // For core classes, isDefaultValueAvailable() can
+                    // be false when isOptional() returns true. If the
+                    // argument *is* optional, allow it to be missing
+                    if ($parameter->isOptional()) {
+                        continue;
+                    }
                     throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
                 }
 

@@ -441,7 +441,7 @@ class Inline
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey) && !is_int($evaluatedKey)) {
-                    throw new ParseException('Implicit casting of incompatible mapping keys to strings is not supported. Pass the Yaml::PARSE_KEYS_AS_STRINGS flag to cast them to strings.', self::$parsedLineNumber + 1, $mapping);
+                    throw new ParseException('Implicit casting of incompatible mapping keys to strings is not supported. Quote your evaluable mapping keys instead.', self::$parsedLineNumber + 1, $mapping);
                 }
             }
 

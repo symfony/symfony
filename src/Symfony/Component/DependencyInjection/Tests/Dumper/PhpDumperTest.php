@@ -145,7 +145,7 @@ class PhpDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container9.php';
         $container->compile();
         $dumper = new PhpDumper($container);
-        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9_compiled.php')), $dumper->dump(), '->dump() dumps services');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), '%path%', $dumper->dump()), '->dump() dumps services');
 
         $container = new ContainerBuilder();
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
@@ -577,6 +577,22 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_array_params.php', str_replace('\\\\Dumper', '/Dumper', $dumper->dump(array('file' => self::$fixturesPath.'/php/services_array_params.php'))));
+    }
+
+    public function testExpressionReferencingPrivateService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('private_bar', 'stdClass')
+            ->setPublic(false);
+        $container->register('private_foo', 'stdClass')
+            ->setPublic(false);
+        $container->register('public_foo', 'stdClass')
+            ->addArgument(new Expression('service("private_foo")'));
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_private_in_expression.php', $dumper->dump());
     }
 
     public function testDumpHandlesLiteralClassWithRootNamespace()

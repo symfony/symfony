@@ -47,8 +47,7 @@ CHANGELOG
 
  * Deprecated support for implicitly parsing non-string mapping keys as strings.
    Mapping keys that are no strings will lead to a `ParseException` in Symfony
-   4.0. Use the `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as
-   strings.
+   4.0. Use quotes to opt-in for keys to be parsed as strings.
 
    Before:
 
@@ -56,7 +55,6 @@ CHANGELOG
    $yaml = <<<YAML
    null: null key
    true: boolean true
-   1: integer key
    2.0: float key
    YAML;
 
@@ -68,13 +66,12 @@ CHANGELOG
    ```php
 
    $yaml = <<<YAML
-   null: null key
-   true: boolean true
-   1: integer key
-   2.0: float key
+   "null": null key
+   "true": boolean true
+   "2.0": float key
    YAML;
 
-   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   Yaml::parse($yaml);
    ```
 
  * Omitted mapping values will be parsed as `null`.

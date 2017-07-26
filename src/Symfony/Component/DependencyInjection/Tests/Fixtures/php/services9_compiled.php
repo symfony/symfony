@@ -394,7 +394,7 @@ class ProjectServiceContainer extends Container
 
         $instance->setBar(($this->services['foo'] ?? $this->getFooService()));
         $instance->setBar(NULL);
-        $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar((($this->services['foo'] ?? $this->getFooService())->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
 
         return $instance;
     }

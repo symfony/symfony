@@ -26,6 +26,7 @@ trait MemcachedTrait
         'persistent_id' => null,
         'username' => null,
         'password' => null,
+        'serializer' => 'php',
     );
 
     private $client;
@@ -194,7 +195,14 @@ trait MemcachedTrait
      */
     protected function doFetch(array $ids)
     {
-        return $this->checkResultCode($this->client->getMulti($ids));
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+        try {
+            return $this->checkResultCode($this->client->getMulti($ids));
+        } catch (\Error $e) {
+            throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+        } finally {
+            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
+        }
     }
 
     /**

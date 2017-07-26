@@ -1,21 +1,19 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
+    {% import _self as helper %}
     {% set request_handler %}
-        {% import _self as helper %}
         {{ helper.set_handler(collector.controller) }}
     {% endset %}
 
     {% if collector.redirect %}
         {% set redirect_handler %}
-            {% import _self as helper %}
             {{ helper.set_handler(collector.redirect.controller, collector.redirect.route, 'GET' != collector.redirect.method ? collector.redirect.method) }}
         {% endset %}
     {% endif %}
 
     {% if collector.forward|default(false) %}
         {% set forward_handler %}
-            {% import _self as helper %}
             {{ helper.set_handler(collector.forward.controller) }}
         {% endset %}
     {% endif %}
@@ -108,6 +106,12 @@
 {% endblock %}
 
 {% block panel %}
+    {% import _self as helper %}
+
+    <h2>
+        {{ helper.set_handler(collector.controller) }}
+    </h2>
+
     <div class="sf-tabs">
         <div class="tab">
             <h3 class="tab-title">Request</h3>
@@ -268,7 +272,7 @@
                 {% for child in profile.children %}
                     <h3>
                         <a href="{{ path('_profiler', { token: child.token }) }}">
-                            {{- child.getcollector('request').identifier -}}
+                            {{ helper.set_handler(child.getcollector('request').controller) }}
                         </a>
                         <small>(token = {{ child.token }})</small>
                     </h3>

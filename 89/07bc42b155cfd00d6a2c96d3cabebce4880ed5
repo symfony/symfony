@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-21T20:31:46Z
+
+So, what would be your stand on #19895?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-21T20:37:45Z
+
+Accidentally hit delete when editing my original message; here it is again:
+
+> Does this make the php serializer default now?! Do we really need to force this default for users, especially to an inferior serialization method? If people want portability and the environment's they deploy to differ, they can already explicitly set whatever serializer they want, right?
+
+I think my initial reaction was an uneducated gut-reaction without fully understanding the intentions of this PR; if your goal is https://github.com/symfony/symfony/issues/19895#issuecomment-317005709, then I'm onboard, and may even have some time to contribute towards those goals.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-21T20:46:26Z
+
+My goal with this PR is to have a predictable, thus safe, default behavior. :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-22T13:24:53Z
+
+Rebased to target 3.3

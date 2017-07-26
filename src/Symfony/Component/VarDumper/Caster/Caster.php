@@ -60,7 +60,7 @@ class Caster
             $combine = false;
             $p = array_keys($a);
             foreach ($p as $i => $k) {
-                if (isset($k[0]) && "\0" !== $k[0] && !$reflector->hasProperty($k)) {
+                if (isset($k[0]) ? "\0" !== $k[0] && !$reflector->hasProperty($k) : \PHP_VERSION_ID >= 70200) {
                     $combine = true;
                     $p[$i] = self::PREFIX_DYNAMIC.$k;
                 } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {

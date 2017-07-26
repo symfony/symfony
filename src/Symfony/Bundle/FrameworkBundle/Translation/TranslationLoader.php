@@ -16,4 +16,8 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
  */
 class TranslationLoader extends \Symfony\Component\Translation\Loader\TranslationLoader
 {
+    public function __construct()
+    {
+        @trigger_error(sprintf('The class "%s" has been deprecated. Use "%s" instead. ', TranslationLoader::class, \Symfony\Component\Translation\Loader\TranslationLoader::class), E_USER_DEPRECATED);
+    }
 }

@@ -336,15 +336,12 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass` class
    has been removed. Use the `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass`
    class instead.
-   
+
  * Using the `KERNEL_DIR` environment variable and the automatic guessing based
    on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()` 
    method implementation. Set the `KERNEL_CLASS` environment variable to the
    fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()` 
    or `KernelTestCase::getKernelClass()` method instead.
-   
- * The methods `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
-   have been removed.
 
  * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
    Use `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
@@ -556,10 +553,10 @@ TwigBridge
 
  * The `TwigRendererEngine::setEnvironment()` method has been removed.
    Pass the Twig Environment as second argument of the constructor instead.
-   
+
  * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability 
    to pass a command name as first argument.
- 
+
  * Removed `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability
    to pass a command name as first argument.
 
@@ -645,8 +642,8 @@ Yaml
    throws a `ParseException`.
 
  * Removed support for implicitly parsing non-string mapping keys as strings.
-   Mapping keys that are no strings will result in a `ParseException`. Use the
-   `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as strings.
+   Mapping keys that are no strings will result in a `ParseException`. Use
+   quotes to opt-in for keys to be parsed as strings.
 
    Before:
 
@@ -654,7 +651,6 @@ Yaml
    $yaml = <<<YAML
    null: null key
    true: boolean true
-   1: integer key
    2.0: float key
    YAML;
 
@@ -666,13 +662,12 @@ Yaml
    ```php
 
    $yaml = <<<YAML
-   null: null key
-   true: boolean true
-   1: integer key
-   2.0: float key
+   "null": null key
+   "true": boolean true
+   "2.0": float key
    YAML;
 
-   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   Yaml::parse($yaml);
    ```
 
  * Omitting the key of a mapping is not supported anymore and throws a `ParseException`.

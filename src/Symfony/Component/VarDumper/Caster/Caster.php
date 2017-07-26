@@ -70,7 +70,7 @@ class Caster
             $i = 0;
             $prefixedKeys = array();
             foreach ($a as $k => $v) {
-                if (isset($k[0]) && "\0" !== $k[0]) {
+                if (isset($k[0]) ? "\0" !== $k[0] : \PHP_VERSION_ID >= 70200) {
                     if (!isset($publicProperties[$class])) {
                         foreach (get_class_vars($class) as $prop => $v) {
                             $publicProperties[$class][$prop] = true;

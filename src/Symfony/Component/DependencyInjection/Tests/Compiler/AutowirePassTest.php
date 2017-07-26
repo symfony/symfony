@@ -512,6 +512,23 @@ class AutowirePassTest extends TestCase
         );
     }
 
+    public function testOptionalArgsNoRequiredForCoreClasses()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', \SplFileObject::class)
+            ->addArgument('foo.txt')
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('foo');
+        $this->assertEquals(
+            array('foo.txt'),
+            $definition->getArguments()
+        );
+    }
+
     public function testSetterInjection()
     {
         $container = new ContainerBuilder();

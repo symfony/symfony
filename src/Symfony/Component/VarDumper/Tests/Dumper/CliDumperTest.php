@@ -200,8 +200,22 @@ EOTXT
         $var[] = &$v;
         $var[''] = 2;
 
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
+        if (\PHP_VERSION_ID >= 70200) {
+            $this->assertDumpMatchesFormat(
+                <<<'EOTXT'
+array:4 [
+  0 => {}
+  1 => &1 null
+  2 => &1 null
+  "" => 2
+]
+EOTXT
+                ,
+                $var
+            );
+        } else {
+            $this->assertDumpMatchesFormat(
+                <<<'EOTXT'
 array:4 [
   "0" => {}
   "1" => &1 null
@@ -209,9 +223,10 @@ array:4 [
   "" => 2
 ]
 EOTXT
-            ,
-            $var
-        );
+                ,
+                $var
+            );
+        }
     }
 
     public function testObjectCast()
@@ -219,16 +234,28 @@ EOTXT
         $var = (object) array(1 => 1);
         $var->{1} = 2;
 
-        $this->assertDumpMatchesFormat(
-            <<<'EOTXT'
+        if (\PHP_VERSION_ID >= 70200) {
+            $this->assertDumpMatchesFormat(
+                <<<'EOTXT'
+{
+  +"1": 2
+}
+EOTXT
+                ,
+                $var
+            );
+        } else {
+            $this->assertDumpMatchesFormat(
+                <<<'EOTXT'
 {
   +1: 1
   +"1": 2
 }
 EOTXT
-            ,
-            $var
-        );
+                ,
+                $var
+            );
+        }
     }
 
     public function testClosedResource()

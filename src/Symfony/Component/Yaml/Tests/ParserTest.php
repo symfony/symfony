@@ -1081,7 +1081,7 @@ EOF;
 
     /**
      * @group legacy
-     * @expectedDeprecation Implicit casting of numeric key to string is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRINGS flag to explicitly enable the type casts.
+     * @expectedDeprecation Implicit casting of numeric key to string is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.
      */
     public function testFloatKeys()
     {
@@ -1103,7 +1103,7 @@ EOF;
 
     /**
      * @group legacy
-     * @expectedDeprecation Implicit casting of non-string key to string is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRINGS flag to explicitly enable the type casts.
+     * @expectedDeprecation Implicit casting of non-string key to string is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.
      */
     public function testBooleanKeys()
     {

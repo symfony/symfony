@@ -66,12 +66,48 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
+    public function testGetPropertiesWithEmbedded()
+    {
+        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+        }
+
+        $this->assertEquals(
+            array(
+                'id',
+                'embedded',
+            ),
+            $this->extractor->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
+        );
+    }
+
     /**
      * @dataProvider typesProvider
      */
     public function testExtract($property, array $type = null)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, array()));
+    }
+
+    public function testExtractWithEmbedded()
+    {
+        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+        }
+
+        $expectedTypes = array(new Type(
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
+        ));
+
+        $actualTypes = $this->extractor->getTypes(
+            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',
+            'embedded',
+            array()
+        );
+
+        $this->assertEquals($expectedTypes, $actualTypes);
     }
 
     public function typesProvider()

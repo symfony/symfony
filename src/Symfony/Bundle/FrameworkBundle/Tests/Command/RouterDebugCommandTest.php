@@ -71,10 +71,6 @@ class RouterDebugCommandTest extends TestCase
             ->will($this->returnValue($routeCollection))
         ;
 
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->atLeastOnce())

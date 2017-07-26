@@ -32,12 +32,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'service_from_anonymous_factory' service.
+     * Gets the public 'service_from_anonymous_factory' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getServiceFromAnonymousFactoryService()
     {
@@ -45,12 +42,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'service_with_method_call_and_factory' service.
+     * Gets the public 'service_with_method_call_and_factory' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getServiceWithMethodCallAndFactoryService()
     {

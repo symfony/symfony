@@ -423,7 +423,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         if (isset($item[0])) {
             $stub->cut = $item[0];
         }
-        $stub->value = $stub->cut + \count($this->data[$stub->position]);
+        $stub->value = $stub->cut + ($stub->position ? \count($this->data[$stub->position]) : 0);
 
         return $stub;
     }

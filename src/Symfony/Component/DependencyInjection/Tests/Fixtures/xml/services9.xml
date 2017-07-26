@@ -114,6 +114,7 @@
     </service>
     <service id="factory_simple" class="SimpleFactoryClass" public="false">
       <argument>foo</argument>
+      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.</deprecated>
     </service>
     <service id="factory_service_simple" class="Bar">
       <factory service="factory_simple" method="getInstance"/>

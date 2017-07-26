@@ -76,12 +76,12 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $this->services['bar'] = $instance = new \stdClass();
 
         $instance->foo1 = ${($_ = isset($this->services['foo1']) ? $this->services['foo1'] : null) && false ?: '_'};
-        $instance->foo2 = null;
+        $instance->foo2 = ${($_ = isset($this->services['foo2']) ? $this->services['foo2'] : null) && false ?: '_'};
         $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : null) && false ?: '_'};
         $instance->closures = array(0 => function () {
             return ${($_ = isset($this->services['foo1']) ? $this->services['foo1'] : null) && false ?: '_'};
         }, 1 => function () {
-            return null;
+            return ${($_ = isset($this->services['foo2']) ? $this->services['foo2'] : null) && false ?: '_'};
         }, 2 => function () {
             return ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : null) && false ?: '_'};
         });
@@ -90,7 +90,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
                 yield 'foo1' => ${($_ = isset($this->services['foo1']) ? $this->services['foo1'] : null) && false ?: '_'};
             }
             if (false) {
-                yield 'foo2' => null;
+                yield 'foo2' => ${($_ = isset($this->services['foo2']) ? $this->services['foo2'] : null) && false ?: '_'};
             }
             if (isset($this->services['foo3'])) {
                 yield 'foo3' => ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : null) && false ?: '_'};
@@ -111,7 +111,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     {
         $this->services['baz'] = $instance = new \stdClass();
 
-        $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : $this->getFoo3Service()) && false ?: '_'};
+        $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : $this->services['foo3'] = new \stdClass()) && false ?: '_'};
 
         return $instance;
     }

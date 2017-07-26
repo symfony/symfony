@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializable
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     private $data;
     private $position = 0;
@@ -72,7 +72,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
         if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
             $item = $item->value;
         }
-        if (!$item instanceof Stub) {
+        if (!($item = $this->getStub($item)) instanceof Stub) {
             return $item;
         }
         if (Stub::TYPE_STRING === $item->type) {
@@ -82,7 +82,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
         $children = $item->position ? $this->data[$item->position] : array();
 
         foreach ($children as $k => $v) {
-            if ($recursive && !$v instanceof Stub) {
+            if ($recursive && !($v = $this->getStub($v)) instanceof Stub) {
                 continue;
             }
             $children[$k] = clone $this;
@@ -90,12 +90,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
             $children[$k]->position = $item->position;
 
             if ($recursive) {
-                if ($v instanceof Stub && Stub::TYPE_REF === $v->type && $v->value instanceof Stub) {
+                if (Stub::TYPE_REF === $v->type && ($v = $this->getStub($v->value)) instanceof Stub) {
                     $recursive = (array) $recursive;
-                    if (isset($recursive[$v->value->position])) {
+                    if (isset($recursive[$v->position])) {
                         continue;
                     }
-                    $recursive[$v->value->position] = true;
+                    $recursive[$v->position] = true;
                 }
                 $children[$k] = $children[$k]->getValue($recursive);
             }
@@ -123,7 +123,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
     public function __get($key)
     {
         if (null !== $data = $this->seek($key)) {
-            $item = $data->data[$data->position][$data->key];
+            $item = $this->getStub($data->data[$data->position][$data->key]);
 
             return $item instanceof Stub || array() === $item ? $data : $item;
         }
@@ -224,7 +224,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
         if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
             $item = $item->value;
         }
-        if (!$item instanceof Stub || !$item->position) {
+        if (!($item = $this->getStub($item)) instanceof Stub || !$item->position) {
             return;
         }
         $keys = array($key);
@@ -267,57 +267,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
     }
 
     /**
-     * @internal
-     */
-    public function serialize()
-    {
-        $data = $this->data;
-
-        foreach ($data as $i => $values) {
-            foreach ($values as $k => $v) {
-                if ($v instanceof Stub) {
-                    if (Stub::TYPE_ARRAY === $v->type) {
-                        $v = self::mapStubConsts($v, false);
-                        $data[$i][$k] = array($v->class, $v->position, $v->cut);
-                    } else {
-                        $v = self::mapStubConsts($v, false);
-                        $data[$i][$k] = array($v->class, $v->position, $v->cut, $v->type, $v->value, $v->handle, $v->refCount, $v->attr);
-                    }
-                }
-            }
-        }
-
-        return serialize(array($data, $this->position, $this->key, $this->maxDepth, $this->maxItemsPerDepth, $this->useRefHandles));
-    }
-
-    /**
-     * @internal
-     */
-    public function unserialize($serialized)
-    {
-        list($data, $this->position, $this->key, $this->maxDepth, $this->maxItemsPerDepth, $this->useRefHandles) = unserialize($serialized);
-
-        foreach ($data as $i => $values) {
-            foreach ($values as $k => $v) {
-                if ($v && is_array($v)) {
-                    $s = new Stub();
-                    if (3 === count($v)) {
-                        $s->type = Stub::TYPE_ARRAY;
-                        $s = self::mapStubConsts($s, false);
-                        list($s->class, $s->position, $s->cut) = $v;
-                        $s->value = $s->cut + count($data[$s->position]);
-                    } else {
-                        list($s->class, $s->position, $s->cut, $s->type, $s->value, $s->handle, $s->refCount, $s->attr) = $v;
-                    }
-                    $data[$i][$k] = self::mapStubConsts($s, true);
-                }
-            }
-        }
-
-        $this->data = $data;
-    }
-
-    /**
      * Depth-first dumping of items.
      *
      * @param DumperInterface $dumper The dumper being used for dumping
@@ -334,7 +283,10 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
 
         if (!$item instanceof Stub) {
             $cursor->attr = array();
-            $type = gettype($item);
+            $type = \gettype($item);
+            if ($item && 'array' === $type) {
+                $item = $this->getStub($item);
+            }
         } elseif (Stub::TYPE_REF === $item->type) {
             if ($item->handle) {
                 if (!isset($refs[$r = $item->handle - (PHP_INT_MAX >> 1)])) {
@@ -348,7 +300,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
             }
             $cursor->attr = $item->attr;
             $type = $item->class ?: gettype($item->value);
-            $item = $item->value;
+            $item = $this->getStub($item->value);
         }
         if ($item instanceof Stub) {
             if ($item->refCount) {
@@ -446,21 +398,20 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Serializabl
         return $hashCut;
     }
 
-    private static function mapStubConsts(Stub $stub, $resolve)
+    private function getStub($item)
     {
-        static $stubConstIndexes, $stubConstValues;
-
-        if (null === $stubConstIndexes) {
-            $r = new \ReflectionClass(Stub::class);
-            $stubConstIndexes = array_flip(array_values($r->getConstants()));
-            $stubConstValues = array_flip($stubConstIndexes);
+        if (!$item || !\is_array($item)) {
+            return $item;
         }
 
-        $map = $resolve ? $stubConstValues : $stubConstIndexes;
-
-        $stub = clone $stub;
-        $stub->type = $map[$stub->type];
-        $stub->class = isset($map[$stub->class]) ? $map[$stub->class] : $stub->class;
+        $stub = new Stub();
+        $stub->type = Stub::TYPE_ARRAY;
+        foreach ($item as $stub->class => $stub->position) {
+        }
+        if (isset($item[0])) {
+            $stub->cut = $item[0];
+        }
+        $stub->value = $stub->cut + ($stub->position ? \count($this->data[$stub->position]) : 0);
 
         return $stub;
     }

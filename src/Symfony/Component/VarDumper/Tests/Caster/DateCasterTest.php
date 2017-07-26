@@ -56,7 +56,7 @@ EODUMP;
 
         $xDump = <<<'EODUMP'
 Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: "ref"
+  +type: 1
   +class: "2017-08-30 00:00:00.000000 Europe/Zurich (+02:00)"
   +value: """
     Wednesday, August 30, 2017\n
@@ -141,7 +141,7 @@ EODUMP;
 
         $xDump = <<<EODUMP
 Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: "ref"
+  +type: 1
   +class: "$xInterval"
   +value: "$xSeconds"
   +cut: 0
@@ -230,7 +230,7 @@ EODUMP;
 
         $xDump = <<<EODUMP
 Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: "ref"
+  +type: 1
   +class: "$xTimezone"
   +value: "$xRegion"
   +cut: 0

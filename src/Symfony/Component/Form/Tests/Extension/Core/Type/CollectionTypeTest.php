@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends BaseTypeTest
 {
@@ -108,6 +109,49 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testResizedDownWithDeleteEmptyCallable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'entry_type' => AuthorType::class,
+            'allow_delete' => true,
+            'delete_empty' => function (Author $obj = null) {
+                return null === $obj || empty($obj->firstName);
+            },
+        ));
+
+        $form->setData(array(new Author('Bob'), new Author('Alice')));
+        $form->submit(array(array('firstName' => 'Bob'), array('firstName' => '')));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals(new Author('Bob'), $form[0]->getData());
+        $this->assertEquals(array(new Author('Bob')), $form->getData());
+    }
+
+    public function testResizedDownIfSubmittedWithCompoundEmptyDataDeleteEmptyAndNoDataClass()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'entry_type' => AuthorType::class,
+            // If the field is not required, no new Author will be created if the
+            // form is completely empty
+            'entry_options' => array('data_class' => null),
+            'allow_add' => true,
+            'allow_delete' => true,
+            'delete_empty' => function ($author) {
+                return empty($author['firstName']);
+            },
+        ));
+        $form->setData(array(array('firstName' => 'first', 'lastName' => 'last')));
+        $form->submit(array(
+            array('firstName' => 's_first', 'lastName' => 's_last'),
+            array('firstName' => '', 'lastName' => ''),
+        ));
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals(array('firstName' => 's_first', 'lastName' => 's_last'), $form[0]->getData());
+        $this->assertEquals(array(array('firstName' => 's_first', 'lastName' => 's_last')), $form->getData());
     }
 
     public function testDontAddEmptyDataIfDeleteEmpty()

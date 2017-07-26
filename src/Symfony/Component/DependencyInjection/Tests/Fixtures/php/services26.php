@@ -50,10 +50,7 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'test' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
+     * Gets the public 'test' shared service.
      *
      * @return object A %env(FOO)% instance
      */

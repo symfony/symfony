@@ -52,12 +52,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'public_foo' service.
+     * Gets the public 'public_foo' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      */
     protected function getPublicFooService()
     {
@@ -65,16 +62,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'private_foo' service.
+     * Gets the private 'private_foo' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * This service is private.
-     * If you want to be able to request this service from the container directly,
-     * make it public, otherwise you might end up with broken code.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      */
     protected function getPrivateFooService()
     {

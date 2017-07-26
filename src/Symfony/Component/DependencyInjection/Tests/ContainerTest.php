@@ -230,7 +230,7 @@ class ContainerTest extends TestCase
      */
     public function testGetSyntheticServiceThrows()
     {
-        require_once __DIR__.'/Fixtures/php/services9.php';
+        require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
         $container->get('request');

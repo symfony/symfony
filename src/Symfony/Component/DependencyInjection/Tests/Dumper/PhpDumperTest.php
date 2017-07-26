@@ -272,7 +272,7 @@ class PhpDumperTest extends TestCase
      */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
-        require_once self::$fixturesPath.'/php/services9.php';
+        require_once self::$fixturesPath.'/php/services9_compiled.php';
         require_once self::$fixturesPath.'/includes/foo.php';
 
         $container = new \ProjectServiceContainer();

@@ -67,12 +67,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'bar' service.
+     * Gets the public 'bar' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \BarClass A BarClass instance
+     * @return \BarClass
      */
     protected function getBarService()
     {

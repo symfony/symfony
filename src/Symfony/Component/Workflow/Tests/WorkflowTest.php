@@ -281,9 +281,9 @@ class WorkflowTest extends TestCase
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
-        $eventDispatcher = new EventDispatcherMock();
+        $dispatcher = new EventDispatcher();
         $name = 'workflow_name';
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, $name);
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $dispatcher, $name);
 
         $assertWorkflowName = function (Event $event) use ($name) {
             $this->assertEquals($name, $event->getWorkflowName());
@@ -299,10 +299,10 @@ class WorkflowTest extends TestCase
         );
 
         foreach ($eventNames as $eventName) {
-            $eventDispatcher->addListener($eventName, $assertWorkflowName);
+            $dispatcher->addListener($eventName, $assertWorkflowName);
         }
 
-        $marking = $workflow->apply($subject, 't1');
+        $workflow->apply($subject, 't1');
     }
 
     public function testMarkingStateOnApplyWithEventDispatcher()

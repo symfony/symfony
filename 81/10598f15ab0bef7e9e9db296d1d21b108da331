@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-19T14:50:07Z
+
+good catch.
+
+> Im not sure why this as not been added before. When dispatching all other events we use the forth parameter to Event.
+
+Because I only searched for `        $event = new Event($subject, $marking, $transition);
+` (`$transition` vs `$initialTransition`) ;)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-07-19T14:58:20Z
+
+A unit test sounds necessary here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-20T14:17:55Z
+
+For which branch is this?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-20T15:49:25Z
+
+This feature was introduced in https://github.com/symfony/symfony/pull/21925
+
+I was not sure if my PR is a bugfix or a feature. We may consider it as a bugfix since all other events have the workflow name. We could also consider it as a feature since `announce` event never had the workflow name.
+
+If we think this is a bugfix, then branch 3.3. Sorry for not being clear it the PR description.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-20T16:27:00Z
+
+:+1:
+For me it's 3.4, as it's a new feature. And no-one reported it so...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-20T16:31:28Z
+
+> a new feature
+
+Then a CHANGELOG entry would be good to advertise it :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-24T21:44:46Z
+
+Sorry for the delay. I've updated the change log.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-25T09:17:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-26T08:26:56Z
+
+Other events are not tested. I'm fine with this PR.
+But if @Nyholm wants to add, I will not say no ;)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-26T12:16:14Z
+
+I've added a small test.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-26T12:29:58Z
+
+Oups, I have changed the "base" of this PR to set 3.4 instead of master.
+But it looks like github does not like it. Could you please move all your commit on the 3.4 branch and `push -f` ? If you can't I will do it for you
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-26T12:35:41Z
+
+Im traveling atm, I maybe able to do it later tonight. Feel free to do it for me.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-26T12:43:07Z
+
+The PR is ready. I'm gonna merge it today.
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-26T13:28:03Z
+
+deps=low tests are failing
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-27T00:34:18Z
+
+Thank you. I've updated the tests now.

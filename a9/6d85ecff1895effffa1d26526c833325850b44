@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-23T10:15:21Z
+
+Sadly I don't. The solution you mentioned would only work if the `FormInterface` was implementing `IteratorAggregate`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-23T10:52:43Z
+
+Maybe deprecate implementing `\Iterator` (i rarely do that nowadays). And favor `\IteratorAggregate` instead.
+
+FormInterface extending from Traversable is a bit weird;
+
+> Abstract base interface that cannot be implemented alone. Instead it must be implemented by either IteratorAggregate or Iterator.
+
+So now form interface is the abstract base interface; i dont see a real need for that.
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-07-23T11:32:20Z
+
+@ro0NL where can I add deprecation notices if form implements `Iterator`? Maybe `Form::add()`,  I can work on it on separate PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-23T11:45:04Z
+
+I think everywhere right before we rely on $form to be foreached. In that case if it's an \Iterator you should get a deprecation.
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-07-23T12:11:29Z
+
+@ro0NL see https://github.com/symfony/symfony/pull/23634
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-23T12:45:22Z
+
+Sorry @Koc , I didn't answer @ro0NL's suggestion in time. I don't think #23634 is needed.
+`FormInterface` extends from `\Traversable`, it's behavioral. There is no reason we should enforce the implementation to be `\Iterator` or `\IteratorAggregate`. Moreover, it should not just be by reasoning about SCA.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-23T12:51:20Z
+
+> There is no reason we should enforce the implementation to be \Iterator or \IteratorAggregate. Moreover, it should not just be by reasoning about SCA.
+
+Sorry if i got it going too fast :) though i like the _problem_ it solves; i have no real opinion if this is worth it or so. But thats what a PR is for.. to find out :)

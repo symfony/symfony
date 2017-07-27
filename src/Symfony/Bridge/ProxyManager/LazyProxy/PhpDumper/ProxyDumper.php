@@ -65,7 +65,7 @@ class ProxyDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id, $methodName = null)
+    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null)
     {
         $instantiation = 'return';
 
@@ -73,11 +73,12 @@ class ProxyDumper implements DumperInterface
             $instantiation .= " \$this->services['$id'] =";
         }
 
-        if (func_num_args() >= 3) {
-            $methodName = func_get_arg(2);
-        } else {
-            @trigger_error(sprintf('You must use the third argument of %s to define the method to call to construct your service since version 3.1, not using it won\'t be supported in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $methodName = 'get'.Container::camelize($id).'Service';
+        if (null === $factoryCode) {
+            @trigger_error(sprintf('The "%s()" method expects a third argument defining the code to execute to construct your service since version 3.4, providing it will be required in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            $factoryCode = '$this->get'.Container::camelize($id).'Service(false)';
+        } elseif (false === strpos($factoryCode, '(')) {
+            @trigger_error(sprintf('The "%s()" method expects its third argument to define the code to execute to construct your service since version 3.4, providing it will be required in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            $factoryCode = "\$this->$factoryCode(false)";
         }
         $proxyClass = $this->getProxyClassName($definition);
 
@@ -92,7 +93,7 @@ class ProxyDumper implements DumperInterface
 
             $instantiation $constructorCall(
                 function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
-                    \$wrappedInstance = \$this->$methodName(false);
+                    \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
 

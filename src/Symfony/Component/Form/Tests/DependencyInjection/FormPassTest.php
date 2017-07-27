@@ -14,12 +14,14 @@ namespace Symfony\Component\Form\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormRegistryInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -33,6 +35,15 @@ class FormPassTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('form.extension'));
+    }
+
+    public function testDoNothingIfDebugCommandNotLoaded()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition(DebugCommand::class));
     }
 
     public function testAddTaggedTypes()
@@ -53,6 +64,28 @@ class FormPassTest extends TestCase
                 __CLASS__.'_Type2' => new ServiceClosureArgument(new Reference('my.type2')),
             ))))->addTag('container.service_locator')->setPublic(false),
             $extDefinition->getArgument(0)
+        );
+    }
+
+    public function testAddTaggedTypesToDebugCommand()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->setDefinition(DebugCommand::class, $this->createDebugCommandDefinition());
+        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type');
+        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type');
+
+        $container->compile();
+
+        $cmdDefinition = $container->getDefinition(DebugCommand::class);
+
+        $this->assertEquals(
+            array(
+                'Symfony\Component\Form\Extension\Core\Type',
+                __NAMESPACE__,
+            ),
+            $cmdDefinition->getArgument(1)
         );
     }
 
@@ -220,6 +253,18 @@ class FormPassTest extends TestCase
             array(),
             array(),
             new IteratorArgument(array()),
+        ));
+
+        return $definition;
+    }
+
+    private function createDebugCommandDefinition()
+    {
+        $definition = new Definition('Symfony\Component\Form\Command\DebugCommand');
+        $definition->setArguments(array(
+            $formRegistry = $this->getMockBuilder(FormRegistryInterface::class)->getMock(),
+            array(),
+            array('Symfony\Component\Form\Extension\Core\Type'),
         ));
 
         return $definition;

@@ -19,7 +19,7 @@
         "php": "^5.5.9|>=7.0.8",
         "symfony/event-dispatcher": "~2.8|~3.0|~4.0",
         "symfony/intl": "^2.8.18|^3.2.5|~4.0",
-        "symfony/options-resolver": "~2.8|~3.0|~4.0",
+        "symfony/options-resolver": "~3.4|~4.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/property-access": "~2.8|~3.0|~4.0"
     },
@@ -32,7 +32,8 @@
         "symfony/http-kernel": "^3.3.5|~4.0",
         "symfony/security-csrf": "~2.8|~3.0|~4.0",
         "symfony/translation": "~2.8|~3.0|~4.0",
-        "symfony/var-dumper": "~3.3|~4.0"
+        "symfony/var-dumper": "~3.3|~4.0",
+        "symfony/console": "~3.4|~4.0"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",

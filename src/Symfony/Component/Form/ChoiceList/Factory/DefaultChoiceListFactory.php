@@ -178,9 +178,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // $isPreferred may be null if no choices are preferred
         if ($isPreferred && call_user_func($isPreferred, $choice, $key, $value)) {
             $preferredViews[$nextIndex] = $view;
-        } else {
-            $otherViews[$nextIndex] = $view;
         }
+
+        $otherViews[$nextIndex] = $view;
     }
 
     private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)

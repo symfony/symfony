@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-26T16:20:45Z
+
+Confirming this PR does indeed fix the inability to properly kill the web server process via the `server:stop` console command, as originally reported in #23568.

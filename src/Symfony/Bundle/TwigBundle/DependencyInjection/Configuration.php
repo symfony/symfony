@@ -158,6 +158,9 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->prototype('variable')->end()
                 ->end()
+                ->scalarNode('default_path')
+                    ->defaultValue('%kernel.project_dir%/templates')
+                ->end()
             ->end()
         ;
     }

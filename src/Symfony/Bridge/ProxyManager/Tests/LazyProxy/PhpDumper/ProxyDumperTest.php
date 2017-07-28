@@ -81,7 +81,7 @@ class ProxyDumperTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing name of method to call to construct the service "foo".
+     * @expectedExceptionMessage Missing factory code to construct the service "foo".
      */
     public function testGetProxyFactoryCodeWithoutCustomMethod()
     {

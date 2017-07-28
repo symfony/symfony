@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-26T08:36:12Z
+
+> Can it actually be done in 3.4 ? Private services can still be accessed there,
+
+Hum right, rebased now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-26T10:05:25Z
+
+fabbot failure is false positive, PR ready.

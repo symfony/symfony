@@ -231,7 +231,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = (new \SimpleFactoryClass('foo'))->getInstance();
+        return $this->services['factory_service_simple'] = ($this->privates['factory_simple'] ?? $this->getFactorySimpleService())->getInstance();
     }
 
     /**
@@ -370,6 +370,20 @@ class ProjectServiceContainer extends Container
     protected function getServiceFromStaticMethodService()
     {
         return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
+    }
+
+    /**
+     * Gets the private 'factory_simple' shared service.
+     *
+     * @return \SimpleFactoryClass
+     *
+     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.
+     */
+    private function getFactorySimpleService()
+    {
+        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+
+        return $this->privates['factory_simple'] = new \SimpleFactoryClass('foo');
     }
 
     /**

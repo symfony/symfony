@@ -125,6 +125,7 @@ $container
 $container
     ->register('factory_simple', 'SimpleFactoryClass')
     ->addArgument('foo')
+    ->setDeprecated(true)
     ->setPublic(false)
 ;
 $container

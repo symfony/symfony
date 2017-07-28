@@ -105,6 +105,7 @@ services:
         factory: [Bar\FooClass, getInstance]
     factory_simple:
         class: SimpleFactoryClass
+        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
         public: false
         arguments: ['foo']
     factory_service_simple:

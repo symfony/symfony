@@ -65,7 +65,7 @@ class ProxyDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id, $methodName = null)
+    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null)
     {
         $instantiation = 'return';
 
@@ -73,8 +73,8 @@ class ProxyDumper implements DumperInterface
             $instantiation .= sprintf(' $this->%s[\'%s\'] =', $definition->isPublic() || !method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates', $id);
         }
 
-        if (null === $methodName) {
-            throw new \InvalidArgumentException(sprintf('Missing name of method to call to construct the service "%s".', $id));
+        if (null === $factoryCode) {
+            throw new \InvalidArgumentException(sprintf('Missing factory code to construct the service "%s".', $id));
         }
 
         $proxyClass = $this->getProxyClassName($definition);
@@ -90,7 +90,7 @@ class ProxyDumper implements DumperInterface
 
             $instantiation $constructorCall(
                 function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
-                    \$wrappedInstance = \$this->$methodName(false);
+                    \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
 

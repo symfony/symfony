@@ -116,6 +116,7 @@ class ChoiceType extends AbstractType
                 // Reconstruct the data as mapping from child names to values
                 $data = array();
 
+                /** @var FormInterface $child */
                 foreach ($form as $child) {
                     $value = $child->getConfig()->getOption('value');
 

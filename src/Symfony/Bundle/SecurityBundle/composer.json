@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5.9|>=7.0.8",
         "ext-xml": "*",
         "symfony/security": "~3.3",
         "symfony/dependency-injection": "~3.3",

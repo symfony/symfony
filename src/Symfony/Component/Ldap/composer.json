@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5.9|>=7.0.8",
         "symfony/polyfill-php56": "~1.0",
         "symfony/options-resolver": "~2.8|~3.0",
         "ext-ldap": "*"

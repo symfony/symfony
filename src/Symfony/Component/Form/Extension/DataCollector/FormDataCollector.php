@@ -85,6 +85,9 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        if (70000 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 70800) {
+            @trigger_error('A bug in PHP v7.0.0 to v7.0.7 is breaking the Form panel, please upgrade to v7.0.8 or more.', E_USER_DEPRECATED);
+        }
     }
 
     /**

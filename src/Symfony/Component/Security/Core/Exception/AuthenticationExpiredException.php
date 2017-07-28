@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Exception;
 
 /**
- * AuthenticationServiceException is thrown when an authenticated token becomes un-authentcated between requests.
+ * AuthenticationServiceException is thrown when an authenticated token becomes un-authenticated between requests.
  *
  * In practice, this is due to the User changing between requests (e.g. password changes),
  * causes the token to become un-authenticated.

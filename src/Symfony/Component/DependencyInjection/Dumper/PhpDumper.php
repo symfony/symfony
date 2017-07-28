@@ -639,7 +639,7 @@ class PhpDumper extends Dumper
 
 EOF;
 
-        $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $methodName) : '';
+        $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id, "\$this->$methodName(false)") : '';
 
         if ($definition->isDeprecated()) {
             $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));

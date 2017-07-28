@@ -55,16 +55,7 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            if (is_array($shortcut)) {
-                $shortcut = implode('|', $shortcut);
-            }
-            $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
-            $shortcuts = array_filter($shortcuts);
-            $shortcut = implode('|', $shortcuts);
-
-            if (empty($shortcut)) {
-                throw new \InvalidArgumentException('An option shortcut cannot be empty.');
-            }
+            $shortcut = $this->filterShortcut($shortcut);
         }
 
         if (null === $mode) {
@@ -205,5 +196,52 @@ class InputOption
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
         ;
+    }
+
+    /**
+     * Filters invalid shortcuts.
+     *
+     * @param string|array $shortcut
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    private function filterShortcut($shortcut)
+    {
+        if (is_array($shortcut)) {
+            $shortcut = implode('|', $shortcut);
+        }
+        if ('' === str_replace(array('|'), '', $shortcut)) {
+            throw new \InvalidArgumentException('An option shortcut cannot be formed only with "|" chars, since they are used as level separators.');
+        }
+        if ('' === str_replace(array('|', '-'), '', $shortcut)) {
+            throw new \InvalidArgumentException('An option shortcut cannot be formed only with "-" chars.');
+        }
+        $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
+
+        if (!$shortcuts = array_filter($shortcuts)) {
+            throw new \InvalidArgumentException('An option shortcut cannot be empty.');
+        }
+        $shortcuts = array_values($shortcuts);
+
+        if (1 === count($shortcuts)) {
+            if (strlen($shortcuts[0]) > 1) {
+                throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", it must be formed by a single char.', $shortcut));
+            }
+        } else {
+            if (array_unique($shortcuts) !== $shortcuts) {
+                throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must not be repeated.', implode('|', $shortcuts)));
+            }
+            $sortedShortcuts = $shortcuts;
+            natcasesort($sortedShortcuts);
+            usort($sortedShortcuts, 'strnatcasecmp');
+
+            if ($sortedShortcuts !== $shortcuts) {
+                throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must be ordered ascending.', implode('|', $shortcuts)));
+            }
+        }
+
+        return implode('|', $shortcuts);
     }
 }

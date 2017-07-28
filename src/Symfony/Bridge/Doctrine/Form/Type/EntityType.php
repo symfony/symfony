@@ -34,6 +34,10 @@ class EntityType extends DoctrineType
                 if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                     throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
                 }
+                
+                if ($queryBuilder === null) {
+                    return false;
+                }
             }
 
             return $queryBuilder;

@@ -16,8 +16,10 @@ namespace Symfony\Component\VarDumper\Cloner;
  */
 class VarCloner extends AbstractCloner
 {
+    private static $gid;
     private static $hashMask = 0;
     private static $hashOffset = 0;
+    private static $arrayCache = array();
 
     /**
      * {@inheritdoc}
@@ -36,14 +38,15 @@ class VarCloner extends AbstractCloner
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $cookie = (object) array();     // Unique object used to detect hard references
-        $gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
         $a = null;                      // Array cast for nested structures
         $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
 
         if (!self::$hashMask) {
+            self::$gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
             self::initHashMask();
         }
+        $gid = self::$gid;
         $hashMask = self::$hashMask;
         $hashOffset = self::$hashOffset;
         $arrayStub = new Stub();
@@ -58,9 +61,9 @@ class VarCloner extends AbstractCloner
                     if (\is_int($k)) {
                         continue;
                     }
-                    foreach (array($k => true) as $j => $v) {
+                    foreach (array($k => true) as $gk => $gv) {
                     }
-                    if ($k !== $j) {
+                    if ($gk !== $k) {
                         $fromObjCast = true;
                         $refs = $vals = \array_values($queue[$i]);
                         break;
@@ -95,7 +98,7 @@ class VarCloner extends AbstractCloner
                     case true === $v:
                     case \is_int($v):
                     case \is_float($v):
-                        break;
+                        continue 2;
 
                     case \is_string($v):
                         if (!\preg_match('//u', $v)) {
@@ -114,7 +117,10 @@ class VarCloner extends AbstractCloner
                             $stub->class = Stub::STRING_UTF8;
                             $stub->cut = $cut;
                             $stub->value = \mb_substr($v, 0, $maxString, 'UTF-8');
+                        } else {
+                            continue 2;
                         }
+                        $a = null;
                         break;
 
                     case \is_array($v):
@@ -146,11 +152,9 @@ class VarCloner extends AbstractCloner
                             } else {
                                 $a = $v;
                             }
-                        } else {
+                        } elseif (\PHP_VERSION_ID < 70200) {
                             $indexedArrays[$len] = true;
                         }
-
-                        $stub->value = \count($a);
                         break;
 
                     case \is_object($v):
@@ -210,42 +214,40 @@ class VarCloner extends AbstractCloner
                         break;
                 }
 
-                if (isset($stub)) {
-                    if ($a) {
-                        if (!$i || 0 > $maxItems) {
-                            $queue[$len] = $a;
-                            $stub->position = $len++;
-                        } elseif ($pos < $maxItems) {
-                            if ($maxItems < $pos += \count($a)) {
-                                $a = \array_slice($a, 0, $maxItems - $pos);
-                                if ($stub->cut >= 0) {
-                                    $stub->cut += $pos - $maxItems;
-                                }
+                if ($a) {
+                    if (!$i || 0 > $maxItems) {
+                        $queue[$len] = $a;
+                        $stub->position = $len++;
+                    } elseif ($pos < $maxItems) {
+                        if ($maxItems < $pos += \count($a)) {
+                            $a = \array_slice($a, 0, $maxItems - $pos);
+                            if ($stub->cut >= 0) {
+                                $stub->cut += $pos - $maxItems;
                             }
-                            $queue[$len] = $a;
-                            $stub->position = $len++;
-                        } elseif ($stub->cut >= 0) {
-                            $stub->cut += \count($a);
-                            $stub->position = 0;
                         }
+                        $queue[$len] = $a;
+                        $stub->position = $len++;
+                    } elseif ($stub->cut >= 0) {
+                        $stub->cut += \count($a);
+                        $stub->position = 0;
                     }
+                }
 
-                    if ($arrayStub === $stub) {
-                        if ($arrayStub->cut) {
-                            $stub = array($arrayStub->cut, $arrayStub->class => $arrayStub->position);
-                            $arrayStub->cut = 0;
-                        } else {
-                            $stub = array($arrayStub->class => $arrayStub->position);
-                        }
-                    }
-
-                    if ($zvalIsRef) {
-                        $refs[$k]->value = $stub;
+                if ($arrayStub === $stub) {
+                    if ($arrayStub->cut) {
+                        $stub = array($arrayStub->cut, $arrayStub->class => $arrayStub->position);
+                        $arrayStub->cut = 0;
+                    } elseif (isset(self::$arrayCache[$arrayStub->class][$arrayStub->position])) {
+                        $stub = self::$arrayCache[$arrayStub->class][$arrayStub->position];
                     } else {
-                        $vals[$k] = $stub;
+                        self::$arrayCache[$arrayStub->class][$arrayStub->position] = $stub = array($arrayStub->class => $arrayStub->position);
                     }
+                }
 
-                    $stub = $a = null;
+                if ($zvalIsRef) {
+                    $refs[$k]->value = $stub;
+                } else {
+                    $vals[$k] = $stub;
                 }
             }
 
@@ -255,9 +257,9 @@ class VarCloner extends AbstractCloner
                 $vals = array();
                 $j = -1;
                 foreach ($queue[$i] as $k => $v) {
-                    foreach (array($k => true) as $a => $v) {
+                    foreach (array($k => true) as $gk => $gv) {
                     }
-                    if ($a !== $k) {
+                    if ($gk !== $k) {
                         $vals = (object) $vals;
                         $vals->{$k} = $refs[++$j];
                         $vals = (array) $vals;
@@ -268,7 +270,6 @@ class VarCloner extends AbstractCloner
             }
 
             $queue[$i] = $vals;
-            unset($indexedArrays[$i]);
         }
 
         foreach ($values as $h => $v) {

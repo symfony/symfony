@@ -48,7 +48,14 @@ class RedirectResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
+     * Factory method for chainability.
+     *
+     * @param string $url     The URL to redirect to. The URL should be a full URL, with schema etc.,
+     *                        but practically every browser redirects on paths only as well
+     * @param int    $status  The response status code
+     * @param array  $headers An array of response headers
+     *
+     * @return static
      */
     public static function create($url = '', $status = 302, $headers = array())
     {
@@ -76,6 +83,10 @@ class RedirectResponse extends Response
      */
     public function setTargetUrl($url)
     {
+        if (!is_string($url)) {
+            throw new \InvalidArgumentException(sprintf('The redirect url must be a string, "%s" given.', gettype($url)));
+        }
+
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }

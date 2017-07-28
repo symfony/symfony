@@ -94,4 +94,22 @@ class RedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar', 302);
         $this->assertTrue($response->headers->hasCacheControlDirective('no-cache'));
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTargetUrlObject()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setTargetUrl(new \stdClass());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTargetUrlToEmptyString()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setTargetUrl('');
+    }
 }

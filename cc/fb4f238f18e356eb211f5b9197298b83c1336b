@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-26T13:48:31Z
+
+On a smaller profile with GC disabled to be sure we don't compare just GC's time:
+https://blackfire.io/profiles/compare/53798f9a-e2ab-42b4-94b4-a564f15814d5/graph
+still -32% in memory, and -5% in wall time.
+
+Another https://blackfire.io achievement! :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-07-26T14:20:57Z
+
+18.6s is too much anyway
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-26T14:27:44Z
+
+@Koc see #23659 for the core reason why this test page is slow.

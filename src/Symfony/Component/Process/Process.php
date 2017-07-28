@@ -334,7 +334,11 @@ class Process implements \IteratorAggregate
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $this->options);
+        if (!file_exists($this->cwd)) {
+            trigger_error("The provided cwd does not exist. Command is currently ran against getcwd()", E_DEPRECATED);
+        }
+
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $options);
 
         foreach ($envBackup as $k => $v) {
             putenv(false === $v ? $k : "$k=$v");

@@ -48,6 +48,27 @@ class ProcessTest extends TestCase
         }
     }
 
+    /**
+     * @see https://github.com/symfony/symfony/issues/18249
+     */
+    public function testCwdParameterBugDeprecationIssue18249()
+    {
+        // Check that it works fine if the CWD exists
+        $cmd = new Process("touch testing1.txt", __DIR__);
+        $this->assertEquals(0, $cmd->run());
+
+        try{
+            $cmd = new Process("touch testing2.txt", __DIR__ . "/notfound/");
+            $this->assertEquals(0, $cmd->run());
+        } catch (\Throwable $e) {
+            $this->assertTrue(true); // A deprecated error was thrown
+            // Blank intentionally
+        }
+
+        @unlink(__DIR__ . "/testing1.txt");
+        @unlink(getcwd() . "/testing2.txt");
+    }
+
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {

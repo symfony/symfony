@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-28T16:37:35Z
+
+@symfony/mergers should be merged *before* releasing v3.3.6

@@ -50,6 +50,9 @@ class ProcessTest extends TestCase
 
     /**
      * @see https://github.com/symfony/symfony/issues/18249
+     *
+     * @group legacy
+     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd()
      */
     public function testInvalidCwd()
     {
@@ -57,13 +60,8 @@ class ProcessTest extends TestCase
         $cmd = new Process('touch testing1.txt', __DIR__);
         $this->assertEquals(0, $cmd->run());
 
-        try {
-            $cmd = new Process('touch testing2.txt', __DIR__.'/notfound/');
-            $this->assertEquals(0, $cmd->run());
-        } catch (\Throwable $e) {
-            $this->assertTrue(true); // A deprecated error was thrown
-            // Blank intentionally
-        }
+        $cmd = new Process('touch testing2.txt', __DIR__.'/notfound/');
+        $this->assertEquals(0, $cmd->run());
 
         @unlink(__DIR__.'/testing1.txt');
         @unlink(getcwd().'/testing2.txt');

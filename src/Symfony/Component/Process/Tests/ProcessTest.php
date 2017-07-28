@@ -51,7 +51,7 @@ class ProcessTest extends TestCase
     /**
      * @see https://github.com/symfony/symfony/issues/18249
      */
-    public function testCwdParameterBugDeprecationIssue18249()
+    public function testInvalidCwd()
     {
         // Check that it works fine if the CWD exists
         $cmd = new Process('touch testing1.txt', __DIR__);

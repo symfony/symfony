@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * Resize a collection form element based on the data sent from the client.
@@ -150,6 +151,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
         if ($this->deleteEmpty) {
             $previousData = $event->getForm()->getData();
+            /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
 

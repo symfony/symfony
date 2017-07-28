@@ -82,7 +82,7 @@
 
     <h2>Translation Messages</h2>
 
-    {% block panelContentHead %}{% endblock %}
+    {% block before_translation_messages %}{% endblock %}
 
     {# sort translation messages in groups #}
     {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
@@ -110,7 +110,7 @@
                         <p>None of the used translation messages are defined for the given locale.</p>
                     </div>
                 {% else %}
-                    {% block definedMessagesTable %}
+                    {% block defined_messages %}
                         {{ helper.render_table(messages_defined) }}
                     {% endblock %}
                 {% endif %}
@@ -131,7 +131,7 @@
                         <p>No fallback translation messages were used.</p>
                     </div>
                 {% else %}
-                    {% block fallbackMessagesTable %}
+                    {% block fallback_messages %}
                         {{ helper.render_table(messages_fallback) }}
                     {% endblock %}
                 {% endif %}
@@ -153,7 +153,7 @@
                         <p>There are no messages of this category.</p>
                     </div>
                 {% else %}
-                    {% block missingMessagesTable %}
+                    {% block missing_messages %}
                         {{ helper.render_table(messages_missing) }}
                     {% endblock %}
                 {% endif %}
@@ -161,7 +161,7 @@
         </div>
     </div>
 
-    {% block panelContentFooter %}{% endblock %}
+    {% block after_translation_messages %}{% endblock %}
 
 {% endblock %}
 

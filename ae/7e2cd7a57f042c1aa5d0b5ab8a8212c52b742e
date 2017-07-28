@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-28T16:39:57Z
+
+Congrats :)
+Since this patch also applies to branch 2.7, it should be submitted again branch 2.7.
+
+---------------------------------------------------------------------------
+
+by medinae at 2017-07-28T16:50:13Z
+
+Target branch switched to 2.7
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-28T17:08:56Z
+
+Can you rebase your branch against 2.7 to make tests green?
+
+---------------------------------------------------------------------------
+
+by medinae at 2017-07-28T21:29:59Z
+
+@chalasr Done.

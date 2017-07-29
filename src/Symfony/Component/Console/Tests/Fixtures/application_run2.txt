@@ -2,7 +2,7 @@ Usage:
   help [options] [--] [<command_name>]
 
 Arguments:
-  command               The command to execute
+  command               The command to execute [default: "list"]
   command_name          The command name [default: "help"]
 
 Options:

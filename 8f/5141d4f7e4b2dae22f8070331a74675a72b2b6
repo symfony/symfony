@@ -1,0 +1,148 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T08:01:59Z
+
+ping @lyrixx?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-04-03T12:26:29Z
+
+I don't know. But without test, It can not be merged.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-03T12:58:31Z
+
+It never worked (tried 2.7.0 out).
+
+~~Also what about arguments? Here, the first passed argument will just be considered as the command name. Just wondering if we should expect the `command` argument value to be automatically set instead? It would echo the behavior of [single command applications](http://symfony.com/doc/master/components/console/single_command_tool.html) since 3.2, which sounds good to me (as a feature on master).~~ It can't work.
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-03T13:11:00Z
+
+I'll create a unit test for that use case later today. Could someone give me a hand with that "interact called" thing in the unit tests, that is failing?
+
+@chalasr it can only work with options. The first argument is used as a command name, so it's never a case.
+
+```app/console --abc=true``` this invocation should call default command and pass abc as an option. This is the only use case i can think about at the moment.
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-03T15:58:16Z
+
+ok seems much better to me now. I added test as well. I still have no clue why travis fails with:
+
+```
+2) Symfony\Component\Console\Tests\ApplicationTest::testSetRunCustomDefaultCommandWithOption
+Application runs the default set command if different from 'list' command
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'interact called
+-called
++'called
+ opt
+ '
+```
+
+Can anyone help me with that?
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-05T12:14:46Z
+
+@chalasr is there anything else for me to do here? especially with that failing unit test.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-05T12:31:56Z
+
+@jakubsacha I given a quick look at the build failure 2 days ago trying to reproduce, unfortunately I don't know what happen either, the test runs fine locally. I would suggest to rebase this PR against the current master since there is a lot of activity on it these days. I will give a deeper look into the failing test. Apart from that, this looks good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-05T14:59:00Z
+
+So, we would allow options to work but not arguments, right?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-05T15:46:16Z
+
+Arguments work already, but the first needs to be the command name (we could not guess it from the default command as we can't predict which value targets which argument in the raw input token).
+
+Actually you can't do:
+
+```
+php console.php --foo=bar // default command executed,  getOption('foo') is NULL
+```
+
+You have to specify the command name to have options taken into account. This PR proposes to allow omitting it so that `getOption('foo')` is equal to `bar` using the previous example
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-05T15:49:36Z
+
+@fabpot correct. In case you have arguments the first one becomes command name, and you don't have that issue. The problem is only for defaultCommand.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-04-06T16:05:05Z
+
+@jakubsacha [this statement](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Application.php#L825-L827) is reached in the build, thus `interact()` is not called. Dunno why it happens in your PR and not in the current 2.7 build.
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-07T22:04:46Z
+
+Ok I think I understand what was the problem:
+
+Current Symfony 2.7 behaviour:
+* ArrayInput is created in the ApplicationTester
+* It's passed through Application::run to Application::configureIO, where interactive shell is disabled
+* ArrayInput is recreated in Application::doRun, and by default interactive shell is true. and its done _after_ configureIO is called.
+
+Unit tests were failing because I didn't create new Input but used one passed initially. Since my input is processed by configureIO and the shell is not interactive in the CI systems, it failed.
+
+I forced non-interactive execution of the tests, but I'm not sure is it the best approach.
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-10T14:46:33Z
+
+ping @chalasr
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-19T08:28:06Z
+
+ping @chalasr @fabpot. could we do anything with that pull request? i think it's ready to merge.
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-04-28T08:32:07Z
+
+@fabpot kind ping again;-) any chance we get it through?
+
+---------------------------------------------------------------------------
+
+by jakubsacha at 2017-07-20T14:28:32Z
+
+@fabpot @Simperfit @chalasr @lyrixx it's been some time. It's still relevant to me. Can we merge it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-28T10:01:33Z
+
+ping @ogizanagi also :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-28T13:27:03Z
+
+Just checked this out again. The changes in ApplicationTest might look suspicious, but this fix just reveals that the fact we are currently creating a new ArrayInput instance makes `interactive` to true in the middle of a command execution even if not a tty.
+This fixes a real bug: input options and arguments are lost when the default command is used.
+Still 👍  for me.

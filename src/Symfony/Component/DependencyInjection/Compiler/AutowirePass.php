@@ -477,6 +477,8 @@ class AutowirePass extends AbstractRecursivePass
             $this->currentId = $currentId;
         }
 
+        @trigger_error(sprintf('Using autowiring service auto-registration for type "%s" is deprecated since version 3.4 and won\'t be supported in 4.0. Create a service named "%s" instead.', $type, $type), E_USER_DEPRECATED);
+
         $this->container->log($this, sprintf('Type "%s" has been auto-registered for service "%s".', $type, $this->currentId));
 
         return new TypedReference($argumentId, $type);

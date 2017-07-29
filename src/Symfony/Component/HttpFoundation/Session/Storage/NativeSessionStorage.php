@@ -101,8 +101,12 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
-        session_cache_limiter(''); // disable by default because it's managed by HeaderBag (if used)
-        ini_set('session.use_cookies', 1);
+        if (empty($options)) {
+            $options += array('cache_limiter' => 'public');
+        }
+        if (1 !== (int) ini_get('session.use_cookies')) {
+            ini_set('session.use_cookies', 1);
+        }
 
         if (\PHP_VERSION_ID >= 50400) {
             session_register_shutdown();
@@ -345,9 +349,11 @@ class NativeSessionStorage implements SessionStorageInterface
             'sid_length', 'sid_bits_per_character', 'trans_sid_hosts', 'trans_sid_tags',
         ));
 
-        foreach ($options as $key => $value) {
-            if (isset($validOptions[$key])) {
-                ini_set('session.'.$key, $value);
+        if (PHP_VERSION_ID < 70200 || !headers_sent()) {
+            foreach ($options as $key => $value) {
+                if (isset($validOptions[$key])) {
+                    ini_set('session.'.$key, $value);
+                }
             }
         }
     }
@@ -392,7 +398,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
         $this->saveHandler = $saveHandler;
 
-        if ($this->saveHandler instanceof \SessionHandlerInterface) {
+        if ($this->saveHandler instanceof \SessionHandlerInterface && false === headers_sent()) {
             if (\PHP_VERSION_ID >= 50400) {
                 session_set_save_handler($this->saveHandler, false);
             } else {

@@ -25,8 +25,10 @@ class LegacyDefaultCsrfProviderTest extends TestCase
 
     public static function setUpBeforeClass()
     {
-        ini_set('session.save_handler', 'files');
-        ini_set('session.save_path', sys_get_temp_dir());
+        if (\PHP_VERSION_ID < 70200) {
+            ini_set('session.save_handler', 'files');
+            ini_set('session.save_path', sys_get_temp_dir());
+        }
     }
 
     protected function setUp()

@@ -3,7 +3,7 @@
 use %a
 class LazyServiceProjectServiceContainer extends Container
 {%a
-    public function getFooService($lazyLoad = true)
+    p%s function getFooService($lazyLoad = true)
     {
         if ($lazyLoad) {
 

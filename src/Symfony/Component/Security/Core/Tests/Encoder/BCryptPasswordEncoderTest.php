@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 class BCryptPasswordEncoderTest extends TestCase
 {
     const PASSWORD = 'password';
-    const BYTES = '0123456789abcdef';
     const VALID_COST = '04';
 
     /**

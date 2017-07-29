@@ -276,7 +276,7 @@ EOF
                 $bundleTransPath = end($transPaths).'translations';
             }
 
-            $this->writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

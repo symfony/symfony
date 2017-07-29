@@ -122,6 +122,8 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
     {
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
         \Locale::setDefault('fr');
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
 
@@ -139,10 +141,10 @@ class PercentToLocalizedStringTransformerTest extends TestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
-        // Since we test against "de_DE", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
-        \Locale::setDefault('de_DE');
+        \Locale::setDefault('de_AT');
 
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
 
@@ -155,7 +157,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
     {
         // Since we test against "de_DE", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
         \Locale::setDefault('de_DE');
 
@@ -179,7 +181,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
         \Locale::setDefault('bg');
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
@@ -198,6 +200,8 @@ class PercentToLocalizedStringTransformerTest extends TestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
     {
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
 
         $transformer->reverseTransform('1,234,5');
@@ -208,6 +212,8 @@ class PercentToLocalizedStringTransformerTest extends TestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep()
     {
+        IntlTestHelper::requireFullIntl($this, '4.8.1.1');
+
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
 
         $transformer->reverseTransform('1234,5');

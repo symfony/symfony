@@ -15,6 +15,7 @@ use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\HttpFoundation\Request;
 
 class LoggerTest extends TestCase
 {
@@ -77,6 +78,21 @@ class LoggerTest extends TestCase
 
         $this->assertEquals('test', $record['message']);
         $this->assertEquals(Logger::INFO, $record['priority']);
+    }
+
+    public function testGetLogsWithDebugProcessor3()
+    {
+        $request = new Request();
+        $processor = $this->getMockBuilder(DebugProcessor::class)->getMock();
+        $processor->expects($this->once())->method('getLogs')->with($request);
+        $processor->expects($this->once())->method('countErrors')->with($request);
+
+        $handler = new TestHandler();
+        $logger = new Logger('test', array($handler));
+        $logger->pushProcessor($processor);
+
+        $logger->getLogs($request);
+        $logger->countErrors($request);
     }
 
     public function testClear()

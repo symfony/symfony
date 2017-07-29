@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -24,10 +25,10 @@ class Logger extends BaseLogger implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs()
+    public function getLogs(/* Request $request = null */)
     {
         if ($logger = $this->getDebugLogger()) {
-            return $logger->getLogs();
+            return \call_user_func_array(array($logger, 'getLogs'), \func_get_args());
         }
 
         return array();
@@ -36,10 +37,10 @@ class Logger extends BaseLogger implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors()
+    public function countErrors(/* Request $request = null */)
     {
         if ($logger = $this->getDebugLogger()) {
-            return $logger->countErrors();
+            return \call_user_func_array(array($logger, 'countErrors'), \func_get_args());
         }
 
         return 0;

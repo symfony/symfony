@@ -65,18 +65,38 @@ class FormValidator extends ConstraintValidator
             // Validate the data against the constraints defined
             // in the form
             $constraints = $config->getOption('constraints', array());
-            foreach ($constraints as $constraint) {
-                foreach ($groups as $group) {
-                    if (in_array($group, $constraint->groups)) {
-                        if ($validator) {
-                            $validator->atPath('data')->validate($form->getData(), $constraint, $group);
-                        } else {
-                            // 2.4 API
-                            $this->context->validateValue($form->getData(), $constraint, 'data', $group);
+
+            if ($groups instanceof GroupSequence) {
+                if ($validator) {
+                    $validator->atPath('data')->validate($form->getData(), $constraints, $groups);
+                } else {
+                    // 2.4 API
+                    foreach ($groups as $group) {
+                        foreach ($constraints as $constraint) {
+                            if (in_array($group, $constraint->groups)) {
+                                $this->context->validateValue($form->getData(), $constraint, 'data', $group);
+                            }
                         }
 
-                        // Prevent duplicate validation
-                        continue 2;
+                        if (count($this->context->getViolations()) > 0) {
+                            break;
+                        }
+                    }
+                }
+            } else {
+                foreach ($constraints as $constraint) {
+                    foreach ($groups as $group) {
+                        if (in_array($group, $constraint->groups)) {
+                            if ($validator) {
+                                $validator->atPath('data')->validate($form->getData(), $constraint, $group);
+                            } else {
+                                // 2.4 API
+                                $this->context->validateValue($form->getData(), $constraint, 'data', $group);
+                            }
+
+                            // Prevent duplicate validation
+                            continue 2;
+                        }
                     }
                 }
             }

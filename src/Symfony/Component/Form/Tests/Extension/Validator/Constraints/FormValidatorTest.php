@@ -342,7 +342,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testHandleCallbackValidationGroups()
+    public function testHandleGroupSequenceValidationGroups()
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => new GroupSequence(array('group1', 'group2')));
@@ -351,13 +351,14 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->getForm();
 
         $this->expectValidateAt(0, 'data', $object, new GroupSequence(array('group1', 'group2')));
+        $this->expectValidateAt(1, 'data', $object, new GroupSequence(array('group1', 'group2')));
 
         $this->validator->validate($form, new Form());
 
         $this->assertNoViolation();
     }
 
-    public function testHandleGroupSequenceValidationGroups()
+    public function testHandleCallbackValidationGroups()
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => array($this, 'getValidationGroups'));

@@ -214,4 +214,14 @@ class DotenvTest extends TestCase
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
     }
+
+    public function testOverrideEnvVar()
+    {
+        putenv('TEST_ENV_VAR=original_value');
+
+        $dotenv = new DotEnv(true);
+        $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'));
+
+        $this->assertSame('new_value', getenv('TEST_ENV_VAR'));
+    }
 }

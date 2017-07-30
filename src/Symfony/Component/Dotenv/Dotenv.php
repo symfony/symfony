@@ -36,6 +36,18 @@ final class Dotenv
     private $state;
     private $values;
 
+    private $overrideExistingVars;
+
+    /**
+     * Constructor.
+     *
+     * @param bool $overrideExistingVars Override existing environment variables
+     */
+    public function __construct($overrideExistingVars = false)
+    {
+        $this->overrideExistingVars = $overrideExistingVars;
+    }
+
     /**
      * Loads one or several .env files.
      *
@@ -60,14 +72,12 @@ final class Dotenv
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
-     * Note that existing environment variables are never overridden.
-     *
      * @param array $values An array of env variables
      */
     public function populate($values)
     {
         foreach ($values as $name => $value) {
-            if (isset($_ENV[$name]) || isset($_SERVER[$name]) || false !== getenv($name)) {
+            if (!$this->overrideExistingVars && (isset($_ENV[$name]) || isset($_SERVER[$name]) || false !== getenv($name))) {
                 continue;
             }
 

@@ -21,8 +21,9 @@ class WebServerConfig
     private $documentRoot;
     private $env;
     private $router;
+    private $executable;
 
-    public function __construct($documentRoot, $env, $address = null, $router = null)
+    public function __construct($documentRoot, $env, $address = null, $router = null, $executable = null)
     {
         if (!is_dir($documentRoot)) {
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
@@ -69,6 +70,8 @@ class WebServerConfig
         if (!ctype_digit($this->port)) {
             throw new \InvalidArgumentException(sprintf('Port "%s" is not valid.', $this->port));
         }
+
+        $this->executable = $executable;
     }
 
     public function getDocumentRoot()
@@ -84,6 +87,11 @@ class WebServerConfig
     public function getRouter()
     {
         return $this->router;
+    }
+
+    public function getExecutable()
+    {
+        return $this->executable;
     }
 
     public function getHostname()

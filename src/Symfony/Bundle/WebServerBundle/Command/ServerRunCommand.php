@@ -52,6 +52,7 @@ class ServerRunCommand extends Command
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('executable', 'e', InputOption::VALUE_REQUIRED, 'Custom executable for the PHP commandline webserver'),
             ))
             ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'
@@ -76,6 +77,10 @@ Use the <info>--docroot</info> option to change the default docroot directory:
 Specify your own router script via the <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
+
+Specify your own server executable via the <info>--executable</info> option:
+
+  <info>%command.full_name% --executable=/usr/bin/php7</info>
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 EOF
@@ -130,7 +135,13 @@ EOF
 
         try {
             $server = new WebServer();
-            $config = new WebServerConfig($documentRoot, $env, $input->getArgument('addressport'), $input->getOption('router'));
+            $config = new WebServerConfig(
+                $documentRoot,
+                $env,
+                $input->getArgument('addressport'),
+                $input->getOption('router'),
+                $input->getOption('executable')
+            );
 
             $io->success(sprintf('Server listening on http://%s', $config->getAddress()));
             $io->comment('Quit the server with CONTROL-C.');

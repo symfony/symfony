@@ -145,12 +145,16 @@ class WebServer
      */
     private function createServerProcess(WebServerConfig $config)
     {
-        $finder = new PhpExecutableFinder();
-        if (false === $binary = $finder->find()) {
-            throw new \RuntimeException('Unable to find the PHP binary.');
+        $executable = $config->getExecutable();
+
+        if ($executable === null) {
+            $finder = new PhpExecutableFinder();
+            if (false === $executable = $finder->find()) {
+                throw new \RuntimeException('Unable to find the PHP executable.');
+            }
         }
 
-        $process = new Process(array($binary, '-S', $config->getAddress(), $config->getRouter()));
+        $process = new Process(array($executable, '-S', $config->getAddress(), $config->getRouter()));
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 

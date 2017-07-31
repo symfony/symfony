@@ -44,6 +44,7 @@ class Application extends BaseApplication
 
         $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name', $kernel->getEnvironment()));
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode'));
+        $this->getDefinition()->addOption(new InputOption('--ignore-dotenv', null, InputOption::VALUE_NONE, 'Ignore the .env file'));
     }
 
     /**

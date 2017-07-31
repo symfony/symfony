@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\WebServerBundle;
 
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -146,13 +145,6 @@ class WebServer
     private function createServerProcess(WebServerConfig $config)
     {
         $executable = $config->getExecutable();
-
-        if ($executable === null) {
-            $finder = new PhpExecutableFinder();
-            if (false === $executable = $finder->find()) {
-                throw new \RuntimeException('Unable to find the PHP executable.');
-            }
-        }
 
         $process = new Process(array($executable, '-S', $config->getAddress(), $config->getRouter()));
         $process->setWorkingDirectory($config->getDocumentRoot());

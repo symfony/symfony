@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\WebServerBundle;
 
+use Symfony\Component\Process\PhpExecutableFinder;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -69,6 +71,13 @@ class WebServerConfig
 
         if (!ctype_digit($this->port)) {
             throw new \InvalidArgumentException(sprintf('Port "%s" is not valid.', $this->port));
+        }
+
+        if ($executable === null) {
+            $finder = new PhpExecutableFinder();
+            if (false === $executable = $finder->find()) {
+                throw new \RuntimeException('Unable to find the PHP executable.');
+            }
         }
 
         $this->executable = $executable;

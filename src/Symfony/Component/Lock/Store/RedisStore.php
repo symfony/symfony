@@ -66,7 +66,7 @@ class RedisStore implements StoreInterface
      * @param string $dsn
      * @param array  $options See self::$defaultConnectionOptions
      *
-     * @throws InvalidArgumentException When the DSN is invalid.
+     * @throws InvalidArgumentException When the DSN is invalid
      *
      * @return \Redis|\Predis\Client According to the "class" option
      */

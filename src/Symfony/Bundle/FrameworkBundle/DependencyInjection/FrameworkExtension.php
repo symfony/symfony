@@ -55,8 +55,11 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
+use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -1679,18 +1682,9 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads lock configuration.
-     *
-     * @param array            $config
-     * @param ContainerBuilder $container
-     * @param XmlFileLoader    $loader
-     */
     private function registerLockConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('lock.xml');
-
-        $container->getDefinition('lock.store.flock')->replaceArgument(0, sys_get_temp_dir());
 
         foreach ($config['resources'] as $resourceName => $resourceStores) {
             if (0 === count($resourceStores)) {
@@ -1709,7 +1703,7 @@ class FrameworkExtension extends Extension
                         $storeDefinition = new Reference('lock.store.semaphore');
                         break;
                     case $usedEnvs || preg_match('#^[a-z]++://#', $storeDsn):
-                        if (!$container->hasDefinition($connectionDefinitionId = md5($storeDsn))) {
+                        if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
                             $connectionDefinition->setFactory(array(StoreFactory::class, 'createConnection'));
@@ -1717,16 +1711,14 @@ class FrameworkExtension extends Extension
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 
-                        $storeDefinition = new Definition(\stdClass::class);
+                        $storeDefinition = new Definition(StoreInterface::class);
+                        $storeDefinition->setPublic(false);
                         $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
                         $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
 
-                        $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.md5($storeDsn), $storeDefinition);
+                        $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 
                         $storeDefinition = new Reference($storeDefinitionId);
-                        break;
-                    case $usedEnvs:
-
                         break;
                     default:
                         throw new InvalidArgumentException(sprintf('Lock store DSN "%s" is not valid in resource "%s"', $storeDsn, $resourceName));
@@ -1741,26 +1733,29 @@ class FrameworkExtension extends Extension
                 $combinedDefinition->replaceArgument(0, $storeDefinitions);
                 $container->setDefinition('lock.'.$resourceName.'.store', $combinedDefinition);
             } else {
-                $container->setAlias('lock.'.$resourceName.'.store', new Alias((string) $storeDefinitions[0]));
+                $container->setAlias('lock.'.$resourceName.'.store', new Alias((string) $storeDefinitions[0], false));
             }
 
             // Generate factories for each resource
             $factoryDefinition = new ChildDefinition('lock.factory.abstract');
             $factoryDefinition->replaceArgument(0, new Reference('lock.'.$resourceName.'.store'));
-            $factoryDefinition->setPublic(true);
             $container->setDefinition('lock.'.$resourceName.'.factory', $factoryDefinition);
 
             // Generate services for lock instances
             $lockDefinition = new Definition(Lock::class);
+            $lockDefinition->setPublic(false);
             $lockDefinition->setFactory(array(new Reference('lock.'.$resourceName.'.factory'), 'createLock'));
             $lockDefinition->setArguments(array($resourceName));
             $container->setDefinition('lock.'.$resourceName, $lockDefinition);
 
             // provide alias for default resource
             if ('default' === $resourceName) {
-                $container->setAlias('lock.store', new Alias('lock.'.$resourceName.'.store'));
-                $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory'));
-                $container->setAlias('lock', new Alias('lock.'.$resourceName));
+                $container->setAlias('lock.store', new Alias('lock.'.$resourceName.'.store', false));
+                $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory', false));
+                $container->setAlias('lock', new Alias('lock.'.$resourceName, false));
+                $container->setAlias(StoreInterface::class, new Alias('lock.store', false));
+                $container->setAlias(Factory::class, new Alias('lock.factory', false));
+                $container->setAlias(LockInterface::class, new Alias('lock', false));
             }
         }
     }

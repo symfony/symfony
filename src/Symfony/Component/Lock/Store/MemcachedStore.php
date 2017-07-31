@@ -67,18 +67,15 @@ class MemcachedStore implements StoreInterface
      * - 'memcached://user:pass@localhost?weight=33'
      * - array(array('localhost', 11211, 33))
      *
-     * @param string $dsn
-     * @param array  $options See self::$defaultConnectionOptions
+     * @param string $dsn     A server or A DSN
+     * @param array  $options An array of options
      *
      * @return \Memcached
      *
-     * @throws \ErrorEception When invalid options or dsn are provided
+     * @throws \ErrorEception When invalid options or server are provided
      */
-    public static function createConnection($dsn, array $options = array())
+    public static function createConnection($server, array $options = array())
     {
-        if (0 !== strpos($dsn, 'memcached://')) {
-            throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s does not start with "memcached://"', $dsn));
-        }
         if (!static::isSupported()) {
             throw new InvalidArgumentException('Memcached extension is required');
         }
@@ -88,10 +85,46 @@ class MemcachedStore implements StoreInterface
             $client = new \Memcached($options['persistent_id']);
             $username = $options['username'];
             $password = $options['password'];
-            unset($options['persistent_id'], $options['username'], $options['password']);
-            $options = array_change_key_case($options, CASE_UPPER);
+
+            // parse any DSN in $server
+            if (is_string($server)) {
+                if (0 !== strpos($server, 'memcached://')) {
+                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s does not start with "memcached://"', $server));
+                }
+                $params = preg_replace_callback('#^memcached://(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
+                    if (!empty($m[1])) {
+                        list($username, $password) = explode(':', $m[1], 2) + array(1 => null);
+                    }
+
+                    return 'file://';
+                }, $server);
+                if (false === $params = parse_url($params)) {
+                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s', $server));
+                }
+                if (!isset($params['host']) && !isset($params['path'])) {
+                    throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s', $server));
+                }
+                if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
+                    $params['weight'] = $m[1];
+                    $params['path'] = substr($params['path'], 0, -strlen($m[0]));
+                }
+                $params += array(
+                    'host' => isset($params['host']) ? $params['host'] : $params['path'],
+                    'port' => isset($params['host']) ? 11211 : null,
+                    'weight' => 0,
+                );
+                if (isset($params['query'])) {
+                    parse_str($params['query'], $query);
+                    $params += $query;
+                    $options = $query + $options;
+                }
+
+                $server = array($params['host'], $params['port'], $params['weight']);
+            }
 
             // set client's options
+            unset($options['persistent_id'], $options['username'], $options['password'], $options['weight']);
+            $options = array_change_key_case($options, CASE_UPPER);
             $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
             $client->setOption(\Memcached::OPT_NO_BLOCK, false);
             if (!array_key_exists('LIBKETAMA_COMPATIBLE', $options) && !array_key_exists(\Memcached::OPT_LIBKETAMA_COMPATIBLE, $options)) {
@@ -111,36 +144,6 @@ class MemcachedStore implements StoreInterface
             }
             $client->setOptions($options);
 
-            // parse any DSN in $servers
-            $params = preg_replace_callback('#^memcached://(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
-                if (!empty($m[1])) {
-                    list($username, $password) = explode(':', $m[1], 2) + array(1 => null);
-                }
-
-                return 'file://';
-            }, $dsn);
-            if (false === $params = parse_url($params)) {
-                throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s', $dsn));
-            }
-            if (!isset($params['host']) && !isset($params['path'])) {
-                throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s', $dsn));
-            }
-            if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
-                $params['weight'] = $m[1];
-                $params['path'] = substr($params['path'], 0, -strlen($m[0]));
-            }
-            $params += array(
-                'host' => isset($params['host']) ? $params['host'] : $params['path'],
-                'port' => isset($params['host']) ? 11211 : null,
-                'weight' => 0,
-            );
-            if (isset($params['query'])) {
-                parse_str($params['query'], $query);
-                $params += $query;
-            }
-
-            $servers = array(array($params['host'], $params['port'], $params['weight']));
-
             // set client's servers, taking care of persistent connections
             if (!$client->isPristine()) {
                 $oldServers = array();
@@ -149,22 +152,20 @@ class MemcachedStore implements StoreInterface
                 }
 
                 $newServers = array();
-                foreach ($servers as $server) {
-                    if (1 < count($server)) {
-                        $server = array_values($server);
-                        unset($server[2]);
-                        $server[1] = (int) $server[1];
-                    }
-                    $newServers[] = $server;
+                if (1 < count($server)) {
+                    $server = array_values($server);
+                    unset($server[2]);
+                    $server[1] = (int) $server[1];
                 }
+                $newServers[] = $server;
 
                 if ($oldServers !== $newServers) {
                     // before resetting, ensure $servers is valid
-                    $client->addServers($servers);
+                    $client->addServers(array($server));
                     $client->resetServerList();
                 }
             }
-            $client->addServers($servers);
+            $client->addServers(array($server));
 
             if (null !== $username || null !== $password) {
                 if (!method_exists($client, 'setSaslAuthData')) {

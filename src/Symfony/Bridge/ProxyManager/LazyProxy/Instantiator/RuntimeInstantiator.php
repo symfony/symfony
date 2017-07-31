@@ -36,7 +36,11 @@ class RuntimeInstantiator implements InstantiatorInterface
         $config = new Configuration();
         $config->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
 
-        $this->factory = new LazyLoadingValueHolderFactory($config);
+        if (method_exists('ProxyManager\Version', 'getVersion')) {
+            $this->factory = new LazyLoadingValueHolderFactoryV2($config);
+        } else {
+            $this->factory = new LazyLoadingValueHolderFactoryV1($config);
+        }
     }
 
     /**

@@ -1,18 +1,10 @@
 <div id="sfwdt{{ token }}" class="sf-toolbar sf-display-none"></div>
 {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
 <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
-    {{ include('@WebProfiler/Profiler/toolbar.css.twig', { 'position': position, 'floatable': true }) }}
+    {{ include('@WebProfiler/Profiler/toolbar.css.twig') }}
 </style>
 <script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
     (function () {
-        {% if 'top' == position %}
-            var sfwdt = document.getElementById('sfwdt{{ token }}');
-            document.body.insertBefore(
-                document.body.removeChild(sfwdt),
-                document.body.firstChild
-            );
-        {% endif %}
-
         Sfjs.load(
             'sfwdt{{ token }}',
             '{{ path("_wdt", { "token": token }) }}',

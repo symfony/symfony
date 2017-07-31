@@ -34,6 +34,18 @@ class TranslationWriterTest extends TestCase
         $writer->writeTranslations(new MessageCatalogue(array()), 'test');
     }
 
+    public function testWrite()
+    {
+        $dumper = $this->getMockBuilder('Symfony\Component\Translation\Dumper\DumperInterface')->getMock();
+        $dumper
+            ->expects($this->once())
+            ->method('dump');
+
+        $writer = new TranslationWriter();
+        $writer->addDumper('test', $dumper);
+        $writer->write(new MessageCatalogue(array()), 'test');
+    }
+
     public function testDisableBackup()
     {
         $nonBackupDumper = new NonBackupDumper();

@@ -186,6 +186,38 @@ class DotenvTest extends TestCase
         $this->assertSame('BAZ', $bar);
     }
 
+    public function testOverload()
+    {
+        unset($_ENV['FOO']);
+        unset($_SERVER['FOO']);
+        putenv('FOO');
+        $_ENV['BAR'] = 'BAR';
+        $_SERVER['BAR'] = 'BAR';
+        putenv('BAR=BAR');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, 'FOO=FOO');
+        file_put_contents($path2, 'BAR=BAZ');
+
+        (new DotEnv())->overload($path1, $path2);
+
+        $foo = getenv('FOO');
+        $bar = getenv('BAR');
+
+        putenv('FOO');
+        putenv('BAR');
+        unlink($path1);
+        unlink($path2);
+        rmdir($tmpdir);
+
+        $this->assertSame('FOO', $foo);
+        $this->assertSame('BAZ', $bar);
+    }
+
     /**
      * @expectedException \Symfony\Component\Dotenv\Exception\PathException
      */
@@ -219,8 +251,8 @@ class DotenvTest extends TestCase
     {
         putenv('TEST_ENV_VAR=original_value');
 
-        $dotenv = new DotEnv(true);
-        $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'));
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'), true);
 
         $this->assertSame('new_value', getenv('TEST_ENV_VAR'));
     }

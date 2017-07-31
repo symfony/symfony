@@ -70,7 +70,7 @@ abstract class AbstractOperation implements OperationInterface
     public function getDomains()
     {
         if (null === $this->domains) {
-            $this->domains = array_values(array_unique(array_merge($this->source->getDomains(), $this->target->getDomains())));
+            $this->domains = array_keys(array_count_values(array_merge($this->source->getDomains(), $this->target->getDomains())));
         }
 
         return $this->domains;

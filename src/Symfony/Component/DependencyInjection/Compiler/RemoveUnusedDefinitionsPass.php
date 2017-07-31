@@ -59,7 +59,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                         $referencingAliases[] = $node->getValue();
                     }
                 }
-                $isReferenced = (count(array_unique($sourceIds)) - count($referencingAliases)) > 0;
+                $isReferenced = (count(array_count_values($sourceIds)) - count($referencingAliases)) > 0;
             } else {
                 $referencingAliases = array();
                 $isReferenced = false;

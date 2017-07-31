@@ -147,6 +147,13 @@ ExpressionLanguage
    class has been removed. You should use the `CacheItemPoolInterface` interface
    instead.
 
+Filesystem
+----------
+
+ * The `Symfony\Component\Filesystem\LockHandler` has been removed,
+   use the `Symfony\Component\Lock\Store\FlockStore` class
+   or  the `Symfony\Component\Lock\Store\FlockStore\SemaphoreStore` class directly instead.
+
 Finder
 ------
 

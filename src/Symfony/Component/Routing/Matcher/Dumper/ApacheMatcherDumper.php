@@ -94,7 +94,7 @@ class ApacheMatcherDumper extends MatcherDumper
         }
         if (0 < count($methodVars)) {
             $rule = array('# 405 Method Not Allowed');
-            $methodVars = array_keys(array_count_values($methodVars));
+            $methodVars = array_values(array_unique($methodVars));
             if (in_array('GET', $methodVars) && !in_array('HEAD', $methodVars)) {
                 $methodVars[] = 'HEAD';
             }

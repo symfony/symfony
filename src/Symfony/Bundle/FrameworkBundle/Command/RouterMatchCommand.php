@@ -62,10 +62,11 @@ class RouterMatchCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
-        // BC to be removed in 4.0
         if (null !== $this->router) {
             return parent::isEnabled();
         }

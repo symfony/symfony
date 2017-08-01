@@ -35,9 +35,13 @@ class WorkflowDumpCommand extends ContainerAwareCommand
         return parent::getContainer();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
+     */
     public function isEnabled()
     {
-        // BC to be removed in 4.0
         return parent::getContainer()->has('workflow.registry');
     }
 

@@ -97,7 +97,7 @@ class Request
     /**
      * Uploaded files ($_FILES).
      *
-     * @var \Symfony\Component\HttpFoundation\FileBag
+     * @var \Symfony\Component\HttpFoundation\FileBag[]
      */
     public $files;
 

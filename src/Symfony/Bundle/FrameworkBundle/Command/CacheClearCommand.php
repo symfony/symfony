@@ -30,15 +30,13 @@ use Symfony\Component\Finder\Finder;
 class CacheClearCommand extends ContainerAwareCommand
 {
     private $cacheClearer;
-    private $cacheDir;
     private $filesystem;
 
     /**
      * @param CacheClearerInterface $cacheClearer
-     * @param string|null           $cacheDir
      * @param Filesystem|null       $filesystem
      */
-    public function __construct($cacheClearer = null, $cacheDir = null, Filesystem $filesystem = null)
+    public function __construct($cacheClearer = null, Filesystem $filesystem = null)
     {
         parent::__construct();
 
@@ -51,7 +49,6 @@ class CacheClearCommand extends ContainerAwareCommand
         }
 
         $this->cacheClearer = $cacheClearer;
-        $this->cacheDir = $cacheDir;
         $this->filesystem = $filesystem ?: new Filesystem();
     }
 
@@ -98,18 +95,14 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->cacheClearer) {
             $this->cacheClearer = parent::getContainer()->get('cache_clearer');
-        }
-        if (null === $this->cacheDir) {
-            $this->cacheDir = parent::getContainer()->getParameter('kernel.cache_dir');
-        }
-        if (null === $this->filesystem) {
             $this->filesystem = parent::getContainer()->get('filesystem');
+            $realCacheDir = parent::getContainer()->getParameter('kernel.cache_dir');
         }
 
         $io = new SymfonyStyle($input, $output);
 
         $kernel = $this->getApplication()->getKernel();
-        $realCacheDir = null === $this->cacheDir ? $this->cacheDir : $kernel->getCacheDir();
+        $realCacheDir = isset($realCacheDir) ? $realCacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir');
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
         $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');

@@ -26,13 +26,11 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 final class CachePoolClearCommand extends ContainerAwareCommand
 {
     private $poolClearer;
-    private $cacheDir;
 
     /**
      * @param Psr6CacheClearer $poolClearer
-     * @param string|null      $cacheDir
      */
-    public function __construct($poolClearer = null, $cacheDir = null)
+    public function __construct($poolClearer = null)
     {
         parent::__construct();
 
@@ -45,7 +43,6 @@ final class CachePoolClearCommand extends ContainerAwareCommand
         }
 
         $this->poolClearer = $poolClearer;
-        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -76,9 +73,7 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->poolClearer) {
             $this->poolClearer = $this->getContainer()->get('cache.global_clearer');
-        }
-        if (null === $this->cacheDir) {
-            $this->cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+            $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -104,7 +99,7 @@ EOF
 
         foreach ($clearers as $id => $clearer) {
             $io->comment(sprintf('Calling cache clearer: <info>%s</info>', $id));
-            $clearer->clear(null === $this->cacheDir ? $kernel->getCacheDir() : $this->cacheDir);
+            $clearer->clear(isset($cacheDir) ? $cacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir'));
         }
 
         foreach ($pools as $id => $pool) {

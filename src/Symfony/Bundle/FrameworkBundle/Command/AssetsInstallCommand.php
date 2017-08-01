@@ -34,26 +34,23 @@ class AssetsInstallCommand extends ContainerAwareCommand
     const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
-    private $baseDir;
     private $filesystem;
 
     /**
-     * @param string          $baseDir
      * @param Filesystem|null $filesystem
      */
-    public function __construct($baseDir = null, Filesystem $filesystem = null /**, $newApi = false*/)
+    public function __construct($filesystem = null)
     {
         parent::__construct();
 
-        if (!func_get_arg(2)) {
+        if (!$filesystem instanceof Filesystem) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
-            $this->setName(null === $baseDir ? 'assets:install' : $baseDir);
+            $this->setName(null === $filesystem ? 'assets:install' : $filesystem);
 
             return;
         }
 
-        $this->baseDir = $baseDir;
         $this->filesystem = $filesystem ?: new Filesystem();
     }
 
@@ -111,17 +108,16 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // BC to be removed in 4.0
-        if (null === $this->baseDir) {
-            $this->baseDir = parent::getContainer()->getParameter('kernel.project_dir');
-        }
         if (null === $this->filesystem) {
             $this->filesystem = parent::getContainer()->get('filesystem');
+            $baseDir = parent::getContainer()->getParameter('kernel.project_dir');
         }
 
+        $kernel = $this->getApplication()->getKernel();
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!is_dir($targetArg)) {
-            $targetArg = $this->baseDir.'/'.$targetArg;
+            $targetArg = (isset($baseDir) ? $baseDir : $kernel->getContainer()->getParameter('kernel.project_dir')).'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
                 // deprecated, logic to be removed in 4.0
@@ -159,7 +155,7 @@ EOT
         $exitCode = 0;
         $validAssetDirs = array();
         /** @var BundleInterface $bundle */
-        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+        foreach ($kernel->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 continue;
             }

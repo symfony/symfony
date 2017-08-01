@@ -18,15 +18,12 @@
         </service>
 
         <service id="console.command.assets_install" class="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
-            <argument>%kernel.project_dir%</argument>
             <argument type="service" id="filesystem" />
-            <argument>true</argument> <!-- BC to be removed in 4.0 -->
             <tag name="console.command" command="assets:install" />
         </service>
 
         <service id="console.command.cache_clear" class="Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand">
             <argument type="service" id="cache_clearer" />
-            <argument>null</argument>
             <argument type="service" id="filesystem" />
             <tag name="console.command" command="cache:clear" />
         </service>

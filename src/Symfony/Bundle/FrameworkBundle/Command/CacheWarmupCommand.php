@@ -26,13 +26,11 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 class CacheWarmupCommand extends ContainerAwareCommand
 {
     private $cacheWarmer;
-    private $cacheDir;
 
     /**
      * @param CacheWarmerAggregate $cacheWarmer
-     * @param string|null          $cacheDir
      */
-    public function __construct($cacheWarmer = null, $cacheDir = null)
+    public function __construct($cacheWarmer = null)
     {
         parent::__construct();
 
@@ -45,7 +43,6 @@ class CacheWarmupCommand extends ContainerAwareCommand
         }
 
         $this->cacheWarmer = $cacheWarmer;
-        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -94,9 +91,7 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->cacheWarmer) {
             $this->cacheWarmer = parent::getContainer()->get('cache_warmer');
-        }
-        if (null === $this->cacheDir) {
-            $this->cacheDir = parent::getContainer()->getParameter('kernel.cache_dir');
+            $cacheDir = parent::getContainer()->getParameter('kernel.cache_dir');
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -108,7 +103,7 @@ EOF
             $this->cacheWarmer->enableOptionalWarmers();
         }
 
-        $this->cacheWarmer->warmUp(null === $this->cacheDir ? $kernel->getCacheDir() : $this->cacheDir);
+        $this->cacheWarmer->warmUp(isset($cacheDir) ? $cacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir'));
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully warmed.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }

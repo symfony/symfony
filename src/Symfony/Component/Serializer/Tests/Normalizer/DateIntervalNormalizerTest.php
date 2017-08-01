@@ -150,7 +150,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeFormatMismatchThrowsException()
     {
-        $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, array(DateIntervalNormalizer::FORMAT_KEY => 'P10Y2M3D'));
+        $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, array(DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD'));
     }
 
     private function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)

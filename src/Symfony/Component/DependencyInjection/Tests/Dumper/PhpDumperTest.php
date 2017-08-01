@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -560,6 +561,9 @@ class PhpDumperTest extends TestCase
             ))
         ;
         $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class);
+
+        $container->register(CustomDefinition::class, CustomDefinition::class)
+            ->setPublic(false);
         $container->compile();
 
         $dumper = new PhpDumper($container);

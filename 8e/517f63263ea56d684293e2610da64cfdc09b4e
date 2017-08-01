@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-07-29T10:47:16Z
+
+Could you please rebase @mimol91 ?
+@javiereguiluz WDYT ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-29T13:18:39Z
+
+@mimol91 what happens when using Postgresql ? Explain output uses a `<pre>` tag there, not a table.
+
+---------------------------------------------------------------------------
+
+by mimol91 at 2017-07-29T13:59:06Z
+
+Its working as before
+![screenshot_20170729_175832](https://user-images.githubusercontent.com/2659069/28745335-9609400e-7487-11e7-93ba-4ce0ac4eca1c.png)
+
+Can i re-trigger tests?
+
+---------------------------------------------------------------------------
+
+by mimol91 at 2017-07-30T15:05:42Z
+
+I've rebased with 3.4

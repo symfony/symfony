@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Filesystem;
 
+@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use %s or %s instead.', LockHandler::class, SemaphoreStore::class, FlockStore::class), E_USER_DEPRECATED);
+
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
  * LockHandler class provides a simple abstraction to lock anything by means of
@@ -25,6 +29,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Romain Neutron <imprec@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use Symfony\Component\Lock\Store\SemaphoreStore or Symfony\Component\Lock\Store\FlockStore instead.
  */
 class LockHandler
 {

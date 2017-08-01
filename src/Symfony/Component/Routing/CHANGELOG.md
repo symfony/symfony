@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Added support to resolve dynamic values in default parameters
+
 4.0.0
 -----
 

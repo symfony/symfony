@@ -175,8 +175,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function getAttributes(Route $route, $name, array $attributes)
     {
         $attributes['_route'] = $name;
+        $attributes = $this->filterNamelessAttributes($attributes);
 
-        return $this->mergeDefaults($attributes, $route->getDefaults());
+        $variables = $this->mergeDefaults($attributes, $route->getDefaults());
+
+        return $this->resolveDefaults($variables, $attributes);
     }
 
     /**
@@ -213,9 +216,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function mergeDefaults($params, $defaults)
     {
         foreach ($params as $key => $value) {
-            if (!is_int($key)) {
-                $defaults[$key] = $value;
-            }
+            $defaults[$key] = $value;
         }
 
         return $defaults;
@@ -246,5 +247,52 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             'SCRIPT_FILENAME' => $this->context->getBaseUrl(),
             'SCRIPT_NAME' => $this->context->getBaseUrl(),
         ));
+    }
+
+    /**
+     * Removes key number based attributes and keeps attributes identified by its association name.
+     *
+     * @param array $params List of attributes
+     *
+     * @return array Attributes identified by their key association name
+     */
+    protected function filterNamelessAttributes(array $params)
+    {
+        return array_filter($params, function ($key) {
+            return !is_int($key);
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * Match all variables enclosed in "{}" and substitute value using its corresponding attribute.
+     *
+     * @param array $variables  An array with merged defaults variables
+     * @param array $attributes An array of attributes from the matcher
+     *
+     * @return array Attributes with interpreted values
+     */
+    protected function resolveDefaults($variables, $attributes)
+    {
+        $enclosingPattern = "/{(\w+)}/";
+
+        foreach ($variables as $key => $value) {
+            // checking if the variable come from a specified attribute, if so, we shouldn't evaluate because only default values have to be interpreted
+            if (isset($attributes[$key])) {
+                continue;
+            }
+
+            $valueProcessed = preg_replace_callback($enclosingPattern, function ($match) use ($variables) {
+                $varName = $match[1];
+                if (!isset($variables[$varName])) {
+                    throw new \LogicException('Default params with dynamic values should have a value.');
+                }
+
+                return $variables[$varName];
+            }, $value);
+
+            $variables[$key] = $valueProcessed;
+        }
+
+        return $variables;
     }
 }

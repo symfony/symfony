@@ -93,7 +93,7 @@ class Configuration implements ConfigurationInterface
                             'version' => $v['templating']['assets_version'],
                             'version_format' => $v['templating']['assets_version_format'],
                             'base_path' => '',
-                            'base_urls' => array_values(array_unique(array_merge($v['templating']['assets_base_urls']['http'], $v['templating']['assets_base_urls']['ssl']))),
+                            'base_urls' => array_keys(array_count_values(array_merge($v['templating']['assets_base_urls']['http'], $v['templating']['assets_base_urls']['ssl']))),
                             'packages' => array(),
                         );
 
@@ -102,7 +102,7 @@ class Configuration implements ConfigurationInterface
                                 'version' => null === $config['version'] ? null : (string) $config['version'],
                                 'version_format' => $config['version_format'],
                                 'base_path' => '',
-                                'base_urls' => array_values(array_unique(array_merge($config['base_urls']['http'], $config['base_urls']['ssl']))),
+                                'base_urls' => array_keys(array_count_values(array_merge($config['base_urls']['http'], $config['base_urls']['ssl']))),
                             );
                         }
                     }

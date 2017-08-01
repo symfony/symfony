@@ -454,7 +454,7 @@ class Application
             }
         }
 
-        return array_values(array_unique(array_filter($namespaces)));
+        return array_keys(array_count_values(array_filter($namespaces)));
     }
 
     /**

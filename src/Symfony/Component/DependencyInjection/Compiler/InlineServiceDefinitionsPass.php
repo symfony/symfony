@@ -140,7 +140,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             $ids[] = $edge->getSourceNode()->getId();
         }
 
-        if (count(array_unique($ids)) > 1) {
+        if (count(array_count_values($ids)) > 1) {
             return false;
         }
 

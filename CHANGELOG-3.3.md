@@ -7,6 +7,35 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.6 (2017-08-01)
+
+ * bug #22244 [Console] Fix passing options with defaultCommand (Jakub Sacha)
+ * bug #23705 [Form] Add notice to upgrade to PHP v7.0.8+ (nicolas-grekas)
+ * bug #23683 [VarDumper] Keep and reuse array stubs in memory (nicolas-grekas)
+ * bug #23686 [Console][WebServerBundle] Use "exec" when possible (nicolas-grekas)
+ * bug #23684 [Debug] Missing escape in debug output (c960657)
+ * bug #23644 [VarDumper] Dont use Stub objects for arrays - lower GC pressure (nicolas-grekas)
+ * bug #23615 [Cache] Handle serialization failures for Memcached (nicolas-grekas)
+ * bug #23654 [DI] Fix using private services in expressions (nicolas-grekas)
+ * bug #23662 [VarDumper] Adapt to php 7.2 changes (nicolas-grekas)
+ * bug #23649 [Form][TwigBridge] Don't render _method in form_rest() for a child form (fmarchalemisys)
+ * bug #23588 [WebProfilerBundle] Display trace and context in the logger profiler (lyrixx)
+ * bug #23023 [DoctrineBridge][PropertyInfo] Added support for Doctrine Embeddables (vudaltsov)
+ * bug #23618 [Routing] allow HEAD method to be defined first (DavidBadura)
+ * bug #23619 [Validator] Fix IbanValidator for ukrainian IBANs (paroe)
+ * bug #23605 [DI][Bug] Autowiring thinks optional args on core classes are required (weaverryan)
+ * bug #23586 Fix case sensitive sameSite cookie (mikefrancis)
+ * bug #23584 Fix the design of the profiler exceptions when there is no message (javiereguiluz)
+ * bug #23238 [Security] ensure the 'route' index is set before attempting to use it (gsdevme)
+ * bug #23330 [WebProfilerBundle] Fix full sized dump hovering in toolbar (ogizanagi)
+ * bug #23581 [Config] Minor fix (nicolas-grekas)
+ * bug #23580 Fix login redirect when referer contains a query string (fabpot)
+ * bug #23577 [WebProfilerBundle][TwigBundle] Fix infinite js loop on exception pages (ogizanagi)
+ * bug #23558 [FrameworkBundle] fix ValidatorCacheWarmer: use serializing ArrayAdapter (dmaicher)
+ * bug #23573 [Config] Make ClassExistenceResource throw on invalid parents (nicolas-grekas)
+ * bug #23574 [VarDumper] Move locale sniffing to dump() time (nicolas-grekas)
+ * bug #23575 [VarDumper] Use "C" locale when using "comma" flags (nicolas-grekas)
+
 * 3.3.5 (2017-07-17)
 
  * bug #23549 [PropertyInfo] conflict for phpdocumentor/reflection-docblock 3.2 (xabbuh)

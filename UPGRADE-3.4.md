@@ -8,6 +8,46 @@ DependencyInjection
    in Symfony 4.0. Explicitely inject your dependencies or create services
    whose ids are their fully-qualified class name.
 
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+   ```
+
  * Top-level anonymous services in XML are deprecated and will throw an exception in Symfony 4.0.
 
 Debug

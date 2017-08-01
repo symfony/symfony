@@ -7,6 +7,19 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.26 (2017-08-01)
+
+ * bug #22244 [Console] Fix passing options with defaultCommand (Jakub Sacha)
+ * bug #23684 [Debug] Missing escape in debug output (c960657)
+ * bug #23662 [VarDumper] Adapt to php 7.2 changes (nicolas-grekas)
+ * bug #23649 [Form][TwigBridge] Don't render _method in form_rest() for a child form (fmarchalemisys)
+ * bug #23023 [DoctrineBridge][PropertyInfo] Added support for Doctrine Embeddables (vudaltsov)
+ * bug #23619 [Validator] Fix IbanValidator for ukrainian IBANs (paroe)
+ * bug #23238 [Security] ensure the 'route' index is set before attempting to use it (gsdevme)
+ * bug #23330 [WebProfilerBundle] Fix full sized dump hovering in toolbar (ogizanagi)
+ * bug #23580 Fix login redirect when referer contains a query string (fabpot)
+ * bug #23574 [VarDumper] Move locale sniffing to dump() time (nicolas-grekas)
+
 * 2.8.25 (2017-07-17)
 
  * security #23507 [Security] validate empty passwords again (xabbuh)

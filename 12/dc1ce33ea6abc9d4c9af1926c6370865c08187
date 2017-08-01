@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-01T13:47:44Z
+
+Changing milestone and switching target branch to 2.8 (where the interface has been introduced).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-01T13:49:10Z
+
+@vudaltsov Could you please change the target branch to 2.8 (edit button on top of your PR) and rebase your branch against 2.8 if needed?

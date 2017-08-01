@@ -33,8 +33,7 @@ class Yaml
     const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
 
     /**
-     * @deprecated since version 3.4, to be removed in 4.0. Quote your evaluable
-     * keys instead.
+     * @deprecated since version 3.4, to be removed in 4.0. Quote your evaluable keys instead.
      */
     const PARSE_KEYS_AS_STRINGS = 2048;
 

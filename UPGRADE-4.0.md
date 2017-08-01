@@ -78,7 +78,7 @@ DependencyInjection
 -------------------
 
  * Autowiring service auto-registration is not supported anymore.
-   Explicitely inject your dependencies or create services whose ids are
+   Explicitly inject your dependencies or create services whose ids are
    their fully-qualified class name.
 
    Before:

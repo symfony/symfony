@@ -5,7 +5,7 @@ DependencyInjection
 -------------------
 
  * Autowiring service auto-registration is deprecated and won't be supported
-   in Symfony 4.0. Explicitely inject your dependencies or create services
+   in Symfony 4.0. Explicitly inject your dependencies or create services
    whose ids are their fully-qualified class name.
 
    Before:

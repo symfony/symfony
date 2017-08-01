@@ -24,7 +24,7 @@ use Symfony\Component\Process\Process;
  */
 final class Dotenv
 {
-    const VARNAME_REGEX = '(?i:[A-Z][A-Z0-9_]*+)';
+    const VARNAME_REGEX = '(?i:[A-Z_][A-Z0-9_]*+)';
     const STATE_VARNAME = 0;
     const STATE_VALUE = 1;
 
@@ -95,7 +95,7 @@ final class Dotenv
         $this->cursor = 0;
         $this->end = strlen($this->data);
         $this->state = self::STATE_VARNAME;
-        $this->values = array();
+        $this->values = array('__DIR__' => dirname(realpath($path) ?: $path));
         $name = $value = '';
 
         $this->skipEmptyLines();
@@ -117,6 +117,8 @@ final class Dotenv
         if (self::STATE_VALUE === $this->state) {
             $this->values[$name] = '';
         }
+
+        unset($this->values['__DIR__']);
 
         try {
             return $this->values;

@@ -214,4 +214,12 @@ class DotenvTest extends TestCase
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
     }
+
+    public function testMagicDirVar()
+    {
+        $dotenv = new DotEnv();
+        $vars = $dotenv->parse('DATABASE_URL=${__DIR__}/var/data/db.sqlite', '/tmp/symfony/.env');
+
+        $this->assertSame('/tmp/symfony/var/data/db.sqlite', $vars['DATABASE_URL']);
+    }
 }

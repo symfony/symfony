@@ -7,6 +7,17 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.33 (2017-08-01)
+
+ * bug #22244 [Console] Fix passing options with defaultCommand (Jakub Sacha)
+ * bug #23684 [Debug] Missing escape in debug output (c960657)
+ * bug #23662 [VarDumper] Adapt to php 7.2 changes (nicolas-grekas)
+ * bug #23649 [Form][TwigBridge] Don't render _method in form_rest() for a child form (fmarchalemisys)
+ * bug #23619 [Validator] Fix IbanValidator for ukrainian IBANs (paroe)
+ * bug #23238 [Security] ensure the 'route' index is set before attempting to use it (gsdevme)
+ * bug #23580 Fix login redirect when referer contains a query string (fabpot)
+ * bug #23574 [VarDumper] Move locale sniffing to dump() time (nicolas-grekas)
+
 * 2.7.32 (2017-07-17)
 
  * security #23507 [Security] validate empty passwords again (xabbuh)

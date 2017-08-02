@@ -1633,7 +1633,8 @@ EOF;
             return $this->serviceIdToMethodNameMap[$id];
         }
 
-        $name = Container::camelize($id);
+        $i = strrpos($id, '\\');
+        $name = Container::camelize(false !== $i && isset($id[1 + $i]) ? substr($id, 1 + $i) : $id);
         $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
         $methodName = 'get'.$name.'Service';
         $suffix = 1;

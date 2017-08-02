@@ -11,36 +11,55 @@
 
 namespace Symfony\Component\Amqp;
 
+use Interop\Amqp\AmqpConsumer;
+use Interop\Amqp\AmqpContext;
+use Interop\Amqp\AmqpTopic;
+use Interop\Amqp\AmqpMessage;
+use Interop\Amqp\AmqpQueue;
+use Interop\Amqp\Impl\AmqpBind;
 use Symfony\Component\Amqp\Exception\InvalidArgumentException;
 use Symfony\Component\Amqp\Exception\LogicException;
 use Symfony\Component\Amqp\Exception\NonRetryableException;
 use Symfony\Component\Amqp\RetryStrategy\ConstantRetryStrategy;
 use Symfony\Component\Amqp\RetryStrategy\ExponentialRetryStrategy;
+use Symfony\Component\Amqp\RetryStrategy\RetryStrategyInterface;
 
-/**
- * Provides nice shortcuts for common use cases.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- */
 class Broker
 {
     const DEFAULT_EXCHANGE = 'symfony.default';
     const DEAD_LETTER_EXCHANGE = 'symfony.dead_letter';
     const RETRY_EXCHANGE = 'symfony.retry';
 
-    private $connection;
-    private $channel;
+    /**
+     * @var AmqpContext
+     */
+    private $context;
+
     private $queuesConfiguration = array();
     private $exchangesConfiguration = array();
     private $exchanges = array();
     private $queues = array();
+
+    /**
+     * @var AmqpConsumer[]
+     */
+    private $queueConsumers = array();
+
+    /**
+     * @var string[]
+     */
     private $retryStrategies = array();
+
+    /**
+     * @var string[]
+     */
     private $retryStrategyQueuePatterns = array();
     private $queuesBindings = array();
 
+    private $exchangeBindings = array();
+
     /**
-     * @param \AMQPConnection|string $connection             An \AMQPConnection instance or a DSN
+     * @param AmqpContext            $context                An AmqpContext instance
      * @param array                  $queuesConfiguration    A collection of queue configurations
      * @param array                  $exchangesConfiguration A collection of exchange configurations
      *
@@ -63,24 +82,16 @@ class Broker
      *     )
      * )
      */
-    public function __construct($connection = 'amqp://guest:guest@localhost:5672/', array $queuesConfiguration = array(), array $exchangesConfiguration = array())
+    public function __construct(AmqpContext $context, array $queuesConfiguration = array(), array $exchangesConfiguration = array())
     {
-        if (!extension_loaded('amqp')) {
-            throw new \RuntimeException('The amqp extension is mandatory.');
-        }
-
-        if (is_string($connection)) {
-            $connection = new \AMQPConnection(UrlParser::parseUrl($connection));
-        }
-        if (!$connection instanceof \AMQPConnection) {
-            throw new InvalidArgumentException('The connection should be a DSN or an instance of AMQPConnection.');
-        }
-
-        $this->connection = $connection;
-        $this->connection->setReadTimeout(4 * 60 * 60); // 4 hours
+        $this->context = $context;
 
         $this->setQueuesConfiguration($queuesConfiguration);
         $this->setExchangesConfiguration($exchangesConfiguration);
+
+        // Force the creation of this special exchange. It can not be lazy loaded as
+        // it is needed for the retry workflow because all queues are bound to it.
+        $this->getOrCreateExchange(self::RETRY_EXCHANGE);
     }
 
     /**
@@ -94,69 +105,11 @@ class Broker
     }
 
     /**
-     * Connects to the AMQP using the given channel or by creating one.
-     *
-     * @param \AMQPChannel|null $channel
-     */
-    public function connect(\AMQPChannel $channel = null)
-    {
-        if (!$this->connection->isConnected()) {
-            $this->connection->connect();
-        }
-
-        if (!$this->channel) {
-            $this->channel = $channel ?: new \AMQPChannel($this->connection);
-        }
-
-        // Force the creation of this special exchange. It can not be lazy loaded as
-        // it is needed for the retry workflow because all queues are bound to it.
-        $this->getOrCreateExchange(self::RETRY_EXCHANGE);
-    }
-
-    /**
      * Disconnects from AMQP and clears all parameters excepted configurations.
      */
     public function disconnect()
     {
-        $this->channel = null;
-
-        if ($this->connection->isConnected()) {
-            $this->connection->disconnect();
-        }
-
-        $this->queues = array();
-        $this->exchanges = array();
-        $this->retryStrategies = array();
-        $this->retryStrategyQueuePatterns = array();
-        $this->queuesBindings = array();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isConnected()
-    {
-        return $this->connection->isConnected();
-    }
-
-    /**
-     * @return \AMQPConnection
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * @return \AMQPChannel
-     */
-    public function getChannel()
-    {
-        if (null === $this->channel) {
-            $this->connect();
-        }
-
-        return $this->channel;
+        $this->context->close();
     }
 
     /**
@@ -167,17 +120,43 @@ class Broker
      * @param string $name
      * @param array  $arguments
      *
-     * @return Exchange
+     * @return AmqpTopic
      */
     public function createExchange($name, array $arguments = array())
     {
-        return $this->exchanges[$name] = new Exchange($this->getChannel(), $name, $arguments);
+        $topic = $this->context->createTopic($name);
+
+        if (Broker::DEAD_LETTER_EXCHANGE === $name) {
+            $topic->setType(AmqpTopic::TYPE_HEADERS);
+            unset($arguments['type']);
+        } elseif (Broker::RETRY_EXCHANGE === $name) {
+            $topic->setType(AmqpTopic::TYPE_DIRECT);
+            unset($arguments['type']);
+        } elseif (isset($arguments['type'])) {
+            $topic->setType($arguments['type']);
+            unset($arguments['type']);
+        } else {
+            $topic->setType(AmqpTopic::TYPE_DIRECT);
+        }
+
+        if (isset($arguments['flags'])) {
+            $topic->setFlags($arguments['flags']);
+            unset($arguments['flags']);
+        } else {
+            $topic->addFlag(AmqpTopic::FLAG_DURABLE);
+        }
+
+        $topic->setArguments($arguments);
+
+        $this->context->declareTopic($topic);
+
+        return $this->exchanges[$name] = $topic;
     }
 
     /**
      * @param string $name
      *
-     * @return \AMQPExchange
+     * @return AmqpTopic
      */
     public function getExchange($name)
     {
@@ -194,11 +173,11 @@ class Broker
     /**
      * Sets or replaces the given exchange if its name is already known.
      *
-     * @param \AMQPExchange $exchange
+     * @param AmqpTopic $exchange
      */
-    public function addExchange(\AMQPExchange $exchange)
+    public function addExchange(AmqpTopic $exchange)
     {
-        $this->exchanges[$exchange->getName()] = $exchange;
+        $this->exchanges[$exchange->getTopicName()] = $exchange;
     }
 
     /**
@@ -210,13 +189,11 @@ class Broker
      * @param array  $arguments Queue constructor arguments
      * @param bool   $declare   True by default, the Queue will be bound to the current broker
      *
-     * @return Queue
+     * @return AmqpQueue
      */
-    public function createQueue($name, array $arguments = array(), $declareAndBind = true)
+    public function createQueue($name, array $arguments = array(), $declare = true)
     {
-        if (!$declareAndBind) {
-            return new Queue($this->getChannel(), $name, $arguments, $declareAndBind);
-        }
+        $amqpQueue = $this->context->createQueue($name);
 
         if (isset($arguments['exchange'])) {
             $this->getOrCreateExchange($arguments['exchange']);
@@ -224,11 +201,115 @@ class Broker
             $this->getOrCreateExchange(self::DEFAULT_EXCHANGE);
         }
 
-        $queue = new Queue($this->getChannel(), $name, $arguments, $declareAndBind);
+        if (array_key_exists('routing_keys', $arguments)) {
+            $routingKeys = $arguments['routing_keys'];
+            if (is_string($routingKeys)) {
+                $routingKeys = array($routingKeys);
+            }
+            if (!is_array($routingKeys) && null !== $routingKeys && false !== $routingKeys) {
+                throw new InvalidArgumentException(sprintf('"routing_keys" option should be a string, false, null or an array of string, "%s" given.', gettype($routingKeys)));
+            }
 
-        $this->addQueue($queue);
+            unset($arguments['routing_keys']);
+        } else {
+            $routingKeys = array($name);
+        }
 
-        return $queue;
+        if (isset($arguments['flags'])) {
+            $amqpQueue->setFlags($arguments['flags']);
+            unset($arguments['flags']);
+        } else {
+            $amqpQueue->setFlags(AmqpQueue::FLAG_DURABLE);
+        }
+
+        if (isset($arguments['exchange'])) {
+            $exchange = $arguments['exchange'];
+            unset($arguments['exchange']);
+        } else {
+            $exchange = Broker::DEFAULT_EXCHANGE;
+        }
+
+        if (array_key_exists('retry_strategy', $arguments)) {
+            $retryStrategy = $arguments['retry_strategy'];
+            if (!$retryStrategy instanceof RetryStrategyInterface) {
+                throw new InvalidArgumentException('The retry_strategy should be an instance of RetryStrategyInterface.');
+            }
+
+            $this->retryStrategies[$name] = $retryStrategy;
+            unset($arguments['retry_strategy']);
+        }
+
+        if (array_key_exists('retry_strategy_queue_pattern', $arguments)) {
+            $this->retryStrategyQueuePatterns[$name] = $arguments['retry_strategy_queue_pattern'];
+            unset($arguments['retry_strategy_queue_pattern']);
+        } else {
+            $this->retryStrategyQueuePatterns[$name] = '%exchange%.%time%.wait';
+        }
+
+        if (isset($arguments['bind_arguments'])) {
+            $bindArguments = $arguments['bind_arguments'];
+            unset($arguments['bind_arguments']);
+        } else {
+            $bindArguments = array();
+        }
+
+        $amqpQueue->setArguments($arguments);
+
+        if (null === $routingKeys) {
+            $bindingConfig = [
+                'queue' => $name,
+                'exchange' => $exchange,
+                'routing_key' => null,
+                'bind_arguments' => $bindArguments,
+            ];
+
+            $this->queuesBindings[$name][] = $bindingConfig;
+            $this->exchangeBindings[$exchange][] = $bindingConfig;
+        } elseif (is_array($routingKeys)) {
+
+            foreach ($routingKeys as $routingKey) {
+                $bindingConfig = [
+                    'queue' => $name,
+                    'exchange' => $exchange,
+                    'routing_key' => $routingKey,
+                    'bind_arguments' => $bindArguments,
+                ];
+
+                $this->queuesBindings[$name][] = $bindingConfig;
+                $this->exchangeBindings[$exchange] = $bindingConfig;
+            }
+        }
+
+        // Special binding: Bind this queue, with its name as the routing key
+        // with the retry exchange in order to have a nice retry workflow.
+        $bindingConfig = [
+            'queue' => $name,
+            'exchange' => Broker::RETRY_EXCHANGE,
+            'routing_key' => $name,
+            'bind_arguments' => $bindArguments,
+        ];
+        $this->queuesBindings[$name][] = $bindingConfig;
+        $this->exchangeBindings[Broker::RETRY_EXCHANGE][] = $bindingConfig;
+
+        if ($declare) {
+            $this->context->declareQueue($amqpQueue);
+
+            foreach ($this->queuesBindings[$name] as $config) {
+                $amqpTopic = $this->getExchange($config['exchange']);
+
+                $this->context->bind(new AmqpBind(
+                    $amqpTopic,
+                    $amqpQueue,
+                    $config['routing_key'],
+                    AmqpBind::FLAG_NOPARAM,
+                    $config['bind_arguments']
+                ));
+            }
+        }
+
+        $this->queues[$name] = $amqpQueue;
+
+        return $amqpQueue;
     }
 
     /**
@@ -236,7 +317,7 @@ class Broker
      *
      * @param string $name
      *
-     * @return Queue
+     * @return AmqpQueue
      */
     public function getQueue($name)
     {
@@ -248,32 +329,6 @@ class Broker
         }
 
         return $this->queues[$name];
-    }
-
-    /**
-     * Binds a Queue and its strategy.
-     *
-     * A Queue can only be bound through unique pairs of Exchange
-     * and routing key.
-     *
-     * @param Queue $queue
-     */
-    public function addQueue(Queue $queue)
-    {
-        $name = $queue->getName();
-
-        $this->queues[$name] = $queue;
-
-        $this->retryStrategies[$name] = $queue->getRetryStrategy();
-        $this->retryStrategyQueuePatterns[$name] = $queue->getRetryStrategyQueuePattern();
-
-        // We register the binding to not create queue in case of multiple
-        // queues bound with the same routing key
-        foreach ($queue->getBindings() as $exchange => $bindings) {
-            foreach ($bindings as $binding) {
-                $this->queuesBindings[$exchange][$binding['routing_key']] = true;
-            }
-        }
     }
 
     /**
@@ -304,11 +359,14 @@ class Broker
      */
     public function publish($routingKey, $message, array $attributes = array())
     {
+        $amqpMessage = $this->context->createMessage($message);
+
         if (isset($attributes['flags'])) {
-            $flags = $attributes['flags'];
+            $amqpMessage->setFlags($attributes['flags']);
+
             unset($attributes['flags']);
         } else {
-            $flags = \AMQP_MANDATORY;
+            $amqpMessage->addFlag(AmqpMessage::FLAG_MANDATORY);
         }
 
         if (isset($attributes['exchange'])) {
@@ -318,15 +376,27 @@ class Broker
             $exchangeName = self::DEFAULT_EXCHANGE;
         }
 
-        // Force Exchange creation if needed
-        $exchange = $this->getOrCreateExchange($exchangeName);
-
-        // Force Queue creation if needed
-        if ($this->shouldCreateQueue($exchange, $routingKey)) {
-            $this->lazyLoadQueues($exchange, $routingKey);
+        if (isset($attributes['headers'])) {
+            $amqpMessage->setProperties($attributes['headers']);
+            unset($attributes['headers']);
         }
 
-        return $exchange->publish($message, $routingKey, $flags, $attributes);
+        $amqpMessage->setHeaders($attributes);
+
+        // Force Exchange creation if needed
+        $topic = $this->getOrCreateExchange($exchangeName);
+
+        // Force Queue creation if needed
+        if ($this->shouldCreateQueue($topic, $routingKey)) {
+            $this->lazyLoadQueues($topic, $routingKey);
+        }
+
+        $amqpMessage->setRoutingKey($routingKey);
+        $amqpMessage->setDeliveryMode(AmqpMessage::DELIVERY_MODE_PERSISTENT);
+
+        $this->context->createProducer()->send($topic, $amqpMessage);
+
+        return true;
     }
 
     /**
@@ -366,9 +436,19 @@ class Broker
      * @param int           $flags
      * @param string|null   $consumerTag
      */
-    public function consume($name, callable $callback = null, $flags = \AMQP_NOPARAM, $consumerTag = null)
+    public function consume($name, $callback = null, $flags = AmqpConsumer::FLAG_NOPARAM, $consumerTag = null)
     {
-        $this->getOrCreateQueue($name)->consume($callback, $flags, $consumerTag);
+        $consumer = $this->getQueueConsumer($name);
+        $consumer->setConsumerTag($consumerTag);
+        $consumer->setFlags($flags);
+
+        while (true) {
+            if ($message = $consumer->receive(1000)) {
+                if (false === call_user_func($callback, $message, $consumer)) {
+                    return;
+                }
+            }
+        }
     }
 
     /**
@@ -377,11 +457,14 @@ class Broker
      * @param string $name  The queue name
      * @param int    $flags
      *
-     * @return \AMQPEnvelope|bool An enveloppe or false
+     * @return AmqpMessage|null
      */
-    public function get($name, $flags = \AMQP_NOPARAM)
+    public function get($name, $flags = AmqpConsumer::FLAG_NOPARAM)
     {
-        return $this->getOrCreateQueue($name)->get($flags);
+        $consumer = $this->getQueueConsumer($name);
+        $consumer->setFlags($flags);
+
+        return $consumer->receiveNoWait();
     }
 
     /**
@@ -390,17 +473,16 @@ class Broker
      *
      * If it's not the case, you MUST specify the queueName.
      *
-     * @param \AMQPEnvelope $msg
-     * @param int           $flags
-     * @param string|null   $queueName
+     * @param AmqpMessage $message
+     * @param string|null $queueName
      *
      * @return bool
      */
-    public function ack(\AMQPEnvelope $msg, $flags = \AMQP_NOPARAM, $queueName = null)
+    public function ack(AmqpMessage $message, $queueName = null)
     {
-        $queueName = $queueName ?: $msg->getRoutingKey();
+        $queueName = $queueName ?: $message->getRoutingKey();
 
-        return $this->getQueue($queueName)->ack($msg->getDeliveryTag(), $flags);
+        $this->getQueueConsumer($queueName)->acknowledge($message);
     }
 
     /**
@@ -409,17 +491,16 @@ class Broker
      *
      * If it's not the case, you MUST specify the queueName.
      *
-     * @param \AMQPEnvelope $msg
-     * @param int           $flags
-     * @param string|null   $queueName
+     * @param AmqpMessage $message
+     * @param string|null $queueName
      *
      * @return bool
      */
-    public function nack(\AMQPEnvelope $msg, $flags = \AMQP_NOPARAM, $queueName = null)
+    public function nack(AmqpMessage $message, $queueName = null)
     {
-        $queueName = $queueName ?: $msg->getRoutingKey();
+        $queueName = $queueName ?: $message->getRoutingKey();
 
-        return $this->getQueue($queueName)->nack($msg->getDeliveryTag(), $flags);
+        $this->getQueueConsumer($queueName)->reject($message, false);
     }
 
     /**
@@ -428,15 +509,15 @@ class Broker
      *
      * If it's not the case, you MUST specify the queueName.
      *
-     * @param \AMQPEnvelope $msg
-     * @param string|null   $queueName
-     * @param string|null   $message
+     * @param AmqpMessage $amqpMessage
+     * @param string|null $queueName
+     * @param string|null $retryMessage
      *
      * @return bool
      */
-    public function retry(\AMQPEnvelope $msg, $queueName = null, $message = null)
+    public function retry(AmqpMessage $amqpMessage, $queueName = null, $retryMessage = null)
     {
-        $queueName = $queueName ?: $msg->getRoutingKey();
+        $queueName = $queueName ?: $amqpMessage->getRoutingKey();
 
         if (!$this->hasRetryStrategy($queueName)) {
             throw new LogicException(sprintf('The queue "%s" has no retry strategy.', $queueName));
@@ -444,28 +525,28 @@ class Broker
 
         $retryStrategy = $this->retryStrategies[$queueName];
 
-        if (!$retryStrategy->isRetryable($msg)) {
-            throw new NonRetryableException($retryStrategy, $msg);
+        if (!$retryStrategy->isRetryable($amqpMessage)) {
+            throw new NonRetryableException($retryStrategy, $amqpMessage);
         }
 
-        $time = $retryStrategy->getWaitingTime($msg);
+        $time = $retryStrategy->getWaitingTime($amqpMessage);
 
         $this->createDelayedQueue($queueName, $time);
 
         // Copy previous headers, but omit x-death
-        $headers = $msg->getHeaders();
+        $headers = $amqpMessage->getHeaders();
         unset($headers['x-death']);
         $headers['queue-time'] = (string) $time;
         $headers['exchange'] = (string) self::RETRY_EXCHANGE;
-        $headers['retries'] = $msg->getHeader('retries') + 1;
+        $headers['retries'] = $amqpMessage->getHeader('retries') + 1;
 
         // Some RabbitMQ versions fail when $message is null
         // + if a message already exists, we want to keep it.
-        if (null !== $message) {
-            $headers['retry-message'] = $message;
+        if (null !== $retryMessage) {
+            $headers['retry-message'] = $retryMessage;
         }
 
-        return $this->publish($queueName, $msg->getBody(), array(
+        return $this->publish($queueName, $amqpMessage->getBody(), array(
             'exchange' => self::DEAD_LETTER_EXCHANGE,
             'headers' => $headers,
         ));
@@ -477,54 +558,26 @@ class Broker
      * If attributes are given as third argument they will override the
      * message ones.
      *
-     * @param \AMQPEnvelope $msg
-     * @param string        $routingKey
-     * @param array         $attributes
+     * @param AmqpMessage $msg
+     * @param string      $routingKey
+     * @param array       $attributes
      *
      * @return bool
      */
-    public function move(\AMQPEnvelope $msg, $routingKey, array $attributes = array())
+    public function move(AmqpMessage $msg, $routingKey, $attributes)
     {
-        $map = array(
-            'app_id' => 'getAppId',
-            'content_encoding' => 'getContentEncoding',
-            'content_type' => 'getContentType',
-            'delivery_mode' => 'getDeliveryMode',
-            'expiration' => 'getExpiration',
-            'headers' => 'getHeaders',
-            'message_id' => 'getMessageId',
-            'priority' => 'getPriority',
-            'reply_to' => 'getReplyTo',
-            'timestamp' => 'getTimestamp',
-            'type' => 'getType',
-            'user_id' => 'getUserId',
-        );
+        $attributes = array_replace($msg->getHeaders(), $attributes);
 
-        $originalAttributes = array();
-
-        foreach ($map as $key => $method) {
-            if (isset($attributes[$key])) {
-                $originalAttributes[$key] = $attributes[$key];
-
-                continue;
-            }
-
-            $value = $msg->{$method}();
-            if ($value) {
-                $originalAttributes[$key] = $value;
-            }
-        }
-
-        return $this->publish($routingKey, $msg->getBody(), $originalAttributes);
+        return $this->publish($routingKey, $msg->getBody(), $attributes);
     }
 
     /**
-     * @param \AMQPEnvelope $msg
-     * @param array         $attributes
+     * @param AmqpMessage $msg
+     * @param array       $attributes
      *
      * @return bool
      */
-    public function moveToDeadLetter(\AMQPEnvelope $msg, array $attributes = array())
+    public function moveToDeadLetter(AmqpMessage $msg, array $attributes = array())
     {
         return $this->move($msg, $msg->getRoutingKey().'.dead', $attributes);
     }
@@ -578,9 +631,9 @@ class Broker
      * @param string $name
      * @param string $type
      *
-     * @return \AMQPExchange
+     * @return AmqpTopic
      */
-    private function getOrCreateExchange($name, $type = \AMQP_EX_TYPE_DIRECT)
+    private function getOrCreateExchange($name, $type = AmqpTopic::TYPE_DIRECT)
     {
         if (!isset($this->exchanges[$name])) {
             if (isset($this->exchangesConfiguration[$name])) {
@@ -596,7 +649,7 @@ class Broker
     /**
      * @param array $conf
      *
-     * @return Exchange
+     * @return AmqpTopic
      */
     private function createExchangeFromConfiguration(array $conf)
     {
@@ -626,7 +679,7 @@ class Broker
      * @param array $conf
      * @param bool  $declareAndBind
      *
-     * @return Queue
+     * @return AmqpQueue
      */
     private function createQueueFromConfiguration(array $conf, $declareAndBind = true)
     {
@@ -685,72 +738,89 @@ class Broker
         ));
     }
 
-    private function shouldCreateQueue(\AMQPExchange $exchange, $routingKey)
+    private function shouldCreateQueue(AmqpTopic $topic, $routingKey)
     {
-        if (\AMQP_EX_TYPE_DIRECT === $exchange->getType() && null === $routingKey) {
+        if (AmqpTopic::TYPE_DIRECT === $topic->getType() && null === $routingKey) {
             return false;
         }
 
-        $exchangeName = $exchange->getName();
+        $topicName = $topic->getTopicName();
 
-        if ($exchangeName === self::DEAD_LETTER_EXCHANGE) {
+        if ($topicName === self::DEAD_LETTER_EXCHANGE) {
             return false;
         }
 
-        if ($exchangeName === self::RETRY_EXCHANGE) {
+        if ($topicName === self::RETRY_EXCHANGE) {
             return false;
         }
 
         return true;
     }
 
-    private function lazyLoadQueues(\AMQPExchange $exchange, $routingKey)
+    private function lazyLoadQueues(AmqpTopic $amqpTopic, $routingKey)
     {
-        $match = false;
-        $exchangeName = $exchange->getName();
+        // TODO find out what it does and implement this
 
-        // A queue is already setup
-        if (isset($this->queuesBindings[$exchangeName][$routingKey])) {
-            $match = true;
+//        $match = false;
+//        $exchangeName = $amqpTopic->getTopicName();
+//
+//        // A queue is already setup
+////        if (isset($this->queuesBindings[$exchangeName][$routingKey])) {
+////            $match = true;
+////        }
+//
+//        // Try to find a queue which is already configured
+//        foreach ($this->exchangeBindings[$exchangeName] as $index => $config) {
+//            if (isset($config['configured'])) {
+//                $match = true;
+//                continue;
+//            }
+//
+//            if ($config['routing_key'] != $routingKey) {
+//                continue;
+//            }
+//
+//            $queue = $this->createQueueFromConfiguration($this->queuesConfiguration[$config['queue']], false);
+//            $this->queues[$queue->getQueueName()] = $queue;
+//
+//
+//
+//            // Can only lazy load direct queue
+//            if (AmqpTopic::TYPE_DIRECT !== $amqpTopic->getType()) {
+//                $match = true;
+//                $this->context->declareQueue($queue);
+//                $this->exchangeBindings[$exchangeName][$index]['configured'] = true;
+//
+//                continue;
+//            }
+//
+//            foreach ($bindings as $binding) {
+//                if ($routingKey === $binding['routing_key']) {
+//                    $match = true;
+//                    $queue->declareAndBind();
+//                    $this->queuesConfiguration[$name]['configured'] = true;
+//                    $this->addQueue($queue);
+//                }
+//            }
+//        }
+//
+//        if (!$match) {
+//            $this->createQueue($routingKey, array('exchange' => $exchangeName));
+//        }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return AmqpConsumer
+     */
+    private function getQueueConsumer($name)
+    {
+        if (false == isset($this->queueConsumers[$name])) {
+            $this->queueConsumers = $this->context->createConsumer($this->getQueue($name));
         }
 
-        // Try to find a queue which is already configured
-        foreach ($this->queuesConfiguration as $name => $config) {
-            if (isset($config['configured'])) {
-                $match = true;
-                continue;
-            }
+        return $this->queueConsumers[$name];
 
-            $queue = $this->createQueueFromConfiguration($config, false);
-
-            foreach ($queue->getBindings() as $ex => $bindings) {
-                if ($ex !== $exchangeName) {
-                    continue;
-                }
-
-                // Can only lazy load direct queue
-                if (\AMQP_EX_TYPE_DIRECT !== $exchange->getType()) {
-                    $match = true;
-                    $queue->declareAndBind();
-                    $this->queuesConfiguration[$name]['configured'] = true;
-                    $this->addQueue($queue);
-
-                    continue;
-                }
-
-                foreach ($bindings as $binding) {
-                    if ($routingKey === $binding['routing_key']) {
-                        $match = true;
-                        $queue->declareAndBind();
-                        $this->queuesConfiguration[$name]['configured'] = true;
-                        $this->addQueue($queue);
-                    }
-                }
-            }
-        }
-
-        if (!$match) {
-            $this->createQueue($routingKey, array('exchange' => $exchangeName));
-        }
     }
 }

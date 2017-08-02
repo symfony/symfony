@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Amqp\Exception;
 
+use Interop\Amqp\AmqpMessage;
 use Symfony\Component\Amqp\RetryStrategy\RetryStrategyInterface;
 
 /**
@@ -19,15 +20,22 @@ use Symfony\Component\Amqp\RetryStrategy\RetryStrategyInterface;
  */
 class NonRetryableException extends \RuntimeException implements ExceptionInterface
 {
+    /**
+     * @var RetryStrategyInterface
+     */
     private $retryStrategy;
-    private $envelope;
 
-    public function __construct(RetryStrategyInterface $retryStrategy, \AMQPEnvelope $envelope)
+    /**
+     * @var AmqpMessage
+     */
+    private $amqpMessage;
+
+    public function __construct(RetryStrategyInterface $retryStrategy, AmqpMessage $amqpMessage)
     {
-        parent::__construct(sprintf('The message has been retried too many times (%s).', $envelope->getHeader('retries')));
+        parent::__construct(sprintf('The message has been retried too many times (%s).', $amqpMessage->getHeader('retries')));
 
         $this->retryStrategy = $retryStrategy;
-        $this->envelope = $envelope;
+        $this->amqpMessage = $amqpMessage;
     }
 
     public function getRetryStrategy()
@@ -35,8 +43,11 @@ class NonRetryableException extends \RuntimeException implements ExceptionInterf
         return $this->retryStrategy;
     }
 
-    public function getEnvelope()
+    /**
+     * @return AmqpMessage
+     */
+    public function getAmqpMessage()
     {
-        return $this->envelope;
+        return $this->amqpMessage;
     }
 }

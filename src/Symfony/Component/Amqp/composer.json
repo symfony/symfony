@@ -21,9 +21,9 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "ext-amqp": ">=1.5",
         "psr/log": "~1.0",
-        "symfony/event-dispatcher": "^2.3|^3.0|^4.0"
+        "symfony/event-dispatcher": "^2.3|^3.0|^4.0",
+        "queue-interop/amqp-interop": "*@dev"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^3.3"

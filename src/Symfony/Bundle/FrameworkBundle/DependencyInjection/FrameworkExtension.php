@@ -1524,7 +1524,7 @@ class FrameworkExtension extends Extension
         }
 
         if (class_exists(DateIntervalNormalizer::class)) {
-            // Run after serializer.normalizer.object
+            // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.dateinterval', DateIntervalNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -915));

@@ -14,6 +14,7 @@ namespace Symfony\Component\Yaml\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
@@ -694,5 +695,41 @@ class InlineTest extends TestCase
             'null' => array('{null: "foo"}', array('null' => 'foo')),
             'float' => array('{0.25: "foo"}', array('0.25' => 'foo')),
         );
+    }
+
+    public function testTagWithoutValueInSequence()
+    {
+        $value = Inline::parse('[!foo]', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value[0]);
+        $this->assertSame('foo', $value[0]->getTag());
+        $this->assertSame('', $value[0]->getValue());
+    }
+
+    public function testTagWithEmptyValueInSequence()
+    {
+        $value = Inline::parse('[!foo ""]', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value[0]);
+        $this->assertSame('foo', $value[0]->getTag());
+        $this->assertSame('', $value[0]->getValue());
+    }
+
+    public function testTagWithoutValueInMapping()
+    {
+        $value = Inline::parse('{foo: !bar}', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value['foo']);
+        $this->assertSame('bar', $value['foo']->getTag());
+        $this->assertSame('', $value['foo']->getValue());
+    }
+
+    public function testTagWithEmptyValueInMapping()
+    {
+        $value = Inline::parse('{foo: !bar ""}', Yaml::PARSE_CUSTOM_TAGS);
+
+        $this->assertInstanceOf(TaggedValue::class, $value['foo']);
+        $this->assertSame('bar', $value['foo']->getTag());
+        $this->assertSame('', $value['foo']->getValue());
     }
 }

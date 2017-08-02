@@ -644,7 +644,7 @@ class Inline
             return;
         }
 
-        $tagLength = strcspn($value, " \t\n", $i + 1);
+        $tagLength = strcspn($value, " \t\n[]{},", $i + 1);
         $tag = substr($value, $i + 1, $tagLength);
 
         $nextOffset = $i + $tagLength + 1;

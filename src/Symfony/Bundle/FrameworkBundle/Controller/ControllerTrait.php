@@ -238,9 +238,7 @@ trait ControllerTrait
             throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
         }
 
-        if (null === $response) {
-            $response = new Response();
-        }
+        $response = new Response();
 
         $response->setContent($this->container->get('twig')->render($view, $parameters));
 

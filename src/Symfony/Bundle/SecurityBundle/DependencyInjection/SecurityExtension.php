@@ -666,7 +666,7 @@ class SecurityExtension extends Extension
 
     private function createExpression($container, $expression)
     {
-        if (isset($this->expressions[$id = 'security.expression.'.sha1($expression)])) {
+        if (isset($this->expressions[$id = 'security.expression.'.ContainerBuilder::hash($expression)])) {
             return $this->expressions[$id];
         }
 
@@ -686,8 +686,7 @@ class SecurityExtension extends Extension
             $methods = array_map('strtoupper', (array) $methods);
         }
 
-        $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
-        $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
+        $id = 'security.request_matcher.'.ContainerBuilder::hash(array($path, $host, $methods, $ip, $attributes));
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];

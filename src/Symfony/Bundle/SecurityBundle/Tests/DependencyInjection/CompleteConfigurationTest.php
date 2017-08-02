@@ -84,7 +84,7 @@ abstract class CompleteConfigurationTest extends TestCase
             array(
                 'simple',
                 'security.user_checker',
-                'security.request_matcher.707b20193d4cb9f2718114abcbebb32af48f948484fc166a03482f49bf14f25e271f72c7',
+                'security.request_matcher.6tndozi',
                 false,
             ),
             array(
@@ -117,7 +117,7 @@ abstract class CompleteConfigurationTest extends TestCase
             array(
                 'host',
                 'security.user_checker',
-                'security.request_matcher.dda8b565689ad8509623ee68fb2c639cd81cd4cb339d60edbaf7d67d30e6aa09bd8c63c3',
+                'security.request_matcher.and0kk1',
                 true,
                 false,
                 'security.user.provider.concrete.default',

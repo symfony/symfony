@@ -28,6 +28,8 @@ class FileDumperTest extends TestCase
         $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertFileExists($tempDir.'/messages.en.concrete');
+
+        @unlink($tempDir.'/messages.en.concrete');
     }
 
     /**

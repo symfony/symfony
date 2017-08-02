@@ -111,7 +111,7 @@ class CachePoolPass implements CompilerPassInterface
         if ($usedEnvs || preg_match('#^[a-z]++://#', $name)) {
             $dsn = $name;
 
-            if (!$container->hasDefinition($name = md5($dsn))) {
+            if (!$container->hasDefinition($name = 'cache_connection.'.ContainerBuilder::hash($dsn))) {
                 $definition = new Definition(AbstractAdapter::class);
                 $definition->setPublic(false);
                 $definition->setFactory(array(AbstractAdapter::class, 'createConnection'));

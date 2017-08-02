@@ -57,7 +57,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         if ($public = $value->isPublic()) {
             $value->setPublic(false);
         }
-        $id = 'service_locator.'.md5(serialize($value));
+        $id = 'service_locator.'.ContainerBuilder::hash($value);
 
         if ($isRoot) {
             if ($id !== $this->currentId) {
@@ -90,7 +90,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             ->setPublic(false)
             ->addTag('container.service_locator');
 
-        if (!$container->has($id = 'service_locator.'.md5(serialize($locator)))) {
+        if (!$container->has($id = 'service_locator.'.ContainerBuilder::hash($locator))) {
             $container->setDefinition($id, $locator);
         }
 

@@ -121,7 +121,7 @@
             <tag name="translation.extractor" alias="php" />
         </service>
 
-        <service id="translation.loader" class="Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader" public="true" />
+        <service id="translation.loader" class="Symfony\Component\Translation\Loader\TranslationLoader" public="true" />
 
         <service id="translation.extractor" class="Symfony\Component\Translation\Extractor\ChainExtractor" public="true" />
 

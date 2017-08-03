@@ -137,6 +137,31 @@ class WorkflowTest extends TestCase
         $this->assertFalse($workflow->can($subject, 't1'));
     }
 
+    public function testCanDoesNotTriggerGuardEventsForNotEnabledTransitions()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+
+        $dispatchedEvents = array();
+        $eventDispatcher = new EventDispatcher();
+
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow->apply($subject, 't1');
+        $workflow->apply($subject, 't2');
+
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t3', function () use (&$dispatchedEvents) {
+            $dispatchedEvents[] = 'workflow_name.guard.t3';
+        });
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t4', function () use (&$dispatchedEvents) {
+            $dispatchedEvents[] = 'workflow_name.guard.t4';
+        });
+
+        $workflow->can($subject, 't3');
+
+        $this->assertSame(array('workflow_name.guard.t3'), $dispatchedEvents);
+    }
+
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Unable to apply transition "t2" for workflow "unnamed".

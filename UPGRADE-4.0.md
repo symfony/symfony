@@ -721,6 +721,32 @@ Yaml
    Yaml::parse($yaml);
    ```
 
+ * Removed the `Yaml::PARSE_KEYS_AS_STRINGS` flag.
+
+   Before:
+
+   ```php
+   $yaml = <<<YAML
+   null: null key
+   true: boolean true
+   2.0: float key
+   YAML;
+
+   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   ```
+
+   After:
+
+   ```php
+   $yaml = <<<YAML
+   "null": null key
+   "true": boolean true
+   "2.0": float key
+   YAML;
+
+   Yaml::parse($yaml);
+   ```
+
  * Omitting the key of a mapping is not supported anymore and throws a `ParseException`.
 
  * Mappings with a colon (`:`) that is not followed by a whitespace are not

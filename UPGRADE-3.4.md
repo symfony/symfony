@@ -162,3 +162,30 @@ Yaml
 
  * Using the non-specific tag `!` is deprecated and will have a different
    behavior in 4.0. Use a plain integer or `!!float` instead.
+
+ * Using the `Yaml::PARSE_KEYS_AS_STRINGS` flag is deprecated as it will be
+   removed in 4.0.
+
+   Before:
+
+   ```php
+   $yaml = <<<YAML
+   null: null key
+   true: boolean true
+   2.0: float key
+   YAML;
+
+   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   ```
+
+   After:
+
+   ```php
+   $yaml = <<<YAML
+   "null": null key
+   "true": boolean true
+   "2.0": float key
+   YAML;
+
+   Yaml::parse($yaml);
+   ```

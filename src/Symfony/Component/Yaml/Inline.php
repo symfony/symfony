@@ -437,7 +437,7 @@ class Inline
                 break;
             }
 
-            if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags)) {
+            if (!$isKeyQuoted) {
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey) && !is_int($evaluatedKey)) {

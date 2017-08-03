@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Tests\Resource;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
+use Symfony\Component\Config\Tests\Fixtures\BadParent;
 
 class ClassExistenceResourceTest extends TestCase
 {
@@ -72,6 +73,22 @@ EOF
         } finally {
             spl_autoload_unregister($autoloader);
         }
+    }
+
+    public function testBadParentWithTimestamp()
+    {
+        $res = new ClassExistenceResource(BadParent::class, false);
+        $this->assertTrue($res->isFresh(time()));
+    }
+
+    /**
+     * @expectedException \ReflectionException
+     * @expectedExceptionMessage Class Symfony\Component\Config\Tests\Fixtures\MissingParent not found
+     */
+    public function testBadParentWithNoTimestamp()
+    {
+        $res = new ClassExistenceResource(BadParent::class, false);
+        $res->isFresh(0);
     }
 
     public function testConditionalClass()

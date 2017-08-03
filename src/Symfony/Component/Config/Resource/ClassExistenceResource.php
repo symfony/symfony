@@ -65,7 +65,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     {
         $loaded = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
 
-        if (null !== $exists = &self::$existsCache[$this->resource]) {
+        if (null !== $exists = &self::$existsCache[(int) (0 >= $timestamp)][$this->resource]) {
             $exists = $exists || $loaded;
         } elseif (!$exists = $loaded) {
             if (!self::$autoloadLevel++) {
@@ -76,6 +76,11 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
 
             try {
                 $exists = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+            } catch (\ReflectionException $e) {
+                if (0 >= $timestamp) {
+                    unset(self::$existsCache[1][$this->resource]);
+                    throw $e;
+                }
             } finally {
                 self::$autoloadedClass = $autoloadedClass;
                 if (!--self::$autoloadLevel) {

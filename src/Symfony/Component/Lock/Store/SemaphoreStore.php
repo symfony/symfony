@@ -24,9 +24,24 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class SemaphoreStore implements StoreInterface
 {
-    public static function isSupported()
+    /**
+     * Returns whether or not the store is supported.
+     *
+     * @param bool|null $blocking When not null, checked again the blocking mode.
+     *
+     * @return bool
+     */
+    public static function isSupported($blocking = null)
     {
-        return extension_loaded('sysvsem');
+        if (!extension_loaded('sysvsem')) {
+            return false;
+        }
+
+        if ($blocking === false && \PHP_VERSION_ID < 50601) {
+            return false;
+        }
+
+        return true;
     }
 
     public function __construct()

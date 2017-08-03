@@ -35,7 +35,7 @@ trait BlockingStoreTestTrait
     public function testBlockingLocks()
     {
         // Amount a microsecond used to order async actions
-        $clockDelay = 50000;
+        $clockDelay = 200000;
 
         /** @var StoreInterface $store */
         $store = $this->getStore();
@@ -43,7 +43,7 @@ trait BlockingStoreTestTrait
 
         if ($childPID1 = pcntl_fork()) {
             // give time to fork to start
-            usleep(2 * $clockDelay);
+            usleep(1 * $clockDelay);
 
             try {
                 // This call should failed given the lock should already by acquired by the child #1
@@ -63,8 +63,8 @@ trait BlockingStoreTestTrait
         } else {
             try {
                 $store->save($key);
-                // Wait 3 ClockDelay to let parent process to finish
-                usleep(3 * $clockDelay);
+                // Wait 2 ClockDelay to let parent process to finish
+                usleep(2 * $clockDelay);
                 $store->delete($key);
                 exit(0);
             } catch (\Exception $e) {

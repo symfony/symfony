@@ -391,7 +391,7 @@ class XmlFileLoader extends FileLoader
             foreach ($nodes as $node) {
                 if ($services = $this->getChildren($node, 'service')) {
                     // give it a unique name
-                    $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
+                    $id = sprintf('%d_%s', ++$count, substr(hash('sha256', $file), 0, 7));
                     $node->setAttribute('id', $id);
                     $node->setAttribute('service', $id);
 

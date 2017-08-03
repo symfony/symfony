@@ -29,7 +29,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services = $this->privates = array();
         $this->methodMap = array(
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo' => 'getSymfony_Component_DependencyInjection_Tests_Fixtures_Container33_FooService',
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo' => 'getFooService',
         );
 
         $this->aliases = array();
@@ -65,7 +65,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo
      */
-    protected function getSymfony_Component_DependencyInjection_Tests_Fixtures_Container33_FooService()
+    protected function getFooService()
     {
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo();
     }

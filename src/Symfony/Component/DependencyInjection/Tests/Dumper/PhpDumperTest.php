@@ -160,6 +160,14 @@ class PhpDumperTest extends TestCase
         }
     }
 
+    public function testDumpAsFiles()
+    {
+        $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services9_as_files.txt', str_replace(str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), '%path%', print_r($dumper->dump(array('as_files' => true)), true)));
+    }
+
     public function testServicesWithAnonymousFactories()
     {
         $container = include self::$fixturesPath.'/containers/container19.php';

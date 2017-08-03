@@ -673,7 +673,7 @@ class YamlFileLoader extends FileLoader
                 $instanceof = $this->instanceof;
                 $this->instanceof = array();
 
-                $id = sprintf('%d_%s', ++$this->anonymousServicesCount, hash('sha256', $file));
+                $id = sprintf('%d_%s', ++$this->anonymousServicesCount, substr(hash('sha256', $file), 0, 7));
                 $this->parseDefinition($id, $argument, $file, array());
 
                 if (!$this->container->hasDefinition($id)) {

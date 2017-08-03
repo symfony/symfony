@@ -276,7 +276,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooBarService()
     {
-        return new \Bar\FooClass();
+        return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
     }
 
     /**
@@ -379,7 +379,7 @@ class ProjectServiceContainer extends Container
      *
      * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.
      */
-    private function getFactorySimpleService()
+    protected function getFactorySimpleService()
     {
         @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 

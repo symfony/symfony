@@ -41,7 +41,9 @@
       <argument>%foo_bar%</argument>
       <configurator service="foo.baz" method="configure"/>
     </service>
-    <service id="foo_bar" class="%foo_class%" shared="false"/>
+    <service id="foo_bar" class="%foo_class%" shared="false">
+      <argument type="service" id="deprecated_service"/>
+    </service>
     <service id="method_call1" class="Bar\FooClass">
       <file>%path%foo.php</file>
       <call method="setBar">

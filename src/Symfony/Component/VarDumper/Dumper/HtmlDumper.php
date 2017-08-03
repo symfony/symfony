@@ -818,7 +818,7 @@ EOHTML
         }, $v).'</span>';
 
         if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
-            $attr['href'] = $href;
+            $v = sprintf('<a href="%s" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($href)), $v);
         }
         if (isset($attr['href'])) {
             $v = sprintf('<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $v);

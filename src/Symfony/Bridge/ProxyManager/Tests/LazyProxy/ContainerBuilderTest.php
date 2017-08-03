@@ -39,6 +39,9 @@ class ContainerBuilderTest extends TestCase
         /* @var $foo1 \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
         $foo1 = $builder->get('foo1');
 
+        $foo1->__destruct();
+        $this->assertSame(0, $foo1::$destructorCount);
+
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
         $this->assertInstanceOf('\ProxyManagerBridgeFooClass', $foo1);
         $this->assertInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1);
@@ -50,5 +53,8 @@ class ContainerBuilderTest extends TestCase
         $this->assertTrue($foo1->isProxyInitialized());
         $this->assertInstanceOf('\ProxyManagerBridgeFooClass', $foo1->getWrappedValueHolderValue());
         $this->assertNotInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1->getWrappedValueHolderValue());
+
+        $foo1->__destruct();
+        $this->assertSame(1, $foo1::$destructorCount);
     }
 }

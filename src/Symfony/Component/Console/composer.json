@@ -25,13 +25,13 @@
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/filesystem": "~3.4|~4.0",
+        "symfony/lock": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
         "psr/log": "~1.0"
     },
     "suggest": {
         "symfony/event-dispatcher": "",
-        "symfony/filesystem": "",
+        "symfony/lock": "",
         "symfony/process": "",
         "psr/log": "For using the console logger"
     },

@@ -1273,7 +1273,7 @@ class FrameworkExtension extends Extension
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
-            // Run after serializer.normalizer.object
+            // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -920));

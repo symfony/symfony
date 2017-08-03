@@ -32,7 +32,7 @@ class DateCaster
         ;
 
         $a = array();
-        $a[$prefix.'date'] = new ConstStub($d->format('Y-m-d H:i:s.u '.($location ? 'e (P)' : 'P')), $title);
+        $a[$prefix.'date'] = new ConstStub($d->format('Y-m-d H:i:'.self::formatSeconds($d->format('s'), $d->format('u')).($location ? ' e (P)' : ' P')), $title);
 
         $stub->class .= $d->format(' @U');
 
@@ -59,7 +59,7 @@ class DateCaster
         ;
 
         if (\PHP_VERSION_ID >= 70100 && isset($i->f)) {
-            $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:%S.%F' : '';
+            $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:'.self::formatSeconds($i->s, $i->f) : '';
         } else {
             $format .= $i->h || $i->i || $i->s ? '%H:%I:%S' : '';
         }
@@ -78,5 +78,10 @@ class DateCaster
         $z = array(Caster::PREFIX_VIRTUAL.'timezone' => new ConstStub($formatted, $title));
 
         return $filter & Caster::EXCLUDE_VERBOSE ? $z : $z + $a;
+    }
+
+    private static function formatSeconds($s, $us)
+    {
+        return sprintf('%02d.%s', $s, 0 === ($len = strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));
     }
 }

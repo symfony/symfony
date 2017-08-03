@@ -915,7 +915,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('cache');
 
         $redisUrl = 'redis://localhost';
-        $providerId = md5($redisUrl);
+        $providerId = 'cache_connection.'.ContainerBuilder::hash($redisUrl);
 
         $this->assertTrue($container->hasDefinition($providerId));
 
@@ -929,7 +929,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('cache_env_var');
 
         $redisUrl = 'redis://paas.com';
-        $providerId = md5($redisUrl);
+        $providerId = 'cache_connection.'.ContainerBuilder::hash($redisUrl);
 
         $this->assertTrue($container->hasDefinition($providerId));
 

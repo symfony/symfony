@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -97,6 +98,7 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     private $anonymousServicesCount;
+    private $anonymousServicesSuffix;
 
     /**
      * {@inheritdoc}
@@ -133,6 +135,7 @@ class YamlFileLoader extends FileLoader
 
         // services
         $this->anonymousServicesCount = 0;
+        $this->anonymousServicesSuffix = ContainerBuilder::hash($path);
         $this->setCurrentDir(dirname($path));
         try {
             $this->parseDefinitions($content, $path);
@@ -673,7 +676,7 @@ class YamlFileLoader extends FileLoader
                 $instanceof = $this->instanceof;
                 $this->instanceof = array();
 
-                $id = sprintf('%d_%s', ++$this->anonymousServicesCount, hash('sha256', $file));
+                $id = sprintf('%d_%s', ++$this->anonymousServicesCount, preg_replace('/^.*\\\\/', '', isset($argument['class']) ? $argument['class'] : '').$this->anonymousServicesSuffix);
                 $this->parseDefinition($id, $argument, $file, array());
 
                 if (!$this->container->hasDefinition($id)) {

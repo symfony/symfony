@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -382,6 +383,7 @@ class XmlFileLoader extends FileLoader
     {
         $definitions = array();
         $count = 0;
+        $suffix = ContainerBuilder::hash($file);
 
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -391,7 +393,7 @@ class XmlFileLoader extends FileLoader
             foreach ($nodes as $node) {
                 if ($services = $this->getChildren($node, 'service')) {
                     // give it a unique name
-                    $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
+                    $id = sprintf('%d_%s', ++$count, preg_replace('/^.*\\\\/', '', $node->getAttribute('class')).$suffix);
                     $node->setAttribute('id', $id);
                     $node->setAttribute('service', $id);
 

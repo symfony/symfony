@@ -167,16 +167,6 @@ class PhpDumper extends Dumper
         ;
         $this->targetDirRegex = null;
 
-        $unusedEnvs = array();
-        foreach ($this->container->getEnvCounters() as $env => $use) {
-            if (!$use) {
-                $unusedEnvs[] = $env;
-            }
-        }
-        if ($unusedEnvs) {
-            throw new EnvParameterException($unusedEnvs, null, 'Environment variables "%s" are never used. Please, check your container\'s configuration.');
-        }
-
         return $code;
     }
 

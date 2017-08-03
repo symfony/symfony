@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2017-07-28T13:10:00Z
+
+This will just confuse users with <7.0.8 about why they're not getting important security updates anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-28T13:27:10Z
+
+@curry684 truth is, serializing is broken with PHP <7.0.8, so everybody should reject these versions. It's only losely related to the linked issue.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-07-28T13:48:11Z
+
+I completely agree with the solution and change, just not some of its possible side effects.
+
+If 3.3.6 contains a warning for PHP <7.0.8, and we then remove that in 3.3.7 and 3.4.0 along with the Composer bump the issue is fixed, *and* users that are upgrading Symfony but not PHP have a clear end-of-road warning.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-28T16:37:08Z
+
+@curry684 see #23705
+
+@symfony/deciders should be merged *after* the release of v3.3.6
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-07-28T20:43:11Z
+
+Cheers, well solved.

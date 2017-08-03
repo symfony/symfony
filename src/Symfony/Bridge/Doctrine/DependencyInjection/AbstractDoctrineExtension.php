@@ -387,8 +387,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 $seed = '_'.$container->getParameter('kernel.root_dir');
             }
             $seed .= '.'.$container->getParameter('kernel.name').'.'.$container->getParameter('kernel.environment').'.'.$container->getParameter('kernel.debug');
-            $hash = hash('sha256', $seed);
-            $namespace = 'sf_'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.$hash;
+            $namespace = 'sf_'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.ContainerBuilder::hash($seed);
 
             $cacheDriver['namespace'] = $namespace;
         }

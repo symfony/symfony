@@ -62,8 +62,9 @@ class FlockStoreTest extends AbstractStoreTest
         $key = new Key('<?php echo "% hello word ! %" ?>');
 
         $file = sprintf(
-            '%s/sf.-php-echo-hello-word-.4b3d9d0d27ddef3a78a64685dda3a963e478659a9e5240feaf7b4173a8f28d5f.lock',
-            sys_get_temp_dir()
+            '%s/sf.-php-echo-hello-word-.%s.lock',
+            sys_get_temp_dir(),
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
         );
         // ensure the file does not exist before the store
         @unlink($file);

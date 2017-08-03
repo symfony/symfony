@@ -19,7 +19,7 @@
         "php": "^5.5.9|>=7.0.8",
         "ext-xml": "*",
         "symfony/security": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.3|~4.0",
+        "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/http-kernel": "~3.3|~4.0",
         "symfony/polyfill-php70": "~1.0"
     },
@@ -29,7 +29,7 @@
         "symfony/console": "~3.2|~4.0",
         "symfony/css-selector": "~2.8|~3.0|~4.0",
         "symfony/dom-crawler": "~2.8|~3.0|~4.0",
-        "symfony/event-dispatcher": "~3.3|~4.0",
+        "symfony/event-dispatcher": "^3.3.1|~4.0",
         "symfony/form": "^2.8.18|^3.2.5|~4.0",
         "symfony/framework-bundle": "^3.2.8|~4.0",
         "symfony/http-foundation": "~2.8|~3.0|~4.0",
@@ -47,7 +47,7 @@
     },
     "conflict": {
         "symfony/var-dumper": "<3.3",
-        "symfony/event-dispatcher": "<3.3"
+        "symfony/event-dispatcher": "<3.3.1"
     },
     "suggest": {
         "symfony/security-acl": "For using the ACL functionality of this bundle"

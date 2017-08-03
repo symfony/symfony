@@ -1392,6 +1392,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Computes a reasonably unique hash of a value.
+     *
+     * @param mixed $value A serializable value
+     *
+     * @return string
+     */
+    public static function hash($value)
+    {
+        $hash = substr(base64_encode(hash('sha256', serialize($value), true)), 0, 7);
+
+        return str_replace(array('/', '+'), array('.', '_'), strtolower($hash));
+    }
+
+    /**
      * Retrieves the currently set proxy instantiator or instantiates one.
      *
      * @return InstantiatorInterface

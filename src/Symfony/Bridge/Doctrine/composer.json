@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5.9|>=7.0.8",
         "doctrine/common": "~2.4",
         "symfony/polyfill-mbstring": "~1.0"
     },

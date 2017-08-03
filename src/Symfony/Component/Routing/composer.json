@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": "^5.5.9|>=7.0.8"
     },
     "require-dev": {
         "symfony/config": "~2.8|~3.0",

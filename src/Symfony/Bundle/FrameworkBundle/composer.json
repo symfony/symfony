@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5.9|>=7.0.8",
         "ext-xml": "*",
         "symfony/cache": "~3.3",
         "symfony/class-loader": "~3.2",

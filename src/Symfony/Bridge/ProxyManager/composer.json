@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5.9|>=7.0.8",
         "symfony/dependency-injection": "~2.8|~3.0",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0"
     },

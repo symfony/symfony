@@ -20,7 +20,7 @@
         "psr/simple-cache-implementation": "1.0"
     },
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5.9|>=7.0.8",
         "psr/cache": "~1.0",
         "psr/log": "~1.0",
         "psr/simple-cache": "^1.0"

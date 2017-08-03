@@ -54,7 +54,8 @@ class Process implements \IteratorAggregate
     private $cwd;
     private $env;
     private $input;
-    private $starttime;
+    private $startTime;
+    private $endTime;
     private $lastOutputTime;
     private $timeout;
     private $idleTimeout;
@@ -284,7 +285,7 @@ class Process implements \IteratorAggregate
         }
 
         $this->resetProcessData();
-        $this->starttime = $this->lastOutputTime = microtime(true);
+        $this->startTime = $this->lastOutputTime = microtime(true);
         $this->callback = $this->buildCallback($callback);
         $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
@@ -831,7 +832,7 @@ class Process implements \IteratorAggregate
      */
     public function isStarted()
     {
-        return $this->status != self::STATUS_READY;
+        return $this->status !== self::STATUS_READY;
     }
 
     /**
@@ -843,7 +844,7 @@ class Process implements \IteratorAggregate
     {
         $this->updateStatus(false);
 
-        return $this->status == self::STATUS_TERMINATED;
+        return $this->status === self::STATUS_TERMINATED;
     }
 
     /**
@@ -1313,6 +1314,58 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Returns the time the process started.
+     *
+     * @return float Start time as seconds since the UNIX epoch (accurate to the microsecond)
+     *
+     * @throws LogicException if the process has not yet started
+     */
+    public function getStartTime()
+    {
+        if ($this->status === self::STATUS_READY) {
+            throw new LogicException('Process has not yet started.');
+        }
+
+        return $this->startTime;
+    }
+
+    /**
+     * Returns the time the process ended.
+     *
+     * @return float End time as seconds since the UNIX epoch (accurate to the microsecond)
+     *
+     * @throws LogicException if the process has not yet finished
+     */
+    public function getEndTime()
+    {
+        if ($this->status !== self::STATUS_TERMINATED) {
+            throw new LogicException('Process has not yet finished.');
+        }
+
+        return $this->endTime;
+    }
+
+    /**
+     * Returns the time the process has taken to run.
+     *
+     * @return float Running time in seconds (accurate to the microsecond)
+     *
+     * @throws LogicException if the process has not yet started
+     */
+    public function getRunningTime()
+    {
+        if ($this->status === self::STATUS_READY) {
+            throw new LogicException('Process has not yet started.');
+        }
+
+        if ($this->status === self::STATUS_STARTED) {
+            return microtime(true) - $this->startTime;
+        }
+
+        return $this->endTime - $this->startTime;
+    }
+
+    /**
      * Performs a check between the timeout definition and the time the process started.
      *
      * In case you run a background process (with the start method), you should
@@ -1326,7 +1379,7 @@ class Process implements \IteratorAggregate
             return;
         }
 
-        if (null !== $this->timeout && $this->timeout < microtime(true) - $this->starttime) {
+        if (null !== $this->timeout && $this->timeout < microtime(true) - $this->startTime) {
             $this->stop(0);
 
             throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_GENERAL);
@@ -1533,6 +1586,7 @@ class Process implements \IteratorAggregate
         }
         $this->exitcode = $this->processInformation['exitcode'];
         $this->status = self::STATUS_TERMINATED;
+        $this->endTime = microtime(true);
 
         if (-1 === $this->exitcode) {
             if ($this->processInformation['signaled'] && 0 < $this->processInformation['termsig']) {
@@ -1557,7 +1611,8 @@ class Process implements \IteratorAggregate
      */
     private function resetProcessData()
     {
-        $this->starttime = null;
+        $this->startTime = null;
+        $this->endTime = null;
         $this->callback = null;
         $this->exitcode = null;
         $this->fallbackStatus = array();

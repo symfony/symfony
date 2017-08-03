@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-31T10:58:30Z
+
+This is a new feature so it must target 3.4.
+
+---------------------------------------------------------------------------
+
+by BPScott at 2017-07-31T11:24:51Z
+
+Ah rats, I was in two minds about if this constituted a new feature or a bug. I leant towards bug for 3.3.x as I hoped this could be interpreted as "it should have been there at the start but it was missed". What do you reckon @weaverryan?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-01T05:29:26Z
+
+@BPScott Even if it should have been part of 3.3, we missed that and Symfony is perfectly usable without it. So, that qualifies as a new feature.
+
+---------------------------------------------------------------------------
+
+by BPScott at 2017-08-01T09:23:34Z
+
+Thank you for the clarification @chalasr and @fabpot, I'll keep that in mind for any future PRs.
+
+I've rebased and retargeted this PR to 3.4

@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.9",
+        "queue-interop/queue-interop": "^0.5"
     },
     "require-dev": {
         "symfony/dependency-injection": "~3.3|~4.0",

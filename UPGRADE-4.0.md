@@ -77,6 +77,50 @@ Debug
 DependencyInjection
 -------------------
 
+ * Relying on service auto-registration while autowiring is not supported anymore.
+   Explicitly inject your dependencies or create services whose ids are
+   their fully-qualified class name.
+
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+    ```
+
  * Autowiring services based on the types they implement is not supported anymore. Rename (or alias) your services to their FQCN id to make them autowirable.
 
  * `_defaults` and `_instanceof` are now reserved service names in Yaml configurations. Please rename any services with that names.
@@ -345,9 +389,9 @@ FrameworkBundle
    class instead.
 
  * Using the `KERNEL_DIR` environment variable and the automatic guessing based
-   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()` 
+   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()`
    method implementation. Set the `KERNEL_CLASS` environment variable to the
-   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()` 
+   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()`
    or `KernelTestCase::getKernelClass()` method instead.
 
  * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
@@ -356,10 +400,10 @@ FrameworkBundle
  * The `--no-prefix` option of the `translation:update` command has
    been removed.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed. 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed.
    Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
 
- * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed. 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed.
    Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
@@ -561,7 +605,7 @@ TwigBridge
  * The `TwigRendererEngine::setEnvironment()` method has been removed.
    Pass the Twig Environment as second argument of the constructor instead.
 
- * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability 
+ * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability
    to pass a command name as first argument.
 
  * Removed `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability

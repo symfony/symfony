@@ -820,7 +820,6 @@ EOHTML
         if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
             $attr['href'] = $href;
         }
-
         if (isset($attr['href'])) {
             $v = sprintf('<a href="%s" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
         }

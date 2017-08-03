@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * added `AbstractCloner::setMinDepth()` function to ensure minimum tree depth
- * source links are not opened in a new tab/window. 
+ * links are not opened in a new tab/window. 
 
 2.7.0
 -----

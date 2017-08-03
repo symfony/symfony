@@ -998,6 +998,7 @@ abstract class FrameworkExtensionTest extends TestCase
         if ($resetCompilerPasses) {
             $container->getCompilerPassConfig()->setOptimizationPasses(array());
             $container->getCompilerPassConfig()->setRemovingPasses(array());
+            
         }
         $container->getCompilerPassConfig()->setBeforeRemovingPasses(array(new AddAnnotationsCachedReaderPass(), new AddConstraintValidatorsPass(), new TranslatorPass()));
         $container->compile();

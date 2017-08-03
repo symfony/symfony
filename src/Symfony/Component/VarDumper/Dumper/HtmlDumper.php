@@ -818,10 +818,11 @@ EOHTML
         }, $v).'</span>';
 
         if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
-            $v = sprintf('<a href="%s" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($href)), $v);
+            $attr['href'] = $href;
         }
+
         if (isset($attr['href'])) {
-            $v = sprintf('<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
+            $v = sprintf('<a href="%s" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
         }
         if (isset($attr['lang'])) {
             $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);

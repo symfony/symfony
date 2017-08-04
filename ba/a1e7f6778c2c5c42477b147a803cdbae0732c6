@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-05-25T10:35:47Z
+
+👍 (we will probably still need some special handling for the `!php/const` tag though as referring to class constants still requires us to use colons inside a mapping key)
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-25T10:37:06Z
+
+The handling won't be dedicated, the value will just need to be quoted:
+```yml
+!php/const "Foo::BAR": quz
+```
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-29T20:22:37Z
+
+PR broken for now, will fix it later.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-06-29T11:46:36Z
+
+Rebased on 3.4, it should be ok now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-06T10:20:32Z
+
+@xabbuh Can you check this one please?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-07-24T09:10:33Z
+
+The build failure is because this is not yet in master.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-31T17:46:10Z
+
+Needs rebase
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-01T08:47:03Z
+
+@chalasr rebased.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-04T09:11:34Z
+
+@xabbuh fixed

@@ -432,7 +432,7 @@ EOF;
     public function testObjectSupportEnabled()
     {
         $input = <<<'EOF'
-foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+foo: !php/object O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
@@ -444,8 +444,34 @@ EOF;
 foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-
         $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider deprecatedObjectValueProvider
+     */
+    public function testObjectSupportEnabledWithDeprecatedTag($yaml)
+    {
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($yaml, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
+    }
+
+    public function deprecatedObjectValueProvider()
+    {
+        return array(
+            array(
+                <<<YAML
+foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+YAML
+            ),
+            array(
+                <<<YAML
+foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+YAML
+            ),
+        );
     }
 
     /**
@@ -1735,6 +1761,35 @@ YAML;
     }
 
     public function testPhpConstantTagMappingKey()
+    {
+        $yaml = <<<YAML
+transitions:
+    !php/const 'Symfony\Component\Yaml\Tests\B::FOO':
+        from:
+            - !php/const 'Symfony\Component\Yaml\Tests\B::BAR'
+        to: !php/const 'Symfony\Component\Yaml\Tests\B::BAZ'
+YAML;
+        $expected = array(
+            'transitions' => array(
+                'foo' => array(
+                    'from' => array(
+                        'bar',
+                    ),
+                    'to' => 'baz',
+                ),
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.
+     */
+    public function testDeprecatedPhpConstantTagMappingKey()
     {
         $yaml = <<<YAML
 transitions:

@@ -49,10 +49,10 @@ class InlineTest extends TestCase
     public function getTestsForParsePhpConstants()
     {
         return array(
-            array('!php/const:Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT),
-            array('!php/const:PHP_INT_MAX', PHP_INT_MAX),
-            array('[!php/const:PHP_INT_MAX]', array(PHP_INT_MAX)),
-            array('{ foo: !php/const:PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
+            array('!php/const Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT),
+            array('!php/const PHP_INT_MAX', PHP_INT_MAX),
+            array('[!php/const PHP_INT_MAX]', array(PHP_INT_MAX)),
+            array('{ foo: !php/const PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
         );
     }
 
@@ -62,16 +62,25 @@ class InlineTest extends TestCase
      */
     public function testParsePhpConstantThrowsExceptionWhenUndefined()
     {
-        Inline::parse('!php/const:WRONG_CONSTANT', Yaml::PARSE_CONSTANT);
+        Inline::parse('!php/const WRONG_CONSTANT', Yaml::PARSE_CONSTANT);
     }
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessageRegExp #The string "!php/const:PHP_INT_MAX" could not be parsed as a constant.*#
+     * @expectedExceptionMessageRegExp #The string "!php/const PHP_INT_MAX" could not be parsed as a constant.*#
      */
     public function testParsePhpConstantThrowsExceptionOnInvalidType()
     {
-        Inline::parse('!php/const:PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+        Inline::parse('!php/const PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.
+     */
+    public function testDeprecatedConstantTag()
+    {
+        Inline::parse('!php/const:PHP_INT_MAX', Yaml::PARSE_CONSTANT);
     }
 
     /**

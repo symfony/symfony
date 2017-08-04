@@ -554,30 +554,6 @@ class Inline
                         return (string) substr($scalar, 6);
                     case 0 === strpos($scalar, '! '):
                         return substr($scalar, 2);
-                    case 0 === strpos($scalar, '!php/object:'):
-                        if (self::$objectSupport) {
-                            @trigger_error('The !php/object: tag to indicate dumped PHP objects is deprecated since version 3.4 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.', E_USER_DEPRECATED);
-
-                            return unserialize(substr($scalar, 12));
-                        }
-
-                        if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
-                        }
-
-                        return;
-                    case 0 === strpos($scalar, '!!php/object:'):
-                        if (self::$objectSupport) {
-                            @trigger_error('The !!php/object: tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.', E_USER_DEPRECATED);
-
-                            return unserialize(substr($scalar, 13));
-                        }
-
-                        if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
-                        }
-
-                        return;
                     case 0 === strpos($scalar, '!php/object'):
                         if (self::$objectSupport) {
                             return unserialize(self::parseScalar(substr($scalar, 12)));
@@ -585,21 +561,6 @@ class Inline
 
                         if (self::$exceptionOnInvalidType) {
                             throw new ParseException('Object support when parsing a YAML file has been disabled.');
-                        }
-
-                        return;
-                    case 0 === strpos($scalar, '!php/const:'):
-                        if (self::$constantSupport) {
-                            @trigger_error('The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.', E_USER_DEPRECATED);
-
-                            if (defined($const = substr($scalar, 11))) {
-                                return constant($const);
-                            }
-
-                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const));
-                        }
-                        if (self::$exceptionOnInvalidType) {
-                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar));
                         }
 
                         return;
@@ -690,7 +651,7 @@ class Inline
         $nextOffset += strspn($value, ' ', $nextOffset);
 
         // Is followed by a scalar and is a built-in tag
-        if ($tag && (!isset($value[$nextOffset]) || !in_array($value[$nextOffset], array('[', '{'), true)) && ('!' === $tag[0] || 'str' === $tag || 0 === strpos($tag, 'php/const:') || 0 === strpos($tag, 'php/object:'))) {
+        if ($tag && (!isset($value[$nextOffset]) || !in_array($value[$nextOffset], array('[', '{'), true)) && ('!' === $tag[0] || 'str' === $tag || 'php/const' === $tag || 'php/object' === $tag)) {
             // Manage in {@link self::evaluateScalar()}
             return;
         }

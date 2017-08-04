@@ -45,6 +45,18 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
+    public function testConstructWithSplTempFileObject()
+    {
+        $file = new \SplTempFileObject();
+        $file->fwrite('foo');
+        $response = new BinaryFileResponse($file);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\BinaryFileResponse', $response);
+        $this->expectOutputString('foo');
+
+        $response->sendContent();
+    }
+
     /**
      * @expectedException \LogicException
      */

@@ -4,5 +4,6 @@ $container->loadFromExtension('framework', array(
     'property_access' => array(
         'magic_call' => true,
         'throw_exception_on_invalid_index' => true,
+        'naming_strategy' => 'my_naming_strategy',
     ),
 ));

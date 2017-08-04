@@ -78,6 +78,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $def = $container->getDefinition('property_accessor');
         $this->assertTrue($def->getArgument(0));
         $this->assertTrue($def->getArgument(1));
+        $this->assertEquals(new Reference('my_naming_strategy'), $def->getArgument(3));
     }
 
     public function testPropertyAccessCache()

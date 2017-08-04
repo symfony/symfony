@@ -722,6 +722,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
+                        ->scalarNode('naming_strategy')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end()

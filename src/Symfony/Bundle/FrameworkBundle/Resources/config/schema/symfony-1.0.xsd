@@ -217,6 +217,7 @@
     <xsd:complexType name="property_access">
         <xsd:attribute name="magic-call" type="xsd:boolean" />
         <xsd:attribute name="throw-exception-on-invalid-index" type="xsd:boolean" />
+        <xsd:attribute name="naming-strategy" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="serializer">

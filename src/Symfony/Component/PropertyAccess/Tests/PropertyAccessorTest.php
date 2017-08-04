@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\NamingStrategy\NamingStrategyInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
@@ -566,6 +567,22 @@ class PropertyAccessorTest extends TestCase
         $propertyAccessor->setValue($obj, 'publicGetSetter', 'bar');
         $propertyAccessor->setValue($obj, 'publicGetSetter', 'baz');
         $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'publicGetSetter'));
+    }
+
+    public function testNamingStrategy()
+    {
+        $strategy = $this->getMockBuilder(NamingStrategyInterface::class)->getMock();
+        $strategy->method('getGetters')->with(TestClass::class, 'my_path1')->willReturn(array('getPublicAccessor'));
+        $strategy->method('getSetters')->with(TestClass::class, 'my_path2')->willReturn(array('setPublicAccessor'));
+        $strategy->method('getAddersAndRemovers')->with(TestClass::class, 'my_path2')->willReturn(array());
+
+        $obj = new TestClass('foo');
+
+        $propertyAccessor = new PropertyAccessor(false, false, null, $strategy);
+
+        $this->assertEquals('foo', $propertyAccessor->getValue($obj, 'my_path1'));
+        $propertyAccessor->setValue($obj, 'my_path2', 'baz');
+        $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'my_path1'));
     }
 
     /**

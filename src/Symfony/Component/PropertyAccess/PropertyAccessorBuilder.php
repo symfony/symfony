@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\PropertyAccess\NamingStrategy\NamingStrategyInterface;
 
 /**
  * A configurable builder to create a PropertyAccessor.
@@ -27,6 +28,11 @@ class PropertyAccessorBuilder
      * @var CacheItemPoolInterface|null
      */
     private $cacheItemPool;
+
+    /**
+     * @var NamingStrategyInterface|null
+     */
+    private $namingStrategy;
 
     /**
      * Enables the use of "__call" by the PropertyAccessor.
@@ -121,6 +127,18 @@ class PropertyAccessorBuilder
         return $this->cacheItemPool;
     }
 
+    public function setNamingStrategy(NamingStrategyInterface $namingStrategy = null): self
+    {
+        $this->namingStrategy = $namingStrategy;
+
+        return $this;
+    }
+
+    public function getNamingStrategy(): ?NamingStrategyInterface
+    {
+        return $this->namingStrategy;
+    }
+
     /**
      * Builds and returns a new PropertyAccessor object.
      *
@@ -128,6 +146,11 @@ class PropertyAccessorBuilder
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool);
+        return new PropertyAccessor(
+            $this->magicCall,
+            $this->throwExceptionOnInvalidIndex,
+            $this->cacheItemPool,
+            $this->namingStrategy
+        );
     }
 }

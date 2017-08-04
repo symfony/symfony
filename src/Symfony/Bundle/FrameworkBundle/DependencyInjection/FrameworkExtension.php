@@ -1113,6 +1113,10 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
         ;
+
+        if (isset($config['naming_strategy'])) {
+            $container->getDefinition('property_accessor')->addArgument(new Reference($config['naming_strategy']));
+        }
     }
 
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)

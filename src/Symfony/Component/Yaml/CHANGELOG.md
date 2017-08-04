@@ -4,10 +4,10 @@ CHANGELOG
 3.4.0
 -----
 
- * Deprecated the tag`!php/object:` tag which will be replaced by the
+ * Deprecated the `!php/object:` tag which will be replaced by the
    `!php/object` tag (without the colon) in 4.0.
 
- * Deprecated the tag`!php/const:` tag which will be replaced by the
+ * Deprecated the `!php/const:` tag which will be replaced by the
    `!php/const` tag (without the colon) in 4.0.
 
  * Support for the `!str` tag is deprecated, use the `!!str` tag instead.

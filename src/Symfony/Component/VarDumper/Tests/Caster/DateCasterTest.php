@@ -173,6 +173,7 @@ EODUMP;
             array('P5M', 0, '+ 5m', null),
             array('P6Y', 0, '+ 6y', null),
             array('P1Y2M3DT4H5M6S', 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
+            array('PT3600S', 0, '+ 01:00:00'.$ms, null),
 
             array('PT0S', 1, '0s', '0s'),
             array('PT1S', 1, '- 00:00:01'.$ms, '-1s'),
@@ -182,6 +183,7 @@ EODUMP;
             array('P5M', 1, '- 5m', null),
             array('P6Y', 1, '- 6y', null),
             array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06'.$ms, null),
+            array('PT3600S', 1, '- 01:00:00'.$ms, null),
         );
     }
 

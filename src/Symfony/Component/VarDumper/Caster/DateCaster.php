@@ -52,6 +52,10 @@ class DateCaster
 
     private static function formatInterval(\DateInterval $i)
     {
+        if ($i->m >= 12 || $i->d >= 31 || $i->h >= 24 || $i->i >= 60 || $i->s >= 60) {
+            $i = date_diff($d = new \DateTime(), date_add(clone $d, $i));
+        }
+
         $format = '%R '
             .($i->y ? '%yy ' : '')
             .($i->m ? '%mm ' : '')

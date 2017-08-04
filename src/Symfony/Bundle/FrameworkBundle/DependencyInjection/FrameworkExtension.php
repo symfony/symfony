@@ -46,6 +46,7 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -597,6 +598,10 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the ExpressionLanguage component is not installed.');
                 }
 
+                if (!class_exists(Security::class)) {
+                    throw new LogicException('Cannot guard workflows as the Security component is not installed.');
+                }
+
                 $eventName = sprintf('workflow.%s.guard.%s', $name, $transitionName);
                 $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
                 $configuration[$eventName] = $config['guard'];
@@ -612,6 +617,7 @@ class FrameworkExtension extends Extension
                 ));
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
+                $container->setParameter('workflow.has_guard_listeners', true);
             }
         }
     }

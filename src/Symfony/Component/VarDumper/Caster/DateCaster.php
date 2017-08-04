@@ -52,11 +52,14 @@ class DateCaster
 
     private static function formatInterval(\DateInterval $i)
     {
-        $format = '%R '
-            .($i->y ? '%yy ' : '')
-            .($i->m ? '%mm ' : '')
-            .($i->d ? '%dd ' : '')
-        ;
+        $format = '%R ';
+
+        if ($i->y === 0 && $i->m === 0 && ($i->h >= 24 || $i->i >= 60 || $i->s >= 60)) {
+            $i = date_diff($d = new \DateTime(), date_add(clone $d, $i)); // recalculate carry over points
+            $format .= 0 < $i->days ? '%ad ' : '';
+        } else {
+            $format .= ($i->y ? '%yy ' : '').($i->m ? '%mm ' : '').($i->d ? '%dd ' : '');
+        }
 
         if (\PHP_VERSION_ID >= 70100 && isset($i->f)) {
             $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:%S.%F' : '';

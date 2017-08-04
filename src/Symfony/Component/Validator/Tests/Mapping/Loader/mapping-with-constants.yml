@@ -5,4 +5,4 @@ Symfony\Component\Validator\Tests\Fixtures\Entity:
   properties:
     firstName:
       - Range:
-          max: !php/const:PHP_INT_MAX
+          max: !php/const PHP_INT_MAX

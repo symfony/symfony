@@ -158,6 +158,24 @@ Validator
 Yaml
 ----
 
+ * using the `!php/object:` tag is deprecated and won't be supported in 4.0. Use
+   the `!php/object` tag (without the colon) instead.
+
+ * using the `!php/const:` tag is deprecated and won't be supported in 4.0. Use
+   the `!php/const` tag (without the colon) instead.
+
+   Before:
+
+   ```yml
+   !php/const:PHP_INT_MAX
+   ```
+
+   After:
+
+   ```yml
+   !php/const PHP_INT_MAX
+   ```
+
  * Support for the `!str` tag is deprecated, use the `!!str` tag instead.
 
  * Using the non-specific tag `!` is deprecated and will have a different

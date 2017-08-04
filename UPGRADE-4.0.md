@@ -843,3 +843,21 @@ Yaml
 
  * The behavior of the non-specific tag `!` is changed and now forces
    non-evaluating your values.
+
+ * The `!php/object:` tag was removed in favor of the `!php/object` tag (without
+   the colon).
+
+ * The `!php/const:` tag was removed in favor of the `!php/const` tag (without
+   the colon).
+
+   Before:
+
+   ```yml
+   !php/const:PHP_INT_MAX
+   ```
+
+   After:
+
+   ```yml
+   !php/const PHP_INT_MAX
+   ```

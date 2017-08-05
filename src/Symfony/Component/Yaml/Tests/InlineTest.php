@@ -75,15 +75,6 @@ class InlineTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.
-     */
-    public function testDeprecatedConstantTag()
-    {
-        Inline::parse('!php/const:PHP_INT_MAX', Yaml::PARSE_CONSTANT);
-    }
-
-    /**
      * @dataProvider getTestsForDump
      */
     public function testDump($yaml, $value, $parseFlags = 0)

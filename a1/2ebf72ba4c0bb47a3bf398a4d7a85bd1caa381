@@ -1,0 +1,177 @@
+---------------------------------------------------------------------------
+
+by kgilden at 2016-12-31T14:37:57Z
+
+@xabbuh awesome! I confirmed it works as would validation groups work for every other constraint, i.e. in `validation.xml` you add groups to ´Valid` and now pass the `validation_groups` option when creating the form. `Valid` will only be applied if any of the groups in `validation_groups` equals those specified in `validation.xml`.
+
+However, I do think there is one super useful use case not covered. Consider an `Profile` object having `profilePicture` and `coverPhoto` properties - both of type `Image`, which internally has a `file` property of type `File`. Let's say we have different maximum file sizes for both of them, so we add 2 `File` constraints to the `Image` object. And both properties should be valid at all times for `Profile`.
+
+```xml
+<class name="Profile">
+  <property name="profilePicture">
+    <constraint name="Valid" />
+  </property>
+  <property name="coverPhoto">
+    <constraint name="Valid" />
+  </property>
+</class>
+
+<class name="Image">
+  <property name="file">
+    <constraint name="File">
+      <option name="maxSize">100k</option>
+      <option name="groups">
+        <value>profile-picture</value>
+      </option>
+    </constraint>
+    <constraint name="File">
+      <option name="maxSize">1000k</option>
+      <option name="groups">
+        <value>cover-photo</value>
+      </option>
+    </constraint>
+  </property>
+</class>
+```
+
+In `ProfileType` we'd have something like this probably.
+
+```php
+$builder->add('profilePicture', ImageType::class, ['validation_groups' => ['profile-picture']]);
+$builder->add('coverPhoto', ImageType::class, ['validation_groups' => ['cover-photo']);
+```
+
+But try as you might, it seems to me that validation for these `File` objects does not kick in.
+
+```php
+$form = $factory->create(ProfileType::class);
+$form->handleRequest($request);
+$form->isValid(); // returns true for files larger than what was specified
+```
+
+Of course this is a bit nonsensical example, but I tried to simplify as much as possible. In one of my projects we for example have `Document` objects which wrap all files and in one of the entities one property can contain only XML files and the other one can accept a different whitelist of types.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T14:45:47Z
+
+@kgilden This seems logical to me as the root form itself is validated in the `Default` group. Configuration `validation_groups` for the root form to be, for example, `['Default', 'profile-picture', 'cover-photo']` should do the trick.
+
+---------------------------------------------------------------------------
+
+by kgilden at 2016-12-31T15:28:25Z
+
+@xabbuh ahh yes, sorry for the confusion. I should note that this patch is *still* required to make my example above work. The same groups must also be added to `Valid` constraints and then it works as expected.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T15:47:12Z
+
+@kgilden You are right. But IMO this behaviour is straight-forward with how validation groups in Symfony work in general. Do you disagree with that?
+
+---------------------------------------------------------------------------
+
+by kgilden at 2016-12-31T17:32:43Z
+
+@xabbuh it's straight-forward if for example the `File` constraint is applied to two distinct properties on the root object, i.e.
+
+```xml
+<class name="Profile">
+  <property name="profilePicture">
+    <constraint name="File">
+        <!-- distinct options -->
+    </constraint>
+  </property>
+  <property name="coverPhoto">
+    <constraint name="File">
+        <!-- distinct options -->
+    </constraint>
+  </property>
+</class>
+```
+
+What I think is currently not possible is when you want to validate the same objects deeper. After this PR it's possible to do as follows.
+
+```xml
+<class name="Profile">
+  <property name="profilePicture">
+    <constraint name="Valid">
+      <option name="groups">
+        <value>profile-picture</value>
+      </option>
+    </constraint>
+  </property>
+  <property name="coverPhoto">
+    <constraint name="Valid">
+      <option name="groups">
+        <value>cover-photo</value>
+      </option>
+    </constraint>
+  </property>
+</class>
+
+<class name="Image">
+  <property name="file">
+    <constraint name="File">
+      <option name="maxSize">100k</option>
+      <option name="groups">
+        <value>profile-picture</value>
+      </option>
+    </constraint>
+    <constraint name="File">
+      <option name="maxSize">1000k</option>
+      <option name="groups">
+        <value>cover-photo</value>
+      </option>
+    </constraint>
+  </property>
+</class>
+```
+
+```php
+class ProfileType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add('profilePicture', ImageType::class);
+        $builder->add('coverPhoto', ImageType::class);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(['validation_groups' => ['Default', 'cover-photo', 'profile-picture']]);
+    }
+}
+```
+
+Correct me if I'm wrong, but I don't think there was a way to do it prior to this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T18:25:00Z
+
+Indeed, that's not possible right now.
+
+---------------------------------------------------------------------------
+
+by pourquoi at 2017-02-25T03:00:58Z
+
++1 for this feature. The use case described by kgilden happens regularly for me (deep cascade validation groups)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-01T15:15:41Z
+
+@xabbuh Can you add a note in the CHANGELOG before I can merge?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-03-01T15:41:19Z
+
+@fabpot done, but are we sure that this is the right way to implement it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-12T17:45:53Z
+
+ping @symfony/deciders

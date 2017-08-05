@@ -20,6 +20,7 @@ CHANGELOG
  * Removed support of the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Removed the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
  * Removed the "framework.validation.cache" configuration option. Configure the "cache.validator" service under "framework.cache.pools" instead.
+ * Added a console option allowing to ignore the .env file.
 
 3.4.0
 -----

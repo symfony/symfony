@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,5 +37,10 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new ExceptionListenerPass());
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
+    }
+
+    public function registerCommands(Application $application)
+    {
+        // noop
     }
 }

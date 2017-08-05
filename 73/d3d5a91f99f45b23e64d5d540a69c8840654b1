@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-05T10:26:26Z
+
+Otherwise what about disallowing `cannotBeEmpty` like the numeric node does? https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Config/Definition/Builder/NumericNodeDefinition.php#L71
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-14T13:53:03Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-27T09:27:15Z
+
+Tests added.
+
+> or given this bug, shouldn't we not fix it (to prevent any bc break)
+
+Agree. Not sure we should do anything on lower branches given "ignored method call" vs. "crashing method call".
+
+Right now both `requiresAtLeastOneElement` and `cannotBeEmpty` work the same, as expected probably. And im also not sure we should change that on lower branches...
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-31T15:01:47Z
+
+@fabpot in case you missed it (failures unrelated). Let me know if i should add a changelog or so.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-12T11:39:57Z
+
+All good. Failure unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T14:37:13Z
+
+ping @ogizanagi @fabpot

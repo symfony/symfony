@@ -186,6 +186,14 @@ class Workflow
         return $this->definition;
     }
 
+    /**
+     * @return MarkingStoreInterface
+     */
+    public function getMarkingStore()
+    {
+        return $this->markingStore;
+    }
+
     private function doCan($subject, Marking $marking, Transition $transition)
     {
         foreach ($transition->getFroms() as $place) {

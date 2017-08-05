@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-08-03T12:48:55Z
+
+Doesn't this break the compatibility with apps that use bundles?
+edit: Ah was too quick. Now it catches everything.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-03T12:49:43Z
+
+I don't think so, the pattern matches both styles, isn't it?

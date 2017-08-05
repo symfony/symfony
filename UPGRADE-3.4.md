@@ -131,8 +131,9 @@ SecurityBundle
 Translation
 -----------
 
- * Deprecated `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations` 
-   function, use `Symfony\Component\Translation\Writer\TranslationWriter::write` instead. 
+ * `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations` has been deprecated 
+   and will be removed in 4.0, use `Symfony\Component\Translation\Writer\TranslationWriter::write` 
+   instead. 
 
 TwigBridge
 ----------

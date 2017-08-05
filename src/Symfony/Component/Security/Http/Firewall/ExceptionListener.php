@@ -104,7 +104,7 @@ class ExceptionListener
         } while (null !== $exception = $exception->getPrevious());
     }
 
-    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception)
+    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('An AuthenticationException was thrown; redirecting to authentication entry point.', array('exception' => $exception));
@@ -167,22 +167,14 @@ class ExceptionListener
         }
     }
 
-    private function handleLogoutException(LogoutException $exception)
+    private function handleLogoutException(LogoutException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('A LogoutException was thrown.', array('exception' => $exception));
         }
     }
 
-    /**
-     * @param Request                 $request
-     * @param AuthenticationException $authException
-     *
-     * @return Response
-     *
-     * @throws AuthenticationException
-     */
-    private function startAuthentication(Request $request, AuthenticationException $authException)
+    private function startAuthentication(Request $request, AuthenticationException $authException): Response
     {
         if (null === $this->authenticationEntryPoint) {
             throw $authException;
@@ -216,9 +208,6 @@ class ExceptionListener
         return $response;
     }
 
-    /**
-     * @param Request $request
-     */
     protected function setTargetPath(Request $request)
     {
         // session isn't required when using HTTP basic authentication mechanism for example

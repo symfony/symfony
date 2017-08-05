@@ -344,10 +344,7 @@ class SymfonyStyle extends OutputStyle
         return new self($this->input, $this->getErrorOutput());
     }
 
-    /**
-     * @return ProgressBar
-     */
-    private function getProgressBar()
+    private function getProgressBar(): ProgressBar
     {
         if (!$this->progressBar) {
             throw new RuntimeException('The ProgressBar is not started.');
@@ -356,18 +353,20 @@ class SymfonyStyle extends OutputStyle
         return $this->progressBar;
     }
 
-    private function autoPrependBlock()
+    private function autoPrependBlock(): void
     {
         $chars = substr(str_replace(PHP_EOL, "\n", $this->bufferedOutput->fetch()), -2);
 
         if (!isset($chars[0])) {
-            return $this->newLine(); //empty history, so we should start with a new line.
+            $this->newLine(); //empty history, so we should start with a new line.
+
+            return;
         }
         //Prepend new line for each non LF chars (This means no blank line was output before)
         $this->newLine(2 - substr_count($chars, "\n"));
     }
 
-    private function autoPrependText()
+    private function autoPrependText(): void
     {
         $fetched = $this->bufferedOutput->fetch();
         //Prepend new line if last char isn't EOL:
@@ -376,7 +375,7 @@ class SymfonyStyle extends OutputStyle
         }
     }
 
-    private function reduceBuffer($messages)
+    private function reduceBuffer($messages): array
     {
         // We need to know if the two last chars are PHP_EOL
         // Preserve the last 4 chars inserted (PHP_EOL on windows is two chars) in the history buffer
@@ -385,7 +384,7 @@ class SymfonyStyle extends OutputStyle
         }, array_merge(array($this->bufferedOutput->fetch()), (array) $messages));
     }
 
-    private function createBlock($messages, $type = null, $style = null, $prefix = ' ', $padding = false, $escape = false)
+    private function createBlock(iterable $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false)
     {
         $indentLength = 0;
         $prefixLength = Helper::strlenWithoutDecoration($this->getFormatter(), $prefix);

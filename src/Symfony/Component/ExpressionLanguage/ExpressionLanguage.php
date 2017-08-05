@@ -141,7 +141,7 @@ class ExpressionLanguage
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
     }
 
-    private function getLexer()
+    private function getLexer(): Lexer
     {
         if (null === $this->lexer) {
             $this->lexer = new Lexer();
@@ -150,7 +150,7 @@ class ExpressionLanguage
         return $this->lexer;
     }
 
-    private function getParser()
+    private function getParser(): Parser
     {
         if (null === $this->parser) {
             $this->parser = new Parser($this->functions);
@@ -159,7 +159,7 @@ class ExpressionLanguage
         return $this->parser;
     }
 
-    private function getCompiler()
+    private function getCompiler(): Compiler
     {
         if (null === $this->compiler) {
             $this->compiler = new Compiler($this->functions);

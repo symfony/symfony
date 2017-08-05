@@ -11,10 +11,7 @@ final class ClassInstanceSupportStrategy implements SupportStrategyInterface
 {
     private $className;
 
-    /**
-     * @param string $className a FQCN
-     */
-    public function __construct($className)
+    public function __construct(string $className)
     {
         $this->className = $className;
     }

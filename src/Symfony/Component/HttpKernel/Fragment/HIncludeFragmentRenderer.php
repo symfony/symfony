@@ -123,12 +123,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
     }
 
-    /**
-     * @param string $template
-     *
-     * @return bool
-     */
-    private function templateExists($template)
+    private function templateExists(string $template): bool
     {
         if ($this->templating instanceof EngineInterface) {
             try {

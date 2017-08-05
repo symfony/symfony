@@ -61,7 +61,9 @@ class YamlEncoderTest extends TestCase
         $obj = new \stdClass();
         $obj->bar = 2;
 
-        $this->assertEquals("    foo: !php/object:O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}\n", $encoder->encode(array('foo' => $obj), 'yaml'));
+        $legacyTag = "    foo: !php/object:O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}\n";
+        $spacedTag = "    foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'\n";
+        $this->assertThat($encoder->encode(array('foo' => $obj), 'yaml'), $this->logicalOr($this->equalTo($legacyTag), $this->equalTo($spacedTag)));
         $this->assertEquals('  { foo: null }', $encoder->encode(array('foo' => $obj), 'yaml', array('yaml_inline' => 0, 'yaml_indent' => 2, 'yaml_flags' => 0)));
         $this->assertEquals(array('foo' => $obj), $encoder->decode('foo: !php/object:O:8:"stdClass":1:{s:3:"bar";i:2;}', 'yaml'));
         $this->assertEquals(array('foo' => null), $encoder->decode('foo: !php/object:O:8:"stdClass":1:{s:3:"bar";i:2;}', 'yaml', array('yaml_flags' => 0)));

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-03T19:01:49Z
+
+Thanks for this PR.
+I like it but now the real logic (a transition is enabled if all places before it,  contain a token) exists at two different place (in `getEnabledTransitions` -> `doCan` and `can` method).
+If you find a way to share this logic without adding some complexity it will be awesome.
+
+Anyway I'm :+1:
+
+---------------------------------------------------------------------------
+
+by fmata at 2017-08-04T13:28:42Z
+
+This can not be considered as a bugfix ?
+Do you have an idea to avoid this current behaviour in 3.3.* ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-04T13:41:29Z
+
+> This can not be considered as a bugfix ?
+
+IMHO this is not a bug fix as the current behavior (before this PR) is not buggy. This is just a performance optimization.
+
+> Do you have an idea to avoid this current behaviour in 3.3.* ?
+
+it's not possible.

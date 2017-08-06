@@ -20,7 +20,7 @@
                         </h2>
 
                         {% set request_collector = profile.collectors.request|default(false) %}
-                        {% if request_collector is defined and request_collector.redirect -%}
+                        {% if request_collector and request_collector.redirect -%}
                             {%- set redirect = request_collector.redirect -%}
                             {%- set controller = redirect.controller -%}
                             {%- set redirect_route = '@' ~ redirect.route %}

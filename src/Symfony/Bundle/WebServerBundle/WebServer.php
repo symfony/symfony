@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\WebServerBundle;
 
-use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 /**
  * Manages a local HTTP web server.
@@ -146,7 +147,16 @@ class WebServer
     {
         $executable = $config->getExecutable();
 
-        $process = new Process(array($executable, '-S', $config->getAddress(), $config->getRouter()));
+        // we need to separate the executable from the rest of the string as StringInput won't handle it
+        $firstPartOfCommand = explode(' ', $executable)[0];
+        // remove the executable and keep remainder of parameters
+        $remainder = substr($executable, strlen($firstPartOfCommand) + 1); //the one is a space
+
+        $input = new StringInput($remainder);
+        // newly added method to retrieve input parts
+        $executableArray = $input->getCommandLineArray();
+        $processArray = array_merge(array($firstPartOfCommand), $executableArray, array('-S', $config->getAddress(), $config->getRouter()));
+        $process = new Process($processArray);
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 

@@ -27,6 +27,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  * FrameworkExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Configuration implements ConfigurationInterface
 {
@@ -130,6 +131,8 @@ class Configuration implements ConfigurationInterface
         $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addWebLinkSection($rootNode);
+        $this->addAmqpSection($rootNode);
+        $this->addWorkerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -857,5 +860,387 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function addAmqpSection($rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('amqp')
+                    ->fixXmlConfig('connection')
+                    ->children()
+                        ->arrayNode('connections')
+                            ->addDefaultChildrenIfNoneSet('default')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->fixXmlConfig('exchange')
+                                ->fixXmlConfig('queue')
+                                ->children()
+                                    ->scalarNode('name')
+                                        ->cannotBeEmpty()
+                                    ->end()
+                                    ->scalarNode('url')
+                                        ->cannotBeEmpty()
+                                        ->defaultValue('amqp://guest:guest@localhost:5672/symfony')
+                                    ->end()
+                                    ->arrayNode('exchanges')
+                                        ->prototype('array')
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->variableNode('arguments')
+                                                    ->defaultValue(array())
+                                                    // Deal with XML config
+                                                    ->beforeNormalization()
+                                                        ->always()
+                                                        ->then(function ($v) {
+                                                            return $this->fixXmlArguments($v);
+                                                        })
+                                                    ->end()
+                                                    ->validate()
+                                                        ->ifTrue(function ($v) {
+                                                            return !is_array($v);
+                                                        })
+                                                        ->thenInvalid('Arguments should be an array (got %s).')
+                                                    ->end()
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('queues')
+                                        ->prototype('array')
+                                            ->fixXmlConfig('argument')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->variableNode('arguments')
+                                                    ->defaultValue(array())
+                                                    // Deal with XML config
+                                                    ->beforeNormalization()
+                                                        ->always()
+                                                        ->then(function ($v) {
+                                                            return $this->fixXmlArguments($v);
+                                                        })
+                                                    ->end()
+                                                    ->validate()
+                                                        ->ifTrue(function ($v) {
+                                                            return !is_array($v);
+                                                        })
+                                                        ->thenInvalid('Arguments should be an array (got %s).')
+                                                    ->end()
+                                                ->end()
+                                                ->enumNode('retry_strategy')
+                                                    ->values(array(null, 'constant', 'exponential'))
+                                                    ->defaultNull()
+                                                ->end()
+                                                ->variableNode('retry_strategy_options')
+                                                    ->validate()
+                                                        ->ifTrue(function ($v) {
+                                                            return !is_array($v);
+                                                        })
+                                                        ->thenInvalid('Arguments should be an array (got %s).')
+                                                    ->end()
+                                                ->end()
+                                                ->arrayNode('thresholds')
+                                                    ->addDefaultsIfNotSet()
+                                                    ->children()
+                                                        ->integerNode('warning')->defaultNull()->end()
+                                                        ->integerNode('critical')->defaultNull()->end()
+                                                    ->end()
+                                                ->end()
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'constant' === $config['retry_strategy'] && !array_key_exists('max', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"max" of "retry_strategy_options" should be set for constant retry strategy.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'constant' === $config['retry_strategy'] && !array_key_exists('time', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"time" of "retry_strategy_options" should be set for constant retry strategy.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'exponential' === $config['retry_strategy'] && !array_key_exists('max', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"max" of "retry_strategy_options" should be set for exponential retry strategy.')
+                                            ->end()
+                                            ->validate()
+                                                ->ifTrue(function ($config) {
+                                                    return 'exponential' === $config['retry_strategy'] && !array_key_exists('offset', $config['retry_strategy_options']);
+                                                })
+                                                ->thenInvalid('"offset" of "retry_strategy_options" should be set for exponential retry strategy.')
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('default_connection')
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addWorkerSection($rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('worker')
+                        ->addDefaultsIfNotSet()
+                        ->fixXmlConfig('worker')
+                        ->children()
+                            ->arrayNode('fetchers')
+                                ->addDefaultsIfNotSet()
+                                ->fixXmlConfig('amqp')
+                                ->fixXmlConfig('service')
+                                ->fixXmlConfig('buffer')
+                                ->children()
+                                    ->arrayNode('amqps')
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($v) {
+                                                $v = $this->useKeyAsAttribute($v, 'queue_name');
+                                                $v = $this->useKeyAsAttribute($v, 'name');
+
+                                                return $v;
+                                            })
+                                        ->end()
+                                        ->useAttributeAsKey('name', false)
+                                        ->prototype('array')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->scalarNode('queue_name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->booleanNode('auto_ack')
+                                                    ->defaultValue(false)
+                                                ->end()
+                                                ->scalarNode('connection')
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('buffers')
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($v) {
+                                                $v = $this->useKeyAsAttribute($v, 'wrap');
+                                                $v = $this->useKeyAsAttribute($v, 'name');
+
+                                                return $v;
+                                            })
+                                        ->end()
+                                        ->useAttributeAsKey('name', false)
+                                        ->prototype('array')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->scalarNode('wrap')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->integerNode('max_messages')
+                                                    ->defaultValue(10)
+                                                ->end()
+                                                ->integerNode('max_buffering_time')
+                                                    ->defaultValue(10)
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('services')
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($v) {
+                                                $v = $this->useKeyAsAttribute($v, 'service');
+                                                $v = $this->useKeyAsAttribute($v, 'name');
+
+                                                return $v;
+                                            })
+                                        ->end()
+                                        ->useAttributeAsKey('name', false)
+                                        ->prototype('array')
+                                            ->children()
+                                                ->scalarNode('service')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('routers')
+                                ->addDefaultsIfNotSet()
+                                ->fixXmlConfig('direct')
+                                ->fixXmlConfig('round_robin')
+                                ->children()
+                                    ->arrayNode('directs')
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($v) {
+                                                $v = $this->useKeyAsAttribute($v, 'fetcher');
+                                                $v = $this->useKeyAsAttribute($v, 'name');
+
+                                                return $v;
+                                            })
+                                        ->end()
+                                        ->useAttributeAsKey('name', false)
+                                        ->prototype('array')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->scalarNode('fetcher')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->scalarNode('consumer')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('round_robins')
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($v) {
+                                                $v = $this->useKeyAsAttribute($v, 'name');
+
+                                                return $v;
+                                            })
+                                        ->end()
+                                        ->useAttributeAsKey('name', false)
+                                        ->prototype('array')
+                                            ->fixXmlConfig('group')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->arrayNode('groups')
+                                                    ->isRequired()
+                                                    ->requiresAtLeastOneElement()
+                                                    ->prototype('scalar')
+                                                        ->isRequired()
+                                                        ->cannotBeEmpty()
+                                                    ->end()
+                                                ->end()
+                                                ->booleanNode('consume_everything')
+                                                    ->defaultValue(false)
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
+                            ->arrayNode('workers')
+                                ->beforeNormalization()
+                                    ->always()
+                                    ->then(function ($v) {
+                                        $v = $this->useKeyAsAttribute($v, 'name');
+
+                                        return $v;
+                                    })
+                                ->end()
+                                ->useAttributeAsKey('name', false)
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('name')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('router')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('fetcher')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('consumer')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                    ->end()
+                                    ->validate()
+                                        ->ifTrue(function ($v) {
+                                            return isset($v['router'], $v['fetcher']) || isset($v['router'], $v['consumer']) || !isset($v['router']) && !isset($v['fetcher']) && !isset($v['consumer']);
+                                        })
+                                        ->thenInvalid('You should use either "router" or "fetcher" and "consumer" options.')
+                                    ->end()
+                                    ->validate()
+                                        ->ifTrue(function ($v) {
+                                            return isset($v['fetcher']) && !isset($v['consumer']) || !isset($v['fetcher']) && isset($v['consumer']);
+                                        })
+                                        ->thenInvalid('The fetcher and the consumer should be configured.')
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->scalarNode('cli_title_prefix')
+                                ->defaultValue('app')
+                                ->cannotBeEmpty()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function useKeyAsAttribute(array $v, $attribute)
+    {
+        $return = array();
+
+        foreach ($v as $name => $config) {
+            if (isset($config['name'])) {
+                $name = $config['name'];
+            }
+            if (null === $config || is_array($config) && !array_key_exists($attribute, $config)) {
+                $config[$attribute] = $name;
+            }
+            $return[$name] = $config;
+        }
+
+        return $return;
+    }
+
+    private function fixXmlArguments($v)
+    {
+        if (!is_array($v)) {
+            return $v;
+        }
+
+        $tmp = array();
+
+        foreach ($v as $key => $value) {
+            if (!isset($value['key']) && !isset($value['value'])) {
+                return $v;
+            }
+            $tmp[$value['key']] = $value['value'];
+        }
+
+        return $tmp;
     }
 }

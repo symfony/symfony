@@ -1,0 +1,43 @@
+{
+    "name": "symfony/amqp",
+    "type": "library",
+    "description": "Library to dialog with AMQP",
+    "keywords": ["amqp", "rabbitmq", "consumer", "producer", "queue", "exchange", "worker"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Grégoire Pineau",
+            "email": "lyrixx@lyrixx.info"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "ext-amqp": ">=1.5",
+        "psr/log": "~1.0",
+        "symfony/event-dispatcher": "^2.3|^3.0|^4.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^3.3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Amqp\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.4-dev"
+        }
+    }
+}

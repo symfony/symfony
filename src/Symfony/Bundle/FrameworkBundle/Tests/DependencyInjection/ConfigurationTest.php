@@ -339,6 +339,19 @@ class ConfigurationTest extends TestCase
             'web_link' => array(
                 'enabled' => !class_exists(FullStack::class),
             ),
+            'worker' => array(
+                'fetchers' => array(
+                    'amqps' => array(),
+                    'buffers' => array(),
+                    'services' => array(),
+                ),
+                'routers' => array(
+                    'directs' => array(),
+                    'round_robins' => array(),
+                ),
+                'workers' => array(),
+                'cli_title_prefix' => 'app',
+            ),
         );
     }
 }

@@ -19,6 +19,7 @@
         <env name="LDAP_PORT" value="3389" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
+        <env name="RABBITMQ_URL" value="amqp://guest:guest@localhost:5672/sensiolabs_amqp" />
     </php>
 
     <testsuites>

@@ -30,6 +30,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -42,6 +43,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+use Symfony\Component\Worker\Loop\Loop;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -969,6 +971,186 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
+    }
+
+    public function testAmqpEmpty()
+    {
+        $container = $this->createContainerFromFile('amqp_empty');
+
+        $this->assertTrue($container->hasDefinition('amqp.broker.default'));
+        $this->assertSame(\Symfony\Component\Amqp\Broker::class, $container->getDefinition('amqp.broker.default')->getClass());
+        $this->assertSame('amqp://guest:guest@localhost:5672/symfony', $container->getDefinition('amqp.broker.default')->getArgument(0));
+
+        $this->assertTrue($container->hasAlias('amqp.broker'));
+        $this->assertSame('amqp.broker.default', (string) $container->getAlias('amqp.broker'));
+        $this->assertEquals(new Reference('amqp.broker'), $container->getDefinition('amqp.command.move')->getArgument(0));
+    }
+
+    public function testAmqpFull()
+    {
+        $container = $this->createContainerFromFile('amqp_full');
+
+        $this->assertTrue($container->hasDefinition('amqp.broker.queue_staging'));
+        $this->assertSame(\Symfony\Component\Amqp\Broker::class, $container->getDefinition('amqp.broker.queue_staging')->getClass());
+        $this->assertSame('amqp://foo:baz@rabbitmq:1234/staging', $container->getDefinition('amqp.broker.queue_staging')->getArgument(0));
+
+        $this->assertTrue($container->hasDefinition('amqp.broker.queue_prod'));
+        $this->assertSame(\Symfony\Component\Amqp\Broker::class, $container->getDefinition('amqp.broker.queue_prod')->getClass());
+        $this->assertSame('amqp://foo:bar@rabbitmq:1234/prod', $container->getDefinition('amqp.broker.queue_prod')->getArgument(0));
+        $queueConfiguration = array(
+            array(
+                'name' => 'retry_strategy_exponential',
+                'retry_strategy' => 'exponential',
+                'retry_strategy_options' => array(
+                    'offset' => 1,
+                    'max' => 3,
+                ),
+                'arguments' => array(),
+                'thresholds' => array(
+                    'warning' => null,
+                    'critical' => null,
+                ),
+            ),
+            array(
+                'name' => 'arguments',
+                'arguments' => array(
+                    'routing_keys' => 'my_routing_key',
+                    'flags' => 2,
+                ),
+                'retry_strategy' => null,
+                'thresholds' => array(
+                    'warning' => null,
+                    'critical' => null,
+                ),
+            ),
+        );
+        $this->assertEquals($queueConfiguration, $container->getDefinition('amqp.broker.queue_prod')->getArgument(1));
+        $exchangeConfiguration = array(
+            array(
+                'name' => 'headers',
+                'arguments' => array(
+                    'type' => 'headers',
+                ),
+            ),
+        );
+        $this->assertSame($exchangeConfiguration, $container->getDefinition('amqp.broker.queue_prod')->getArgument(2));
+
+        $this->assertTrue($container->hasAlias('amqp.broker'));
+        $this->assertSame('amqp.broker.queue_prod', (string) $container->getAlias('amqp.broker'));
+        $this->assertEquals(new Reference('amqp.broker'), $container->getDefinition('amqp.command.move')->getArgument(0));
+    }
+
+    public function testWorkerEmpty()
+    {
+        $container = $this->createContainerFromFile('worker_empty');
+
+        $this->assertSame(array(), $container->getDefinition('worker.command.list')->getArgument(0));
+    }
+
+    public function testWorkerFull()
+    {
+        $container = $this->createContainerFromFile('worker_full');
+
+        /* workers.fetchers.amqp */
+        $assertFetcherAmqp = function (ContainerBuilder $container, $id, $queueName, $connection = 'amqp.broker') {
+            $this->assertTrue($container->hasDefinition("worker.message_fecher.amqp.$id"));
+            $fetcher = $container->getDefinition("worker.message_fecher.amqp.$id");
+            $this->assertInstanceOf(Reference::class, $fetcher->getArgument(0));
+            $this->assertSame($connection, (string) $fetcher->getArgument(0));
+            $this->assertSame($queueName, $fetcher->getArgument(1));
+        };
+        $assertFetcherAmqp($container, 'queue_a', 'queue_a');
+        $assertFetcherAmqp($container, 'queue_b', 'queue_b');
+        $assertFetcherAmqp($container, 'queue_c_1', 'queue_c');
+        $assertFetcherAmqp($container, 'queue_d', 'queue_d');
+        $assertFetcherAmqp($container, 'queue_e', 'queue_e');
+        $assertFetcherAmqp($container, 'queue_f', 'queue_f', 'amqp.broker.another_one');
+
+        /* workers.fetchers.service */
+        $assertFetcherService = function (ContainerBuilder $container, $id, $service) {
+            $this->assertTrue($container->hasAlias("worker.message_fecher.service.$id"));
+            $fetcher = $container->getAlias("worker.message_fecher.service.$id");
+            $this->assertSame($service, (string) $fetcher);
+        };
+        $assertFetcherService($container, 'service_a', 'service_a');
+        $assertFetcherService($container, 'service_b', 'service_b');
+        $assertFetcherService($container, 'service_c_1', 'service_c');
+        $assertFetcherService($container, 'service_d', 'service_d');
+        $assertFetcherService($container, 'service_e', 'service_e');
+
+        /* workers.fetchers.buffer */
+        $assertFetcherBuffer = function (ContainerBuilder $container, $id, $wrap) {
+            $this->assertTrue($container->hasDefinition("worker.message_fecher.buffer.$id"));
+            $fetcher = $container->getDefinition("worker.message_fecher.buffer.$id");
+            $this->assertInstanceOf(Reference::class, $fetcher->getArgument(0));
+            $this->assertSame("worker.message_fecher.$wrap", (string) $fetcher->getArgument(0));
+        };
+        $assertFetcherBuffer($container, 'queue_a', 'amqp.queue_a');
+        $assertFetcherBuffer($container, 'queue_b', 'amqp.queue_b');
+        $assertFetcherBuffer($container, 'queue_c', 'amqp.queue_c_1');
+        $assertFetcherBuffer($container, 'queue_d_1', 'amqp.queue_d');
+        $assertFetcherBuffer($container, 'queue_e', 'amqp.queue_e');
+        $assertFetcherBuffer($container, 'service_a', 'service.service_a');
+
+        /* workers.routers.direct */
+        $assertWorkerDirect = function (ContainerBuilder $container, $id, $fetcher) {
+            $this->assertTrue($container->hasDefinition("worker.router.direct.$id"));
+            $router = $container->getDefinition("worker.router.direct.$id");
+            $this->assertInstanceOf(Reference::class, $router->getArgument(0));
+            $this->assertSame("worker.message_fecher.$fetcher", (string) $router->getArgument(0));
+            $this->assertInstanceOf(Reference::class, $router->getArgument(1));
+            $this->assertSame('a_consumer_service', (string) $router->getArgument(1));
+        };
+        $assertWorkerDirect($container, 'queue_a', 'buffer.queue_a'); // "buffer" and not "amqp" because the buffer fetcher replace the original fetcher
+        $assertWorkerDirect($container, 'queue_b', 'buffer.queue_b'); // "buffer" and not "amqp" because the buffer fetcher replace the original fetcher
+        $assertWorkerDirect($container, 'router_c', 'buffer.queue_c'); // "buffer" and not "amqp" because the buffer fetcher replace the original fetcher
+        $assertWorkerDirect($container, 'router_d', 'amqp.queue_d');
+
+        /* workers.routers.round_robin */
+        $this->assertTrue($container->hasDefinition('worker.router.round_robin.router_c_and_d'));
+        $router = $container->getDefinition('worker.router.round_robin.router_c_and_d');
+        $routers = $router->getArgument(0);
+        $this->assertCount(2, $routers);
+        $this->assertInstanceOf(Reference::class, $routers[0]);
+        $this->assertSame('worker.router.direct.router_c', (string) $routers[0]);
+        $this->assertInstanceOf(Reference::class, $routers[1]);
+        $this->assertSame('worker.router.direct.router_d', (string) $routers[1]);
+
+        /* workers.workers */
+        $this->assertTrue($container->hasDefinition('worker.worker.worker_d'));
+        $worker = $container->getDefinition('worker.worker.worker_d');
+        $this->assertInstanceOf(Reference::class, $worker->getArgument(0));
+        $this->assertSame('worker.router.direct.router_d', (string) $worker->getArgument(0));
+        $this->assertInstanceOf(Reference::class, $worker->getArgument(1));
+        $this->assertSame('event_dispatcher', (string) $worker->getArgument(1));
+        $this->assertInstanceOf(Reference::class, $worker->getArgument(2));
+        $this->assertSame('logger', (string) $worker->getArgument(2));
+        $this->assertSame('worker_d', $worker->getArgument(3));
+
+        $this->assertTrue($container->hasDefinition('worker.worker.worker_service_a'));
+        $worker = $container->getDefinition('worker.worker.worker_service_a');
+        $this->assertInstanceOf(Definition::class, $worker->getArgument(0));
+        $router = $worker->getArgument(0);
+        $this->assertInstanceOf(Reference::class, $router->getArgument(0));
+        $this->assertSame('worker.message_fecher.buffer.service_a', (string) $router->getArgument(0));
+        $this->assertInstanceOf(Reference::class, $router->getArgument(1));
+        $this->assertSame('a_consumer_service', (string) $router->getArgument(1));
+        $this->assertInstanceOf(Reference::class, $worker->getArgument(1));
+        $this->assertSame('event_dispatcher', (string) $worker->getArgument(1));
+        $this->assertInstanceOf(Reference::class, $worker->getArgument(2));
+        $this->assertSame('logger', (string) $worker->getArgument(2));
+        $this->assertSame('worker_service_a', $worker->getArgument(3));
+        $workerLocator = $container->getDefinition('worker.worker_locator');
+        $this->assertEquals(array('worker_d' => new TypedReference('worker.worker.worker_d', Loop::class), 'worker_service_a' => new TypedReference('worker.worker.worker_service_a', Loop::class)), $workerLocator->getArgument(0));
+
+        /* worker:list command */
+        $this->assertSame(array('worker_d', 'worker_service_a'), $container->getDefinition('worker.command.list')->getArgument(0));
+
+        /* worker:run command */
+        $workerRunCommand = $container->getDefinition('worker.command.run');
+        $this->assertEquals(new Reference('worker.worker_locator'), $workerRunCommand->getArgument(0));
+        $this->assertEquals('foobar', $workerRunCommand->getArgument(1), 'worker:run expects the "worker.cli_title_prefix" config value as 2nd argument');
+        $this->assertSame(array('worker_d', 'worker_service_a'), $workerRunCommand->getArgument(2));
     }
 
     protected function createContainer(array $data = array())

@@ -1,0 +1,74 @@
+# AMQP need to be enabled in order to use AMQP Fetcher
+framework:
+    amqp:
+        connections:
+            default: ~
+            another_one: ~
+
+    worker:
+        cli_title_prefix: foobar
+
+        fetchers:
+            amqps:
+                queue_a: ~
+                queue_b: {}
+                queue_c_1:
+                    queue_name: queue_c
+                queue_d_1:
+                    name: queue_d
+                queue_e (key not used):
+                    name: queue_e
+                    queue_name: queue_e
+                queue_f:
+                    connection: another_one
+                    auto_ack: true
+
+            services:
+                service_a: ~
+                service_b: {}
+                service_c_1:
+                    service: service_c
+                service_d_1:
+                    name: service_d
+                service_e (key not used):
+                    name: service_e
+                    service: service_e
+
+            buffers:
+                queue_a: ~
+                queue_b: {}
+                queue_c:
+                    wrap: queue_c_1
+                queue_d (key not used):
+                    name: queue_d_1
+                    wrap: queue_d
+                queue_e:
+                    max_messages: 12
+                    max_buffering_time: 60
+                service_a: ~
+
+        routers:
+            directs:
+                queue_a:
+                    consumer: a_consumer_service
+                queue_b_1:
+                    consumer: a_consumer_service
+                    name: queue_b
+                queue_c (key is not used):
+                    consumer: a_consumer_service
+                    fetcher: queue_c
+                    name: router_c
+                router_d:
+                    consumer: a_consumer_service
+                    fetcher: queue_d
+
+            round_robins:
+                router_c_and_d:
+                    groups: [router_c, router_d]
+
+        workers:
+            worker_d:
+                router: router_d
+            worker_service_a:
+                fetcher: service_a
+                consumer: a_consumer_service

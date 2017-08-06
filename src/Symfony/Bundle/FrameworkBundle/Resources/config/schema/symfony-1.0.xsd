@@ -29,6 +29,8 @@
             <xsd:element name="property-info" type="property_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="amqp" type="amqp" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="worker" type="worker" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -294,4 +296,115 @@
             <xsd:enumeration value="workflow" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="amqp">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="connection" type="amqp_connection" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+
+        <xsd:attribute name="default_connection" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="amqp_connection">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="queue" type="amqp_queue" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="exchange" type="amqp_exchange" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+
+        <xsd:attribute name="url" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="amqp_queue">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="argument" type="amqp_argument" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="retry-strategy-options" type="amqp_queue_retry_strategy_options" minOccurs="0" maxOccurs="1" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="retry-strategy" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="amqp_argument">
+        <xsd:attribute name="key" type="xsd:string" />
+        <xsd:attribute name="value" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="amqp_queue_retry_strategy_options">
+        <xsd:attribute name="key" type="xsd:string" />
+        <xsd:attribute name="offset" type="xsd:string" />
+        <xsd:attribute name="max" type="xsd:string" />
+        <xsd:attribute name="time" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="amqp_exchange">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="argument" type="amqp_argument" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="worker">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="fetchers" type="worker_fetchers" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="routers" type="worker_routers" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="worker" type="worker_workers" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="cli-title-prefix" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="worker_fetchers">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="amqp" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                    <xsd:attribute name="queue_name" type="xsd:string" />
+                    <xsd:attribute name="connection" type="xsd:string" />
+                    <xsd:attribute name="auto_ack" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="service" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                    <xsd:attribute name="service" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="buffer" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                    <xsd:attribute name="wrap" type="xsd:string" />
+                    <xsd:attribute name="max_messages" type="xsd:string" />
+                    <xsd:attribute name="max_buffering_time" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="worker_routers">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="direct" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                    <xsd:attribute name="fetcher" type="xsd:string" />
+                    <xsd:attribute name="consumer" type="xsd:string" />
+                    <xsd:attribute name="auto_ack" type="xsd:string" />
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="round-robin" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                        <xsd:element name="group" type="xsd:string" />
+                    </xsd:sequence>
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="worker_workers">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="router" type="xsd:string" />
+        <xsd:attribute name="fetcher" type="xsd:string" />
+        <xsd:attribute name="consumer" type="xsd:string" />
+    </xsd:complexType>
+
 </xsd:schema>

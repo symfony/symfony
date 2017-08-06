@@ -3,7 +3,7 @@
 namespace Symfony\Component\Debug\Tests\Fixtures;
 
 /**
- * @internal this class is internal.
+ * @internal since version 3.4.
  */
 class InternalClass
 {

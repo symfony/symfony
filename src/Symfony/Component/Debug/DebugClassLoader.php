@@ -168,8 +168,8 @@ class DebugClassLoader
 
             $parent = get_parent_class($class);
             $doc = $refl->getDocComment();
-            if (preg_match('#\n \* @internal(?: .+?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
-                self::$internal[$name] = true;
+            if (preg_match('#\n \* @internal(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
+                self::$internal[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
             }
 
             // Not an interface nor a trait
@@ -228,25 +228,9 @@ class DebugClassLoader
                 }
             }
 
-            foreach (call_user_func(function () use ($name, $parent) {
-                if (isset(self::$internal[$parent])) {
-                    yield 'class' => $parent;
-                }
-
-                foreach (class_implements($name, false) as $interface) {
-                    if (isset(self::$internal[$interface])) {
-                        yield 'interface' => $interface;
-                    }
-                }
-
-                foreach (class_uses($name, false) as $use) {
-                    if (isset(self::$internal[$use])) {
-                        yield 'trait' => $use;
-                    }
-                }
-            }) as $type => $internalUse) {
-                if (strncmp($ns, $internalUse, $len)) {
-                    @trigger_error(sprintf('The "%s" %s is considered internal. It may change without further notice. You should not use it from "%s".', $internalUse, $type, $name), E_USER_DEPRECATED);
+            foreach (array_merge(array($parent), class_implements($name, false), class_uses($name, false)) as $use) {
+                if (isset(self::$internal[$use]) && strncmp($ns, $use, $len)) {
+                    @trigger_error(sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $name), E_USER_DEPRECATED);
                 }
             }
 

@@ -48,7 +48,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @return string The SHA-256 hash
      *
-     * @internal Should not be used by user-land code.
+     * @internal
      */
     public static function generateHash($value, $namespace = '')
     {
@@ -71,7 +71,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      * @param array $array  The array to flatten
      * @param array $output The flattened output
      *
-     * @internal Should not be used by user-land code
+     * @internal
      */
     private static function flatten(array $array, &$output)
     {

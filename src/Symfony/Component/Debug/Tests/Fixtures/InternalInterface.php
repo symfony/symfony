@@ -3,7 +3,7 @@
 namespace Symfony\Component\Debug\Tests\Fixtures;
 
 /**
- * @internal this interface is internal.
+ * @internal
  */
 interface InternalInterface
 {

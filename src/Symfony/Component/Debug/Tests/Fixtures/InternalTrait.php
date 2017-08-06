@@ -3,7 +3,7 @@
 namespace Symfony\Component\Debug\Tests\Fixtures;
 
 /**
- * @internal this trait is internal.
+ * @internal
  */
 trait InternalTrait
 {

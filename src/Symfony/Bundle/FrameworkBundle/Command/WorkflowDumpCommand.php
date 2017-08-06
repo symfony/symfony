@@ -28,23 +28,11 @@ class WorkflowDumpCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * BC to be removed in 4.0
      */
     public function isEnabled()
     {
-        return parent::getContainer()->has('workflow.registry');
+        return $this->getContainer()->has('workflow.registry');
     }
 
     /**

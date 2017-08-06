@@ -58,18 +58,6 @@ class AssetsInstallCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -111,8 +99,8 @@ EOT
     {
         // BC to be removed in 4.0
         if (null === $this->filesystem) {
-            $this->filesystem = parent::getContainer()->get('filesystem');
-            $baseDir = parent::getContainer()->getParameter('kernel.project_dir');
+            $this->filesystem = $this->getContainer()->get('filesystem');
+            $baseDir = $this->getContainer()->getParameter('kernel.project_dir');
         }
 
         $kernel = $this->getApplication()->getKernel();

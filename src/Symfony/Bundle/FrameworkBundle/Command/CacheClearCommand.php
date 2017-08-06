@@ -56,18 +56,6 @@ class CacheClearCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -96,9 +84,9 @@ EOF
     {
         // BC to be removed in 4.0
         if (null === $this->cacheClearer) {
-            $this->cacheClearer = parent::getContainer()->get('cache_clearer');
-            $this->filesystem = parent::getContainer()->get('filesystem');
-            $realCacheDir = parent::getContainer()->getParameter('kernel.cache_dir');
+            $this->cacheClearer = $this->getContainer()->get('cache_clearer');
+            $this->filesystem = $this->getContainer()->get('filesystem');
+            $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         }
 
         $io = new SymfonyStyle($input, $output);

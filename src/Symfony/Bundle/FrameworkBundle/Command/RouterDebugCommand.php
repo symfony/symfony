@@ -55,18 +55,6 @@ class RouterDebugCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * BC to be removed in 4.0
      */
     public function isEnabled()
@@ -74,10 +62,10 @@ class RouterDebugCommand extends ContainerAwareCommand
         if (null !== $this->router) {
             return parent::isEnabled();
         }
-        if (!parent::getContainer()->has('router')) {
+        if (!$this->getContainer()->has('router')) {
             return false;
         }
-        $router = parent::getContainer()->get('router');
+        $router = $this->getContainer()->get('router');
         if (!$router instanceof RouterInterface) {
             return false;
         }
@@ -118,7 +106,7 @@ EOF
     {
         // BC to be removed in 4.0
         if (null === $this->router) {
-            $this->router = parent::getContainer()->get('router');
+            $this->router = $this->getContainer()->get('router');
         }
 
         $io = new SymfonyStyle($input, $output);

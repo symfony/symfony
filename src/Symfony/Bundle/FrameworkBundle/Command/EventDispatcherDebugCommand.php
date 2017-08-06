@@ -51,18 +51,6 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -95,16 +83,8 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // BC to be removed in 4.0
-        if (__CLASS__ !== get_class($this)) {
-            $r = new \ReflectionMethod($this, 'getEventDispatcher');
-            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Usage of method "%s" is deprecated since version 3.4 and will no longer be supported in 4.0. Construct the command with its required arguments instead.', get_class($this).'::getEventDispatcher'), E_USER_DEPRECATED);
-
-                $this->dispatcher = $this->getEventDispatcher();
-            }
-        }
         if (null === $this->dispatcher) {
-            $this->dispatcher = parent::getContainer()->get('event_dispatcher');
+            $this->dispatcher = $this->getEventDispatcher();
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -130,14 +110,12 @@ EOF
     /**
      * Loads the Event Dispatcher from the container.
      *
-     * @return EventDispatcherInterface
+     * BC to removed in 4.0
      *
-     * @deprecated since version 3.4, to be removed in 4.0
+     * @return EventDispatcherInterface
      */
     protected function getEventDispatcher()
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        return parent::getContainer()->get('event_dispatcher');
+        return $this->getContainer()->get('event_dispatcher');
     }
 }

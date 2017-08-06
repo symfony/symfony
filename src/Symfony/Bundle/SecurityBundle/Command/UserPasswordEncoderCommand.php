@@ -26,6 +26,8 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
  * Encode a user's password.
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
+ *
+ * @final since version 3.4
  */
 class UserPasswordEncoderCommand extends Command
 {

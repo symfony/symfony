@@ -15,15 +15,34 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 /**
  * Clear and Warmup the cache.
  *
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
 class CacheClearCommand extends ContainerAwareCommand
 {
+    private $cacheClearer;
+    private $filesystem;
+
+    /**
+     * @param CacheClearerInterface $cacheClearer
+     * @param Filesystem|null       $filesystem
+     */
+    public function __construct(CacheClearerInterface $cacheClearer, Filesystem $filesystem = null)
+    {
+        parent::__construct();
+
+        $this->cacheClearer = $cacheClearer;
+        $this->filesystem = $filesystem ?: new Filesystem();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -53,22 +72,21 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $filesystem = $this->getContainer()->get('filesystem');
+        $kernel = $this->getApplication()->getKernel();
+        $cacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
 
         if (!is_writable($cacheDir)) {
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $cacheDir));
         }
 
-        $kernel = $this->getContainer()->get('kernel');
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-        $this->getContainer()->get('cache_clearer')->clear($cacheDir);
+        $this->cacheClearer->clear($cacheDir);
 
         if ($output->isVerbose()) {
             $io->comment('Removing old cache directory...');
         }
 
-        $filesystem->remove($cacheDir);
+        $this->filesystem->remove($cacheDir);
 
         if ($output->isVerbose()) {
             $io->comment('Finished');

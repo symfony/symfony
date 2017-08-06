@@ -25,6 +25,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Wouter J <waldio.webdesign@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since version 3.4
  */
 class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {

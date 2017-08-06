@@ -131,7 +131,7 @@ class GenericMetadata implements MetadataInterface
             ));
         }
 
-        if ($constraint instanceof Valid) {
+        if ($constraint instanceof Valid && null === $constraint->groups) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 
             if ($constraint->traverse) {

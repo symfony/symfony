@@ -13,6 +13,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added support for validation groups to the `Valid` constraint
  * not setting the `strict` option of the `Choice` constraint to `true` is
    deprecated and will throw an exception in Symfony 4.0
  * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of

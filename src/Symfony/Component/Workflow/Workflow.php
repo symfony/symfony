@@ -92,10 +92,19 @@ class Workflow
      */
     public function can($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject);
+        $transitions = $this->definition->getTransitions();
+        $marking = $this->getMarking($subject);
 
         foreach ($transitions as $transition) {
-            if ($transitionName === $transition->getName()) {
+            foreach ($transition->getFroms() as $place) {
+                if (!$marking->has($place)) {
+                    // do not emit guard events for transitions where the marking does not contain
+                    // all "from places" (thus the transition couldn't be applied anyway)
+                    continue 2;
+                }
+            }
+
+            if ($transitionName === $transition->getName() && $this->doCan($subject, $marking, $transition)) {
                 return true;
             }
         }
@@ -184,6 +193,14 @@ class Workflow
     public function getDefinition()
     {
         return $this->definition;
+    }
+
+    /**
+     * @return MarkingStoreInterface
+     */
+    public function getMarkingStore()
+    {
+        return $this->markingStore;
     }
 
     private function doCan($subject, Marking $marking, Transition $transition)

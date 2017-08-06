@@ -32,11 +32,36 @@ use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
  */
 class SetAclCommand extends ContainerAwareCommand
 {
+    private $provider;
+
+    /**
+     * @param MutableAclProviderInterface $provider
+     */
+    public function __construct($provider = null)
+    {
+        if (!$provider instanceof MutableAclProviderInterface) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            parent::__construct($provider);
+
+            return;
+        }
+
+        parent::__construct();
+
+        $this->provider = $provider;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
+        if (null !== $this->provider) {
+            return parent::isEnabled();
+        }
         if (!$this->getContainer()->has('security.acl.provider')) {
             return false;
         }
@@ -91,6 +116,11 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->provider) {
+            $this->provider = $this->getContainer()->get('security.acl.provider');
+        }
+
         // Parse arguments
         $objectIdentities = array();
         $maskBuilder = $this->getMaskBuilder();
@@ -136,20 +166,15 @@ EOF
             }
         }
 
-        /** @var $container \Symfony\Component\DependencyInjection\ContainerInterface */
-        $container = $this->getContainer();
-        /** @var $aclProvider MutableAclProviderInterface */
-        $aclProvider = $container->get('security.acl.provider');
-
         // Sets ACL
         foreach ($objectIdentities as $objectIdentity) {
             // Creates a new ACL if it does not already exist
             try {
-                $aclProvider->createAcl($objectIdentity);
+                $this->provider->createAcl($objectIdentity);
             } catch (AclAlreadyExistsException $e) {
             }
 
-            $acl = $aclProvider->findAcl($objectIdentity, $securityIdentities);
+            $acl = $this->provider->findAcl($objectIdentity, $securityIdentities);
 
             foreach ($securityIdentities as $securityIdentity) {
                 if ($classScopeOption) {
@@ -159,12 +184,14 @@ EOF
                 }
             }
 
-            $aclProvider->updateAcl($acl);
+            $this->provider->updateAcl($acl);
         }
     }
 
     /**
      * Gets the mask builder.
+     *
+     * BC to be removed in 4.0
      *
      * @return MaskBuilder
      */

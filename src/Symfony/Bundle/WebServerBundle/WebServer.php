@@ -154,6 +154,11 @@ class WebServer
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 
+        if (in_array('APP_ENV', explode(',', getenv('SYMFONY_DOTENV_VARS')))) {
+            $process->setEnv(array('APP_ENV' => false));
+            $process->inheritEnvironmentVariables();
+        }
+
         return $process;
     }
 

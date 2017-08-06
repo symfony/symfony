@@ -96,7 +96,7 @@ class SetAclCommandTest extends WebTestCase
         $role = 'ROLE_ADMIN';
 
         $application = $this->getApplication();
-        $application->add(new SetAclCommand());
+        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('security.acl.provider')));
 
         $setAclCommand = $application->find('acl:set');
         $setAclCommandTester = new CommandTester($setAclCommand);
@@ -138,7 +138,7 @@ class SetAclCommandTest extends WebTestCase
         $role = 'ROLE_USER';
 
         $application = $this->getApplication();
-        $application->add(new SetAclCommand());
+        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('security.acl.provider')));
 
         $setAclCommand = $application->find('acl:set');
         $setAclCommandTester = new CommandTester($setAclCommand);
@@ -170,7 +170,7 @@ class SetAclCommandTest extends WebTestCase
         $kernel->boot();
 
         $application = new Application($kernel);
-        $application->add(new InitAclCommand());
+        $application->add(new InitAclCommand($kernel->getContainer()->get('security.acl.dbal.connection'), $kernel->getContainer()->get('security.acl.dbal.schema')));
 
         $initAclCommand = $application->find('init:acl');
         $initAclCommandTester = new CommandTester($initAclCommand);

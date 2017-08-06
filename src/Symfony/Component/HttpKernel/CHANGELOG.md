@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * deprecated commands auto registration
  * added `AddCacheClearerPass`
  * added `AddCacheWarmerPass`
 

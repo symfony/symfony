@@ -114,6 +114,35 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
 
+HttpKernel
+----------
+
+ * Relying on commands auto-discovery has been deprecated and won't be supported
+   in 4.0. Use PSR-4 based Service Discovery instead.
+
+   Before:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # implicit commands registration
+   ```
+
+   After:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # explicit commands registration
+       AppBundle\Command:
+           resource: '../../src/AppBundle/Command/*'
+           tags: ['console.command']
+   ```
+
 Process
 -------
 

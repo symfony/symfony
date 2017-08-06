@@ -39,7 +39,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
     private $filesystem;
 
     /**
-     * @param Filesystem|null $filesystem
+     * @param Filesystem $filesystem
      */
     public function __construct($filesystem = null)
     {
@@ -53,7 +53,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
             return;
         }
 
-        $this->filesystem = $filesystem ?: new Filesystem();
+        $this->filesystem = $filesystem;
     }
 
     /**

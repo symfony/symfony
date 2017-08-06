@@ -153,11 +153,7 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->translator) {
             $this->translator = parent::getContainer()->get('translator');
-        }
-        if (null === $this->loader) {
             $this->loader = parent::getContainer()->get('translation.loader');
-        }
-        if (null === $this->extractor) {
             $this->extractor = parent::getContainer()->get('translation.extractor');
         }
 

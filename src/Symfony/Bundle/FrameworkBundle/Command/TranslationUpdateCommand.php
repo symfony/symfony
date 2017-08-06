@@ -138,14 +138,8 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->writer) {
             $this->writer = parent::getContainer()->get('translation.writer');
-        }
-        if (null === $this->loader) {
             $this->loader = parent::getContainer()->get('translation.loader');
-        }
-        if (null === $this->extractor) {
             $this->extractor = parent::getContainer()->get('translation.extractor');
-        }
-        if (null === $this->defaultLocale) {
             $this->defaultLocale = parent::getContainer()->getParameter('kernel.default_locale');
         }
 

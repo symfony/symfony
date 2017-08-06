@@ -48,26 +48,34 @@ final class Dotenv
     public function load($path/*, ...$paths*/)
     {
         // func_get_args() to be replaced by a variadic argument for Symfony 4.0
-        foreach (func_get_args() as $path) {
-            if (!is_readable($path) || is_dir($path)) {
-                throw new PathException($path);
-            }
+        $this->doLoad(func_get_args(), false);
+    }
 
-            $this->populate($this->parse(file_get_contents($path), $path));
-        }
+    /**
+     * Loads one or several .env files with overriding existing vars.
+     *
+     * @param string    $path  A file to load
+     * @param ...string $paths A list of additional files to load
+     *
+     * @throws FormatException when a file has a syntax error
+     * @throws PathException   when a file does not exist or is not readable
+     */
+    public function overload($path/*, ...$paths*/)
+    {
+        // func_get_args() to be replaced by a variadic argument for Symfony 4.0
+        $this->doLoad(func_get_args(), true);
     }
 
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
-     * Note that existing environment variables are never overridden.
-     *
-     * @param array $values An array of env variables
+     * @param array $values               An array of env variables
+     * @param bool  $overrideExistingVars Override the existing env variables
      */
-    public function populate($values)
+    public function populate($values, $overrideExistingVars = false)
     {
         foreach ($values as $name => $value) {
-            if (isset($_ENV[$name]) || isset($_SERVER[$name]) || false !== getenv($name)) {
+            if (!$overrideExistingVars && (isset($_ENV[$name]) || isset($_SERVER[$name]) || false !== getenv($name))) {
                 continue;
             }
 
@@ -373,5 +381,16 @@ final class Dotenv
     private function createFormatException($message)
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
+    }
+
+    private function doLoad(array $paths, $overrideExistingVars = false)
+    {
+        foreach ($paths as $path) {
+            if (!is_readable($path) || is_dir($path)) {
+                throw new PathException($path);
+            }
+
+            $this->populate($this->parse(file_get_contents($path), $path), $overrideExistingVars);
+        }
     }
 }

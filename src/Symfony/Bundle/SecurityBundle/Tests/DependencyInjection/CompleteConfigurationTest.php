@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -355,7 +356,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     public function testUserPasswordEncoderCommandIsRegistered()
     {
-        $this->assertTrue($this->getContainer('remember_me_options')->has('security.console.user_password_encoder_command'));
+        $this->assertTrue($this->getContainer('remember_me_options')->has(UserPasswordEncoderCommand::class));
     }
 
     public function testDefaultAccessDecisionManagerStrategyIsAffirmative()

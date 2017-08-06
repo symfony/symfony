@@ -48,19 +48,33 @@ class RouterDebugCommandTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     */
+    public function testLegacyDebugCommand()
+    {
+        $application = new Application($this->getKernel());
+        $application->add(new RouterDebugCommand());
+
+        $tester = new CommandTester($application->find('debug:router'));
+
+        $tester->execute(array());
+
+        $this->assertRegExp('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
+    }
+
+    /**
      * @return CommandTester
      */
     private function createCommandTester()
     {
         $application = new Application($this->getKernel());
-
-        $command = new RouterDebugCommand();
-        $application->add($command);
+        $application->add(new RouterDebugCommand($this->getRouter()));
 
         return new CommandTester($application->find('debug:router'));
     }
 
-    private function getKernel()
+    private function getRouter()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -68,9 +82,13 @@ class RouterDebugCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection))
-        ;
+            ->will($this->returnValue($routeCollection));
 
+        return $router;
+    }
+
+    private function getKernel()
+    {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->atLeastOnce())
@@ -87,7 +105,7 @@ class RouterDebugCommandTest extends TestCase
             ->expects($this->any())
             ->method('get')
             ->with('router')
-            ->willReturn($router)
+            ->willReturn($this->getRouter())
         ;
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();

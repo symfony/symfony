@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -74,11 +75,28 @@ class CachePoolClearCommandTest extends WebTestCase
             ->execute(array('pools' => array('unknown_pool')), array('decorated' => false));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     */
+    public function testLegacyClearCommand()
+    {
+        $application = new Application(static::$kernel);
+        $application->add(new CachePoolClearCommand());
+
+        $tester = new CommandTester($application->find('cache:pool:clear'));
+
+        $tester->execute(array('pools' => array()));
+
+        $this->assertContains('Cache was successfully cleared', $tester->getDisplay());
+    }
+
     private function createCommandTester()
     {
-        $command = new CachePoolClearCommand();
-        $command->setContainer(static::$kernel->getContainer());
+        $container = static::$kernel->getContainer();
+        $application = new Application(static::$kernel);
+        $application->add(new CachePoolClearCommand($container->get('cache.global_clearer')));
 
-        return new CommandTester($command);
+        return new CommandTester($application->find('cache:pool:clear'));
     }
 }

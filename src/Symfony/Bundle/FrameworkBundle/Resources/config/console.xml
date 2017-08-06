@@ -12,5 +12,89 @@
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="console" />
         </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">
+            <tag name="console.command" command="about" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
+            <argument type="service" id="filesystem" />
+            <tag name="console.command" command="assets:install" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand">
+            <argument type="service" id="cache_clearer" />
+            <argument type="service" id="filesystem" />
+            <tag name="console.command" command="cache:clear" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand">
+            <argument type="service" id="cache.global_clearer" />
+            <tag name="console.command" command="cache:pool:clear" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand">
+            <argument type="iterator" />
+            <tag name="console.command" command="cache:pool:prune" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
+            <argument type="service" id="cache_warmer" />
+            <tag name="console.command" command="cache:warmup" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand">
+            <tag name="console.command" command="debug:config" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand">
+            <tag name="console.command" command="config:dump-reference" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand">
+            <tag name="console.command" command="debug:container" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand">
+            <argument type="service" id="event_dispatcher" />
+            <tag name="console.command" command="debug:event-dispatcher" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
+            <argument type="service" id="router" />
+            <tag name="console.command" command="debug:router" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand">
+            <argument type="service" id="router" />
+            <tag name="console.command" command="router:match" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand">
+            <argument type="service" id="translator" />
+            <argument type="service" id="translation.loader" />
+            <argument type="service" id="translation.extractor" />
+            <tag name="console.command" command="debug:translation" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand">
+            <argument type="service" id="translation.writer" />
+            <argument type="service" id="translation.loader" />
+            <argument type="service" id="translation.extractor" />
+            <argument>%kernel.default_locale%</argument>
+            <tag name="console.command" command="translation:update" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
+            <tag name="console.command" command="workflow:dump" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand">
+            <tag name="console.command" command="lint:xliff" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand">
+            <tag name="console.command" command="lint:yaml" />
+        </service>
     </services>
 </container>

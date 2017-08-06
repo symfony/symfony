@@ -27,6 +27,8 @@ use Symfony\Component\Config\FileLocator;
  * A console command for retrieving information about services.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @internal since version 3.4
  */
 class ContainerDebugCommand extends ContainerAwareCommand
 {

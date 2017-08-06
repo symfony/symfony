@@ -24,14 +24,41 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  * A console command to test route matching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
 class RouterMatchCommand extends ContainerAwareCommand
 {
+    private $router;
+
+    /**
+     * @param RouterInterface $router
+     */
+    public function __construct($router = null)
+    {
+        parent::__construct();
+
+        if (!$router instanceof RouterInterface) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->setName(null === $router ? 'router:match' : $router);
+
+            return;
+        }
+
+        $this->router = $router;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
+        if (null !== $this->router) {
+            return parent::isEnabled();
+        }
         if (!$this->getContainer()->has('router')) {
             return false;
         }
@@ -76,10 +103,14 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC to be removed in 4.0
+        if (null === $this->router) {
+            $this->router = $this->getContainer()->get('router');
+        }
+
         $io = new SymfonyStyle($input, $output);
 
-        $router = $this->getContainer()->get('router');
-        $context = $router->getContext();
+        $context = $this->router->getContext();
         if (null !== $method = $input->getOption('method')) {
             $context->setMethod($method);
         }
@@ -90,7 +121,7 @@ EOF
             $context->setHost($host);
         }
 
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
+        $matcher = new TraceableUrlMatcher($this->router->getRouteCollection(), $context);
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 

@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilder
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
 use Symfony\Component\Config\DependencyInjection\ConfigCachePass;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass;
@@ -130,5 +131,10 @@ class FrameworkBundle extends Bundle
         if (class_exists($class)) {
             $container->addCompilerPass(new $class(), $type, $priority);
         }
+    }
+
+    public function registerCommands(Application $application)
+    {
+        // noop
     }
 }

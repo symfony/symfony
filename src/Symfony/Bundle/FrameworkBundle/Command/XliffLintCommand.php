@@ -22,6 +22,8 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ *
+ * @final since version 3.4
  */
 class XliffLintCommand extends Command
 {

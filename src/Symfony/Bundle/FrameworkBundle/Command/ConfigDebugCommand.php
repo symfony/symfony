@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Yaml;
  * A console command for dumping available configuration reference.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since version 3.4
  */
 class ConfigDebugCommand extends AbstractConfigCommand
 {
@@ -111,7 +113,7 @@ EOF
 
     private function compileContainer()
     {
-        $kernel = clone $this->getContainer()->get('kernel');
+        $kernel = clone $this->getApplication()->getKernel();
         $kernel->boot();
 
         $method = new \ReflectionMethod($kernel, 'buildContainer');

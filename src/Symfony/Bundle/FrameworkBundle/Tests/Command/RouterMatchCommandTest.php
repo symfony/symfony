@@ -42,18 +42,36 @@ class RouterMatchCommandTest extends TestCase
     }
 
     /**
-     * @return CommandTester
+     * @group legacy
+     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
      */
-    private function createCommandTester()
+    public function testLegacyMatchCommand()
     {
         $application = new Application($this->getKernel());
         $application->add(new RouterMatchCommand());
         $application->add(new RouterDebugCommand());
 
+        $tester = new CommandTester($application->find('router:match'));
+
+        $tester->execute(array('path_info' => '/'));
+
+        $this->assertContains('None of the routes match the path "/"', $tester->getDisplay());
+    }
+
+    /**
+     * @return CommandTester
+     */
+    private function createCommandTester()
+    {
+        $application = new Application($this->getKernel());
+        $application->add(new RouterMatchCommand($this->getRouter()));
+        $application->add(new RouterDebugCommand($this->getRouter()));
+
         return new CommandTester($application->find('router:match'));
     }
 
-    private function getKernel()
+    private function getRouter()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -62,14 +80,17 @@ class RouterMatchCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection))
-        ;
+            ->will($this->returnValue($routeCollection));
         $router
             ->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($requestContext))
-        ;
+            ->will($this->returnValue($requestContext));
 
+        return $router;
+    }
+
+    private function getKernel()
+    {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->atLeastOnce())
@@ -85,7 +106,9 @@ class RouterMatchCommandTest extends TestCase
         $container
             ->expects($this->any())
             ->method('get')
-            ->willReturn($router);
+            ->with('router')
+            ->willReturn($this->getRouter())
+        ;
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel

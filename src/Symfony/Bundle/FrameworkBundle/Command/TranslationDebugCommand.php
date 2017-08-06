@@ -36,13 +36,13 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class TranslationDebugCommand extends ContainerAwareCommand
 {
-    private $translator;
-    private $loader;
-    private $extractor;
-
     const MESSAGE_MISSING = 0;
     const MESSAGE_UNUSED = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
+
+    private $translator;
+    private $loader;
+    private $extractor;
 
     /**
      * @param TranslatorInterface $translator
@@ -51,15 +51,15 @@ class TranslationDebugCommand extends ContainerAwareCommand
      */
     public function __construct($translator = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null)
     {
-        parent::__construct();
-
         if (!$translator instanceof TranslatorInterface) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
-            $this->setName(null === $translator ? 'debug:translation' : $translator);
+            parent::__construct($translator);
 
             return;
         }
+
+        parent::__construct();
 
         $this->translator = $translator;
         $this->loader = $loader;

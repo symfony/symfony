@@ -36,15 +36,15 @@ class RouterMatchCommand extends ContainerAwareCommand
      */
     public function __construct($router = null)
     {
-        parent::__construct();
-
         if (!$router instanceof RouterInterface) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
-            $this->setName(null === $router ? 'router:match' : $router);
+            parent::__construct($router);
 
             return;
         }
+
+        parent::__construct();
 
         $this->router = $router;
     }

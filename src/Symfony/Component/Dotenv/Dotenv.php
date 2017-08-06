@@ -81,10 +81,12 @@ final class Dotenv
             $loadedVars[$name] = true;
         }
 
-        $loadedVars = implode(',', array_keys($loadedVars));
-        putenv("SYMFONY_DOTENV_VARS=$loadedVars");
-        $_ENV['SYMFONY_DOTENV_VARS'] = $loadedVars;
-        $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars;
+        if ($loadedVars) {
+            $loadedVars = implode(',', array_keys($loadedVars));
+            putenv("SYMFONY_DOTENV_VARS=$loadedVars");
+            $_ENV['SYMFONY_DOTENV_VARS'] = $loadedVars;
+            $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars;
+        }
     }
 
     /**

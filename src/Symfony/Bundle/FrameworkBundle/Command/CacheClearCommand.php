@@ -39,15 +39,15 @@ class CacheClearCommand extends ContainerAwareCommand
      */
     public function __construct($cacheClearer = null, Filesystem $filesystem = null)
     {
-        parent::__construct();
-
         if (!$cacheClearer instanceof CacheClearerInterface) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
-            $this->setName(null === $cacheClearer ? 'cache:clear' : $cacheClearer);
+            parent::__construct($cacheClearer);
 
             return;
         }
+
+        parent::__construct();
 
         $this->cacheClearer = $cacheClearer;
         $this->filesystem = $filesystem ?: new Filesystem();

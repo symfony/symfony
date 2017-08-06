@@ -32,15 +32,15 @@ final class CachePoolClearCommand extends ContainerAwareCommand
      */
     public function __construct($poolClearer = null)
     {
-        parent::__construct();
-
         if (!$poolClearer instanceof Psr6CacheClearer) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
-            $this->setName(null === $poolClearer ? 'cache:pool:clear' : $poolClearer);
+            parent::__construct($poolClearer);
 
             return;
         }
+
+        parent::__construct();
 
         $this->poolClearer = $poolClearer;
     }

@@ -8,7 +8,8 @@
         <defaults public="false" />
 
         <service id="Symfony\Bundle\SecurityBundle\Command\InitAclCommand">
-            <tag name="console.command" command="init:acl" />
+            <tag name="console.command" command="acl:init" />
+            <tag name="console.command" command="init:acl" /> <!-- BC to be removed in 4.0 -->
         </service>
 
         <service id="Symfony\Bundle\SecurityBundle\Command\SetAclCommand">

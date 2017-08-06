@@ -43,7 +43,8 @@ class InitAclCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('init:acl')
+            ->setName('acl:init')
+            ->setAliases(array('init:acl'))
             ->setDescription('Mounts ACL tables in the database')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command mounts ACL tables in the database.
@@ -65,6 +66,14 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':a')) {
+            $warning = 'The use of "init:acl" command is deprecated since version 3.4 and will be removed in 4.0. Use the "acl:init" command instead.';
+
+            @trigger_error($warning, E_USER_DEPRECATED);
+
+            $output->writeln('<comment>'.$warning.'</>');
+        }
+
         $container = $this->getContainer();
 
         $connection = $container->get('security.acl.dbal.connection');

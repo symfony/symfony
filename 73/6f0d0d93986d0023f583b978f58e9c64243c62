@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-22T10:50:26Z
+
+>And filesystem as a service; perhaps drop that as well :)
+
+@ro0NL while should be another RFC, this is probably not a good thing to do for mocking reasons
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-22T11:04:58Z
+
+> all commands at once
+
+let's do that :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-22T11:21:05Z
+
+Alright. Next is `cache:pool:clear`.. this one requires all pools by id from the container.
+
+It may benefit from #22200 so it gets `cache.pool` tagged services. But we need them as a map, indexed by service id :sweat_smile: which we can provide as default implem. for !tagged-services.
+
+/cc @nicolas-grekas
+
+edit: that would be the global clearer, which it already has. Basically this command allows for any cleaer-ish like service, so truly needs to be container aware. Bummer :)
+
+or inject `@service_container`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-22T13:07:05Z
+
+@ro0NL support for by-id maps in tagged-services wouldn't help us remove the CachePoolClearerPass, which has additional logic that can't be replaced solely by the tag. So, remark is off topic :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-22T13:52:45Z
+
+Right! I'd already move forward with injecting @service_container, some other need that as well. Imo. thats good enough to bridge to whatever it's refactored to, some day.
+
+Ready for review.
+
+Btw @iltar need any help with https://github.com/symfony/acl-bundle/pull/2? Regarding the commands we need to decide what to do.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-22T14:04:13Z
+
+tests still need some love ;)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-29T08:16:11Z
+
+Im having my thoughts about cache_dir/project_dir as an optional constructor arg. Do we really, really need it? It's not like the framework commands should be very abstract and generic, and we fallback to the parameter anyway.
+
+My vote goes to simply `getKernel()->getContainer()->getParameter()`. Which works for project_dir  and cache_dir (im favoring getParameter() over getCacheDir() as well).
+
+That would fix the argument hassle in assets:install :) while remaining consistency with other commands.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-31T22:00:00Z
+
+No objection for `getKernel()->getContainer()->getParameter('kernel.*')` on my side.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-01T09:29:29Z
+
+Done.
+
+Last thing; i noticed cache:pool:prune is added in between and is registered in cache.xml, the definition is, AFAIK, not removed if Console\Application is unavailable. I tend to register all commands in console.xml which is only loaded under that condition, and then additionally remove specific command definitions if its component is unavailable. This also applies to #23694
+
+Is that the right approach, or should we inverse it? And does it need a class_exists(Application::class) check?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-01T10:02:34Z
+
+My vote would go to the per component definition, and removing if `class_exists(Application::class)` is false.
+So we could also prefix by the component name as for other services, definitively resolving the debate we had in https://github.com/symfony/symfony/pull/23624#discussion_r128898177? 😄
+
+```diff
+- console.command.event_dispatcher_debug
++ event_dispatcher.command.debug
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-01T10:10:36Z
+
+Not sure :) twigbundle and securitybundle already conditionally load console.xml, webserverbundle doesnt but it depends on symfony/console directly.
+
+I think frameworkbundle should follow =/ and avoid having command definitions scattered across files.
+
+Only loading commands if symfony/console is available is nice?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-01T13:58:26Z
+
+Indeed. Right now the only way I see is to define all commands in `console.xml`, inject dependencies as `on-invalid="null"` and keep checking for their availability in `Command::isEnabled()`.
+Could that work regarding introduced BC layers?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-01T14:11:13Z
+
+Dunno.. what i do currently, [removing the definition](https://github.com/symfony/symfony/pull/23624/files#diff-0e793081ceb720201745c982a568903fR519), seems to work fine.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-01T14:40:25Z
+
+Fine for me, sorry I missed some comments.

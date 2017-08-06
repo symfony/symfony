@@ -27,6 +27,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Gábor Egyed <gabor.egyed@gmail.com>
+ *
+ * @final since version 3.4
  */
 class AssetsInstallCommand extends ContainerAwareCommand
 {

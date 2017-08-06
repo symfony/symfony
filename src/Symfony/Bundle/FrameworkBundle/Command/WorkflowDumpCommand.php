@@ -20,6 +20,8 @@ use Symfony\Component\Workflow\Marking;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since version 3.4
  */
 class WorkflowDumpCommand extends ContainerAwareCommand
 {

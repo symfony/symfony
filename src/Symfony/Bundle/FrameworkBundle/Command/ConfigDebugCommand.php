@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Yaml;
  * A console command for dumping available configuration reference.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since version 3.4
  */
 class ConfigDebugCommand extends AbstractConfigCommand
 {

@@ -28,6 +28,8 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
  * into the translation files.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @final since version 3.4
  */
 class TranslationUpdateCommand extends ContainerAwareCommand
 {

@@ -25,6 +25,8 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  * A console command to test route matching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
 class RouterMatchCommand extends ContainerAwareCommand
 {

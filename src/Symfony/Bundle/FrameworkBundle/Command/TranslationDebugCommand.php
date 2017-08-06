@@ -31,6 +31,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * and comparing them with the fallback ones.
  *
  * @author Florian Voutzinos <florian@voutzinos.com>
+ *
+ * @final since version 3.4
  */
 class TranslationDebugCommand extends ContainerAwareCommand
 {

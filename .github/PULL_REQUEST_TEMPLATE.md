@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 3.4 or master / 2.7, 2.8, 3.2 or 3.3 <!-- see comment below -->
+| Branch?       | 3.4 or master / 2.7, 2.8 or 3.3 <!-- see comment below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- don't forget updating src/**/CHANGELOG.md files -->
 | BC breaks?    | yes/no

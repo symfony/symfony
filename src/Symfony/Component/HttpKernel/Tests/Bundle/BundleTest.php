@@ -31,6 +31,10 @@ class BundleTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Auto-registration of the command "Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand" is deprecated since Symfony 3.4 and won't be supported in 4.0. Use PSR-4 based service discovery instead.
+     */
     public function testRegisterCommands()
     {
         $cmd = new FooCommand();

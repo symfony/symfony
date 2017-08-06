@@ -172,9 +172,9 @@ class SetAclCommandTest extends WebTestCase
         $application = new Application($kernel);
         $application->add(new InitAclCommand());
 
-        $initAclCommand = $application->find('init:acl');
+        $initAclCommand = $application->find('acl:init');
         $initAclCommandTester = new CommandTester($initAclCommand);
-        $initAclCommandTester->execute(array('command' => 'init:acl'));
+        $initAclCommandTester->execute(array('command' => 'acl:init'));
 
         return $application;
     }

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-02T14:04:06Z
+
+you can add a test case in `AdapterTestCase` I guess
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2017-08-02T14:19:27Z
+
+@nicolas-grekas added a case to the MemcachedAdapterTest
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-02T16:45:19Z
+
+can we move it to the FilesystemAdapterTest ? I think it may have the issue also, and this would allow more people to actually run the test
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-02T16:51:08Z
+
+wait, it really needs to be in AdapterTestCase, all of them need to run that test
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-02T16:51:49Z
+
+it should also be in Simple\CacheTestCase, just for parity
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-02T20:25:10Z
+
+Could even be part of https://github.com/php-cache/integration-tests, with even longer keys.
+/cc @Nyholm

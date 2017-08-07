@@ -46,6 +46,7 @@ class Container implements ResettableContainerInterface
     protected $parameterBag;
 
     protected $services = array();
+    protected $fileMap = array();
     protected $methodMap = array();
     protected $aliases = array();
     protected $loading = array();
@@ -150,7 +151,7 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (isset($this->methodMap[$id])) {
+        if (isset($this->fileMap[$id]) || isset($this->methodMap[$id])) {
             throw new InvalidArgumentException(sprintf('You cannot set the pre-defined service "%s".', $id));
         }
 
@@ -186,18 +187,11 @@ class Container implements ResettableContainerInterface
             return true;
         }
 
-        if (isset($this->methodMap[$id])) {
-            return true;
-        }
-
-        return false;
+        return isset($this->fileMap[$id]) || isset($this->methodMap[$id]);
     }
 
     /**
      * Gets a service.
-     *
-     * If a service is defined both through a set() method and
-     * with a get{$id}Service() method, the former has always precedence.
      *
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
@@ -228,32 +222,14 @@ class Container implements ResettableContainerInterface
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }
 
-        if (isset($this->methodMap[$id])) {
-            $method = $this->methodMap[$id];
-        } else {
-            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                if (!$id) {
-                    throw new ServiceNotFoundException($id);
-                }
-
-                $alternatives = array();
-                foreach ($this->getServiceIds() as $knownId) {
-                    $lev = levenshtein($id, $knownId);
-                    if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
-                        $alternatives[] = $knownId;
-                    }
-                }
-
-                throw new ServiceNotFoundException($id, null, null, $alternatives);
-            }
-
-            return;
-        }
-
         $this->loading[$id] = true;
 
         try {
-            $service = $this->$method();
+            if (isset($this->fileMap[$id])) {
+                return $this->load($this->fileMap[$id]);
+            } elseif (isset($this->methodMap[$id])) {
+                return $this->{$this->methodMap[$id]}();
+            }
         } catch (\Exception $e) {
             unset($this->services[$id]);
 
@@ -262,7 +238,21 @@ class Container implements ResettableContainerInterface
             unset($this->loading[$id]);
         }
 
-        return $service;
+        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+            if (!$id) {
+                throw new ServiceNotFoundException($id);
+            }
+
+            $alternatives = array();
+            foreach ($this->getServiceIds() as $knownId) {
+                $lev = levenshtein($id, $knownId);
+                if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                    $alternatives[] = $knownId;
+                }
+            }
+
+            throw new ServiceNotFoundException($id, null, null, $alternatives);
+        }
     }
 
     /**
@@ -300,7 +290,7 @@ class Container implements ResettableContainerInterface
      */
     public function getServiceIds()
     {
-        return array_unique(array_merge(array('service_container'), array_keys($this->methodMap), array_keys($this->services)));
+        return array_unique(array_merge(array('service_container'), array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->services)));
     }
 
     /**
@@ -325,6 +315,16 @@ class Container implements ResettableContainerInterface
     public static function underscore($id)
     {
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), str_replace('_', '.', $id)));
+    }
+
+    /**
+     * Creates a service by requiring its factory file.
+     *
+     * @return object The service created by the file
+     */
+    protected function load($file)
+    {
+        return require $file;
     }
 
     /**

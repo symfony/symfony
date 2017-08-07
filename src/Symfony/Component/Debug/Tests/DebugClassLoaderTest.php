@@ -222,6 +222,24 @@ class DebugClassLoaderTest extends TestCase
 
         $this->assertSame($xError, $lastError);
     }
+
+    public function testInternalsUse()
+    {
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\ExtendsInternals', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame($deprecations, array(
+            'The "Symfony\Component\Debug\Tests\Fixtures\InternalClass" class is considered internal since version 3.4. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
+            'The "Symfony\Component\Debug\Tests\Fixtures\InternalInterface" interface is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
+            'The "Symfony\Component\Debug\Tests\Fixtures\InternalTrait" trait is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
+        ));
+    }
 }
 
 class ClassLoader
@@ -245,22 +263,12 @@ class ClassLoader
             eval('namespace '.__NAMESPACE__.'; class TestingStacking { function foo() {} }');
         } elseif (__NAMESPACE__.'\TestingCaseMismatch' === $class) {
             eval('namespace '.__NAMESPACE__.'; class TestingCaseMisMatch {}');
-        } elseif (__NAMESPACE__.'\Fixtures\CaseMismatch' === $class) {
-            return $fixtureDir.'CaseMismatch.php';
         } elseif (__NAMESPACE__.'\Fixtures\Psr4CaseMismatch' === $class) {
             return $fixtureDir.'psr4'.DIRECTORY_SEPARATOR.'Psr4CaseMismatch.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0' === $class) {
             return $fixtureDir.'reallyNotPsr0.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
             return $fixtureDir.'notPsr0Bis.php';
-        } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
-            return $fixtureDir.'DeprecatedInterface.php';
-        } elseif (__NAMESPACE__.'\Fixtures\FinalClass' === $class) {
-            return $fixtureDir.'FinalClass.php';
-        } elseif (__NAMESPACE__.'\Fixtures\FinalMethod' === $class) {
-            return $fixtureDir.'FinalMethod.php';
-        } elseif (__NAMESPACE__.'\Fixtures\ExtendedFinalMethod' === $class) {
-            return $fixtureDir.'ExtendedFinalMethod.php';
         } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
             eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
@@ -273,6 +281,10 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
         } elseif ('Test\\'.__NAMESPACE__.'\ExtendsFinalClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsFinalClass extends \\'.__NAMESPACE__.'\Fixtures\FinalClass {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\ExtendsInternals' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsInternals extends \\'.__NAMESPACE__.'\Fixtures\InternalClass implements \\'.__NAMESPACE__.'\Fixtures\InternalInterface {
+                use \\'.__NAMESPACE__.'\Fixtures\InternalTrait;
+            }');
         }
     }
 }

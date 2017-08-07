@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
@@ -87,6 +88,9 @@ EOF
         }
 
         $this->filesystem->remove($cacheDir);
+
+        // The current event dispatcher is stale, let's not use it anymore
+        $this->getApplication()->setDispatcher(new EventDispatcher());
 
         if ($output->isVerbose()) {
             $io->comment('Finished');

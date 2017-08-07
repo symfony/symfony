@@ -27,6 +27,7 @@ class DebugClassLoader
     private $classLoader;
     private $isFinder;
     private static $caseCheck;
+    private static $internal = array();
     private static $final = array();
     private static $finalMethods = array();
     private static $deprecated = array();
@@ -165,10 +166,14 @@ class DebugClassLoader
             }
 
             $parent = get_parent_class($class);
+            $doc = $refl->getDocComment();
+            if (preg_match('#\n \* @internal(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
+                self::$internal[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+            }
 
             // Not an interface nor a trait
             if (class_exists($name, false)) {
-                if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
                     self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
                 }
 
@@ -202,48 +207,54 @@ class DebugClassLoader
 
             if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
+            }
+
+            // Don't trigger deprecations for classes in the same vendor
+            if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
+                $len = 0;
+                $ns = '';
             } else {
-                // Don't trigger deprecations for classes in the same vendor
-                if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
-                    $len = 0;
-                    $ns = '';
-                } else {
-                    switch ($ns = substr($name, 0, $len)) {
-                        case 'Symfony\Bridge\\':
-                        case 'Symfony\Bundle\\':
-                        case 'Symfony\Component\\':
-                            $ns = 'Symfony\\';
-                            $len = strlen($ns);
-                            break;
+                switch ($ns = substr($name, 0, $len)) {
+                    case 'Symfony\Bridge\\':
+                    case 'Symfony\Bundle\\':
+                    case 'Symfony\Component\\':
+                        $ns = 'Symfony\\';
+                        $len = strlen($ns);
+                        break;
+                }
+            }
+
+            foreach (array_merge(array($parent), class_implements($name, false), class_uses($name, false)) as $use) {
+                if (isset(self::$internal[$use]) && strncmp($ns, $use, $len)) {
+                    @trigger_error(sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $name), E_USER_DEPRECATED);
+                }
+            }
+
+            if (!$parent || strncmp($ns, $parent, $len)) {
+                if ($parent && isset(self::$deprecated[$parent]) && strncmp($ns, $parent, $len)) {
+                    @trigger_error(sprintf('The "%s" class extends "%s" that is deprecated %s', $name, $parent, self::$deprecated[$parent]), E_USER_DEPRECATED);
+                }
+
+                $parentInterfaces = array();
+                $deprecatedInterfaces = array();
+                if ($parent) {
+                    foreach (class_implements($parent) as $interface) {
+                        $parentInterfaces[$interface] = 1;
                     }
                 }
 
-                if (!$parent || strncmp($ns, $parent, $len)) {
-                    if ($parent && isset(self::$deprecated[$parent]) && strncmp($ns, $parent, $len)) {
-                        @trigger_error(sprintf('The "%s" class extends "%s" that is deprecated %s', $name, $parent, self::$deprecated[$parent]), E_USER_DEPRECATED);
+                foreach ($refl->getInterfaceNames() as $interface) {
+                    if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len)) {
+                        $deprecatedInterfaces[] = $interface;
                     }
-
-                    $parentInterfaces = array();
-                    $deprecatedInterfaces = array();
-                    if ($parent) {
-                        foreach (class_implements($parent) as $interface) {
-                            $parentInterfaces[$interface] = 1;
-                        }
+                    foreach (class_implements($interface) as $interface) {
+                        $parentInterfaces[$interface] = 1;
                     }
+                }
 
-                    foreach ($refl->getInterfaceNames() as $interface) {
-                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len)) {
-                            $deprecatedInterfaces[] = $interface;
-                        }
-                        foreach (class_implements($interface) as $interface) {
-                            $parentInterfaces[$interface] = 1;
-                        }
-                    }
-
-                    foreach ($deprecatedInterfaces as $interface) {
-                        if (!isset($parentInterfaces[$interface])) {
-                            @trigger_error(sprintf('The "%s" %s "%s" that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
-                        }
+                foreach ($deprecatedInterfaces as $interface) {
+                    if (!isset($parentInterfaces[$interface])) {
+                        @trigger_error(sprintf('The "%s" %s "%s" that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                     }
                 }
             }

@@ -161,6 +161,18 @@ class PhpDumperTest extends TestCase
         }
     }
 
+    public function testDumpAsFiles()
+    {
+        $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(array('as_files' => true, 'file' => __DIR__)), true);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo.php', '/Fixtures/includes/foo.php', $dump);
+        }
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
+    }
+
     public function testServicesWithAnonymousFactories()
     {
         $container = include self::$fixturesPath.'/containers/container19.php';

@@ -78,24 +78,21 @@ class ProxyDumper implements DumperInterface
 
         $proxyClass = $this->getProxyClassName($definition);
 
-        $generatedClass = $this->generateProxyClass($definition);
+        $hasStaticConstructor = $this->generateProxyClass($definition)->hasMethod('staticProxyConstructor');
 
-        $constructorCall = $generatedClass->hasMethod('staticProxyConstructor')
-            ? $proxyClass.'::staticProxyConstructor'
-            : 'new '.$proxyClass;
+        $constructorCall = sprintf($hasStaticConstructor ? '%s::staticProxyConstructor' : 'new %s', '\\'.$proxyClass);
 
         return <<<EOF
         if (\$lazyLoad) {
-
-            $instantiation $constructorCall(
-                function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
+            $instantiation \$this->createProxy('$proxyClass', function () {
+                return $constructorCall(function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
                     \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
 
                     return true;
-                }
-            );
+                });
+            });
         }
 
 
@@ -119,7 +116,7 @@ EOF;
      */
     private function getProxyClassName(Definition $definition)
     {
-        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition).$this->salt;
+        return preg_replace('/^.*\\\\/', '', $definition->getClass()).'_'.substr(hash('sha256', spl_object_hash($definition).$this->salt), -7);
     }
 
     /**

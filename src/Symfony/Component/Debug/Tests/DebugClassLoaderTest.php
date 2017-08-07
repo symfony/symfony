@@ -313,6 +313,28 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
+    public function testExtendedDeprecatedMethod()
+    {
+        set_error_handler(function () { return false; });
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\ExtendsAnnotatedClass', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'The "Symfony\Component\Debug\Tests\Fixtures\AnnotatedClass::deprecatedMethod()" method is deprecated since version 3.4. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsAnnotatedClass".',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
+
     public function testInternalsUse()
     {
         $deprecations = array();
@@ -328,6 +350,7 @@ class DebugClassLoaderTest extends TestCase
             'The "Symfony\Component\Debug\Tests\Fixtures\InternalClass" class is considered internal since version 3.4. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
             'The "Symfony\Component\Debug\Tests\Fixtures\InternalInterface" interface is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
             'The "Symfony\Component\Debug\Tests\Fixtures\InternalTrait" trait is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
+            'The "Symfony\Component\Debug\Tests\Fixtures\InternalClass::internalMethod()" method is considered internal since version 3.4. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
         ));
     }
 }
@@ -371,9 +394,15 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
         } elseif ('Test\\'.__NAMESPACE__.'\ExtendsFinalClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsFinalClass extends \\'.__NAMESPACE__.'\Fixtures\FinalClass {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\ExtendsAnnotatedClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsAnnotatedClass extends \\'.__NAMESPACE__.'\Fixtures\AnnotatedClass {
+                public function deprecatedMethod() { }
+            }');
         } elseif ('Test\\'.__NAMESPACE__.'\ExtendsInternals' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsInternals extends \\'.__NAMESPACE__.'\Fixtures\InternalClass implements \\'.__NAMESPACE__.'\Fixtures\InternalInterface {
                 use \\'.__NAMESPACE__.'\Fixtures\InternalTrait;
+
+                public function internalMethod() { }
             }');
         }
     }

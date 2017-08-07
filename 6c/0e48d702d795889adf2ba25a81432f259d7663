@@ -1,0 +1,229 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-04-30T15:53:03Z
+
+I am not convinced that we really need this additional event. You can already make use of the entered event and retrieve the applied transition from the `Event` object.
+
+---------------------------------------------------------------------------
+
+by izzyp at 2017-04-30T16:24:02Z
+
+Are you suggesting that in the EventSubscriber->getSubscribedEvents() you would subscribe to an event like so:
+```
+$events = [
+    'workflow.workflow_name.entered.place_name'         => 'onEnteredPlaceName',
+    ...
+]
+```
+and in the `onEnteredPlaceName()` method you would check and apply logic depending on the transition passed with the event?
+
+like so:
+```
+if ($event->getTransition()->getName() == 'draft') {
+	some stuff ...
+}
+elseif ($event->getTransition()->getName() == 'undo') {
+	some other stuff ...
+}
+etc...
+```
+
+This doesn't seem right to me at all. It forces unrelated logic into the same listener methods, the listeners become responsible for knowing which transitions are being called, etc.
+
+It is much cleaner and simpler to dispatch a completed transition event.
+
+The Entered event relates to the place, the Completed event relates to the transition. They serve different purposes.
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2017-06-25T14:15:38Z
+
+Huge 👍 on this. @izzyp gave a very good use case, this is very useful for circular state machines. I had the same problem recently.
+
+I have solved this by checking the transition name as @xabbuh suggested, but it would be nice to be able to tie this to transition complete event.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-19T06:33:34Z
+
+ping @lyrixx @Nyholm
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-19T08:14:47Z
+
+Thank you for the ping.
+
+Thank you @izzyp for this suggestion. Can you tell me how this differ from the "annouce" event? I fail to see any difference. But maybe you see something I don't.
+Also, be aware, [master Workflow](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Workflow/Workflow.php#L301-L308) is a bit updated from where you based you PR.
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2017-07-19T13:03:40Z
+
+@Nyholm The announce event is for the next available transitions after the event is complete. This one is for the just completed event.
+
+For example:
+    A -> B
+    B -> C
+    C -> B
+
+Applying the A->B transition triggers the events, but none of them are right for this:
+- `enter/entered` : Refers to the state, instead of the transition, and in this case multiple transitions can move the state to B.
+- `announce`: Refers to the next available transitions. B->C in this case.
+- `completed`: Refers to the just completed transition A->B
+
+I understand the reluctance to add a new event yet again, but keep in mind that state machines usually have events for transitions, not states, due to their circular nature. This is not necessarily true for workflows.
+Since Symfony supports both, it should have events for both.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-19T15:34:22Z
+
+Thank you. I understand better now.
+
+If applying the A->B transition triggers the events in your example, You wound get:
+ * workflow.foo.leave.a
+ * workflow.foo.transition.ab_transition
+ * workflow.foo.enter.b
+ * workflow.foo.entered.b
+ * **workflow.foo.completed.ab_transition**
+ * workflow.foo.announce.bc_transition
+
++ a lot of other related (less detailed) events.
+
+I can understand why you want the new event. I do not think we need `workflow.foo.completed` and `workflow.foo.completed` because they exact copies of the "announce" (and "entered"!) events.
+
+I would (but Im not sure the other agree) modify the `announce()` function and add your one new event there. Maybe even rename it to `workflow.foo.completed_transaction.ab_transition`
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2017-07-19T16:23:12Z
+
+As I understand `announce` only meant to announce new possibilities.
+A->B is complete (new event here: complete.A->B), now you can apply the B->C transition (announce.B->C).
+
+`announce` is very useful when you want to auto apply a transition. I use this for billing. When the billing conditions are met, apply the `bill` transition which creates an invoice.
+
+I see these as totally different events, for different use cases. `enter` and `entered` refer to the state, `announce` refers to future transitions, `complete` would refer to the current transition.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-20T16:37:11Z
+
+Hello. (Sorry for the delay.)
+
+I understand clearly why others event are not suitable for you but right now I fail to see a real use case for this event. Could you (you or @Padam87)  tell us more about what you will do in your listener?
+
+Thanks
+
+(note: I'm OK with this PR, I just be sure we really need theses events)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-20T16:39:48Z
+
+Oh, And you need to update the CHANGELOG also.
+Thanks.
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2017-07-20T18:20:19Z
+
+At printmagus.com (online printing shop) I have recently replaced finite with the new workflow component. I was glad to see that it was an easy swap, just this one issue, with 4 occurrences.
+
+`files` state machine:
+![files](https://user-images.githubusercontent.com/776488/28431969-8c09dee0-6d86-11e7-8bfe-6a8738fef403.png)
+
+The `uploaded` state can be reached by 2 transitions: `upload` and `recheck`.
+`upload` listener does the following:
+- calculates the deadline for the order (deadlines start when the files are uploaded)
+- sends an email confirming the upload and the new deadline
+- emits a message to our WS, notifying the team about the new file ready for preflight
+
+`recheck` on the other hand:
+- removes any comments about the files
+- removes preflight data
+(basically resets the validation process)
+
+I hope this is enough, the other 3 cases I have are part of our `production` state machine with 19 states and 30 something transitions, and I don't want a headache right now :D
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-21T07:33:14Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by izzyp at 2017-07-21T14:10:14Z
+
+@Nyholm @lyrixx
+
+The uses outlined by @Padam87 are spot on.
+
+I have many different use cases in my projects that this is indispensable for. The simplest example i can think of is as follows:
+
+An application process follows this workflow:
+
+<img width="692" alt="screen shot 2017-07-21 at 13 19 40" src="https://user-images.githubusercontent.com/1904199/28463217-4a92e90c-6e17-11e7-858f-0f0475e9d784.png">
+
+We listen for the "workflow.foo.completed.*approve*" event - and for example send an email to the applicant requesting "further info" amongst other actions.
+
+If the applicant doesn't respond within a certain amount of time, the cancel transition is applied.
+
+If the applicant responds after the application is already cancelled - we apply the reapprove transition to the application and listen for the "workflow.foo.completed.*reapprove*" event. For this transition to Approve, we do not need to resend the "further info" email or trigger the other actions that were raised on the original approval, the actions raised in this case are different.
+
+Bottom line - same place is Entered but via 2 (or more) different Transitions and each different transition needs to trigger different behaviour and actions, even though they end in the same Place.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-21T14:16:11Z
+
+@izzyp Don't worry I'm gonna merge this PR ;) I already added a :+1:
+
+I'm just waiting for the CHANGELOG and for the fabbot fix
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-24T09:11:30Z
+
+@izzyp Looks like something went wrong while rebasing. Did you rebase on `master` instead of `3.4`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-04T05:41:27Z
+
+@izzyp I can finish this PR for you if you lake time, just tell me;)
+
+---------------------------------------------------------------------------
+
+by izzyp at 2017-08-05T22:36:34Z
+
+Thanks @lyrixx
+
+I buggered something up while attempting to rebase and i've been too swamped for time to work out what i did wrong or how to fix.
+
+Would appreciate any assistance to get this finished up!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-07T08:33:35Z
+
+Here we go. I cleaned the git history (was not easy, I don't know what you did ;) ) and I updated the PR description.
+
+---
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by izzyp at 2017-08-07T09:31:13Z
+
+Thanks @lyrixx !
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-07T09:43:18Z
+
+Failures on appveyor seems not related.

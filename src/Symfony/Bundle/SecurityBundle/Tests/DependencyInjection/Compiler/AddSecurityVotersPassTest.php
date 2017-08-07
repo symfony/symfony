@@ -68,23 +68,4 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
         $this->assertCount(4, $refs);
     }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage stdClass must implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface when used as a voter.
-     */
-    public function testVoterMissingInterface()
-    {
-        $container = new ContainerBuilder();
-        $container
-            ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array())
-        ;
-        $container
-            ->register('without_interface', 'stdClass')
-            ->addTag('security.voter')
-        ;
-        $compilerPass = new AddSecurityVotersPass();
-        $compilerPass->process($container);
-    }
 }

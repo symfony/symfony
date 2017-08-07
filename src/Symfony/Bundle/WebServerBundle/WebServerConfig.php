@@ -74,6 +74,13 @@ class WebServerConfig
         }
 
         if ($executable === null) {
+            $envExecutable = getenv('SYMFONY_SERVER_EXECUTABLE');
+            if ($envExecutable !== false) {
+                $executable = $envExecutable;
+            }
+        }
+
+        if ($executable === null) {
             $finder = new PhpExecutableFinder();
             if (false === $executable = $finder->find()) {
                 throw new \RuntimeException('Unable to find the PHP executable.');

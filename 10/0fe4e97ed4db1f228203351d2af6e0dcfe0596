@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-01T13:18:59Z
+
+@javiereguiluz your comment is for #23729. And yes, I've no better name idea and the intent is to reflect the major version of ocramius/proxy-manager, so yes also, there will be as many versions of this file as there will be BC breaks on the parent class.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-03T16:11:11Z
+
+Failures are false positives :)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-08-03T19:55:24Z
+
+Here are some benchmarks and cache comparisons for an [older, legacy Symfony app](https://github.com/src-run/srw-client-silverpapillon) that is halfway through being rewritten with some modern principals in mind. It has an overly bloated service container that only recently has gone `public: false` by default.
+
+Beyond the shown comparisons below, I generally found slight performance increases, sometimes alongside slight memory increases, with only a few situations that resulted in minor performance regressions (often within a margin of error). The cache size is significantly larger, but it is still a negligible size, anyway, so this doesn't particularly bother me.
+
+## Benchmarks
+
+| Controller | Symfony Vers | Difference | Blackfire |
+| --- | --- | --- | --- |
+| [DefaultController::index](https://github.com/src-run/srw-client-silverpapillon/blob/master/src/Controller/DefaultController.php#L67) | 3.3 -> 3.4 | `+2.71%` | [Graph](https://blackfire.io/profiles/compare/005ee8e6-f1be-4722-81b0-1007b2df9942/graph) |
+|  | 3.4 -> PR#23741 | `-4.39%` | [Graph](https://blackfire.io/profiles/compare/4d51ed6d-f5af-49d8-a6e5-01bdee269335/graph) |
+| [CouponController::list](https://github.com/src-run/srw-client-silverpapillon/blob/master/src/Controller/CouponController.php#L50) | 3.3 -> 3.4 | `+0.59%` | [Graph](https://blackfire.io/profiles/compare/58384be8-fe92-4bd6-b368-494823d78de3/graph) |
+|  | 3.4 -> PR#23741 | `-2.14%` | [Graph](https://blackfire.io/profiles/compare/f0863933-55e8-46c2-909e-834066d513af/graph) |
+| [CategoryController::list](https://github.com/src-run/srw-client-silverpapillon/blob/master/src/Controller/CategoryController.php#L27) | 3.3 -> 3.4 | `-2.62%` | [Graph](https://blackfire.io/profiles/compare/9e5a2e7a-9a46-48bd-b8fb-92dba2632b34/graph) |
+|  | 3.4 -> PR#23741 | `-2.43%` | [Graph](https://blackfire.io/profiles/compare/2cb965d9-db12-4aac-bc4d-19e029e0ac63/graph) |
+
+## Cache Size
+
+### Symfony 3.3
+
+| Size | File |
+| --- | --- |
+| 188K | var/cache/dev/appDevDebugProjectContainerCompiler.log |
+| 4.0K | var/cache/dev/appDevDebugProjectContainerDeprecations.log |
+| 580K | var/cache/dev/appDevDebugProjectContainer.php |
+| 72K | var/cache/dev/appDevDebugProjectContainer.php.meta |
+| 28K | var/cache/dev/appDevDebugProjectContainerUrlGenerator.php |
+| 92K | var/cache/dev/appDevDebugProjectContainerUrlGenerator.php.meta |
+| 28K | var/cache/dev/appDevDebugProjectContainerUrlMatcher.php |
+| 92K | var/cache/dev/appDevDebugProjectContainerUrlMatcher.php.meta |
+| 536K | var/cache/dev/appDevDebugProjectContainer.xml |
+| 72K | var/cache/dev/appDevDebugProjectContainer.xml.meta |
+| __1692K__ | __Total__ |
+
+### Symfony 3.4
+
+| Size | File |
+| --- | --- |
+| 188K | var/cache/dev/appDevDebugProjectContainerCompiler.log |
+| 4.0K | var/cache/dev/appDevDebugProjectContainerDeprecations.log |
+| 580K | var/cache/dev/appDevDebugProjectContainer.php |
+| 72K | var/cache/dev/appDevDebugProjectContainer.php.meta |
+| 28K | var/cache/dev/appDevDebugProjectContainerUrlGenerator.php |
+| 92K | var/cache/dev/appDevDebugProjectContainerUrlGenerator.php.meta |
+| 28K | var/cache/dev/appDevDebugProjectContainerUrlMatcher.php |
+| 92K | var/cache/dev/appDevDebugProjectContainerUrlMatcher.php.meta |
+| 512K | var/cache/dev/appDevDebugProjectContainer.xml |
+| 72K | var/cache/dev/appDevDebugProjectContainer.xml.meta |
+| __1668K__ | __Total__ |
+
+### Symfony 3.4 (with PR #23741)
+
+| Size | File |
+| --- | --- |
+| 1843K | var/cache/dev/appDevDebugProjectContainer |
+| 188K | var/cache/dev/appDevDebugProjectContainerCompiler.log |
+| 4.0K | var/cache/dev/appDevDebugProjectContainerDeprecations.log |
+| 188K | var/cache/dev/appDevDebugProjectContainer.php |
+| 72K | var/cache/dev/appDevDebugProjectContainer.php.meta |
+| 28K | var/cache/dev/appDevDebugProjectContainerUrlGenerator.php |
+| 92K | var/cache/dev/appDevDebugProjectContainerUrlGenerator.php.meta |
+| 28K | var/cache/dev/appDevDebugProjectContainerUrlMatcher.php |
+| 92K | var/cache/dev/appDevDebugProjectContainerUrlMatcher.php.meta |
+| 512K | var/cache/dev/appDevDebugProjectContainer.xml |
+| 72K | var/cache/dev/appDevDebugProjectContainer.xml.meta |
+| __3119K__ | __Total__ |
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-03T20:09:44Z
+
+Thanks for the numbers. The size of the folder doesn't matter at all to me btw.

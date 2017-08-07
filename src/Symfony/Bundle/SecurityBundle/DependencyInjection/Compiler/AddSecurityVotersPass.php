@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * Adds all configured security voters to the access decision manager.

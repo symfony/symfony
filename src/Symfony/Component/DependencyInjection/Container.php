@@ -55,6 +55,7 @@ class Container implements ResettableContainerInterface
     protected $parameterBag;
 
     protected $services = array();
+    protected $fileMap = array();
     protected $methodMap = array();
     protected $aliases = array();
     protected $loading = array();
@@ -203,7 +204,7 @@ class Container implements ResettableContainerInterface
             } else {
                 @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
-        } elseif (isset($this->methodMap[$id])) {
+        } elseif (isset($this->fileMap[$id]) || isset($this->methodMap[$id])) {
             if (null === $service) {
                 @trigger_error(sprintf('Unsetting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             } else {
@@ -235,7 +236,7 @@ class Container implements ResettableContainerInterface
                 return true;
             }
 
-            if (isset($this->methodMap[$id])) {
+            if (isset($this->fileMap[$id]) || isset($this->methodMap[$id])) {
                 return true;
             }
 
@@ -299,40 +300,25 @@ class Container implements ResettableContainerInterface
                 throw new ServiceCircularReferenceException($id, array_keys($this->loading));
             }
 
-            if (isset($this->methodMap[$id])) {
-                $method = $this->methodMap[$id];
-            } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
-                $id = $normalizedId;
-                continue;
-            } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
-                // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
-                // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-                @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
-                // $method is set to the right value, proceed
-            } else {
-                if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                    if (!$id) {
-                        throw new ServiceNotFoundException($id);
-                    }
-
-                    $alternatives = array();
-                    foreach ($this->getServiceIds() as $knownId) {
-                        $lev = levenshtein($id, $knownId);
-                        if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
-                            $alternatives[] = $knownId;
-                        }
-                    }
-
-                    throw new ServiceNotFoundException($id, null, null, $alternatives);
-                }
-
-                return;
-            }
-
             $this->loading[$id] = true;
 
             try {
-                $service = $this->$method();
+                if (isset($this->fileMap[$id])) {
+                    return $this->load($this->fileMap[$id]);
+                } elseif (isset($this->methodMap[$id])) {
+                    return $this->{$this->methodMap[$id]}();
+                } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
+                    $id = $normalizedId;
+                    continue;
+                } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
+                    // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
+                    // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
+                    @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
+
+                    return $this->{$method}();
+                }
+
+                break;
             } catch (\Exception $e) {
                 unset($this->services[$id]);
 
@@ -340,8 +326,22 @@ class Container implements ResettableContainerInterface
             } finally {
                 unset($this->loading[$id]);
             }
+        }
 
-            return $service;
+        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+            if (!$id) {
+                throw new ServiceNotFoundException($id);
+            }
+
+            $alternatives = array();
+            foreach ($this->getServiceIds() as $knownId) {
+                $lev = levenshtein($id, $knownId);
+                if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                    $alternatives[] = $knownId;
+                }
+            }
+
+            throw new ServiceNotFoundException($id, null, null, $alternatives);
         }
     }
 
@@ -401,7 +401,7 @@ class Container implements ResettableContainerInterface
         }
         $ids[] = 'service_container';
 
-        return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->services)));
+        return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->fileMap), array_keys($this->services)));
     }
 
     /**
@@ -426,6 +426,16 @@ class Container implements ResettableContainerInterface
     public static function underscore($id)
     {
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), str_replace('_', '.', $id)));
+    }
+
+    /**
+     * Creates a service by requiring its factory file.
+     *
+     * @return object The service created by the file
+     */
+    protected function load($file)
+    {
+        return require $file;
     }
 
     /**

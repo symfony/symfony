@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -588,9 +589,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $fresh = false;
         }
 
-        require_once $cache->getPath();
-
-        $this->container = new $class();
+        $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
         if (!$fresh && $this->container->has('cache_warmer')) {
@@ -757,9 +756,24 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $dumper->setProxyDumper(new ProxyDumper(substr(hash('sha256', $cache->getPath()), 0, 7)));
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath(), 'debug' => $this->debug));
+        $content = $dumper->dump(array(
+            'class' => $class,
+            'base_class' => $baseClass,
+            'file' => $cache->getPath(),
+            'as_files' => true,
+            'debug' => $this->debug,
+        ));
 
-        $cache->write($content, $container->getResources());
+        $rootCode = array_pop($content);
+        $dir = dirname($cache->getPath()).'/';
+        $fs = new Filesystem();
+
+        foreach ($content as $file => $code) {
+            $fs->dumpFile($dir.$file, $code, null);
+            @chmod($dir.$file, 0666 & ~umask());
+        }
+
+        $cache->write($rootCode, $container->getResources());
     }
 
     /**

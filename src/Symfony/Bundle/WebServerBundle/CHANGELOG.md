@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * WebServer can now use '*' as a wildcard to bind to 0.0.0.0 (INADDR_ANY)
- * `server:run` command now has `executable` option that allows using custom executable for the commandline server (such as `php -c /path/to/ini`)
+ * Custom executable can be set using `SYMFONY_SERVER_EXECUTABLE` environment variable
 
 3.3.0
 -----

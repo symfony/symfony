@@ -22,8 +22,7 @@ class WebServerConfigTest extends TestCase
             __DIR__.'/fixtures',
             'dev',
             '85.111.31.18:8080',
-            __DIR__.'/fixtures/router.php',
-            '/usr/bin/php -c /tmp/custom/php.ini'
+            __DIR__.'/fixtures/router.php'
         );
 
         $this->assertSame(
@@ -37,7 +36,6 @@ class WebServerConfigTest extends TestCase
             $this->normalizePath(__DIR__.'/fixtures/router.php'),
             $this->normalizePath($config->getRouter())
         );
-        $this->assertSame('/usr/bin/php -c /tmp/custom/php.ini', $config->getExecutable());
     }
 
     public function testWillSetCorrectAddressAndPortAutomatically()
@@ -114,14 +112,6 @@ class WebServerConfigTest extends TestCase
             $this->normalizePath(dirname(dirname(__DIR__)).'/Resources/router.php'),
             $this->normalizePath($config->getRouter())
         );
-    }
-
-    public function testWillTryToFindExectuableIfNotPresent()
-    {
-        $config = new WebServerConfig(__DIR__.'/fixtures', 'dev');
-
-        // symplified as path will vary a lot on different systems
-        $this->assertNotEmpty($config->getExecutable());
     }
 
     /**

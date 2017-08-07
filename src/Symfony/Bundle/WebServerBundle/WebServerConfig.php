@@ -25,7 +25,7 @@ class WebServerConfig
     private $router;
     private $executable;
 
-    public function __construct($documentRoot, $env, $address = null, $router = null, $executable = null)
+    public function __construct($documentRoot, $env, $address = null, $router = null)
     {
         if (!is_dir($documentRoot)) {
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
@@ -73,11 +73,11 @@ class WebServerConfig
             throw new \InvalidArgumentException(sprintf('Port "%s" is not valid.', $this->port));
         }
 
-        if ($executable === null) {
-            $envExecutable = getenv('SYMFONY_SERVER_EXECUTABLE');
-            if ($envExecutable !== false) {
-                $executable = $envExecutable;
-            }
+        $executable = null;
+
+        $envExecutable = getenv('SYMFONY_SERVER_EXECUTABLE');
+        if ($envExecutable !== false) {
+            $executable = $envExecutable;
         }
 
         if ($executable === null) {

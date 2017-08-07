@@ -52,7 +52,7 @@ class SetAclCommandTest extends WebTestCase
         $grantedPermission2 = 'EDIT';
 
         $application = $this->getApplication();
-        $application->add(new SetAclCommand());
+        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('security.acl.provider')));
 
         $setAclCommand = $application->find('acl:set');
         $setAclCommandTester = new CommandTester($setAclCommand);

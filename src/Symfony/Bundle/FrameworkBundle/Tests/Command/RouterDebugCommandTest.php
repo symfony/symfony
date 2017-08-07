@@ -48,22 +48,6 @@ class RouterDebugCommandTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
-     */
-    public function testLegacyDebugCommand()
-    {
-        $application = new Application($this->getKernel());
-        $application->add(new RouterDebugCommand());
-
-        $tester = new CommandTester($application->find('debug:router'));
-
-        $tester->execute(array());
-
-        $this->assertRegExp('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
-    }
-
-    /**
      * @return CommandTester
      */
     private function createCommandTester()

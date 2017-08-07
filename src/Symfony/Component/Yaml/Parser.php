@@ -181,15 +181,7 @@ class Parser
                 Inline::parse(null, $flags, $this->refs);
                 try {
                     Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
-                    $i = 0;
-                    $evaluateKey = !(Yaml::PARSE_KEYS_AS_STRINGS & $flags);
-
-                    // constants in key will be evaluated anyway
-                    if (isset($values['key'][0]) && '!' === $values['key'][0] && Yaml::PARSE_CONSTANT & $flags) {
-                        $evaluateKey = true;
-                    }
-
-                    $key = Inline::parseScalar($values['key'], 0, null, $i, $evaluateKey);
+                    $key = Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                     $e->setSnippet($this->currentLine);

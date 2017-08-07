@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,7 +30,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * @final since version 3.4
  */
-class AssetsInstallCommand extends ContainerAwareCommand
+class AssetsInstallCommand extends Command
 {
     const METHOD_COPY = 'copy';
     const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
@@ -37,19 +38,8 @@ class AssetsInstallCommand extends ContainerAwareCommand
 
     private $filesystem;
 
-    /**
-     * @param Filesystem $filesystem
-     */
-    public function __construct($filesystem = null)
+    public function __construct(Filesystem $filesystem)
     {
-        if (!$filesystem instanceof Filesystem) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            parent::__construct($filesystem);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->filesystem = $filesystem;
@@ -96,17 +86,11 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->filesystem) {
-            $this->filesystem = $this->getContainer()->get('filesystem');
-            $baseDir = $this->getContainer()->getParameter('kernel.project_dir');
-        }
-
         $kernel = $this->getApplication()->getKernel();
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!is_dir($targetArg)) {
-            $targetArg = (isset($baseDir) ? $baseDir : $kernel->getContainer()->getParameter('kernel.project_dir')).'/'.$targetArg;
+            $targetArg = $kernel->getContainer()->getParameter('kernel.project_dir').'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
                 throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));

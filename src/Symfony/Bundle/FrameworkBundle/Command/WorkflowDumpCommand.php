@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,18 +24,8 @@ use Symfony\Component\Workflow\Marking;
  *
  * @final since version 3.4
  */
-class WorkflowDumpCommand extends ContainerAwareCommand
+class WorkflowDumpCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
-     */
-    public function isEnabled()
-    {
-        return $this->getContainer()->has('workflow.registry');
-    }
-
     /**
      * {@inheritdoc}
      */

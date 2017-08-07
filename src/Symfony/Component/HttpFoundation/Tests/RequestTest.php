@@ -1008,7 +1008,7 @@ class RequestTest extends TestCase
         $req = new Request(array(), array(), array(), array(), array(), array(), 'MyContent');
         $resource = $req->getContent(true);
 
-        $this->assertTrue(is_resource($resource));
+        $this->assertInternalType('resource', $resource);
         $this->assertEquals('MyContent', stream_get_contents($resource));
     }
 
@@ -1083,16 +1083,19 @@ class RequestTest extends TestCase
             array('PUT'),
             array('DELETE'),
             array('PATCH'),
-            array('put'),
-            array('delete'),
-            array('patch'),
+            array('put', 'multipart/form-data'),
+            array('delete', 'multipart/form-data'),
+            array('patch', 'multipart/form-data'),
         );
     }
 
     /**
+     * @param string $method      The HTTP method.
+     * @param string $contentType The HTTP Content-Type.
+     *
      * @dataProvider provideOverloadedMethods
      */
-    public function testCreateFromGlobals($method)
+    public function testCreateFromGlobals($method, $contentType = 'application/x-www-form-urlencoded')
     {
         $normalizedMethod = strtoupper($method);
 
@@ -1112,7 +1115,7 @@ class RequestTest extends TestCase
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
 
         $_SERVER['REQUEST_METHOD'] = $method;
-        $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+        $_SERVER['CONTENT_TYPE'] = $contentType;
         $request = RequestContentProxy::createFromGlobals();
         $this->assertEquals($normalizedMethod, $request->getMethod());
         $this->assertEquals('mycontent', $request->request->get('content'));

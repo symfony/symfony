@@ -11,10 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle;
 
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\CheckSecurityVotersValidityPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginFactory;
 use Symfony\Component\Console\Application;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
@@ -60,7 +58,6 @@ class SecurityBundle extends Bundle
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());
-        $container->addCompilerPass(new CheckSecurityVotersValidityPass(), PassConfig::TYPE_OPTIMIZE);
     }
 
     public function registerCommands(Application $application)

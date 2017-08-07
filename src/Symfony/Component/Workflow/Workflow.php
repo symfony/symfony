@@ -151,6 +151,8 @@ class Workflow
 
             $this->entered($subject, $transition, $marking);
 
+            $this->completed($subject, $transition, $marking);
+
             $this->announce($subject, $transition, $marking);
         }
 
@@ -307,6 +309,19 @@ class Workflow
         foreach ($transition->getTos() as $place) {
             $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
         }
+    }
+
+    private function completed($subject, Transition $transition, Marking $marking)
+    {
+        if (null === $this->dispatcher) {
+            return;
+        }
+
+        $event = new Event($subject, $marking, $transition, $this->name);
+
+        $this->dispatcher->dispatch('workflow.completed', $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.completed', $this->name), $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.completed.%s', $this->name, $transition->getName()), $event);
     }
 
     private function announce($subject, Transition $initialTransition, Marking $marking)

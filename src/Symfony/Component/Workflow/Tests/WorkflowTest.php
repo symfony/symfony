@@ -287,6 +287,9 @@ class WorkflowTest extends TestCase
             'workflow.workflow_name.entered',
             'workflow.workflow_name.entered.b',
             'workflow.workflow_name.entered.c',
+            'workflow.completed',
+            'workflow.workflow_name.completed',
+            'workflow.workflow_name.completed.t1',
             // Following events are fired because of announce() method
             'workflow.announce',
             'workflow.workflow_name.announce',

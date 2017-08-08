@@ -535,8 +535,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($defaults['bind']) || isset($service['bind'])) {
-            // deep clone, to avoid multiple process of the same instance in the
-            // passes
+            // deep clone, to avoid multiple process of the same instance in the passes
             $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : array();
 
             if (isset($service['bind'])) {

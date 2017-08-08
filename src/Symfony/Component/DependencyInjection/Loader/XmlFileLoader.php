@@ -356,8 +356,7 @@ class XmlFileLoader extends FileLoader
 
         $bindings = $this->getArgumentsAsPhp($service, 'bind', $file);
         if (isset($defaults['bind'])) {
-            // deep clone, to avoid multiple process of the same instance in the
-            // passes
+            // deep clone, to avoid multiple process of the same instance in the passes
             $bindings = array_merge(unserialize(serialize($defaults['bind'])), $bindings);
         }
         if ($bindings) {

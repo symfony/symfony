@@ -49,7 +49,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
      */
     protected function processValue($value, $isRoot = false)
     {
-        if ($value instanceof TypedReference) {
+        if ($value instanceof TypedReference && $value->getType() === (string) $value) {
             // Already checked
             $bindings = $this->container->getDefinition($this->currentId)->getBindings();
 
@@ -64,7 +64,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        foreach ($value->getBindings() as $key => $binding) {
+        foreach ($bindings as $key => $binding) {
             list($bindingValue, $bindingId, $used) = $binding->getValues();
             if ($used) {
                 $this->usedBindings[$bindingId] = true;

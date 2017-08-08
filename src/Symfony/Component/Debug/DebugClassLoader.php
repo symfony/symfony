@@ -198,11 +198,10 @@ class DebugClassLoader
                 }
             }
 
-            $traits = class_uses($name, false);
-            $interfaces = $this->getOwnInterfaces($name);
+            $parentAndTraits = ($parent ? array($parent => $parent) : array()) + class_uses($name, false);
 
             // Detect if the parent is annotated
-            foreach (array_merge(array($parent), $interfaces, $traits) as $use) {
+            foreach ($parentAndTraits + $this->getOwnInterfaces($name) as $use) {
                 if (isset(self::$deprecated[$use]) && strncmp($ns, $use, $len)) {
                     $type = class_exists($name, false) ? 'class' : (interface_exists($name, false) ? 'interface' : 'trait');
                     $verb = class_exists($use, false) || interface_exists($name, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
@@ -218,7 +217,7 @@ class DebugClassLoader
             self::$finalMethods[$name] = array();
             self::$deprecatedMethods[$name] = array();
             self::$internalMethods[$name] = array();
-            foreach (array_merge(array($parent), $traits) as $use) {
+            foreach ($parentAndTraits as $use) {
                 foreach (array('finalMethods', 'deprecatedMethods', 'internalMethods') as $property) {
                     if (isset(self::${$property}[$use])) {
                         self::${$property}[$name] = array_merge(self::${$property}[$name], self::${$property}[$use]);
@@ -237,7 +236,7 @@ class DebugClassLoader
                     @trigger_error(sprintf('The "%s" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $methodShortName, $message, $name), E_USER_DEPRECATED);
                 }
 
-                foreach (array_merge(array($parent), $traits) as $use) {
+                foreach ($parentAndTraits as $use) {
                     if (isset(self::$deprecatedMethods[$use][$method->name]) && strncmp($ns, $use, $len)) {
                         list($methodShortName, $message) = self::$deprecatedMethods[$use][$method->name];
                         @trigger_error(sprintf('The "%s" method is deprecated%s. You should not extend it from "%s".', $methodShortName, $message, $name), E_USER_DEPRECATED);
@@ -249,8 +248,7 @@ class DebugClassLoader
                 }
 
                 // Detect method annotations
-                $doc = $method->getDocComment();
-                if (false === $doc) {
+                if (false === $doc = $method->getDocComment()) {
                     continue;
                 }
 
@@ -366,8 +364,7 @@ class DebugClassLoader
     }
 
     /**
-     * `class_implements` includes interfaces from the parents so we have to
-     * manually exclude them.
+     * `class_implements` includes interfaces from the parents so we have to manually exclude them.
      *
      * @param string $class
      *
@@ -375,19 +372,20 @@ class DebugClassLoader
      */
     private function getOwnInterfaces($class)
     {
-        $parentInterfaces = array();
+        $ownInterfaces = class_implements($class, false);
+
         if ($parent = get_parent_class($class)) {
             foreach (class_implements($parent, false) as $interface) {
-                $parentInterfaces[$interface] = true;
+                unset($ownInterfaces[$interface]);
             }
         }
 
-        foreach (class_implements($class, false) as $interface) {
+        foreach ($ownInterfaces as $interface) {
             foreach (class_implements($interface) as $interface) {
-                $parentInterfaces[$interface] = true;
+                unset($ownInterfaces[$interface]);
             }
         }
 
-        return array_keys(array_diff_key(class_implements($class, false), $parentInterfaces));
+        return $ownInterfaces;
     }
 }

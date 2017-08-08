@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-08T11:49:22Z
+
+To summarize the exit codes; Symfony now treats error codes other than 0 as error, but that doesn't mean they are errors.
+
+> Every command returns an exit status (sometimes referred to as a return status or exit code). A successful command returns a 0, while an unsuccessful one returns a non-zero value that usually _**can**_ be interpreted as an error code. Well-behaved UNIX commands, programs, and utilities return a 0 exit code upon successful completion, though there are some exceptions.
+
+ - http://tldp.org/LDP/abs/html/exit-status.html
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-08T11:52:36Z
+
+Also there is no error event dispatched if no exception has been thrown, logging an error in this case seems inconsistent.
+
+---------------------------------------------------------------------------
+
+by haroldiedema at 2017-08-08T11:56:55Z
+
+I think you're right. I got the same comment from a colleague immediately after I made this PR. Guess the gut feeling was right.
+
+I'll update the PR. Stand by.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-08T11:58:33Z
+
+I mean that using the `debug` level seems more appropriate. What change would you do? Removing the log completely? I find it useful as purely informative.
+
+---------------------------------------------------------------------------
+
+by haroldiedema at 2017-08-08T12:01:01Z
+
+I was going to remove the `onConsoleTerminate` event listener entirely. It feels a bit 'iffly', since it's in an error listener, but it has nothing to do with errors, nor do I personally find the information very helpful to be in a log. This was also the remark I got from my colleague.
+
+@iltar what do you think?
+
+I think that the `console.terminate` event listener, if it's going to log to `debug`, has no place in a class named `ErrorListener`, since this specific part has nothing to do with it.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-08T12:03:03Z
+
+Indeed, that's an error listener. OK for removing it if others think it's not useful.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-08T12:04:18Z
+
+But that's a public method, we can't remove it from 3.3. Needs to be deprecated in 3.4 first.
+
+---------------------------------------------------------------------------
+
+by haroldiedema at 2017-08-08T12:06:10Z
+
+Oh dear, I didn't think of that :rofl:
+
+Alright, in that case I'm in for leaving it as it is now then. It solves our issues and we could always mark it as deprecated for 3.4 and make a separate `TerminateListener` if people find this information useful.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-08T16:38:54Z
+
+About dropping the log entirely, I suggest opening an issue first so that you can get feedbacks (one may be happy to find this log if that means the command did fail, better have logs that are not useful most of the times than nothing at all).

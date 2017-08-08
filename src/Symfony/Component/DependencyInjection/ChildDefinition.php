@@ -33,7 +33,7 @@ class ChildDefinition extends Definition
     }
 
     /**
-     * Returns the Definition being decorated.
+     * Returns the Definition to inherit from.
      *
      * @return string
      */
@@ -43,7 +43,7 @@ class ChildDefinition extends Definition
     }
 
     /**
-     * Sets the Definition being decorated.
+     * Sets the Definition to inherit from.
      *
      * @param string $parent
      *

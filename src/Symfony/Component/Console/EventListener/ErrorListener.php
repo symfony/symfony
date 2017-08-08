@@ -59,10 +59,10 @@ class ErrorListener implements EventSubscriberInterface
         }
 
         if (!$inputString = $this->getInputString($event)) {
-            return $this->logger->error('The console exited with code "{code}"', array('code' => $exitCode));
+            return $this->logger->debug('The console exited with code "{code}"', array('code' => $exitCode));
         }
 
-        $this->logger->error('Command "{command}" exited with code "{code}"', array('command' => $inputString, 'code' => $exitCode));
+        $this->logger->debug('Command "{command}" exited with code "{code}"', array('command' => $inputString, 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()

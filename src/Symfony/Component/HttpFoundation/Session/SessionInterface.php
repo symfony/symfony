@@ -173,7 +173,7 @@ interface SessionInterface
      * @return SessionBagInterface
      */
     public function getBag($name);
-    
+
     /**
      * Gets the flashbag interface.
      *

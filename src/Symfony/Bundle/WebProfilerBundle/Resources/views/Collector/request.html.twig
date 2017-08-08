@@ -249,6 +249,22 @@
             </div>
         </div>
 
+        <div class="tab {{ profile.collector('dotenv').envs is empty ? 'disabled' }}">
+              <h3 class="tab-title">.env</h3>
+
+              <div class="tab-content">
+                  <h3>Loaded variables</h3>
+
+                  {% if profile.collector('dotenv').envs is empty %}
+                      <div class="empty">
+                          <p>No variables were loaded.</p>
+                      </div>
+                  {% else %}
+                      {{ include('@WebProfiler/Profiler/table.html.twig', { data: profile.collector('dotenv').envs }, with_context = false) }}
+                  {% endif %}
+              </div>
+        </div>
+
         {% if profile.parent %}
         <div class="tab">
             <h3 class="tab-title">Parent Request</h3>

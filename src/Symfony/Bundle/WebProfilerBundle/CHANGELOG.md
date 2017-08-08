@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added a pane with envs loaded by the Dotenv component
  * Deprecated the `web_profiler.position` config option (in 4.0 version the toolbar
    will always be displayed at the bottom) and the `web_profiler.debug_toolbar.position`
    container parameter.

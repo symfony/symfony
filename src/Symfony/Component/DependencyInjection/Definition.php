@@ -250,6 +250,14 @@ class Definition
         return $this;
     }
 
+    /**
+     * Sets a specific argument.
+     *
+     * @param int|string $key
+     * @param mixed      $value
+     *
+     * @return $this
+     */
     public function setArgument($key, $value)
     {
         $this->arguments[$key] = $value;
@@ -778,7 +786,7 @@ class Definition
     }
 
     /**
-     * Sets autowired.
+     * Enables/disables autowiring.
      *
      * @param bool $autowired
      *

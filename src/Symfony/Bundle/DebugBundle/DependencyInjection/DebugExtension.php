@@ -48,6 +48,15 @@ class DebugExtension extends Extension
                 ->replaceArgument(4, new Reference('var_dumper.cli_dumper'))
             ;
         }
+
+        if ($config['server_dump']) {
+            $container->getDefinition('debug.dump_listener')
+                ->replaceArgument(1, new Reference('var_dumper.server_dumper'))
+            ;
+        } else {
+            $container->removeDefinition('var_dumper.server_dumper');
+            $container->removeDefinition('var_dumper.command.server_dump');
+        }
     }
 
     /**

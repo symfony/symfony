@@ -51,6 +51,11 @@ class Configuration implements ConfigurationInterface
                     ->example('php://stderr')
                     ->defaultNull()
                 ->end()
+                ->booleanNode('server_dump')
+                    ->info('Enables the server dumper allowing to send dump data clone to a centralized server')
+                    ->treatNullLike(true)
+                    ->defaultFalse()
+                ->end()
             ->end()
         ;
 

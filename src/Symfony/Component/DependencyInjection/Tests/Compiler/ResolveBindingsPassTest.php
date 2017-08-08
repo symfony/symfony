@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 class ResolveBindingsPassTest extends TestCase
 {
@@ -55,5 +56,27 @@ class ResolveBindingsPassTest extends TestCase
 
         $pass = new ResolveBindingsPass();
         $pass->process($container);
+    }
+
+    public function testTypedReferenceSupport()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = array(CaseSensitiveClass::class => new BoundArgument(new Reference('foo')));
+
+        // Explicit service id
+        $definition1 = $container->register('def1', NamedArgumentsDummy::class);
+        $definition1->addArgument($typedRef = new TypedReference('bar', CaseSensitiveClass::class));
+        $definition1->setBindings($bindings);
+
+        $definition2 = $container->register('def2', NamedArgumentsDummy::class);
+        $definition2->addArgument(new TypedReference(CaseSensitiveClass::class, CaseSensitiveClass::class));
+        $definition2->setBindings($bindings);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
+
+        $this->assertEquals(array($typedRef), $container->getDefinition('def1')->getArguments());
+        $this->assertEquals(array(new Reference('foo')), $container->getDefinition('def2')->getArguments());
     }
 }

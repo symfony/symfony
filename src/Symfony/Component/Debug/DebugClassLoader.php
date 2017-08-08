@@ -192,16 +192,17 @@ class DebugClassLoader
                 }
             }
 
+            $parentAndTraits = class_uses($name, false);
             if ($parent = get_parent_class($class)) {
+                $parentAndTraits[] = $parent;
+
                 if (isset(self::$final[$parent])) {
                     @trigger_error(sprintf('The "%s" class is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
                 }
             }
 
-            $parentAndTraits = ($parent ? array($parent => $parent) : array()) + class_uses($name, false);
-
             // Detect if the parent is annotated
-            foreach ($parentAndTraits + $this->getOwnInterfaces($name) as $use) {
+            foreach ($parentAndTraits + $this->getOwnInterfaces($name, $parent) as $use) {
                 if (isset(self::$deprecated[$use]) && strncmp($ns, $use, $len)) {
                     $type = class_exists($name, false) ? 'class' : (interface_exists($name, false) ? 'interface' : 'trait');
                     $verb = class_exists($use, false) || interface_exists($name, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
@@ -366,15 +367,16 @@ class DebugClassLoader
     /**
      * `class_implements` includes interfaces from the parents so we have to manually exclude them.
      *
-     * @param string $class
+     * @param string       $class
+     * @param string|false $parent
      *
      * @return string[]
      */
-    private function getOwnInterfaces($class)
+    private function getOwnInterfaces($class, $parent)
     {
         $ownInterfaces = class_implements($class, false);
 
-        if ($parent = get_parent_class($class)) {
+        if ($parent) {
             foreach (class_implements($parent, false) as $interface) {
                 unset($ownInterfaces[$interface]);
             }

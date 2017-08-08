@@ -14,7 +14,6 @@ CHANGELOG
    the same helpers as the `Controller` class, but does not allow accessing the dependency
    injection container, in order to encourage explicit dependency declarations.
  * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
- * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Changed default configuration for
    assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
    `canBeDisabled()` when Flex is used

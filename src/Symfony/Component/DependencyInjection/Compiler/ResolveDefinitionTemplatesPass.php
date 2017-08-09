@@ -100,6 +100,8 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setAutowired($parentDef->isAutowired());
         $def->setChanges($parentDef->getChanges());
 
+        $def->setBindings($parentDef->getBindings());
+
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
         if (isset($changes['class'])) {

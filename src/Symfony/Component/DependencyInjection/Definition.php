@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -40,6 +41,7 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $changes = array();
+    private $bindings = array();
 
     protected $arguments = array();
 
@@ -766,6 +768,40 @@ class Definition
         $this->changes['autowired'] = true;
 
         $this->autowired = (bool) $autowired;
+
+        return $this;
+    }
+
+    /**
+     * Gets bindings.
+     *
+     * @return array
+     */
+    public function getBindings()
+    {
+        return $this->bindings;
+    }
+
+    /**
+     * Sets bindings.
+     *
+     * Bindings map $named or FQCN arguments to values that should be
+     * injected in the matching parameters (of the constructor, of methods
+     * called and of controller actions).
+     *
+     * @param array $bindings
+     *
+     * @return $this
+     */
+    public function setBindings(array $bindings)
+    {
+        foreach ($bindings as $key => $binding) {
+            if (!$binding instanceof BoundArgument) {
+                $bindings[$key] = new BoundArgument($binding);
+            }
+        }
+
+        $this->bindings = $bindings;
 
         return $this;
     }

@@ -120,4 +120,12 @@ class ChildDefinition extends Definition
     {
         throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
     }
+
+    /**
+     * @internal
+     */
+    public function setBindings(array $bindings)
+    {
+        throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
+    }
 }

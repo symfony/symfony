@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -56,6 +57,7 @@ class YamlFileLoader extends FileLoader
         'decoration_priority' => 'decoration_priority',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'bind' => 'bind',
     );
 
     private static $prototypeKeywords = array(
@@ -75,6 +77,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'bind' => 'bind',
     );
 
     private static $instanceofKeywords = array(
@@ -93,6 +96,7 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'bind' => 'bind',
     );
 
     private $yamlParser;
@@ -258,33 +262,41 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::$defaultsKeywords)));
             }
         }
-        if (!isset($defaults['tags'])) {
-            return $defaults;
-        }
-        if (!is_array($tags = $defaults['tags'])) {
-            throw new InvalidArgumentException(sprintf('Parameter "tags" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
-        }
 
-        foreach ($tags as $tag) {
-            if (!is_array($tag)) {
-                $tag = array('name' => $tag);
+        if (isset($defaults['tags'])) {
+            if (!is_array($tags = $defaults['tags'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "tags" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
             }
 
-            if (!isset($tag['name'])) {
-                throw new InvalidArgumentException(sprintf('A "tags" entry in "_defaults" is missing a "name" key in %s.', $file));
-            }
-            $name = $tag['name'];
-            unset($tag['name']);
+            foreach ($tags as $tag) {
+                if (!is_array($tag)) {
+                    $tag = array('name' => $tag);
+                }
 
-            if (!is_string($name) || '' === $name) {
-                throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in %s.', $file));
-            }
+                if (!isset($tag['name'])) {
+                    throw new InvalidArgumentException(sprintf('A "tags" entry in "_defaults" is missing a "name" key in %s.', $file));
+                }
+                $name = $tag['name'];
+                unset($tag['name']);
 
-            foreach ($tag as $attribute => $value) {
-                if (!is_scalar($value) && null !== $value) {
-                    throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in %s. Check your YAML syntax.', $name, $attribute, $file));
+                if (!is_string($name) || '' === $name) {
+                    throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in %s.', $file));
+                }
+
+                foreach ($tag as $attribute => $value) {
+                    if (!is_scalar($value) && null !== $value) {
+                        throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in %s. Check your YAML syntax.', $name, $attribute, $file));
+                    }
                 }
             }
+        }
+
+        if (isset($defaults['bind'])) {
+            if (!is_array($defaults['bind'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "bind" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
+            }
+
+            $defaults['bind'] = array_map(function ($v) { return new BoundArgument($v); }, $this->resolveServices($defaults['bind'], $file));
         }
 
         return $defaults;
@@ -368,6 +380,9 @@ class YamlFileLoader extends FileLoader
                     // since tags are never inherited from parents, there is no confusion
                     // thus we can safely add them as defaults to ChildDefinition
                     continue;
+                }
+                if ('bind' === $k) {
+                    throw new InvalidArgumentException(sprintf('Attribute "bind" on service "%s" cannot be inherited from "_defaults" when a "parent" is set. Move your child definitions to a separate file.', $id));
                 }
                 if (!isset($service[$k])) {
                     throw new InvalidArgumentException(sprintf('Attribute "%s" on service "%s" cannot be inherited from "_defaults" when a "parent" is set. Move your child definitions to a separate file or define this attribute explicitly.', $k, $id));
@@ -502,6 +517,21 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['autowire'])) {
             $definition->setAutowired($service['autowire']);
+        }
+
+        if (isset($defaults['bind']) || isset($service['bind'])) {
+            // deep clone, to avoid multiple process of the same instance in the passes
+            $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : array();
+
+            if (isset($service['bind'])) {
+                if (!is_array($service['bind'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "bind" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                }
+
+                $bindings = array_merge($bindings, $this->resolveServices($service['bind'], $file));
+            }
+
+            $definition->setBindings($bindings);
         }
 
         if (isset($service['autoconfigure'])) {

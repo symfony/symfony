@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added support for `EventSubscriberInterface` on `MicroKernelTrait`
  * Removed `doctrine/cache` from the list of required dependencies in `composer.json`
  * Deprecated `validator.mapping.cache.doctrine.apc` service
  * The `symfony/stopwatch` dependency has been removed, require it via `composer

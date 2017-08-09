@@ -26,10 +26,6 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
     protected $validators = array();
 
-    public function __construct()
-    {
-    }
-
     /**
      * {@inheritdoc}
      */

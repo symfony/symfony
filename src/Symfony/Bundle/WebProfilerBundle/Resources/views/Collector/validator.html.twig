@@ -6,7 +6,7 @@
         {% set icon %}
             {{ include('@WebProfiler/Icon/validator.svg') }}
             <span class="sf-toolbar-value">
-                {{ collector.violationsCount }}
+                {{ collector.violationsCount ?: collector.calls|length }}
             </span>
         {% endset %}
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-08-09T09:21:44Z
+
+why is it done only in master ? In 3.4, you switched from a full hash to a truncated hash. So this is the place where your change should be merged.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-09T09:27:50Z
+
+targeted

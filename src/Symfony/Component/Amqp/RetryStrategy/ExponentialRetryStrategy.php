@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Amqp\RetryStrategy;
 
+use Interop\Amqp\AmqpMessage;
+
 /**
  * The retry mechanism is based on a truncated exponential backoff algorithm.
  *
@@ -35,13 +37,13 @@ class ExponentialRetryStrategy implements RetryStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function isRetryable(\AMQPEnvelope $msg)
+    public function isRetryable(AmqpMessage $msg)
     {
         if (0 === $this->max) {
             return true;
         }
 
-        $retries = (int) $msg->getHeader('retries');
+        $retries = (int) $msg->getProperty('retries', 0);
 
         return $retries < $this->max;
     }
@@ -49,9 +51,9 @@ class ExponentialRetryStrategy implements RetryStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getWaitingTime(\AMQPEnvelope $msg)
+    public function getWaitingTime(AmqpMessage $msg)
     {
-        $retries = (int) $msg->getHeader('retries');
+        $retries = (int) $msg->getProperty('retries', 0);
 
         return pow(2, $retries + $this->offset);
     }

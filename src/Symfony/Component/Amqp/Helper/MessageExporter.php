@@ -62,9 +62,9 @@ class MessageExporter
         $phar = new \PharData($filename);
         foreach ($messages as $i => $message) {
             if ($ack) {
-                $this->broker->ack($message, null, $queueName);
+                $this->broker->ack($message, $queueName);
             } else {
-                $this->broker->nack($message, \AMQP_REQUEUE, $queueName);
+                $this->broker->nack($message, $queueName);
             }
             $buffer = '';
             foreach ($message->getHeaders() as $name => $value) {

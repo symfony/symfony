@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Amqp;
 
+use Enqueue\AmqpTools\DelayStrategyAware;
+use Enqueue\AmqpTools\RabbitMqDlxDelayStrategy;
 use Interop\Amqp\AmqpConsumer;
 use Interop\Amqp\AmqpContext;
 use Interop\Amqp\AmqpTopic;
@@ -394,7 +396,16 @@ class Broker
         $amqpMessage->setRoutingKey($routingKey);
         $amqpMessage->setDeliveryMode(AmqpMessage::DELIVERY_MODE_PERSISTENT);
 
-        $this->context->createProducer()->send($topic, $amqpMessage);
+        $producer = $this->context->createProducer();
+
+        if (isset($attributes['delay']) && $producer instanceof DelayStrategyAware) {
+            $producer
+                ->setDelayStrategy(new RabbitMqDlxDelayStrategy())
+                ->setDeliveryDelay($attributes['delay'] * 1000)
+            ;
+        }
+
+        $producer->send($topic, $amqpMessage);
 
         return true;
     }
@@ -417,13 +428,7 @@ class Broker
      */
     public function delay($routingKey, $message, $delay, array $attributes = array())
     {
-        $exchangeName = isset($attributes['exchange']) ? $attributes['exchange'] : self::DEFAULT_EXCHANGE;
-
-        $this->createDelayedQueue($routingKey, $delay, $exchangeName);
-
-        $attributes['exchange'] = self::DEAD_LETTER_EXCHANGE;
-        $attributes['headers']['queue-time'] = (string) $delay;
-        $attributes['headers']['exchange'] = (string) $exchangeName;
+        $attributes['delay'] = $delay;
 
         return $this->publish($routingKey, $message, $attributes);
     }
@@ -496,11 +501,11 @@ class Broker
      *
      * @return bool
      */
-    public function nack(AmqpMessage $message, $queueName = null)
+    public function nack(AmqpMessage $message, $queueName = null, $requeue = false)
     {
         $queueName = $queueName ?: $message->getRoutingKey();
 
-        $this->getQueueConsumer($queueName)->reject($message, false);
+        $this->getQueueConsumer($queueName)->reject($message, $requeue);
     }
 
     /**

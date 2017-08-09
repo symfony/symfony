@@ -23,10 +23,12 @@
         "php": ">=5.5.9",
         "psr/log": "~1.0",
         "symfony/event-dispatcher": "^2.3|^3.0|^4.0",
-        "queue-interop/amqp-interop": "*@dev"
+        "queue-interop/amqp-interop": "^0.6",
+        "enqueue/amqp-tools": "^0.7"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^3.3"
+        "symfony/phpunit-bridge": "^3.3",
+        "enqueue/amqp-bunny": "^0.7"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Amqp\\": "" },

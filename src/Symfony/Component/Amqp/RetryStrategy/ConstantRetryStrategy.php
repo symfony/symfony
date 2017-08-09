@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Amqp\RetryStrategy;
 
+use Interop\Amqp\AmqpMessage;
 use Symfony\Component\Amqp\Exception\InvalidArgumentException;
 
 /**
@@ -41,9 +42,9 @@ class ConstantRetryStrategy implements RetryStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function isRetryable(\AMQPEnvelope $msg)
+    public function isRetryable(AmqpMessage $msg)
     {
-        $retries = (int) $msg->getHeader('retries');
+        $retries = (int) $msg->getProperty('retries');
 
         return $this->max ? $retries < $this->max : true;
     }
@@ -51,7 +52,7 @@ class ConstantRetryStrategy implements RetryStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getWaitingTime(\AMQPEnvelope $msg)
+    public function getWaitingTime(AmqpMessage $msg)
     {
         return $this->time;
     }

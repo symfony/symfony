@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Worker\MessageFetcher;
 
+use Interop\Amqp\AmqpConsumer;
 use Symfony\Component\Amqp\Broker;
 use Symfony\Component\Worker\MessageCollection;
 
@@ -27,7 +28,7 @@ class AmqpMessageFetcher implements MessageFetcherInterface
     {
         $this->broker = $broker;
         $this->queueName = $queueName;
-        $this->flags = $autoAck ? \AMQP_AUTOACK : \AMQP_NOPARAM;
+        $this->flags = $autoAck ? AmqpConsumer::FLAG_NOACK : AmqpConsumer::FLAG_NOPARAM;
     }
 
     public function fetchMessages()

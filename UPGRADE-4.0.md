@@ -453,7 +453,7 @@ HttpKernel
 ----------
 
  * Relying on convention-based commands discovery is not supported anymore.
-   Use PSR-4 based Service Discovery instead.
+   Use PSR-4 based service discovery instead.
 
    Before:
 
@@ -462,7 +462,7 @@ HttpKernel
    services:
        # ...
 
-       # implicit commands registration
+       # implicit registration of all commands in the `Command` folder
    ```
 
    After:

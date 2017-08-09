@@ -232,19 +232,28 @@ class DebugClassLoader
                     continue;
                 }
 
+                // Method from a trait
+                if ($method->getFilename() !== $refl->getFileName()) {
+                    continue;
+                }
+
                 if ($isClass && $parent && isset(self::$finalMethods[$parent][$method->name])) {
-                    list($methodShortName, $message) = self::$finalMethods[$parent][$method->name];
-                    @trigger_error(sprintf('The "%s" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $methodShortName, $message, $name), E_USER_DEPRECATED);
+                    list($declaringClass, $message) = self::$finalMethods[$parent][$method->name];
+                    @trigger_error(sprintf('The "%s::%s()" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
                 }
 
                 foreach ($parentAndTraits as $use) {
-                    if (isset(self::$deprecatedMethods[$use][$method->name]) && strncmp($ns, $use, $len)) {
-                        list($methodShortName, $message) = self::$deprecatedMethods[$use][$method->name];
-                        @trigger_error(sprintf('The "%s" method is deprecated%s. You should not extend it from "%s".', $methodShortName, $message, $name), E_USER_DEPRECATED);
+                    if (isset(self::$deprecatedMethods[$use][$method->name])) {
+                        list($declaringClass, $message) = self::$deprecatedMethods[$use][$method->name];
+                        if (strncmp($ns, $declaringClass, $len)) {
+                            @trigger_error(sprintf('The "%s::%s()" method is deprecated%s. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
+                        }
                     }
-                    if (isset(self::$internalMethods[$use][$method->name]) && strncmp($ns, $use, $len)) {
-                        list($methodShortName, $message) = self::$internalMethods[$use][$method->name];
-                        @trigger_error(sprintf('The "%s" method is considered internal%s. It may change without further notice. You should not use it from "%s".', $methodShortName, $message, $name), E_USER_DEPRECATED);
+                    if (isset(self::$internalMethods[$use][$method->name])) {
+                        list($declaringClass, $message) = self::$internalMethods[$use][$method->name];
+                        if (strncmp($ns, $declaringClass, $len)) {
+                            @trigger_error(sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
+                        }
                     }
                 }
 
@@ -256,7 +265,7 @@ class DebugClassLoader
                 foreach (array('final', 'deprecated', 'internal') as $annotation) {
                     if (false !== strpos($doc, '@'.$annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
                         $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-                        self::${$annotation.'Methods'}[$name][$method->name] = array(sprintf('%s::%s()', $name, $method->name), $message);
+                        self::${$annotation.'Methods'}[$name][$method->name] = array($name, $message);
                     }
                 }
             }

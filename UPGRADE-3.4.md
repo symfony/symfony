@@ -127,7 +127,7 @@ HttpKernel
    services:
        # ...
 
-       # implicit commands registration
+       # implicit registration of all commands in the `Command` folder
    ```
 
    After:

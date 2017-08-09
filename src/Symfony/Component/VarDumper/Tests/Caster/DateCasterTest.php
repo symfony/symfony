@@ -27,7 +27,7 @@ class DateCasterTest extends TestCase
     /**
      * @dataProvider provideDateTimes
      */
-    public function testDumpDateTime($time, $timezone, $expected)
+    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp)
     {
         if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
             $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
@@ -36,37 +36,40 @@ class DateCasterTest extends TestCase
         $date = new \DateTime($time, new \DateTimeZone($timezone));
 
         $xDump = <<<EODUMP
-DateTime @1493503200 {
-  date: $expected
+DateTime @$xTimestamp {
+  date: $xDate
 }
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $date);
+        $this->assertDumpEquals($xDump, $date);
     }
 
-    public function testCastDateTime()
+    /**
+     * @dataProvider provideDateTimes
+     */
+    public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
+        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
+            $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
+        }
+
         $stub = new Stub();
-        $date = new \DateTime('2017-08-30 00:00:00.000000', new \DateTimeZone('Europe/Zurich'));
+        $date = new \DateTime($time, new \DateTimeZone($timezone));
         $cast = DateCaster::castDateTime($date, array('foo' => 'bar'), $stub, false, 0);
 
-        $xDump = <<<'EODUMP'
+        $xDump = <<<EODUMP
 array:1 [
-  "\x00~\x00date" => 2017-08-30 00:00:00.0 Europe/Zurich (+02:00)
+  "\\x00~\\x00date" => $xDate
 ]
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $cast);
+        $this->assertDumpEquals($xDump, $cast);
 
-        $xDump = <<<'EODUMP'
+        $xDump = <<<EODUMP
 Symfony\Component\VarDumper\Caster\ConstStub {
   +type: 1
-  +class: "2017-08-30 00:00:00.0 Europe/Zurich (+02:00)"
-  +value: """
-    Wednesday, August 30, 2017\n
-    +%a from now\n
-    DST On
-    """
+  +class: "$xDate"
+  +value: "%A$xInfos%A"
   +cut: 0
   +handle: 0
   +refCount: 0
@@ -81,15 +84,16 @@ EODUMP;
     public function provideDateTimes()
     {
         return array(
-            array('2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)'),
-            array('2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00'),
+            array('2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'),
+            array('2017-12-31 00:00:00.000000', 'Europe/Zurich', '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)', 1514674800, 'Sunday, December 31, 2017%Afrom now%ADST Off'),
+            array('2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00', 1493503200, 'Sunday, April 30, 2017%Afrom now'),
 
-            array('2017-04-30 00:00:00.100000', '+02:00', '2017-04-30 00:00:00.100 +02:00'),
-            array('2017-04-30 00:00:00.120000', '+02:00', '2017-04-30 00:00:00.120 +02:00'),
-            array('2017-04-30 00:00:00.123000', '+02:00', '2017-04-30 00:00:00.123 +02:00'),
-            array('2017-04-30 00:00:00.123400', '+02:00', '2017-04-30 00:00:00.123400 +02:00'),
-            array('2017-04-30 00:00:00.123450', '+02:00', '2017-04-30 00:00:00.123450 +02:00'),
-            array('2017-04-30 00:00:00.123456', '+02:00', '2017-04-30 00:00:00.123456 +02:00'),
+            array('2017-04-30 00:00:00.100000', '+00:00', '2017-04-30 00:00:00.100 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
+            array('2017-04-30 00:00:00.120000', '+00:00', '2017-04-30 00:00:00.120 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
+            array('2017-04-30 00:00:00.123000', '+00:00', '2017-04-30 00:00:00.123 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
+            array('2017-04-30 00:00:00.123400', '+00:00', '2017-04-30 00:00:00.123400 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
+            array('2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
+            array('2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
         );
     }
 
@@ -124,7 +128,7 @@ DateInterval {
 }
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $interval, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals($xDump, $interval, Caster::EXCLUDE_VERBOSE);
     }
 
     /**
@@ -144,7 +148,7 @@ array:1 [
 ]
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $cast);
+        $this->assertDumpEquals($xDump, $cast);
 
         if (null === $xSeconds) {
             return;
@@ -163,7 +167,7 @@ Symfony\Component\VarDumper\Caster\ConstStub {
 }
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $cast["\0~\0interval"]);
+        $this->assertDumpEquals($xDump, $cast["\0~\0interval"]);
     }
 
     public function provideIntervals()
@@ -229,7 +233,7 @@ DateTimeZone {
 }
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $timezone, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals($xDump, $timezone, Caster::EXCLUDE_VERBOSE);
     }
 
     /**
@@ -252,7 +256,7 @@ array:1 [
 ]
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $cast);
+        $this->assertDumpEquals($xDump, $cast);
 
         $xDump = <<<EODUMP
 Symfony\Component\VarDumper\Caster\ConstStub {

@@ -27,7 +27,7 @@ class DateCaster
         $fromNow = (new \DateTime())->diff($d);
 
         $title = $d->format('l, F j, Y')
-            ."\n".$fromNow->format('%R').self::formatInterval($fromNow).' from now'
+            ."\n".self::formatInterval($fromNow).' from now'
             .($location ? ($d->format('I') ? "\nDST On" : "\nDST Off") : '')
         ;
 

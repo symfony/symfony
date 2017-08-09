@@ -1,0 +1,324 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-03-28T17:27:32Z
+
+@nicolas-grekas thanks for you comments, they should all be fixed now :smiley:
+
+---------------------------------------------------------------------------
+
+by lunetics at 2017-03-30T01:36:54Z
+
++1, how much is left to do? can't await it!
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-03-30T05:05:53Z
+
+For me it's ready.
+Maybe we can do something about https://github.com/symfony/symfony/pull/22187#discussion_r108519905 but I don't see how to improve this part of the code for now.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-04-01T20:12:02Z
+
+>  can you look at descriptors also please?
+
+As for named arguments the updated arguments are shown by the descriptors, so I agree with you, I don't think we need to support the bindings in the descriptors.
+
+> to help spot typos in named args, what about keeping a pass-wide property of all named args and their usages, and throw for unused ones at the end of the pass?
+
+I found a way to throw an error when a binding is used nowhere so no need to do this anymore.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-04-05T17:51:00Z
+
+In case it can convince people, this could be used to have services truly private, not even injectable in third party code:
+```yml
+services:
+    _defaults:
+        bind:
+            Vendor\BarInterface: !service { class: Vendor\Bar }
+
+     Vendor\Foo: ~ # public service needing BarInterface
+```
+
+This could also be used safely in third party bundles as it does not depend on the app configuration (whereas autowiring).
+
+Also when you use autowiring and you want to use a different implementation than the default one:
+```yml
+services:
+    _defaults:
+        autowire: true
+        bind:
+            Symfony\Component\Translation\TranslatorInterface: "@app.my_translator"
+
+     App\Foo: ~
+```
+
+This can be used with or without autowiring.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-11T17:24:31Z
+
+I'm not convinced we need that.
+
+At some point, falling back to explicit wiring is a better option. Trying to cover all cases with abstract configuration makes configuration look awful and code more complex than needed.
+
+When reading the config for the first, it looks like random keywords assembled in a YAML snippet.
+
+Let's see how people are using the features already introduced in 3.3 first. And let's discuss further "improvements/changes" for 3.4.
+
+---------------------------------------------------------------------------
+
+by lunetics at 2017-04-11T17:57:20Z
+
+Imho it is often practical to have local bindings.
+
+Example use case : Using a Messagebus (interface) implementation. We have
+an eventbus, commandbus and querybus implementation. We can now easily have
+a controller (yaml) configuration, which binds the commandbus. One
+configuration for the eventbus etc.
+
+Now, using interfaces in constructors currently allows us to bind one!
+Concrete implementation to an Interface (via alias), which is also global.
+
+This means when my messagebus Interface is aliased to the commandbus
+implementation, I have to make explicit and imho unneeded configuration for
+the event and querybus.
+
+So in my opinion it is almost required for having auto wiring and code with
+interfaces.
+
+Am 11.04.2017 7:25 nachm. schrieb "Fabien Potencier" <
+notifications@github.com>:
+
+> I'm not convinced we need that.
+>
+> At some point, falling back to explicit wiring is a better option. Trying
+> to cover all cases with abstract configuration makes configuration look
+> awful and code more complex than needed.
+>
+> When reading the config for the first, it looks like random keywords
+> assembled in a YAML snippet.
+>
+> Let's see how people are using the features already introduced in 3.3
+> first. And let's discuss further "improvements/changes" for 3.4.
+>
+> —
+> You are receiving this because you are subscribed to this thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/22187#issuecomment-293336139>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAJI-I9zJn2k7s0kvlK59kDAjYEQeojGks5ru7dvgaJpZM4MqpAr>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-04-11T18:33:45Z
+
+@fabpot bindings solves problems that can't be solved using autowiring and is far more convenient than manual wiring, an example is [in the demo](https://github.com/symfony/symfony-demo/pull/483/files#diff-1728bfc1c274f341afc1a0275fca694dR115) with scalar arguments in an autowired prototype, bindings would allow to simplify its file using:
+```yml
+services:
+    AppBundle\:
+        # Register all classes in the src/AppBundle directory as services
+        resource: '../../src/AppBundle/{EventListener,Form/Type,Security,Twig,Utils}'
+        bind:
+            $locales: '%app_locales%'
+            $sender: '%app.notifications.email_sender%'
+```
+
+Being able to define arguments for an entire file while they can be used only in some services, in other words, optional arguments is one of the major goal, which is not doable at all currently.
+
+This is not only meant to solve autowiring conflicts, it's also pretty useful used alone.
+
+---------------------------------------------------------------------------
+
+by simensen at 2017-04-24T19:05:23Z
+
+I think this solution looks interesting and I think it is something that makes autowiring more feasible. We can use `alias` to bind a specific implementation to an interface. Without contextual binding of somesort, you'll no longer be able to use autowiring *at all* (as far as I can tell) the instant you end up with more than one implementation of a given interface added to the container.
+
+(I may be oversimplifying things here, but I think this is mostly accurate?)
+
+![](http://d.pr/i/ymWv+)
+
+---------------------------------------------------------------------------
+
+by lunetics at 2017-04-24T19:31:52Z
+
+@simensen exactly, currently you are bound to one! concrete implementation (via alias, which in addition is container-wide).
+
+Local binding is config-file wise (as explained before)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-24T20:33:44Z
+
+Rebased and green.
+
+---------------------------------------------------------------------------
+
+by simensen at 2017-04-25T18:27:13Z
+
+I'd also like to point out that this isn't *just* for cases where you are defining an implementation of an abstract class or interface. It is also for the case where the same class might be configured multiple ways. So although the simple interface binding might not be required, this really is required if you want to have different instances of the same class used differently.
+
+![](http://d.pr/i/Y6N6+)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-25T18:46:37Z
+
+PR updated to use "bind" instead of "bindings" in Yaml and Xml definitions (as discussed with @weaverryan offline)
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-04-25T19:12:06Z
+
+> PR updated to use "bind" instead of "bindings" in Yaml and Xml definitions (as discussed with @weaverryan offline)
+
+I asked @nicolas-grekas to understand this choice and here are the reasons: `bind` is a verb/an action which is more consistent with `autowire`, `autoconfigure`.
+`bind` is also more usual in programming `\Closure::bind()`, `object.bind()`, ... so it's easier to understand and remember for the user.
+
+---------------------------------------------------------------------------
+
+by lunetics at 2017-04-25T19:31:29Z
+
+I wish for 3.3 :pray:
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-05-05T18:21:00Z
+
+Rebased on master: bound arguments aren't allowed anymore on child definitions to be consistent with https://github.com/symfony/symfony/pull/22563.
+
+`TypedReference` are now supported, bindings can be used for service subscribers.
+However, I had to make a specific implementation to support bindings in controller arguments, but it provides a real benefit:
+```yml
+services:
+    AppBundle\Controller\LuckyController:
+        tags: [controller.service_arguments]
+        bind:
+            $logger: @monolog.logger.doctrine
+
+    # instead of
+    AppBundle\Controller\LuckyController:
+        tags:
+            - name: controller.service_arguments
+              action: numberAction
+              argument: logger
+              id: monolog.logger.doctrine
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-07-23T11:21:40Z
+
+@nicolas-grekas I just fixed your comments, thanks for the review!
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-07-24T09:15:18Z
+
+The build failure is because this is not yet in master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-31T07:30:13Z
+
+this PR description could be enhanced to emphasis the use of mapping arguments to parameters, because that's a common need, see #23718
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-31T07:30:45Z
+
+Can we improve the DX of this feature? If [this comment](https://github.com/symfony/symfony/issues/23718#issuecomment-318910628) by @GuilhemN is correct, this is how the feature works now:
+
+```yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+        bind:
+            $argument1: '%kernel.project_dir%'
+            $argument2: '%app.container_param%'
+            $argument3: '%app.another_param%'
+
+    # ...
+```
+
+This is my proposal:
+
+```yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        arguments:
+            $argument1: '%kernel.project_dir%'
+            $argument2: '%app.container_param%'
+            $argument3: '%app.another_param%'
+
+    # ...
+```
+
+My reasoning:
+
+* This feature is about defining the default value of scalar arguments, so "_defaults.arguments" sounds natural.
+* We wouldn't introduce yet another config option ("bind").
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-07-31T07:45:16Z
+
+> ```yml
+> services:
+>     _defaults:
+>         autowire: true
+>         autoconfigure: true
+>         public: false
+>
+>     bind:
+>         $argument1: '%kernel.project_dir%'
+>         $argument2: '%app.container_param%'
+>         $argument3: '%app.another_param%'
+>
+>     # ...
+> ```
+
+`bind` is used under _defaults or in a service definition, it's not a special option.
+
+@javiereguiluz arguments are not the same, they can only be used in the constructor while bindings are meant to be used in the constructor, method calls and in action arguments.
+Bindings are also optional (no need to be used in all services) while arguments must be used in every service of the file/resource.
+
+> This feature is about defining the default value of scalar arguments, so "_defaults.arguments" sounds natural.
+
+That's just one use case :) It can also be used in libraries as a totally predictable autowiring, to deal with multiple instance of the same class, to have a nicer syntax to replace services in action arguments and so on.
+And as I said earlier `arguments` are far more limited, having a different behavior in _defaults for arguments would be weird.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-08T05:54:03Z
+
+@javiereguiluz here is a typical example:
+```yaml
+services:
+  _defaults:
+    bind:
+      $projectDir: '%kernel.project_dir%'
+```
+
+This means that any arguments (constructor or setter) that are named `$projectDir` for services defined *in the current file* will get the `kernel.project_dir` value, provided the services don't themselves explicitly set any other values of course.
+
+~~We could even put that specific line in the default flex config.~~ (no, because that would trigger an "unused binding" kind of exception, we preferred to ease spotting typos here)
+
+Do we get your vote? :)
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-08T08:49:33Z
+
+@nicolas-grekas comments fixed :)

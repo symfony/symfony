@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T12:32:48Z
+
+rebase unlocked - the same should also apply to internal methods, isn't it?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-07T12:35:32Z
+
+Yes, I'm on it.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-07T13:22:53Z
+
+rebased
+
+Edit: known issue, when you extend a method of an inherited trait, the deprecation will show the name of the class using the trait instead of the name of the trait itself. I didn't find a workaround but I think it's still better than no warning at all.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-07T17:37:25Z
+
+fabbot failure is a false-positive. Travis and appveyor failures are unrelated.

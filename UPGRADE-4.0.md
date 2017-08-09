@@ -452,6 +452,32 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Relying on convention-based commands discovery is not supported anymore.
+   Use PSR-4 based service discovery instead.
+
+   Before:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # implicit registration of all commands in the `Command` folder
+   ```
+
+   After:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # explicit commands registration
+       AppBundle\Command:
+           resource: '../../src/AppBundle/Command/*'
+           tags: ['console.command']
+   ```
+
  * Removed the `kernel.root_dir` parameter. Use the `kernel.project_dir` parameter
    instead.
 

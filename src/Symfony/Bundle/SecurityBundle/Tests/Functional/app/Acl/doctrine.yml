@@ -1,0 +1,5 @@
+# to be removed once https://github.com/doctrine/DoctrineBundle/pull/684 is merged
+services:
+    Doctrine\Bundle\DoctrineBundle\Command\:
+        resource: "@DoctrineBundle/Command/*"
+        tags: [console.command]

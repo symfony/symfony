@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
@@ -265,6 +266,34 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $this->assertEmpty(array_keys($locator));
+    }
+
+    /**
+     * @dataProvider provideBindings
+     */
+    public function testBindings($bindingName)
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', RegisterTestController::class)
+            ->setBindings(array($bindingName => new Reference('foo')))
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+
+        $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
+
+        $expected = array('bar' => new ServiceClosureArgument(new Reference('foo')));
+        $this->assertEquals($expected, $locator->getArgument(0));
+    }
+
+    public function provideBindings()
+    {
+        return array(array(ControllerDummy::class), array('$bar'));
     }
 }
 

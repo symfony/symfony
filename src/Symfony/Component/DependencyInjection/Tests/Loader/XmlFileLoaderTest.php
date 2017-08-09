@@ -22,6 +22,8 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -702,7 +704,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_named_args.xml');
 
-        $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
+        $this->assertEquals(array('$apiKey' => 'ABCD', CaseSensitiveClass::class => null), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
 
         $container->compile();
 
@@ -768,12 +770,38 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
         $this->assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
     }
-}
 
-interface BarInterface
-{
-}
+    public function testBindings()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_bindings.xml');
+        $container->compile();
 
-class Bar implements BarInterface
-{
+        $definition = $container->getDefinition('bar');
+        $this->assertEquals(array(
+            'NonExistent' => null,
+            BarInterface::class => new Reference(Bar::class),
+            '$foo' => array(null),
+            '$quz' => 'quz',
+            '$factory' => 'factory',
+        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+        $this->assertEquals(array(
+            'quz',
+            null,
+            new Reference(Bar::class),
+            array(null),
+        ), $definition->getArguments());
+
+        $definition = $container->getDefinition(Bar::class);
+        $this->assertEquals(array(
+            null,
+            'factory',
+        ), $definition->getArguments());
+        $this->assertEquals(array(
+            'NonExistent' => null,
+            '$quz' => 'quz',
+            '$factory' => 'factory',
+        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+    }
 }

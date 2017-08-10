@@ -118,6 +118,14 @@ class YamlDumper extends Dumper
             $code .= sprintf("        autowiring_types:\n%s", $autowiringTypesCode);
         }
 
+        if ($definition->isAutoconfigured()) {
+            $code .= "        autoconfigure: true\n";
+        }
+
+        if ($definition->isAbstract()) {
+            $code .= "        abstract: true\n";
+        }
+
         if ($definition->isLazy()) {
             $code .= "        lazy: true\n";
         }

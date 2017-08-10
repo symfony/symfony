@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-09T11:37:06Z
+
+do we care some commands could not be registered while running another command? When running the actual command i think 1 red block (the middle) is fine =/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-09T11:52:32Z
+
+~~I agree with @ro0NL about the "1 red block is enough". We could just list the command that fail to be loaded, and not display the corresponding exception. But then, when that failing command is run, we should display the exception of course. WDYT?~~
+
+unapplicable as the failure prevents knowing the name of the command
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-09T12:26:08Z
+
+Maybe simple and effective; just render all registration exceptions and abort the run. It's an invalid state and currently already crashes. Not sure tracking command<>exception is worth it in effort to run another valid command (this is new behavior ;-)).
+
+edit: omg.. this day :) it's feature request not a bugfix :) my bad. Still not sure about it though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-09T12:32:34Z
+
+> worth it in effort to run another valid command
+
+that's exactly what this PR tries to fix: running `cache:clear` while some other commands are broken. So YES, it's worth the effort :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-09T12:41:05Z
+
+You're right. i went over the related issue way to fast.
+
+But im not sure if linking exceptions from auto-discovery with command names is worth it, especially since thats going to be deprecated.
+
+Also warnings being red bites.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-09T12:53:21Z
+
+> do we care some commands could not be registered while running another command?
+
+we don't know what command failed since we don't have their names before they are successfully booted, so we have to display the warning + errors when running any valid command.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-09T15:15:22Z
+
+PR updated, first exception replaced by a warning.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-09T16:39:38Z
+
+(updated to make use of stderr when available)

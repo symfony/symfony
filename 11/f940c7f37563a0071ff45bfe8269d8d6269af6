@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-02T08:58:50Z
+
+Tag values are always strings as they are not evaluated, I don't think this change makes sense.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-02T10:47:18Z
+
+> Tag values are always strings as they are not evaluated, I don't think this change makes sense.
+
+I didn't find anything in the specs that forbids having a tag without a value. Did I miss anything?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-02T10:58:58Z
+
+at least http://yaml-online-parser.appspot.com/ forbids it
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-02T11:30:13Z
+
+http://yaml-online-parser.appspot.com/ is buggy then :)
+
+> I didn't find anything in the specs that forbids having a tag without a value. Did I miss anything?
+
+Having a tag without a value is allowed, I'm just saying the value is not `null` then but `""`.
+
+Edit: the only thing we should change is forbidding indicators in a tag name.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-03T08:51:37Z
+
+OK, it's not buggy, it's that a space is required after the tag, and then it resolves to the empty string yes.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-03T08:55:48Z
+
+@nicolas-grekas the reference is http://ben-kiki.org/ypaste/data/497/index.html :)
+
+`}` is forbidden in tag names so the parser should properly know that the tag is ended and should not need a space.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-03T09:22:40Z
+
+tags without values are now getting parsed as empty strings (their values are parsed as empty strings)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-04T07:55:41Z
+
+Let's wait here until we have merged #22913 so we can indeed forbid indicator characters in tags (as written in https://github.com/symfony/symfony/pull/23757#discussion_r130824148). Currently, we cannot do that because we would then break parsing the `!php/object` tag.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-06T08:53:59Z
+
+https://github.com/symfony/symfony/pull/22913 and https://github.com/symfony/symfony/pull/23790 have been merged :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-07T11:01:02Z
+
+rebased and ready

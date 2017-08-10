@@ -25,6 +25,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleInterfaceImplementation()
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
@@ -35,6 +39,10 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(array('list')), new NullOutput());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleCommandsAreRegistered()
     {
         $bundle = $this->createBundleMock(array());
@@ -48,6 +56,10 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(array('list')), new NullOutput());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleCommandsAreRetrievable()
     {
         $bundle = $this->createBundleMock(array());
@@ -61,6 +73,10 @@ class ApplicationTest extends TestCase
         $application->all();
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleSingleCommandIsRetrievable()
     {
         $command = new Command('example');
@@ -74,6 +90,10 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->get('example'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleCommandCanBeFound()
     {
         $command = new Command('example');
@@ -87,6 +107,10 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('example'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleCommandCanBeFoundByAlias()
     {
         $command = new Command('example');
@@ -101,6 +125,10 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleCommandsHaveRightContainer()
     {
         $command = $this->getMockForAbstractClass('Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand', array('foo'), '', true, true, true, array('setContainer'));
@@ -120,6 +148,10 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
     {
         $command = new Command('example');
@@ -138,19 +170,18 @@ class ApplicationTest extends TestCase
     public function testRunOnlyWarnsOnUnregistrableCommand()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class, FineCommand::class => FineCommand::class));
         $container->register('event_dispatcher', EventDispatcher::class);
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
-        $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class));
+        $container->register(FineCommand::class, FineCommand::class);
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel
-            ->method('getBundles')
-            ->willReturn(array($this->createBundleMock(
-                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
-            )));
-        $kernel
             ->method('getContainer')
             ->willReturn($container);
+        $kernel
+            ->method('getBundles')
+            ->willReturn(array());
 
         $application = new Application($kernel);
         $application->setAutoExit(false);
@@ -230,5 +261,18 @@ class ThrowingCommand extends Command
     public function __construct()
     {
         throw new \Exception('throwing');
+    }
+}
+
+class FineCommand extends Command
+{
+    public function __construct()
+    {
+        parent::__construct('fine');
+    }
+
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('fine');
     }
 }

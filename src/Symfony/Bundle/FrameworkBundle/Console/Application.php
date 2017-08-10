@@ -159,7 +159,7 @@ class Application extends BaseApplication
         foreach ($this->kernel->getBundles() as $bundle) {
             if ($bundle instanceof Bundle) {
                 try {
-                    $bundle->registerCommands($this);
+                    $bundle->registerCommands($this, false);
                 } catch (\Exception $e) {
                     $this->registrationErrors[] = $e;
                 } catch (\Throwable $e) {

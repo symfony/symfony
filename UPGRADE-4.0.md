@@ -513,6 +513,9 @@ HttpKernel
    by Symfony. Use the `%env()%` syntax to get the value of any environment
    variable from configuration files instead.
 
+ * The `Bundle::registerCommands()` method has been deprecated and will
+   be removed in 4.0. Register commands as services instead.
+
 Ldap
 ----
 

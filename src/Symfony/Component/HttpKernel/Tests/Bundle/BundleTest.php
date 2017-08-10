@@ -42,7 +42,7 @@ class BundleTest extends TestCase
         $app->expects($this->once())->method('add')->with($this->equalTo($cmd));
 
         $bundle = new ExtensionPresentBundle();
-        $bundle->registerCommands($app);
+        $bundle->registerCommands($app, false);
 
         $bundle2 = new ExtensionAbsentBundle();
 
@@ -59,6 +59,10 @@ class BundleTest extends TestCase
         $bundle->getContainerExtension();
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.
+     */
     public function testHttpKernelRegisterCommandsIgnoresCommandsThatAreRegisteredAsServices()
     {
         $container = new ContainerBuilder();

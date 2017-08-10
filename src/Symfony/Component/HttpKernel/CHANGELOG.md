@@ -7,6 +7,7 @@ CHANGELOG
  * deprecated commands auto registration
  * added `AddCacheClearerPass`
  * added `AddCacheWarmerPass`
+ * deprecated `Bundle::registerCommands()`
 
 3.3.0
 -----

@@ -45,10 +45,6 @@ EODUMP;
      */
     public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
-        if ((defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) && preg_match('/[-+]\d{2}:\d{2}/', $timezone)) {
-            $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
-        }
-
         $stub = new Stub();
         $date = new \DateTime($time, new \DateTimeZone($timezone));
         $cast = DateCaster::castDateTime($date, array('foo' => 'bar'), $stub, false, 0);

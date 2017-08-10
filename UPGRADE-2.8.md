@@ -546,11 +546,11 @@ Security
 
  * The `VoterInterface::supportsClass` and `supportsAttribute` methods were
    deprecated and will be removed from the interface in 3.0.
-   
- * The the `key` setting of `anonymous`, `remember_me` and `http_digest`
-   is deprecated, and will be removed in 3.0.  Use `secret` instead.
-   
-    Before:
+
+ * The `key` setting of `anonymous`, `remember_me` and `http_digest` is
+   deprecated, and will be removed in 3.0. Use `secret` instead.
+
+   Before:
 
    ```yaml
    security:

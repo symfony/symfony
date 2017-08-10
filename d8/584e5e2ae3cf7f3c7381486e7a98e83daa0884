@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-10T07:11:01Z
+
+Is it really useful to know the number of validator calls? How does it help?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-10T08:03:57Z
+
+It shows something went on if no violation occurred.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-10T08:51:47Z
+
+> Is it really useful to know the number of validator calls? How does it help?
+
+The number usually isn't much important right. Having only the icon might be enough actually:
+
+<img width="870" alt="screenshot 2017-08-10 a 10 42 58" src="https://user-images.githubusercontent.com/2211145/29162113-baf0d212-7db8-11e7-984c-cc8c1bfcf182.PNG">
+
+But all other items have values, which makes it a bit weird.
+
+Displaying the number of violations when everything went fine means displaying `0` which is always a bit misleading on what happened at first sight. So, to me, in order to acknowledge validation calls were properly made as expected on a given request, either we should display the icon without associated value, either with the number of calls.
+
+Despite the arguments above, I recognize this is highly subjective but was my feeling after using it a bit more and being used to the form toolbar item behavior.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-10T09:00:31Z
+
+The icon without a number looks confusing and out of place. I think that the proposed behavior is consistent with other panels (translation, logger, form, database):
+
+* No errors and no calls: don't display the panel.
+* Calls but no errors: show the num. of calls.
+* Calls and errors: show the num. of errors.

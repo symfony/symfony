@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-10T07:46:07Z
+
+Can you expand the fixtures to make use of such an annotation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-10T07:58:02Z
+
+Are our tests broken because of this bug in phpdocumentor? If yes, we should merge (but a component's composer.json should be patched also, isn't it?), if not, it's not our job to provide an exclusion list to me.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-10T08:02:07Z
+
+@nicolas-grekas Having an annotation without parentheses is so common that we IMO should not fail on those classes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-10T08:07:19Z
+
+then we need a test case that ensures we hit the issue also, as you asked for already btw :)
+and src/Symfony/Component/PropertyInfo/composer.json needs the same patch
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2017-08-10T08:16:37Z
+
+Any hints on which test class to add an `@api` anotation i.e.?
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2017-08-10T10:24:35Z
+
+I added a simple testcase which definetly fails on 3.2.1. I required it localy and saw the test failing with the well know error.
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2017-08-10T12:10:32Z
+
+Just give me a hint when i should squash the commits.
+
+---------------------------------------------------------------------------
+
+by ElectricMaxxx at 2017-08-10T14:10:31Z
+
+`assertSame()` it is now.

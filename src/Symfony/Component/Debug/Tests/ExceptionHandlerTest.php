@@ -130,4 +130,16 @@ class ExceptionHandlerTest extends TestCase
 
         $handler->handle($exception);
     }
+
+    public function testApplicationStyle()
+    {
+        $handler = new ExceptionHandler();
+
+        ob_start();
+        $handler->sendPhpResponse(new \RuntimeException('Foo'));
+        $response = ob_get_clean();
+
+        $this->assertSame(1, preg_match('/trace-row application".+ExceptionHandlerTest\\.php.+<\\/td>/', $response));
+        $this->assertSame(1, preg_match('/trace-row ".+testApplicationStyle().+<\\/td>/', $response));
+    }
 }

@@ -41,6 +41,7 @@ class ReflectionExtractorTest extends TestCase
                 'B',
                 'Guid',
                 'g',
+                'emptyVar',
                 'foo',
                 'foo2',
                 'foo3',
@@ -122,37 +123,63 @@ class ReflectionExtractorTest extends TestCase
         );
     }
 
-    public function testIsReadable()
+    /**
+     * @dataProvider getReadableProperties
+     */
+    public function testIsReadable($property, $expected)
     {
-        $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'bar', array()));
-        $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'baz', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'parent', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'a', array()));
-        $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'b', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'c', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'd', array()));
-        $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'e', array()));
-        $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'f', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'Id', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'id', array()));
-        $this->assertTrue($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'Guid', array()));
-        $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'guid', array()));
+        $this->assertSame(
+            $expected,
+            $this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, array())
+        );
     }
 
-    public function testIsWritable()
+    public function getReadableProperties()
     {
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'bar', array()));
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'baz', array()));
-        $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'parent', array()));
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'a', array()));
-        $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'b', array()));
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'c', array()));
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'd', array()));
-        $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'e', array()));
-        $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'f', array()));
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'Id', array()));
-        $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'Guid', array()));
-        $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'guid', array()));
+        return array(
+            array('bar', false),
+            array('baz', false),
+            array('parent', true),
+            array('a', true),
+            array('b', false),
+            array('c', true),
+            array('d', true),
+            array('e', false),
+            array('f', false),
+            array('Id', true),
+            array('id', true),
+            array('Guid', true),
+            array('guid', false),
+        );
+    }
+
+    /**
+     * @dataProvider getWritableProperties
+     */
+    public function testIsWritable($property, $expected)
+    {
+        $this->assertSame(
+            $expected,
+            $this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, array())
+        );
+    }
+
+    public function getWritableProperties()
+    {
+        return array(
+            array('bar', false),
+            array('baz', false),
+            array('parent', true),
+            array('a', false),
+            array('b', true),
+            array('c', false),
+            array('d', false),
+            array('e', true),
+            array('f', true),
+            array('Id', false),
+            array('Guid', true),
+            array('guid', false),
+        );
     }
 
     public function testSingularize()

@@ -72,6 +72,7 @@ class PhpDocExtractorTest extends TestCase
             array('donotexist', null, null, null),
             array('staticGetter', null, null, null),
             array('staticSetter', null, null, null),
+            array('emptyVar', null, null, null),
         );
     }
 

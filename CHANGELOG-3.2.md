@@ -7,6 +7,22 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.13 (2017-08-01)
+
+ * bug #22244 [Console] Fix passing options with defaultCommand (Jakub Sacha)
+ * bug #23684 [Debug] Missing escape in debug output (c960657)
+ * bug #23654 [DI] Fix using private services in expressions (nicolas-grekas)
+ * bug #23662 [VarDumper] Adapt to php 7.2 changes (nicolas-grekas)
+ * bug #23649 [Form][TwigBridge] Don't render _method in form_rest() for a child form (fmarchalemisys)
+ * bug #23023 [DoctrineBridge][PropertyInfo] Added support for Doctrine Embeddables (vudaltsov)
+ * bug #23619 [Validator] Fix IbanValidator for ukrainian IBANs (paroe)
+ * bug #23586 Fix case sensitive sameSite cookie (mikefrancis)
+ * bug #23238 [Security] ensure the 'route' index is set before attempting to use it (gsdevme)
+ * bug #23330 [WebProfilerBundle] Fix full sized dump hovering in toolbar (ogizanagi)
+ * bug #23580 Fix login redirect when referer contains a query string (fabpot)
+ * bug #23558 [FrameworkBundle] fix ValidatorCacheWarmer: use serializing ArrayAdapter (dmaicher)
+ * bug #23574 [VarDumper] Move locale sniffing to dump() time (nicolas-grekas)
+
 * 3.2.12 (2017-07-17)
 
  * bug #23549 [PropertyInfo] conflict for phpdocumentor/reflection-docblock 3.2 (xabbuh)

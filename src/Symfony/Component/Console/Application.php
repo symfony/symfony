@@ -698,6 +698,16 @@ class Application
     {
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
+        $this->doRenderException($e, $output);
+
+        if (null !== $this->runningCommand) {
+            $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
+            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+        }
+    }
+
+    protected function doRenderException(\Exception $e, OutputInterface $output)
+    {
         do {
             $title = sprintf(
                 '  [%s%s]  ',
@@ -755,11 +765,6 @@ class Application
                 $output->writeln('', OutputInterface::VERBOSITY_QUIET);
             }
         } while ($e = $e->getPrevious());
-
-        if (null !== $this->runningCommand) {
-            $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
-            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
-        }
     }
 
     /**

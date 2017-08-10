@@ -80,7 +80,7 @@ header .container { display: flex; justify-content: space-between; }
 .exception-hierarchy .icon svg { height: 13px; width: 13px; vertical-align: -2px; }
 
 .exception-without-message .exception-message-wrapper { display: none; }
-.exception-message-wrapper .container { display: flex; align-items: flex-start; min-height: 70px; padding: 10px 0 8px; }
+.exception-message-wrapper .container { display: flex; align-items: flex-start; min-height: 70px; padding: 10px 15px 8px; }
 .exception-message { flex-grow: 1; }
 .exception-message, .exception-message a { color: #FFF; font-size: 21px; font-weight: 400; margin: 0; }
 .exception-message.long { font-size: 18px; }
@@ -107,11 +107,11 @@ header .container { display: flex; justify-content: space-between; }
 .trace-line .icon svg { height: 16px; width: 16px; }
 .trace-line-header { padding-left: 36px; }
 
-.trace-file-path, .trace-file-path a { color: #999; color: #795da3; color: #B0413E; color: #222; font-size: 13px; }
+.trace-file-path, .trace-file-path a { color: #222; font-size: 13px; }
 .trace-class { color: #B0413E; }
 .trace-type { padding: 0 2px; }
-.trace-method { color: #B0413E; color: #222; font-weight: bold; color: #B0413E; }
-.trace-arguments { color: #222; color: #999; font-weight: normal; color: #795da3; color: #777; padding-left: 2px; }
+.trace-method { color: #B0413E; font-weight: bold; }
+.trace-arguments { color: #777; font-weight: normal; padding-left: 2px; }
 
 .trace-code { background: #FFF; font-size: 12px; margin: 10px 10px 2px 10px; padding: 10px; overflow-x: auto; white-space: nowrap; }
 .trace-code ol { margin: 0; float: left; }

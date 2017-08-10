@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
@@ -62,6 +63,19 @@ class YamlDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container24.php';
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services24.yml', $dumper->dump());
+    }
+
+    public function testInlineServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Class1')
+            ->addArgument((new Definition('Class2'))
+                ->addArgument(new Definition('Class2'))
+            )
+        ;
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_inline.yml', $dumper->dump());
     }
 
     private function assertEqualYamlStructure($expected, $yaml, $message = '')

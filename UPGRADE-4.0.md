@@ -164,8 +164,8 @@ DependencyInjection
 
  * Using unsupported options to configure service aliases raises an exception.
 
- * Setting or unsetting a private service with the `Container::set()` method is
-   no longer supported. Only public services can be set or unset.
+ * Setting or unsetting a service with the `Container::set()` method is
+   no longer supported. Only synthetic services can be set or unset.
 
  * Checking the existence of a private service with the `Container::has()`
    method is no longer supported and will return `false`.
@@ -454,6 +454,32 @@ HttpFoundation
 
 HttpKernel
 ----------
+
+ * Relying on convention-based commands discovery is not supported anymore.
+   Use PSR-4 based service discovery instead.
+
+   Before:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # implicit registration of all commands in the `Command` folder
+   ```
+
+   After:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # explicit commands registration
+       AppBundle\Command:
+           resource: '../../src/AppBundle/Command/*'
+           tags: ['console.command']
+   ```
 
  * Removed the `kernel.root_dir` parameter. Use the `kernel.project_dir` parameter
    instead.

@@ -12,7 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\Yaml\Dumper as YmlDumper;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -267,6 +269,8 @@ class YamlDumper extends Dumper
             return $this->getParameterCall((string) $value);
         } elseif ($value instanceof Expression) {
             return $this->getExpressionCall((string) $value);
+        } elseif ($value instanceof Definition) {
+            return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }

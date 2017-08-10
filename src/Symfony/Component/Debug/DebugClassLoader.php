@@ -27,10 +27,12 @@ class DebugClassLoader
     private $classLoader;
     private $isFinder;
     private static $caseCheck;
-    private static $internal = array();
     private static $final = array();
     private static $finalMethods = array();
     private static $deprecated = array();
+    private static $deprecatedMethods = array();
+    private static $internal = array();
+    private static $internalMethods = array();
     private static $darwinCache = array('/' => array('/', array()));
 
     /**
@@ -165,50 +167,6 @@ class DebugClassLoader
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: "%s" vs "%s".', $class, $name));
             }
 
-            $parent = get_parent_class($class);
-            $doc = $refl->getDocComment();
-            if (preg_match('#\n \* @internal(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
-                self::$internal[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-            }
-
-            // Not an interface nor a trait
-            if (class_exists($name, false)) {
-                if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
-                    self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-                }
-
-                if ($parent && isset(self::$final[$parent])) {
-                    @trigger_error(sprintf('The "%s" class is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
-                }
-
-                // Inherit @final annotations
-                self::$finalMethods[$name] = $parent && isset(self::$finalMethods[$parent]) ? self::$finalMethods[$parent] : array();
-
-                foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
-                    if ($method->class !== $name) {
-                        continue;
-                    }
-
-                    if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
-                        @trigger_error(sprintf('%s It may change without further notice as of its next major version. You should not extend it from "%s".', self::$finalMethods[$parent][$method->name], $name), E_USER_DEPRECATED);
-                    }
-
-                    $doc = $method->getDocComment();
-                    if (false === $doc || false === strpos($doc, '@final')) {
-                        continue;
-                    }
-
-                    if (preg_match('#\n\s+\* @final(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
-                        $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-                        self::$finalMethods[$name][$method->name] = sprintf('The "%s::%s()" method is considered final%s.', $name, $method->name, $message);
-                    }
-                }
-            }
-
-            if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
-                self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
-            }
-
             // Don't trigger deprecations for classes in the same vendor
             if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
                 $len = 0;
@@ -224,37 +182,89 @@ class DebugClassLoader
                 }
             }
 
-            foreach (array_merge(array($parent), class_implements($name, false), class_uses($name, false)) as $use) {
+            // Detect annotations on the class
+            if (false !== $doc = $refl->getDocComment()) {
+                foreach (array('final', 'deprecated', 'internal') as $annotation) {
+                    if (false !== strpos($doc, '@'.$annotation) && preg_match('#\n \* @'.$annotation.'(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
+                        self::${$annotation}[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                    }
+                }
+            }
+
+            $parentAndTraits = class_uses($name, false);
+            if ($parent = get_parent_class($class)) {
+                $parentAndTraits[] = $parent;
+
+                if (isset(self::$final[$parent])) {
+                    @trigger_error(sprintf('The "%s" class is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
+                }
+            }
+
+            // Detect if the parent is annotated
+            foreach ($parentAndTraits + $this->getOwnInterfaces($name, $parent) as $use) {
+                if (isset(self::$deprecated[$use]) && strncmp($ns, $use, $len)) {
+                    $type = class_exists($name, false) ? 'class' : (interface_exists($name, false) ? 'interface' : 'trait');
+                    $verb = class_exists($use, false) || interface_exists($name, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
+
+                    @trigger_error(sprintf('The "%s" %s %s "%s" that is deprecated%s.', $name, $type, $verb, $use, self::$deprecated[$use]), E_USER_DEPRECATED);
+                }
                 if (isset(self::$internal[$use]) && strncmp($ns, $use, $len)) {
                     @trigger_error(sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $name), E_USER_DEPRECATED);
                 }
             }
 
-            if (!$parent || strncmp($ns, $parent, $len)) {
-                if ($parent && isset(self::$deprecated[$parent]) && strncmp($ns, $parent, $len)) {
-                    @trigger_error(sprintf('The "%s" class extends "%s" that is deprecated %s', $name, $parent, self::$deprecated[$parent]), E_USER_DEPRECATED);
+            // Inherit @final and @deprecated annotations for methods
+            self::$finalMethods[$name] = array();
+            self::$deprecatedMethods[$name] = array();
+            self::$internalMethods[$name] = array();
+            foreach ($parentAndTraits as $use) {
+                foreach (array('finalMethods', 'deprecatedMethods', 'internalMethods') as $property) {
+                    if (isset(self::${$property}[$use])) {
+                        self::${$property}[$name] = array_merge(self::${$property}[$name], self::${$property}[$use]);
+                    }
+                }
+            }
+
+            $isClass = class_exists($name, false);
+            foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+                if ($method->class !== $name) {
+                    continue;
                 }
 
-                $parentInterfaces = array();
-                $deprecatedInterfaces = array();
-                if ($parent) {
-                    foreach (class_implements($parent) as $interface) {
-                        $parentInterfaces[$interface] = 1;
+                // Method from a trait
+                if ($method->getFilename() !== $refl->getFileName()) {
+                    continue;
+                }
+
+                if ($isClass && $parent && isset(self::$finalMethods[$parent][$method->name])) {
+                    list($declaringClass, $message) = self::$finalMethods[$parent][$method->name];
+                    @trigger_error(sprintf('The "%s::%s()" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
+                }
+
+                foreach ($parentAndTraits as $use) {
+                    if (isset(self::$deprecatedMethods[$use][$method->name])) {
+                        list($declaringClass, $message) = self::$deprecatedMethods[$use][$method->name];
+                        if (strncmp($ns, $declaringClass, $len)) {
+                            @trigger_error(sprintf('The "%s::%s()" method is deprecated%s. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
+                        }
+                    }
+                    if (isset(self::$internalMethods[$use][$method->name])) {
+                        list($declaringClass, $message) = self::$internalMethods[$use][$method->name];
+                        if (strncmp($ns, $declaringClass, $len)) {
+                            @trigger_error(sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
+                        }
                     }
                 }
 
-                foreach ($refl->getInterfaceNames() as $interface) {
-                    if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len)) {
-                        $deprecatedInterfaces[] = $interface;
-                    }
-                    foreach (class_implements($interface) as $interface) {
-                        $parentInterfaces[$interface] = 1;
-                    }
+                // Detect method annotations
+                if (false === $doc = $method->getDocComment()) {
+                    continue;
                 }
 
-                foreach ($deprecatedInterfaces as $interface) {
-                    if (!isset($parentInterfaces[$interface])) {
-                        @trigger_error(sprintf('The "%s" %s "%s" that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                foreach (array('final', 'deprecated', 'internal') as $annotation) {
+                    if (false !== strpos($doc, '@'.$annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
+                        $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                        self::${$annotation.'Methods'}[$name][$method->name] = array($name, $message);
                     }
                 }
             }
@@ -356,5 +366,32 @@ class DebugClassLoader
 
             return true;
         }
+    }
+
+    /**
+     * `class_implements` includes interfaces from the parents so we have to manually exclude them.
+     *
+     * @param string       $class
+     * @param string|false $parent
+     *
+     * @return string[]
+     */
+    private function getOwnInterfaces($class, $parent)
+    {
+        $ownInterfaces = class_implements($class, false);
+
+        if ($parent) {
+            foreach (class_implements($parent, false) as $interface) {
+                unset($ownInterfaces[$interface]);
+            }
+        }
+
+        foreach ($ownInterfaces as $interface) {
+            foreach (class_implements($interface) as $interface) {
+                unset($ownInterfaces[$interface]);
+            }
+        }
+
+        return $ownInterfaces;
     }
 }

@@ -20,6 +20,7 @@ CHANGELOG
  * support for the `X-Status-Code` when handling exceptions in the `HttpKernel`
    has been dropped, use the `HttpKernel::allowCustomResponseCode()` method
    instead
+ * removed convention-based commands registration
 
 3.4.0
 -----

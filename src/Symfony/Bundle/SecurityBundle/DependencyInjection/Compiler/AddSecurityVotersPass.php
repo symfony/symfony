@@ -42,7 +42,8 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         foreach ($voters as $voter) {
-            $class = $container->getDefinition((string) $voter)->getClass();
+            $definition = $container->getDefinition((string) $voter);
+            $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (!is_a($class, VoterInterface::class, true)) {
                 @trigger_error(sprintf('Using a security.voter tag on a class without implementing the %1$s is deprecated as of 3.4 and will be removed in 4.0. Implement the %1$s instead.', VoterInterface::class), E_USER_DEPRECATED);

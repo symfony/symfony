@@ -31,7 +31,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
             // Make sure that each transition has exactly one FROM
             $froms = $transition->getFroms();
             if (1 !== count($froms)) {
-                throw new InvalidDefinitionException(sprintf('A transition in StateMachine can only have one input. But the transition "%s" in StateMachine "%s" has %d inputs.', $transition->getName(), $name, count($transition->getTos())));
+                throw new InvalidDefinitionException(sprintf('A transition in StateMachine can only have one input. But the transition "%s" in StateMachine "%s" has %d inputs.', $transition->getName(), $name, count($froms)));
             }
 
             // Enforcing uniqueness of the names of transitions starting at each node

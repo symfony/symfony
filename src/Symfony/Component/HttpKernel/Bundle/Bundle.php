@@ -161,9 +161,15 @@ abstract class Bundle implements BundleInterface
      * * Commands extend Symfony\Component\Console\Command\Command
      *
      * @param Application $application An Application instance
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
      */
     public function registerCommands(Application $application)
     {
+        if (0 === func_num_args() || func_get_arg(0)) {
+            @trigger_error(sprintf('The %s() method is deprecated since version 3.4 and will be removed in 4.0. Register commands as services instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         if (!is_dir($dir = $this->getPath().'/Command')) {
             return;
         }

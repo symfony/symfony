@@ -143,6 +143,9 @@ HttpKernel
            tags: ['console.command']
    ```
 
+ * The `Bundle::registerCommands()` method has been deprecated and will
+   be removed in 4.0. Register commands as services instead.
+
 Process
 -------
 

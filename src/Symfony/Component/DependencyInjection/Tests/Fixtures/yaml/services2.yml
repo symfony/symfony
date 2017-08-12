@@ -1,5 +1,5 @@
 parameters:
-    FOO: bar
+    foo: bar
     values:
         - true
         - false
@@ -9,5 +9,5 @@ parameters:
     bar: foo
     escape: '@@escapeme'
     foo_bar: '@foo_bar'
-    MixedCase:
+    mixedcase:
         MixedCaseKey: value

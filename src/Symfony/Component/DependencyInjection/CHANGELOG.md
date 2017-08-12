@@ -7,6 +7,7 @@ CHANGELOG
  * deprecated service auto-registration while autowiring
  * deprecated the ability to check for the initialization of a private service with the `Container::initialized()` method
  * deprecated support for top-level anonymous services in XML
+ * deprecated case insensitivity of parameter names
 
 3.3.0
 -----

@@ -486,11 +486,6 @@ class XmlFileLoader extends FileLoader
                 $key = array_pop($keys);
             } else {
                 $key = $arg->getAttribute('key');
-
-                // parameter keys are case insensitive
-                if ('parameter' == $name && $lowercase) {
-                    $key = strtolower($key);
-                }
             }
 
             $onInvalid = $arg->getAttribute('on-invalid');

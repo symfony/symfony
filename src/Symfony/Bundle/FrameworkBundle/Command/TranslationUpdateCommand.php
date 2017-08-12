@@ -21,7 +21,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**

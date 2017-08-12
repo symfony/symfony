@@ -5,8 +5,10 @@ CHANGELOG
 -----
 
  * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
- * deprecated `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability to pass a command name as first argument
- * deprecated `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability to pass a command name as first argument
+ * deprecated `DebugCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument  of the constructor instead
+ * deprecated `LintCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument of the constructor instead
 
 3.3.0
 -----

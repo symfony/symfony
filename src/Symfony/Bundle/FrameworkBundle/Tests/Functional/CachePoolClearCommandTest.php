@@ -77,7 +77,7 @@ class CachePoolClearCommandTest extends WebTestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand::__construct() expects an instance of "Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
      */
     public function testLegacyClearCommand()
     {

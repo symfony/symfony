@@ -419,8 +419,40 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Translation\Reader\TranslationReader` class instead.
 
- * The `translation.loader` service has been deprecated and will be removed in 4.0. Use the `translation.reader` service instead.
+ * The `translation.loader` service has been removed.
+   Use the `translation.reader` service instead.
  
+ * `AssetsInstallCommand::__construct()` now requires an instance of
+   `Symfony\Component\Filesystem\Filesystem` as first argument.
+
+ * `CacheClearCommand::__construct()` now requires an instance of
+   `Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface` as
+    first argument.
+
+ * `CachePoolClearCommand::__construct()` now requires an instance of
+   `Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer` as
+    first argument.
+
+ * `EventDispatcherDebugCommand::__construct()` now requires an instance of
+   `Symfony\Component\EventDispatcher\EventDispatcherInterface` as
+    first argument.
+
+ * `RouterDebugCommand::__construct()` now requires an instance of
+   `Symfony\Component\Routing\RouterInteface` as
+    first argument.
+
+ * `RouterMatchCommand::__construct()` now requires an instance of
+   `Symfony\Component\Routing\RouterInteface` as
+    first argument.
+
+ * `TranslationDebugCommand::__construct()` now requires an instance of
+   `Symfony\Component\Translation\TranslatorInterface` as
+    first argument.
+
+ * `TranslationUpdateCommand::__construct()` now requires an instance of
+   `Symfony\Component\Translation\TranslatorInterface` as
+    first argument.
+
 HttpFoundation
 --------------
 
@@ -568,6 +600,13 @@ SecurityBundle
 
  * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` nor implement `ContainerAwareInterface` anymore.
 
+ * `InitAclCommand::__construct()` now requires an instance of
+   `Doctrine\DBAL\Connection`  as first argument.
+
+ * `SetAclCommand::__construct()` now requires an instance of
+   `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
+    as first argument.
+
 Serializer
 ----------
 
@@ -642,11 +681,12 @@ TwigBridge
  * The `TwigRendererEngine::setEnvironment()` method has been removed.
    Pass the Twig Environment as second argument of the constructor instead.
 
- * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability
-   to pass a command name as first argument.
+ * Removed `DebugCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument of the constructor instead.
 
- * Removed `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability
-   to pass a command name as first argument.
+ * Removed `LintCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument of the constructor instead.
+
 
 Validator
 ---------

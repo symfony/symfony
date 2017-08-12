@@ -45,7 +45,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
     public function __construct($filesystem = null)
     {
         if (!$filesystem instanceof Filesystem) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, Filesystem::class), E_USER_DEPRECATED);
 
             parent::__construct($filesystem);
 

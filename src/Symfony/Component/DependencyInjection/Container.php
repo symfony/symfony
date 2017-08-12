@@ -180,7 +180,7 @@ class Container implements ResettableContainerInterface
      */
     public function set($id, $service)
     {
-        $id = $this->normalizeId($id);
+        $id = $this->normalizeId($id, true);
 
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
@@ -455,12 +455,13 @@ class Container implements ResettableContainerInterface
      * Returns the case sensitive id used at registration time.
      *
      * @param string $id
+     * @param bool   $register
      *
      * @return string
      *
      * @internal
      */
-    public function normalizeId($id)
+    public function normalizeId($id, $register = false)
     {
         if (!is_string($id)) {
             $id = (string) $id;
@@ -470,8 +471,10 @@ class Container implements ResettableContainerInterface
             if ($id !== $normalizedId) {
                 @trigger_error(sprintf('Service identifiers will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.3.', $id, $normalizedId), E_USER_DEPRECATED);
             }
-        } else {
+        } elseif ($register) {
             $normalizedId = $this->normalizedIds[$normalizedId] = $id;
+        } else {
+            $normalizedId = $id;
         }
 
         return $normalizedId;

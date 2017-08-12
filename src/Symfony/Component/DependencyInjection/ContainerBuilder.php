@@ -505,7 +505,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function set($id, $service)
     {
-        $id = $this->normalizeId($id);
+        $id = $this->normalizeId($id, true);
 
         if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
             // setting a synthetic service on a compiled container is alright
@@ -793,7 +793,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setAlias($alias, $id)
     {
-        $alias = $this->normalizeId($alias);
+        $alias = $this->normalizeId($alias, true);
 
         if (is_string($id)) {
             $id = new Alias($this->normalizeId($id));
@@ -943,7 +943,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Adding definition to a compiled container is not allowed');
         }
 
-        $id = $this->normalizeId($id);
+        $id = $this->normalizeId($id, true);
 
         unset($this->aliasDefinitions[$id]);
 
@@ -1428,7 +1428,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function shareService(Definition $definition, $service, $id)
     {
         if (null !== $id && $definition->isShared()) {
-            $this->services[$this->normalizeId($id)] = $service;
+            $this->services[$this->normalizeId($id, true)] = $service;
         }
     }
 

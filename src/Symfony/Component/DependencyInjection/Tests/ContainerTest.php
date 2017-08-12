@@ -236,6 +236,8 @@ class ContainerTest extends TestCase
     public function testNormalizeIdKeepsCase()
     {
         $sc = new ProjectServiceContainer();
+        $this->assertSame('foo', $sc->normalizeId('foo'));
+
         $sc->normalizeId('Foo', true);
         $this->assertSame('Foo', $sc->normalizeId('foo'));
     }
@@ -270,6 +272,18 @@ class ContainerTest extends TestCase
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSetNormalizesId()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->has('Foo');
+        $sc->set('foo', new \stdClass());
+
+        $this->addToAssertionCount(1);
     }
 
     public function testGetThrowServiceNotFoundException()

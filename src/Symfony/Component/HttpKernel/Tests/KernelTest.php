@@ -771,11 +771,36 @@ EOF;
 
     public function testProjectDirExtension()
     {
-        $kernel = new CustomProjectDirKernel('test', true);
+        $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
         $this->assertSame('foo', $kernel->getProjectDir());
         $this->assertSame('foo', $kernel->getContainer()->getParameter('kernel.project_dir'));
+    }
+
+    public function testKernelReset()
+    {
+        (new Filesystem())->remove(__DIR__.'/Fixtures/cache');
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $containerClass = get_class($kernel->getContainer());
+        $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertSame($containerClass, get_class($kernel->getContainer()));
+        $this->assertFileExists($containerFile);
+        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+
+        $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass'); });
+        $kernel->boot();
+
+        $this->assertTrue(get_class($kernel->getContainer()) !== $containerClass);
+        $this->assertFileNotExists($containerFile);
     }
 
     /**
@@ -878,12 +903,14 @@ class TestKernel implements HttpKernelInterface
 class CustomProjectDirKernel extends Kernel
 {
     private $baseDir;
+    private $buildContainer;
 
-    public function __construct()
+    public function __construct(\Closure $buildContainer = null)
     {
-        parent::__construct('test', false);
+        parent::__construct('custom', true);
 
         $this->baseDir = 'foo';
+        $this->buildContainer = $buildContainer;
     }
 
     public function registerBundles()
@@ -903,5 +930,12 @@ class CustomProjectDirKernel extends Kernel
     public function getRootDir()
     {
         return __DIR__.'/Fixtures';
+    }
+
+    protected function build(ContainerBuilder $container)
+    {
+        if ($build = $this->buildContainer) {
+            $build($container);
+        }
     }
 }

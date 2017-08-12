@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-11T16:09:00Z
+
+I don't know if we should make this change *(at the moment we're doing the opposite in other parts of the framework: stop being case-insensitive)* but I can confirm that this is a very annoying issue. I make this error almost every day. In my case the error is: `server:Start` instead of `server:start` 😡
+
+---------------------------------------------------------------------------
+
+by thanosp at 2017-08-11T16:17:19Z
+
+I agree being strict is perfect for bots and automated stuff. Bots will/should not use shortcuts though. This is purely good for DX that I believe is very important. I don't believe it should be in the same bucket as other more restrictive flows
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-11T16:50:01Z
+
+👍 for this idea, even if I've never hit such an issue myself.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-11T17:04:32Z
+
+This is a BC break. Taking the same example as in your test case:
+
+```php
+// test.php
+$app = new Symfony\Component\Console\Application();
+$app->register('FOO:BAR')->setCode(function () { print 'FOO:BAR executed'; });
+$app->register('foo:bar')->setCode(function () { print 'foo:bar executed'; });
+$app->run();
+```
+
+Current behavior is:
+```
+$ php test.php F:B
+FOO:BAR executed
+
+$ php test.php f:b
+foo:bar executed
+```
+
+With this, both `f:b` and `F:B` become ambiguous and no one runs, so 👎  for this PR as is.
+
+If we want to fix this issue, we should make command names case insensitive (as @javiereguiluz seems to be asking for), not only shortcuts, and that would require a proper upgrade path.
+I'm not opposed to that idea either, but I wonder if we are not missing some valid use cases for case-sensitive command names.
+
+---------------------------------------------------------------------------
+
+by thanosp at 2017-08-11T18:02:40Z
+
+@chalasr I agree this is a BC break as you stated it. I've updated the table to mark it as such.
+This will break functionality for people explicitly choosing to use case sensitive shortcuts by matching more than one commands (not choosing an unexpected one) and refusing to run.
+Therefore it would require either more characters to match uniquely or the full command for precision.
+
+But if we assume that such a person exists that prefers `f:b`, `f:B` and `F:B` to match different things, for them I would say having to type `:` is an even bigger problem. Or they've never noticed that they've been running the wrong command. I would say allowing `f:b` and `f:B` pointing to different commands is already bad as too error prone.
+
+I do like the idea of having all commands case insensitive. That would also solve the problem but I don't know how much work that is.
+
+There was a nice talk by @ellotheth called [Building for Utopia](https://www.youtube.com/watch?v=_bUjqDSZbz4) at PHPTek talking about similar issues.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-11T18:22:02Z
+
+Why should there be any BC break? Can't we search case sensitive first,
+then insensitive if nothing found?
+
+---------------------------------------------------------------------------
+
+by thanosp at 2017-08-11T18:36:59Z
+
+@nicolas-grekas I think we can. I will try that
+
+---------------------------------------------------------------------------
+
+by thanosp at 2017-08-11T23:10:12Z
+
+Ready for review again.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-12T06:52:26Z
+
+Could you add a note in the Console CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by thanosp at 2017-08-12T08:32:17Z
+
+Thanks @chalasr I've updated the Console CHANGELOG

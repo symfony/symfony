@@ -74,7 +74,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         }
 
         if (!$this->isISO8601($data)) {
-            throw new UnexpectedValueException('Non ISO 8601 interval strings are not supported yet.');
+            throw new UnexpectedValueException('Expected a valid ISO 8601 interval string.');
         }
 
         $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;

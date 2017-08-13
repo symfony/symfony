@@ -81,11 +81,10 @@ abstract class CompleteConfigurationTest extends TestCase
             $configs[] = array_values($configDef->getArguments());
         }
 
-        // transform all $configs values to lower case so tests are case-insensitive and
-        // they also work in newer Symfony versions where service IDs are case-sensitive
-        array_walk_recursive($configs, function (&$value) {
-            $value = is_string($value) ? strtolower($value) : $value;
-        });
+        // the IDs of the services are case sensitive or insensitive depending on
+        // the Symfony version. Transform them to lowercase to simplify tests.
+        $configs[0][2] = strtolower($configs[0][2]);
+        $configs[2][2] = strtolower($configs[2][2]);
 
         $this->assertEquals(array(
             array(
@@ -118,7 +117,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 ),
                 array(
                     'parameter' => '_switch_user',
-                    'role' => 'role_allowed_to_switch',
+                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
                 ),
             ),
             array(

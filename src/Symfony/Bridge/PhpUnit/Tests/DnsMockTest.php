@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
-use PHPUnit\Framework\TestCase;
+//use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
 
 class DnsMockTest

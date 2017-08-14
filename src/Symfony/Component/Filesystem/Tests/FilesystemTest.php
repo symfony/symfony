@@ -1013,30 +1013,27 @@ class FilesystemTest extends FilesystemTestCase
     {
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
-        $oldPath = getcwd();
-        chdir($this->workspace);
-
         mkdir($sourcePath);
         touch($sourcePath.'source');
         touch($sourcePath.'target');
 
         $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
 
+        $oldPath = getcwd();
+        chdir($this->workspace);
+
         $this->filesystem->mirror('source', $targetPath);
+
+        chdir($oldPath);
 
         $this->assertTrue(is_dir($targetPath));
         $this->assertFileExists($targetPath.'source');
         $this->assertFileExists($targetPath.'target');
-
-        chdir($oldPath);
     }
 
     public function testMirrorContentsWithSameNameAsSourceOrTargetWithDeleteOption()
     {
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
-
-        $oldPath = getcwd();
-        chdir($this->workspace);
 
         mkdir($sourcePath);
         touch($sourcePath.'source');
@@ -1047,13 +1044,16 @@ class FilesystemTest extends FilesystemTestCase
         touch($targetPath.'source');
         touch($targetPath.'target');
 
+        $oldPath = getcwd();
+        chdir($this->workspace);
+
         $this->filesystem->mirror('source', 'target', null, array('delete' => true));
+
+        chdir($oldPath);
 
         $this->assertTrue(is_dir($targetPath));
         $this->assertFileExists($targetPath.'source');
         $this->assertFileNotExists($targetPath.'target');
-
-        chdir($oldPath);
     }
 
     /**

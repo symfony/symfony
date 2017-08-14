@@ -7,6 +7,7 @@ CHANGELOG
  * Added `TranslationDumperPass`
  * Added `TranslationExtractorPass`
  * Added `TranslatorPass`
+ * Added <notes> section to the Xliff 2.0 dumper. 
 
 3.2.0
 -----

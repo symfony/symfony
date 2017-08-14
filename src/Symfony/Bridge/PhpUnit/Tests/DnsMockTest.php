@@ -11,10 +11,10 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
-use PHPUnit\Framework\TestCase;
+//use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
 
-class DnsMockTest extends TestCase
+class DnsMockTest
 {
     protected function tearDown()
     {

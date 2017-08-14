@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-12T18:04:03Z
+
+But tests do pass for me locally, and also on Travis and Appveyor. How do you get the failure?
+
+---------------------------------------------------------------------------
+
+by MatthieuMota at 2017-08-12T18:36:05Z
+
+@nicolas-grekas I just tested on my gentoo and indeed the test do pass before my commit but not on my archlinux.
+
+![capture d ecran_2017-08-12_20-32-15](https://user-images.githubusercontent.com/2427947/29243353-59812900-7f9d-11e7-8428-f2aa0dc707d5.png)
+
+At first sight I think it is a worry of configuration or extension with php. I'm on 7.1.8 on arch and 7.1.7 on gentoo.
+
+**Updated:** I just tested on a new ArchLinux with Docker, the worry is the same. I think problem come with Arch but I don't know yet if the worry comes from the php build or other :(
+
+---------------------------------------------------------------------------
+
+by MatthieuMota at 2017-08-13T09:00:24Z
+
+@nicolas-grekas Ok i found that the problem comes with use flags when libxml is compiled.
+
+We can easily reproduce the bug with DOMDocument instance and loadHTML with string in createTestCrawler method. I've more spaces on my arch (string(608)) and (string(456)) on a debian docker.
+I've simply add option LIBXML_NOBLANKS (second argument in loadHTML). It fixes my problem and if you want to reverse and see my bug, you can add LIBXML_COMPACT.
+[See here example](https://gist.github.com/MatthieuMota/bfd163d9ca8fd0a743eb23a79b663967)
+
+I think I can commit this directly in createTestCrawler :) What do you think ?

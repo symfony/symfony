@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
@@ -25,6 +26,12 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
 
 class KernelTest extends TestCase
 {
+    public static function tearDownAfterClass()
+    {
+        $fs = new Filesystem();
+        $fs->remove(__DIR__.'/Fixtures/cache');
+    }
+
     public function testConstructor()
     {
         $env = 'test_env';

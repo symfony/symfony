@@ -162,4 +162,26 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->get('env(ARRAY_VAR)');
         $bag->resolve();
     }
+
+    public function testEnvReferencedServices()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->get('env(foo@SERVICE)');
+
+        $this->assertSame(array('service' => 'service'), $bag->getEnvReferencedServices());
+
+        $expected = <<<'EOTXT'
+Array
+(
+    [foo@service] => Array
+        (
+            [env_foo@service_%s] => env_foo@service_%s
+        )
+
+)
+
+EOTXT;
+
+        $this->assertStringMatchesFormat($expected, print_r($bag->getEnvPlaceholders(), true));
+    }
 }

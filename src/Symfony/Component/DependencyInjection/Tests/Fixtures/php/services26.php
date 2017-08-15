@@ -9,14 +9,14 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
+ * Symfony_DI_PhpDumper_Test_EnvParameters.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -31,6 +31,7 @@ class ProjectServiceContainer extends Container
 
         $this->services = $this->privates = array();
         $this->methodMap = array(
+            'env_resolver' => 'getEnvResolverService',
             'test' => 'getTestService',
         );
 
@@ -72,6 +73,23 @@ class ProjectServiceContainer extends Container
         $class = $this->getEnv('FOO');
 
         return $this->services['test'] = new $class($this->getEnv('Bar'), 'foo'.$this->getEnv('FOO').'baz');
+    }
+
+    /**
+     * Gets the 'env_resolver' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\EnvResolver A Symfony\Component\DependencyInjection\Tests\Dumper\EnvResolver instance
+     */
+    protected function getEnvResolverService()
+    {
+        return $this->services['env_resolver'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\EnvResolver();
     }
 
     /**
@@ -129,6 +147,7 @@ class ProjectServiceContainer extends Container
 
     private $loadedDynamicParameters = array(
         'bar' => false,
+        'baz' => false,
     );
     private $dynamicParameters = array();
 
@@ -145,6 +164,7 @@ class ProjectServiceContainer extends Container
     {
         switch ($name) {
             case 'bar': $value = $this->getEnv('FOO'); break;
+            case 'baz': $value = $this->getEnv('Baz@env_resolver'); break;
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
         }
         $this->loadedDynamicParameters[$name] = true;

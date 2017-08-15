@@ -332,7 +332,7 @@ class Container implements ResettableContainerInterface
      *
      * @param string $name The name of the environment variable
      *
-     * @return scalar The value to use for the provided environment variable name
+     * @return mixed The value to use for the provided environment variable
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */
@@ -346,6 +346,14 @@ class Container implements ResettableContainerInterface
         }
         if (false !== $env = getenv($name)) {
             return $this->envCache[$name] = $env;
+        }
+        if (false !== $i = strpos($name, '@')) {
+            $id = substr($name, 1 + $i);
+            $service = isset($this->services[$id]) ? $this->services[$id] : (isset($this->methodMap[$id]) ? $this->{$this->methodMap[$id]}() : $this->get($id));
+
+            if (null !== $env = $service->getEnv(substr($name, 0, $i))) {
+                return $this->envCache[$name] = $env;
+            }
         }
         if (!$this->hasParameter("env($name)")) {
             throw new EnvNotFoundException($name);

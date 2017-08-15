@@ -22,7 +22,6 @@
     },
     "require-dev": {
         "symfony/config": "~3.4|~4.0",
-        "symfony/http-kernel": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/lock": "~3.4|~4.0",

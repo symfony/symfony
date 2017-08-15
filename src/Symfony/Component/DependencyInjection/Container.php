@@ -330,7 +330,7 @@ class Container implements ResettableContainerInterface
     /**
      * Fetches a variable from the environment.
      *
-     * @param string The name of the environment variable
+     * @param string $name The name of the environment variable
      *
      * @return scalar The value to use for the provided environment variable name
      *

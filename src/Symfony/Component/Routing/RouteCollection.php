@@ -23,7 +23,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class RouteCollection implements \IteratorAggregate, \Countable
+class RouteCollection implements \IteratorAggregate, \Countable, \Serializable
 {
     /**
      * @var Route[]
@@ -273,5 +273,19 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function addResource(ResourceInterface $resource)
     {
         $this->resources[] = $resource;
+    }
+
+    public function serialize()
+    {
+        $serializableResources = array_filter($this->resources, function ($resource) {
+            return $resource instanceof \Serializable;
+        });
+
+        return serialize(array($this->routes, $serializableResources));
+    }
+
+    public function unserialize($serialized)
+    {
+        list($this->routes, $this->resources) = unserialize($serialized);
     }
 }

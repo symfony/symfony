@@ -16,6 +16,7 @@ CHANGELOG
 
  * added `CommandLoaderInterface`, `FactoryCommandLoader` and PSR-11
    `ContainerCommandLoader` for commands lazy-loading
+ * added a case-insensitive command name matching fallback
 
 3.3.0
 -----

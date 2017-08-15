@@ -50,6 +50,8 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
         require_once self::$fixturesPath.'/Foo5Command.php';
+        require_once self::$fixturesPath.'/FooSameCaseUppercaseCommand.php';
+        require_once self::$fixturesPath.'/FooSameCaseLowercaseCommand.php';
         require_once self::$fixturesPath.'/FoobarCommand.php';
         require_once self::$fixturesPath.'/BarBucCommand.php';
         require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
@@ -316,6 +318,41 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('FooCommand', $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
     }
 
+    public function testFindCaseSensitiveFirst()
+    {
+        $application = new Application();
+        $application->add(new \FooSameCaseUppercaseCommand());
+        $application->add(new \FooSameCaseLowercaseCommand());
+
+        $this->assertInstanceOf('FooSameCaseUppercaseCommand', $application->find('f:B'), '->find() returns a command if the abbreviation is the correct case');
+        $this->assertInstanceOf('FooSameCaseUppercaseCommand', $application->find('f:BAR'), '->find() returns a command if the abbreviation is the correct case');
+        $this->assertInstanceOf('FooSameCaseLowercaseCommand', $application->find('f:b'), '->find() returns a command if the abbreviation is the correct case');
+        $this->assertInstanceOf('FooSameCaseLowercaseCommand', $application->find('f:bar'), '->find() returns a command if the abbreviation is the correct case');
+    }
+
+    public function testFindCaseInsensitiveAsFallback()
+    {
+        $application = new Application();
+        $application->add(new \FooSameCaseLowercaseCommand());
+
+        $this->assertInstanceOf('FooSameCaseLowercaseCommand', $application->find('f:b'), '->find() returns a command if the abbreviation is the correct case');
+        $this->assertInstanceOf('FooSameCaseLowercaseCommand', $application->find('f:B'), '->find() will fallback to case insensitivity');
+        $this->assertInstanceOf('FooSameCaseLowercaseCommand', $application->find('FoO:BaR'), '->find() will fallback to case insensitivity');
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\CommandNotFoundException
+     * @expectedExceptionMessage Command "FoO:BaR" is ambiguous
+     */
+    public function testFindCaseInsensitiveSuggestions()
+    {
+        $application = new Application();
+        $application->add(new \FooSameCaseLowercaseCommand());
+        $application->add(new \FooSameCaseUppercaseCommand());
+
+        $this->assertInstanceOf('FooSameCaseLowercaseCommand', $application->find('FoO:BaR'), '->find() will find two suggestions with case insensitivity');
+    }
+
     public function testFindWithCommandLoader()
     {
         $application = new Application();
@@ -413,8 +450,8 @@ class ApplicationTest extends TestCase
     public function provideInvalidCommandNamesSingle()
     {
         return array(
-            array('foo3:baR'),
-            array('foO3:bar'),
+            array('foo3:barr'),
+            array('fooo3:bar'),
         );
     }
 

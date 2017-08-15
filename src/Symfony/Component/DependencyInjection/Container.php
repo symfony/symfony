@@ -429,7 +429,7 @@ class Container implements ResettableContainerInterface
      *
      * @param string $name The name of the environment variable
      *
-     * @return scalar The value to use for the provided environment variable name
+     * @return mixed The value to use for the provided environment variable name
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */

@@ -73,6 +73,8 @@ class Definition
     /**
      * Sets the tracked changes for the Definition object.
      *
+     * @param array $changes An array of changes for this Definition
+     *
      * @return $this
      */
     public function setChanges(array $changes)
@@ -403,6 +405,8 @@ class Definition
      * Sets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
      *
      * @param $instanceof ChildDefinition[]
+     *
+     * @return $this
      */
     public function setInstanceofConditionals(array $instanceof)
     {

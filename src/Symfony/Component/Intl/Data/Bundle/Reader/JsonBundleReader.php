@@ -32,17 +32,15 @@ class JsonBundleReader implements BundleReaderInterface
 
         if (!file_exists($fileName)) {
             throw new ResourceBundleNotFoundException(sprintf(
-                'The resource bundle "%s/%s.json" does not exist.',
-                $path,
-                $locale
+                'The resource bundle "%s" does not exist.',
+                $fileName
             ));
         }
 
         if (!is_file($fileName)) {
             throw new RuntimeException(sprintf(
-                'The resource bundle "%s/%s.json" is not a file.',
-                $path,
-                $locale
+                'The resource bundle "%s" is not a file.',
+                $fileName
             ));
         }
 
@@ -50,9 +48,8 @@ class JsonBundleReader implements BundleReaderInterface
 
         if (null === $data) {
             throw new RuntimeException(sprintf(
-                'The resource bundle "%s/%s.json" contains invalid JSON: %s',
-                $path,
-                $locale,
+                'The resource bundle "%s" contains invalid JSON: %s',
+                $fileName,
                 json_last_error_msg()
             ));
         }

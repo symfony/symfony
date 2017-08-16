@@ -25,6 +25,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
+    private $processedConfigs = array();
+
     /**
      * {@inheritdoc}
      */
@@ -91,7 +93,19 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     {
         $processor = new Processor();
 
-        return $processor->processConfiguration($configuration, $configs);
+        return $this->processedConfigs[] = $processor->processConfiguration($configuration, $configs);
+    }
+
+    /**
+     * @internal
+     */
+    final public function getProcessedConfigs()
+    {
+        try {
+            return $this->processedConfigs;
+        } finally {
+            $this->processedConfigs = array();
+        }
     }
 
     /**

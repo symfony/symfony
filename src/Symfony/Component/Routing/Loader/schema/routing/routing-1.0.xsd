@@ -41,6 +41,7 @@
     <xsd:attribute name="host" type="xsd:string" />
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
+    <xsd:attribute name="controller" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="import">
@@ -52,6 +53,7 @@
     <xsd:attribute name="host" type="xsd:string" />
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
+    <xsd:attribute name="controller" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="default" mixed="true">

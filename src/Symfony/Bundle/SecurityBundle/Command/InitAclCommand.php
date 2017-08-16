@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Acl\Dbal\Schema;
@@ -25,43 +25,17 @@ use Doctrine\DBAL\Schema\SchemaException;
  *
  * @final since version 3.4
  */
-class InitAclCommand extends ContainerAwareCommand
+class InitAclCommand extends Command
 {
     private $connection;
     private $schema;
 
-    /**
-     * @param Connection $connection
-     * @param Schema     $schema
-     */
-    public function __construct($connection = null, Schema $schema = null)
+    public function __construct(Connection $connection, Schema $schema)
     {
-        if (!$connection instanceof Connection) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            parent::__construct($connection);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->connection = $connection;
         $this->schema = $schema;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
-     */
-    public function isEnabled()
-    {
-        if (!$this->connection && !$this->getContainer()->has('security.acl.dbal.connection')) {
-            return false;
-        }
-
-        return parent::isEnabled();
     }
 
     /**
@@ -92,12 +66,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->connection) {
-            $this->connection = $this->getContainer()->get('security.acl.dbal.connection');
-            $this->schema = $this->getContainer()->get('security.acl.dbal.schema');
-        }
-
         try {
             $this->schema->addToSchema($this->connection->getSchemaManager()->createSchema());
         } catch (SchemaException $e) {

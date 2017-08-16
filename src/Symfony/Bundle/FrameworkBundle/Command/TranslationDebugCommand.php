@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,7 +35,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @final since version 3.4
  */
-class TranslationDebugCommand extends ContainerAwareCommand
+class TranslationDebugCommand extends Command
 {
     const MESSAGE_MISSING = 0;
     const MESSAGE_UNUSED = 1;
@@ -44,21 +45,8 @@ class TranslationDebugCommand extends ContainerAwareCommand
     private $loader;
     private $extractor;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param TranslationLoader   $loader
-     * @param ExtractorInterface  $extractor
-     */
-    public function __construct($translator = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null)
+    public function __construct(TranslatorInterface $translator, TranslationLoader $loader, ExtractorInterface $extractor)
     {
-        if (!$translator instanceof TranslatorInterface) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            parent::__construct($translator);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->translator = $translator;
@@ -118,33 +106,9 @@ EOF
 
     /**
      * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
-     */
-    public function isEnabled()
-    {
-        if (null !== $this->translator) {
-            return parent::isEnabled();
-        }
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            return false;
-        }
-
-        return parent::isEnabled();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->translator) {
-            $this->translator = $this->getContainer()->get('translator');
-            $this->loader = $this->getContainer()->get('translation.loader');
-            $this->extractor = $this->getContainer()->get('translation.extractor');
-        }
-
         $io = new SymfonyStyle($input, $output);
 
         $locale = $input->getArgument('locale');

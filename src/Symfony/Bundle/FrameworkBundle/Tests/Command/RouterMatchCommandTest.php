@@ -42,24 +42,6 @@ class RouterMatchCommandTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
-     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
-     */
-    public function testLegacyMatchCommand()
-    {
-        $application = new Application($this->getKernel());
-        $application->add(new RouterMatchCommand());
-        $application->add(new RouterDebugCommand());
-
-        $tester = new CommandTester($application->find('router:match'));
-
-        $tester->execute(array('path_info' => '/'));
-
-        $this->assertContains('None of the routes match the path "/"', $tester->getDisplay());
-    }
-
-    /**
      * @return CommandTester
      */
     private function createCommandTester()

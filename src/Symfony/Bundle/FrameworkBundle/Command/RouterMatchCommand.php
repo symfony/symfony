@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,47 +28,15 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  *
  * @final since version 3.4
  */
-class RouterMatchCommand extends ContainerAwareCommand
+class RouterMatchCommand extends Command
 {
     private $router;
 
-    /**
-     * @param RouterInterface $router
-     */
-    public function __construct($router = null)
+    public function __construct(RouterInterface $router)
     {
-        if (!$router instanceof RouterInterface) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            parent::__construct($router);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->router = $router;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
-     */
-    public function isEnabled()
-    {
-        if (null !== $this->router) {
-            return parent::isEnabled();
-        }
-        if (!$this->getContainer()->has('router')) {
-            return false;
-        }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof RouterInterface) {
-            return false;
-        }
-
-        return parent::isEnabled();
     }
 
     /**
@@ -103,11 +72,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->router) {
-            $this->router = $this->getContainer()->get('router');
-        }
-
         $io = new SymfonyStyle($input, $output);
 
         $context = $this->router->getContext();

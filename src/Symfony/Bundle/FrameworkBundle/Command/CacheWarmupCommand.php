@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,23 +25,12 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
  *
  * @final since version 3.4
  */
-class CacheWarmupCommand extends ContainerAwareCommand
+class CacheWarmupCommand extends Command
 {
     private $cacheWarmer;
 
-    /**
-     * @param CacheWarmerAggregate $cacheWarmer
-     */
-    public function __construct($cacheWarmer = null)
+    public function __construct(CacheWarmerAggregate $cacheWarmer)
     {
-        if (!$cacheWarmer instanceof CacheWarmerAggregate) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            parent::__construct($cacheWarmer);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->cacheWarmer = $cacheWarmer;
@@ -77,12 +67,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->cacheWarmer) {
-            $this->cacheWarmer = $this->getContainer()->get('cache_warmer');
-            $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        }
-
         $io = new SymfonyStyle($input, $output);
 
         $kernel = $this->getApplication()->getKernel();
@@ -92,7 +76,7 @@ EOF
             $this->cacheWarmer->enableOptionalWarmers();
         }
 
-        $this->cacheWarmer->warmUp(isset($cacheDir) ? $cacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir'));
+        $this->cacheWarmer->warmUp($kernel->getContainer()->getParameter('kernel.cache_dir'));
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully warmed.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }

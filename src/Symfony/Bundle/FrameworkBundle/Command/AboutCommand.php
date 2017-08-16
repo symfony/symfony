@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @final since version 3.4
  */
-class AboutCommand extends ContainerAwareCommand
+class AboutCommand extends Command
 {
     /**
      * {@inheritdoc}

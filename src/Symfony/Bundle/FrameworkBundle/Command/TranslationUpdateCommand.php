@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
@@ -31,7 +32,7 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
  *
  * @final since version 3.4
  */
-class TranslationUpdateCommand extends ContainerAwareCommand
+class TranslationUpdateCommand extends Command
 {
     private $writer;
     private $loader;
@@ -44,16 +45,8 @@ class TranslationUpdateCommand extends ContainerAwareCommand
      * @param ExtractorInterface $extractor
      * @param string             $defaultLocale
      */
-    public function __construct($writer = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
+    public function __construct(TranslationWriter $writer, TranslationLoader $loader, ExtractorInterface $extractor, $defaultLocale)
     {
-        if (!$writer instanceof TranslationWriter) {
-            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-
-            parent::__construct($writer);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->writer = $writer;
@@ -102,34 +95,9 @@ EOF
 
     /**
      * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
-     */
-    public function isEnabled()
-    {
-        if (null !== $this->writer) {
-            return parent::isEnabled();
-        }
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            return false;
-        }
-
-        return parent::isEnabled();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->writer) {
-            $this->writer = $this->getContainer()->get('translation.writer');
-            $this->loader = $this->getContainer()->get('translation.loader');
-            $this->extractor = $this->getContainer()->get('translation.extractor');
-            $this->defaultLocale = $this->getContainer()->getParameter('kernel.default_locale');
-        }
-
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 

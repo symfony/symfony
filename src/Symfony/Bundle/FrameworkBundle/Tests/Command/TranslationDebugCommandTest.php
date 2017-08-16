@@ -174,51 +174,6 @@ class TranslationDebugCommandTest extends TestCase
         return new CommandTester($application->find('debug:translation'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
-     */
-    public function testLegacyDebugCommand()
-    {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader')->getMock();
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
-        $kernel
-            ->expects($this->any())
-            ->method('getBundles')
-            ->will($this->returnValue(array()));
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap(array(
-                array('translation.extractor', 1, $extractor),
-                array('translation.loader', 1, $loader),
-                array('translator', 1, $translator),
-                array('kernel', 1, $kernel),
-            )));
-
-        $kernel
-            ->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($container));
-
-        $command = new TranslationDebugCommand();
-        $command->setContainer($container);
-
-        $application = new Application($kernel);
-        $application->add($command);
-
-        $tester = new CommandTester($application->find('debug:translation'));
-        $tester->execute(array('locale' => 'en'));
-
-        $this->assertContains('No defined or extracted', $tester->getDisplay());
-    }
-
     private function getBundle($path)
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();

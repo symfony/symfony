@@ -23,29 +23,21 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
  */
 class YamlLintCommand extends BaseLintCommand
 {
-    public function __construct($name = null, $directoryIteratorProvider = null, $isReadableProvider = null)
+    public function __construct()
     {
-        if (func_num_args()) {
-            @trigger_error(sprintf('Passing a constructor argument in "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
-        }
+        $directoryIteratorProvider = function ($directory, $default) {
+            if (!is_dir($directory)) {
+                $directory = $this->getApplication()->getKernel()->locateResource($directory);
+            }
 
-        if (null === $directoryIteratorProvider) {
-            $directoryIteratorProvider = function ($directory, $default) {
-                if (!is_dir($directory)) {
-                    $directory = $this->getApplication()->getKernel()->locateResource($directory);
-                }
+            return $default($directory);
+        };
 
-                return $default($directory);
-            };
-        }
+        $isReadableProvider = function ($fileOrDirectory, $default) {
+            return 0 === strpos($fileOrDirectory, '@') || $default($fileOrDirectory);
+        };
 
-        if (null === $isReadableProvider) {
-            $isReadableProvider = function ($fileOrDirectory, $default) {
-                return 0 === strpos($fileOrDirectory, '@') || $default($fileOrDirectory);
-            };
-        }
-
-        parent::__construct($name, $directoryIteratorProvider, $isReadableProvider);
+        parent::__construct(null, $directoryIteratorProvider, $isReadableProvider);
     }
 
     /**

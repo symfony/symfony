@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by pounard at 2017-08-15T10:52:27Z
+
+From what I see, it should work, I need to test it in the original context I got the error, I can only do that at work so I'll give you a straight answer within the next week.
+
+As a side note I'm afraid this will truncate reported file names, am I wrong ? Isn't there a more straight method to determine the project root ? Something from configuration or a constant or anything else would be great actually.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-15T11:01:33Z
+
+This is pure visual truncation so we don't really care if it's not perfect.
+
+---------------------------------------------------------------------------
+
+by pounard at 2017-08-15T11:54:31Z
+
+Seems legit, I will test it as soon as I can, thanks for patching so fast.

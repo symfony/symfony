@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\EventListener;
 
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
@@ -54,6 +55,10 @@ class GuardListener
     private function getVariables(GuardEvent $event)
     {
         $token = $this->tokenStorage->getToken();
+        if($token == null) {
+            $token = new AnonymousToken('secret','anon',[]);
+            $this->tokenStorage->setToken($token);
+        }
 
         if (null !== $this->roleHierarchy) {
             $roles = $this->roleHierarchy->getReachableRoles($token->getRoles());

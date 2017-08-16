@@ -69,6 +69,20 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
+    public function testWithNoTokenStorage()
+    {
+        $event = $this->createEvent();
+        $this->tokenStorage = null;
+
+        $this->listener->onTransition($event, 'event_name_a');
+
+        $this->assertFalse($event->isBlocked());
+
+        $this->listener->onTransition($event, 'event_name_b');
+
+        $this->assertTrue($event->isBlocked());
+    }
+
     private function createEvent()
     {
         $subject = new \stdClass();

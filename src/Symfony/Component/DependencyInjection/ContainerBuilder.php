@@ -114,6 +114,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $envCounters = array();
 
     /**
+     * @var string[][] a map of secret var names to their placeholders
+     */
+    private $secretPlaceholders = array();
+
+    /**
+     * @var int[] a map of secret vars to their resolution counter
+     */
+    private $secretCounters = array();
+
+    /**
      * @var string[] the list of vendor directories
      */
     private $vendors;
@@ -637,14 +647,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($this->getParameterBag() instanceof EnvPlaceholderParameterBag && $container->getParameterBag() instanceof EnvPlaceholderParameterBag) {
             $this->getParameterBag()->mergeEnvPlaceholders($container->getParameterBag());
+            $this->getParameterBag()->mergeSecretPlaceholders($container->getParameterBag());
         }
 
         foreach ($container->envCounters as $env => $count) {
-            if (!isset($this->envCounters[$env])) {
-                $this->envCounters[$env] = $count;
-            } else {
-                $this->envCounters[$env] += $count;
-            }
+            isset($this->envCounters[$env]) ? $this->envCounters[$env] += $count : $this->envCounters[$env] = $count;
+        }
+
+        foreach ($container->secretCounters as $secret => $count) {
+            isset($this->secretCounters[$secret]) ? $this->secretCounters[$secret] += $count : $this->secretCounters[$secret] = $count;
         }
 
         foreach ($container->getAutoconfiguredInstanceof() as $interface => $childDefinition) {
@@ -701,15 +712,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *  * The parameter bag is frozen;
      *  * Extension loading is disabled.
      *
-     * @param bool $resolveEnvPlaceholders Whether %env()% parameters should be resolved using the current
+     * @param bool $resolvePlaceholders Whether %env()% and %secret% parameters should be resolved using the current
      *                                     env vars or be replaced by uniquely identifiable placeholders.
      *                                     Set to "true" when you want to use the current ContainerBuilder
      *                                     directly, keep to "false" when the container is dumped instead.
      */
-    public function compile(/*$resolveEnvPlaceholders = false*/)
+    public function compile(/*$resolvePlaceholders = false*/)
     {
         if (1 <= func_num_args()) {
-            $resolveEnvPlaceholders = func_get_arg(0);
+            $resolvePlaceholders = func_get_arg(0);
         } else {
             if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
@@ -717,7 +728,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     @trigger_error(sprintf('The %s::compile() method expects a first "$resolveEnvPlaceholders" argument since version 3.3. It will be made mandatory in 4.0.', static::class), E_USER_DEPRECATED);
                 }
             }
-            $resolveEnvPlaceholders = false;
+            $resolvePlaceholders = false;
         }
         $compiler = $this->getCompiler();
 
@@ -728,10 +739,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
         $bag = $this->getParameterBag();
 
-        if ($resolveEnvPlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
-            $this->parameterBag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
+        if ($resolvePlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
+            $values = $this->resolveEnvPlaceholders($bag->all(), true);
+            $this->parameterBag = new ParameterBag($this->resolveSecretPlaceholders($values, true));
+
             $this->envPlaceholders = $bag->getEnvPlaceholders();
-            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all()));
+            $this->secretPlaceholders = $bag->getSecretPlaceholders();
+
+            $values = $this->resolveEnvPlaceholders($this->parameterBag->all());
+            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($values));
         }
 
         $compiler->compile($this);
@@ -747,6 +763,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         parent::compile();
 
         $this->envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : array();
+        $this->secretPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getSecretPlaceholders() : array();
     }
 
     /**
@@ -1279,20 +1296,41 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string|true|null $format    A sprintf() format returning the replacement for each env var name or
      *                                    null to resolve back to the original "%env(VAR)%" format or
      *                                    true to resolve to the actual values of the referenced env vars
-     * @param array            &$usedEnvs Env vars found while resolving are added to this array
+     * @param array            &$used     Env vars found while resolving are added to this array
      *
      * @return string The string with env parameters resolved
      */
-    public function resolveEnvPlaceholders($value, $format = null, array &$usedEnvs = null)
+    public function resolveEnvPlaceholders($value, $format = null, array &$used = null)
+    {
+        return $this->resolvePlaceholders(false, $value, $format, $used);
+    }
+
+    /**
+     * Resolves secret parameter placeholders in a string or an array.
+     *
+     * @param mixed            $value     The value to resolve
+     * @param string|true|null $format    A sprintf() format returning the replacement for each secret var name or
+     *                                    null to resolve back to the original "%secret(VAR)%" format or
+     *                                    true to resolve to the actual values of the referenced secret vars
+     * @param array            &$used     Secret vars found while resolving are added to this array
+     *
+     * @return string The string with secret parameters resolved
+     */
+    public function resolveSecretPlaceholders($value, $format = null, array &$used = null)
+    {
+        return $this->resolvePlaceholders(true, $value, $format, $used);
+    }
+
+    private function resolvePlaceholders($secret, $value, $format = null, array &$used = null)
     {
         if (null === $format) {
-            $format = '%%env(%s)%%';
+            $format = '%%'.($secret ? 'secret' : 'env').'(%s)%%';
         }
 
         if (is_array($value)) {
             $result = array();
             foreach ($value as $k => $v) {
-                $result[$this->resolveEnvPlaceholders($k, $format, $usedEnvs)] = $this->resolveEnvPlaceholders($v, $format, $usedEnvs);
+                $result[$this->resolvePlaceholders($secret, $k, $format, $used)] = $this->resolvePlaceholders($secret, $v, $format, $used);
             }
 
             return $result;
@@ -1306,19 +1344,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (true === $format) {
             $value = $bag->resolveValue($value);
         }
-        $envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
 
-        foreach ($envPlaceholders as $env => $placeholders) {
+        if ($secret) {
+            $placeholderList = $bag instanceof EnvPlaceholderParameterBag ? $bag->getSecretPlaceholders() : $this->secretPlaceholders;
+        } else {
+            $placeholderList = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
+        }
+
+        foreach ($placeholderList as $key => $placeholders) {
             foreach ($placeholders as $placeholder) {
                 if (false !== stripos($value, $placeholder)) {
                     if (true === $format) {
-                        $resolved = $bag->escapeValue($this->getEnv($env));
+                        $resolved = $bag->escapeValue($secret ? $this->getSecret($key) : $this->getEnv($key));
                     } else {
-                        $resolved = sprintf($format, $env);
+                        $resolved = sprintf($format, $key);
                     }
                     $value = str_ireplace($placeholder, $resolved, $value);
-                    $usedEnvs[$env] = $env;
-                    $this->envCounters[$env] = isset($this->envCounters[$env]) ? 1 + $this->envCounters[$env] : 1;
+                    $used[$key] = $key;
+
+                    if ($secret) {
+                        $this->secretCounters[$key] = isset($this->secretCounters[$key]) ? 1 + $this->secretCounters[$key] : 1;
+                    } else {
+                        $this->envCounters[$key] = isset($this->envCounters[$key]) ? 1 + $this->envCounters[$key] : 1;
+                    }
                 }
             }
         }
@@ -1359,6 +1407,25 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $normalizedIds;
+    }
+
+    /**
+     * Get statistics about secret usage.
+     *
+     * @return int[] The number of time each secret vars has been resolved
+     */
+    public function getSecretCounters()
+    {
+        $bag = $this->getParameterBag();
+        $secretPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getSecretPlaceholders() : $this->secretPlaceholders;
+
+        foreach ($secretPlaceholders as $secret => $placeholders) {
+            if (!isset($this->secretCounters[$secret])) {
+                $this->secretCounters[$secret] = 0;
+            }
+        }
+
+        return $this->secretCounters;
     }
 
     /**

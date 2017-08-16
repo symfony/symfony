@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-06-20T13:11:03Z
+
+I'm not sure about this proposal. It's better for DX ... but it introduces another way to configure something that you can already configure it in several ways.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-20T13:46:51Z
+
+Thus, it might then confuse people about why there is `_controller` in attributes of the Request object
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-06-20T14:18:20Z
+
+@stof, I think it's not a problem. Most users prefer to configure routes using annotations and don't know about the Request's `_controller` parameter.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-03T10:25:50Z
+
+I like the idea. Back then, I didn't know if we would have more than `_controller`. 5 years later, I think it's a good time to actually recognize that using `_controller` is not so nice and move it to a first class citizen.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-03T10:29:47Z
+
+Same to me, DX wise, it's way easier to use.
+About the implem, I think we should do that in the existing loaders.
+I get the argument that the router doesn't know about what a "controller" is, but a loader just maps some input to an output. Adding this case doesn't mean the routing component becomes controller-aware all of a sudden. This will ease the patch and its maintenance.
+
+---------------------------------------------------------------------------
+
+by szymach at 2017-07-03T10:32:39Z
+
+Out of curiosity, is there a way to not define a controller and have the route work? Aside from it being just a placeholder, like for example the logout route. If there is no other way to use routes that to map them to controllers, it should just by a first-class citizen.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-03T11:36:26Z
+
+I totally agree about using the existing loader. It also means that other projects uisng the component without FrameworkBundle (Silex, Drupal, etc...) get the same experience.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-03T19:53:46Z
+
+@stof, @nicolas-grekas, Okay, maybe you're right. I've made changes to use the existing loaders instead of creating the new ones.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-04T13:42:20Z
+
+@fabpot, I've fixed all the CS issues you pointed out.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-04T16:46:53Z
+
+@nicolas-grekas, Fixed. I've removed the `controllerKey` property. Now the `_controller` key is hardcoded in the loaders.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T08:00:22Z
+
+W don't merge PRs with merge commit, please rebase instead.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-11T08:49:25Z
+
+@nicolas-grekas, sorry, I used the GitHub's web interface to resolve conflict and didn't know that it creates merge commit. I've removed that commit and rebased the PR. Thanks!
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-15T18:30:49Z
+
+@xabbuh, thanks for the code review! I've fixed all issues you pointed out and added the missing test cases.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-17T13:59:31Z
+
+@xabbuh, I think you're right! I've added the test case you suggested.

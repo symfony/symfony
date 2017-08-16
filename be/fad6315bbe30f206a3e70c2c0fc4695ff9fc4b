@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T10:48:36Z
+
+don't forget to replace the `extends ContainerAwareCommand` also
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-07T11:42:03Z
+
+See also Xliff/YamlLintCommand btw

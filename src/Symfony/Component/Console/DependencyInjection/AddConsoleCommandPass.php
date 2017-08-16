@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\DependencyInjection;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\DefaultNameProviderInterface;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -55,7 +56,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
             $commandId = 'console.command.'.strtolower(str_replace('\\', '_', $class));
 
-            if (!isset($tags[0]['command'])) {
+            if (!isset($tags[0]['command']) && !$r->implementsInterface(DefaultNameProviderInterface::class)) {
                 if (isset($serviceIds[$commandId]) || $container->hasAlias($commandId)) {
                     $commandId = $commandId.'_'.$id;
                 }
@@ -69,7 +70,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
             }
 
             $serviceIds[$commandId] = false;
-            $commandName = $tags[0]['command'];
+            $commandName = isset($tags[0]['command']) ? $tags[0]['command'] : $class::getDefaultName();
             unset($tags[0]);
             $lazyCommandMap[$commandName] = $id;
             $lazyCommandRefs[$id] = new TypedReference($id, $class);

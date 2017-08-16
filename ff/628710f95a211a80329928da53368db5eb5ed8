@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-12T12:41:57Z
+
+Status: needs work
+
+If the new container is the same as the old, we shouldn't remove the files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-12T16:50:10Z
+
+Fixed
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-08-13T12:19:18Z
+
+No tests? 🙀
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-15T13:47:33Z
+
+@sstok now with tests :)

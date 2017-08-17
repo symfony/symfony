@@ -75,7 +75,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['bar'] = $instance = new \BarClass();
 
-        $instance->setBaz($this->parameters['array_1'], $this->getParameter('array_2'), '%array_1%');
+        $instance->setBaz($this->parameters['array_1'], $this->getParameter('array_2'), '%array_1%', $this->parameters['array_1']);
 
         return $instance;
     }

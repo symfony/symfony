@@ -56,7 +56,7 @@ class GuardListener
     {
         $token = $this->tokenStorage->getToken();
 
-        if ($token == null) {
+        if (null === $token) {
             $token = new AnonymousToken('secret', 'anon', array());
             $this->tokenStorage->setToken($token);
         }

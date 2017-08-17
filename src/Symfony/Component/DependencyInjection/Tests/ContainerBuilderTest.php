@@ -603,29 +603,37 @@ class ContainerBuilderTest extends TestCase
     public function testResolveEnvValues()
     {
         $_ENV['DUMMY_ENV_VAR'] = 'du%%y';
+        $_SERVER['DUMMY_SERVER_VAR'] = 'ABC';
+        $_SERVER['HTTP_DUMMY_VAR'] = 'DEF';
 
         $container = new ContainerBuilder();
-        $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)%');
+        $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)% %env(DUMMY_SERVER_VAR)% %env(HTTP_DUMMY_VAR)%');
+        $container->setParameter('env(HTTP_DUMMY_VAR)', '123');
 
-        $this->assertSame('%% du%%%%y', $container->resolveEnvPlaceholders('%bar%', true));
+        $this->assertSame('%% du%%%%y ABC 123', $container->resolveEnvPlaceholders('%bar%', true));
 
-        unset($_ENV['DUMMY_ENV_VAR']);
+        unset($_ENV['DUMMY_ENV_VAR'], $_SERVER['DUMMY_SERVER_VAR'], $_SERVER['HTTP_DUMMY_VAR']);
     }
 
     public function testCompileWithResolveEnv()
     {
-        $_ENV['DUMMY_ENV_VAR'] = 'du%%y';
+        putenv('DUMMY_ENV_VAR=du%%y');
+        $_SERVER['DUMMY_SERVER_VAR'] = 'ABC';
+        $_SERVER['HTTP_DUMMY_VAR'] = 'DEF';
 
         $container = new ContainerBuilder();
         $container->setParameter('env(FOO)', 'Foo');
-        $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)%');
+        $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)% %env(DUMMY_SERVER_VAR)% %env(HTTP_DUMMY_VAR)%');
         $container->setParameter('foo', '%env(FOO)%');
+        $container->setParameter('baz', '%foo%');
+        $container->setParameter('env(HTTP_DUMMY_VAR)', '123');
         $container->compile(true);
 
-        $this->assertSame('% du%%y', $container->getParameter('bar'));
-        $this->assertSame('Foo', $container->getParameter('foo'));
+        $this->assertSame('% du%%y ABC 123', $container->getParameter('bar'));
+        $this->assertSame('Foo', $container->getParameter('baz'));
 
-        unset($_ENV['DUMMY_ENV_VAR']);
+        unset($_SERVER['DUMMY_SERVER_VAR'], $_SERVER['HTTP_DUMMY_VAR']);
+        putenv('DUMMY_ENV_VAR');
     }
 
     /**

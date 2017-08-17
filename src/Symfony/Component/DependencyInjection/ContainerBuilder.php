@@ -729,9 +729,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $bag = $this->getParameterBag();
 
         if ($resolveEnvPlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
-            $this->parameterBag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
+            $bag->resolveEnvReferences();
+            $this->parameterBag = new ParameterBag($bag->all());
             $this->envPlaceholders = $bag->getEnvPlaceholders();
-            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all()));
+            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
         }
 
         $compiler->compile($this);
@@ -746,7 +747,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         parent::compile();
 
-        $this->envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : array();
+        if ($bag instanceof EnvPlaceholderParameterBag) {
+            $this->envPlaceholders = $bag->getEnvPlaceholders();
+        }
     }
 
     /**
@@ -1311,10 +1314,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         foreach ($envPlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
                 if (false !== stripos($value, $placeholder)) {
-                    if (true === $format) {
-                        $resolved = $bag->escapeValue($this->getEnv($env));
-                    } else {
+                    if (true !== $format) {
                         $resolved = sprintf($format, $env);
+                    } elseif ($placeholder === $resolved = $bag->escapeValue($this->getEnv($env))) {
+                        $resolved = $bag->all()[strtolower("env($env)")];
                     }
                     $value = str_ireplace($placeholder, $resolved, $value);
                     $usedEnvs[$env] = $env;

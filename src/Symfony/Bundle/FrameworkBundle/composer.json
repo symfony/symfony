@@ -55,7 +55,7 @@
         "symfony/property-info": "~3.4|~4.0",
         "symfony/web-link": "~3.4|~4.0",
         "doctrine/annotations": "~1.0",
-        "phpdocumentor/reflection-docblock": "^3.0",
+        "phpdocumentor/reflection-docblock": "^3.0|^4.0",
         "twig/twig": "~1.34|~2.4"
     },
     "conflict": {

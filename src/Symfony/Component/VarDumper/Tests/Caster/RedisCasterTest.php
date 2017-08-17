@@ -44,8 +44,7 @@ EODUMP;
         }
 
         $xCast = <<<'EODUMP'
-Redis {
-  +"socket": Redis Socket Buffer resource
+Redis {%A
   isConnected: true
   host: "127.0.0.1"
   port: 6379

@@ -527,6 +527,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                     file_put_contents($this->getCacheDir().'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
                 }
             }
+
+            if ($oldContainer = file_exists($cache->getPath()) ? @include $cache->getPath() : false) {
+                $oldContainer = new \ReflectionClass($oldContainer);
+            }
+
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
@@ -535,7 +540,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
-        if (!$fresh && $this->container->has('cache_warmer')) {
+        if ($fresh) {
+            return;
+        }
+
+        if ($oldContainer && get_class($this->container) !== $oldContainer->name) {
+            (new Filesystem())->remove(dirname($oldContainer->getFileName()));
+        }
+
+        if ($this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
@@ -686,6 +699,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $fs->dumpFile($dir.$file, $code, null);
             @chmod($dir.$file, 0666 & ~umask());
         }
+
+        // track changes made to the container directory
+        $container->fileExists(dirname($dir.$file));
 
         $cache->write($rootCode, $container->getResources());
     }

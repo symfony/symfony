@@ -309,13 +309,3 @@ class ClassMetadataTest extends TestCase
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
 }
-
-class ParentClass
-{
-    public $example = 0;
-}
-
-class ChildClass extends ParentClass
-{
-    public $example = 1;    // overrides parent property of same name
-}

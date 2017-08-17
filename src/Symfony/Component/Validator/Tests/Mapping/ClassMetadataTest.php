@@ -24,6 +24,7 @@ class ClassMetadataTest extends TestCase
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
     const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
+    const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
 
     protected $metadata;
 
@@ -298,6 +299,17 @@ class ClassMetadataTest extends TestCase
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
+        $this->assertTrue($metadata->isGroupSequenceProvider());
+    }
+
+    public function testMergeConstraintsMergesGroupSequenceProvider()
+    {
+        $parent = new ClassMetadata(self::PROVIDERCLASS);
+        $parent->setGroupSequenceProvider(true);
+
+        $metadata = new ClassMetadata(self::PROVIDERCHILDCLASS);
+        $metadata->mergeConstraints($parent);
+
         $this->assertTrue($metadata->isGroupSequenceProvider());
     }
 

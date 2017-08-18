@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholders = array();
-    private $resolveEnvReferences = false;
 
     /**
      * {@inheritdoc}
@@ -101,30 +100,5 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, %s given.', $env, gettype($default)));
             }
         }
-    }
-
-    /**
-     * Replaces "%env(FOO)%" references by their placeholder, keeping regular "%parameters%" references as is.
-     */
-    public function resolveEnvReferences(array $value)
-    {
-        $this->resolveEnvReferences = true;
-        try {
-            return $this->resolveValue($value);
-        } finally {
-            $this->resolveEnvReferences = false;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolveString($value, array $resolving = array())
-    {
-        if ($this->resolveEnvReferences) {
-            return preg_replace_callback('/%%|%(env\([^%\s]+\))%/', function ($match) { return isset($match[1]) ? $this->get($match[1]) : '%%'; }, $value);
-        }
-
-        return parent::resolveString($value, $resolving);
     }
 }

@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added `RebootableInterface` and implemented it in `Kernel`
  * deprecated commands auto registration
  * added `AddCacheClearerPass`
  * added `AddCacheWarmerPass`

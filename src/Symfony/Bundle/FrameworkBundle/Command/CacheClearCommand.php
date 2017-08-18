@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\RebootableInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -33,6 +34,7 @@ class CacheClearCommand extends ContainerAwareCommand
 {
     private $cacheClearer;
     private $filesystem;
+    private $warning;
 
     /**
      * @param CacheClearerInterface $cacheClearer
@@ -112,6 +114,12 @@ EOF
             $this->filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
             $this->warmupCache($input, $output, $realCacheDir, $oldCacheDir);
+
+            if ($this->warning) {
+                @trigger_error($this->warning, E_USER_DEPRECATED);
+                $io->warning($this->warning);
+                $this->warning = null;
+            }
         }
 
         if ($output->isVerbose()) {
@@ -167,17 +175,23 @@ EOF
     {
         // create a temporary kernel
         $realKernel = $this->getApplication()->getKernel();
-        $realKernelClass = get_class($realKernel);
-        $namespace = '';
-        if (false !== $pos = strrpos($realKernelClass, '\\')) {
-            $namespace = substr($realKernelClass, 0, $pos);
-            $realKernelClass = substr($realKernelClass, $pos + 1);
-        }
-        $tempKernel = $this->getTempKernel($realKernel, $namespace, $realKernelClass, $warmupDir);
-        $tempKernel->boot();
+        if ($realKernel instanceof RebootableInterface) {
+            $realKernel->reboot($warmupDir);
+            $tempKernel = $realKernel;
+        } else {
+            $this->warning = 'Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is deprecated since version 3.4 and will be unsupported in 4.0.';
+            $realKernelClass = get_class($realKernel);
+            $namespace = '';
+            if (false !== $pos = strrpos($realKernelClass, '\\')) {
+                $namespace = substr($realKernelClass, 0, $pos);
+                $realKernelClass = substr($realKernelClass, $pos + 1);
+            }
+            $tempKernel = $this->getTempKernel($realKernel, $namespace, $realKernelClass, $warmupDir);
+            $tempKernel->boot();
 
-        $tempKernelReflection = new \ReflectionObject($tempKernel);
-        $tempKernelFile = $tempKernelReflection->getFileName();
+            $tempKernelReflection = new \ReflectionObject($tempKernel);
+            $tempKernelFile = $tempKernelReflection->getFileName();
+        }
 
         // warmup temporary dir
         $warmer = $tempKernel->getContainer()->get('cache_warmer');
@@ -185,6 +199,20 @@ EOF
             $warmer->enableOptionalWarmers();
         }
         $warmer->warmUp($warmupDir);
+
+        // fix references to cached files with the real cache directory name
+        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $replace = str_replace('\\', '/', $realCacheDir);
+        foreach (Finder::create()->files()->in($warmupDir) as $file) {
+            $content = str_replace($search, $replace, file_get_contents($file), $count);
+            if ($count) {
+                file_put_contents($file, $content);
+            }
+        }
+
+        if ($realKernel instanceof RebootableInterface) {
+            return;
+        }
 
         // fix references to the Kernel in .meta files
         $safeTempKernel = str_replace('\\', '\\\\', get_class($tempKernel));
@@ -196,16 +224,6 @@ EOF
                 sprintf('$1"%s"', $realKernelFQN),
                 file_get_contents($file)
             ));
-        }
-
-        // fix references to cached files with the real cache directory name
-        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
-        $replace = str_replace('\\', '/', $realCacheDir);
-        foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($search, $replace, file_get_contents($file), $count);
-            if ($count) {
-                file_put_contents($file, $content);
-            }
         }
 
         // fix references to container's class

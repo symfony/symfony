@@ -84,5 +84,11 @@
         <service id="templating.globals" class="Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables">
             <argument type="service" id="service_container" />
         </service>
+
+        <service id="templating.form_extension.theme" class="Symfony\Component\Form\Extension\Templating\Type\FormTypeThemeExtension">
+            <argument type="service" id="templating.form.engine" />
+            <argument>.html.php</argument>
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+        </service>
     </services>
 </container>

@@ -56,6 +56,9 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
     );
 
+    /** @var array */
+    private $formatterOptions;
+
     /**
      * Constructor.
      *
@@ -64,15 +67,22 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      * @param bool                 $bubble            Whether the messages that are handled can bubble up the stack
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
+     * @param array                $formatterOptions  Array of options for default formatter (ConsoleFormatter)
      */
-    public function __construct(OutputInterface $output = null, $bubble = true, array $verbosityLevelMap = array())
-    {
+    public function __construct(
+        OutputInterface $output = null,
+        $bubble = true,
+        array $verbosityLevelMap = array(),
+        array $formatterOptions = array()
+    ) {
         parent::__construct(Logger::DEBUG, $bubble);
         $this->output = $output;
 
         if ($verbosityLevelMap) {
             $this->verbosityLevelMap = $verbosityLevelMap;
         }
+
+        $this->formatterOptions = $formatterOptions;
     }
 
     /**
@@ -165,13 +175,13 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     protected function getDefaultFormatter()
     {
         if (!$this->output) {
-            return new ConsoleFormatter();
+            return new ConsoleFormatter($this->formatterOptions);
         }
 
-        return new ConsoleFormatter(array(
+        return new ConsoleFormatter(array_replace(array(
             'colors' => $this->output->isDecorated(),
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
-        ));
+        ), $this->formatterOptions));
     }
 
     /**

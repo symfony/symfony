@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * the `ConsoleHandler` class now accepts options for default formatter (`ConsoleFormatter`)
+
 3.3.0
 -----
 

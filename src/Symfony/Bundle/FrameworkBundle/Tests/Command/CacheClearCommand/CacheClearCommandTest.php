@@ -43,9 +43,6 @@ class CacheClearCommandTest extends TestCase
         $this->fs->remove($this->rootDir);
     }
 
-    /**
-     * @group legacy
-     */
     public function testCacheIsFreshAfterCacheClearedWithWarmup()
     {
         $input = new ArrayInput(array('cache:clear'));

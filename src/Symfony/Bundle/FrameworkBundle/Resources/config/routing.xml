@@ -97,8 +97,9 @@
         <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context" />
 
         <service id="router.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer">
+            <tag name="container.service_subscriber" id="router" />
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="router" />
+            <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
 
         <service id="router_listener" class="Symfony\Component\HttpKernel\EventListener\RouterListener" public="true">

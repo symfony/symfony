@@ -14,21 +14,50 @@ namespace Symfony\Bundle\SecurityBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Security\Acl\Dbal\Schema;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\SchemaException;
 
 /**
  * Installs the tables required by the ACL system.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @final since version 3.4
  */
 class InitAclCommand extends ContainerAwareCommand
 {
+    private $connection;
+    private $schema;
+
+    /**
+     * @param Connection $connection
+     * @param Schema     $schema
+     */
+    public function __construct($connection = null, Schema $schema = null)
+    {
+        if (!$connection instanceof Connection) {
+            @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+
+            parent::__construct($connection);
+
+            return;
+        }
+
+        parent::__construct();
+
+        $this->connection = $connection;
+        $this->schema = $schema;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
-        if (!$this->getContainer()->has('security.acl.dbal.connection')) {
+        if (!$this->connection && !$this->getContainer()->has('security.acl.dbal.connection')) {
             return false;
         }
 
@@ -63,21 +92,22 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-
-        $connection = $container->get('security.acl.dbal.connection');
-        $schema = $container->get('security.acl.dbal.schema');
+        // BC to be removed in 4.0
+        if (null === $this->connection) {
+            $this->connection = $this->getContainer()->get('security.acl.dbal.connection');
+            $this->schema = $this->getContainer()->get('security.acl.dbal.schema');
+        }
 
         try {
-            $schema->addToSchema($connection->getSchemaManager()->createSchema());
+            $this->schema->addToSchema($this->connection->getSchemaManager()->createSchema());
         } catch (SchemaException $e) {
             $output->writeln('Aborting: '.$e->getMessage());
 
             return 1;
         }
 
-        foreach ($schema->toSql($connection->getDatabasePlatform()) as $sql) {
-            $connection->exec($sql);
+        foreach ($this->schema->toSql($this->connection->getDatabasePlatform()) as $sql) {
+            $this->connection->exec($sql);
         }
 
         $output->writeln('ACL tables have been initialized successfully.');

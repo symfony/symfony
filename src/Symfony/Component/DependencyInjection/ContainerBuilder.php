@@ -337,12 +337,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Retrieves the requested reflection class and registers it for resource tracking.
      *
      * @param string $class
+     * @param bool   $throw
      *
      * @return \ReflectionClass|null
      *
+     * @throws \ReflectionException when a parent class/interface/trait is not found and $throw is true
+     *
      * @final
      */
-    public function getReflectionClass($class)
+    public function getReflectionClass($class, $throw = true)
     {
         if (!$class = $this->getParameterBag()->resolveValue($class)) {
             return;
@@ -357,6 +360,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
             }
         } catch (\ReflectionException $e) {
+            if ($throw) {
+                throw $e;
+            }
             $classReflector = false;
         }
 
@@ -723,9 +729,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $bag = $this->getParameterBag();
 
         if ($resolveEnvPlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
-            $this->parameterBag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
+            $this->parameterBag = new ParameterBag($bag->resolveEnvReferences($bag->all()));
             $this->envPlaceholders = $bag->getEnvPlaceholders();
-            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all()));
+            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all(), true));
         }
 
         $compiler->compile($this);
@@ -740,7 +746,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         parent::compile();
 
-        $this->envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : array();
+        if ($bag instanceof EnvPlaceholderParameterBag) {
+            $this->envPlaceholders = $bag->getEnvPlaceholders();
+        }
     }
 
     /**
@@ -862,8 +870,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      *
-     * @param string $id    The service identifier
-     * @param string $class The service class
+     * @param string $id         The service identifier
+     * @param string $class|null The service class
      *
      * @return Definition A Definition instance
      */
@@ -1305,10 +1313,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         foreach ($envPlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
                 if (false !== stripos($value, $placeholder)) {
-                    if (true === $format) {
-                        $resolved = $bag->escapeValue($this->getEnv($env));
-                    } else {
+                    if (true !== $format) {
                         $resolved = sprintf($format, $env);
+                    } elseif ($placeholder === $resolved = $bag->escapeValue($this->getEnv($env))) {
+                        $resolved = $bag->all()[strtolower("env($env)")];
                     }
                     $value = str_ireplace($placeholder, $resolved, $value);
                     $usedEnvs[$env] = $env;
@@ -1383,6 +1391,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $services;
+    }
+
+    /**
+     * Computes a reasonably unique hash of a value.
+     *
+     * @param mixed $value A serializable value
+     *
+     * @return string
+     */
+    public static function hash($value)
+    {
+        $hash = substr(base64_encode(hash('sha256', serialize($value), true)), 0, 7);
+
+        return str_replace(array('/', '+'), array('.', '_'), strtolower($hash));
     }
 
     /**

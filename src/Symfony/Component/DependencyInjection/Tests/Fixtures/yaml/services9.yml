@@ -31,6 +31,7 @@ services:
     foo_bar:
         class: '%foo_class%'
         shared: false
+        arguments: ['@deprecated_service']
     method_call1:
         class: Bar\FooClass
         file: '%path%foo.php'

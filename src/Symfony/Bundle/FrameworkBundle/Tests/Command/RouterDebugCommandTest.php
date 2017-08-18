@@ -12,9 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -47,20 +48,33 @@ class RouterDebugCommandTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation Passing a command name as the first argument of "Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     */
+    public function testLegacyDebugCommand()
+    {
+        $application = new Application($this->getKernel());
+        $application->add(new RouterDebugCommand());
+
+        $tester = new CommandTester($application->find('debug:router'));
+
+        $tester->execute(array());
+
+        $this->assertRegExp('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
+    }
+
+    /**
      * @return CommandTester
      */
     private function createCommandTester()
     {
-        $application = new Application();
-
-        $command = new RouterDebugCommand();
-        $command->setContainer($this->getContainer());
-        $application->add($command);
+        $application = new Application($this->getKernel());
+        $application->add(new RouterDebugCommand($this->getRouter()));
 
         return new CommandTester($application->find('debug:router'));
     }
 
-    private function getContainer()
+    private function getRouter()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -68,28 +82,44 @@ class RouterDebugCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection))
-        ;
+            ->will($this->returnValue($routeCollection));
 
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $router;
+    }
 
+    private function getKernel()
+    {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('has')
+            ->will($this->returnCallback(function ($id) {
+                if ('console.command_loader' === $id) {
+                    return false;
+                }
+
+                return true;
+            }))
+        ;
+        $container
+            ->expects($this->any())
+            ->method('get')
             ->with('router')
-            ->will($this->returnValue(true))
+            ->willReturn($this->getRouter())
         ;
 
-        $container
-            ->method('get')
-            ->will($this->returnValueMap(array(
-                array('router', 1, $router),
-                array('controller_name_converter', 1, $loader),
-            )));
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->expects($this->any())
+            ->method('getContainer')
+            ->willReturn($container)
+        ;
+        $kernel
+            ->expects($this->once())
+            ->method('getBundles')
+            ->willReturn(array())
+        ;
 
-        return $container;
+        return $kernel;
     }
 }

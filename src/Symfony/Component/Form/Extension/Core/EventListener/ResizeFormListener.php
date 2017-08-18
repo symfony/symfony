@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * Resize a collection form element based on the data sent from the client.
@@ -48,7 +49,7 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $allowDelete;
 
     /**
-     * @var bool
+     * @var bool|callable
      */
     private $deleteEmpty;
 
@@ -148,14 +149,16 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        if ($this->deleteEmpty) {
-            $previousData = $event->getForm()->getData();
+        if ($entryFilter = $this->deleteEmpty) {
+            $previousData = $form->getData();
+            /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
+                $isEmpty = is_callable($entryFilter) ? $entryFilter($child->getData()) : $child->isEmpty();
 
                 // $isNew can only be true if allowAdd is true, so we don't
                 // need to check allowAdd again
-                if ($child->isEmpty() && ($isNew || $this->allowDelete)) {
+                if ($isEmpty && ($isNew || $this->allowDelete)) {
                     unset($data[$name]);
                     $form->remove($name);
                 }

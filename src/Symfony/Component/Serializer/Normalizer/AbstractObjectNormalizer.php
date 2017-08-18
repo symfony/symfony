@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -33,6 +32,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
     const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+    const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
 
     private $propertyTypeExtractor;
     private $attributesCache = array();
@@ -54,8 +54,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {
@@ -287,6 +285,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if (call_user_func('is_'.$builtinType, $data)) {
                 return $data;
             }
+        }
+
+        if (!empty($context[self::DISABLE_TYPE_ENFORCEMENT])) {
+            return $data;
         }
 
         throw new UnexpectedValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), gettype($data)));

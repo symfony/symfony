@@ -59,6 +59,26 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->root('security');
 
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(function ($v) {
+                    if (!isset($v['access_decision_manager'])) {
+                        return true;
+                    }
+
+                    if (!isset($v['access_decision_manager']['strategy']) && !isset($v['access_decision_manager']['service'])) {
+                        return true;
+                    }
+
+                    return false;
+                })
+                ->then(function ($v) {
+                    $v['access_decision_manager'] = array(
+                        'strategy' => AccessDecisionManager::STRATEGY_AFFIRMATIVE,
+                    );
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')
@@ -73,10 +93,14 @@ class MainConfiguration implements ConfigurationInterface
                     ->children()
                         ->enumNode('strategy')
                             ->values(array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS))
-                            ->defaultValue(AccessDecisionManager::STRATEGY_AFFIRMATIVE)
                         ->end()
+                        ->scalarNode('service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['strategy']) && isset($v['service']); })
+                        ->thenInvalid('"strategy" and "service" cannot be used together.')
                     ->end()
                 ->end()
             ->end()

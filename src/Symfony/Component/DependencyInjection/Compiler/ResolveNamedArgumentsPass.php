@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Resolves named arguments to their corresponding numeric index.
@@ -43,9 +45,6 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                     $resolvedArguments[$key] = $argument;
                     continue;
                 }
-                if ('' === $key || '$' !== $key[0]) {
-                    throw new InvalidArgumentException(sprintf('Invalid key "%s" found in arguments of method "%s()" for service "%s": only integer or $named arguments are allowed.', $key, $method, $this->currentId));
-                }
 
                 if (null === $parameters) {
                     $r = $this->getReflectionMethod($value, $method);
@@ -53,15 +52,31 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                     $parameters = $r->getParameters();
                 }
 
+                if (isset($key[0]) && '$' === $key[0]) {
+                    foreach ($parameters as $j => $p) {
+                        if ($key === '$'.$p->name) {
+                            $resolvedArguments[$j] = $argument;
+
+                            continue 2;
+                        }
+                    }
+
+                    throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s()" has no argument named "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
+                }
+
+                if (null !== $argument && !$argument instanceof Reference && !$argument instanceof Definition) {
+                    throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": the value of argument "%s" of method "%s()" must be null, an instance of %s or an instance of %s, %s given.', $this->currentId, $key, $class !== $this->currentId ? $class.'::'.$method : $method, Reference::class, Definition::class, gettype($argument)));
+                }
+
                 foreach ($parameters as $j => $p) {
-                    if ($key === '$'.$p->name) {
+                    if (ProxyHelper::getTypeHint($r, $p, true) === $key) {
                         $resolvedArguments[$j] = $argument;
 
                         continue 2;
                     }
                 }
 
-                throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s()" has no argument named "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
+                throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s()" has no argument type-hinted as "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
             }
 
             if ($resolvedArguments !== $call[1]) {

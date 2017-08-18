@@ -1,0 +1,11 @@
+app_homepage:
+    path: /
+    controller: AppBundle:Homepage:show
+
+app_blog:
+    path: /blog
+    defaults:
+        _controller: AppBundle:Blog:list
+
+app_logout:
+    path: /logout

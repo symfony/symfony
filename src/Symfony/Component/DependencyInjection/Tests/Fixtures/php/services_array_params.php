@@ -67,18 +67,15 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'bar' service.
+     * Gets the public 'bar' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \BarClass A BarClass instance
+     * @return \BarClass
      */
     protected function getBarService()
     {
         $this->services['bar'] = $instance = new \BarClass();
 
-        $instance->setBaz($this->parameters['array_1'], $this->getParameter('array_2'), '%array_1%');
+        $instance->setBaz($this->parameters['array_1'], $this->getParameter('array_2'), '%array_1%', $this->parameters['array_1']);
 
         return $instance;
     }

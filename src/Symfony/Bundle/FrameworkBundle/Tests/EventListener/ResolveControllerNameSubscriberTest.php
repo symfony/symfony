@@ -37,7 +37,10 @@ class ResolveControllerNameSubscriberTest extends TestCase
         $this->assertEquals('App\\Final\\Format::methodName', $request->attributes->get('_controller'));
     }
 
-    public function testSkipsOtherControllerFormats()
+    /**
+     * @dataProvider provideSkippedControllers
+     */
+    public function testSkipsOtherControllerFormats($controller)
     {
         $parser = $this->getMockBuilder(ControllerNameParser::class)->disableOriginalConstructor()->getMock();
         $parser->expects($this->never())
@@ -45,10 +48,16 @@ class ResolveControllerNameSubscriberTest extends TestCase
         $httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
 
         $request = new Request();
-        $request->attributes->set('_controller', 'Other:format');
+        $request->attributes->set('_controller', $controller);
 
         $subscriber = new ResolveControllerNameSubscriber($parser);
         $subscriber->onKernelRequest(new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
-        $this->assertEquals('Other:format', $request->attributes->get('_controller'));
+        $this->assertEquals($controller, $request->attributes->get('_controller'));
+    }
+
+    public function provideSkippedControllers()
+    {
+        yield array('Other:format');
+        yield array(function () {});
     }
 }

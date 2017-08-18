@@ -13,12 +13,14 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Twig\Extension\ExtensionInterface;
+use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
 
 /**
@@ -46,6 +48,10 @@ class TwigExtension extends Extension
 
         if (interface_exists('Symfony\Component\Templating\EngineInterface')) {
             $loader->load('templating.xml');
+        }
+
+        if (class_exists(Application::class)) {
+            $loader->load('console.xml');
         }
 
         if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
@@ -150,6 +156,7 @@ class TwigExtension extends Extension
         $container->registerForAutoconfiguration(\Twig_LoaderInterface::class)->addTag('twig.loader');
         $container->registerForAutoconfiguration(ExtensionInterface::class)->addTag('twig.extension');
         $container->registerForAutoconfiguration(LoaderInterface::class)->addTag('twig.loader');
+        $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');
 
         if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(

@@ -159,40 +159,40 @@ trait ControllerTrait
     }
 
     /**
-     * Checks if the attributes are granted against the current authentication token and optionally supplied object.
+     * Checks if the attributes are granted against the current authentication token and optionally supplied subject.
      *
      * @param mixed $attributes The attributes
-     * @param mixed $object     The object
+     * @param mixed $subject    The subject
      *
      * @return bool
      *
      * @throws \LogicException
      */
-    protected function isGranted($attributes, $object = null)
+    protected function isGranted($attributes, $subject = null)
     {
         if (!$this->container->has('security.authorization_checker')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        return $this->container->get('security.authorization_checker')->isGranted($attributes, $object);
+        return $this->container->get('security.authorization_checker')->isGranted($attributes, $subject);
     }
 
     /**
      * Throws an exception unless the attributes are granted against the current authentication token and optionally
-     * supplied object.
+     * supplied subject.
      *
      * @param mixed  $attributes The attributes
-     * @param mixed  $object     The object
+     * @param mixed  $subject    The subject
      * @param string $message    The message passed to the exception
      *
      * @throws AccessDeniedException
      */
-    protected function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
+    protected function denyAccessUnlessGranted($attributes, $subject = null, $message = 'Access Denied.')
     {
-        if (!$this->isGranted($attributes, $object)) {
+        if (!$this->isGranted($attributes, $subject)) {
             $exception = $this->createAccessDeniedException($message);
             $exception->setAttributes($attributes);
-            $exception->setSubject($object);
+            $exception->setSubject($subject);
 
             throw $exception;
         }

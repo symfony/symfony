@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -41,6 +42,7 @@ class Definition
     private $autowired = false;
     private $autowiringTypes = array();
     private $changes = array();
+    private $bindings = array();
 
     protected $arguments = array();
 
@@ -70,6 +72,8 @@ class Definition
 
     /**
      * Sets the tracked changes for the Definition object.
+     *
+     * @param array $changes An array of changes for this Definition
      *
      * @return $this
      */
@@ -188,6 +192,13 @@ class Definition
         return $this;
     }
 
+    /**
+     * Sets the properties to define when creating the service.
+     *
+     * @param array $properties
+     *
+     * @return $this
+     */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
@@ -195,11 +206,24 @@ class Definition
         return $this;
     }
 
+    /**
+     * Gets the properties to define when creating the service.
+     *
+     * @return array
+     */
     public function getProperties()
     {
         return $this->properties;
     }
 
+    /**
+     * Sets a specific property.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
@@ -222,7 +246,7 @@ class Definition
     }
 
     /**
-     * Sets a specific argument.
+     * Replaces a specific argument.
      *
      * @param int|string $index
      * @param mixed      $argument
@@ -250,6 +274,14 @@ class Definition
         return $this;
     }
 
+    /**
+     * Sets a specific argument.
+     *
+     * @param int|string $key
+     * @param mixed      $value
+     *
+     * @return $this
+     */
     public function setArgument($key, $value)
     {
         $this->arguments[$key] = $value;
@@ -373,6 +405,8 @@ class Definition
      * Sets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
      *
      * @param $instanceof ChildDefinition[]
+     *
+     * @return $this
      */
     public function setInstanceofConditionals(array $instanceof)
     {
@@ -778,7 +812,7 @@ class Definition
     }
 
     /**
-     * Sets autowired.
+     * Enables/disables autowiring.
      *
      * @param bool $autowired
      *
@@ -859,5 +893,39 @@ class Definition
         @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
 
         return isset($this->autowiringTypes[$type]);
+    }
+
+    /**
+     * Gets bindings.
+     *
+     * @return array
+     */
+    public function getBindings()
+    {
+        return $this->bindings;
+    }
+
+    /**
+     * Sets bindings.
+     *
+     * Bindings map $named or FQCN arguments to values that should be
+     * injected in the matching parameters (of the constructor, of methods
+     * called and of controller actions).
+     *
+     * @param array $bindings
+     *
+     * @return $this
+     */
+    public function setBindings(array $bindings)
+    {
+        foreach ($bindings as $key => $binding) {
+            if (!$binding instanceof BoundArgument) {
+                $bindings[$key] = new BoundArgument($binding);
+            }
+        }
+
+        $this->bindings = $bindings;
+
+        return $this;
     }
 }

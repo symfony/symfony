@@ -72,7 +72,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList($this->getTimezones(), $value);
+        return $this->choiceList = new ArrayChoiceList(self::getTimezones(), $value);
     }
 
     /**

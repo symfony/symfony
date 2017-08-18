@@ -102,7 +102,7 @@ class ExceptionCaster
         }
 
         unset($a[$sPrefix.'file'], $a[$sPrefix.'line'], $a[$sPrefix.'trace']);
-        $a[Caster::PREFIX_VIRTUAL.'trace'] = new TraceStub($trace);
+        $a[Caster::PREFIX_VIRTUAL.'trace'] = new TraceStub($trace, self::$traceArgs);
 
         return $a;
     }
@@ -256,7 +256,7 @@ class ExceptionCaster
             $trace = array();
         }
 
-        if (!($filter & Caster::EXCLUDE_VERBOSE)) {
+        if (!($filter & Caster::EXCLUDE_VERBOSE) && $trace) {
             if (isset($a[Caster::PREFIX_PROTECTED.'file'], $a[Caster::PREFIX_PROTECTED.'line'])) {
                 self::traceUnshift($trace, $xClass, $a[Caster::PREFIX_PROTECTED.'file'], $a[Caster::PREFIX_PROTECTED.'line']);
             }

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
+ * deprecated `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability to pass a command name as first argument
+ * deprecated `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability to pass a command name as first argument
+
 3.3.0
 -----
 

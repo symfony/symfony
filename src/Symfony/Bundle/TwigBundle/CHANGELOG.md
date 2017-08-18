@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Bundle\TwigBundle\Command\DebugCommand`, use `Symfony\Bridge\Twig\Command\DebugCommand` instead
+ * deprecated relying on the `ContainerAwareInterface` implementation for `Symfony\Bundle\TwigBundle\Command\LintCommand`
+
 3.3.0
 -----
 

@@ -41,4 +41,30 @@ class PdoAdapterTest extends AdapterTestCase
     {
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
+
+    public function testCleanupExpiredItems()
+    {
+        $pdo = new \PDO('sqlite:'.self::$dbFile);
+
+        $getCacheItemCount = function () use ($pdo) {
+            return (int) $pdo->query('SELECT COUNT(*) FROM cache_items')->fetch(\PDO::FETCH_COLUMN);
+        };
+
+        $this->assertSame(0, $getCacheItemCount());
+
+        $cache = $this->createCachePool();
+
+        $item = $cache->getItem('some_nice_key');
+        $item->expiresAfter(1);
+        $item->set(1);
+
+        $cache->save($item);
+        $this->assertSame(1, $getCacheItemCount());
+
+        sleep(2);
+
+        $newItem = $cache->getItem($item->getKey());
+        $this->assertFalse($newItem->isHit());
+        $this->assertSame(0, $getCacheItemCount(), 'PDOAdapter must clean up expired items');
+    }
 }

@@ -170,7 +170,7 @@ class Inline
                 }
 
                 if (Yaml::DUMP_OBJECT & $flags) {
-                    return '!php/object:'.serialize($value);
+                    return '!php/object '.self::dump(serialize($value));
                 }
 
                 if (Yaml::DUMP_OBJECT_AS_MAP & $flags && ($value instanceof \stdClass || $value instanceof \ArrayObject)) {
@@ -490,11 +490,11 @@ class Inline
                 @trigger_error('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
             }
 
-            if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags)) {
+            if (!$isKeyQuoted) {
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey) && !is_int($evaluatedKey)) {
-                    @trigger_error('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Pass the PARSE_KEYS_AS_STRINGS flag to explicitly enable the type casts.', E_USER_DEPRECATED);
+                    @trigger_error('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.', E_USER_DEPRECATED);
                 }
             }
 
@@ -609,13 +609,19 @@ class Inline
             case $scalar[0] === '!':
                 switch (true) {
                     case 0 === strpos($scalar, '!str'):
+                        @trigger_error('Support for the !str tag is deprecated since version 3.4. Use the !!str tag instead.', E_USER_DEPRECATED);
+
                         return (string) substr($scalar, 5);
+                    case 0 === strpos($scalar, '!!str '):
+                        return (string) substr($scalar, 6);
                     case 0 === strpos($scalar, '! '):
                         @trigger_error('Using the non-specific tag "!" is deprecated since version 3.4 as its behavior will change in 4.0. It will force non-evaluating your values in 4.0. Use plain integers or !!float instead.', E_USER_DEPRECATED);
 
                         return (int) self::parseScalar(substr($scalar, 2), $flags);
                     case 0 === strpos($scalar, '!php/object:'):
                         if (self::$objectSupport) {
+                            @trigger_error('The !php/object: tag to indicate dumped PHP objects is deprecated since version 3.4 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.', E_USER_DEPRECATED);
+
                             return unserialize(substr($scalar, 12));
                         }
 
@@ -626,7 +632,7 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
-                            @trigger_error('The !!php/object tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object tag instead.', E_USER_DEPRECATED);
+                            @trigger_error('The !!php/object: tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object (without the colon) tag instead.', E_USER_DEPRECATED);
 
                             return unserialize(substr($scalar, 13));
                         }
@@ -636,9 +642,34 @@ class Inline
                         }
 
                         return;
+                    case 0 === strpos($scalar, '!php/object'):
+                        if (self::$objectSupport) {
+                            return unserialize(self::parseScalar(substr($scalar, 12)));
+                        }
+
+                        if (self::$exceptionOnInvalidType) {
+                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
+                        }
+
+                        return;
                     case 0 === strpos($scalar, '!php/const:'):
                         if (self::$constantSupport) {
+                            @trigger_error('The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.', E_USER_DEPRECATED);
+
                             if (defined($const = substr($scalar, 11))) {
+                                return constant($const);
+                            }
+
+                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const));
+                        }
+                        if (self::$exceptionOnInvalidType) {
+                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar));
+                        }
+
+                        return;
+                    case 0 === strpos($scalar, '!php/const'):
+                        if (self::$constantSupport) {
+                            if (defined($const = self::parseScalar(substr($scalar, 11)))) {
                                 return constant($const);
                             }
 

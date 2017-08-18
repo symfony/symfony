@@ -37,7 +37,8 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $overwriteNewerFiles = false)
     {
-        if (stream_is_local($originFile) && !is_file($originFile)) {
+        $originIsLocal = stream_is_local($originFile) || 0 === stripos($originFile, 'file://');
+        if ($originIsLocal && !is_file($originFile)) {
             throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
         }
 
@@ -68,11 +69,13 @@ class Filesystem
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
 
-            // Like `cp`, preserve executable permission bits
-            @chmod($targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
+            if ($originIsLocal) {
+                // Like `cp`, preserve executable permission bits
+                @chmod($targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
 
-            if (stream_is_local($originFile) && $bytesCopied !== ($bytesOrigin = filesize($originFile))) {
-                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
+                if ($bytesCopied !== $bytesOrigin = filesize($originFile)) {
+                    throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
+                }
             }
         }
     }

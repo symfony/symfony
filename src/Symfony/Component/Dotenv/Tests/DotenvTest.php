@@ -63,6 +63,7 @@ class DotenvTest extends TestCase
     public function getEnvData()
     {
         putenv('LOCAL=local');
+        $_ENV['REMOTE'] = 'remote';
 
         $tests = array(
             // spaces
@@ -85,7 +86,6 @@ class DotenvTest extends TestCase
             array("FOO='bar'\n", array('FOO' => 'bar')),
             array("FOO='bar\"foo'\n", array('FOO' => 'bar"foo')),
             array("FOO=\"bar\\\"foo\"\n", array('FOO' => 'bar"foo')),
-            array("FOO='bar''foo'\n", array('FOO' => 'bar\'foo')),
             array('FOO="bar\nfoo"', array('FOO' => "bar\nfoo")),
             array('FOO="bar\rfoo"', array('FOO' => "bar\rfoo")),
             array('FOO=\'bar\nfoo\'', array('FOO' => 'bar\nfoo')),
@@ -94,8 +94,15 @@ class DotenvTest extends TestCase
             array('FOO="  "', array('FOO' => '  ')),
             array('PATH="c:\\\\"', array('PATH' => 'c:\\')),
             array("FOO=\"bar\nfoo\"", array('FOO' => "bar\nfoo")),
+            array('FOO=BAR\\"', array('FOO' => 'BAR"')),
+            array("FOO=BAR\\'BAZ", array('FOO' => "BAR'BAZ")),
+            array('FOO=\\"BAR', array('FOO' => '"BAR')),
 
             // concatenated values
+            array("FOO='bar''foo'\n", array('FOO' => 'barfoo')),
+            array("FOO='bar '' baz'", array('FOO' => 'bar  baz')),
+            array("FOO=bar\nBAR='baz'\"\$FOO\"", array('FOO' => 'bar', 'BAR' => 'bazbar')),
+            array("FOO='bar '\\'' baz'", array('FOO' => "bar ' baz")),
 
             // comments
             array("#FOO=bar\nBAR=foo", array('BAR' => 'foo')),
@@ -128,6 +135,7 @@ class DotenvTest extends TestCase
             array('FOO=" \\$ "', array('FOO' => ' $ ')),
             array('FOO=" $ "', array('FOO' => ' $ ')),
             array('BAR=$LOCAL', array('BAR' => 'local')),
+            array('BAR=$REMOTE', array('BAR' => 'remote')),
             array('FOO=$NOTDEFINED', array('FOO' => '')),
         );
 
@@ -148,6 +156,13 @@ class DotenvTest extends TestCase
 
     public function testLoad()
     {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_SERVER['FOO']);
+        unset($_SERVER['BAR']);
+        putenv('FOO');
+        putenv('BAR');
+
         @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
 
         $path1 = tempnam($tmpdir, 'sf-');
@@ -158,14 +173,17 @@ class DotenvTest extends TestCase
 
         (new DotEnv())->load($path1, $path2);
 
-        $this->assertSame('BAR', getenv('FOO'));
-        $this->assertSame('BAZ', getenv('BAR'));
+        $foo = getenv('FOO');
+        $bar = getenv('BAR');
 
         putenv('FOO');
         putenv('BAR');
         unlink($path1);
         unlink($path2);
         rmdir($tmpdir);
+
+        $this->assertSame('BAR', $foo);
+        $this->assertSame('BAZ', $bar);
     }
 
     /**

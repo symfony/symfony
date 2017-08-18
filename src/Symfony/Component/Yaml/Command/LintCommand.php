@@ -105,7 +105,7 @@ EOF
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
             if (E_USER_DEPRECATED === $level) {
-                throw new ParseException($message);
+                throw new ParseException($message, $this->getParser()->getRealCurrentLineNb() + 1);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
@@ -114,7 +114,7 @@ EOF
         try {
             $this->getParser()->parse($content, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
-            return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
+            return array('file' => $file, 'line' => $e->getParsedLine(), 'valid' => false, 'message' => $e->getMessage());
         } finally {
             restore_error_handler();
         }

@@ -33,7 +33,7 @@ class ChildDefinition extends Definition
     }
 
     /**
-     * Returns the Definition being decorated.
+     * Returns the Definition to inherit from.
      *
      * @return string
      */
@@ -43,7 +43,7 @@ class ChildDefinition extends Definition
     }
 
     /**
-     * Sets the Definition being decorated.
+     * Sets the Definition to inherit from.
      *
      * @param string $parent
      *
@@ -119,6 +119,14 @@ class ChildDefinition extends Definition
     public function setInstanceofConditionals(array $instanceof)
     {
         throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
+    }
+
+    /**
+     * @internal
+     */
+    public function setBindings(array $bindings)
+    {
+        throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
     }
 }
 

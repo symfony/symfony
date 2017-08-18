@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -72,7 +73,7 @@ class CachePoolPass implements CompilerPassInterface
             }
             $i = 0;
             foreach ($attributes as $attr) {
-                if (isset($tags[0][$attr])) {
+                if (isset($tags[0][$attr]) && ('namespace' !== $attr || ArrayAdapter::class !== $adapter->getClass())) {
                     $pool->replaceArgument($i++, $tags[0][$attr]);
                 }
                 unset($tags[0][$attr]);
@@ -110,7 +111,7 @@ class CachePoolPass implements CompilerPassInterface
         if ($usedEnvs || preg_match('#^[a-z]++://#', $name)) {
             $dsn = $name;
 
-            if (!$container->hasDefinition($name = md5($dsn))) {
+            if (!$container->hasDefinition($name = 'cache_connection.'.ContainerBuilder::hash($dsn))) {
                 $definition = new Definition(AbstractAdapter::class);
                 $definition->setPublic(false);
                 $definition->setFactory(array(AbstractAdapter::class, 'createConnection'));

@@ -54,6 +54,7 @@ class ArrayNodeDefinitionTest extends TestCase
             array('defaultValue', array(array())),
             array('addDefaultChildrenIfNoneSet', array()),
             array('requiresAtLeastOneElement', array()),
+            array('cannotBeEmpty', array()),
             array('useAttributeAsKey', array('foo')),
         );
     }
@@ -283,6 +284,32 @@ class ArrayNodeDefinitionTest extends TestCase
             array(array('enabled' => false, 'foo' => 'baz'), array(array('foo' => 'baz', 'enabled' => false)), 'An enableable node can be disabled'),
             array(array('enabled' => false, 'foo' => 'bar'), array(false), 'false disables an enableable node'),
         );
+    }
+
+    public function testRequiresAtLeastOneElement()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->requiresAtLeastOneElement()
+            ->integerPrototype();
+
+        $node->getNode()->finalize(array(1));
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.
+     */
+    public function testCannotBeEmpty()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->cannotBeEmpty()
+            ->integerPrototype();
+
+        $node->getNode()->finalize(array());
     }
 
     protected function getField($object, $field)

@@ -81,9 +81,9 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                     break;
                 }
             } catch (AccountStatusException $e) {
-                $e->setToken($token);
+                $lastException = $e;
 
-                throw $e;
+                break;
             } catch (AuthenticationException $e) {
                 $lastException = $e;
             }

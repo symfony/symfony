@@ -13,6 +13,9 @@ namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Core\Event\AuthenticationEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
@@ -123,6 +126,50 @@ class AuthenticationProviderManagerTest extends TestCase
 
         $token = $manager->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
         $this->assertEquals('bar', $token->getCredentials());
+    }
+
+    public function testAuthenticateDispatchesAuthenticationFailureEvent()
+    {
+        $token = new UsernamePasswordToken('foo', 'bar', 'key');
+        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
+        $provider->expects($this->once())->method('supports')->willReturn(true);
+        $provider->expects($this->once())->method('authenticate')->willThrowException($exception = new AuthenticationException());
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(AuthenticationEvents::AUTHENTICATION_FAILURE, $this->equalTo(new AuthenticationFailureEvent($token, $exception)));
+
+        $manager = new AuthenticationProviderManager(array($provider));
+        $manager->setEventDispatcher($dispatcher);
+
+        try {
+            $manager->authenticate($token);
+            $this->fail('->authenticate() should rethrow exceptions');
+        } catch (AuthenticationException $e) {
+            $this->assertSame($token, $exception->getToken());
+        }
+    }
+
+    public function testAuthenticateDispatchesAuthenticationSuccessEvent()
+    {
+        $token = new UsernamePasswordToken('foo', 'bar', 'key');
+
+        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
+        $provider->expects($this->once())->method('supports')->willReturn(true);
+        $provider->expects($this->once())->method('authenticate')->willReturn($token);
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(AuthenticationEvents::AUTHENTICATION_SUCCESS, $this->equalTo(new AuthenticationEvent($token)));
+
+        $manager = new AuthenticationProviderManager(array($provider));
+        $manager->setEventDispatcher($dispatcher);
+
+        $this->assertSame($token, $manager->authenticate($token));
     }
 
     protected function getAuthenticationProvider($supports, $token = null, $exception = null)

@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 
+/**
+ * @group legacy
+ */
 class AddCacheWarmerPassTest extends TestCase
 {
     public function testThatCacheWarmersAreProcessedInPriorityOrder()

@@ -19,6 +19,8 @@ class RedisCache extends AbstractCache
 
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
+     * @param string                                          $namespace
+     * @param int                                             $defaultLifetime
      */
     public function __construct($redisClient, $namespace = '', $defaultLifetime = 0)
     {

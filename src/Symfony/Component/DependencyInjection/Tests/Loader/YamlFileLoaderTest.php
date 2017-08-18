@@ -23,6 +23,8 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
@@ -431,7 +433,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_named_args.yml');
 
         $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
-        $this->assertEquals(array(null, '$apiKey' => 'ABCD'), $container->getDefinition('another_one')->getArguments());
+        $this->assertEquals(array('$apiKey' => 'ABCD', CaseSensitiveClass::class => null), $container->getDefinition('another_one')->getArguments());
 
         $container->compile();
 
@@ -447,7 +449,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_instanceof.yml');
         $container->compile();
 
-        $definition = $container->getDefinition(Foo::class);
+        $definition = $container->getDefinition(Bar::class);
         $this->assertTrue($definition->isAutowired());
         $this->assertTrue($definition->isLazy());
         $this->assertSame(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
@@ -501,7 +503,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter "tags" must be an array for service "Foo\Bar" in services31_invalid_tags.yml. Check your YAML syntax.
+     * @expectedExceptionMessageRegExp /Parameter "tags" must be an array for service "Foo\\Bar" in .+services31_invalid_tags\.yml\. Check your YAML syntax./
      */
     public function testInvalidTagsWithDefaults()
     {
@@ -534,7 +536,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(1, $args);
         $this->assertInstanceOf(Reference::class, $args[0]);
         $this->assertTrue($container->has((string) $args[0]));
-        $this->assertStringStartsWith('2', (string) $args[0]);
+        $this->assertRegExp('/^\d+_Bar[._A-Za-z0-9]{7}$/', (string) $args[0]);
 
         $anonymous = $container->getDefinition((string) $args[0]);
         $this->assertEquals('Bar', $anonymous->getClass());
@@ -546,13 +548,26 @@ class YamlFileLoaderTest extends TestCase
         $this->assertInternalType('array', $factory);
         $this->assertInstanceOf(Reference::class, $factory[0]);
         $this->assertTrue($container->has((string) $factory[0]));
-        $this->assertStringStartsWith('1', (string) $factory[0]);
+        $this->assertRegExp('/^\d+_Quz[._A-Za-z0-9]{7}$/', (string) $factory[0]);
         $this->assertEquals('constructFoo', $factory[1]);
 
         $anonymous = $container->getDefinition((string) $factory[0]);
         $this->assertEquals('Quz', $anonymous->getClass());
         $this->assertFalse($anonymous->isPublic());
         $this->assertFalse($anonymous->isAutowired());
+    }
+
+    public function testAnonymousServicesInDifferentFilesWithSameNameDoNotConflict()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml/foo'));
+        $loader->load('services.yml');
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml/bar'));
+        $loader->load('services.yml');
+
+        $this->assertCount(5, $container->getDefinitions());
     }
 
     public function testAnonymousServicesInInstanceof()
@@ -582,7 +597,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Creating an alias using the tag "!service" is not allowed in "anonymous_services_alias.yml".
+     * @expectedExceptionMessageRegExp /Creating an alias using the tag "!service" is not allowed in ".+anonymous_services_alias\.yml"\./
      */
     public function testAnonymousServicesWithAliases()
     {
@@ -593,7 +608,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Using an anonymous service in a parameter is not allowed in "anonymous_services_in_parameters.yml".
+     * @expectedExceptionMessageRegExp /Using an anonymous service in a parameter is not allowed in ".+anonymous_services_in_parameters\.yml"\./
      */
     public function testAnonymousServicesInParameters()
     {
@@ -614,7 +629,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Service "_defaults" key must be an array, "NULL" given in "bad_empty_defaults.yml".
+     * @expectedExceptionMessageRegExp /Service "_defaults" key must be an array, "NULL" given in ".+bad_empty_defaults\.yml"\./
      */
     public function testEmptyDefaultsThrowsClearException()
     {
@@ -625,7 +640,7 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Service "_instanceof" key must be an array, "NULL" given in "bad_empty_instanceof.yml".
+     * @expectedExceptionMessageRegExp /Service "_instanceof" key must be an array, "NULL" given in ".+bad_empty_instanceof\.yml"\./
      */
     public function testEmptyInstanceofThrowsClearException()
     {
@@ -633,12 +648,38 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_empty_instanceof.yml');
     }
-}
 
-interface FooInterface
-{
-}
+    public function testBindings()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_bindings.yml');
+        $container->compile();
 
-class Foo implements FooInterface
-{
+        $definition = $container->getDefinition('bar');
+        $this->assertEquals(array(
+            'NonExistent' => null,
+            BarInterface::class => new Reference(Bar::class),
+            '$foo' => array(null),
+            '$quz' => 'quz',
+            '$factory' => 'factory',
+        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+        $this->assertEquals(array(
+            'quz',
+            null,
+            new Reference(Bar::class),
+            array(null),
+        ), $definition->getArguments());
+
+        $definition = $container->getDefinition(Bar::class);
+        $this->assertEquals(array(
+            null,
+            'factory',
+        ), $definition->getArguments());
+        $this->assertEquals(array(
+            'NonExistent' => null,
+            '$quz' => 'quz',
+            '$factory' => 'factory',
+        ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
+    }
 }

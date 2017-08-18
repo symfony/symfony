@@ -71,7 +71,7 @@ class FlockStore implements StoreInterface
         $fileName = sprintf('%s/sf.%s.%s.lock',
             $this->lockPath,
             preg_replace('/[^a-z0-9\._-]+/i', '-', $key),
-            hash('sha256', $key)
+            strtr(substr(base64_encode(hash('sha256', $key, true)), 0, 7), '/', '_')
         );
 
         // Silence error reporting

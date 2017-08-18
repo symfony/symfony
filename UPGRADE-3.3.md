@@ -72,6 +72,8 @@ Console
    have been deprecated in favor of the `console.error` event and the `ConsoleErrorEvent`
    class. The deprecated event and class will be removed in 4.0.
 
+ * The `SymfonyQuestionHelper::ask` default validation has been deprecated and will be removed in 4.0. Apply validation using `Question::setValidator` instead.
+
 Debug
 -----
 
@@ -164,9 +166,6 @@ Form
 
 FrameworkBundle
 ---------------
-
- * The `cache:clear` command should always be called with the `--no-warmup` option.
-   Warmup should be done via the `cache:warmup` command.
 
  * [BC BREAK] The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies"
    parameter have been removed. Use the Request::setTrustedProxies() method in your front controller instead.
@@ -365,8 +364,7 @@ Yaml
 
  * Deprecated support for implicitly parsing non-string mapping keys as strings.
    Mapping keys that are no strings will lead to a `ParseException` in Symfony
-   4.0. Use the `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as
-   strings.
+   4.0. Use quotes to opt-in for keys to be parsed as strings.
 
    Before:
 
@@ -374,7 +372,6 @@ Yaml
    $yaml = <<<YAML
    null: null key
    true: boolean true
-   1: integer key
    2.0: float key
    YAML;
 
@@ -386,13 +383,12 @@ Yaml
    ```php
 
    $yaml = <<<YAML
-   null: null key
-   true: boolean true
-   1: integer key
-   2.0: float key
+   "null": null key
+   "true": boolean true
+   "2.0": float key
    YAML;
 
-   Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   Yaml::parse($yaml);
    ```
 
  * Omitting the key of a mapping is deprecated and will throw a `ParseException` in Symfony 4.0.

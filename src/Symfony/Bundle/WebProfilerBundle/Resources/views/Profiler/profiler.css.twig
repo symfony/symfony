@@ -874,6 +874,13 @@ table.logs .metadata {
     margin: .5em 0;
     padding: 1em;
 }
+.sql-explain {
+    overflow-x: auto;
+    max-width: 920px;
+}
+.sql-explain table td, .sql-explain table tr {
+    word-break: normal;
+}
 .queries-table pre {
     {{ mixins.break_long_words|raw }}
     margin: 0;

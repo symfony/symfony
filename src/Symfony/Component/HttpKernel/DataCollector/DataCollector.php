@@ -12,9 +12,10 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
-use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
@@ -37,7 +38,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
     /**
      * @var ClonerInterface
      */
-    private static $cloner;
+    private $cloner;
 
     public function serialize()
     {
@@ -61,16 +62,20 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     protected function cloneVar($var)
     {
-        if (null === self::$cloner) {
-            if (class_exists(ClassStub::class)) {
-                self::$cloner = new VarCloner();
-                self::$cloner->setMaxItems(-1);
+        if ($var instanceof Data) {
+            return $var;
+        }
+        if (null === $this->cloner) {
+            if (class_exists(CutStub::class)) {
+                $this->cloner = new VarCloner();
+                $this->cloner->setMaxItems(-1);
+                $this->cloner->addCasters($this->getCasters());
             } else {
                 @trigger_error(sprintf('Using the %s() method without the VarDumper component is deprecated since version 3.2 and won\'t be supported in 4.0. Install symfony/var-dumper version 3.2 or above.', __METHOD__), E_USER_DEPRECATED);
-                self::$cloner = false;
+                $this->cloner = false;
             }
         }
-        if (false === self::$cloner) {
+        if (false === $this->cloner) {
             if (null === $this->valueExporter) {
                 $this->valueExporter = new ValueExporter();
             }
@@ -78,7 +83,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
             return $this->valueExporter->exportValue($var);
         }
 
-        return self::$cloner->cloneVar($var);
+        return $this->cloner->cloneVar($var);
     }
 
     /**
@@ -99,5 +104,25 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
         }
 
         return $this->valueExporter->exportValue($var);
+    }
+
+    /**
+     * @return callable[] The casters to add to the cloner
+     */
+    protected function getCasters()
+    {
+        return array(
+            '*' => function ($v, array $a, Stub $s, $isNested) {
+                if (!$v instanceof Stub) {
+                    foreach ($a as $k => $v) {
+                        if (is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
+                            $a[$k] = new CutStub($v);
+                        }
+                    }
+                }
+
+                return $a;
+            },
+        );
     }
 }

@@ -4,12 +4,25 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added support for `EventSubscriberInterface` on `MicroKernelTrait`
  * Removed `doctrine/cache` from the list of required dependencies in `composer.json`
  * Deprecated `validator.mapping.cache.doctrine.apc` service
  * The `symfony/stopwatch` dependency has been removed, require it via `composer
    require symfony/stopwatch` in your `dev` environment.
  * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+ * Deprecated `AddCacheClearerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` instead.
+ * Deprecated `AddCacheWarmerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` instead.
+ * Deprecated `TranslationDumperPass`, use 
+   `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` instead
+ * Deprecated `TranslationExtractorPass`, use 
+   `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` instead
+ * Deprecated `TranslatorPass`, use 
+   `Symfony\Component\Translation\DependencyInjection\TranslatorPass` instead
+ * Added `command` attribute to the `console.command` tag which takes the command
+   name as value, using it makes the command lazy
+ * Added `cache:pool:prune` command to allow manual stale cache item pruning of supported PSR-6 and PSR-16 cache pool
+   implementations
 
 3.3.0
 -----
@@ -24,7 +37,6 @@ CHANGELOG
    the same helpers as the `Controller` class, but does not allow accessing the dependency
    injection container, in order to encourage explicit dependency declarations.
  * Added support for the `controller.service_arguments` tag, for injecting services into controllers' actions
- * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Changed default configuration for
    assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
    `canBeDisabled()` when Flex is used
@@ -81,7 +93,8 @@ CHANGELOG
  * Deprecated using core form types without dependencies as services
  * Added `Symfony\Component\HttpHernel\DataCollector\RequestDataCollector::onKernelResponse()`
  * Added `Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector`
- * Deprecated service `serializer.mapping.cache.apc` (use `serializer.mapping.cache.doctrine.apc` instead)
+ * The `framework.serializer.cache` option and the service `serializer.mapping.cache.apc` have been
+   deprecated. APCu should now be automatically used when available.
 
 3.0.0
 -----

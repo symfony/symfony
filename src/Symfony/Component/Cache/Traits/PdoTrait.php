@@ -170,7 +170,7 @@ trait PdoTrait
             foreach ($expired as $id) {
                 $stmt->bindValue(++$i, $id);
             }
-            $stmt->execute($expired);
+            $stmt->execute();
         }
     }
 

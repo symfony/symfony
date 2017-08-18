@@ -339,7 +339,7 @@
         {% endif %}
     {%- endfor %}
 
-    {% if not form.methodRendered %}
+    {% if not form.methodRendered and form.parent is null %}
         {%- do form.setMethodRendered() -%}
         {% set method = method|upper %}
         {%- if method in ["GET", "POST"] -%}

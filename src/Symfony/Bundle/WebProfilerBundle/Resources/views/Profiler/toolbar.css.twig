@@ -380,13 +380,12 @@
     100% { background: #222; }
 }
 
-.sf-toolbar-block.sf-toolbar-block-dump {
-    position: static;
-}
-
 .sf-toolbar-block.sf-toolbar-block-dump .sf-toolbar-info {
     max-width: none;
-    right: 0;
+    width: 100%;
+    position: fixed;
+    box-sizing: border-box;
+    left: 0;
 }
 
 .sf-toolbar-block-dump pre.sf-dump {
@@ -537,6 +536,43 @@
 
     .sf-toolbar-block .sf-toolbar-info-piece-additional:empty,
     .sf-toolbar-block .sf-toolbar-info-piece-additional-detail:empty {
+        display: none;
+    }
+}
+
+/***** Error Toolbar *****/
+.sf-error-toolbar .sf-toolbarreset {
+    background: #222;
+    color: #f5f5f5;
+    font: 13px/36px Arial, sans-serif;
+    height: 36px;
+    padding: 0 15px;
+    text-align: left;
+}
+
+.sf-error-toolbar .sf-toolbarreset svg {
+    height: auto;
+}
+
+.sf-error-toolbar .sf-toolbarreset a {
+    color: #99cdd8;
+    margin-left: 5px;
+    text-decoration: underline;
+}
+
+.sf-error-toolbar .sf-toolbarreset a:hover {
+    text-decoration: none;
+}
+
+.sf-error-toolbar .sf-toolbarreset .sf-toolbar-icon {
+    float: left;
+    padding: 5px 0;
+    margin-right: 10px;
+}
+
+/***** Media query print: Do not print the Toolbar. *****/
+@media print {
+    .sf-toolbar {
         display: none;
     }
 }

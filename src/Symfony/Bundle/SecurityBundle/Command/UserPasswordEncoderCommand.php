@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\User\User;
  * Encode a user's password.
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
+ *
+ * @final since version 3.4
  */
 class UserPasswordEncoderCommand extends ContainerAwareCommand
 {
@@ -44,16 +46,6 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
         $this->userClasses = $userClasses;
 
         parent::__construct();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getContainer()
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.3 and "%s" won\'t implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareInterface::class), E_USER_DEPRECATED);
-
-        return parent::getContainer();
     }
 
     /**
@@ -123,7 +115,7 @@ EOF
         $userClass = $this->getUserClass($input, $io);
         $emptySalt = $input->getOption('empty-salt');
 
-        $encoderFactory = $this->encoderFactory ?: parent::getContainer()->get('security.encoder_factory');
+        $encoderFactory = $this->encoderFactory ?: $this->getContainer()->get('security.encoder_factory');
         $encoder = $encoderFactory->getEncoder($userClass);
         $bcryptWithoutEmptySalt = !$emptySalt && $encoder instanceof BCryptPasswordEncoder;
 

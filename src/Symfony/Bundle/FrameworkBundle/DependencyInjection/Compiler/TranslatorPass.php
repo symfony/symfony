@@ -11,42 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
+@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Component\Translation\DependencyInjection\TranslatorPass instead.', TranslatorPass::class), E_USER_DEPRECATED);
 
-class TranslatorPass implements CompilerPassInterface
+use Symfony\Component\Translation\DependencyInjection\TranslatorPass as BaseTranslatorPass;
+
+/**
+ * Adds tagged translation.formatter services to translation writer.
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use {@link BaseTranslatorPass instead}.
+ */
+class TranslatorPass extends BaseTranslatorPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('translator.default')) {
-            return;
-        }
-
-        $loaders = array();
-        $loaderRefs = array();
-        foreach ($container->findTaggedServiceIds('translation.loader', true) as $id => $attributes) {
-            $loaderRefs[$id] = new Reference($id);
-            $loaders[$id][] = $attributes[0]['alias'];
-            if (isset($attributes[0]['legacy-alias'])) {
-                $loaders[$id][] = $attributes[0]['legacy-alias'];
-            }
-        }
-
-        if ($container->hasDefinition('translation.loader')) {
-            $definition = $container->getDefinition('translation.loader');
-            foreach ($loaders as $id => $formats) {
-                foreach ($formats as $format) {
-                    $definition->addMethodCall('addLoader', array($format, $loaderRefs[$id]));
-                }
-            }
-        }
-
-        $container
-            ->findDefinition('translator.default')
-            ->replaceArgument(0, ServiceLocatorTagPass::register($container, $loaderRefs))
-            ->replaceArgument(3, $loaders)
-        ;
-    }
 }

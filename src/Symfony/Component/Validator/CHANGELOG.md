@@ -4,9 +4,13 @@ CHANGELOG
 3.4.0
 -----
 
+ * added support for validation groups to the `Valid` constraint
  * not setting the `strict` option of the `Choice` constraint to `true` is
    deprecated and will throw an exception in Symfony 4.0
- * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of constant values and will throw an exception in Symfony 4.0
+ * setting the `checkDNS` option of the `Url` constraint to `true` is deprecated in favor of
+   the `Url::CHECK_DNS_TYPE_*` constants values and will throw an exception in Symfony 4.0
+ * added min/max amount of pixels check to `Image` constraint via `minPixels` and `maxPixels`
+ * added a new "propertyPath" option to comparison constraints in order to get the value to compare from an array or object
  * added a `dataPath` option to the `Expression` constraint to allow an other way to get "this" from the context
 
 3.3.0
@@ -20,6 +24,7 @@ CHANGELOG
 -----
 
  * deprecated `Tests\Constraints\AbstractContraintValidatorTest` in favor of `Test\ConstraintValidatorTestCase`
+ * added support for PHP constants in YAML configuration files
 
 3.1.0
 -----

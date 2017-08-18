@@ -120,6 +120,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             $log['priorityName'] = 'DEBUG';
             $log['channel'] = '-';
             $log['scream'] = false;
+            unset($log['type'], $log['file'], $log['line'], $log['trace'], $log['trace'], $log['count']);
             $logs[] = $log;
         }
 
@@ -251,7 +252,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         foreach ($containerDeprecationLogs as $deprecationLog) {
-            $count['deprecation_count'] += $deprecationLog['count'];
+            $count['deprecation_count'] += $deprecationLog['context']['exception']->count;
         }
 
         ksort($count['priorities']);

@@ -44,16 +44,18 @@ class ContextListener implements ListenerInterface
     private $registered;
     private $trustResolver;
 
-    public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
+    /**
+     * @param TokenStorageInterface                     $tokenStorage
+     * @param iterable|UserProviderInterface[]          $userProviders
+     * @param string                                    $contextKey
+     * @param LoggerInterface|null                      $logger
+     * @param EventDispatcherInterface|null             $dispatcher
+     * @param AuthenticationTrustResolverInterface|null $trustResolver
+     */
+    public function __construct(TokenStorageInterface $tokenStorage, $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
-        }
-
-        foreach ($userProviders as $userProvider) {
-            if (!$userProvider instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
-            }
         }
 
         $this->tokenStorage = $tokenStorage;
@@ -158,6 +160,10 @@ class ContextListener implements ListenerInterface
         $userNotFoundByProvider = false;
 
         foreach ($this->userProviders as $provider) {
+            if (!$provider instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "%s".', get_class($provider), UserProviderInterface::class));
+            }
+
             try {
                 $refreshedUser = $provider->refreshUser($user);
                 $token->setUser($refreshedUser);

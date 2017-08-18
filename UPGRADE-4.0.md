@@ -61,6 +61,8 @@ Console
  * The `console.exception` event and the related `ConsoleExceptionEvent` class have
    been removed in favor of the `console.error` event and the `ConsoleErrorEvent` class.
 
+ * The `SymfonyQuestionHelper::ask` default validation has been removed in favor of `Question::setValidator`.
+
 Debug
 -----
 
@@ -70,8 +72,54 @@ Debug
  * `FlattenException::getTrace()` now returns additional type descriptions
    `integer` and `float`.
 
+ * Support for stacked errors in the `ErrorHandler` has been removed
+
 DependencyInjection
 -------------------
+
+ * Relying on service auto-registration while autowiring is not supported anymore.
+   Explicitly inject your dependencies or create services whose ids are
+   their fully-qualified class name.
+
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+    ```
 
  * Autowiring services based on the types they implement is not supported anymore. Rename (or alias) your services to their FQCN id to make them autowirable.
 
@@ -116,8 +164,8 @@ DependencyInjection
 
  * Using unsupported options to configure service aliases raises an exception.
 
- * Setting or unsetting a private service with the `Container::set()` method is
-   no longer supported. Only public services can be set or unset.
+ * Setting or unsetting a service with the `Container::set()` method is
+   no longer supported. Only synthetic services can be set or unset.
 
  * Checking the existence of a private service with the `Container::has()`
    method is no longer supported and will return `false`.
@@ -142,6 +190,13 @@ ExpressionLanguage
  * The ability to pass a `ParserCacheInterface` instance to the `ExpressionLanguage`
    class has been removed. You should use the `CacheItemPoolInterface` interface
    instead.
+
+Filesystem
+----------
+
+ * The `Symfony\Component\Filesystem\LockHandler` has been removed,
+   use the `Symfony\Component\Lock\Store\FlockStore` class
+   or  the `Symfony\Component\Lock\Store\FlockStore\SemaphoreStore` class directly instead.
 
 Finder
 ------
@@ -228,9 +283,6 @@ FrameworkBundle
 ---------------
 
  * The `validator.mapping.cache.doctrine.apc` service has been removed.
-
- * The `cache:clear` command does not warmup the cache anymore. Warmup should
-   be done via the `cache:warmup` command.
 
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been removed. Use the `Request::setTrustedProxies()` method in your front controller instead.
 
@@ -332,21 +384,36 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass` class
    has been removed. Use the `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass`
    class instead.
-   
+
  * Using the `KERNEL_DIR` environment variable and the automatic guessing based
-   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()` 
+   on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()`
    method implementation. Set the `KERNEL_CLASS` environment variable to the
-   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()` 
+   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()`
    or `KernelTestCase::getKernelClass()` method instead.
-   
- * The methods `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
-   have been removed.
 
  * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
    Use `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
  * The `--no-prefix` option of the `translation:update` command has
    been removed.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed.
+   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed.
+   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass`
+   class has been removed. Use the
+   `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
 
 HttpFoundation
 --------------
@@ -381,6 +448,32 @@ HttpFoundation
 
 HttpKernel
 ----------
+
+ * Relying on convention-based commands discovery is not supported anymore.
+   Use PSR-4 based service discovery instead.
+
+   Before:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # implicit registration of all commands in the `Command` folder
+   ```
+
+   After:
+
+   ```yml
+   # app/config/services.yml
+   services:
+       # ...
+
+       # explicit commands registration
+       AppBundle\Command:
+           resource: '../../src/AppBundle/Command/*'
+           tags: ['console.command']
+   ```
 
  * Removed the `kernel.root_dir` parameter. Use the `kernel.project_dir` parameter
    instead.
@@ -417,10 +510,13 @@ HttpKernel
    by Symfony. Use the `%env()%` syntax to get the value of any environment
    variable from configuration files instead.
 
+ * The `getCacheDir()` method of your kernel should not be called while building the container.
+   Use the `%kernel.cache_dir%` parameter instead. Not doing so may break the `cache:clear` command.
+
 Ldap
 ----
 
- * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`
+ * The `RenameEntryInterface` has been removed, and merged with `EntryManagerInterface`
 
 Process
 -------
@@ -464,7 +560,7 @@ SecurityBundle
 
  * The `UserPasswordEncoderCommand` class does not allow `null` as the first argument anymore.
 
- * `UserPasswordEncoderCommand` does not implement `ContainerAwareInterface` anymore.
+ * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` nor implement `ContainerAwareInterface` anymore.
 
 Serializer
 ----------
@@ -491,8 +587,15 @@ TwigBundle
 * The `ContainerAwareRuntimeLoader` class has been removed. Use the
   Twig `Twig_ContainerRuntimeLoader` class instead.
 
+ * Removed `DebugCommand` in favor of `Symfony\Bridge\Twig\Command\DebugCommand`.
+
+ * Removed `ContainerAwareInterface` implementation in `Symfony\Bundle\TwigBundle\Command\LintCommand`.
+
 TwigBridge
 ----------
+
+ * removed the `Symfony\Bridge\Twig\Form\TwigRenderer` class, use the `FormRenderer`
+   class from the Form component instead
 
  * Removed the possibility to inject the Form `TwigRenderer` into the `FormExtension`.
    Upgrade Twig to `^1.30`, inject the `Twig_Environment` into the `TwigRendererEngine` and load
@@ -527,6 +630,12 @@ TwigBridge
 
  * The `TwigRendererEngine::setEnvironment()` method has been removed.
    Pass the Twig Environment as second argument of the constructor instead.
+
+ * Removed `Symfony\Bridge\Twig\Command\DebugCommand::set/getTwigEnvironment` and the ability
+   to pass a command name as first argument.
+
+ * Removed `Symfony\Bridge\Twig\Command\LintCommand::set/getTwigEnvironment` and the ability
+   to pass a command name as first argument.
 
 Validator
 ---------
@@ -563,9 +672,38 @@ Validator
    }
    ```
 
- * The default value of the strict option of the `Choice` Constraint has been
-   changed to `true` as of 4.0. If you need the previous behaviour ensure to
-   set the option to `false`.
+VarDumper
+---------
+
+ * The `VarDumperTestTrait::assertDumpEquals()` method expects a 3rd `$context = null`
+   argument and moves `$message = ''` argument at 4th position.
+
+   Before:
+
+   ```php
+   VarDumperTestTrait::assertDumpEquals($dump, $data, $message = '');
+   ```
+
+   After:
+
+   ```php
+   VarDumperTestTrait::assertDumpEquals($dump, $data, $filter = 0, $message = '');
+   ```
+
+ * The `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$context = null`
+   argument and moves `$message = ''` argument at 4th position.
+
+   Before:
+
+   ```php
+   VarDumperTestTrait::assertDumpMatchesFormat($dump, $data, $message = '');
+   ```
+
+   After:
+
+   ```php
+   VarDumperTestTrait::assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '');
+   ```
 
 Workflow
 --------
@@ -575,12 +713,14 @@ Workflow
 Yaml
 ----
 
+ * Support for the `!str` tag was removed, use the `!!str` tag instead.
+
  * Starting an unquoted string with a question mark followed by a space
    throws a `ParseException`.
 
  * Removed support for implicitly parsing non-string mapping keys as strings.
-   Mapping keys that are no strings will result in a `ParseException`. Use the
-   `PARSE_KEYS_AS_STRINGS` flag to opt-in for keys to be parsed as strings.
+   Mapping keys that are no strings will result in a `ParseException`. Use
+   quotes to opt-in for keys to be parsed as strings.
 
    Before:
 
@@ -588,7 +728,6 @@ Yaml
    $yaml = <<<YAML
    null: null key
    true: boolean true
-   1: integer key
    2.0: float key
    YAML;
 
@@ -600,13 +739,38 @@ Yaml
    ```php
 
    $yaml = <<<YAML
+   "null": null key
+   "true": boolean true
+   "2.0": float key
+   YAML;
+
+   Yaml::parse($yaml);
+   ```
+
+ * Removed the `Yaml::PARSE_KEYS_AS_STRINGS` flag.
+
+   Before:
+
+   ```php
+   $yaml = <<<YAML
    null: null key
    true: boolean true
-   1: integer key
    2.0: float key
    YAML;
 
    Yaml::parse($yaml, Yaml::PARSE_KEYS_AS_STRINGS);
+   ```
+
+   After:
+
+   ```php
+   $yaml = <<<YAML
+   "null": null key
+   "true": boolean true
+   "2.0": float key
+   YAML;
+
+   Yaml::parse($yaml);
    ```
 
  * Omitting the key of a mapping is not supported anymore and throws a `ParseException`.
@@ -705,3 +869,21 @@ Yaml
 
  * The behavior of the non-specific tag `!` is changed and now forces
    non-evaluating your values.
+
+ * The `!php/object:` tag was removed in favor of the `!php/object` tag (without
+   the colon).
+
+ * The `!php/const:` tag was removed in favor of the `!php/const` tag (without
+   the colon).
+
+   Before:
+
+   ```yml
+   !php/const:PHP_INT_MAX
+   ```
+
+   After:
+
+   ```yml
+   !php/const PHP_INT_MAX
+   ```

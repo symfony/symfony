@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        bind:
+            NonExistent: ~
+            $quz: quz
+            $factory: factory
+
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+        autowire: true
+        bind:
+            Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface: '@Symfony\Component\DependencyInjection\Tests\Fixtures\Bar'
+            $foo: [ ~ ]
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Bar:
+        factory: [ ~, 'create' ]

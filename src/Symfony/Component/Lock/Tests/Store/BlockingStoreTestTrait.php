@@ -46,17 +46,24 @@ trait BlockingStoreTestTrait
         /** @var StoreInterface $store */
         $store = $this->getStore();
         $key = new Key(uniqid(__METHOD__, true));
+        $parentPID = posix_getpid();
 
-        if ($childPID1 = pcntl_fork()) {
-            // give time to fork to start
-            usleep(2 * $clockDelay);
+        // Block SIGHUP signal
+        pcntl_sigprocmask(SIG_BLOCK, array(SIGHUP));
+
+        if ($childPID = pcntl_fork()) {
+            // Wait the start of the child
+            pcntl_sigwaitinfo(array(SIGHUP), $info);
 
             try {
-                // This call should failed given the lock should already by acquired by the child #1
+                // This call should failed given the lock should already by acquired by the child
                 $store->save($key);
                 $this->fail('The store saves a locked key.');
             } catch (LockConflictedException $e) {
             }
+
+            // send the ready signal to the child
+            posix_kill($childPID, SIGHUP);
 
             // This call should be blocked by the child #1
             $store->waitAndSave($key);
@@ -64,13 +71,21 @@ trait BlockingStoreTestTrait
             $store->delete($key);
 
             // Now, assert the child process worked well
-            pcntl_waitpid($childPID1, $status1);
+            pcntl_waitpid($childPID, $status1);
             $this->assertSame(0, pcntl_wexitstatus($status1), 'The child process couldn\'t lock the resource');
         } else {
+            // Block SIGHUP signal
+            pcntl_sigprocmask(SIG_BLOCK, array(SIGHUP));
             try {
                 $store->save($key);
-                // Wait 3 ClockDelay to let parent process to finish
-                usleep(3 * $clockDelay);
+                // send the ready signal to the parent
+                posix_kill($parentPID, SIGHUP);
+
+                // Wait for the parent to be ready
+                pcntl_sigwaitinfo(array(SIGHUP), $info);
+
+                // Wait ClockDelay to let parent assert to finish
+                usleep($clockDelay);
                 $store->delete($key);
                 exit(0);
             } catch (\Exception $e) {

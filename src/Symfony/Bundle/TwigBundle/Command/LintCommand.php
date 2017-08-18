@@ -24,15 +24,8 @@ use Symfony\Component\Finder\Finder;
  */
 final class LintCommand extends BaseLintCommand implements ContainerAwareInterface
 {
+    // BC to be removed in 4.0
     use ContainerAwareTrait;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTwigEnvironment()
-    {
-        return $this->container->get('twig');
-    }
 
     /**
      * {@inheritdoc}

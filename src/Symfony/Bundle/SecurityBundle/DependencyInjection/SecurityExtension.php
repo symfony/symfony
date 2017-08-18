@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\Command\InitAclCommand;
+use Symfony\Bundle\SecurityBundle\Command\SetAclCommand;
+use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -83,12 +86,17 @@ class SecurityExtension extends Extension
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
-        $container
-            ->getDefinition('security.access.decision_manager')
-            ->addArgument($config['access_decision_manager']['strategy'])
-            ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
-        ;
+
+        if (isset($config['access_decision_manager']['service'])) {
+            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
+        } else {
+            $container
+                ->getDefinition('security.access.decision_manager')
+                ->addArgument($config['access_decision_manager']['strategy'])
+                ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
+                ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
+        }
+
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
@@ -102,12 +110,15 @@ class SecurityExtension extends Extension
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
-            $container->getDefinition('security.console.user_password_encoder_command')->replaceArgument(1, array_keys($config['encoders']));
+            $container->getDefinition(UserPasswordEncoderCommand::class)->replaceArgument(1, array_keys($config['encoders']));
         }
 
         // load ACL
         if (isset($config['acl'])) {
             $this->aclLoad($config['acl'], $container);
+        } else {
+            $container->removeDefinition(InitAclCommand::class);
+            $container->removeDefinition(SetAclCommand::class);
         }
 
         $container->registerForAutoconfiguration(VoterInterface::class)
@@ -245,7 +256,7 @@ class SecurityExtension extends Extension
         foreach ($providerIds as $userProviderId) {
             $userProviders[] = new Reference($userProviderId);
         }
-        $arguments[1] = $userProviders;
+        $arguments[1] = new IteratorArgument($userProviders);
         $definition->setArguments($arguments);
 
         $customUserChecker = false;
@@ -613,7 +624,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($name, new ChildDefinition('security.user.provider.chain'))
-                ->addArgument($providers);
+                ->addArgument(new IteratorArgument($providers));
 
             return $name;
         }
@@ -661,7 +672,7 @@ class SecurityExtension extends Extension
 
     private function createExpression($container, $expression)
     {
-        if (isset($this->expressions[$id = 'security.expression.'.sha1($expression)])) {
+        if (isset($this->expressions[$id = 'security.expression.'.ContainerBuilder::hash($expression)])) {
             return $this->expressions[$id];
         }
 
@@ -681,8 +692,7 @@ class SecurityExtension extends Extension
             $methods = array_map('strtoupper', (array) $methods);
         }
 
-        $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
-        $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
+        $id = 'security.request_matcher.'.ContainerBuilder::hash(array($path, $host, $methods, $ip, $attributes));
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];

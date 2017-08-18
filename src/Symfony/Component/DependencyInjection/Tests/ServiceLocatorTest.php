@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ServiceLocatorTest extends TestCase
@@ -58,7 +59,7 @@ class ServiceLocatorTest extends TestCase
 
     /**
      * @expectedException        \Psr\Container\NotFoundExceptionInterface
-     * @expectedExceptionMessage You have requested a non-existent service "dummy"
+     * @expectedExceptionMessage You have requested a non-existent service "dummy". Did you mean one of these: "foo", "bar"?
      */
     public function testGetThrowsOnUndefinedService()
     {
@@ -67,7 +68,13 @@ class ServiceLocatorTest extends TestCase
             'bar' => function () { return 'baz'; },
         ));
 
-        $locator->get('dummy');
+        try {
+            $locator->get('dummy');
+        } catch (ServiceNotFoundException $e) {
+            $this->assertSame(array('foo', 'bar'), $e->getAlternatives());
+
+            throw $e;
+        }
     }
 
     public function testInvoke()

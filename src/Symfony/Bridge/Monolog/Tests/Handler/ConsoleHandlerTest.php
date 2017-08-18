@@ -168,6 +168,36 @@ class ConsoleHandlerTest extends TestCase
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
     }
 
+    public function testWritingAndFormattingWithCustomFormattingOptions()
+    {
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $output
+            ->expects($this->any())
+            ->method('getVerbosity')
+            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG))
+        ;
+        $output
+            ->expects($this->once())
+            ->method('write')
+            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n")
+        ;
+
+        $handler = new ConsoleHandler(null, false, array(), array('ignore_empty_context_and_extra' => true));
+        $handler->setOutput($output);
+
+        $infoRecord = array(
+            'message' => 'My info message',
+            'context' => array(),
+            'level' => Logger::INFO,
+            'level_name' => Logger::getLevelName(Logger::INFO),
+            'channel' => 'app',
+            'datetime' => new \DateTime('2013-05-29 16:21:54'),
+            'extra' => array(),
+        );
+
+        $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
+    }
+
     public function testLogsFromListeners()
     {
         $output = new BufferedOutput();

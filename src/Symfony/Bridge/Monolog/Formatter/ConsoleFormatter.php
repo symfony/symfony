@@ -78,6 +78,7 @@ class ConsoleFormatter implements FormatterInterface
             'date_format' => self::SIMPLE_DATE,
             'colors' => true,
             'multiline' => false,
+            'ignore_empty_context_and_extra' => false,
         ), $options);
 
         if (class_exists(VarCloner::class)) {
@@ -116,13 +117,16 @@ class ConsoleFormatter implements FormatterInterface
     {
         $levelColor = self::$levelColorMap[$record['level']];
 
-        if ($this->options['multiline']) {
-            $context = $extra = "\n";
-        } else {
-            $context = $extra = ' ';
+        $context = $extra = '';
+        if (!empty($record['context']) || !$this->options['ignore_empty_context_and_extra']) {
+            $context = $this->options['multiline'] ? "\n" : ' ';
+            $context .= $this->dumpData($record['context']);
         }
-        $context .= $this->dumpData($record['context']);
-        $extra .= $this->dumpData($record['extra']);
+
+        if (!empty($record['extra']) || !$this->options['ignore_empty_context_and_extra']) {
+            $extra = $this->options['multiline'] ? "\n" : ' ';
+            $extra .= $this->dumpData($record['extra']);
+        }
 
         $formatted = strtr($this->options['format'], array(
             '%datetime%' => $record['datetime']->format($this->options['date_format']),

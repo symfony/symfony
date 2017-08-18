@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -24,8 +23,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public
- * - synthetic services are always of non-prototype scope
- * - shared services are always of non-prototype scope
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -46,24 +43,19 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                 throw new RuntimeException(sprintf('A synthetic service ("%s") must be public.', $id));
             }
 
-            // synthetic service has non-prototype scope
-            if ($definition->isSynthetic() && ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope(false)) {
-                throw new RuntimeException(sprintf('A synthetic service ("%s") cannot be of scope "prototype".', $id));
-            }
-
-            // shared service has non-prototype scope
-            if ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope(false)) {
-                throw new RuntimeException(sprintf('A shared service ("%s") cannot be of scope "prototype".', $id));
-            }
-
-            if ($definition->getFactory() && ($definition->getFactoryClass(false) || $definition->getFactoryService(false) || $definition->getFactoryMethod(false))) {
-                throw new RuntimeException(sprintf('A service ("%s") can use either the old or the new factory syntax, not both.', $id));
-            }
-
             // non-synthetic, non-abstract service has class
             if (!$definition->isAbstract() && !$definition->isSynthetic() && !$definition->getClass()) {
-                if ($definition->getFactory() || $definition->getFactoryClass(false) || $definition->getFactoryService(false)) {
+                if ($definition->getFactory()) {
                     throw new RuntimeException(sprintf('Please add the class to service "%s" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.', $id));
+                }
+                if (class_exists($id) || interface_exists($id, false)) {
+                    throw new RuntimeException(sprintf(
+                         'The definition for "%s" has no class attribute, and appears to reference a '
+                        .'class or interface in the global namespace. Leaving out the "class" attribute '
+                        .'is only allowed for namespaced classes. Please specify the class attribute '
+                        .'explicitly to get rid of this error.',
+                        $id
+                    ));
                 }
 
                 throw new RuntimeException(sprintf(

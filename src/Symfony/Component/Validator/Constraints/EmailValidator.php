@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Egulias\EmailValidator\Validation\EmailValidation;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\RuntimeException;
@@ -56,39 +57,32 @@ class EmailValidator extends ConstraintValidator
         }
 
         if ($constraint->strict) {
-            if (!class_exists('\Egulias\EmailValidator\EmailValidator') || interface_exists('\Egulias\EmailValidator\Validation\EmailValidation')) {
-                throw new RuntimeException('Strict email validation requires egulias/email-validator:~1.2');
+            if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
+                throw new RuntimeException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
             }
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();
 
-            if (!$strictValidator->isValid($value, false, true)) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Email::INVALID_FORMAT_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Email::INVALID_FORMAT_ERROR)
-                        ->addViolation();
-                }
-
-                return;
-            }
-        } elseif (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
-            if ($this->context instanceof ExecutionContextInterface) {
+            if (interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, new NoRFCWarningsValidation())) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)
                     ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
+
+                return;
+            } elseif (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
+                $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)
                     ->addViolation();
+
+                return;
             }
+        } elseif (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Email::INVALID_FORMAT_ERROR)
+                ->addViolation();
 
             return;
         }
@@ -98,34 +92,20 @@ class EmailValidator extends ConstraintValidator
         // Check for host DNS resource records
         if ($constraint->checkMX) {
             if (!$this->checkMX($host)) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Email::MX_CHECK_FAILED_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->message)
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode(Email::MX_CHECK_FAILED_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::MX_CHECK_FAILED_ERROR)
+                    ->addViolation();
             }
 
             return;
         }
 
         if ($constraint->checkHost && !$this->checkHost($host)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Email::HOST_CHECK_FAILED_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Email::HOST_CHECK_FAILED_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Email::HOST_CHECK_FAILED_ERROR)
+                ->addViolation();
         }
     }
 

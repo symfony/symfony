@@ -15,7 +15,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -39,17 +42,20 @@ class ContextListener implements ListenerInterface
     private $userProviders;
     private $dispatcher;
     private $registered;
+    private $trustResolver;
 
-    public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    /**
+     * @param TokenStorageInterface                     $tokenStorage
+     * @param iterable|UserProviderInterface[]          $userProviders
+     * @param string                                    $contextKey
+     * @param LoggerInterface|null                      $logger
+     * @param EventDispatcherInterface|null             $dispatcher
+     * @param AuthenticationTrustResolverInterface|null $trustResolver
+     */
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
-        }
-
-        foreach ($userProviders as $userProvider) {
-            if (!$userProvider instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
-            }
         }
 
         $this->tokenStorage = $tokenStorage;
@@ -58,6 +64,7 @@ class ContextListener implements ListenerInterface
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
     }
 
     /**
@@ -121,7 +128,7 @@ class ContextListener implements ListenerInterface
         $request = $event->getRequest();
         $session = $request->getSession();
 
-        if ((null === $token = $this->tokenStorage->getToken()) || ($token instanceof AnonymousToken)) {
+        if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }
@@ -153,6 +160,10 @@ class ContextListener implements ListenerInterface
         $userNotFoundByProvider = false;
 
         foreach ($this->userProviders as $provider) {
+            if (!$provider instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "%s".', get_class($provider), UserProviderInterface::class));
+            }
+
             try {
                 $refreshedUser = $provider->refreshUser($user);
                 $token->setUser($refreshedUser);

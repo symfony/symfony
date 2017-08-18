@@ -11,14 +11,11 @@
 
 namespace Symfony\Component\Console\Command;
 
-use Symfony\Component\Console\Descriptor\TextDescriptor;
-use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -37,6 +34,7 @@ class Command
     private $processTitle;
     private $aliases = array();
     private $definition;
+    private $hidden = false;
     private $help;
     private $description;
     private $ignoreValidationErrors = false;
@@ -63,10 +61,6 @@ class Command
         }
 
         $this->configure();
-
-        if (!$this->name) {
-            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
-        }
     }
 
     /**
@@ -283,24 +277,12 @@ class Command
      *
      * @see execute()
      */
-    public function setCode($code)
+    public function setCode(callable $code)
     {
-        if (!is_callable($code)) {
-            throw new InvalidArgumentException('Invalid callable provided to Command::setCode.');
-        }
-
-        if (PHP_VERSION_ID >= 50400 && $code instanceof \Closure) {
+        if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                if (PHP_VERSION_ID < 70000) {
-                    // Bug in PHP5: https://bugs.php.net/bug.php?id=64761
-                    // This means that we cannot bind static closures and therefore we must
-                    // ignore any errors here.  There is no way to test if the closure is
-                    // bindable.
-                    $code = @\Closure::bind($code, $this);
-                } else {
-                    $code = \Closure::bind($code, $this);
-                }
+                $code = \Closure::bind($code, $this);
             }
         }
 
@@ -367,7 +349,7 @@ class Command
     }
 
     /**
-     * Gets the InputDefinition to be used to create XML and Text representations of this Command.
+     * Gets the InputDefinition to be used to create representations of this Command.
      *
      * Can be overridden to provide the original command representation when it would otherwise
      * be changed by merging with the application InputDefinition.
@@ -466,6 +448,26 @@ class Command
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @param bool $hidden Whether or not the command should be hidden from the list of commands
+     *
+     * @return Command The current instance
+     */
+    public function setHidden($hidden)
+    {
+        $this->hidden = (bool) $hidden;
+
+        return $this;
+    }
+
+    /**
+     * @return bool Whether the command should be publicly shown or not.
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
     }
 
     /**
@@ -635,49 +637,6 @@ class Command
         }
 
         return $this->helperSet->get($name);
-    }
-
-    /**
-     * Returns a text representation of the command.
-     *
-     * @return string A string representing the command
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     */
-    public function asText()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $descriptor = new TextDescriptor();
-        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $descriptor->describe($output, $this, array('raw_output' => true));
-
-        return $output->fetch();
-    }
-
-    /**
-     * Returns an XML representation of the command.
-     *
-     * @param bool $asDom Whether to return a DOM or an XML string
-     *
-     * @return string|\DOMDocument An XML string representing the command
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     */
-    public function asXml($asDom = false)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $descriptor = new XmlDescriptor();
-
-        if ($asDom) {
-            return $descriptor->getCommandDocument($this);
-        }
-
-        $output = new BufferedOutput();
-        $descriptor->describe($output, $this);
-
-        return $output->fetch();
     }
 
     /**

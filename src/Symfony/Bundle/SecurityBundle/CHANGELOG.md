@@ -1,6 +1,45 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `FirewallContext::getContext()`
+ * made `FirewallMap::$container` and `::$map` private
+ * made the first `UserPasswordEncoderCommand::_construct()` argument mandatory
+ * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` anymore
+ * removed support for voters that don't implement the `VoterInterface`
+
+3.4.0
+-----
+
+ * Tagging voters with the `security.voter` tag without implementing the
+   `VoterInterface` on the class is now deprecated and will be removed in 4.0.
+ * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
+ * added info about called security listeners in profiler 
+
+3.3.0
+-----
+
+ * Deprecated instantiating `UserPasswordEncoderCommand` without its constructor
+   arguments fully provided.
+ * Deprecated `UserPasswordEncoderCommand::getContainer()` and relying on the
+  `ContainerAwareCommand` sub class or `ContainerAwareInterface` implementation for this command.
+ * Deprecated the `FirewallMap::$map` and `$container` properties.
+ * [BC BREAK] Keys of the `users` node for `in_memory` user provider are no longer normalized.
+ * deprecated `FirewallContext::getListeners()`
+
+3.2.0
+-----
+
+ * Added the `SecurityUserValueResolver` to inject the security users in actions via
+   `Symfony\Component\Security\Core\User\UserInterface` in the method signature.
+
+3.0.0
+-----
+
+ * Removed the `security.context` service.
+
 2.8.0
 -----
 

@@ -17,16 +17,6 @@ class TimezoneTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimezoneType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('timezone');
-
-        $this->assertSame('timezone', $form->getConfig()->getType()->getName());
-    }
-
     public function testTimezonesAreSelectable()
     {
         $choices = $this->factory->create(static::TESTED_TYPE)

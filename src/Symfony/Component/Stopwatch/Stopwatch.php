@@ -19,6 +19,11 @@ namespace Symfony\Component\Stopwatch;
 class Stopwatch
 {
     /**
+     * @var bool
+     */
+    private $morePrecision;
+
+    /**
      * @var Section[]
      */
     private $sections;
@@ -28,9 +33,13 @@ class Stopwatch
      */
     private $activeSections;
 
-    public function __construct()
+    /**
+     * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
+     */
+    public function __construct($morePrecision = false)
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
+        $this->morePrecision = $morePrecision;
+        $this->reset();
     }
 
     /**
@@ -155,5 +164,13 @@ class Stopwatch
     public function getSectionEvents($id)
     {
         return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : array();
+    }
+
+    /**
+     * Resets the stopwatch to its original state.
+     */
+    public function reset()
+    {
+        $this->sections = $this->activeSections = array('__root__' => new Section('__root__', $this->morePrecision));
     }
 }

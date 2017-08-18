@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Exception;
 
+use Psr\Container\NotFoundExceptionInterface;
+
 /**
  * This exception is thrown when a non-existent service is requested.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ServiceNotFoundException extends InvalidArgumentException
+class ServiceNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {
     private $id;
     private $sourceId;

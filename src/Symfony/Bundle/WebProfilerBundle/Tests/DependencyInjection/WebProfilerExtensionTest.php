@@ -27,10 +27,13 @@ class WebProfilerExtensionTest extends TestCase
      */
     private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '')
+    public static function assertSaneContainer(Container $container, $message = '', $knownPrivates = array())
     {
         $errors = array();
         foreach ($container->getServiceIds() as $id) {
+            if (in_array($id, $knownPrivates, true)) { // for BC with 3.4
+                continue;
+            }
             try {
                 $container->get($id);
             } catch (\Exception $e) {
@@ -56,6 +59,8 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
+        $this->container->setParameter('kernel.charset', 'UTF-8');
+        $this->container->setParameter('debug.file_link_format', null);
         $this->container->setParameter('profiler.class', array('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'));
         $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
@@ -96,11 +101,11 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
+        $this->assertSaneContainer($this->getDumpedContainer(), '', array('web_profiler.csp.handler'));
+
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
         }
-
-        $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     public function getDebugModes()

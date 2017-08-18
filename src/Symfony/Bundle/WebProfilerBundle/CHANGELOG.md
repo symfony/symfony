@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `WebProfilerExtension::dumpValue()` method
+ * removed the `getTemplates()` method of the `TemplateManager` class in favor of the ``getNames()`` method
+
+3.1.0
+-----
+
+ * added information about redirected and forwarded requests to the profiler
+
+3.0.0
+-----
+
+ * removed profiler:import and profiler:export commands
+
 2.8.0
 -----
 

@@ -11,30 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\app;
 
-// get the autoload file
-$dir = __DIR__;
-$lastDir = null;
-while ($dir !== $lastDir) {
-    $lastDir = $dir;
-
-    if (is_file($dir.'/autoload.php')) {
-        require_once $dir.'/autoload.php';
-        break;
-    }
-
-    if (is_file($dir.'/autoload.php.dist')) {
-        require_once $dir.'/autoload.php.dist';
-        break;
-    }
-
-    if (file_exists($dir.'/vendor/autoload.php')) {
-        require_once $dir.'/vendor/autoload.php';
-        break;
-    }
-
-    $dir = dirname($dir);
-}
-
+use Doctrine\ORM\Version;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
@@ -106,6 +83,11 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->rootConfig);
+
+        // to be removed once https://github.com/doctrine/DoctrineBundle/pull/684 is merged
+        if ('Acl' === $this->testCase && class_exists(Version::class)) {
+            $loader->load(__DIR__.'/Acl/doctrine.yml');
+        }
     }
 
     public function serialize()

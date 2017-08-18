@@ -47,16 +47,6 @@ class TraversalStrategy
     const TRAVERSE = 4;
 
     /**
-     * Specifies that nested instances of {@link \Traversable} should never be
-     * iterated. Can be combined with {@link IMPLICIT} or {@link TRAVERSE}.
-     *
-     * @deprecated since version 2.5, to be removed in 3.0. This constant was added for backwards compatibility only.
-     *
-     * @internal
-     */
-    const STOP_RECURSION = 8;
-
-    /**
      * Not instantiable.
      */
     private function __construct()

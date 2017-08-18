@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,23 +25,18 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  * A console command to test route matching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
-class RouterMatchCommand extends ContainerAwareCommand
+class RouterMatchCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        if (!$this->getContainer()->has('router')) {
-            return false;
-        }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof RouterInterface) {
-            return false;
-        }
+    private $router;
 
-        return parent::isEnabled();
+    public function __construct(RouterInterface $router)
+    {
+        parent::__construct();
+
+        $this->router = $router;
     }
 
     /**
@@ -78,8 +74,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $router = $this->getContainer()->get('router');
-        $context = $router->getContext();
+        $context = $this->router->getContext();
         if (null !== $method = $input->getOption('method')) {
             $context->setMethod($method);
         }
@@ -90,7 +85,7 @@ EOF
             $context->setHost($host);
         }
 
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
+        $matcher = new TraceableUrlMatcher($this->router->getRouteCollection(), $context);
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 

@@ -12,11 +12,13 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
@@ -58,23 +60,101 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertEquals(array(), array_diff($providers, $expectedProviders));
 
         // chain provider
-        $this->assertEquals(array(array(
+        $this->assertEquals(array(new IteratorArgument(array(
             new Reference('security.user.provider.concrete.service'),
             new Reference('security.user.provider.concrete.basic'),
-        )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
+        ))), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
     public function testFirewalls()
     {
         $container = $this->getContainer('container1');
-
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $listeners = array();
-        foreach (array_keys($arguments[1]) as $contextId) {
+        $configs = array();
+        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']);
+            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+
+            $configDef = $container->getDefinition((string) $arguments['index_2']);
+            $configs[] = array_values($configDef->getArguments());
         }
+
+        // the IDs of the services are case sensitive or insensitive depending on
+        // the Symfony version. Transform them to lowercase to simplify tests.
+        $configs[0][2] = strtolower($configs[0][2]);
+        $configs[2][2] = strtolower($configs[2][2]);
+
+        $this->assertEquals(array(
+            array(
+                'simple',
+                'security.user_checker',
+                'security.request_matcher.6tndozi',
+                false,
+            ),
+            array(
+                'secure',
+                'security.user_checker',
+                null,
+                true,
+                true,
+                'security.user.provider.concrete.default',
+                null,
+                'security.authentication.form_entry_point.secure',
+                null,
+                null,
+                array(
+                    'logout',
+                    'switch_user',
+                    'x509',
+                    'remote_user',
+                    'form_login',
+                    'http_basic',
+                    'http_digest',
+                    'remember_me',
+                    'anonymous',
+                ),
+                array(
+                    'parameter' => '_switch_user',
+                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                ),
+            ),
+            array(
+                'host',
+                'security.user_checker',
+                'security.request_matcher.and0kk1',
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'host',
+                'security.authentication.basic_entry_point.host',
+                null,
+                null,
+                array(
+                    'http_basic',
+                    'anonymous',
+                ),
+                null,
+            ),
+            array(
+                'with_user_checker',
+                'app.user_checker',
+                null,
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'with_user_checker',
+                'security.authentication.basic_entry_point.with_user_checker',
+                null,
+                null,
+                array(
+                    'http_basic',
+                    'anonymous',
+                ),
+                null,
+            ),
+        ), $configs);
 
         $this->assertEquals(array(
             array(),
@@ -106,6 +186,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.access_listener',
             ),
         ), $listeners);
+
+        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
     }
 
     public function testFirewallRequestMatchers()
@@ -115,7 +197,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $matchers = array();
 
-        foreach ($arguments[1] as $reference) {
+        foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
                 $definition = $container->getDefinition((string) $reference);
                 $matchers[] = $definition->getArguments();
@@ -134,6 +216,14 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $matchers);
     }
 
+    public function testUserCheckerAliasIsRegistered()
+    {
+        $container = $this->getContainer('no_custom_user_checker');
+
+        $this->assertTrue($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'Alias for user checker is registered when no custom user checker service is registered'));
+        $this->assertFalse($container->getAlias('Symfony\Component\Security\Core\User\UserCheckerInterface')->isPublic());
+    }
+
     public function testAccess()
     {
         $container = $this->getContainer('container1');
@@ -146,8 +236,7 @@ abstract class CompleteConfigurationTest extends TestCase
         }
 
         $matcherIds = array();
-        foreach ($rules as $rule) {
-            list($matcherId, $attributes, $channel) = $rule;
+        foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertFalse(isset($matcherIds[$matcherId]));
@@ -192,24 +281,34 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $this->assertEquals(array(array(
             'JMS\FooBundle\Entity\User1' => array(
-                'class' => new Parameter('security.encoder.plain.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
                 'arguments' => array(false),
             ),
             'JMS\FooBundle\Entity\User2' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
-                'arguments' => array('sha1', false, 5),
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => 13,
             ),
             'JMS\FooBundle\Entity\User3' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
-                'arguments' => array('md5', true, 5000),
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => 13,
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => array(
-                'class' => new Parameter('security.encoder.pbkdf2.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
                 'arguments' => array('sha1', false, 5, 30),
             ),
             'JMS\FooBundle\Entity\User6' => array(
-                'class' => new Parameter('security.encoder.bcrypt.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
                 'arguments' => array(15),
             ),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
@@ -258,6 +357,34 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testUserCheckerConfigWithNoCheckers()
     {
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
+    }
+
+    public function testUserPasswordEncoderCommandIsRegistered()
+    {
+        $this->assertTrue($this->getContainer('remember_me_options')->has(UserPasswordEncoderCommand::class));
+    }
+
+    public function testDefaultAccessDecisionManagerStrategyIsAffirmative()
+    {
+        $container = $this->getContainer('access_decision_manager_default_strategy');
+
+        $this->assertSame(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $container->getDefinition('security.access.decision_manager')->getArgument(1), 'Default vote strategy is affirmative');
+    }
+
+    public function testCustomAccessDecisionManagerService()
+    {
+        $container = $this->getContainer('access_decision_manager_service');
+
+        $this->assertSame('app.access_decision_manager', (string) $container->getAlias('security.access.decision_manager'), 'The custom access decision manager service is aliased');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "strategy" and "service" cannot be used together.
+     */
+    public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
+    {
+        $container = $this->getContainer('access_decision_manager_service_and_strategy');
     }
 
     protected function getContainer($file)

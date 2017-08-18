@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,9 +24,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * A console command for retrieving information about event dispatcher.
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
+ *
+ * @final since version 3.4
  */
-class EventDispatcherDebugCommand extends ContainerAwareCommand
+class EventDispatcherDebugCommand extends Command
 {
+    private $dispatcher;
+
+    public function __construct(EventDispatcherInterface $dispatcher)
+    {
+        parent::__construct();
+
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -60,12 +72,11 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $dispatcher = $this->getEventDispatcher();
 
         $options = array();
         if ($event = $input->getArgument('event')) {
-            if (!$dispatcher->hasListeners($event)) {
-                $io->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+            if (!$this->dispatcher->hasListeners($event)) {
+                $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
                 return;
             }
@@ -77,16 +88,6 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $helper->describe($io, $dispatcher, $options);
-    }
-
-    /**
-     * Loads the Event Dispatcher from the container.
-     *
-     * @return EventDispatcherInterface
-     */
-    protected function getEventDispatcher()
-    {
-        return $this->getContainer()->get('event_dispatcher');
+        $helper->describe($io, $this->dispatcher, $options);
     }
 }

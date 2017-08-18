@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
-use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 
 class KernelTest extends TestCase
 {
@@ -94,17 +95,6 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
-    public function testClassCacheIsLoaded()
-    {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
-        $kernel->loadClassCache('name', '.extension');
-        $kernel->expects($this->once())
-            ->method('doLoadClassCache')
-            ->with('name', '.extension');
-
-        $kernel->boot();
-    }
-
     public function testClassCacheIsNotLoadedByDefault()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
@@ -112,14 +102,6 @@ class KernelTest extends TestCase
             ->method('doLoadClassCache');
 
         $kernel->boot();
-    }
-
-    public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
-    {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
-        $kernel->loadClassCache();
-        $kernel->expects($this->never())
-            ->method('doLoadClassCache');
     }
 
     public function testEnvParametersResourceIsAdded()
@@ -319,48 +301,6 @@ EOF;
         }
 
         $this->assertEquals($expected, $output);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyIsClassInActiveBundleFalse()
-    {
-        $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
-
-        $this->assertFalse($kernel->isClassInActiveBundle('Not\In\Active\Bundle'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyIsClassInActiveBundleFalseNoNamespace()
-    {
-        $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
-
-        $this->assertFalse($kernel->isClassInActiveBundle('NotNamespacedClass'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyIsClassInActiveBundleTrue()
-    {
-        $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
-
-        $this->assertTrue($kernel->isClassInActiveBundle(__NAMESPACE__.'\Fixtures\FooBarBundle\SomeClass'));
-    }
-
-    protected function getKernelMockForIsClassInActiveBundleTest()
-    {
-        $bundle = new FooBarBundle();
-
-        $kernel = $this->getKernel(array('getBundles'));
-        $kernel->expects($this->once())
-            ->method('getBundles')
-            ->will($this->returnValue(array($bundle)));
-
-        return $kernel;
     }
 
     public function testGetRootDir()
@@ -769,12 +709,54 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
+    public function testKernelWithoutBundles()
+    {
+        $kernel = new KernelWithoutBundles('test', true);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
+    }
+
     public function testKernelRootDirNameStartingWithANumber()
     {
         $dir = __DIR__.'/Fixtures/123';
         require_once $dir.'/Kernel123.php';
         $kernel = new \Symfony\Component\HttpKernel\Tests\Fixtures\_123\Kernel123('dev', true);
         $this->assertEquals('_123', $kernel->getName());
+    }
+
+    public function testProjectDirExtension()
+    {
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertSame('foo', $kernel->getProjectDir());
+        $this->assertSame('foo', $kernel->getContainer()->getParameter('kernel.project_dir'));
+    }
+
+    public function testKernelReset()
+    {
+        (new Filesystem())->remove(__DIR__.'/Fixtures/cache');
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $containerClass = get_class($kernel->getContainer());
+        $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertSame($containerClass, get_class($kernel->getContainer()));
+        $this->assertFileExists($containerFile);
+        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+
+        $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass'); });
+        $kernel->boot();
+
+        $this->assertTrue(get_class($kernel->getContainer()) !== $containerClass);
+        $this->assertFileNotExists($containerFile);
     }
 
     /**
@@ -871,5 +853,45 @@ class TestKernel implements HttpKernelInterface
 
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
+    }
+}
+
+class CustomProjectDirKernel extends Kernel
+{
+    private $baseDir;
+    private $buildContainer;
+
+    public function __construct(\Closure $buildContainer = null)
+    {
+        parent::__construct('custom', true);
+
+        $this->baseDir = 'foo';
+        $this->buildContainer = $buildContainer;
+    }
+
+    public function registerBundles()
+    {
+        return array();
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+
+    public function getProjectDir()
+    {
+        return $this->baseDir;
+    }
+
+    public function getRootDir()
+    {
+        return __DIR__.'/Fixtures';
+    }
+
+    protected function build(ContainerBuilder $container)
+    {
+        if ($build = $this->buildContainer) {
+            $build($container);
+        }
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -34,7 +34,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         // authentication provider
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
-            ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
+            ->setDefinition($authProviderId, new ChildDefinition('security.authentication.provider.rememberme'))
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addArgument($config['secret'])
             ->addArgument($id)
@@ -56,7 +56,7 @@ class RememberMeFactory implements SecurityFactoryInterface
             ;
         }
 
-        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
+        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new ChildDefinition($templateId));
         $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
@@ -102,7 +102,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // remember-me listener
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
         $listener->replaceArgument(5, $config['catch_exceptions']);
 
@@ -121,25 +121,10 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
-        $node->fixXmlConfig('user_provider');
         $builder = $node
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['key']); })
-                ->then(function ($v) {
-                    if (isset($v['secret'])) {
-                        throw new \LogicException('Cannot set both key and secret options for remember_me, use only secret instead.');
-                    }
-
-                    @trigger_error('remember_me.key is deprecated since version 2.8 and will be removed in 3.0. Use remember_me.secret instead.', E_USER_DEPRECATED);
-
-                    $v['secret'] = $v['key'];
-
-                    unset($v['key']);
-
-                    return $v;
-                })
-                ->end()
-            ->children();
+            ->fixXmlConfig('user_provider')
+            ->children()
+        ;
 
         $builder
             ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()

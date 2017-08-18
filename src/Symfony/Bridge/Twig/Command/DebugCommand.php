@@ -28,30 +28,17 @@ class DebugCommand extends Command
 {
     private $twig;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($name = 'debug:twig')
+    public function __construct(Environment $twig)
     {
-        parent::__construct($name);
-    }
+        parent::__construct();
 
-    public function setTwigEnvironment(Environment $twig)
-    {
         $this->twig = $twig;
-    }
-
-    /**
-     * @return Environment $twig
-     */
-    protected function getTwigEnvironment()
-    {
-        return $this->twig;
     }
 
     protected function configure()
     {
         $this
+            ->setName('debug:twig')
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
@@ -80,20 +67,12 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $twig = $this->getTwigEnvironment();
-
-        if (null === $twig) {
-            $io->error('The Twig environment needs to be set.');
-
-            return 1;
-        }
-
         $types = array('functions', 'filters', 'tests', 'globals');
 
         if ($input->getOption('format') === 'json') {
             $data = array();
             foreach ($types as $type) {
-                foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
+                foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                     $data[$type][$name] = $this->getMetadata($type, $entity);
                 }
             }
@@ -107,7 +86,7 @@ EOF
 
         foreach ($types as $index => $type) {
             $items = array();
-            foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
+            foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
                 }

@@ -16,21 +16,29 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": "^7.1.3",
+        "psr/container": "^1.0"
     },
     "require-dev": {
-        "symfony/yaml": "~2.3.42|~2.7.14|~2.8.7|~3.0.7",
-        "symfony/config": "~2.2|~3.0.0",
-        "symfony/expression-language": "~2.6|~3.0.0"
-    },
-    "conflict": {
-        "symfony/expression-language": "<2.6"
+        "symfony/yaml": "~3.4|~4.0",
+        "symfony/config": "~3.4|~4.0",
+        "symfony/expression-language": "~3.4|~4.0"
     },
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",
+        "symfony/finder": "For using double-star glob patterns or when GLOB_BRACE portability is required",
         "symfony/expression-language": "For using expressions in service container configuration",
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
+    },
+    "conflict": {
+        "symfony/config": "<3.4",
+        "symfony/finder": "<3.4",
+        "symfony/proxy-manager-bridge": "<3.4",
+        "symfony/yaml": "<3.4"
+    },
+    "provide": {
+        "psr/container-implementation": "1.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },
@@ -41,7 +49,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "4.0-dev"
         }
     }
 }

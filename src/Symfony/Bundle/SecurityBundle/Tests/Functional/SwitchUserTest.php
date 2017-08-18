@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
+
 class SwitchUserTest extends WebTestCase
 {
     /**
@@ -42,7 +44,7 @@ class SwitchUserTest extends WebTestCase
         $client = $this->createAuthenticatedClient('user_can_switch');
 
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_1');
-        $client->request('GET', '/profile?_switch_user=_exit');
+        $client->request('GET', '/profile?_switch_user='.SwitchUserListener::EXIT_VALUE);
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());

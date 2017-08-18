@@ -1,0 +1,21 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    dummy:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
+        arguments: ['@cache.private_pool']
+    custom_clearer:
+        parent: cache.default_clearer
+        tags:
+            - name: kernel.cache_clearer
+
+framework:
+    cache:
+        pools:
+            cache.private_pool: ~
+            cache.public_pool:
+                public: true
+            cache.pool_with_clearer:
+                public: true
+                clearer: custom_clearer

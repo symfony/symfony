@@ -1,6 +1,44 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()`
+   methods have been removed
+ * the `Request::HEADER_CLIENT_IP` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_FOR` instead
+ * the `Request::HEADER_CLIENT_HOST` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_HOST` instead
+ * the `Request::HEADER_CLIENT_PROTO` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_PROTO` instead
+ * the `Request::HEADER_CLIENT_PORT` constant has been removed, use
+   `Request::HEADER_X_FORWARDED_PORT` instead
+ * checking for cacheable HTTP methods using the `Request::isMethodSafe()`
+   method (by not passing `false` as its argument) is not supported anymore and
+   throws a `\BadMethodCallException`
+
+3.3.0
+-----
+
+ * the `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument,
+   see http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html for more info,
+ * deprecated the `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods,
+ * added `File\Stream`, to be passed to `BinaryFileResponse` when the size of the served file is unknown,
+   disabling `Range` and `Content-Length` handling, switching to chunked encoding instead
+ * added the `Cookie::fromString()` method that allows to create a cookie from a
+   raw header string
+
+3.1.0
+-----
+
+ * Added support for creating `JsonResponse` with a string of JSON data
+
+3.0.0
+-----
+
+ * The precedence of parameters returned from `Request::get()` changed from "GET, PATH, BODY" to "PATH, GET, BODY"
+
 2.8.0
 -----
 

@@ -84,12 +84,13 @@ class ServiceReferenceGraph
      * @param string $destId
      * @param string $destValue
      * @param string $reference
+     * @param bool   $lazy
      */
-    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null)
+    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null, bool $lazy = false)
     {
         $sourceNode = $this->createNode($sourceId, $sourceValue);
         $destNode = $this->createNode($destId, $destValue);
-        $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference);
+        $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy);
 
         $sourceNode->addOutEdge($edge);
         $destNode->addInEdge($edge);

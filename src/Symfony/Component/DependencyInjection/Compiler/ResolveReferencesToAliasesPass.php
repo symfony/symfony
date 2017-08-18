@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,8 +43,9 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
             $definition->setArguments($this->processArguments($definition->getArguments()));
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
             $definition->setProperties($this->processArguments($definition->getProperties()));
-            $definition->setFactory($this->processFactory($definition->getFactory()));
-            $definition->setFactoryService($this->processFactoryService($definition->getFactoryService(false)), false);
+            if (isset($definition->getChanges()['factory'])) {
+                $definition->setFactory($this->processFactory($definition->getFactory()));
+            }
         }
 
         foreach ($container->getAliases() as $id => $alias) {
@@ -66,25 +68,18 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->processArguments($argument);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $argument->setValues($this->processArguments($argument->getValues()));
             } elseif ($argument instanceof Reference) {
                 $defId = $this->getDefinitionId($id = (string) $argument);
 
                 if ($defId !== $id) {
-                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict(false));
+                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior());
                 }
             }
         }
 
         return $arguments;
-    }
-
-    private function processFactoryService($factoryService)
-    {
-        if (null === $factoryService) {
-            return;
-        }
-
-        return $this->getDefinitionId($factoryService);
     }
 
     private function processFactory($factory)
@@ -96,7 +91,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         $defId = $this->getDefinitionId($id = (string) $factory[0]);
 
         if ($defId !== $id) {
-            $factory[0] = new Reference($defId, $factory[0]->getInvalidBehavior(), $factory[0]->isStrict(false));
+            $factory[0] = new Reference($defId, $factory[0]->getInvalidBehavior());
         }
 
         return $factory;

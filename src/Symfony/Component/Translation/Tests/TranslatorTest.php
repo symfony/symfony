@@ -21,7 +21,7 @@ class TranslatorTest extends TestCase
 {
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testConstructorInvalidLocale($locale)
     {
@@ -57,7 +57,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testSetInvalidLocale($locale)
     {
@@ -140,7 +140,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testSetFallbackInvalidLocales($locale)
     {
@@ -172,7 +172,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testAddResourceInvalidLocales($locale)
     {
@@ -266,7 +266,7 @@ class TranslatorTest extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Translation\Exception\RuntimeException
      */
     public function testWhenAResourceHasNoRegisteredLoader()
     {
@@ -320,7 +320,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testTransInvalidLocale($locale)
     {
@@ -370,7 +370,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testTransChoiceInvalidLocale($locale)
     {
@@ -445,23 +445,26 @@ class TranslatorTest extends TestCase
     public function getTransChoiceTests()
     {
         return array(
-            array('Il y a 0 pomme', '{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples', '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
-            array('Il y a 1 pomme', '{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples', '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 1, array('%count%' => 1), 'fr', ''),
-            array('Il y a 10 pommes', '{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples', '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
+            array('Il y a 0 pomme', '{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples', '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array(), 'fr', ''),
+            array('Il y a 1 pomme', '{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples', '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 1, array(), 'fr', ''),
+            array('Il y a 10 pommes', '{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples', '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 10, array(), 'fr', ''),
 
-            array('Il y a 0 pomme', 'There is one apple|There is %count% apples', 'Il y a %count% pomme|Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
-            array('Il y a 1 pomme', 'There is one apple|There is %count% apples', 'Il y a %count% pomme|Il y a %count% pommes', 1, array('%count%' => 1), 'fr', ''),
-            array('Il y a 10 pommes', 'There is one apple|There is %count% apples', 'Il y a %count% pomme|Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
+            array('Il y a 0 pomme', 'There is one apple|There is %count% apples', 'Il y a %count% pomme|Il y a %count% pommes', 0, array(), 'fr', ''),
+            array('Il y a 1 pomme', 'There is one apple|There is %count% apples', 'Il y a %count% pomme|Il y a %count% pommes', 1, array(), 'fr', ''),
+            array('Il y a 10 pommes', 'There is one apple|There is %count% apples', 'Il y a %count% pomme|Il y a %count% pommes', 10, array(), 'fr', ''),
 
-            array('Il y a 0 pomme', 'one: There is one apple|more: There is %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
-            array('Il y a 1 pomme', 'one: There is one apple|more: There is %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 1, array('%count%' => 1), 'fr', ''),
-            array('Il y a 10 pommes', 'one: There is one apple|more: There is %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
+            array('Il y a 0 pomme', 'one: There is one apple|more: There is %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 0, array(), 'fr', ''),
+            array('Il y a 1 pomme', 'one: There is one apple|more: There is %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 1, array(), 'fr', ''),
+            array('Il y a 10 pommes', 'one: There is one apple|more: There is %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array(), 'fr', ''),
 
-            array('Il n\'y a aucune pomme', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
-            array('Il y a 1 pomme', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 1, array('%count%' => 1), 'fr', ''),
-            array('Il y a 10 pommes', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
+            array('Il n\'y a aucune pomme', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 0, array(), 'fr', ''),
+            array('Il y a 1 pomme', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 1, array(), 'fr', ''),
+            array('Il y a 10 pommes', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array(), 'fr', ''),
 
-            array('Il y a 0 pomme', new StringClass('{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
+            array('Il y a 0 pomme', new StringClass('{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array(), 'fr', ''),
+
+            // Override %count% with a custom value
+            array('Il y a quelques pommes', 'one: There is one apple|more: There are %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 2, array('%count%' => 'quelques'), 'fr', ''),
         );
     }
 
@@ -528,121 +531,6 @@ class TranslatorTest extends TestCase
         // consistent behavior with Translator::trans(), which returns the string
         // unchanged if it can't be found
         $this->assertEquals('some_message2', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider dataProviderGetMessages
-     */
-    public function testLegacyGetMessages($resources, $locale, $expected)
-    {
-        $locales = array_keys($resources);
-        $_locale = null !== $locale ? $locale : reset($locales);
-        $locales = array_slice($locales, 0, array_search($_locale, $locales));
-
-        $translator = new Translator($_locale, new MessageSelector());
-        $translator->setFallbackLocales(array_reverse($locales));
-        $translator->addLoader('array', new ArrayLoader());
-        foreach ($resources as $_locale => $domainMessages) {
-            foreach ($domainMessages as $domain => $messages) {
-                $translator->addResource('array', $messages, $_locale, $domain);
-            }
-        }
-        $result = $translator->getMessages($locale);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public function dataProviderGetMessages()
-    {
-        $resources = array(
-            'en' => array(
-                'jsmessages' => array(
-                    'foo' => 'foo (EN)',
-                    'bar' => 'bar (EN)',
-                ),
-                'messages' => array(
-                    'foo' => 'foo messages (EN)',
-                ),
-                'validators' => array(
-                    'int' => 'integer (EN)',
-                ),
-            ),
-            'pt-PT' => array(
-                'messages' => array(
-                    'foo' => 'foo messages (PT)',
-                ),
-                'validators' => array(
-                    'str' => 'integer (PT)',
-                ),
-            ),
-            'pt_BR' => array(
-                'validators' => array(
-                    'int' => 'integer (BR)',
-                ),
-            ),
-        );
-
-        return array(
-            array($resources, null,
-                array(
-                    'jsmessages' => array(
-                        'foo' => 'foo (EN)',
-                        'bar' => 'bar (EN)',
-                    ),
-                    'messages' => array(
-                        'foo' => 'foo messages (EN)',
-                    ),
-                    'validators' => array(
-                        'int' => 'integer (EN)',
-                    ),
-                ),
-            ),
-            array($resources, 'en',
-                array(
-                    'jsmessages' => array(
-                        'foo' => 'foo (EN)',
-                        'bar' => 'bar (EN)',
-                    ),
-                    'messages' => array(
-                        'foo' => 'foo messages (EN)',
-                    ),
-                    'validators' => array(
-                        'int' => 'integer (EN)',
-                    ),
-                ),
-            ),
-            array($resources, 'pt-PT',
-                array(
-                    'jsmessages' => array(
-                        'foo' => 'foo (EN)',
-                        'bar' => 'bar (EN)',
-                    ),
-                    'messages' => array(
-                        'foo' => 'foo messages (PT)',
-                    ),
-                    'validators' => array(
-                        'int' => 'integer (EN)',
-                        'str' => 'integer (PT)',
-                    ),
-                ),
-            ),
-            array($resources, 'pt_BR',
-                array(
-                    'jsmessages' => array(
-                        'foo' => 'foo (EN)',
-                        'bar' => 'bar (EN)',
-                    ),
-                    'messages' => array(
-                        'foo' => 'foo messages (PT)',
-                    ),
-                    'validators' => array(
-                        'int' => 'integer (BR)',
-                        'str' => 'integer (PT)',
-                    ),
-                ),
-            ),
-        );
     }
 }
 

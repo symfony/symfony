@@ -12,9 +12,6 @@
 namespace Symfony\Component\Form\Extension\Templating;
 
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Templating\PhpEngine;
@@ -27,14 +24,8 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
  */
 class TemplatingExtension extends AbstractExtension
 {
-    public function __construct(PhpEngine $engine, $csrfTokenManager = null, array $defaultThemes = array())
+    public function __construct(PhpEngine $engine, CsrfTokenManagerInterface $csrfTokenManager = null, array $defaultThemes = array())
     {
-        if ($csrfTokenManager instanceof CsrfProviderInterface) {
-            $csrfTokenManager = new CsrfProviderAdapter($csrfTokenManager);
-        } elseif (null !== $csrfTokenManager && !$csrfTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($csrfTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
-        }
-
         $engine->addHelpers(array(
             new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfTokenManager)),
         ));

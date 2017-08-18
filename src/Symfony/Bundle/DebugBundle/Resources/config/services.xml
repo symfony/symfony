@@ -5,31 +5,44 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension" public="false">
+        <defaults public="false" />
+
+        <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension">
             <tag name="twig.extension" />
             <argument type="service" id="var_dumper.cloner" />
+            <argument type="service" id="var_dumper.html_dumper" />
         </service>
 
-        <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
+        <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector" public="true">
             <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
-            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
+            <argument type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
             <argument>%kernel.charset%</argument>
             <argument type="service" id="request_stack" />
             <argument>null</argument><!-- var_dumper.cli_dumper when debug.dump_destination is set -->
         </service>
 
-        <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
+        <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener" public="true">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="var_dumper.cloner" />
             <argument type="service" id="var_dumper.cli_dumper" />
         </service>
 
-        <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />
-        <service id="var_dumper.cli_dumper" class="Symfony\Component\VarDumper\Dumper\CliDumper">
+        <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" public="true" />
+        <service id="var_dumper.cli_dumper" class="Symfony\Component\VarDumper\Dumper\CliDumper" public="true">
             <argument>null</argument><!-- debug.dump_destination -->
             <argument>%kernel.charset%</argument>
+            <argument>0</argument> <!-- flags -->
+        </service>
+        <service id="var_dumper.html_dumper" class="Symfony\Component\VarDumper\Dumper\HtmlDumper">
+            <argument>null</argument>
+            <argument>%kernel.charset%</argument>
+            <argument>0</argument> <!-- flags -->
+            <call method="setDisplayOptions">
+                <argument type="collection">
+                    <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
+                </argument>
+            </call>
         </service>
     </services>
-
 </container>

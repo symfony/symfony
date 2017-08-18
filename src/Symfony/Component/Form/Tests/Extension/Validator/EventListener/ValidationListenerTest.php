@@ -65,9 +65,9 @@ class ValidationListenerTest extends TestCase
         $this->params = array('foo' => 'bar');
     }
 
-    private function getConstraintViolation($code = null, $constraint = null)
+    private function getConstraintViolation($code = null)
     {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, $constraint);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, new Form());
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
@@ -94,7 +94,7 @@ class ValidationListenerTest extends TestCase
     // More specific mapping tests can be found in ViolationMapperTest
     public function testMapViolation()
     {
-        $violation = $this->getConstraintViolation(null, new Form());
+        $violation = $this->getConstraintViolation();
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())
@@ -110,28 +110,7 @@ class ValidationListenerTest extends TestCase
 
     public function testMapViolationAllowsNonSyncIfInvalid()
     {
-        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR, new Form());
-        $form = $this->getForm('street');
-
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->will($this->returnValue(array($violation)));
-
-        $this->violationMapper->expects($this->once())
-            ->method('mapViolation')
-            // pass true now
-            ->with($violation, $form, true);
-
-        $this->listener->validateForm(new FormEvent($form, null));
-    }
-
-    public function testMapViolationAllowsNonSyncIfInvalidWithoutConstraintReference()
-    {
-        // constraint violations have no reference to the constraint if they are created by
-        //   Symfony\Component\Validator\ExecutionContext
-        // which is deprecated in favor of
-        //   Symfony\Component\Validator\Context\ExecutionContext
-        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR, null);
+        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR);
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())
@@ -181,33 +160,11 @@ class ValidationListenerTest extends TestCase
         $this->listener->validateForm(new FormEvent($form, null));
     }
 
-    public function testValidatorInterfaceSinceSymfony25()
+    public function testValidatorInterface()
     {
-        // Mock of ValidatorInterface since apiVersion 2.5
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 
         $listener = new ValidationListener($validator, $this->violationMapper);
         $this->assertAttributeSame($validator, 'validator', $listener);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testValidatorInterfaceUntilSymfony24()
-    {
-        // Mock of ValidatorInterface until apiVersion 2.4
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\ValidatorInterface')->getMock();
-
-        $listener = new ValidationListener($validator, $this->violationMapper);
-        $this->assertAttributeSame($validator, 'validator', $listener);
-    }
-
-    /**
-     * @group legacy
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidValidatorInterface()
-    {
-        new ValidationListener(null, $this->violationMapper);
     }
 }

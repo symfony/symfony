@@ -12,29 +12,47 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
+use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\LoggingTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Helps finding unused or missing translation messages in a given locale
  * and comparing them with the fallback ones.
  *
  * @author Florian Voutzinos <florian@voutzinos.com>
+ *
+ * @final since version 3.4
  */
-class TranslationDebugCommand extends ContainerAwareCommand
+class TranslationDebugCommand extends Command
 {
     const MESSAGE_MISSING = 0;
     const MESSAGE_UNUSED = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
+
+    private $translator;
+    private $loader;
+    private $extractor;
+
+    public function __construct(TranslatorInterface $translator, TranslationLoader $loader, ExtractorInterface $extractor)
+    {
+        parent::__construct();
+
+        $this->translator = $translator;
+        $this->loader = $loader;
+        $this->extractor = $extractor;
+    }
 
     /**
      * {@inheritdoc}
@@ -43,9 +61,6 @@ class TranslationDebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('debug:translation')
-            ->setAliases(array(
-                'translation:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
@@ -95,16 +110,11 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $io->caution('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
-        }
 
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
-        /** @var TranslationLoader $loader */
-        $loader = $this->getContainer()->get('translation.loader');
-        /** @var Kernel $kernel */
-        $kernel = $this->getContainer()->get('kernel');
+        /** @var KernelInterface $kernel */
+        $kernel = $this->getApplication()->getKernel();
 
         // Define Root Path to App folder
         $transPaths = array($kernel->getRootDir().'/Resources/');
@@ -136,7 +146,7 @@ EOF
         $extractedCatalogue = $this->extractMessages($locale, $transPaths);
 
         // Load defined messages
-        $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths, $loader);
+        $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths);
 
         // Merge defined and extracted messages to get all message ids
         $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
@@ -153,13 +163,13 @@ EOF
                 $outputMessage .= sprintf(' and domain "%s"', $domain);
             }
 
-            $io->warning($outputMessage);
+            $io->getErrorStyle()->warning($outputMessage);
 
             return;
         }
 
         // Load the fallback catalogues
-        $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths, $loader);
+        $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths);
 
         // Display header line
         $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
@@ -265,7 +275,7 @@ EOF
         foreach ($transPaths as $path) {
             $path = $path.'views';
             if (is_dir($path)) {
-                $this->getContainer()->get('translation.extractor')->extract($path, $extractedCatalogue);
+                $this->extractor->extract($path, $extractedCatalogue);
             }
         }
 
@@ -273,19 +283,18 @@ EOF
     }
 
     /**
-     * @param string            $locale
-     * @param array             $transPaths
-     * @param TranslationLoader $loader
+     * @param string $locale
+     * @param array  $transPaths
      *
      * @return MessageCatalogue
      */
-    private function loadCurrentMessages($locale, $transPaths, TranslationLoader $loader)
+    private function loadCurrentMessages($locale, $transPaths)
     {
         $currentCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
             $path = $path.'translations';
             if (is_dir($path)) {
-                $loader->loadMessages($path, $currentCatalogue);
+                $this->loader->loadMessages($path, $currentCatalogue);
             }
         }
 
@@ -293,18 +302,16 @@ EOF
     }
 
     /**
-     * @param string            $locale
-     * @param array             $transPaths
-     * @param TranslationLoader $loader
+     * @param string $locale
+     * @param array  $transPaths
      *
      * @return MessageCatalogue[]
      */
-    private function loadFallbackCatalogues($locale, $transPaths, TranslationLoader $loader)
+    private function loadFallbackCatalogues($locale, $transPaths)
     {
         $fallbackCatalogues = array();
-        $translator = $this->getContainer()->get('translator');
-        if ($translator instanceof Translator || $translator instanceof DataCollectorTranslator || $translator instanceof LoggingTranslator) {
-            foreach ($translator->getFallbackLocales() as $fallbackLocale) {
+        if ($this->translator instanceof Translator || $this->translator instanceof DataCollectorTranslator || $this->translator instanceof LoggingTranslator) {
+            foreach ($this->translator->getFallbackLocales() as $fallbackLocale) {
                 if ($fallbackLocale === $locale) {
                     continue;
                 }
@@ -313,7 +320,7 @@ EOF
                 foreach ($transPaths as $path) {
                     $path = $path.'translations';
                     if (is_dir($path)) {
-                        $loader->loadMessages($path, $fallbackCatalogue);
+                        $this->loader->loadMessages($path, $fallbackCatalogue);
                     }
                 }
                 $fallbackCatalogues[] = $fallbackCatalogue;

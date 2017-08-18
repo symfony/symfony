@@ -13,7 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorBagInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
@@ -31,9 +33,21 @@ class LoggingTranslatorPass implements CompilerPassInterface
             $definition = $container->getDefinition((string) $translatorAlias);
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
-            if (is_subclass_of($class, 'Symfony\Component\Translation\TranslatorInterface') && is_subclass_of($class, 'Symfony\Component\Translation\TranslatorBagInterface')) {
+            if (!$r = $container->getReflectionClass($class)) {
+                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $translatorAlias));
+            }
+            if ($r->isSubclassOf(TranslatorInterface::class) && $r->isSubclassOf(TranslatorBagInterface::class)) {
                 $container->getDefinition('translator.logging')->setDecoratedService('translator');
-                $container->getDefinition('translation.warmer')->replaceArgument(0, new Reference('translator.logging.inner'));
+                $warmer = $container->getDefinition('translation.warmer');
+                $subscriberAttributes = $warmer->getTag('container.service_subscriber');
+                $warmer->clearTag('container.service_subscriber');
+
+                foreach ($subscriberAttributes as $k => $v) {
+                    if ((!isset($v['id']) || 'translator' !== $v['id']) && (!isset($v['key']) || 'translator' !== $v['key'])) {
+                        $warmer->addTag('container.service_subscriber', $v);
+                    }
+                }
+                $warmer->addTag('container.service_subscriber', array('key' => 'translator', 'id' => 'translator.logging.inner'));
             }
         }
     }

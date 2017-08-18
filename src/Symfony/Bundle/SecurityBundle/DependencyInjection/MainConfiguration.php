@@ -59,6 +59,26 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->root('security');
 
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(function ($v) {
+                    if (!isset($v['access_decision_manager'])) {
+                        return true;
+                    }
+
+                    if (!isset($v['access_decision_manager']['strategy']) && !isset($v['access_decision_manager']['service'])) {
+                        return true;
+                    }
+
+                    return false;
+                })
+                ->then(function ($v) {
+                    $v['access_decision_manager'] = array(
+                        'strategy' => AccessDecisionManager::STRATEGY_AFFIRMATIVE,
+                    );
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')
@@ -73,10 +93,14 @@ class MainConfiguration implements ConfigurationInterface
                     ->children()
                         ->enumNode('strategy')
                             ->values(array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS))
-                            ->defaultValue(AccessDecisionManager::STRATEGY_AFFIRMATIVE)
                         ->end()
+                        ->scalarNode('service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['strategy']) && isset($v['service']); })
+                        ->thenInvalid('"strategy" and "service" cannot be used together.')
                     ->end()
                 ->end()
             ->end()
@@ -231,36 +255,6 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('logout')
                 ->treatTrueLike(array())
                 ->canBeUnset()
-                ->beforeNormalization()
-                    ->ifTrue(function ($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
-                    ->thenInvalid("You should define a value for only one of 'csrf_provider' and 'csrf_token_generator' on a security firewall. Use 'csrf_token_generator' as this replaces 'csrf_provider'.")
-                ->end()
-                ->beforeNormalization()
-                    ->ifTrue(function ($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
-                    ->thenInvalid("You should define a value for only one of 'intention' and 'csrf_token_id' on a security firewall. Use 'csrf_token_id' as this replaces 'intention'.")
-                ->end()
-                ->beforeNormalization()
-                    ->ifTrue(function ($v) { return isset($v['csrf_provider']); })
-                    ->then(function ($v) {
-                        @trigger_error("Setting the 'csrf_provider' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_generator' configuration key instead.", E_USER_DEPRECATED);
-
-                        $v['csrf_token_generator'] = $v['csrf_provider'];
-                        unset($v['csrf_provider']);
-
-                        return $v;
-                    })
-                ->end()
-                ->beforeNormalization()
-                    ->ifTrue(function ($v) { return isset($v['intention']); })
-                    ->then(function ($v) {
-                        @trigger_error("Setting the 'intention' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_id' key instead.", E_USER_DEPRECATED);
-
-                        $v['csrf_token_id'] = $v['intention'];
-                        unset($v['intention']);
-
-                        return $v;
-                    })
-                ->end()
                 ->children()
                     ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
                     ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
@@ -295,20 +289,6 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
             ->arrayNode('anonymous')
                 ->canBeUnset()
-                ->beforeNormalization()
-                    ->ifTrue(function ($v) { return isset($v['key']); })
-                    ->then(function ($v) {
-                        if (isset($v['secret'])) {
-                            throw new \LogicException('Cannot set both key and secret options for security.firewall.anonymous, use only secret instead.');
-                        }
-
-                        @trigger_error('security.firewall.anonymous.key is deprecated since version 2.8 and will be removed in 3.0. Use security.firewall.anonymous.secret instead.', E_USER_DEPRECATED);
-
-                        $v['secret'] = $v['key'];
-
-                        unset($v['key']);
-                    })
-                ->end()
                 ->children()
                     ->scalarNode('secret')->defaultValue(uniqid('', true))->end()
                 ->end()

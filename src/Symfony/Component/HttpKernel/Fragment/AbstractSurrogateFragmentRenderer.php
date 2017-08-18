@@ -64,6 +64,10 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     public function render($uri, Request $request, array $options = array())
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
+            if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
+                throw new \InvalidArgumentException('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is not supported. Use a different rendering strategy or pass scalar values.');
+            }
+
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 
@@ -91,5 +95,18 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         $fragmentUri = $this->signer->sign($this->generateFragmentUri($uri, $request, true));
 
         return substr($fragmentUri, strlen($request->getSchemeAndHttpHost()));
+    }
+
+    private function containsNonScalars(array $values)
+    {
+        foreach ($values as $value) {
+            if (is_array($value) && $this->containsNonScalars($value)) {
+                return true;
+            } elseif (!is_scalar($value) && null !== $value) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

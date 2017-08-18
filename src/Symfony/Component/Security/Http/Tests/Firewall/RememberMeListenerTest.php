@@ -66,6 +66,8 @@ class RememberMeListenerTest extends TestCase
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
+        $request = new Request();
+        $exception = new AuthenticationException('Authentication failed.');
 
         $tokenStorage
             ->expects($this->once())
@@ -82,9 +84,9 @@ class RememberMeListenerTest extends TestCase
         $service
             ->expects($this->once())
             ->method('loginFail')
+            ->with($request, $exception)
         ;
 
-        $exception = new AuthenticationException('Authentication failed.');
         $manager
             ->expects($this->once())
             ->method('authenticate')
@@ -95,7 +97,7 @@ class RememberMeListenerTest extends TestCase
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue(new Request()))
+            ->will($this->returnValue($request))
         ;
 
         $listener->handle($event);

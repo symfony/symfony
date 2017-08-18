@@ -15,20 +15,35 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
-class ConcreteMicroKernel extends Kernel
+class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 {
     use MicroKernelTrait;
 
     private $cacheDir;
 
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        if ($event->getException() instanceof Danger) {
+            $event->setResponse(Response::create('It\'s dangerous to go alone. Take this ⚔'));
+        }
+    }
+
     public function halloweenAction()
     {
         return new Response('halloween');
+    }
+
+    public function dangerousAction()
+    {
+        throw new Danger();
     }
 
     public function registerBundles()
@@ -57,6 +72,7 @@ class ConcreteMicroKernel extends Kernel
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
         $routes->add('/', 'kernel:halloweenAction');
+        $routes->add('/danger', 'kernel:dangerousAction');
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
@@ -68,4 +84,18 @@ class ConcreteMicroKernel extends Kernel
         $c->setParameter('halloween', 'Have a great day!');
         $c->register('halloween', 'stdClass');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::EXCEPTION => 'onKernelException',
+        );
+    }
+}
+
+class Danger extends \RuntimeException
+{
 }

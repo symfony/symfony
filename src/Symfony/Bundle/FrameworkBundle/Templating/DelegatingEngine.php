@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

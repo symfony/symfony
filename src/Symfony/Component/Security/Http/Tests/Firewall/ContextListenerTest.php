@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -52,11 +53,7 @@ class ContextListenerTest extends TestCase
      */
     public function testUserProvidersNeedToImplementAnInterface()
     {
-        new ContextListener(
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
-            array(new \stdClass()),
-            'key123'
-        );
+        $this->handleEventWithPreviousSession(new TokenStorage(), array(new \stdClass()));
     }
 
     public function testOnKernelResponseWillAddSession()
@@ -89,6 +86,13 @@ class ContextListenerTest extends TestCase
             null,
             'C:10:"serialized"'
         );
+
+        $this->assertFalse($session->has('_security_session'));
+    }
+
+    public function testOnKernelResponseWillRemoveSessionOnAnonymousToken()
+    {
+        $session = $this->runSessionOnKernelResponse(new AnonymousToken('secret', 'anon.'), 'C:10:"serialized"');
 
         $this->assertFalse($session->has('_security_session'));
     }
@@ -279,6 +283,15 @@ class ContextListenerTest extends TestCase
         $this->handleEventWithPreviousSession(new TokenStorage(), array(new NotSupportingUserProvider(), new NotSupportingUserProvider()));
     }
 
+    public function testAcceptsProvidersAsTraversable()
+    {
+        $tokenStorage = new TokenStorage();
+        $refreshedUser = new User('foobar', 'baz');
+        $this->handleEventWithPreviousSession($tokenStorage, new \ArrayObject(array(new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser))));
+
+        $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
+    }
+
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());
@@ -307,7 +320,7 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, array $userProviders)
+    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders)
     {
         $session = new Session(new MockArraySessionStorage());
         $session->set('_security_context_key', serialize(new UsernamePasswordToken(new User('foo', 'bar'), '', 'context_key')));

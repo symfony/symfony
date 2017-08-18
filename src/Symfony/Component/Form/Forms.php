@@ -29,7 +29,6 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *     ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
  *     ->add('gender', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
  *         'choices' => array('Male' => 'm', 'Female' => 'f'),
- *         'choices_as_values' => true,
  *     ))
  *     ->getForm();
  * </code>

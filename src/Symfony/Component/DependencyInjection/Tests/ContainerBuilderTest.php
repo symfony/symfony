@@ -1111,6 +1111,23 @@ class ContainerBuilderTest extends TestCase
 
         $container->get('bar');
     }
+
+    public function testDeprecatePublicService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('was_public', 'stdClass')
+            ->setPublic(false)
+            ->addTag('deprecated.public');
+        $container->register('ref_was_public', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('foo', new Reference('was_public'));
+
+        $container->compile();
+
+        $this->assertTrue($container->has('was_public'));
+        $this->assertInstanceOf('stdClass', $service = $container->get('was_public'));
+        $this->assertSame($service, $container->get('ref_was_public')->foo);
+    }
 }
 
 class FooClass

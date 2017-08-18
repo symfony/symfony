@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\EventListener\ExpressionLanguage;
 use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Event\GuardEvent;
@@ -16,57 +17,83 @@ use Symfony\Component\Workflow\Transition;
 
 class GuardListenerTest extends TestCase
 {
-    private $tokenStorage;
+    private $authenticationChecker;
+    private $validator;
     private $listener;
 
     protected function setUp()
     {
         $configuration = array(
-            'event_name_a' => 'true',
-            'event_name_b' => 'false',
+            'test_is_granted' => 'is_granted("something")',
+            'test_is_valid' => 'is_valid(subject)',
         );
-
         $expressionLanguage = new ExpressionLanguage();
-        $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token->expects($this->any())->method('getRoles')->willReturn(array(new Role('ROLE_USER')));
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
+        $this->authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
         $trustResolver = $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock();
-
-        $this->listener = new GuardListener($configuration, $expressionLanguage, $this->tokenStorage, $authenticationChecker, $trustResolver);
+        $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
+        $this->listener = new GuardListener($configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, null, $this->validator);
     }
 
     protected function tearDown()
     {
+        $this->authenticationChecker = null;
+        $this->validator = null;
         $this->listener = null;
     }
 
     public function testWithNotSupportedEvent()
     {
         $event = $this->createEvent();
-        $this->configureTokenStorage(false);
+        $this->configureAuthenticationChecker(false);
+        $this->configureValidator(false);
 
         $this->listener->onTransition($event, 'not supported');
 
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithSupportedEventAndReject()
+    public function testWithSecuritySupportedEventAndReject()
     {
         $event = $this->createEvent();
-        $this->configureTokenStorage(true);
+        $this->configureAuthenticationChecker(true, false);
 
-        $this->listener->onTransition($event, 'event_name_a');
+        $this->listener->onTransition($event, 'test_is_granted');
+
+        $this->assertTrue($event->isBlocked());
+    }
+
+    public function testWithSecuritySupportedEventAndAccept()
+    {
+        $event = $this->createEvent();
+        $this->configureAuthenticationChecker(true, true);
+
+        $this->listener->onTransition($event, 'test_is_granted');
 
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithSupportedEventAndAccept()
+    public function testWithValidatorSupportedEventAndReject()
     {
         $event = $this->createEvent();
-        $this->configureTokenStorage(true);
+        $this->configureValidator(true, false);
 
-        $this->listener->onTransition($event, 'event_name_b');
+        $this->listener->onTransition($event, 'test_is_valid');
 
         $this->assertTrue($event->isBlocked());
+    }
+
+    public function testWithValidatorSupportedEventAndAccept()
+    {
+        $event = $this->createEvent();
+        $this->configureValidator(true, true);
+
+        $this->listener->onTransition($event, 'test_is_valid');
+
+        $this->assertFalse($event->isBlocked());
     }
 
     private function createEvent()
@@ -78,28 +105,39 @@ class GuardListenerTest extends TestCase
         return new GuardEvent($subject, $subject->marking, $transition);
     }
 
-    private function configureTokenStorage($hasUser)
+    private function configureAuthenticationChecker($isUsed, $granted = true)
     {
-        if (!$hasUser) {
-            $this->tokenStorage
+        if (!$isUsed) {
+            $this->authenticationChecker
                 ->expects($this->never())
-                ->method('getToken')
+                ->method('isGranted')
             ;
 
             return;
         }
 
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $token
+        $this->authenticationChecker
             ->expects($this->once())
-            ->method('getRoles')
-            ->willReturn(array(new Role('ROLE_ADMIN')))
+            ->method('isGranted')
+            ->willReturn($granted)
         ;
+    }
 
-        $this->tokenStorage
+    private function configureValidator($isUsed, $valid = true)
+    {
+        if (!$isUsed) {
+            $this->validator
+                ->expects($this->never())
+                ->method('validate')
+            ;
+
+            return;
+        }
+
+        $this->validator
             ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token)
+            ->method('validate')
+            ->willReturn($valid ? array() : array('a violation'))
         ;
     }
 }

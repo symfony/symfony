@@ -4,7 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
- * Add guard `is_valid()` method support
+ * Added guard `is_valid()` method support.
  * Added support for `Event::getWorkflowName()` for "announce" events.
  * Added `workflow.completed` events which are fired after a transition is completed.
 

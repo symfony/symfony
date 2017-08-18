@@ -36,7 +36,7 @@ class ExpressionLanguage extends BaseExpressionLanguage
             return sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups);
         }, function (array $variables, $object = null, $groups = null) {
             if (!$variables['validator'] instanceof ValidatorInterface) {
-                throw new RuntimeException('Validator not defined, did you install the component?');
+                throw new RuntimeException('"is_valid" cannot be used as the Validator component is not installed.');
             }
 
             $errors = $variables['validator']->validate($object, null, $groups);

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class WorkflowGuardListenerPass implements CompilerPassInterface
 {
@@ -31,20 +32,17 @@ class WorkflowGuardListenerPass implements CompilerPassInterface
 
         $container->getParameterBag()->remove('workflow.has_guard_listeners');
 
-        if (!$container->has('security.token_storage')) {
-            throw new LogicException('The "security.token_storage" service is needed to be able to use the workflow guard listener.');
-        }
+        $servicesNeeded = array(
+            'security.token_storage',
+            'security.authorization_checker',
+            'security.authentication.trust_resolver',
+            'security.role_hierarchy',
+        );
 
-        if (!$container->has('security.authorization_checker')) {
-            throw new LogicException('The "security.authorization_checker" service is needed to be able to use the workflow guard listener.');
-        }
-
-        if (!$container->has('security.authentication.trust_resolver')) {
-            throw new LogicException('The "security.authentication.trust_resolver" service is needed to be able to use the workflow guard listener.');
-        }
-
-        if (!$container->has('security.role_hierarchy')) {
-            throw new LogicException('The "security.role_hierarchy" service is needed to be able to use the workflow guard listener.');
+        foreach ($servicesNeeded as $service) {
+            if (!$container->has($service)) {
+                throw new LogicException(sprintf('The "%s" service is needed to be able to use the workflow guard listener.', $service));
+            }
         }
     }
 }

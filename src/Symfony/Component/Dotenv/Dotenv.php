@@ -60,8 +60,6 @@ final class Dotenv
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
-     * Existing environment variables are never overridden, unless they are listed in the SYMFONY_DOTENV_VARS env var.
-     *
      * @param array $values An array of env variables
      */
     public function populate($values)

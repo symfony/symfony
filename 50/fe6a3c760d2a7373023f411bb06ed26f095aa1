@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-17T13:56:30Z
+
+This is a nice addition to ease debugging I suppose. I just don't think this is how you should handle these errors runtime though, might want to solve it without service locator?
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-08-17T14:10:51Z
+
+Service locator is needed here. `TransportNotFoundException` should be handled by developer during coding/configuration. The problem is we throwing some specific exception and message of this exception can suggest available services. But it cann't without getting `private $alternatives`.

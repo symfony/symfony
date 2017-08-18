@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-17T13:06:55Z
+
+Because processing configuration is done internally in `Extension::load()`, we have no proper way to get the processed configuration from the outside.
+
+I didn't find any better implementation than the one in this PR, which consist of storing processed configs when `Extension::processConfiguration()` is being called, then fetching these with a new `Extension::getProcessedConfigs()` method.
+
+This works only if extensions do call `processConfiguration()` of course.
+I'd expect this to be a common enough situation to consider the issue fixed.
+If the expectation is not met, the outcome is that overridden env vars are tracked again, which is not a huge issue anyway, and is just the current situation.
+
+Decoupling config processing from loading is another possibility, but that'd be asking for big changes for all bundle authors. Not worth it IMHO.
+
+PR is ready (failures are false positives.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-18T11:26:17Z
+
+comments added, should be ready

@@ -70,7 +70,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         if (!is_string($data)) {
-            throw new InvalidArgumentException('Data expected to be a string, '.gettype($data).' given.');
+            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', gettype($data)));
         }
 
         if (!$this->isISO8601($data)) {

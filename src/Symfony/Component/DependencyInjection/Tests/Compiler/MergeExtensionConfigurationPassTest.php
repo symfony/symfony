@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class MergeExtensionConfigurationPassTest extends TestCase
@@ -55,13 +56,10 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testExtensionConfigurationIsTrackedByDefault()
     {
-        $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\Extension')->getMock();
-        $extension->expects($this->once())
+        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(array('getConfiguration'))->getMock();
+        $extension->expects($this->exactly(2))
             ->method('getConfiguration')
             ->will($this->returnValue(new FooConfiguration()));
-        $extension->expects($this->any())
-            ->method('getAlias')
-            ->will($this->returnValue('foo'));
 
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
@@ -72,12 +70,51 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $this->assertContains(new FileResource(__FILE__), $container->getResources(), '', false, false);
     }
+
+    public function testOverriddenEnvsAreMerged()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->prependExtensionConfig('foo', array('bar' => '%env(FOO)%'));
+        $container->prependExtensionConfig('foo', array('bar' => '%env(BAR)%'));
+
+        $pass = new MergeExtensionConfigurationPass();
+        $pass->process($container);
+
+        $this->assertSame(array('FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
+    }
 }
 
 class FooConfiguration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        return new TreeBuilder();
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root('foo');
+        $rootNode
+            ->children()
+                ->scalarNode('bar')->end()
+            ->end();
+
+        return $treeBuilder;
+    }
+}
+
+class FooExtension extends Extension
+{
+    public function getAlias()
+    {
+        return 'foo';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new FooConfiguration();
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $configuration = $this->getConfiguration($configs, $container);
+        $config = $this->processConfiguration($configuration, $configs);
     }
 }

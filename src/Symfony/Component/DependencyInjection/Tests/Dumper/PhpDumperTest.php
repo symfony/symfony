@@ -587,7 +587,7 @@ class PhpDumperTest extends TestCase
         $container->setParameter('array_1', array(123));
         $container->setParameter('array_2', array(__DIR__));
         $container->register('bar', 'BarClass')
-            ->addMethodCall('setBaz', array('%array_1%', '%array_2%', '%%array_1%%'));
+            ->addMethodCall('setBaz', array('%array_1%', '%array_2%', '%%array_1%%', array(123)));
         $container->compile();
 
         $dumper = new PhpDumper($container);

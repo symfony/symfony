@@ -1404,6 +1404,9 @@ EOF;
     private function dumpValue($value, $interpolate = true)
     {
         if (is_array($value)) {
+            if ($value && $interpolate && false !== $param = array_search($value, $this->container->getParameterBag()->all(), true)) {
+                return $this->dumpValue("%$param%");
+            }
             $code = array();
             foreach ($value as $k => $v) {
                 $code[] = sprintf('%s => %s', $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));

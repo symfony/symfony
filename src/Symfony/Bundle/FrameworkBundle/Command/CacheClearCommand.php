@@ -19,6 +19,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
+use Symfony\Component\HttpKernel\RebootableInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Clear and Warmup the cache.
@@ -53,7 +55,8 @@ class CacheClearCommand extends Command
         $this
             ->setName('cache:clear')
             ->setDefinition(array(
-                new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Noop. Will be deprecated in 4.1 to be removed in 5.0.'),
+                new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
+                new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
             ->setDescription('Clears the cache')
             ->setHelp(<<<'EOF'
@@ -75,20 +78,33 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         $kernel = $this->getApplication()->getKernel();
-        $cacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
+        $realCacheDir = isset($realCacheDir) ? $realCacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir');
+        // the old cache dir name must not be longer than the real one to avoid exceeding
+        // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
+        $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
 
-        if (!is_writable($cacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $cacheDir));
+        if (!is_writable($realCacheDir)) {
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+        }
+
+        if ($this->filesystem->exists($oldCacheDir)) {
+            $this->filesystem->remove($oldCacheDir);
         }
 
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-        $this->cacheClearer->clear($cacheDir);
+        $this->cacheClearer->clear($realCacheDir);
+
+        if ($input->getOption('no-warmup')) {
+            $this->filesystem->rename($realCacheDir, $oldCacheDir);
+        } else {
+            $this->warmupCache($input, $output, $realCacheDir, $oldCacheDir);
+        }
 
         if ($output->isVerbose()) {
             $io->comment('Removing old cache directory...');
         }
 
-        $this->filesystem->remove($cacheDir);
+        $this->filesystem->remove($oldCacheDir);
 
         // The current event dispatcher is stale, let's not use it anymore
         $this->getApplication()->setDispatcher(new EventDispatcher());
@@ -98,5 +114,65 @@ EOF
         }
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+    }
+
+    private function warmupCache(InputInterface $input, OutputInterface $output, $realCacheDir, $oldCacheDir)
+    {
+        $io = new SymfonyStyle($input, $output);
+
+        // the warmup cache dir name must have the same length than the real one
+        // to avoid the many problems in serialized resources files
+        $realCacheDir = realpath($realCacheDir);
+        $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
+
+        if ($this->filesystem->exists($warmupDir)) {
+            if ($output->isVerbose()) {
+                $io->comment('Clearing outdated warmup directory...');
+            }
+            $this->filesystem->remove($warmupDir);
+        }
+
+        if ($output->isVerbose()) {
+            $io->comment('Warming up cache...');
+        }
+        $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
+
+        $this->filesystem->rename($realCacheDir, $oldCacheDir);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            sleep(1);  // workaround for Windows PHP rename bug
+        }
+        $this->filesystem->rename($warmupDir, $realCacheDir);
+    }
+
+    /**
+     * @param string $warmupDir
+     * @param string $realCacheDir
+     * @param bool   $enableOptionalWarmers
+     */
+    private function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
+    {
+        // create a temporary kernel
+        $kernel = $this->getApplication()->getKernel();
+        if (!$kernel instanceof RebootableInterface) {
+            throw new \LogicException('Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is not supported.');
+        }
+        $kernel->reboot($warmupDir);
+
+        // warmup temporary dir
+        $warmer = $kernel->getContainer()->get('cache_warmer');
+        if ($enableOptionalWarmers) {
+            $warmer->enableOptionalWarmers();
+        }
+        $warmer->warmUp($warmupDir);
+
+        // fix references to cached files with the real cache directory name
+        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $replace = str_replace('\\', '/', $realCacheDir);
+        foreach (Finder::create()->files()->in($warmupDir) as $file) {
+            $content = str_replace($search, $replace, file_get_contents($file), $count);
+            if ($count) {
+                file_put_contents($file, $content);
+            }
+        }
     }
 }

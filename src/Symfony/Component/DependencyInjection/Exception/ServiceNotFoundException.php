@@ -22,6 +22,7 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
 {
     private $id;
     private $sourceId;
+    private $alternatives;
 
     public function __construct($id, $sourceId = null, \Exception $previous = null, array $alternatives = array())
     {
@@ -44,6 +45,7 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
 
         $this->id = $id;
         $this->sourceId = $sourceId;
+        $this->alternatives = $alternatives;
     }
 
     public function getId()
@@ -54,5 +56,10 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
     public function getSourceId()
     {
         return $this->sourceId;
+    }
+
+    public function getAlternatives()
+    {
+        return $this->alternatives;
     }
 }

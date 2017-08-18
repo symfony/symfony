@@ -143,6 +143,9 @@ HttpKernel
            tags: ['console.command']
    ```
 
+ * The `getCacheDir()` method of your kernel should not be called while building the container.
+   Use the `%kernel.cache_dir%` parameter instead. Not doing so may break the `cache:clear` command.
+
 Process
 -------
 

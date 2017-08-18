@@ -111,12 +111,6 @@ EOF
         if ($input->getOption('no-warmup')) {
             $this->filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
-            $warning = 'Calling cache:clear without the --no-warmup option is deprecated since version 3.3. Cache warmup should be done with the cache:warmup command instead.';
-
-            @trigger_error($warning, E_USER_DEPRECATED);
-
-            $io->warning($warning);
-
             $this->warmupCache($input, $output, $realCacheDir, $oldCacheDir);
         }
 
@@ -168,8 +162,6 @@ EOF
      * @param string $warmupDir
      * @param string $realCacheDir
      * @param bool   $enableOptionalWarmers
-     *
-     * @internal to be removed in 4.0
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
@@ -242,8 +234,6 @@ EOF
      * @param string          $warmupDir
      *
      * @return KernelInterface
-     *
-     * @internal to be removed in 4.0
      */
     protected function getTempKernel(KernelInterface $parent, $namespace, $parentClass, $warmupDir)
     {

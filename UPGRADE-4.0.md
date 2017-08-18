@@ -284,9 +284,6 @@ FrameworkBundle
 
  * The `validator.mapping.cache.doctrine.apc` service has been removed.
 
- * The `cache:clear` command does not warmup the cache anymore. Warmup should
-   be done via the `cache:warmup` command.
-
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been removed. Use the `Request::setTrustedProxies()` method in your front controller instead.
 
  * The default value of the `framework.workflows.[name].type` configuration options is now `state_machine`.

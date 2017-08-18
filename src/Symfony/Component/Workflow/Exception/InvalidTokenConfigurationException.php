@@ -12,7 +12,7 @@
 namespace Symfony\Component\Workflow\Exception;
 
 /**
- * Thrown by GuardListener when there is no token set, but guards are placed on a transition
+ * Thrown by GuardListener when there is no token set, but guards are placed on a transition.
  *
  * @author Matt Johnson <matj1985@gmail.com>
  */

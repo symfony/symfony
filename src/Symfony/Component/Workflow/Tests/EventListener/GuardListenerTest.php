@@ -69,12 +69,14 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidTokenConfigurationException
+     * @expectedExceptionMessage No token is set
+     */
     public function testWithNoTokenStorage()
     {
         $event = $this->createEvent();
-        $this->tokenStorage = null;
-
-        $this->expectException(\Exception::class);
+        $this->tokenStorage->setToken(null);
 
         $this->listener->onTransition($event, 'event_name_a');
     }

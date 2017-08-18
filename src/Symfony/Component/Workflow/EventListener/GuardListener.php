@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Exception\InvalidTokenConfigurationException;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -56,7 +57,7 @@ class GuardListener
         $token = $this->tokenStorage->getToken();
 
         if (null === $token) {
-            throw new \Exception('No token is set');
+            throw new InvalidTokenConfigurationException('No token is set');
         }
 
         if (null !== $this->roleHierarchy) {

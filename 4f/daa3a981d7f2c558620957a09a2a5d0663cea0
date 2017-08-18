@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-18T07:52:09Z
+
+I would not revert this in 3.3 as it helps with Flex. Here is the output right now when doing `cache:clear` on a Symfony 3.3 project using Flex:
+
+![image](https://user-images.githubusercontent.com/47313/29449374-bb301aec-83fa-11e7-9121-9be3f5abb841.png)
+
+As you can see, the warning helps explain the fatal error and provide a way to fix the issue. Instead, I would change the warning to explain that without the `--no-warmup` flag, the command does not work in 3.3 (but that it will work again in 3.4). Far from ideal, but at least, it provides a better experience for our users.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-18T07:58:27Z
+
+Investigating the issue a bit more, fixing the `cache:clear` in Flex is quite easy: see symfony/recipes#154.
+
+So, let's remove the `final` keyword in Flex's Kernel and merge this one.

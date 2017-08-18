@@ -1516,11 +1516,11 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals($collection, $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
-    
+
     public function testSetDataEmptyArraySubmitNullMultiple()
     {
-        $emptyArray=array();
-        
+        $emptyArray = array();
+
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -1531,18 +1531,18 @@ class EntityTypeTest extends BaseTypeTest
 
         $this->assertInternalType('array', $form->getData());
     }
-    
+
     public function testSetDataNonEmptyArraySubmitNullMultiple()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $this->persist(array($entity1));
-        
+
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'multiple' => true,
         ));
-        
+
         $existing = array(0 => $entity1);
         $form->setData($existing);
         $form->submit(null);

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T18:35:51Z
+
+rebased and ready
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-07T18:41:29Z
+
+It's hard to review PRs without description (even if the long title explains a bit what this PR does).
+
+For this and every other PR I'd like to have two brief descriptions:
+
+1) how does this improves end-user life;
+2) what internal changes will this introduce for Symfony (so we can update Symfony Docs if needed).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-08-08T08:33:14Z
+
+@nicolas-grekas does it fixes #8500 also?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-08T08:51:10Z
+
+@Koc looks like so, but only you can confirm :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-08-08T09:03:31Z
+
+does no new instance of `AppKernel` creates on cache clear?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-08T09:16:37Z
+
+That's correct, it reuses (reboots) the same instance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-18T10:38:10Z
+
+getWarmupDir is now gone, comments updated
+should be ready

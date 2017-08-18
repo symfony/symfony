@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-18T08:10:18Z
+
+For the record, that helps with Sonata which is using a big array that is also stored as a parameter.

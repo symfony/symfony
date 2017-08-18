@@ -114,8 +114,6 @@ class ConsoleFormatter implements FormatterInterface
      */
     public function format(array $record)
     {
-        $record = $this->replacePlaceHolder($record);
-
         $levelColor = self::$levelColorMap[$record['level']];
 
         if ($this->options['multiline']) {

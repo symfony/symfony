@@ -106,11 +106,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * Replaces "%env(FOO)%" references by their placeholder, keeping regular "%parameters%" references as is.
      */
-    public function resolveEnvReferences()
+    public function resolveEnvReferences(array $value)
     {
         $this->resolveEnvReferences = true;
         try {
-            $this->resolve();
+            return $this->resolveValue($value);
         } finally {
             $this->resolveEnvReferences = false;
         }

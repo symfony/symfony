@@ -729,10 +729,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $bag = $this->getParameterBag();
 
         if ($resolveEnvPlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
-            $bag->resolveEnvReferences();
-            $this->parameterBag = new ParameterBag($bag->all());
+            $this->parameterBag = new ParameterBag($bag->resolveEnvReferences($bag->all()));
             $this->envPlaceholders = $bag->getEnvPlaceholders();
-            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
+            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all(), true));
         }
 
         $compiler->compile($this);

@@ -57,8 +57,7 @@ class GuardListener
         $token = $this->tokenStorage->getToken();
 
         if (null === $token) {
-            $token = new AnonymousToken('secret', 'anon', array());
-            $this->tokenStorage->setToken($token);
+            throw new \Exception("No token is set");
         }
 
         if (null !== $this->roleHierarchy) {

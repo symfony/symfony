@@ -188,4 +188,30 @@ class XliffFileLoaderTest extends TestCase
         // target attributes
         $this->assertEquals(array('target-attributes' => array('order' => 1)), $catalogue->getMetadata('bar', 'domain1'));
     }
+
+    public function testLoadVersion2WithNoteMeta()
+    {
+        $loader = new XliffFileLoader();
+        $resource =  __DIR__.'/../fixtures/resources-notes-meta.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        $this->assertTrue($catalogue->defines('foo'));
+        $metadata = $catalogue->getMetadata('foo');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(3, $metadata['notes']);
+
+        $this->assertEquals('state', $metadata['notes'][0]['category']);
+        $this->assertEquals('new', $metadata['notes'][0]['content']);
+
+        $this->assertEquals('approved', $metadata['notes'][1]['category']);
+        $this->assertEquals('true', $metadata['notes'][1]['content']);
+
+        $this->assertEquals('section', $metadata['notes'][2]['category']);
+        $this->assertEquals('1', $metadata['notes'][2]['priority']);
+        $this->assertEquals('user login', $metadata['notes'][2]['content']);
+    }
 }

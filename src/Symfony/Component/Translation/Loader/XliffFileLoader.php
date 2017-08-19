@@ -127,7 +127,8 @@ class XliffFileLoader implements LoaderInterface
 
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:2.0');
 
-        foreach ($xml->xpath('//xliff:unit/xliff:segment') as $segment) {
+        foreach ($xml->xpath('//xliff:unit') as $unit) {
+            $segment = $unit->segment;
             $source = $segment->source;
 
             // If the xlf file has another encoding specified, try to convert it because
@@ -143,6 +144,18 @@ class XliffFileLoader implements LoaderInterface
                     $metadata['target-attributes'][$key] = (string) $value;
                 }
             }
+
+            if (isset($unit->notes)) {
+                $metadata['notes'] = [];
+                foreach ($unit->notes->note as $noteNode) {
+                    $note = [];
+                    foreach ($noteNode->attributes() as $key => $value) {
+                        $note[$key] = (string) $value;
+                    }
+                    $note['content'] = (string) $noteNode;
+                    $metadata['notes'][] = $note;
+                }
+             }
 
             $catalogue->setMetadata((string) $source, $metadata, $domain);
         }

@@ -188,4 +188,44 @@ class XliffFileLoaderTest extends TestCase
         // target attributes
         $this->assertEquals(array('target-attributes' => array('order' => 1)), $catalogue->getMetadata('bar', 'domain1'));
     }
+
+    public function testLoadVersion2WithNoteMeta()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-notes-meta.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        // test for "foo" metadata
+        $this->assertTrue($catalogue->defines('foo', 'domain1'));
+        $metadata = $catalogue->getMetadata('foo', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(3, $metadata['notes']);
+
+        $this->assertEquals('state', $metadata['notes'][0]['category']);
+        $this->assertEquals('new', $metadata['notes'][0]['content']);
+
+        $this->assertEquals('approved', $metadata['notes'][1]['category']);
+        $this->assertEquals('true', $metadata['notes'][1]['content']);
+
+        $this->assertEquals('section', $metadata['notes'][2]['category']);
+        $this->assertEquals('1', $metadata['notes'][2]['priority']);
+        $this->assertEquals('user login', $metadata['notes'][2]['content']);
+
+        // test for "baz" metadata
+        $this->assertTrue($catalogue->defines('baz', 'domain1'));
+        $metadata = $catalogue->getMetadata('baz', 'domain1');
+        $this->assertNotEmpty($metadata);
+        $this->assertCount(2, $metadata['notes']);
+
+        $this->assertEquals('x', $metadata['notes'][0]['id']);
+        $this->assertEquals('x_content', $metadata['notes'][0]['content']);
+
+        $this->assertEquals('target', $metadata['notes'][1]['appliesTo']);
+        $this->assertEquals('quality', $metadata['notes'][1]['category']);
+        $this->assertEquals('Fuzzy', $metadata['notes'][1]['content']);
+    }
 }

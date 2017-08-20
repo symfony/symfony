@@ -79,6 +79,7 @@ class ConsoleFormatter implements FormatterInterface
             'colors' => true,
             'multiline' => false,
             'ignore_empty_context_and_extra' => false,
+            'remove_used_context_fields' => false,
         ), $options);
 
         if (class_exists(VarCloner::class)) {
@@ -117,6 +118,8 @@ class ConsoleFormatter implements FormatterInterface
     {
         $levelColor = self::$levelColorMap[$record['level']];
 
+        $record = $this->replacePlaceHolder($record);
+
         $context = $extra = '';
         if (!empty($record['context']) || !$this->options['ignore_empty_context_and_extra']) {
             $context = $this->options['multiline'] ? "\n" : ' ';
@@ -134,7 +137,7 @@ class ConsoleFormatter implements FormatterInterface
             '%level_name%' => sprintf('%-9s', $record['level_name']),
             '%end_tag%' => '</>',
             '%channel%' => $record['channel'],
-            '%message%' => $this->replacePlaceHolder($record)['message'],
+            '%message%' => $record['message'],
             '%context%' => $context,
             '%extra%' => $extra,
         ));
@@ -181,13 +184,23 @@ class ConsoleFormatter implements FormatterInterface
 
         $replacements = array();
         foreach ($context as $k => $v) {
+            $placeholder = '{'.$k.'}';
+            if (strpos($message, $placeholder) === false) {
+                continue;
+            }
+
             // Remove quotes added by the dumper around string.
             $v = trim($this->dumpData($v, false), '"');
             $v = OutputFormatter::escape($v);
-            $replacements['{'.$k.'}'] = sprintf('<comment>%s</>', $v);
+            $replacements[$placeholder] = sprintf('<comment>%s</>', $v);
+
+            if ($this->options['remove_used_context_fields']) {
+                unset($context[$k]);
+            }
         }
 
         $record['message'] = strtr($message, $replacements);
+        $record['context'] = $context;
 
         return $record;
     }

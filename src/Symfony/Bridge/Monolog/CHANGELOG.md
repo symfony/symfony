@@ -6,6 +6,7 @@ CHANGELOG
 
  * the `ConsoleHandler` class now accepts options for default formatter (`ConsoleFormatter`)
  * added option `ignore_empty_context_and_extra` to `ConsoleFormatter`
+ * added option `remove_used_context_fields` to `ConsoleFormatter`
 
 3.3.0
 -----

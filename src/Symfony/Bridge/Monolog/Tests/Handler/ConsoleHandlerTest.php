@@ -146,18 +146,25 @@ class ConsoleHandlerTest extends TestCase
             ->method('getVerbosity')
             ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG))
         ;
+        $message = <<<'EOL'
+16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message <comment>bar</>
+[
+  "foo" => "bar"
+]
+[]
+
+EOL;
         $output
             ->expects($this->once())
             ->method('write')
-            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n[]\n[]\n")
-        ;
+            ->with($message);
 
         $handler = new ConsoleHandler(null, false);
         $handler->setOutput($output);
 
         $infoRecord = array(
-            'message' => 'My info message',
-            'context' => array(),
+            'message' => 'My info message {foo}',
+            'context' => array('foo' => 'bar'),
             'level' => Logger::INFO,
             'level_name' => Logger::getLevelName(Logger::INFO),
             'channel' => 'app',
@@ -179,15 +186,16 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->once())
             ->method('write')
-            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n")
+            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message <comment>bar</>\n")
         ;
 
-        $handler = new ConsoleHandler(null, false, array(), array('ignore_empty_context_and_extra' => true));
+        $formatterOptions = array('ignore_empty_context_and_extra' => true, 'remove_used_context_fields' => true);
+        $handler = new ConsoleHandler(null, false, array(), $formatterOptions);
         $handler->setOutput($output);
 
         $infoRecord = array(
-            'message' => 'My info message',
-            'context' => array(),
+            'message' => 'My info message {foo}',
+            'context' => array('foo' => 'bar'),
             'level' => Logger::INFO,
             'level_name' => Logger::getLevelName(Logger::INFO),
             'channel' => 'app',

@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -55,6 +56,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+
+        if (Kernel::VERSION_ID >= 30400) {
+            throw new \LogicException('The "cache:clear" command in Symfony 3.3 is incompatible with HttpKernel 3.4, please upgrade "symfony/framework-bundle" or downgrade "symfony/http-kernel".');
+        }
 
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         // the old cache dir name must not be longer than the real one to avoid exceeding

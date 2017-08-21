@@ -92,7 +92,15 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     {
         $this->beforeProcessingEnvPlaceholders = $resolvingBag->getEnvPlaceholders();
         $config = $this->resolveEnvPlaceholders($extension->getProcessedConfigs());
-        parent::__construct($this->resolveEnvReferences($config));
+        parent::__construct($this->resolveValue($config));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($name)
+    {
+        return $this->has($name) || (0 === strpos($name, 'env(') && ')' === substr($name, -1) && 'env()' !== $name) ? parent::get($name) : '';
     }
 
     /**

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-18T12:58:38Z
+
+Continuing discussion from the fixed ticket:
+
+> Yes, it's the same as @chalasr suggests, but if we follow symfony best practices, then I would say that we also should write core to follow it. I mean class name parameters are not recommended and maybe one day it will be deprecated. Having check validity compiler pass doesn't depend on class parameter parsing and it also doesn't change what worked before
+
+Resolving parameter in the existing pass could not break anything, only fix something that currently breaks (since `%parameter%` aren't valid class names).
+Also I'm not fond of having a `TYPE_OPTIMIZE` pass which doesn't optimize actually.
+If we want to fix this, I would say we should be consistent with the existing pass(es) doing it already, resolving parameters in the existing pass.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-18T13:00:48Z
+
+Registering service class names was a convention which has been abandoned, we just stopped recommending to do so, we won't forbid it.

@@ -68,10 +68,12 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertEquals(new Reference('highest_prio_service'), $refs[0]);
         $this->assertEquals(new Reference('lowest_prio_service'), $refs[1]);
         $this->assertCount(4, $refs);
-    }/**
- * @group legacy
- * @expectedDeprecation Using a security.voter tag on a class without implementing the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface is deprecated as of 3.4 and will be removed in 4.0. Implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface instead.
- */
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using a security.voter tag on a class without implementing the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface is deprecated as of 3.4 and will be removed in 4.0. Implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface instead.
+     */
     public function testVoterMissingInterface()
     {
         $container = new ContainerBuilder();

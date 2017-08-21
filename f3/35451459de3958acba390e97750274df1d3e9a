@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-21T15:36:46Z
+
+@nicolas-grekas i reproduced the array-to-string conversion on 3.3 with `$_ENV['REAL'] = array()`.
+
+That now produces `Illegal offset type in isset or empty in ContainerBuilder.php:1418`. Considering getEnv returns mixed, it might need a patch :) The str_ireplace call seems fine looking at code.
+
+The mixed runtime/compiletime works great now, inlucding leaving out default and/or real values. It just works as expected :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-21T15:49:40Z
+
+> array-to-string conversion
+
+fixed, should be good then

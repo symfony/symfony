@@ -22,6 +22,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 abstract class AbstractRecursivePass implements CompilerPassInterface
 {
+    /**
+     * @var ContainerBuilder|null
+     */
     protected $container;
     protected $currentId;
 

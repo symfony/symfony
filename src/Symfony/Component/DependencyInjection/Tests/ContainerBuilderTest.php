@@ -1111,6 +1111,23 @@ class ContainerBuilderTest extends TestCase
 
         $container->get('bar');
     }
+
+    public function testServiceFactoryTag()
+    {
+        $container = new ContainerBuilder();
+        $container->register(ServiceFactory::class)
+            ->addTag('container.service_factory');
+        $container->register('foo', 'stdClass')
+            ->setProperty('foo', new Reference('global_service'))
+            ->setProperty('bar', new Reference('dep_service'))
+            ->setProperty('baz', new Reference('my.service'));
+
+        $container->compile();
+
+        $this->assertSame($container->get('global_service'), $container->get('foo')->foo);
+        $this->assertSame($container->get('dep_service'), $container->get('foo')->bar);
+        $this->assertSame($container->get('my.service'), $container->get('foo')->baz);
+    }
 }
 
 class FooClass
@@ -1125,5 +1142,45 @@ class B
 {
     public function __construct(A $a)
     {
+    }
+}
+
+abstract class ParentServiceFactory
+{
+    /**
+     * @service
+     */
+    public static function globalService(): A
+    {
+        return new A();
+    }
+
+    /**
+     * @service
+     */
+    abstract public static function depService(): FooClass;
+}
+
+class ServiceFactory extends ParentServiceFactory
+{
+    /**
+     * @service my.service
+     */
+    public function myService(): B
+    {
+        return new B(self::globalService());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function depService(): FooClass
+    {
+        return new FooClass();
+    }
+
+    protected function internalService(): FooClass
+    {
+        return new FooClass();
     }
 }

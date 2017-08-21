@@ -19,7 +19,6 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\User;
@@ -33,6 +32,8 @@ use Symfony\Component\Security\Core\User\User;
  */
 class UserPasswordEncoderCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'security:encode-password';
+
     private $encoderFactory;
     private $userClasses;
 
@@ -54,7 +55,6 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('security:encode-password')
             ->setDescription('Encodes a password.')
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to encode.')
             ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.')

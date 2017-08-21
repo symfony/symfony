@@ -32,6 +32,7 @@ use Symfony\Component\Routing\Route;
  */
 class RouterDebugCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'debug:router';
     private $router;
 
     /**
@@ -79,7 +80,6 @@ class RouterDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('debug:router')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),

@@ -32,6 +32,8 @@ use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
  */
 class SetAclCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'acl:set';
+
     private $provider;
 
     /**
@@ -80,7 +82,6 @@ class SetAclCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('acl:set')
             ->setDescription('Sets ACL for objects')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command sets ACL.

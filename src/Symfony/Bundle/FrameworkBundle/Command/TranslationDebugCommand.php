@@ -40,6 +40,8 @@ class TranslationDebugCommand extends ContainerAwareCommand
     const MESSAGE_UNUSED = 1;
     const MESSAGE_EQUALS_FALLBACK = 2;
 
+    protected static $defaultName = 'debug:translation';
+
     private $translator;
     private $loader;
     private $extractor;
@@ -72,7 +74,6 @@ class TranslationDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('debug:translation')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),

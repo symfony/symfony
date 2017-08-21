@@ -28,15 +28,14 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class AboutCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'about';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('about')
-            ->setDescription('Displays information about the current project')
-        ;
+        $this->setDescription('Displays information about the current project');
     }
 
     /**

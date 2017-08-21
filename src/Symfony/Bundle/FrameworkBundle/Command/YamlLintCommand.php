@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
  */
 class YamlLintCommand extends BaseLintCommand
 {
+    protected static $defaultName = 'lint:yaml';
+
     public function __construct($name = null, $directoryIteratorProvider = null, $isReadableProvider = null)
     {
         if (func_num_args()) {

@@ -35,6 +35,8 @@ class AssetsInstallCommand extends ContainerAwareCommand
     const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
+    protected static $defaultName = 'assets:install';
+
     private $filesystem;
 
     /**
@@ -61,7 +63,6 @@ class AssetsInstallCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('assets:install')
             ->setDefinition(array(
                 new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'public'),
             ))

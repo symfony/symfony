@@ -24,6 +24,8 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
  */
 class XliffLintCommand extends BaseLintCommand
 {
+    protected static $defaultName = 'lint:xliff';
+
     public function __construct($name = null, $directoryIteratorProvider = null, $isReadableProvider = null)
     {
         if (func_num_args()) {

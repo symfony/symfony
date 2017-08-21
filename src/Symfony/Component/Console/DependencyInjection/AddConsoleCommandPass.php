@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\DependencyInjection;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\DefaultNameProviderInterface;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -47,16 +46,21 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
-            if (!$r = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
-            }
-            if (!$r->isSubclassOf(Command::class)) {
-                throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, $this->commandTag, Command::class));
-            }
-
             $commandId = 'console.command.'.strtolower(str_replace('\\', '_', $class));
 
-            if (!isset($tags[0]['command']) && !$r->implementsInterface(DefaultNameProviderInterface::class)) {
+            if (isset($tags[0]['command'])) {
+                $commandName = $tags[0]['command'];
+            } else {
+                if (!$r = $container->getReflectionClass($class)) {
+                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                }
+                if (!$r->isSubclassOf(Command::class)) {
+                    throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, $this->commandTag, Command::class));
+                }
+                $commandName = $class::getDefaultName();
+            }
+
+            if (null === $commandName) {
                 if (isset($serviceIds[$commandId]) || $container->hasAlias($commandId)) {
                     $commandId = $commandId.'_'.$id;
                 }
@@ -70,7 +74,6 @@ class AddConsoleCommandPass implements CompilerPassInterface
             }
 
             $serviceIds[$commandId] = false;
-            $commandName = isset($tags[0]['command']) ? $tags[0]['command'] : $class::getDefaultName();
             unset($tags[0]);
             $lazyCommandMap[$commandName] = $id;
             $lazyCommandRefs[$id] = new TypedReference($id, $class);

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\DefaultNameProviderInterface;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Command\Command;
@@ -129,7 +128,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->addCompilerPass(new AddConsoleCommandPass());
 
         $definition = new Definition('Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
-        $definition->addTag('console.command', array('command' => 'my:command'));
+        $definition->addTag('console.command');
         $definition->setAbstract(true);
         $container->setDefinition('my-command', $definition);
 
@@ -147,7 +146,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->addCompilerPass(new AddConsoleCommandPass());
 
         $definition = new Definition('SplObjectStorage');
-        $definition->addTag('console.command', array('command' => 'my:command'));
+        $definition->addTag('console.command');
         $container->setDefinition('my-command', $definition);
 
         $container->compile();
@@ -180,10 +179,7 @@ class MyCommand extends Command
 {
 }
 
-class NamedCommand extends Command implements DefaultNameProviderInterface
+class NamedCommand extends Command
 {
-    public static function getDefaultName()
-    {
-        return 'default';
-    }
+    protected static $defaultName = 'default';
 }

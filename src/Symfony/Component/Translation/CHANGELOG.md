@@ -7,6 +7,8 @@ CHANGELOG
  * Added `TranslationDumperPass`
  * Added `TranslationExtractorPass`
  * Added `TranslatorPass`
+ * Added `TranslationWriterInterface`
+ * Deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
 
 3.2.0
 -----

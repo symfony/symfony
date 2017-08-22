@@ -82,7 +82,7 @@
 
     <h2>Translation Messages</h2>
 
-    {% block translation_messages %}
+    {% block messages %}
 
     {# sort translation messages in groups #}
     {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
@@ -161,7 +161,7 @@
         </div>
     </div>
 
-    {% endblock %}
+    {% endblock messages %}
 
 {% endblock %}
 

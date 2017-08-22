@@ -66,6 +66,7 @@ class PassConfig
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
             new CheckArgumentsValidityPass(),
+            new DeprecatePublicServicesPass(),
         ));
 
         $this->removingPasses = array(array(

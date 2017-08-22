@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Αυτή η τιμή δεν είναι έκγυρη.</target>
+                <target>Αυτή η τιμή δεν είναι έγκυρη.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
@@ -136,11 +136,11 @@
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
-                <target>Αυτό δεν είναι μια έκγυρη διεύθυνση IP.</target>
+                <target>Αυτό δεν είναι μια έγκυρη διεύθυνση IP.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έκγυρη γλώσσα.</target>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έγκυρη γλώσσα.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -148,7 +148,7 @@
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έκγυρη χώρα.</target>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έγκυρη χώρα.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>

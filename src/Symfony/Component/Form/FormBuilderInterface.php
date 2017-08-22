@@ -27,6 +27,9 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param string|null                     $type
      * @param array                           $options
      *
+     * @throws Exception\BadMethodCallException  if builder is turned into a FormConfigInterface instance.
+     * @throws Exception\UnexpectedTypeException
+     *
      * @return self
      */
     public function add($child, $type = null, array $options = array());
@@ -39,6 +42,8 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param array       $options The options
      *
      * @return self
+     *
+     * @throws Exception\BadMethodCallException if builder is turned into a FormConfigInterface instance.
      */
     public function create($name, $type = null, array $options = array());
 
@@ -49,6 +54,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return self
      *
+     * @throws Exception\BadMethodCallException             if builder is turned into a FormConfigInterface instance.
      * @throws Exception\InvalidArgumentException if the given child does not exist
      */
     public function get($name);
@@ -59,6 +65,8 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param string $name
      *
      * @return self
+     *
+     * @throws Exception\BadMethodCallException if builder is turned into a FormConfigInterface instance.
      */
     public function remove($name);
 
@@ -68,6 +76,8 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param string $name
      *
      * @return bool
+     *
+     * @throws Exception\BadMethodCallException if builder is turned into a FormConfigInterface instance.
      */
     public function has($name);
 
@@ -75,6 +85,8 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * Returns the children.
      *
      * @return array
+     *
+     * @throws Exception\BadMethodCallException if builder is turned into a FormConfigInterface instance.
      */
     public function all();
 
@@ -82,6 +94,8 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * Creates the form.
      *
      * @return FormInterface The form
+     *
+     * @throws Exception\BadMethodCallException if builder is turned into a FormConfigInterface instance.
      */
     public function getForm();
 }

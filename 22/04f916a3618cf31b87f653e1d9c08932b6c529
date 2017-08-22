@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-08-06T14:51:29Z
+
+@nicolas-grekas, Thanks for the code review! I've fixed all issues you pointed out.
+This PR should be merged in `master` branch, so I think we shouldn't use the `Process::inheritEnvironmentVariables` (see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Process/Process.php#L1148)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-06T15:15:15Z
+
+It should be merged in 3.4 to me, even maybe in 3.3 as bug fix?
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-08-06T15:23:45Z
+
+@nicolas-grekas, It introduces a BC break:
+```php
+// This code will work differently for a current version and the new one:
+(new Dotenv())->populate([ 'FOO' => 'foo', 'FOO' => 'bar' ]);
+// Current version echoes: "foo", new version echoes "bar"
+echo getenv('FOO');
+```
+IMHO, we don't need this feature in the Symfony 3.x because it doesn't use the Dotenv component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-06T15:39:01Z
+
+Not sure to get your example, you can't define an array with two identical keys.
+Moreover, Dotenv is for dev only, so we don't care about edge case behavior changes to me.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-08-06T15:40:57Z
+
+@nicolas-grekas, Sorry, example should be:
+```php
+(new Dotenv())->populate([ 'FOO' => 'foo' ]);
+(new Dotenv())->populate([ 'FOO' => 'bar' ]);
+echo getenv('FOO');
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-06T15:44:32Z
+
+Ok :)
+I still think we should propose this for 3.3 and see what others say about it.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-08-06T18:11:19Z
+
+@nicolas-grekas, Ok, I've changed the base branch to 3.3.

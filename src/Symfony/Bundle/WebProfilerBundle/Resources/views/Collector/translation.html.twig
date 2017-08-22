@@ -82,6 +82,8 @@
 
     <h2>Translation Messages</h2>
 
+    {% block messages %}
+
     {# sort translation messages in groups #}
     {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
     {% for message in collector.messages %}
@@ -108,7 +110,9 @@
                         <p>None of the used translation messages are defined for the given locale.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_defined) }}
+                    {% block defined_messages %}
+                        {{ helper.render_table(messages_defined) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
@@ -127,7 +131,9 @@
                         <p>No fallback translation messages were used.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_fallback) }}
+                    {% block fallback_messages %}
+                        {{ helper.render_table(messages_fallback) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
@@ -147,11 +153,16 @@
                         <p>There are no messages of this category.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_missing) }}
+                    {% block missing_messages %}
+                        {{ helper.render_table(messages_missing) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
     </div>
+
+    {% endblock messages %}
+
 {% endblock %}
 
 {% macro render_table(messages) %}

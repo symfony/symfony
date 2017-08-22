@@ -12,6 +12,9 @@ CHANGELOG
  * Added `TranslationDumperPass`
  * Added `TranslationExtractorPass`
  * Added `TranslatorPass`
+ * Added <notes> section to the Xliff 2.0 dumper.
+ * Added `TranslationWriterInterface`
+ * Deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
 
 3.2.0
 -----

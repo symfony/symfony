@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Writer\TranslationWriter;
+use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
  * A command that parses templates to extract translation messages and adds them
@@ -40,12 +40,12 @@ class TranslationUpdateCommand extends Command
     private $defaultLocale;
 
     /**
-     * @param TranslationWriter  $writer
-     * @param TranslationLoader  $loader
-     * @param ExtractorInterface $extractor
-     * @param string             $defaultLocale
+     * @param TranslationWriterInterface $writer
+     * @param TranslationLoader          $loader
+     * @param ExtractorInterface         $extractor
+     * @param string                     $defaultLocale
      */
-    public function __construct(TranslationWriter $writer, TranslationLoader $loader, ExtractorInterface $extractor, $defaultLocale)
+    public function __construct(TranslationWriterInterface $writer, TranslationLoader $loader, ExtractorInterface $extractor, $defaultLocale)
     {
         parent::__construct();
 
@@ -237,7 +237,7 @@ EOF
                 $bundleTransPath = end($transPaths).'translations';
             }
 
-            $this->writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

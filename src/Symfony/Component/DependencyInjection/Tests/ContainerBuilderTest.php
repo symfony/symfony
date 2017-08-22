@@ -623,17 +623,35 @@ class ContainerBuilderTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->setParameter('env(FOO)', 'Foo');
+        $container->setParameter('env(DUMMY_ENV_VAR)', 'GHI');
         $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)% %env(DUMMY_SERVER_VAR)% %env(HTTP_DUMMY_VAR)%');
         $container->setParameter('foo', '%env(FOO)%');
         $container->setParameter('baz', '%foo%');
         $container->setParameter('env(HTTP_DUMMY_VAR)', '123');
+        $container->register('teatime', 'stdClass')
+            ->setProperty('foo', '%env(DUMMY_ENV_VAR)%')
+        ;
         $container->compile(true);
 
         $this->assertSame('% du%%y ABC 123', $container->getParameter('bar'));
         $this->assertSame('Foo', $container->getParameter('baz'));
+        $this->assertSame('du%%y', $container->get('teatime')->foo);
 
         unset($_SERVER['DUMMY_SERVER_VAR'], $_SERVER['HTTP_DUMMY_VAR']);
         putenv('DUMMY_ENV_VAR');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage A string value must be composed of strings and/or numbers, but found parameter "env(ARRAY)" of type array inside string value "ABC %env(ARRAY)%".
+     */
+    public function testCompileWithArrayResolveEnv()
+    {
+        $bag = new TestingEnvPlaceholderParameterBag();
+        $container = new ContainerBuilder($bag);
+        $container->setParameter('foo', '%env(ARRAY)%');
+        $container->setParameter('bar', 'ABC %env(ARRAY)%');
+        $container->compile(true);
     }
 
     /**
@@ -1093,5 +1111,13 @@ class B
 {
     public function __construct(A $a)
     {
+    }
+}
+
+class TestingEnvPlaceholderParameterBag extends EnvPlaceholderParameterBag
+{
+    public function get($name)
+    {
+        return 'env(array)' === strtolower($name) ? array(123) : parent::get($name);
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -390,9 +391,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $exists;
         }
 
-        if ($trackContents && is_dir($path)) {
-            $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
-        } elseif ($trackContents || is_dir($path)) {
+        if (is_dir($path)) {
+            if ($trackContents) {
+                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+            } else {
+                $this->addResource(new GlobResource($path, '/*', false));
+            }
+        } elseif ($trackContents) {
             $this->addResource(new FileResource($path));
         }
 
@@ -682,9 +687,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $bag = $this->getParameterBag();
 
         if ($resolveEnvPlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
-            $this->parameterBag = new ParameterBag($bag->resolveEnvReferences($bag->all()));
-            $this->envPlaceholders = $bag->getEnvPlaceholders();
-            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all(), true));
+            $compiler->addPass(new ResolveEnvPlaceholdersPass(), PassConfig::TYPE_AFTER_REMOVING, -1000);
         }
 
         $compiler->compile($this);
@@ -697,11 +700,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $this->extensionConfigs = array();
 
-        parent::compile();
-
         if ($bag instanceof EnvPlaceholderParameterBag) {
+            if ($resolveEnvPlaceholders) {
+                $this->parameterBag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
+            }
+
             $this->envPlaceholders = $bag->getEnvPlaceholders();
         }
+
+        parent::compile();
     }
 
     /**
@@ -1253,12 +1260,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         foreach ($envPlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
                 if (false !== stripos($value, $placeholder)) {
-                    if (true !== $format) {
+                    if (true === $format) {
+                        $resolved = $bag->escapeValue($this->getEnv($env));
+                    } else {
                         $resolved = sprintf($format, $env);
-                    } elseif ($placeholder === $resolved = $bag->escapeValue($this->getEnv($env))) {
-                        $resolved = $bag->all()[strtolower("env($env)")];
                     }
-                    $value = str_ireplace($placeholder, $resolved, $value);
+                    if ($placeholder === $value) {
+                        $value = $resolved;
+                    } else {
+                        if (!is_string($resolved) && !is_numeric($resolved)) {
+                            throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "env(%s)" of type %s inside string value "%s".', $env, gettype($resolved), $value));
+                        }
+                        $value = str_ireplace($placeholder, $resolved, $value);
+                    }
                     $usedEnvs[$env] = $env;
                     $this->envCounters[$env] = isset($this->envCounters[$env]) ? 1 + $this->envCounters[$env] : 1;
                 }
@@ -1329,6 +1343,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $hash = substr(base64_encode(hash('sha256', serialize($value), true)), 0, 7);
 
         return str_replace(array('/', '+'), array('.', '_'), $hash);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getEnv($name)
+    {
+        $value = parent::getEnv($name);
+
+        if (!is_string($value) || !$this->getParameterBag() instanceof EnvPlaceholderParameterBag) {
+            return $value;
+        }
+
+        foreach ($this->getParameterBag()->getEnvPlaceholders() as $env => $placeholders) {
+            if (isset($placeholders[$value])) {
+                $bag = new ParameterBag($this->getParameterBag()->all());
+
+                return $bag->unescapeValue($bag->get("env($name)"));
+            }
+        }
+
+        return $value;
     }
 
     /**

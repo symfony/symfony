@@ -87,4 +87,24 @@ class XliffFileDumperTest extends TestCase
             $dumper->formatCatalogue($catalogue, 'messages', array('default_locale' => 'fr_FR'))
         );
     }
+
+    public function testFormatCatalogueWithNotesMetadata()
+    {
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add(array(
+            'foo' => 'bar',
+        ));
+        $catalogue->setMetadata('foo', array('notes' => array(
+            array('category' => 'state', 'content' => 'new'),
+            array('category' => 'approved', 'content' => 'true'),
+            array('category' => 'section', 'content' => 'user login', 'priority' => '1'),
+        )));
+
+        $dumper = new XliffFileDumper();
+
+        $this->assertStringEqualsFile(
+            __DIR__.'/../fixtures/resources-notes-meta.xlf',
+            $dumper->formatCatalogue($catalogue, 'messages', array('default_locale' => 'fr_FR', 'xliff_version' => '2.0'))
+        );
+    }
 }

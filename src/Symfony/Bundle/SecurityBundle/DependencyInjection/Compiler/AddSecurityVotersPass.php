@@ -42,7 +42,8 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         foreach ($voters as $voter) {
-            $class = $container->getDefinition((string) $voter)->getClass();
+            $definition = $container->getDefinition((string) $voter);
+            $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (!is_a($class, VoterInterface::class, true)) {
                 throw new LogicException(sprintf('%s must implement the %s when used as a voter.', $class, VoterInterface::class));

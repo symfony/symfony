@@ -1129,6 +1129,21 @@ class ContainerBuilderTest extends TestCase
 
         $container->get('bar');
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "foo" is deprecated since version 3.4.
+     */
+    public function testParameterWithMixedCase()
+    {
+        $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
+        $container->register('foo', 'stdClass')
+            ->setProperty('foo', '%FOO%');
+
+        $container->compile();
+
+        $this->assertSame('bar', $container->get('foo')->foo);
+    }
 }
 
 class FooClass

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-26T07:55:14Z
+
+I made the new interface follow the Symfony naming conventions.
+
+This means that I deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-31T14:58:03Z
+
+@Nyholm We still need to add a test for the new `write()` method, it will be kept when removing the legacy one.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-31T15:12:21Z
+
+Thank you @chalasr. I've added a test now.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-05T15:05:20Z
+
+Thank you for the review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-12T10:08:42Z
+
+Fabbot complains :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-12T10:16:03Z
+
+Thank you. I've update the PR
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-19T07:29:12Z
+
+Is it anything I can do to get this PR merged?

@@ -208,11 +208,24 @@ class DotenvTest extends TestCase
     public function testEnvVarIsNotOverriden()
     {
         putenv('TEST_ENV_VAR=original_value');
+        $_SERVER['TEST_ENV_VAR'] = 'original_value';
 
         $dotenv = new DotEnv();
         $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'));
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
+    }
+
+    public function testHttpVarIsPartiallyOverriden()
+    {
+        $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('HTTP_TEST_ENV_VAR' => 'env_value'));
+
+        $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
+        $this->assertSame('env_value', $_ENV['HTTP_TEST_ENV_VAR']);
+        $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
     }
 
     public function testMemorizingLoadedVarsNamesInSpecialVar()

@@ -70,13 +70,17 @@ final class Dotenv
         unset($loadedVars['']);
 
         foreach ($values as $name => $value) {
-            if (!isset($loadedVars[$name]) && (isset($_ENV[$name]) || isset($_SERVER[$name]) || false !== getenv($name))) {
+            $notHttpName = 0 !== strpos($name, 'HTTP_');
+            // don't check existence with getenv() because of thread safety issues
+            if (!isset($loadedVars[$name]) && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName))) {
                 continue;
             }
 
             putenv("$name=$value");
             $_ENV[$name] = $value;
-            $_SERVER[$name] = $value;
+            if ($notHttpName) {
+                $_SERVER[$name] = $value;
+            }
 
             $loadedVars[$name] = true;
         }
@@ -363,7 +367,15 @@ final class Dotenv
             }
 
             $name = $matches[3];
-            $value = isset($this->values[$name]) ? $this->values[$name] : (isset($_ENV[$name]) ? $_ENV[$name] : (string) getenv($name));
+            if (isset($this->values[$name])) {
+                $value = $this->values[$name];
+            } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
+                $value = $_SERVER[$name];
+            } elseif (isset($_ENV[$name])) {
+                $value = $_ENV[$name];
+            } else {
+                $value = (string) getenv($name);
+            }
 
             if (!$matches[2] && isset($matches[4])) {
                 $value .= '}';

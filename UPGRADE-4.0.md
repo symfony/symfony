@@ -580,6 +580,9 @@ Translation
 -----------
 
  * Removed the backup feature from the file dumper classes.
+ 
+ * Removed `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations`, 
+   use `Symfony\Component\Translation\Writer\TranslationWriter::write` instead. 
 
 TwigBundle
 ----------

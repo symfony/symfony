@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Writer\TranslationWriter;
+use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
  * A command that parses templates to extract translation messages and adds them
@@ -39,14 +39,14 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     private $defaultLocale;
 
     /**
-     * @param TranslationWriter  $writer
-     * @param TranslationLoader  $loader
-     * @param ExtractorInterface $extractor
-     * @param string             $defaultLocale
+     * @param TranslationWriterInterface $writer
+     * @param TranslationLoader          $loader
+     * @param ExtractorInterface         $extractor
+     * @param string                     $defaultLocale
      */
     public function __construct($writer = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
     {
-        if (!$writer instanceof TranslationWriter) {
+        if (!$writer instanceof TranslationWriterInterface) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
 
             parent::__construct($writer);
@@ -276,7 +276,7 @@ EOF
                 $bundleTransPath = end($transPaths).'translations';
             }
 
-            $this->writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

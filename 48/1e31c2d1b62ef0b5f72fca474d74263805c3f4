@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-08-12T09:29:28Z
+
+Looks good so far :+1: thanks for taking care of this.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-13T11:24:23Z
+
+I think this will do :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-14T15:41:26Z
+
+@nicolas-grekas that means we keep `normalizeParameterName` in 4.0 right? Always checking for `env()` syntax...
+
+The request contradicts with params being case sensitive though.. do we really care about "DI transformations"? Also in bash vars are case sensitive... given that you get exactly the right upgrade path currently.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-14T15:55:51Z
+
+OK, reread again, works already (I was talking about env "placeholders", not env "references", if that distinction makes sense - see str_ireplace in ContainerBuilder::resolveEnvPlaceholders(), which is fine)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-22T11:30:37Z
+
+Status: reviewed

@@ -1441,7 +1441,7 @@ class FrameworkExtension extends Extension
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($dir = $dirname.'/Resources/config/serialization')) {
+            if ($container->fileExists($dir = $dirname.'/Resources/config/serialization', '/^$/')) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }

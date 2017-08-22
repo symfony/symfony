@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T20:46:45Z
+
+To make tests pass for deps=low/high lines, they should compare lowercased values.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-06T10:28:28Z
+
+@Simperfit look at tests before approving ;)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-08-06T12:53:01Z
+
+@nicolas-grekas I know that @javiereguiluz will take care of test anyway ^^
+Le dim. 6 août 2017 à 12:28, Nicolas Grekas <notifications@github.com> a
+écrit :
+
+> @Simperfit <https://github.com/simperfit> look at tests before approving
+> ;)
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/23797#issuecomment-320498499>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8qA1_Zt8uUP4j4Pl1hnd-XkmxZvUks5sVZVVgaJpZM4Ouhm->
+> .
+>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T06:29:10Z
+
+@javiereguiluz you need to patch 3.4 so that the test is case insensitive. Then there will be no need to patch tests here, only remove the strtolower call.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-15T08:24:37Z
+
+ready for a rebase

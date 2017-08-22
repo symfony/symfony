@@ -15,8 +15,17 @@
 
 error_reporting(-1);
 
-// PHPUnit 4.8 does not support PHP 7, while 5.1 requires PHP 5.6+
-$PHPUNIT_VERSION = PHP_VERSION_ID >= 50600 ? getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.7' : '4.8';
+if (PHP_VERSION_ID >= 70200) {
+    // PHPUnit 6 is required for PHP 7.2+
+    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '6.3';
+} elseif (PHP_VERSION_ID >= 50600) {
+    // PHPUnit 4 does not support PHP 7
+    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.7';
+} else {
+    // PHPUnit 5.1 requires PHP 5.6+
+    $PHPUNIT_VERSION = '4.8';
+}
+
 $oldPwd = getcwd();
 $PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: (__DIR__.'/.phpunit');
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';

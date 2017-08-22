@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-20T07:42:08Z
+
+I think changing the key for sessions is also possible. Session would be "lost" when upgrading, or we could add some code to move data from the old key to the new one whenever we read some session data. WDYT?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-20T08:37:59Z
+
+I think there should be a "BC" layer for the session for sure, due to e-commerce applications using the session. Other than that, defo 👍
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-08-21T14:38:53Z
+
+I would also suggest changing the session attributes bag key `_sf2_attributes` (https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/HttpFoundation/Session/Attribute/AttributeBag.php#L36) should have a BC layer then. So in `3.4` we would read from the old key as well and in `4.0` only from the new key? Obviously upgrading from `3.3` directly to `4.0` would then not have the BC layer :smile: That should be documented probably in the `UPGRADE-4.0.md` so that people first upgrade to `3.4` if the sessions are critical?
+
+Edit: Or can we just not have a BC layer and ask people to "overwrite" the session service with an `AttributeBag` that uses the old key in case its really critical for them?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-22T21:25:04Z
+
+I will let someone else remove the remaining sf2 in sessions, with the appropriate BC layer. I would keep the BC layer in 4.0 as well. Just copy from the old key to the new one silently.

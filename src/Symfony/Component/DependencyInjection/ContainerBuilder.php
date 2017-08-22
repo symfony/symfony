@@ -408,9 +408,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $exists;
         }
 
-        if ($trackContents && is_dir($path)) {
-            $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
-        } elseif ($trackContents || is_dir($path)) {
+        if (is_dir($path)) {
+            if ($trackContents) {
+                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+            } else {
+                $this->addResource(new GlobResource($path, '/*', false));
+            }
+        } elseif ($trackContents) {
             $this->addResource(new FileResource($path));
         }
 

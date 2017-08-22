@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-26T09:05:07Z
+
+It's nice to have this feature back ... but I'm afraid it looks very ugly.
+
+What if we use a style similar to the sub-requests?
+
+![subrequests](https://user-images.githubusercontent.com/73419/28613273-3837bba0-71f2-11e7-97de-2d5a479e4353.png)
+
+We could display the controller only in the Request tab, like this:
+
+![controller](https://user-images.githubusercontent.com/73419/28613283-421f179e-71f2-11e7-945e-f58e9d41ac75.png)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-26T09:18:29Z
+
+Oh you find it ugly :( My bad I was proud of my work :D
+
+Actually, my first attempt was what you proposed. And I found it ugly; jajaja.
+
+Note: I moved the link on top of the tab name because the controller is related to the request / response et / etc. and not only the request.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-26T09:31:20Z
+
+What if we display the controller like this:
+
+![controller-1](https://user-images.githubusercontent.com/73419/28614362-e051ca80-71f5-11e7-8b16-34697a410fbd.png)
+
+And reduce the font-size of sub-requests controllers to 18px to display a better hierarchy:
+
+![controller-2](https://user-images.githubusercontent.com/73419/28614379-ee0f0a98-71f5-11e7-8333-3db910b470b7.png)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-18T14:35:10Z
+
+![image](https://user-images.githubusercontent.com/408368/29463486-1d5396c6-8433-11e7-8535-31e582f36da2.png)
+
+WDYT? As you can see, I did not had to change the CSS, And I'm quite happy to not add special rules for this.

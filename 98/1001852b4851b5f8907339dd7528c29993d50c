@@ -1,0 +1,102 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-11T20:09:52Z
+
+I think the existing logic is correct in its intent to track only for new and deleted files, but not for changes.
+BUT, most IDE annihilate that effort by creating a temporary file when saving a file.
+If we merge this PR, we will introduce a new bug: deleted/new files won't be tracked anymore.
+This means we should find a better way to track new/removed files only.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-08-11T21:19:29Z
+
+Then I probably misunderstood the mechanics.
+
+Here's how to reproduce my issue:
+
+```bash
+symfony --quiet demo test
+cd test
+# run symfony to warm up cache
+bin/console --quiet about
+# see container modification time
+date -r var/cache/dev/appDevDebugProjectContainer.php
+# this is to see later the difference in seconds
+sleep 2
+# create a twig file
+touch app/Resources/views/test.html.twig
+# run command again and I expect here the container to be not recompiled
+bin/console --quiet about
+# it actually recompiles, because the modification time is now different
+date -r var/cache/dev/appDevDebugProjectContainer.php
+```
+
+This happens because of this call in [TwigExtension](https://github.com/symfony/symfony/blob/3.3/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php#L181) which creates a `FileResource` for the `app/Resources/views` directory although `$trackContents = false`.
+
+Am I right that TwigBundle keeps track of all bundle directories to recompile container in case these directories appear or get removed?
+
+The actual problem is that dx becomes worse when you are waiting for n seconds after just changing a template...
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-08-11T21:30:56Z
+
+With current code there's no possibility to prevent directory tracking even by doing `ContainerBuilder::fileExists('/path/to/dir', false)`. Is this valid?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-08-12T11:32:53Z
+
+@nicolas-grekas , I've checked, with my changes new and deleted files are still tracked correctly.
+But the Twig issue disappears
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-08-13T13:31:52Z
+
+@vudaltsov the problem with your patch is that removing the `app/Ressources/views` will non longer trigger a recompile of the container leading to a fatal error because twig throw an exception when adding an inexistent path to the FileSystem loader.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-13T15:08:04Z
+
+@vudaltsov can you try this?
+```php
+--- a/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
++++ b/src/Symfony/Component/DependencyInjection/ContainerBuilder.php
+@@ -407,9 +407,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
+             return $exists;
+         }
+
+-        if ($trackContents && is_dir($path)) {
+-            $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+-        } elseif ($trackContents || is_dir($path)) {
++        if (is_dir($path)) {
++            if ($trackContents) {
++                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
++            } else {
++                $this->addResource(new GlobResource($path, '/*', false));
++            }
++        } elseif ($trackContents) {
+             $this->addResource(new FileResource($path));
+         }
+```
+
+If it works, you can take the patch for your PR (and add a test case if possible.)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-08-13T16:45:16Z
+
+@nicolas-grekas, this makes things better. Now editing existing templates doesn't make the container recompile. New templates still do. Which makes sense because `GlobResource` notices the change in the file structure.
+
+Is it possible to improve it even more? As @jvasseur pointed out, we only need to track for directory's existence in case of TwigExtension.
+
+I'll try to experiment a little with this next week.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-08-22T11:16:34Z
+
+@nicolas-grekas , awesome news! Thank you. I din't have time to look at this yet.

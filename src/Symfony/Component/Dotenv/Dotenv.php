@@ -60,6 +60,8 @@ final class Dotenv
     /**
      * Sets values as environment variables (via putenv, $_ENV, and $_SERVER).
      *
+     * Note that existing environment variables are not overridden.
+     *
      * @param array $values An array of env variables
      */
     public function populate($values)

@@ -91,7 +91,11 @@ interface ParameterBagInterface
      *
      * @param mixed $value A value
      *
-     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @return mixed The resolved value
+     *
+     * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
+     * @throws ParameterCircularReferenceException if a circular reference is detected
+     * @throws RuntimeException                    when a given parameter has a type problem.
      */
     public function resolveValue($value);
 

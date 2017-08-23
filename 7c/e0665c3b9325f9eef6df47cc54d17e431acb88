@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-21T08:17:17Z
+
+I suggest to use an `@requires PHP 7` annotation on the test case instead.
+
+---------------------------------------------------------------------------
+
+by siwinski at 2017-08-23T20:55:05Z
+
+Changes made per request above.  Branch rebased.

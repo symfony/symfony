@@ -23,7 +23,7 @@ trait AbstractTrait
 {
     use LoggerAwareTrait;
 
-    private $namespace;
+    protected $namespace;
     private $deferred = array();
 
     /**
@@ -185,7 +185,7 @@ trait AbstractTrait
         }
     }
 
-    private function getId($key)
+    protected function getId($key)
     {
         CacheItem::validateKey($key);
 

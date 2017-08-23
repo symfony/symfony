@@ -46,20 +46,13 @@ Exception {
   #file: "%sExceptionCasterTest.php"
   #line: 28
   trace: {
-    %sExceptionCasterTest.php:28: {
-      : {
-      :     return new \Exception(''.$msg);
-      : }
+    %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+      › {
+      ›     return new \Exception(''.$msg);
+      › }
     }
-    %sExceptionCasterTest.php:%d: {
-      : $ref = array('foo');
-      : $e = $this->getTestException('foo', $ref);
-      : 
-      arguments: {
-        $msg: "foo"
-        &$ref: array:1 [ …1]
-      }
-    }
+    %s%eTests%eCaster%eExceptionCasterTest.php:40 { …}
+    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testDefaultSettings() {}
 %A
 EODUMP;
 
@@ -73,19 +66,13 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 {
-  %sExceptionCasterTest.php:28: {
-    : {
-    :     return new \Exception(''.$msg);
-    : }
+  %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+    › {
+    ›     return new \Exception(''.$msg);
+    › }
   }
-  %sExceptionCasterTest.php:%d: {
-    : {
-    :     $e = $this->getTestException(2);
-    : 
-    arguments: {
-      $msg: 2
-    }
-  }
+  %s%eTests%eCaster%eExceptionCasterTest.php:65 { …}
+  Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testSeek() {}
 %A
 EODUMP;
 
@@ -104,16 +91,13 @@ Exception {
   #file: "%sExceptionCasterTest.php"
   #line: 28
   trace: {
-    %sExceptionCasterTest.php:28: {
-      : {
-      :     return new \Exception(''.$msg);
-      : }
+    %sExceptionCasterTest.php:28 {
+      › {
+      ›     return new \Exception(''.$msg);
+      › }
     }
-    %sExceptionCasterTest.php:%d: {
-      : {
-      :     $e = $this->getTestException(1);
-      :     ExceptionCaster::$traceArgs = false;
-    }
+    %s%eTests%eCaster%eExceptionCasterTest.php:84 { …}
+    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->testNoArgs() {}
 %A
 EODUMP;
 
@@ -132,8 +116,8 @@ Exception {
   #file: "%sExceptionCasterTest.php"
   #line: 28
   trace: {
-    %sExceptionCasterTest.php: 28
-    %sExceptionCasterTest.php: %d
+    %s%eTests%eCaster%eExceptionCasterTest.php:28
+    %s%eTests%eCaster%eExceptionCasterTest.php:%d
 %A
 EODUMP;
 
@@ -161,7 +145,7 @@ EODUMP;
   #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>28</span>
   <span class=sf-dump-meta>trace</span>: {<samp>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
-Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>28</span>
+Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>28</span>
      &hellip;%d
   </samp>}
 </samp>}
@@ -197,10 +181,10 @@ array:2 [
   0 => {
     class: "__TwigTemplate_VarDumperFixture_u75a09"
     src: {
-      %sTwig.php:1: {
-        : 
-        : foo bar
-        :   twig source
+      %sTwig.php:1 {
+        › 
+        › foo bar
+        ›   twig source
       }
     }
   }
@@ -210,10 +194,10 @@ array:2 [
     %A
     }
     src: {
-      %sExceptionCasterTest.php:2: {
-        : foo bar
-        :   twig source
-        : 
+      %sExceptionCasterTest.php:2 {
+        › foo bar
+        ›   twig source
+        › 
       }
     }
   }

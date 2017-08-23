@@ -355,10 +355,16 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
                     $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
                     $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);
                     if ($withChildren) {
-                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, null !== $item->class);
+                        if ($cursor->skipChildren) {
+                            $withChildren = false;
+                            $cut = -1;
+                        } else {
+                            $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, null !== $item->class);
+                        }
                     } elseif ($children && 0 <= $cut) {
                         $cut += count($children);
                     }
+                    $cursor->skipChildren = false;
                     $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
 

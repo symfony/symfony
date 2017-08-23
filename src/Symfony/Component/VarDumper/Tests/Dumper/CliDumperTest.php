@@ -86,7 +86,7 @@ array:24 [
         default: null
       }
     }
-    file: "{$var['file']}"
+    file: "%s%eTests%eFixtures%edumb-var.php"
     line: "{$var['line']} to {$var['line']}"
   }
   "line" => {$var['line']}
@@ -361,30 +361,16 @@ stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
-      %sTwig.php:2: {
-        : foo bar
-        :   twig source
-        : 
+      %sTwig.php:2 {
+        › foo bar
+        ›   twig source
+        › 
       }
-      %sTemplate.php:%d: {
-        : try {
-        :     \$this->doDisplay(\$context, \$blocks);
-        : } catch (Twig%sError \$e) {
-      }
-      %sTemplate.php:%d: {
-        : {
-        :     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
-        : }
-      }
-      %sTemplate.php:%d: {
-        : try {
-        :     \$this->display(\$context);
-        : } catch (%s \$e) {
-      }
-      %sCliDumperTest.php:%d: {
-%A
-      }
-    }
+      %s%eTemplate.php:%d { …}
+      %s%eTemplate.php:%d { …}
+      %s%eTemplate.php:%d { …}
+      %s%eTests%eDumper%eCliDumperTest.php:%d { …}
+%A  }
   }
 %Awrapper_type: "PHP"
   stream_type: "MEMORY"

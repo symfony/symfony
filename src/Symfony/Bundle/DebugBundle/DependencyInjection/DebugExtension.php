@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * DebugExtension.
@@ -37,8 +38,11 @@ class DebugExtension extends Extension
 
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems', array($config['max_items']))
-            ->addMethodCall('setMinDepth', array($config['min_depth']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
+
+        if (method_exists(VarCloner::class, 'setMinDepth')) {
+            $container->getDefinition('var_dumper.cloner')->addMethodCall('setMinDepth', array($config['min_depth']));
+        }
 
         if (null !== $config['dump_destination']) {
             $container->getDefinition('var_dumper.cli_dumper')

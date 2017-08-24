@@ -83,28 +83,6 @@ trait MemcachedTrait
             $client = new \Memcached($options['persistent_id']);
             $username = $options['username'];
             $password = $options['password'];
-            unset($options['persistent_id'], $options['username'], $options['password']);
-            $options = array_change_key_case($options, CASE_UPPER);
-
-            // set client's options
-            $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
-            $client->setOption(\Memcached::OPT_NO_BLOCK, true);
-            if (!array_key_exists('LIBKETAMA_COMPATIBLE', $options) && !array_key_exists(\Memcached::OPT_LIBKETAMA_COMPATIBLE, $options)) {
-                $client->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
-            }
-            foreach ($options as $name => $value) {
-                if (is_int($name)) {
-                    continue;
-                }
-                if ('HASH' === $name || 'SERIALIZER' === $name || 'DISTRIBUTION' === $name) {
-                    $value = constant('Memcached::'.$name.'_'.strtoupper($value));
-                }
-                $opt = constant('Memcached::OPT_'.$name);
-
-                unset($options[$name]);
-                $options[$opt] = $value;
-            }
-            $client->setOptions($options);
 
             // parse any DSN in $servers
             foreach ($servers as $i => $dsn) {
@@ -139,10 +117,33 @@ trait MemcachedTrait
                 if (isset($params['query'])) {
                     parse_str($params['query'], $query);
                     $params += $query;
+                    $options = $query + $options;
                 }
 
                 $servers[$i] = array($params['host'], $params['port'], $params['weight']);
             }
+
+            // set client's options
+            unset($options['persistent_id'], $options['username'], $options['password'], $options['weight']);
+            $options = array_change_key_case($options, CASE_UPPER);
+            $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
+            $client->setOption(\Memcached::OPT_NO_BLOCK, true);
+            if (!array_key_exists('LIBKETAMA_COMPATIBLE', $options) && !array_key_exists(\Memcached::OPT_LIBKETAMA_COMPATIBLE, $options)) {
+                $client->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
+            }
+            foreach ($options as $name => $value) {
+                if (is_int($name)) {
+                    continue;
+                }
+                if ('HASH' === $name || 'SERIALIZER' === $name || 'DISTRIBUTION' === $name) {
+                    $value = constant('Memcached::'.$name.'_'.strtoupper($value));
+                }
+                $opt = constant('Memcached::OPT_'.$name);
+
+                unset($options[$name]);
+                $options[$opt] = $value;
+            }
+            $client->setOptions($options);
 
             // set client's servers, taking care of persistent connections
             if (!$client->isPristine()) {

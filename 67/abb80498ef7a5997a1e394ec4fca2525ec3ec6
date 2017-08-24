@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-14T18:28:09Z
+
+@nicolas-grekas That would require to make them autowired, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-14T18:41:27Z
+
+Correct, bad idea :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-21T08:42:31Z
+
+What about making it easier to define the default name of a command, by asking people to just fill in a
+`protected static $defaultName`?
+
+Here is a commit doing this to see what it could look like: https://github.com/symfony/symfony/commit/05c922a33ade30ba59af8a9e43ea3a04dde578ae
+
+Note that this also "fixes" an issue with inheritance, where the return value of `getDefaultName()` can be provided by the parent class, which usually is not desired. This also means we could just remove the interface btw.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-21T08:53:00Z
+
+> Note that this also "fixes" an issue with inheritance, where the return value of getDefaultName() can be provided by the parent class, which usually is not desired. This also means we could just remove the interface btw.
+
+This is enough to convince me 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-22T12:17:51Z
+
+@nicolas-grekas applied
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-23T23:55:52Z
+
+@fabpot all fixed

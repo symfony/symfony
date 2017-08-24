@@ -35,7 +35,7 @@ class ProxyAdapter implements AdapterInterface
     {
         $this->pool = $pool;
         $this->poolHash = $poolHash = spl_object_hash($pool);
-        $this->namespace = '' === $namespace ? '' : $this->getId($namespace);
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace);
         $this->namespaceLen = strlen($namespace);
         $this->createCacheItem = \Closure::bind(
             function ($key, $innerItem) use ($defaultLifetime, $poolHash) {

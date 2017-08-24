@@ -187,6 +187,10 @@ trait MemcachedTrait
      */
     protected function doSave(array $values, $lifetime)
     {
+        if ($lifetime && $lifetime > 30 * 86400) {
+            $lifetime += time();
+        }
+
         return $this->checkResultCode($this->client->setMulti($values, $lifetime));
     }
 

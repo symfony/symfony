@@ -45,6 +45,26 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertFalse($item->isHit());
     }
 
+    public function testExpiration()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool();
+        $cache->save($cache->getItem('k1')->set('v1')->expiresAfter(2));
+        $cache->save($cache->getItem('k2')->set('v2')->expiresAfter(366 * 86400));
+
+        sleep(3);
+        $item = $cache->getItem('k1');
+        $this->assertFalse($item->isHit());
+        $this->assertNull($item->get(), "Item's value must be null when isHit() is false.");
+
+        $item = $cache->getItem('k2');
+        $this->assertTrue($item->isHit());
+        $this->assertSame('v2', $item->get());
+    }
+
     public function testNotUnserializable()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

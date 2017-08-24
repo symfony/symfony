@@ -33,6 +33,8 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  */
 class TranslationUpdateCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'translation:update';
+
     private $writer;
     private $loader;
     private $extractor;
@@ -68,7 +70,6 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('translation:update')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),

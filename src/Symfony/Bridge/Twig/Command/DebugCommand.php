@@ -26,6 +26,8 @@ use Twig\Environment;
  */
 class DebugCommand extends Command
 {
+    protected static $defaultName = 'debug:twig';
+
     private $twig;
 
     /**
@@ -66,7 +68,6 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('debug:twig')
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),

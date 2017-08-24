@@ -28,13 +28,14 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ConfigDebugCommand extends AbstractConfigCommand
 {
+    protected static $defaultName = 'debug:config';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('debug:config')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),

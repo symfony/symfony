@@ -29,6 +29,8 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  */
 class RouterMatchCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'router:match';
+
     private $router;
 
     /**
@@ -76,7 +78,6 @@ class RouterMatchCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('router:match')
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
                 new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method'),

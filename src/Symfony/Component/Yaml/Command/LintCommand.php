@@ -28,6 +28,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class LintCommand extends Command
 {
+    protected static $defaultName = 'lint:yaml';
+
     private $parser;
     private $format;
     private $displayCorrectFiles;
@@ -48,7 +50,6 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('lint:yaml')
             ->setDescription('Lints a file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')

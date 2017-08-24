@@ -77,6 +77,38 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(array(array('setName', array('my:command')), array('setAliases', array(array('my:alias')))), $command->getMethodCalls());
     }
 
+    public function testProcessFallsBackToDefaultName()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('with-default-name', NamedCommand::class)
+            ->setPublic(false)
+            ->addTag('console.command')
+        ;
+
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $commandLoader = $container->getDefinition('console.command_loader');
+        $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
+
+        $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
+        $this->assertSame(array('default' => 'with-default-name'), $commandLoader->getArgument(1));
+        $this->assertEquals(array(array('with-default-name' => new ServiceClosureArgument(new TypedReference('with-default-name', NamedCommand::class)))), $commandLocator->getArguments());
+        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_namedcommand' => false), $container->getParameter('console.command.ids'));
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('with-default-name', NamedCommand::class)
+            ->setPublic(false)
+            ->addTag('console.command', array('command' => 'new-name'))
+        ;
+
+        $pass->process($container);
+
+        $this->assertSame(array('new-name' => 'with-default-name'), $container->getDefinition('console.command_loader')->getArgument(1));
+    }
+
     public function visibilityProvider()
     {
         return array(
@@ -96,7 +128,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->addCompilerPass(new AddConsoleCommandPass());
 
         $definition = new Definition('Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
-        $definition->addTag('console.command', array('command' => 'my:command'));
+        $definition->addTag('console.command');
         $definition->setAbstract(true);
         $container->setDefinition('my-command', $definition);
 
@@ -114,7 +146,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->addCompilerPass(new AddConsoleCommandPass());
 
         $definition = new Definition('SplObjectStorage');
-        $definition->addTag('console.command', array('command' => 'my:command'));
+        $definition->addTag('console.command');
         $container->setDefinition('my-command', $definition);
 
         $container->compile();
@@ -145,4 +177,9 @@ class AddConsoleCommandPassTest extends TestCase
 
 class MyCommand extends Command
 {
+}
+
+class NamedCommand extends Command
+{
+    protected static $defaultName = 'default';
 }

@@ -28,6 +28,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EventDispatcherDebugCommand extends ContainerAwareCommand
 {
+    protected static $defaultName = 'debug:event-dispatcher';
     private $dispatcher;
 
     /**
@@ -54,7 +55,6 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('debug:event-dispatcher')
             ->setDefinition(array(
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),

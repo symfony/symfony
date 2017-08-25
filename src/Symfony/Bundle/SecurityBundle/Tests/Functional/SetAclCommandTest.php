@@ -20,7 +20,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
  * file that was distributed with this source code.
  */
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\SecurityBundle\Command\InitAclCommand;
 use Symfony\Bundle\SecurityBundle\Command\SetAclCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -170,7 +169,6 @@ class SetAclCommandTest extends WebTestCase
         $kernel->boot();
 
         $application = new Application($kernel);
-        $application->add(new InitAclCommand($kernel->getContainer()->get('security.acl.dbal.connection'), $kernel->getContainer()->get('security.acl.dbal.schema')));
 
         $initAclCommand = $application->find('init:acl');
         $initAclCommandTester = new CommandTester($initAclCommand);

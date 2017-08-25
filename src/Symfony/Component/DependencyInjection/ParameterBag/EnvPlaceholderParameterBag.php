@@ -91,7 +91,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
         parent::resolve();
 
         foreach ($this->envPlaceholders as $env => $placeholders) {
-            if (!isset($this->parameters[$name = strtolower("env($env)")])) {
+            if (!$this->has($name = "env($env)")) {
                 continue;
             }
             if (is_numeric($default = $this->parameters[$name])) {

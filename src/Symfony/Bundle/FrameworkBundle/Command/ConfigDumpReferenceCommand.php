@@ -30,13 +30,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
+    protected static $defaultName = 'config:dump-reference';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('config:dump-reference')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),

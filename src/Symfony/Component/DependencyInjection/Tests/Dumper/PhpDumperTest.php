@@ -650,4 +650,43 @@ class PhpDumperTest extends TestCase
 
         $container->get('bar');
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "foo" instead of "Foo" is deprecated since version 3.4.
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "Foo" is deprecated since version 3.4.
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "bar" instead of "BAR" is deprecated since version 3.4.
+     */
+    public function testParameterWithMixedCase()
+    {
+        $container = new ContainerBuilder(new ParameterBag(array('Foo' => 'bar', 'BAR' => 'foo')));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Parameter_With_Mixed_Case')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Parameter_With_Mixed_Case();
+
+        $this->assertSame('bar', $container->getParameter('foo'));
+        $this->assertSame('bar', $container->getParameter('FOO'));
+        $this->assertSame('foo', $container->getParameter('bar'));
+        $this->assertSame('foo', $container->getParameter('BAR'));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "foo" is deprecated since version 3.4.
+     */
+    public function testParameterWithLowerCase()
+    {
+        $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Parameter_With_Lower_Case')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Parameter_With_Lower_Case();
+
+        $this->assertSame('bar', $container->getParameter('FOO'));
+    }
 }

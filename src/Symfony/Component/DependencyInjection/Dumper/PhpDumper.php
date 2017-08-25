@@ -1039,10 +1039,14 @@ EOF;
 
         $php = array();
         $dynamicPhp = array();
+        $normalizedParams = array();
 
         foreach ($this->container->getParameterBag()->all() as $key => $value) {
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
                 throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: %s.', $resolvedKey));
+            }
+            if ($key !== $lcKey = strtolower($key)) {
+                $normalizedParams[] = sprintf('        %s => %s,', $this->export($lcKey), $this->export($key));
             }
             $export = $this->exportParameters(array($value));
             $export = explode('0 => ', substr(rtrim($export, " )\n"), 7, -1), 2);
@@ -1063,7 +1067,7 @@ EOF;
     public function getParameter($name)
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
-            $name = strtolower($name);
+            $name = $this->normalizeParameterName($name);
 
             if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
                 throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
@@ -1081,7 +1085,7 @@ EOF;
      */
     public function hasParameter($name)
     {
-        $name = strtolower($name);
+        $name = $this->normalizeParameterName($name);
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
@@ -1150,6 +1154,30 @@ EOF;
     {
 {$getDynamicParameter}
     }
+
+
+EOF;
+
+        $code .= '    private $normalizedParameterNames = '.($normalizedParams ? sprintf("array(\n%s\n    );", implode("\n", $normalizedParams)) : 'array();')."\n";
+        $code .= <<<'EOF'
+
+    private function normalizeParameterName($name)
+    {
+        if (isset($this->normalizedParameterNames[$normalizedName = strtolower($name)]) || isset($this->parameters[$normalizedName]) || array_key_exists($normalizedName, $this->parameters)) {
+            $normalizedName = isset($this->normalizedParameterNames[$normalizedName]) ? $this->normalizedParameterNames[$normalizedName] : $normalizedName;
+            if ((string) $name !== $normalizedName) {
+                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
+            }
+        } else {
+            $normalizedName = $this->normalizedParameterNames[$normalizedName] = (string) $name;
+        }
+
+        return $normalizedName;
+    }
+
+EOF;
+
+        $code .= <<<EOF
 
     /*{$this->docStar}
      * Gets the default parameters.
@@ -1533,10 +1561,10 @@ EOF;
             if (preg_match('/^%([^%]+)%$/', $value, $match)) {
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
-                return $this->dumpParameter(strtolower($match[1]));
+                return $this->dumpParameter($match[1]);
             } else {
                 $replaceParameters = function ($match) {
-                    return "'.".$this->dumpParameter(strtolower($match[2])).".'";
+                    return "'.".$this->dumpParameter($match[2]).".'";
                 };
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
@@ -1582,8 +1610,6 @@ EOF;
      */
     private function dumpParameter($name)
     {
-        $name = strtolower($name);
-
         if ($this->container->isCompiled() && $this->container->hasParameter($name)) {
             $value = $this->container->getParameter($name);
             $dumpedValue = $this->dumpValue($value, false);

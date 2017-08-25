@@ -30,6 +30,8 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  */
 class RouterMatchCommand extends Command
 {
+    protected static $defaultName = 'router:match';
+
     private $router;
 
     public function __construct(RouterInterface $router)
@@ -45,7 +47,6 @@ class RouterMatchCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('router:match')
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
                 new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method'),

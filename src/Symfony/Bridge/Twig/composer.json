@@ -39,7 +39,8 @@
         "symfony/web-link": "~3.4|~4.0"
     },
     "conflict": {
-        "symfony/form": "<3.4"
+        "symfony/form": "<3.4",
+        "symfony/console": "<3.4"
     },
     "suggest": {
         "symfony/finder": "",

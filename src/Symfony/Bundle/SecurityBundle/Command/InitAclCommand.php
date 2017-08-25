@@ -27,6 +27,8 @@ use Doctrine\DBAL\Schema\SchemaException;
  */
 class InitAclCommand extends Command
 {
+    protected static $defaultName = 'init:acl';
+
     private $connection;
     private $schema;
 
@@ -44,7 +46,6 @@ class InitAclCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('init:acl')
             ->setDescription('Mounts ACL tables in the database')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command mounts ACL tables in the database.

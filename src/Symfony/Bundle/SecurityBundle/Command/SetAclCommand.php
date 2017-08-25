@@ -32,6 +32,8 @@ use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
  */
 class SetAclCommand extends Command
 {
+    protected static $defaultName = 'acl:set';
+
     private $provider;
 
     public function __construct(MutableAclProviderInterface $provider)
@@ -47,7 +49,6 @@ class SetAclCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('acl:set')
             ->setDescription('Sets ACL for objects')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command sets ACL.

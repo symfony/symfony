@@ -33,6 +33,8 @@ use Symfony\Component\Config\FileLocator;
  */
 class ContainerDebugCommand extends Command
 {
+    protected static $defaultName = 'debug:container';
+
     /**
      * @var ContainerBuilder|null
      */
@@ -44,7 +46,6 @@ class ContainerDebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('debug:container')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),

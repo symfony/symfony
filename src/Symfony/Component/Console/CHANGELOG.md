@@ -17,6 +17,10 @@ CHANGELOG
  * added `CommandLoaderInterface`, `FactoryCommandLoader` and PSR-11
    `ContainerCommandLoader` for commands lazy-loading
  * added a case-insensitive command name matching fallback
+ * added static `Command::$defaultName/getDefaultName()`, allowing for
+   commands to be registered at compile time in the application command loader.
+   Setting the `$defaultName` property avoids the need for filling the `command`
+   attribute on the `console.command` tag when using `AddConsoleCommandPass`.
 
 3.3.0
 -----

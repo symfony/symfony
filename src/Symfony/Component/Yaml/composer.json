@@ -21,6 +21,9 @@
     "require-dev": {
         "symfony/console": "~3.4|~4.0"
     },
+    "conflict": {
+        "symfony/console": "<3.4"
+    },
     "suggest": {
         "symfony/console": "For validating YAML files using the lint command"
     },

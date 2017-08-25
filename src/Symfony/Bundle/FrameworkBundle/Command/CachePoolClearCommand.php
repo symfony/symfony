@@ -26,6 +26,8 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
  */
 final class CachePoolClearCommand extends Command
 {
+    protected static $defaultName = 'cache:pool:clear';
+
     private $poolClearer;
 
     public function __construct(Psr6CacheClearer $poolClearer)
@@ -41,7 +43,6 @@ final class CachePoolClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('cache:pool:clear')
             ->setDefinition(array(
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ))

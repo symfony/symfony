@@ -33,6 +33,7 @@ use Symfony\Component\Routing\Route;
  */
 class RouterDebugCommand extends Command
 {
+    protected static $defaultName = 'debug:router';
     private $router;
 
     public function __construct(RouterInterface $router)
@@ -48,7 +49,6 @@ class RouterDebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('debug:router')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),

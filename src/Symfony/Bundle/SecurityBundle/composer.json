@@ -46,7 +46,8 @@
     },
     "conflict": {
         "symfony/var-dumper": "<3.4",
-        "symfony/event-dispatcher": "<3.4"
+        "symfony/event-dispatcher": "<3.4",
+        "symfony/console": "<3.4"
     },
     "suggest": {
         "symfony/security-acl": "For using the ACL functionality of this bundle"

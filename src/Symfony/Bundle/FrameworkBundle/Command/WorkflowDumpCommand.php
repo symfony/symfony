@@ -26,13 +26,14 @@ use Symfony\Component\Workflow\Marking;
  */
 class WorkflowDumpCommand extends Command
 {
+    protected static $defaultName = 'workflow:dump';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('workflow:dump')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),

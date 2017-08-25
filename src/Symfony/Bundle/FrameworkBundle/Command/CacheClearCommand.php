@@ -32,6 +32,8 @@ use Symfony\Component\Finder\Finder;
  */
 class CacheClearCommand extends Command
 {
+    protected static $defaultName = 'cache:clear';
+
     private $cacheClearer;
     private $filesystem;
 
@@ -53,7 +55,6 @@ class CacheClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),

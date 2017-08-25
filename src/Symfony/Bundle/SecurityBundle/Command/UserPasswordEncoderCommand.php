@@ -31,6 +31,8 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
  */
 class UserPasswordEncoderCommand extends Command
 {
+    protected static $defaultName = 'security:encode-password';
+
     private $encoderFactory;
     private $userClasses;
 
@@ -48,7 +50,6 @@ class UserPasswordEncoderCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('security:encode-password')
             ->setDescription('Encodes a password.')
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to encode.')
             ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.')

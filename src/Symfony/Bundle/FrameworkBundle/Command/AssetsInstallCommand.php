@@ -36,6 +36,8 @@ class AssetsInstallCommand extends Command
     const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
+    protected static $defaultName = 'assets:install';
+
     private $filesystem;
 
     public function __construct(Filesystem $filesystem)
@@ -51,7 +53,6 @@ class AssetsInstallCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('assets:install')
             ->setDefinition(array(
                 new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'public'),
             ))

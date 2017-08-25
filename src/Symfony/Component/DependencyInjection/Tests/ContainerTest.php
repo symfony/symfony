@@ -112,10 +112,6 @@ class ContainerTest extends TestCase
         $sc->setParameter('foo', 'baz');
         $this->assertEquals('baz', $sc->getParameter('foo'), '->setParameter() overrides previously set parameter');
 
-        $sc->setParameter('Foo', 'baz1');
-        $this->assertEquals('baz1', $sc->getParameter('foo'), '->setParameter() converts the key to lowercase');
-        $this->assertEquals('baz1', $sc->getParameter('FOO'), '->getParameter() converts the key to lowercase');
-
         try {
             $sc->getParameter('baba');
             $this->fail('->getParameter() thrown an \InvalidArgumentException if the key does not exist');
@@ -123,6 +119,20 @@ class ContainerTest extends TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
             $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
         }
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.4.
+     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "foo" is deprecated since version 3.4.
+     */
+    public function testGetSetParameterWithMixedCase()
+    {
+        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
+
+        $sc->setParameter('Foo', 'baz1');
+        $this->assertEquals('baz1', $sc->getParameter('foo'), '->setParameter() converts the key to lowercase');
+        $this->assertEquals('baz1', $sc->getParameter('FOO'), '->getParameter() converts the key to lowercase');
     }
 
     public function testGetServiceIds()

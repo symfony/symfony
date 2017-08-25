@@ -27,6 +27,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
  */
 class CacheWarmupCommand extends Command
 {
+    protected static $defaultName = 'cache:warmup';
+
     private $cacheWarmer;
 
     public function __construct(CacheWarmerAggregate $cacheWarmer)
@@ -42,7 +44,6 @@ class CacheWarmupCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('cache:warmup')
             ->setDefinition(array(
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))

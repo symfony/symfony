@@ -31,6 +31,8 @@ use Twig\Source;
  */
 class LintCommand extends Command
 {
+    protected static $defaultName = 'lint:twig';
+
     private $twig;
 
     public function __construct(Environment $twig)
@@ -43,7 +45,6 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('lint:twig')
             ->setDescription('Lints a template and outputs encountered errors')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addArgument('filename', InputArgument::IS_ARRAY)

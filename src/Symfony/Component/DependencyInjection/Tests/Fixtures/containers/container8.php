@@ -4,7 +4,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 $container = new ContainerBuilder(new ParameterBag(array(
-    'FOO' => '%baz%',
+    'foo' => '%baz%',
     'baz' => 'bar',
     'bar' => 'foo is %%foo bar',
     'escape' => '@escapeme',

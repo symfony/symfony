@@ -25,6 +25,7 @@ trait PhpArrayTrait
     private $file;
     private $values;
     private $fallbackPool;
+    private $zendMultiByte;
 
     /**
      * Store an array of cached values.
@@ -106,7 +107,7 @@ EOF;
 
         @rename($tmpFile, $this->file);
 
-        $this->values = (include $this->file) ?: array();
+        $this->initialize();
     }
 
     /**
@@ -126,6 +127,15 @@ EOF;
      */
     private function initialize()
     {
-        $this->values = file_exists($this->file) ? (include $this->file ?: array()) : array();
+        if ($this->zendMultiByte) {
+            $zmb = ini_set('zend.multibyte', 0);
+        }
+        try {
+            $this->values = file_exists($this->file) ? (include $this->file ?: array()) : array();
+        } finally {
+            if ($this->zendMultiByte) {
+                ini_set('zend.multibyte', $zmb);
+            }
+        }
     }
 }

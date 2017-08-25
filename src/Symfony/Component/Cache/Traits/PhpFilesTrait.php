@@ -25,6 +25,7 @@ trait PhpFilesTrait
     use FilesystemCommonTrait;
 
     private $includeHandler;
+    private $zendMultiByte;
 
     public static function isSupported()
     {
@@ -39,6 +40,9 @@ trait PhpFilesTrait
         $values = array();
         $now = time();
 
+        if ($this->zendMultiByte) {
+            $zmb = ini_set('zend.multibyte', 0);
+        }
         set_error_handler($this->includeHandler);
         try {
             foreach ($ids as $id) {
@@ -54,6 +58,9 @@ trait PhpFilesTrait
             }
         } finally {
             restore_error_handler();
+            if ($this->zendMultiByte) {
+                ini_set('zend.multibyte', $zmb);
+            }
         }
 
         foreach ($values as $id => $value) {

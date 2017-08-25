@@ -1,0 +1,8 @@
+services:
+    dir1:
+        resource: ../Prototype/OtherDir/*/Dir1
+        tags: [foo]
+
+    dir2:
+        resource: ../Prototype/OtherDir/*/Dir2
+        tags: [bar]

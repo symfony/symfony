@@ -57,7 +57,7 @@ class GuardListener
         $token = $this->tokenStorage->getToken();
 
         if (null === $token) {
-            throw new InvalidTokenConfigurationException('No token is set');
+            throw new InvalidTokenConfigurationException(sprintf('There are no token available for workflow %s', $event->getWorkflowName()));
         }
 
         if (null !== $this->roleHierarchy) {

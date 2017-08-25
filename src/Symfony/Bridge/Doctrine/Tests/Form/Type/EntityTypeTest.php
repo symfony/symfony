@@ -1482,7 +1482,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals($collection, $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
-    
+
     public function testSetDataEmptyArraySubmitNullMultiple()
     {
         $emptyArray = array();
@@ -1498,7 +1498,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(), $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
-    
+
     public function testSetDataNonEmptyArraySubmitNullMultiple()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');

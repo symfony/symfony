@@ -14,6 +14,8 @@ namespace Symfony\Component\VarDumper\Tests;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -81,13 +83,13 @@ array:24 [
     +"bar": "bar"
   }
   "closure" => Closure {{$r}{$closure54}
-    parameters: array:2 [
-      "\$a" => []
-      "&\$b" => array:2 [
-        "typeHint" => "PDO"
-        "default" => null
-      ]
-    ]
+    parameters: {
+      \$a: {}
+      &\$b: {
+        typeHint: "PDO"
+        default: null
+      }
+    }
     file: "{$var['file']}"
     line: "{$var['line']} to {$var['line']}"
   }
@@ -228,9 +230,15 @@ EOTXT
         );
     }
 
+    /**
+     * @requires function Twig\Template::getSourceContext
+     */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');
+
+        require_once __DIR__.'/Fixtures/Twig.php';
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new Environment(new FilesystemLoader()));
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -243,12 +251,14 @@ EOTXT
             },
         ));
         $cloner->addCasters(array(
-            ':stream' => function () {
-                throw new \Exception('Foobar');
-            },
+            ':stream' => eval('return function () use ($twig) {
+                try {
+                    $twig->render(array());
+                } catch (\Twig\Error\RuntimeError $e) {
+                    throw $e->getPrevious();
+                }
+            };'),
         ));
-        $line = __LINE__ - 3;
-        $file = __FILE__;
         $ref = (int) $out;
 
         $data = $cloner->cloneVar($out);
@@ -269,12 +279,56 @@ stream resource {@{$ref}
 %Aoptions: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
-    trace: array:1 [
-      0 => array:2 [
-        "call" => "%slosure%s()"
-        "file" => "{$file}:{$line}"
-      ]
-    ]
+    -trace: {
+      %d. __TwigTemplate_VarDumperFixture_u75a09->doDisplay() ==> new Exception(): {
+        src: {
+          %sTwig.php:21: """
+                // line 2\\n
+                throw new \Exception('Foobar');\\n
+            }\\n
+            """
+          bar.twig:2: """
+            foo bar\\n
+              twig source\\n
+            \\n
+            """
+        }
+      }
+      %d. Twig%cTemplate->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
+        src: {
+          %sTemplate.php:%d: """
+            try {\\n
+                \$this->doDisplay(\$context, \$blocks);\\n
+            } catch (Twig%sError \$e) {\\n
+            """
+        }
+      }
+      %d. Twig%cTemplate->display() ==> Twig%cTemplate->displayWithErrorHandling(): {
+        src: {
+          %sTemplate.php:%d: """
+            {\\n
+                \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));\\n
+            }\\n
+            """
+        }
+      }
+      %d. Twig%cTemplate->render() ==> Twig%cTemplate->display(): {
+        src: {
+          %sTemplate.php:%d: """
+            try {\\n
+                \$this->display(\$context);\\n
+            } catch (%s \$e) {\\n
+            """
+        }
+      }
+      %d. %slosure%s() ==> Twig%cTemplate->render(): {
+        src: {
+          %sCliDumperTest.php:%d: """
+%A
+            """
+        }
+      }
+    }
   }
 }
 

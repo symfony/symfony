@@ -11,7 +11,7 @@
         </sec:providers>
         <sec:firewall name="main">
             <sec:form-login/>
-            <sec:remember-me key="TheKey" catch-exceptions="false" token-provider="token_provider_id" />
+            <sec:remember-me secret="TheSecret" catch-exceptions="false" token-provider="token_provider_id" />
         </sec:firewall>
     </sec:config>
 

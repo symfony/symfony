@@ -21,6 +21,8 @@ return PhpCsFixer\Config::create()
                 // fixture templates
                 'Symfony/Component/Templating/Tests/Fixtures/templates',
                 'Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom',
+                // generated fixtures
+                'Symfony/Component/VarDumper/Tests/Fixtures',
                 // resource templates
                 'Symfony/Bundle/FrameworkBundle/Resources/views/Form',
             ))

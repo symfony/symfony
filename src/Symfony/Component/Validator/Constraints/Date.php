@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Date extends Constraint
 {
-    const INVALID_FORMAT_ERROR = 1;
-    const INVALID_DATE_ERROR = 2;
+    const INVALID_FORMAT_ERROR = '69819696-02ac-4a99-9ff0-14e127c4d1bc';
+    const INVALID_DATE_ERROR = '3c184ce5-b31d-4de7-8b76-326da7b2be93';
 
     protected static $errorNames = array(
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',

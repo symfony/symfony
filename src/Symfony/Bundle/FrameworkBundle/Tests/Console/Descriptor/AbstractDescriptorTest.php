@@ -12,7 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -76,6 +78,9 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->assertDescription($expectedDescription, $definition);
     }
 
+    /**
+     * @group legacy
+     */
     public function provideLegacySynchronizedServiceDefinitionTestData()
     {
         return $this->getDescriptionTestData(ObjectsProvider::getLegacyContainerDefinitions());
@@ -149,6 +154,11 @@ abstract class AbstractDescriptorTest extends TestCase
     {
         $options['raw_output'] = true;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+
+        if ('txt' === $this->getFormat()) {
+            $options['output'] = new SymfonyStyle(new ArrayInput(array()), $output);
+        }
+
         $this->getDescriptor()->describe($output, $describedObject, $options);
 
         if ('json' === $this->getFormat()) {

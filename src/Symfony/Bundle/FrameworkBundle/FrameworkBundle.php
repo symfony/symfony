@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintVal
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
@@ -29,6 +30,8 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDum
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -89,11 +92,14 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new DataCollectorTranslatorPass());
 
         if ($container->getParameter('kernel.debug')) {
+            $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
+            $container->addCompilerPass(new ConfigCachePass());
         }
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * @group legacy
@@ -194,7 +195,7 @@ class LegacyDialogHelperTest extends TestCase
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
             if (!in_array($color, array('white', 'black'))) {
-                throw new \InvalidArgumentException($error);
+                throw new InvalidArgumentException($error);
             }
 
             return $color;

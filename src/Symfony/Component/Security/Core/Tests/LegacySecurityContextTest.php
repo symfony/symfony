@@ -12,7 +12,9 @@
 namespace Symfony\Component\Security\Core\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * @group legacy
@@ -118,5 +120,15 @@ class LegacySecurityContextTest extends TestCase
             array(null, false),
             array(true, null),
         );
+    }
+
+    /**
+     * Test if the BC Layer is working as intended.
+     */
+    public function testConstantSync()
+    {
+        $this->assertSame(Security::ACCESS_DENIED_ERROR, SecurityContextInterface::ACCESS_DENIED_ERROR);
+        $this->assertSame(Security::AUTHENTICATION_ERROR, SecurityContextInterface::AUTHENTICATION_ERROR);
+        $this->assertSame(Security::LAST_USERNAME, SecurityContextInterface::LAST_USERNAME);
     }
 }

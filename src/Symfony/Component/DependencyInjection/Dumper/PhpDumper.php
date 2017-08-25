@@ -386,9 +386,9 @@ class PhpDumper extends Dumper
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation = '';
 
-        if (!$isProxyCandidate && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (!$isProxyCandidate && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
             $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
@@ -580,7 +580,7 @@ class PhpDumper extends Dumper
             $return[] = sprintf('@return object An instance returned by %s::%s()', $definition->getFactoryService(false), $definition->getFactoryMethod(false));
         }
 
-        $scope = $definition->getScope();
+        $scope = $definition->getScope(false);
         if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             if ($return && 0 === strpos($return[count($return) - 1], '@return')) {
                 $return[] = '';
@@ -588,10 +588,19 @@ class PhpDumper extends Dumper
             $return[] = sprintf("@throws InactiveScopeException when the '%s' service is requested while the '%s' scope is not active", $id, $scope);
         }
 
-        $return = implode("\n     * ", $return);
+        if ($definition->isDeprecated()) {
+            if ($return && 0 === strpos($return[count($return) - 1], '@return')) {
+                $return[] = '';
+            }
 
-        $shared = ContainerInterface::SCOPE_PROTOTYPE !== $scope ? ' shared' : '';
+            $return[] = sprintf('@deprecated %s', $definition->getDeprecationMessage($id));
+        }
+
+        $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
+
+        $shared = $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope ? ' shared' : '';
         $public = $definition->isPublic() ? 'public' : 'private';
+        $autowired = $definition->isAutowired() ? ' autowired' : '';
 
         if ($definition->isLazy()) {
             $lazyInitialization = '$lazyLoad = true';
@@ -605,7 +614,7 @@ class PhpDumper extends Dumper
         $code = <<<EOF
 
     /*{$this->docStar}
-     * Gets the $public '$id'$shared service.
+     * Gets the $public '$id'$shared$autowired service.
      *
      * $return
      */
@@ -629,6 +638,10 @@ EOF;
         if ($definition->isSynthetic()) {
             $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
         } else {
+            if ($definition->isDeprecated()) {
+                $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", var_export($definition->getDeprecationMessage($id), true));
+            }
+
             $code .=
                 $this->addServiceInclude($definition).
                 $this->addServiceLocalTempVariables($id, $definition).
@@ -847,10 +860,10 @@ EOF;
 
 EOF;
 
-        if (count($scopes = $this->container->getScopes()) > 0) {
+        if (count($scopes = $this->container->getScopes(false)) > 0) {
             $code .= "\n";
             $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
+            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren(false)).";\n";
         }
 
         $code .= $this->addMethodMap();
@@ -894,9 +907,9 @@ EOF;
 EOF;
 
         $code .= "\n";
-        if (count($scopes = $this->container->getScopes()) > 0) {
+        if (count($scopes = $this->container->getScopes(false)) > 0) {
             $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
+            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren(false)).";\n";
         } else {
             $code .= "        \$this->scopes = array();\n";
             $code .= "        \$this->scopeChildren = array();\n";

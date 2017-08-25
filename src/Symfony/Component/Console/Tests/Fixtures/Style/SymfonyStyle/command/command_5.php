@@ -26,4 +26,12 @@ return function (InputInterface $input, OutputInterface $output) {
         'Lorem ipsum dolor sit amet',
         'consectetur adipiscing elit',
     ));
+
+    $output->newLine();
+
+    $output->write('Lorem ipsum dolor sit amet');
+    $output->comment(array(
+        'Lorem ipsum dolor sit amet',
+        'consectetur adipiscing elit',
+    ));
 };

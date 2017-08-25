@@ -14,11 +14,10 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Symfony\Component\Form\Tests\Fixtures\ChoiceSubType;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'choice';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = array(
         'Bernhard' => 'a',
@@ -92,6 +91,16 @@ class ChoiceTypeTest extends BaseTypeTest
         parent::tearDown();
 
         $this->objectChoices = null;
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('choice');
+
+        $this->assertSame('choice', $form->getConfig()->getType()->getName());
     }
 
     /**
@@ -2296,7 +2305,7 @@ class ChoiceTypeTest extends BaseTypeTest
                 'choices_as_values' => true,
             )
         );
-        $builder->add('subChoice', new ChoiceSubType());
+        $builder->add('subChoice', 'Symfony\Component\Form\Tests\Fixtures\ChoiceSubType');
         $form = $builder->getForm();
 
         // The default 'choices' normalizer would fill the $choiceLabels, but it has been replaced
@@ -2330,5 +2339,142 @@ class ChoiceTypeTest extends BaseTypeTest
             'multiple, non-expanded' => array(true, false, array(array())),
             'multiple, expanded' => array(true, true, array(array())),
         );
+    }
+
+    public function testInheritTranslationDomainFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+                'translation_domain' => 'domain',
+            ))
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+    }
+
+    public function testPassTranslationDomainToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+            'translation_domain' => 'domain',
+        ))
+            ->createView();
+
+        $this->assertSame('domain', $view->vars['translation_domain']);
+    }
+
+    public function testPreferOwnTranslationDomain()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+                'translation_domain' => 'parent_domain',
+            ))
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+                'translation_domain' => 'domain',
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('domain', $view['child']->vars['translation_domain']);
+    }
+
+    public function testDefaultTranslationDomain()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertNull($view['child']->vars['translation_domain']);
+    }
+
+    public function testPassMultipartFalseToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertFalse($view->vars['multipart']);
+    }
+
+    public function testPassLabelToView()
+    {
+        $view = $this->factory->createNamed('__test___field', static::TESTED_TYPE, null, array(
+            'label' => 'My label',
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertSame('My label', $view->vars['label']);
+    }
+
+    public function testPassIdAndNameToViewWithGrandParent()
+    {
+        $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', FormTypeTest::TESTED_TYPE);
+        $builder->get('child')->add('grand_child', static::TESTED_TYPE, array(
+            'choices_as_values' => true,
+        ));
+        $view = $builder->getForm()->createView();
+
+        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
+        $this->assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
+        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
+    }
+
+    public function testPassIdAndNameToViewWithParent()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('parent_child', $view['child']->vars['id']);
+        $this->assertEquals('child', $view['child']->vars['name']);
+        $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
+    }
+
+    public function testPassDisabledAsOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'disabled' => true,
+            'choices_as_values' => true,
+        ));
+
+        $this->assertTrue($form->isDisabled());
+    }
+
+    public function testPassIdAndNameToView()
+    {
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('name', $view->vars['name']);
+        $this->assertEquals('name', $view->vars['full_name']);
+    }
+
+    public function testStripLeadingUnderscoresAndDigitsFromId()
+    {
+        $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ))
+            ->createView();
+
+        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('_09name', $view->vars['name']);
+        $this->assertEquals('_09name', $view->vars['full_name']);
     }
 }

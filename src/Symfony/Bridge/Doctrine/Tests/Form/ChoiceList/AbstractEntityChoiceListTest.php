@@ -16,6 +16,10 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest;
 
+if (!class_exists('Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest')) {
+    return;
+}
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

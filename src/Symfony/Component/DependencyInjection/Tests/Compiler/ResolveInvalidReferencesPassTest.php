@@ -62,6 +62,9 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertEquals(array(), $def->getProperties());
     }
 
+    /**
+     * @group legacy
+     */
     public function testStrictFlagIsPreserved()
     {
         $container = new ContainerBuilder();

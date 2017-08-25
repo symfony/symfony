@@ -68,7 +68,7 @@ class XmlReferenceDumperTest extends TestCase
         child3=""
     />
 
-    <!-- prototype -->
+    <!-- prototype: Parameter name -->
     <parameter name="parameter name">scalar value</parameter>
 
     <!-- prototype -->

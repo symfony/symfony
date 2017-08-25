@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormTypeExtensionInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,11 +37,35 @@ class ResolvedFormTypeTest extends TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $dataMapper;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeInterface
+     */
     private $parentType;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeInterface
+     */
     private $type;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     */
     private $extension1;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     */
     private $extension2;
+
+    /**
+     * @var ResolvedFormType
+     */
     private $parentResolvedType;
+
+    /**
+     * @var ResolvedFormType
+     */
     private $resolvedType;
 
     protected function setUp()
@@ -307,11 +333,106 @@ class ResolvedFormTypeTest extends TestCase
     }
 
     /**
+     * @dataProvider provideValidNames
+     */
+    public function testGetName($name)
+    {
+        $this->type->expects($this->once())
+            ->method('getName')
+            ->willReturn($name);
+
+        $resolvedType = new ResolvedFormType($this->type);
+
+        $this->assertSame($name, $resolvedType->getName());
+    }
+
+    /**
+     * @dataProvider provideInvalidNames
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function testGetNameFailsIfInvalidChars($name)
+    {
+        $this->type->expects($this->once())
+            ->method('getName')
+            ->willReturn($name);
+
+        new ResolvedFormType($this->type);
+    }
+
+    public function provideValidNames()
+    {
+        return array(
+            array('text'),
+            array('type123'),
+            array('my_type123'),
+        );
+    }
+
+    public function provideInvalidNames()
+    {
+        return array(
+            array('my-type'),
+            array('my[type]'),
+            array('my{type}'),
+        );
+    }
+
+    public function testGetBlockPrefix()
+    {
+        $this->type->expects($this->once())
+            ->method('getBlockPrefix')
+            ->willReturn('my_prefix');
+
+        $resolvedType = new ResolvedFormType($this->type);
+
+        $this->assertSame('my_prefix', $resolvedType->getBlockPrefix());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testBlockPrefixDefaultsToNameIfSet()
+    {
+        // Type without getBlockPrefix() method
+        $type = $this->getMockBuilder('Symfony\Component\Form\FormTypeInterface')->getMock();
+
+        $type->expects($this->once())
+            ->method('getName')
+            ->willReturn('my_prefix');
+
+        $resolvedType = new ResolvedFormType($type);
+
+        $this->assertSame('my_prefix', $resolvedType->getBlockPrefix());
+    }
+
+    /**
+     * @dataProvider provideTypeClassBlockPrefixTuples
+     */
+    public function testBlockPrefixDefaultsToFQCNIfNoName($typeClass, $blockPrefix)
+    {
+        $resolvedType = new ResolvedFormType(new $typeClass());
+
+        $this->assertSame($blockPrefix, $resolvedType->getBlockPrefix());
+    }
+
+    public function provideTypeClassBlockPrefixTuples()
+    {
+        return array(
+            array(__NAMESPACE__.'\Fixtures\FooType', 'foo'),
+            array(__NAMESPACE__.'\Fixtures\Foo', 'foo'),
+            array(__NAMESPACE__.'\Fixtures\Type', 'type'),
+            array(__NAMESPACE__.'\Fixtures\FooBarHTMLType', 'foo_bar_html'),
+            array(__NAMESPACE__.'\Fixtures\Foo1Bar2Type', 'foo1_bar2'),
+            array(__NAMESPACE__.'\Fixtures\FBooType', 'f_boo'),
+        );
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getMockFormType()
+    private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType')
     {
-        return $this->getMockBuilder('Symfony\Component\Form\AbstractType')->setMethods(array('getName', 'configureOptions', 'finishView', 'buildView', 'buildForm'))->getMock();
+        return $this->getMockBuilder($typeClass)->setMethods(array('getName', 'getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'))->getMock();
     }
 
     /**

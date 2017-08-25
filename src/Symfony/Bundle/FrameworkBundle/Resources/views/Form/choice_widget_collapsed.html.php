@@ -7,7 +7,7 @@
     )) ?>
     <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
 >
-    <?php if (null !== $placeholder): ?><option value=""<?php if ($required && empty($value) && '0' !== $value): ?> selected="selected"<?php endif?>><?php echo '' != $placeholder ? $view->escape($view['translator']->trans($placeholder, array(), $translation_domain)) : '' ?></option><?php endif; ?>
+    <?php if (null !== $placeholder): ?><option value=""<?php if ($required && empty($value) && '0' !== $value): ?> selected="selected"<?php endif?>><?php echo '' != $placeholder ? $view->escape(false !== $translation_domain ? $view['translator']->trans($placeholder, array(), $translation_domain) : $placeholder) : '' ?></option><?php endif; ?>
     <?php if (count($preferred_choices) > 0): ?>
         <?php echo $view['form']->block($form, 'choice_widget_options', array('choices' => $preferred_choices)) ?>
         <?php if (count($choices) > 0 && null !== $separator): ?>

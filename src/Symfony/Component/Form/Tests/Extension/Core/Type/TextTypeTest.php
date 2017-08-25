@@ -13,11 +13,21 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class TextTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'text';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('text');
+
+        $this->assertSame('text', $form->getConfig()->getType()->getName());
     }
 
     public function testSubmitNullReturnsNullWithEmptyDataAsString()

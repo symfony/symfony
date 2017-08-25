@@ -12,9 +12,11 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+/**
+ * @group legacy
+ */
 class AbstractVoterTest extends TestCase
 {
     /**
@@ -56,7 +58,7 @@ class AbstractVoterTest extends TestCase
      */
     public function testVote(array $attributes, $expectedVote, $object, $message)
     {
-        $voter = new AbstractVoterTest_Voter();
+        $voter = new Fixtures\MyVoter();
 
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
@@ -121,26 +123,8 @@ class AbstractVoterTest extends TestCase
      */
     public function testSupportsAttribute($expected, $attribute, $message)
     {
-        $voter = new AbstractVoterTest_Voter();
+        $voter = new Fixtures\MyVoter();
 
         $this->assertEquals($expected, $voter->supportsAttribute($attribute), $message);
-    }
-}
-
-class AbstractVoterTest_Voter extends AbstractVoter
-{
-    protected function getSupportedClasses()
-    {
-        return array('stdClass');
-    }
-
-    protected function getSupportedAttributes()
-    {
-        return array('EDIT', 'CREATE');
-    }
-
-    protected function isGranted($attribute, $object, $user = null)
-    {
-        return 'EDIT' === $attribute;
     }
 }

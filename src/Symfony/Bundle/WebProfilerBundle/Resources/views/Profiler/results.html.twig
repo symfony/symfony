@@ -1,43 +1,73 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block summary %}
+    <div class="status">
+        <div class="container">
+            <h2>Profile Search</h2>
+        </div>
+    </div>
+{% endblock %}
+
 {% block panel %}
-    <h2>Search Results</h2>
+    <h2>{{ tokens ? tokens|length : 'No' }} results found</h2>
 
     {% if tokens %}
-        <table>
+        <table id="search-results">
             <thead>
                 <tr>
-                    <th scope="col">Token</th>
+                    <th scope="col" class="text-center">Status</th>
                     <th scope="col">IP</th>
                     <th scope="col">Method</th>
                     <th scope="col">URL</th>
                     <th scope="col">Time</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Token</th>
                 </tr>
             </thead>
             <tbody>
-                {% for elements in tokens %}
+                {% for result in tokens %}
+                    {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : 'status-success' %}
+
                     <tr>
-                        <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
-                        <td>{{ elements.ip }}</td>
-                        <td>{{ elements.method }}</td>
-                        <td>{{ elements.url }}</td>
-                        <td>{{ elements.time|date('r') }}</td>
-                        <td>
-                        {% if elements.status_code is defined and elements.status_code %}
-                            {{ elements.status_code }}
-                        {% else %}
-                            unknown
-                        {% endif %}
+                        <td class="text-center">
+                            <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
                         </td>
+                        <td>
+                            <span class="nowrap">{{ result.ip }}</span>
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'ip': result.ip, 'token': result.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ result.method }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'method': result.method, 'token': result.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="break-long-words">
+                            {{ result.url }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'url': result.url, 'token': result.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="text-small">
+                            <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
+                            <span class="nowrap newline">{{ result.time|date('H:i:s') }}</span>
+                        </td>
+                        <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>
-            <em>The query returned no result.</em>
-        </p>
+        <div class="empty">
+            <p>The query returned no result.</p>
+        </div>
     {% endif %}
 
 {% endblock %}

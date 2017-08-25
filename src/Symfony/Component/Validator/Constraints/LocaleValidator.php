@@ -49,10 +49,12 @@ class LocaleValidator extends ConstraintValidator
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
                     ->addViolation();
             }
         }

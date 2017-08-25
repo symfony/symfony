@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -49,7 +51,7 @@ class DialogHelper extends InputAwareHelper
      *
      * @return int|string|array The selected value or values (the key of the choices array)
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
@@ -73,7 +75,7 @@ class DialogHelper extends InputAwareHelper
             if ($multiselect) {
                 // Check for a separated comma values
                 if (!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
-                    throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
+                    throw new InvalidArgumentException(sprintf($errorMessage, $picked));
                 }
                 $selectedChoices = explode(',', $selectedChoices);
             } else {
@@ -84,7 +86,7 @@ class DialogHelper extends InputAwareHelper
 
             foreach ($selectedChoices as $value) {
                 if (empty($choices[$value])) {
-                    throw new \InvalidArgumentException(sprintf($errorMessage, $value));
+                    throw new InvalidArgumentException(sprintf($errorMessage, $value));
                 }
                 $multiselectChoices[] = $value;
             }
@@ -109,7 +111,7 @@ class DialogHelper extends InputAwareHelper
      *
      * @return string The user answer
      *
-     * @throws \RuntimeException If there is no data to read in the input stream
+     * @throws RuntimeException If there is no data to read in the input stream
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
@@ -128,7 +130,7 @@ class DialogHelper extends InputAwareHelper
         if (null === $autocomplete || !$this->hasSttyAvailable()) {
             $ret = fgets($inputStream, 4096);
             if (false === $ret) {
-                throw new \RuntimeException('Aborted');
+                throw new RuntimeException('Aborted');
             }
             $ret = trim($ret);
         } else {
@@ -274,7 +276,7 @@ class DialogHelper extends InputAwareHelper
      *
      * @return string The answer
      *
-     * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     * @throws RuntimeException In case the fallback is deactivated and the response can not be hidden
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
@@ -313,7 +315,7 @@ class DialogHelper extends InputAwareHelper
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
-                throw new \RuntimeException('Aborted');
+                throw new RuntimeException('Aborted');
             }
 
             $value = trim($value);
@@ -336,7 +338,7 @@ class DialogHelper extends InputAwareHelper
             return $this->ask($output, $question);
         }
 
-        throw new \RuntimeException('Unable to hide the response');
+        throw new RuntimeException('Unable to hide the response');
     }
 
     /**
@@ -383,8 +385,8 @@ class DialogHelper extends InputAwareHelper
      *
      * @return string The response
      *
-     * @throws \Exception        When any of the validators return an error
-     * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     * @throws \Exception       When any of the validators return an error
+     * @throws RuntimeException In case the fallback is deactivated and the response can not be hidden
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {

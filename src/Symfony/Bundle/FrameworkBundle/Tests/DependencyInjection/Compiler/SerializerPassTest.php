@@ -85,7 +85,7 @@ class SerializerPassTest extends TestCase
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
 
-        $container->expects($this->atLeastOnce())
+        $container->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
 

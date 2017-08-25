@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
+
 /**
  * InputInterface is the interface implemented by all input classes.
  *
@@ -60,7 +63,7 @@ interface InputInterface
     /**
      * Validates the input.
      *
-     * @throws \RuntimeException When not enough arguments are given
+     * @throws RuntimeException When not enough arguments are given
      */
     public function validate();
 
@@ -78,7 +81,7 @@ interface InputInterface
      *
      * @return mixed The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function getArgument($name);
 
@@ -88,7 +91,7 @@ interface InputInterface
      * @param string $name  The argument name
      * @param string $value The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function setArgument($name, $value);
 
@@ -115,7 +118,7 @@ interface InputInterface
      *
      * @return mixed The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidArgumentException When option given doesn't exist
      */
     public function getOption($name);
 
@@ -125,7 +128,7 @@ interface InputInterface
      * @param string      $name  The option name
      * @param string|bool $value The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidArgumentException When option given doesn't exist
      */
     public function setOption($name, $value);
 

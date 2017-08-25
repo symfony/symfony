@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 class ObjectNormalizerTest extends TestCase
 {
     /**
-     * @var ObjectNormalizerTest
+     * @var ObjectNormalizer
      */
     private $normalizer;
     /**
@@ -238,6 +238,18 @@ class ObjectNormalizerTest extends TestCase
             array(ObjectNormalizer::GROUPS => array('a', 'b'))
         );
         $this->assertEquals($obj, $normalized);
+    }
+
+    public function testNormalizeNoPropertyInGroup()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+
+        $this->assertEquals(array(), $this->normalizer->normalize($obj, null, array('groups' => array('notExist'))));
     }
 
     public function testGroupsNormalizeWithNameConverter()
@@ -475,6 +487,26 @@ class ObjectNormalizerTest extends TestCase
     {
         $this->assertEquals(array('foo' => 'K'), $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
     }
+
+    public function testNormalizeUpperCaseAttributes()
+    {
+        $this->assertEquals(array('Foo' => 'Foo', 'Bar' => 'BarBar'), $this->normalizer->normalize(new ObjectWithUpperCaseAttributeNames()));
+    }
+
+    public function testNormalizeNotSerializableContext()
+    {
+        $objectDummy = new ObjectDummy();
+        $expected = array(
+            'foo' => null,
+            'baz' => null,
+            'fooBar' => '',
+            'camelCase' => null,
+            'object' => null,
+            'bar' => null,
+        );
+
+        $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, array('not_serializable' => function () {})));
+    }
 }
 
 class ObjectDummy
@@ -633,5 +665,16 @@ class ObjectWithStaticPropertiesAndMethods
     public static function getBaz()
     {
         return 'L';
+    }
+}
+
+class ObjectWithUpperCaseAttributeNames
+{
+    private $Foo = 'Foo';
+    public $Bar = 'BarBar';
+
+    public function getFoo()
+    {
+        return $this->Foo;
     }
 }

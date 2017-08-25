@@ -21,13 +21,13 @@
 
         <service id="assets.path_package" class="Symfony\Component\Asset\PathPackage" abstract="true">
             <argument /> <!-- base path -->
-            <argument type="service" /> <!-- version strategy -->
+            <argument /> <!-- version strategy -->
             <argument type="service" id="assets.context" />
         </service>
 
         <service id="assets.url_package" class="Symfony\Component\Asset\UrlPackage" abstract="true">
             <argument /> <!-- base URLs -->
-            <argument type="service" /> <!-- version strategy -->
+            <argument /> <!-- version strategy -->
             <argument type="service" id="assets.context" />
         </service>
 

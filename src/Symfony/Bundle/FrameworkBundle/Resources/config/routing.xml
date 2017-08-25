@@ -45,10 +45,18 @@
             <argument type="service" id="file_locator" />
         </service>
 
+        <service id="routing.loader.directory" class="Symfony\Component\Routing\Loader\DirectoryLoader" public="false">
+            <tag name="routing.loader" />
+            <argument type="service" id="file_locator" />
+        </service>
+
+        <service id="routing.loader.service" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader" public="false">
+            <tag name="routing.loader" />
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="routing.loader" class="%routing.loader.class%">
-            <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
-            <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />
         </service>
 
@@ -70,6 +78,9 @@
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <call method="setConfigCacheFactory">
+                <argument type="service" id="config_cache_factory" />
+            </call>
         </service>
 
         <service id="router" alias="router.default" />
@@ -92,9 +103,9 @@
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="router" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
-            <argument type="service" id="request_stack" />
         </service>
     </services>
 </container>

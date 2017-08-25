@@ -276,8 +276,10 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the date when the header has been modified');
 
         $response = new Response('', 200);
+        $now = $this->createDateTimeNow();
         $response->headers->remove('Date');
-        $this->assertInstanceOf('\DateTime', $response->getDate());
+        $date = $response->getDate();
+        $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the current Date when the header has previously been removed');
     }
 
     public function testGetMaxAge()

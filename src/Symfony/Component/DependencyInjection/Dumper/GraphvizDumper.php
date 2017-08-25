@@ -177,7 +177,7 @@ class GraphvizDumper extends Dumper
             } catch (ParameterNotFoundException $e) {
             }
 
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], array('style' => ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope() ? 'filled' : 'dotted')));
+            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope(false) ? 'filled' : 'dotted')));
             $container->setDefinition($id, new Definition('stdClass'));
         }
 
@@ -205,7 +205,7 @@ class GraphvizDumper extends Dumper
         $container->setDefinitions($this->container->getDefinitions());
         $container->setAliases($this->container->getAliases());
         $container->setResources($this->container->getResources());
-        foreach ($this->container->getScopes() as $scope => $parentScope) {
+        foreach ($this->container->getScopes(false) as $scope => $parentScope) {
             $container->addScope(new Scope($scope, $parentScope));
         }
         foreach ($this->container->getExtensions() as $extension) {

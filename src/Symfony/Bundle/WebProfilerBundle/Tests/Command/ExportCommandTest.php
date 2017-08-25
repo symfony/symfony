@@ -13,9 +13,13 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Command\ExportCommand;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
+/**
+ * @group legacy
+ */
 class ExportCommandTest extends TestCase
 {
     /**
@@ -29,7 +33,14 @@ class ExportCommandTest extends TestCase
             ->getMock()
         ;
 
+        $helperSet = new HelperSet();
+        $helper = $this->getMockBuilder('Symfony\Component\Console\Helper\FormatterHelper')->getMock();
+        $helper->expects($this->any())->method('formatSection');
+        $helperSet->set($helper, 'formatter');
+
         $command = new ExportCommand($profiler);
+        $command->setHelperSet($helperSet);
+
         $commandTester = new CommandTester($command);
         $commandTester->execute(array('token' => 'TOKEN'));
     }
@@ -45,7 +56,14 @@ class ExportCommandTest extends TestCase
         $profile = new Profile('TOKEN');
         $profiler->expects($this->once())->method('loadProfile')->with('TOKEN')->will($this->returnValue($profile));
 
+        $helperSet = new HelperSet();
+        $helper = $this->getMockBuilder('Symfony\Component\Console\Helper\FormatterHelper')->getMock();
+        $helper->expects($this->any())->method('formatSection');
+        $helperSet->set($helper, 'formatter');
+
         $command = new ExportCommand($profiler);
+        $command->setHelperSet($helperSet);
+
         $commandTester = new CommandTester($command);
         $commandTester->execute(array('token' => 'TOKEN'));
         $this->assertEquals($profiler->export($profile), $commandTester->getDisplay());

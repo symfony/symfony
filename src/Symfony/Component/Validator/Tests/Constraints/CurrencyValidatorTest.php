@@ -98,6 +98,7 @@ class CurrencyValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$currency.'"')
+            ->setCode(Currency::NO_SUCH_CURRENCY_ERROR)
             ->assertRaised();
     }
 

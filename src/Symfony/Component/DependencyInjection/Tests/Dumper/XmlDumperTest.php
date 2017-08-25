@@ -185,6 +185,14 @@ class XmlDumperTest extends TestCase
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services21.xml'), $dumper->dump());
     }
 
+    public function testDumpAutowireData()
+    {
+        $container = include self::$fixturesPath.'/containers/container24.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services24.xml'), $dumper->dump());
+    }
+
     public function testDumpAbstractServices()
     {
         $container = include self::$fixturesPath.'/containers/container_abstract.php';

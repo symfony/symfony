@@ -14,30 +14,28 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler;
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
 /**
+ * @group legacy
  * @requires extension pdo_sqlite
  */
 class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 {
-    protected static $dbFile;
-    protected static $storage;
-
-    public static function setUpBeforeClass()
-    {
-        self::$dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_storage');
-        if (file_exists(self::$dbFile)) {
-            @unlink(self::$dbFile);
-        }
-        self::$storage = new SqliteProfilerStorage('sqlite:'.self::$dbFile);
-    }
-
-    public static function tearDownAfterClass()
-    {
-        @unlink(self::$dbFile);
-    }
+    private $dbFile;
+    private $storage;
 
     protected function setUp()
     {
-        self::$storage->purge();
+        $this->dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_storage');
+        if (file_exists($this->dbFile)) {
+            @unlink($this->dbFile);
+        }
+        $this->storage = new SqliteProfilerStorage('sqlite:'.$this->dbFile);
+
+        $this->storage->purge();
+    }
+
+    protected function tearDown()
+    {
+        @unlink($this->dbFile);
     }
 
     /**
@@ -45,6 +43,6 @@ class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
      */
     protected function getStorage()
     {
-        return self::$storage;
+        return $this->storage;
     }
 }

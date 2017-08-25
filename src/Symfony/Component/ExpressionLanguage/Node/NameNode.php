@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class NameNode extends Node
 {
     public function __construct($name)

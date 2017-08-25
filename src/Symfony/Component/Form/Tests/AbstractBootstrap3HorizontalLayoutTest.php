@@ -15,7 +15,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 {
     public function testLabelOnForm()
     {
-        $form = $this->factory->createNamed('name', 'date');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
         $view = $form->createView();
         $this->renderWidget($view, array('label' => 'foo'));
         $html = $this->renderLabel($view);
@@ -30,7 +30,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testLabelDoesNotRenderFieldAttributes()
     {
-        $form = $this->factory->createNamed('name', 'text');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, array(
             'attr' => array(
                 'class' => 'my&class',
@@ -47,7 +47,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testLabelWithCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'text');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, array(
             'label_attr' => array(
                 'class' => 'my&class',
@@ -64,7 +64,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'text');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Custom label', array(
             'label_attr' => array(
                 'class' => 'my&class',
@@ -82,7 +82,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
             'label' => 'Custom label',
         ));
         $html = $this->renderLabel($form->createView(), null, array(
@@ -102,7 +102,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testStartTag()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
             'action' => 'http://example.com/directory',
         ));
@@ -114,7 +114,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testStartTagWithOverriddenVars()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'put',
             'action' => 'http://example.com/directory',
         ));
@@ -129,11 +129,11 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testStartTagForMultipartForm()
     {
-        $form = $this->factory->createBuilder('form', null, array(
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
                 'method' => 'get',
                 'action' => 'http://example.com/directory',
             ))
-            ->add('file', 'file')
+            ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 
         $html = $this->renderStart($form->createView());
@@ -143,7 +143,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
     public function testStartTagWithExtraAttributes()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
             'action' => 'http://example.com/directory',
         ));

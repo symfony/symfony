@@ -47,12 +47,14 @@
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
 
         <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
+        <parameter key="security.role_hierarchy.roles" type="collection" />
     </parameters>
 
     <services>
         <service id="security.context" class="%security.context.class%">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authorization_checker" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 2.6 and will be removed in 3.0.</deprecated>
         </service>
 
         <service id="security.authorization_checker" class="Symfony\Component\Security\Core\Authorization\AuthorizationChecker">
@@ -158,9 +160,20 @@
             <argument type="service" id="security.token_storage" on-invalid="null" />
         </service>
 
+
         <!-- Provisioning -->
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
+
+        <service id="security.user.provider.ldap" class="Symfony\Component\Security\Core\User\LdapUserProvider" abstract="true" public="false">
+            <argument /> <!-- security.ldap.ldap -->
+            <argument /> <!-- base dn -->
+            <argument /> <!-- search dn -->
+            <argument /> <!-- search password -->
+            <argument /> <!-- default_roles -->
+            <argument /> <!-- uid key -->
+            <argument /> <!-- filter -->
+        </service>
 
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
 
@@ -168,6 +181,7 @@
             <argument type="service" id="router" on-invalid="null" />
             <argument type="service" id="router" on-invalid="null" />
         </service>
+
 
         <!-- Validator -->
         <service id="security.validator.user_password" class="%security.validator.user_password.class%">

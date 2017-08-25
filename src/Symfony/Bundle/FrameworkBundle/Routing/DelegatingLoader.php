@@ -34,14 +34,21 @@ class DelegatingLoader extends BaseDelegatingLoader
     /**
      * Constructor.
      *
+     * Ability to pass a LoggerInterface instance as second argument will be removed in 3.0.
+     *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+    public function __construct(ControllerNameParser $parser, $resolver, $r = null)
     {
         $this->parser = $parser;
-        $this->logger = $logger;
+
+        if (!$resolver instanceof LoaderResolverInterface) {
+            $this->logger = $resolver;
+            $resolver = $r;
+
+            @trigger_error('Passing a LoggerInterface instance as the second argument of the '.__METHOD__.' method is deprecated since version 2.8 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+        }
 
         parent::__construct($resolver);
     }

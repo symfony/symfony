@@ -287,7 +287,7 @@ class CommandTest extends TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        \Symfony\Component\Console\Exception\InvalidOptionException
      * @expectedExceptionMessage The "--bar" option does not exist.
      */
     public function testRunWithInvalidOption()
@@ -353,6 +353,55 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
     }
 
+    public function getSetCodeBindToClosureTests()
+    {
+        return array(
+            array(true, 'not bound to the command'),
+            array(false, 'bound to the command'),
+        );
+    }
+
+    /**
+     * @dataProvider getSetCodeBindToClosureTests
+     * @requires PHP 5.4
+     */
+    public function testSetCodeBindToClosure($previouslyBound, $expected)
+    {
+        $code = createClosure();
+        if ($previouslyBound) {
+            $code = $code->bindTo($this);
+        }
+
+        $command = new \TestCommand();
+        $command->setCode($code);
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+        $this->assertEquals('interact called'.PHP_EOL.$expected.PHP_EOL, $tester->getDisplay());
+    }
+
+    public function testSetCodeWithStaticClosure()
+    {
+        $command = new \TestCommand();
+        $command->setCode(self::createClosure());
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+
+        if (\PHP_VERSION_ID < 70000) {
+            // Cannot bind static closures in PHP 5
+            $this->assertEquals('interact called'.PHP_EOL.'not bound'.PHP_EOL, $tester->getDisplay());
+        } else {
+            // Can bind static closures in PHP 7
+            $this->assertEquals('interact called'.PHP_EOL.'bound'.PHP_EOL, $tester->getDisplay());
+        }
+    }
+
+    private static function createClosure()
+    {
+        return function (InputInterface $input, OutputInterface $output) {
+            $output->writeln(isset($this) ? 'bound' : 'not bound');
+        };
+    }
+
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();
@@ -401,4 +450,13 @@ class CommandTest extends TestCase
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
+}
+
+// In order to get an unbound closure, we should create it outside a class
+// scope.
+function createClosure()
+{
+    return function (InputInterface $input, OutputInterface $output) {
+        $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
+    };
 }

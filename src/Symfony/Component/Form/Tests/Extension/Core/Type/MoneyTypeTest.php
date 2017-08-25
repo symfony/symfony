@@ -15,7 +15,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'money';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\MoneyType';
 
     protected function setUp()
     {
@@ -24,6 +24,16 @@ class MoneyTypeTest extends BaseTypeTest
         IntlTestHelper::requireFullIntl($this, false);
 
         parent::setUp();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('money');
+
+        $this->assertSame('money', $form->getConfig()->getType()->getName());
     }
 
     public function testPassMoneyPatternToView()

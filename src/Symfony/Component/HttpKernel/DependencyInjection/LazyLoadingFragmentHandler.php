@@ -25,11 +25,30 @@ class LazyLoadingFragmentHandler extends FragmentHandler
     private $container;
     private $rendererIds = array();
 
-    public function __construct(ContainerInterface $container, $debug = false, RequestStack $requestStack = null)
+    /**
+     * Constructor.
+     *
+     * RequestStack will become required in 3.0.
+     *
+     * @param ContainerInterface $container    A container
+     * @param RequestStack       $requestStack The Request stack that controls the lifecycle of requests
+     * @param bool               $debug        Whether the debug mode is enabled or not
+     */
+    public function __construct(ContainerInterface $container, $requestStack = null, $debug = false)
     {
         $this->container = $container;
 
-        parent::__construct(array(), $debug, $requestStack);
+        if ((null !== $requestStack && !$requestStack instanceof RequestStack) || $debug instanceof RequestStack) {
+            $tmp = $debug;
+            $debug = $requestStack;
+            $requestStack = func_num_args() < 3 ? null : $tmp;
+
+            @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as second argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+        } elseif (!$requestStack instanceof RequestStack) {
+            @trigger_error('The '.__METHOD__.' method now requires a RequestStack instance as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+        }
+
+        parent::__construct($requestStack, array(), $debug);
     }
 
     /**

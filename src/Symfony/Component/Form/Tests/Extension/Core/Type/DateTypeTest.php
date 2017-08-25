@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'date';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
     private $defaultTimezone;
 
@@ -31,6 +31,16 @@ class DateTypeTest extends BaseTypeTest
     {
         date_default_timezone_set($this->defaultTimezone);
         \Locale::setDefault('en');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('date');
+
+        $this->assertSame('date', $form->getConfig()->getType()->getName());
     }
 
     /**
@@ -938,6 +948,43 @@ class DateTypeTest extends BaseTypeTest
         }
 
         $this->assertEquals($listChoices, $view['year']->vars['choices']);
+    }
+
+    public function testPassDefaultChoiceTranslationDomain()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+
+        $view = $form->createView();
+        $this->assertFalse($view['year']->vars['choice_translation_domain']);
+        $this->assertFalse($view['month']->vars['choice_translation_domain']);
+        $this->assertFalse($view['day']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsString()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choice_translation_domain' => 'messages',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('messages', $view['year']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['month']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['day']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsArray()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'choice_translation_domain' => array(
+                'year' => 'foo',
+                'day' => 'test',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('foo', $view['year']->vars['choice_translation_domain']);
+        $this->assertFalse($view['month']->vars['choice_translation_domain']);
+        $this->assertSame('test', $view['day']->vars['choice_translation_domain']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

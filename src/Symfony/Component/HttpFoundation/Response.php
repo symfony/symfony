@@ -142,7 +142,6 @@ class Response
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
-        306 => 'Reserved',
         307 => 'Temporary Redirect',
         308 => 'Permanent Redirect',    // RFC7238
         400 => 'Bad Request',
@@ -202,8 +201,10 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
+
+        /* RFC2616 - 14.18 says all Responses need to have a Date */
         if (!$this->headers->has('Date')) {
-            $this->setDate(\DateTime::createFromFormat('U', time(), new \DateTimeZone('UTC')));
+            $this->setDate(\DateTime::createFromFormat('U', time()));
         }
     }
 
@@ -333,10 +334,15 @@ class Response
             return $this;
         }
 
+        /* RFC2616 - 14.18 says all Responses need to have a Date */
+        if (!$this->headers->has('Date')) {
+            $this->setDate(\DateTime::createFromFormat('U', time()));
+        }
+
         // headers
         foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {
-                header($name.': '.$value, false);
+                header($name.': '.$value, false, $this->statusCode);
             }
         }
 
@@ -612,7 +618,16 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date', new \DateTime());
+        /*
+            RFC2616 - 14.18 says all Responses need to have a Date.
+            Make sure we provide one even if it the header
+            has been removed in the meantime.
+         */
+        if (!$this->headers->has('Date')) {
+            $this->setDate(\DateTime::createFromFormat('U', time()));
+        }
+
+        return $this->headers->getDate('Date');
     }
 
     /**

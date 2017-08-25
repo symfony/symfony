@@ -63,6 +63,7 @@ class CoreExtension extends AbstractExtension
             new Type\PasswordType(),
             new Type\PercentType(),
             new Type\RadioType(),
+            new Type\RangeType(),
             new Type\RepeatedType(),
             new Type\SearchType(),
             new Type\TextareaType(),

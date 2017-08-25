@@ -15,7 +15,7 @@ use Symfony\Component\Form\Form;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'repeated';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
 
     /**
      * @var Form
@@ -29,6 +29,18 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->form = $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => TextTypeTest::TESTED_TYPE,
         ));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('repeated', array(
+            'type' => 'text',
+        ));
+
+        $this->assertSame('repeated', $form->getConfig()->getType()->getName());
     }
 
     public function testSetData()

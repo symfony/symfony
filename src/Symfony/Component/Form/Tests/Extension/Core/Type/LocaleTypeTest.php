@@ -16,13 +16,23 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LocaleTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'locale';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LocaleType';
 
     protected function setUp()
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('locale');
+
+        $this->assertSame('locale', $form->getConfig()->getType()->getName());
     }
 
     public function testLocalesAreSelectable()

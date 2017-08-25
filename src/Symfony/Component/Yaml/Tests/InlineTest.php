@@ -74,6 +74,23 @@ class InlineTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseScalarWithNonEscapedBlackslashShouldThrowException()
+    {
+        $this->assertSame('Foo\Var', Inline::parse('"Foo\Var"'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseScalarWithNonEscapedBlackslashAtTheEndShouldThrowException()
+    {
+        Inline::parse('"Foo\\"');
+    }
+
+    /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testParseScalarWithIncorrectlyQuotedStringShouldThrowException()
@@ -172,6 +189,51 @@ class InlineTest extends TestCase
     public function testParseUnquotedAsteriskFollowedByAComment()
     {
         Inline::parse('{ foo: * #foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar "@foo " starting with "@" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithReservedAtIndicator()
+    {
+        Inline::parse('{ foo: @foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar "`foo " starting with "`" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithReservedBacktickIndicator()
+    {
+        Inline::parse('{ foo: `foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar "|foo " starting with "|" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithLiteralStyleIndicator()
+    {
+        Inline::parse('{ foo: |foo }');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not quoting the scalar ">foo " starting with ">" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithFoldedStyleIndicator()
+    {
+        Inline::parse('{ foo: >foo }');
+    }
+
+    public function getScalarIndicators()
+    {
+        return array(array('|'), array('>'));
     }
 
     /**

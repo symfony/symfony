@@ -10,9 +10,10 @@
 
     <services>
         <service id="data_collector.security" class="%data_collector.security.class%" public="false">
-            <tag name="data_collector" template="@Security/Collector/security.html.twig" id="security" />
+            <tag name="data_collector" template="@Security/Collector/security.html.twig" id="security" priority="270" />
             <argument type="service" id="security.token_storage" on-invalid="ignore" />
             <argument type="service" id="security.role_hierarchy" />
+            <argument type="service" id="security.logout_url_generator" />
         </service>
     </services>
 </container>

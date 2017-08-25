@@ -86,7 +86,7 @@ class LogoutUrlGenerator
      * Generates the logout URL for the firewall.
      *
      * @param string|null $key           The firewall key or null to use the current firewall key
-     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     * @param int         $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The logout URL
      *

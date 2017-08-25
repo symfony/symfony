@@ -12,7 +12,7 @@
     <div id="traces-text" class="trace" style="display: none;">
 <pre>{% for i, e in exception.toarray %}
 [{{ i + 1 }}] {{ e.class }}: {{ e.message }}
-{% include 'TwigBundle:Exception:traces.txt.twig' with { 'exception': e } only %}
+{% include '@Twig/Exception/traces.txt.twig' with { 'exception': e } only %}
 {% endfor %}</pre>
     </div>
 </div>

@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Shows the status of a process that is running PHP's built-in web server in
@@ -44,6 +45,7 @@ class ServerStatusCommand extends ServerCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
@@ -56,9 +58,9 @@ class ServerStatusCommand extends ServerCommand
         }
 
         if (file_exists($this->getLockFile($address))) {
-            $output->writeln(sprintf('<info>Web server still listening on http://%s</info>', $address));
+            $io->success(sprintf('Web server still listening on http://%s', $address));
         } else {
-            $output->writeln(sprintf('<error>No web server is listening on http://%s</error>', $address));
+            $io->warning(sprintf('No web server is listening on http://%s', $address));
         }
     }
 

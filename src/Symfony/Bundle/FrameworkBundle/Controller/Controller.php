@@ -39,9 +39,9 @@ class Controller extends ContainerAware
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string      $route         The name of the route
-     * @param mixed       $parameters    An array of parameters
-     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     * @param string $route         The name of the route
+     * @param mixed  $parameters    An array of parameters
+     * @param int    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
      *
@@ -159,7 +159,15 @@ class Controller extends ContainerAware
      */
     public function renderView($view, array $parameters = array())
     {
-        return $this->container->get('templating')->render($view, $parameters);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->render($view, $parameters);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        return $this->container->get('twig')->render($view, $parameters);
     }
 
     /**
@@ -173,7 +181,21 @@ class Controller extends ContainerAware
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
-        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        $response->setContent($this->container->get('twig')->render($view, $parameters));
+
+        return $response;
     }
 
     /**
@@ -187,11 +209,21 @@ class Controller extends ContainerAware
      */
     public function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
-        $templating = $this->container->get('templating');
+        if ($this->container->has('templating')) {
+            $templating = $this->container->get('templating');
 
-        $callback = function () use ($templating, $view, $parameters) {
-            $templating->stream($view, $parameters);
-        };
+            $callback = function () use ($templating, $view, $parameters) {
+                $templating->stream($view, $parameters);
+            };
+        } elseif ($this->container->has('twig')) {
+            $twig = $this->container->get('twig');
+
+            $callback = function () use ($twig, $view, $parameters) {
+                $twig->display($view, $parameters);
+            };
+        } else {
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available.');
+        }
 
         if (null === $response) {
             return new StreamedResponse($callback);
@@ -260,7 +292,16 @@ class Controller extends ContainerAware
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+        if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
+            $type = 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        } else {
+            // not using the class name is deprecated since Symfony 2.8 and
+            // is only used for backwards compatibility with older versions
+            // of the Form component
+            $type = 'form';
+        }
+
+        return $this->container->get('form.factory')->createBuilder($type, $data, $options);
     }
 
     /**

@@ -156,9 +156,6 @@ class LegacyProgressHelperTest extends TestCase
         $progress->advance(1);
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testMultiByteSupport()
     {
         $progress = new ProgressHelper();

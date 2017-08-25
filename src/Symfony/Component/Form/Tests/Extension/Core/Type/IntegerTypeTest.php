@@ -15,13 +15,23 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class IntegerTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'integer';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
 
     protected function setUp()
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('integer');
+
+        $this->assertSame('integer', $form->getConfig()->getType()->getName());
     }
 
     public function testSubmitCastsToInteger()

@@ -35,6 +35,7 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
                 'priority' => $record['level'],
                 'priorityName' => $record['level_name'],
                 'context' => $record['context'],
+                'channel' => isset($record['channel']) ? $record['channel'] : '',
             );
         }
 

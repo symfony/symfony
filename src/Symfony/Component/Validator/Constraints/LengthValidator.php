@@ -39,31 +39,9 @@ class LengthValidator extends ConstraintValidator
         }
 
         $stringValue = (string) $value;
-        $invalidCharset = false;
 
-        if ('UTF8' === $charset = strtoupper($constraint->charset)) {
-            $charset = 'UTF-8';
-        }
-
-        if ('UTF-8' === $charset) {
-            if (!preg_match('//u', $stringValue)) {
-                $invalidCharset = true;
-            } elseif (function_exists('utf8_decode')) {
-                $length = strlen(utf8_decode($stringValue));
-            } else {
-                preg_replace('/./u', '', $stringValue, -1, $length);
-            }
-        } elseif (function_exists('mb_strlen')) {
-            if (@mb_check_encoding($stringValue, $constraint->charset)) {
-                $length = mb_strlen($stringValue, $constraint->charset);
-            } else {
-                $invalidCharset = true;
-            }
-        } elseif (function_exists('iconv_strlen')) {
-            $length = @iconv_strlen($stringValue, $constraint->charset);
-            $invalidCharset = false === $length;
-        } else {
-            $length = strlen($stringValue);
+        if (!$invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset)) {
+            $length = mb_strlen($stringValue, $constraint->charset);
         }
 
         if ($invalidCharset) {
@@ -72,12 +50,14 @@ class LengthValidator extends ConstraintValidator
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ charset }}', $constraint->charset)
                     ->setInvalidValue($value)
+                    ->setCode(Length::INVALID_CHARACTERS_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->charsetMessage)
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ charset }}', $constraint->charset)
                     ->setInvalidValue($value)
+                    ->setCode(Length::INVALID_CHARACTERS_ERROR)
                     ->addViolation();
             }
 

@@ -32,6 +32,8 @@ interface ContainerInterface
     /**
      * Sets a service.
      *
+     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
+     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
@@ -94,6 +96,8 @@ interface ContainerInterface
      * Enters the given scope.
      *
      * @param string $name
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function enterScope($name);
 
@@ -101,6 +105,8 @@ interface ContainerInterface
      * Leaves the current scope, and re-enters the parent scope.
      *
      * @param string $name
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function leaveScope($name);
 
@@ -108,6 +114,8 @@ interface ContainerInterface
      * Adds a scope to the container.
      *
      * @param ScopeInterface $scope
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function addScope(ScopeInterface $scope);
 
@@ -117,6 +125,8 @@ interface ContainerInterface
      * @param string $name
      *
      * @return bool
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function hasScope($name);
 
@@ -128,6 +138,8 @@ interface ContainerInterface
      * @param string $name
      *
      * @return bool
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function isScopeActive($name);
 }

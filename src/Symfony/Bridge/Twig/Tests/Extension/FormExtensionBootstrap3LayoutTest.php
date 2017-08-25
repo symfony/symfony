@@ -63,6 +63,30 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
         $this->extension = null;
     }
 
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get">', $html);
+    }
+
+    public function testStartTagHasActionAttributeWhenActionIsZero()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '0',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="0">', $html);
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
@@ -115,40 +139,5 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->extension->renderer->setTheme($view, $themes);
-    }
-
-    public function testRange()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testRangeWithMinMaxValues()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testLabelWithoutTranslationOnButton()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testButtonlabelWithoutTranslation()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
     }
 }

@@ -40,7 +40,7 @@
       <argument>%foo_bar%</argument>
       <configurator service="foo.baz" method="configure"/>
     </service>
-    <service id="foo_bar" class="%foo_class%" scope="prototype"/>
+    <service id="foo_bar" class="%foo_class%" shared="false"/>
     <service id="method_call1" class="Bar\FooClass">
       <file>%path%foo.php</file>
       <call method="setBar">
@@ -87,6 +87,9 @@
     <service id="decorated" class="stdClass"/>
     <service id="decorator_service" class="stdClass" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
+    <service id="deprecated_service" class="stdClass">
+      <deprecated>The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.</deprecated>
+    </service>
     <service id="new_factory" class="FactoryClass" public="false">
       <property name="foo">bar</property>
     </service>

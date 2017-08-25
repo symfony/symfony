@@ -109,6 +109,13 @@ class ProfilerControllerTest extends TestCase
             ->method('find')
             ->will($this->returnValue($tokens));
 
+        $request = Request::create('/_profiler/empty/search/results', 'GET', array(
+                'limit' => 2,
+                'ip' => '127.0.0.1',
+                'method' => 'GET',
+                'url' => 'http://example.com/',
+        ));
+
         $twig->expects($this->once())
             ->method('render')
             ->with($this->stringEndsWith('results.html.twig'), $this->equalTo(array(
@@ -122,16 +129,10 @@ class ProfilerControllerTest extends TestCase
                 'end' => null,
                 'limit' => 2,
                 'panel' => null,
+                'request' => $request,
             )));
 
-        $response = $controller->searchResultsAction(
-            Request::create(
-                '/_profiler/empty/search/results',
-                'GET',
-                array('limit' => 2, 'ip' => '127.0.0.1', 'method' => 'GET', 'url' => 'http://example.com/')
-            ),
-            'empty'
-        );
+        $response = $controller->searchResultsAction($request, 'empty');
         $this->assertEquals(200, $response->getStatusCode());
     }
 }

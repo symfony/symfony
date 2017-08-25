@@ -82,7 +82,7 @@ class PdoCaster
         $a += array(
             $prefix.'inTransaction' => method_exists($c, 'inTransaction'),
             $prefix.'errorInfo' => $c->errorInfo(),
-            $prefix.'attributes' => $attr,
+            $prefix.'attributes' => new EnumStub($attr),
         );
 
         if ($a[$prefix.'inTransaction']) {

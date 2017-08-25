@@ -116,39 +116,4 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
     {
         $this->extension->renderer->setTheme($view, $themes);
     }
-
-    public function testRange()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testRangeWithMinMaxValues()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testLabelWithoutTranslationOnButton()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testButtonlabelWithoutTranslation()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
-
-    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
-    {
-        $this->markTestIncomplete('No-op for forward compatibility with AbstractLayoutTest 2.8');
-    }
 }

@@ -31,11 +31,24 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @group legacy
      */
     public function testProcessDetectsSyntheticPrototypeDefinitions()
     {
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @group legacy
+     */
+    public function testProcessDetectsSharedPrototypeDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->setShared(true)->setScope(ContainerInterface::SCOPE_PROTOTYPE);
 
         $this->process($container);
     }

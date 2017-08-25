@@ -29,7 +29,7 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('username_parameter', '_username');
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
-        $this->addOption('intention', 'authenticate');
+        $this->addOption('csrf_token_id', 'authenticate');
         $this->addOption('post_only', true);
     }
 
@@ -48,8 +48,38 @@ class FormLoginFactory extends AbstractFactory
         parent::addConfiguration($node);
 
         $node
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
+                ->thenInvalid("You should define a value for only one of 'csrf_provider' and 'csrf_token_generator' on a security firewall. Use 'csrf_token_generator' as this replaces 'csrf_provider'.")
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
+                ->thenInvalid("You should define a value for only one of 'intention' and 'csrf_token_id' on a security firewall. Use 'csrf_token_id' as this replaces 'intention'.")
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['csrf_provider']); })
+                ->then(function ($v) {
+                    @trigger_error("Setting the 'csrf_provider' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_generator' configuration key instead.", E_USER_DEPRECATED);
+
+                    $v['csrf_token_generator'] = $v['csrf_provider'];
+                    unset($v['csrf_provider']);
+
+                    return $v;
+                })
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['intention']); })
+                ->then(function ($v) {
+                    @trigger_error("Setting the 'intention' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_id' key instead.", E_USER_DEPRECATED);
+
+                    $v['csrf_token_id'] = $v['intention'];
+                    unset($v['intention']);
+
+                    return $v;
+                })
+            ->end()
             ->children()
-                ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
+                ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
             ->end()
         ;
     }
@@ -65,6 +95,7 @@ class FormLoginFactory extends AbstractFactory
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
         ;
 
@@ -77,7 +108,7 @@ class FormLoginFactory extends AbstractFactory
 
         $container
             ->getDefinition($listenerId)
-            ->addArgument(isset($config['csrf_provider']) ? new Reference($config['csrf_provider']) : null)
+            ->addArgument(isset($config['csrf_token_generator']) ? new Reference($config['csrf_token_generator']) : null)
         ;
 
         return $listenerId;

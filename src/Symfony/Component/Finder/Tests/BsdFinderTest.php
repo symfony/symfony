@@ -12,10 +12,14 @@
 namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Adapter\BsdFindAdapter;
+use Symfony\Component\Finder\Finder;
 
+/**
+ * @group legacy
+ */
 class BsdFinderTest extends FinderTest
 {
-    protected function getAdapter()
+    protected function buildFinder()
     {
         $adapter = new BsdFindAdapter();
 
@@ -23,6 +27,8 @@ class BsdFinderTest extends FinderTest
             $this->markTestSkipped(get_class($adapter).' is not supported.');
         }
 
-        return $adapter;
+        return Finder::create()
+            ->removeAdapters()
+            ->addAdapter($adapter);
     }
 }

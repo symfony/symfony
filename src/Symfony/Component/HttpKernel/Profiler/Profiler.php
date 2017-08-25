@@ -138,9 +138,13 @@ class Profiler
      * @param Profile $profile A Profile instance
      *
      * @return string The exported data
+     *
+     * @deprecated since Symfony 2.8, to be removed in 3.0.
      */
     public function export(Profile $profile)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return base64_encode(serialize($profile));
     }
 
@@ -150,9 +154,13 @@ class Profiler
      * @param string $data A data string as exported by the export() method
      *
      * @return Profile|false A Profile instance
+     *
+     * @deprecated since Symfony 2.8, to be removed in 3.0.
      */
     public function import($data)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $profile = unserialize(base64_decode($data));
 
         if ($this->storage->read($profile->getToken())) {

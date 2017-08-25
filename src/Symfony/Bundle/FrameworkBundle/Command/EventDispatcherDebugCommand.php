@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -58,32 +59,25 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $dispatcher = $this->getEventDispatcher();
 
+        $options = array();
         if ($event = $input->getArgument('event')) {
             if (!$dispatcher->hasListeners($event)) {
-                $formatter = $this->getHelperSet()->get('formatter');
-
-                $formattedBlock = $formatter->formatBlock(
-                    sprintf('[NOTE] The event "%s" does not have any registered listeners.', $event),
-                    'fg=yellow',
-                    true
-                );
-
-                $output->writeln($formattedBlock);
+                $io->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
                 return;
             }
 
             $options = array('event' => $event);
-        } else {
-            $options = array();
         }
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
-        $helper->describe($output, $dispatcher, $options);
+        $options['output'] = $io;
+        $helper->describe($io, $dispatcher, $options);
     }
 
     /**

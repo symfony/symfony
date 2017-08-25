@@ -37,7 +37,7 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 
 class EntityTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'entity';
+    const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
 
     const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';
     const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
@@ -112,6 +112,19 @@ class EntityTypeTest extends BaseTypeTest
         $this->em->flush();
         // no clear, because entities managed by the choice field must
         // be managed!
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+        ));
+
+        $this->assertSame('entity', $field->getConfig()->getType()->getName());
     }
 
     /**
@@ -212,6 +225,24 @@ class EntityTypeTest extends BaseTypeTest
         ));
 
         $field->submit('2');
+    }
+
+    public function testConfigureQueryBuilderWithClosureReturningNullUseDefault()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => function () {
+                return;
+            },
+        ));
+
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     public function testSetDataSingleNull()
@@ -1146,13 +1177,13 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ));
 
-        $choiceList1 = $form->get('property1')->getConfig()->getOption('choice_list');
-        $choiceList2 = $form->get('property2')->getConfig()->getOption('choice_list');
-        $choiceList3 = $form->get('property3')->getConfig()->getOption('choice_list');
+        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
+        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
+        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $choiceList1);
-        $this->assertSame($choiceList1, $choiceList2);
-        $this->assertSame($choiceList1, $choiceList3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertSame($choiceLoader1, $choiceLoader2);
+        $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
     public function testLoaderCachingWithParameters()
@@ -1209,15 +1240,18 @@ class EntityTypeTest extends BaseTypeTest
             'property3' => 2,
         ));
 
-        $choiceList1 = $form->get('property1')->getConfig()->getOption('choice_list');
-        $choiceList2 = $form->get('property2')->getConfig()->getOption('choice_list');
-        $choiceList3 = $form->get('property3')->getConfig()->getOption('choice_list');
+        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
+        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
+        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $choiceList1);
-        $this->assertSame($choiceList1, $choiceList2);
-        $this->assertSame($choiceList1, $choiceList3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertSame($choiceLoader1, $choiceLoader2);
+        $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCacheChoiceLists()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
@@ -1238,8 +1272,8 @@ class EntityTypeTest extends BaseTypeTest
             'choice_label' => 'name',
         ));
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $field1->getConfig()->getOption('choice_list'));
-        $this->assertSame($field1->getConfig()->getOption('choice_list'), $field2->getConfig()->getOption('choice_list'));
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $field1->getConfig()->getOption('choice_loader'));
+        $this->assertSame($field1->getConfig()->getOption('choice_loader'), $field2->getConfig()->getOption('choice_loader'));
     }
 
     /**
@@ -1481,5 +1515,38 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals($collection, $form->getData());
         $this->assertEquals($collection, $form->getNormData());
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
+    }
+
+    public function testSetDataEmptyArraySubmitNullMultiple()
+    {
+        $emptyArray = array();
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'multiple' => true,
+        ));
+        $form->setData($emptyArray);
+        $form->submit(null);
+
+        $this->assertInternalType('array', $form->getData());
+    }
+
+    public function testSetDataNonEmptyArraySubmitNullMultiple()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $this->persist(array($entity1));
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'multiple' => true,
+        ));
+
+        $existing = array(0 => $entity1);
+        $form->setData($existing);
+        $form->submit(null);
+
+        $this->assertInternalType('array', $form->getData());
     }
 }

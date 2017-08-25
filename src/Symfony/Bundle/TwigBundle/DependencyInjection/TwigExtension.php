@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -88,6 +89,9 @@ class TwigExtension extends Extension
             }
         }
 
+        $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
+        $container->getDefinition('twig.template_iterator')->replaceArgument(2, $config['paths']);
+
         $bundleHierarchy = $this->getBundleHierarchy($container);
 
         foreach ($bundleHierarchy as $name => $bundle) {
@@ -107,6 +111,7 @@ class TwigExtension extends Extension
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
+        $container->addResource(new FileExistenceResource($dir));
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
@@ -160,10 +165,12 @@ class TwigExtension extends Extension
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
+            $container->addResource(new FileExistenceResource($dir));
 
             if (is_dir($dir = $bundle['path'].'/Resources/views')) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
+            $container->addResource(new FileExistenceResource($dir));
 
             if (null === $bundle['parent']) {
                 continue;

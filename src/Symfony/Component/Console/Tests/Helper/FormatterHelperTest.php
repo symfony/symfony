@@ -53,9 +53,6 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testFormatBlockWithDiacriticLetters()
     {
         $formatter = new FormatterHelper();
@@ -69,9 +66,6 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testFormatBlockWithDoubleWidthDiacriticLetters()
     {
         $formatter = new FormatterHelper();

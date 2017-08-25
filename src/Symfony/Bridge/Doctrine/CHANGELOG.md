@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated using the entity provider with a Doctrine repository implementing UserProviderInterface
+ * added UserLoaderInterface for loading users through Doctrine.
+
 2.7.0
 -----
 

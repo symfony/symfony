@@ -57,7 +57,7 @@ class ValidationListenerTest extends TestCase
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
-        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\ValidatorInterface')->getMock();
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
         $this->violationMapper = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface')->getMock();
         $this->listener = new ValidationListener($this->validator, $this->violationMapper);
         $this->message = 'Message';
@@ -190,6 +190,9 @@ class ValidationListenerTest extends TestCase
         $this->assertAttributeSame($validator, 'validator', $listener);
     }
 
+    /**
+     * @group legacy
+     */
     public function testValidatorInterfaceUntilSymfony24()
     {
         // Mock of ValidatorInterface until apiVersion 2.4
@@ -200,6 +203,7 @@ class ValidationListenerTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @expectedException \InvalidArgumentException
      */
     public function testInvalidValidatorInterface()

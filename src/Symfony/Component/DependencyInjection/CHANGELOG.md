@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated the abstract ContainerAware class in favor of ContainerAwareTrait
+ * deprecated IntrospectableContainerInterface, to be merged with ContainerInterface in 3.0
+ * allowed specifying a directory to recursively load all configuration files it contains
+ * deprecated the concept of scopes
+ * added `Definition::setShared()` and `Definition::isShared()`
+ * added ResettableContainerInterface to be able to reset the container to release memory on shutdown
+ * added a way to define the priority of service decoration
+ * added support for service autowiring
+
 2.7.0
 -----
 

@@ -57,7 +57,7 @@ class ValidatorExtensionTest extends TestCase
      */
     public function test2Dot4ValidationApi()
     {
-        $factory = $this->getMockBuilder('Symfony\Component\Validator\MetadataFactoryInterface')->getMock();
+        $factory = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface')->getMock();
         $validator = $this->getMockBuilder('Symfony\Component\Validator\ValidatorInterface')->getMock();
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
             ->disableOriginalConstructor()

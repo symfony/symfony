@@ -46,7 +46,7 @@ class HttpKernelExtensionTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $renderer = new FragmentHandler(array(), false, $context);
+        $renderer = new FragmentHandler($context);
 
         if (method_exists($this, 'expectException')) {
             $this->expectException('InvalidArgumentException');
@@ -71,7 +71,7 @@ class HttpKernelExtensionTest extends TestCase
 
         $context->expects($this->any())->method('getCurrentRequest')->will($this->returnValue(Request::create('/')));
 
-        return new FragmentHandler(array($strategy), false, $context);
+        return new FragmentHandler($context, array($strategy), false);
     }
 
     protected function renderTemplate(FragmentHandler $renderer, $template = '{{ render("foo") }}')

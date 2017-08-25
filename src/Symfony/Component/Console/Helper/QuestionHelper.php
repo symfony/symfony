@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.
@@ -39,7 +40,7 @@ class QuestionHelper extends Helper
      *
      * @return mixed The user answer
      *
-     * @throws \RuntimeException If there is no data to read in the input stream
+     * @throws RuntimeException If there is no data to read in the input stream
      */
     public function ask(InputInterface $input, OutputInterface $output, Question $question)
     {
@@ -71,12 +72,12 @@ class QuestionHelper extends Helper
      *
      * @param resource $stream The input stream
      *
-     * @throws \InvalidArgumentException In case the stream is not a resource
+     * @throws InvalidArgumentException In case the stream is not a resource
      */
     public function setInputStream($stream)
     {
         if (!is_resource($stream)) {
-            throw new \InvalidArgumentException('Input stream must be a valid resource.');
+            throw new InvalidArgumentException('Input stream must be a valid resource.');
         }
 
         $this->inputStream = $stream;
@@ -110,8 +111,7 @@ class QuestionHelper extends Helper
      *
      * @return bool|mixed|null|string
      *
-     * @throws \Exception
-     * @throws \RuntimeException
+     * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
     public function doAsk(OutputInterface $output, Question $question)
     {
@@ -125,7 +125,7 @@ class QuestionHelper extends Helper
             if ($question->isHidden()) {
                 try {
                     $ret = trim($this->getHiddenResponse($output, $inputStream));
-                } catch (\RuntimeException $e) {
+                } catch (RuntimeException $e) {
                     if (!$question->isHiddenFallback()) {
                         throw $e;
                     }
@@ -323,7 +323,7 @@ class QuestionHelper extends Helper
      *
      * @return string The answer
      *
-     * @throws \RuntimeException In case the fallback is deactivated and the response cannot be hidden
+     * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream)
     {

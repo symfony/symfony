@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * Finding deep items in `ParameterBag::get()` is deprecated since version 2.8 and
+   will be removed in 3.0.
+
 2.6.0
 -----
 

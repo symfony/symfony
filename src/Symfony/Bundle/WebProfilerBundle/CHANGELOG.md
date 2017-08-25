@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated profiler:import and profiler:export commands
+
 2.7.0
 -----
 

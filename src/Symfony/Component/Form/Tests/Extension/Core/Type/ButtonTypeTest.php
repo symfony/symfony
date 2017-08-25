@@ -16,7 +16,17 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
  */
 class ButtonTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'button';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('button');
+
+        $this->assertSame('button', $form->getConfig()->getType()->getName());
+    }
 
     public function testCreateButtonInstances()
     {

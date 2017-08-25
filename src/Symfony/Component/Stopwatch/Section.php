@@ -53,7 +53,7 @@ class Section
      *
      * @param string $id The child section identifier
      *
-     * @return Section|null The child section or null when none found
+     * @return self|null The child section or null when none found
      */
     public function get($id)
     {

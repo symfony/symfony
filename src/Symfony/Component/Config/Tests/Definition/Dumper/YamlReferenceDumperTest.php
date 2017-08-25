@@ -59,7 +59,7 @@ acme_root:
         child3:               ~ # Example: example setting
     parameters:
 
-        # Prototype
+        # Prototype: Parameter name
         name:                 ~
 EOL;
     }

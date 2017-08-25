@@ -16,13 +16,23 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LanguageTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'language';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
 
     protected function setUp()
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('language');
+
+        $this->assertSame('language', $form->getConfig()->getType()->getName());
     }
 
     public function testCountriesAreSelectable()

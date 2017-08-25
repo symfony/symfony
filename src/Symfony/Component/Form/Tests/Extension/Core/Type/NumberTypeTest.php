@@ -15,7 +15,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'number';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
     protected function setUp()
     {
@@ -25,6 +25,16 @@ class NumberTypeTest extends BaseTypeTest
         IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_DE');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('number');
+
+        $this->assertSame('number', $form->getConfig()->getType()->getName());
     }
 
     public function testDefaultFormatting()

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+@trigger_error('The '.__NAMESPACE__.'\AbstractVoter class is deprecated since version 2.8, to be removed in 3.0. Upgrade to Symfony\Component\Security\Core\Authorization\Voter\Voter instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -18,6 +20,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Abstract Voter implementation that reduces boilerplate code required to create a custom Voter.
  *
  * @author Roman Marintšenko <inoryy@gmail.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0. Upgrade to Symfony\Component\Security\Core\Authorization\Voter\Voter instead.
  */
 abstract class AbstractVoter implements VoterInterface
 {

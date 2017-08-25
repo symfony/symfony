@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * Imports a profile.
  *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ImportCommand extends Command
@@ -49,7 +51,7 @@ class ImportCommand extends Command
     {
         $this
             ->setName('profiler:import')
-            ->setDescription('Imports a profile')
+            ->setDescription('[DEPRECATED] Imports a profile')
             ->setDefinition(array(
                 new InputArgument('filename', InputArgument::OPTIONAL, 'The profile path'),
             ))
@@ -68,6 +70,10 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $formatter = $this->getHelper('formatter');
+
+        $output->writeln($formatter->formatSection('warning', 'The profiler:import command is deprecated since version 2.8 and will be removed in 3.0', 'comment'));
+
         $data = '';
         if ($input->getArgument('filename')) {
             $data = file_get_contents($input->getArgument('filename'));

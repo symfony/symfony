@@ -13,7 +13,17 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class UrlTypeTest extends TextTypeTest
 {
-    const TESTED_TYPE = 'url';
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('url');
+
+        $this->assertSame('url', $form->getConfig()->getType()->getName());
+    }
 
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {

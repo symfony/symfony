@@ -213,18 +213,21 @@ class JsonDescriptor extends Descriptor
     {
         $data = array(
             'class' => (string) $definition->getClass(),
-            'scope' => $definition->getScope(),
+            'scope' => $definition->getScope(false),
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
+            'shared' => $definition->isShared(),
+            'synchronized' => $definition->isSynchronized(false),
+            'abstract' => $definition->isAbstract(),
+            'autowire' => $definition->isAutowired(),
+            'autowiring_types' => array(),
+            'file' => $definition->getFile(),
         );
 
-        if (method_exists($definition, 'isSynchronized')) {
-            $data['synchronized'] = $definition->isSynchronized(false);
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $data['autowiring_types'][] = $autowiringType;
         }
-
-        $data['abstract'] = $definition->isAbstract();
-        $data['file'] = $definition->getFile();
 
         if ($definition->getFactoryClass(false)) {
             $data['factory_class'] = $definition->getFactoryClass(false);
@@ -255,11 +258,9 @@ class JsonDescriptor extends Descriptor
 
         if (!$omitTags) {
             $data['tags'] = array();
-            if (count($definition->getTags())) {
-                foreach ($definition->getTags() as $tagName => $tagData) {
-                    foreach ($tagData as $parameters) {
-                        $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
-                    }
+            foreach ($definition->getTags() as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
                 }
             }
         }
@@ -293,14 +294,18 @@ class JsonDescriptor extends Descriptor
         $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
             foreach ($registeredListeners as $listener) {
-                $data[] = $this->getCallableData($listener);
+                $l = $this->getCallableData($listener);
+                $l['priority'] = $eventDispatcher->getListenerPriority($event, $listener);
+                $data[] = $l;
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 foreach ($eventListeners as $eventListener) {
-                    $data[$eventListened][] = $this->getCallableData($eventListener);
+                    $l = $this->getCallableData($eventListener);
+                    $l['priority'] = $eventDispatcher->getListenerPriority($eventListened, $eventListener);
+                    $data[$eventListened][] = $l;
                 }
             }
         }

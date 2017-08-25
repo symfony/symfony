@@ -24,7 +24,7 @@ class DigestAuthenticationEntryPointTest extends TestCase
 
         $authenticationException = new AuthenticationException('TheAuthenticationExceptionMessage');
 
-        $entryPoint = new DigestAuthenticationEntryPoint('TheRealmName', 'TheKey');
+        $entryPoint = new DigestAuthenticationEntryPoint('TheRealmName', 'TheSecret');
         $response = $entryPoint->start($request, $authenticationException);
 
         $this->assertEquals(401, $response->getStatusCode());
@@ -35,7 +35,7 @@ class DigestAuthenticationEntryPointTest extends TestCase
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
-        $entryPoint = new DigestAuthenticationEntryPoint('TheRealmName', 'TheKey');
+        $entryPoint = new DigestAuthenticationEntryPoint('TheRealmName', 'TheSecret');
         $response = $entryPoint->start($request);
 
         $this->assertEquals(401, $response->getStatusCode());
@@ -48,7 +48,7 @@ class DigestAuthenticationEntryPointTest extends TestCase
 
         $nonceExpiredException = new NonceExpiredException('TheNonceExpiredExceptionMessage');
 
-        $entryPoint = new DigestAuthenticationEntryPoint('TheRealmName', 'TheKey');
+        $entryPoint = new DigestAuthenticationEntryPoint('TheRealmName', 'TheSecret');
         $response = $entryPoint->start($request, $nonceExpiredException);
 
         $this->assertEquals(401, $response->getStatusCode());

@@ -119,7 +119,7 @@ interface ConstraintViolationInterface
     /**
      * Returns a machine-digestible error code for the violation.
      *
-     * @return mixed The error code
+     * @return string|null The error code
      */
     public function getCode();
 }

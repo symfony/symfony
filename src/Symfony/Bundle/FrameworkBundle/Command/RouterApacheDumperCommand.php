@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -74,9 +75,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $formatter = $this->getHelper('formatter');
+        $io = new SymfonyStyle($input, $output);
 
-        $output->writeln($formatter->formatSection('warning', 'The router:dump-apache command is deprecated since version 2.5 and will be removed in 3.0', 'comment'));
+        $io->title('Router Apache Dumper');
+        $io->caution('The router:dump-apache command is deprecated since version 2.5 and will be removed in 3.0.');
 
         $router = $this->getContainer()->get('router');
 
@@ -90,6 +92,6 @@ EOF
 
         $dumper = new ApacheMatcherDumper($router->getRouteCollection());
 
-        $output->writeln($dumper->dump($dumpOptions), OutputInterface::OUTPUT_RAW);
+        $io->writeln($dumper->dump($dumpOptions), OutputInterface::OUTPUT_RAW);
     }
 }

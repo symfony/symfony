@@ -21,6 +21,19 @@ class DependencyInjectionExtensionTest extends TestCase
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
+        $typeExtension1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeExtensionInterface')->getMock();
+        $typeExtension1->expects($this->any())
+            ->method('getExtendedType')
+            ->willReturn('test');
+        $typeExtension2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeExtensionInterface')->getMock();
+        $typeExtension2->expects($this->any())
+            ->method('getExtendedType')
+            ->willReturn('test');
+        $typeExtension3 = $this->getMockBuilder('Symfony\Component\Form\FormTypeExtensionInterface')->getMock();
+        $typeExtension3->expects($this->any())
+            ->method('getExtendedType')
+            ->willReturn('other');
+
         $services = array(
             'extension1' => $typeExtension1 = $this->createFormTypeExtensionMock('test'),
             'extension2' => $typeExtension2 = $this->createFormTypeExtensionMock('test'),
@@ -44,6 +57,9 @@ class DependencyInjectionExtensionTest extends TestCase
         $this->assertSame(array($typeExtension1, $typeExtension2), $extension->getTypeExtensions('test'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
     public function testThrowExceptionForInvalidExtendedType()
     {
         $formTypeExtension = $this->createFormTypeExtensionMock('unmatched');

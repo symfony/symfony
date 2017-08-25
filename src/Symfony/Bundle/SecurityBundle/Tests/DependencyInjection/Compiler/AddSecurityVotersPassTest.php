@@ -44,6 +44,8 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
 
+        $calls = $container->getDefinition('security.access.decision_manager')->getMethodCalls();
+
         $this->assertEquals(
             array(
                 new Reference('highest_prio_service'),
@@ -51,7 +53,7 @@ class AddSecurityVotersPassTest extends TestCase
                 new Reference('no_prio_service'),
                 new Reference('zero_prio_service'),
             ),
-            $container->getDefinition('security.access.decision_manager')->getArgument(0)
+            $calls[0][1][0]
         );
     }
 }

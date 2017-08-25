@@ -656,7 +656,7 @@ class ProgressBarTest extends TestCase
         putenv('COLUMNS=156');
 
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);
-        ProgressBar::setPlaceholderFormatterDefinition('memory', function () {
+        ProgressBar::setPlaceholderFormatterDefinition('memory', function (ProgressBar $bar) {
             static $i = 0;
             $mem = 100000 * $i;
             $colors = $i++ ? '41;37' : '44;37';
@@ -666,7 +666,7 @@ class ProgressBarTest extends TestCase
         $bar->setFormat(" \033[44;37m %title:-37s% \033[0m\n %current%/%max% %bar% %percent:3s%%\n 🏁  %remaining:-10s% %memory:37s%");
         $bar->setBarCharacter($done = "\033[32m●\033[0m");
         $bar->setEmptyBarCharacter($empty = "\033[31m●\033[0m");
-        $bar->setProgressCharacter($progress = "\033[32m➤\033[0m");
+        $bar->setProgressCharacter($progress = "\033[32m➤ \033[0m");
 
         $bar->setMessage('Starting the demo... fingers crossed', 'title');
         $bar->start();

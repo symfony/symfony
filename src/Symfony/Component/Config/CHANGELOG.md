@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `setDeprecated()` method to indicate a deprecated node
+
 3.3.0
 -----
 

@@ -12,5 +12,15 @@
         <target>bar</target>
       </segment>
     </unit>
+    <unit id="uqWglk0">
+      <notes>
+        <note id="x">x_content</note>
+        <note appliesTo="target" category="quality">Fuzzy</note>
+      </notes>
+      <segment>
+        <source>baz</source>
+        <target>biz</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

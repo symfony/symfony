@@ -234,6 +234,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         foreach ($this->children as $name => $child) {
+            if ($child->isDeprecated()) {
+                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), E_USER_DEPRECATED);
+            }
+
             if (!array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
                     $msg = sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath());

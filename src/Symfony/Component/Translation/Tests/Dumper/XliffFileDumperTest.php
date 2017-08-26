@@ -102,7 +102,7 @@ class XliffFileDumperTest extends TestCase
         )));
         $catalogue->setMetadata('baz', array('notes' => array(
             array('id' => 'x', 'content' => 'x_content'),
-            array('appliesTo' => 'target', 'category'=>'quality', 'content' => 'Fuzzy'),
+            array('appliesTo' => 'target', 'category' => 'quality', 'content' => 'Fuzzy'),
         )));
 
         $dumper = new XliffFileDumper();

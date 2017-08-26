@@ -22,7 +22,7 @@ use Symfony\Component\Translation\MetadataAwareInterface;
  *
  * all = source ∪ target = {x: x ∈ source ∨ x ∈ target}
  * new = all ∖ target = {x: x ∈ source ∧ x ∉ target}
- * obsolete = target ∖ all = {x: x ∈ target ∧ x ∉ source}
+ * obsolete = all ∖ source = {x: x ∈ target ∧ x ∉ source}
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */

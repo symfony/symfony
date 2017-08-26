@@ -13,4 +13,5 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 interface EntityInterfaceA
 {
+    public function getData();
 }

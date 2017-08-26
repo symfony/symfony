@@ -146,16 +146,16 @@ class XliffFileLoader implements LoaderInterface
             }
 
             if (isset($unit->notes)) {
-                $metadata['notes'] = [];
+                $metadata['notes'] = array();
                 foreach ($unit->notes->note as $noteNode) {
-                    $note = [];
+                    $note = array();
                     foreach ($noteNode->attributes() as $key => $value) {
                         $note[$key] = (string) $value;
                     }
                     $note['content'] = (string) $noteNode;
                     $metadata['notes'][] = $note;
                 }
-             }
+            }
 
             $catalogue->setMetadata((string) $source, $metadata, $domain);
         }

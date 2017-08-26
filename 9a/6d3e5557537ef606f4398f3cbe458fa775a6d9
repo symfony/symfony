@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2017-04-11T22:31:22Z
+
+You may add the possibility to specify a message ? Anyway that's awesome, thanks !
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-04-11T22:53:31Z
+
+Hello @sanpii, thanks for proposing this. For the record, this was proposed before https://github.com/symfony/symfony/pull/21051.
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-04-12T07:33:34Z
+
+> You may add the possibility to specify a message ?
+
+It’s in a corner of my mind, but I don’t know how do this smartly.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-12T08:35:36Z
+
+FYI, there is typo in the title `depreciate` -> `deprecate` 😉
+depreciate is to devalue something.
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-04-12T08:39:10Z
+
+@sstok fixed, thank you.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-12T14:14:14Z
+
+To clarify, my goal with #21051 was to _not_ include/define deprecated nodes in the tree; and solely focus on bridging the old situation to a new situation (as a normalization step).
+
+Im :-1: on this. You should checkout why mine was rejected :)
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-04-12T19:30:02Z
+
+> You should checkout why mine was rejected :)
+
+I see two points:
+
+> is quite easily implemented directly in the code
+
+Of course, all new features is probably easy to implement… But, I think, `trigger_error` is a low level function and symfony is here to abstract its.
+
+> I don't see the need for end user projects to deprecate options
+
+We are, at least, two persons who find this suffisamment helpful to take the time to make a PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-13T14:38:35Z
+
+I still think it's a good feature.. in case you thought different.
+
+Maybe this approach is good enough, as it's kinda the same we do for services. Personally i like the normalization to happen, otherwise people still need to take care of old/new nodes at implementation level, e.g. in an extension.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-06T07:34:55Z
+
+I think we can go with this feature, the implementation is simple enough.
+I propose this API:
+```
+public function setDeprecated($message)
+public function isDeprecated()
+public function getDeprecationMessage($node, $path)
+```
+
+with `$message` allowing `%node%` and `%path` placeholders.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-07-07T19:24:54Z
+
+PR updated according to @nicolas-grekas’ propositions.
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-07-08T16:05:55Z
+
+@ro0NL Fixed, thank you for your review.
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-07-11T15:34:40Z
+
+@nicolas-grekas thank you.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-26T13:26:28Z
+
+Target branch should also be changed to 3.4 instead of master.
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-08-26T13:49:26Z
+
+@fabpot fixed and rebased on the 3.4 branch. Thank you.

@@ -51,13 +51,6 @@ abstract class FileLoader extends BaseFileLoader
      */
     public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
     {
-        if ('\\' !== substr($namespace, -1)) {
-            throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": %s.', $namespace));
-        }
-        if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+\\\\)++$/', $namespace)) {
-            throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: %s.', $namespace));
-        }
-
         $classes = $this->findClasses($namespace, $resource, $exclude);
         // prepare for deep cloning
         $prototype = serialize($prototype);
@@ -123,15 +116,13 @@ abstract class FileLoader extends BaseFileLoader
             if (!preg_match($extRegexp, $path, $m) || !$info->isReadable()) {
                 continue;
             }
-            $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, -strlen($m[0]))), '\\');
 
-            if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $class)) {
+            if (!$class = $this->getClassFromFile($path)) {
+                // no class found in file
                 continue;
             }
-            // check to make sure the expected class exists
-            if (!$r = $this->container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
-            }
+
+            $r = $this->container->getReflectionClass($class);
 
             if (!$r->isInterface() && !$r->isTrait() && !$r->isAbstract()) {
                 $classes[] = $class;
@@ -148,5 +139,47 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         return $classes;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return string|null
+     *
+     * @see http://jarretbyrne.com/2015/06/197/
+     */
+    private function getClassFromFile($path)
+    {
+        $contents = file_get_contents($path);
+        $class = '';
+        $parsingNamespace = false;
+        $parsingClass = false;
+
+        foreach (token_get_all($contents) as $token) {
+            if (is_array($token) && $token[0] === T_NAMESPACE) {
+                $parsingNamespace = true;
+            }
+
+            if (is_array($token) && $token[0] === T_CLASS) {
+                $parsingClass = true;
+            }
+
+            if ($parsingNamespace) {
+                if (is_array($token) && in_array($token[0], array(T_STRING, T_NS_SEPARATOR), true)) {
+                    $class .= $token[1];
+                }
+
+                if ($token === ';') {
+                    $parsingNamespace = false;
+                }
+            }
+
+            if ($parsingClass && is_array($token) && $token[0] === T_STRING) {
+                $class .= '\\'.$token[1];
+                $parsingClass = false;
+            }
+        }
+
+        return class_exists($class) ? $class : null;
     }
 }

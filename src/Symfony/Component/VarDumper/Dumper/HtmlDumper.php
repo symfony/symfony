@@ -187,7 +187,7 @@ function toggle(a, recursive) {
 function collapse(a, recursive) {
     var s = a.nextSibling || {}, oldClass = s.className;
 
-    if ('sf-dump-expanded' == oldClass) {
+    if (/\bsf-dump-expanded\b/.test(oldClass)) {
         toggle(a, recursive);
 
         return true;
@@ -199,7 +199,7 @@ function collapse(a, recursive) {
 function expand(a, recursive) {
     var s = a.nextSibling || {}, oldClass = s.className;
 
-    if ('sf-dump-compact' == oldClass) {
+    if (/\bsf-dump-compact\b/.test(oldClass)) {
         toggle(a, recursive);
 
         return true;
@@ -254,8 +254,8 @@ function highlight(root, activeNode, nodes) {
 
 function resetHighlightedNodes(root) {
     Array.from(root.querySelectorAll('.sf-dump-str, .sf-dump-key, .sf-dump-public, .sf-dump-protected, .sf-dump-private')).forEach(function (strNode) {
-        strNode.className = strNode.className.replace(/\b sf-dump-highlight\b/, '');
-        strNode.className = strNode.className.replace(/\b sf-dump-highlight-active\b/, '');
+        strNode.className = strNode.className.replace(/\bsf-dump-highlight\b/, '');
+        strNode.className = strNode.className.replace(/\bsf-dump-highlight-active\b/, '');
     });
 }
 
@@ -352,7 +352,7 @@ return function (root, x) {
         } else if (/\bsf-dump-str-toggle\b/.test(a.className)) {
             e.preventDefault();
             e = a.parentNode.parentNode;
-            e.className = e.className.replace(/sf-dump-str-(expand|collapse)/, a.parentNode.className);
+            e.className = e.className.replace(/\bsf-dump-str-(expand|collapse)\b/, a.parentNode.className);
         }
     });
 
@@ -518,8 +518,7 @@ return function (root, x) {
         Array.from(search.querySelectorAll('.sf-dump-search-input-next, .sf-dump-search-input-previous')).forEach(function (btn) {
             addEventListener(btn, 'click', function (e) {
                 e.preventDefault();
-                var direction = -1 !== e.target.className.indexOf('next') ? 'next' : 'previous';
-                'next' === direction ? state.next() : state.previous();
+                -1 !== e.target.className.indexOf('next') ? state.next() : state.previous();
                 searchInput.focus();
                 collapseAll(root);
                 showCurrent(state);

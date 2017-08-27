@@ -357,9 +357,9 @@ class NumberFormatter
     /**
      * Format a number.
      *
-     * @param number $value The value to format
-     * @param int    $type  Type of the formatting, one of the format type constants
-     *                      Only type NumberFormatter::TYPE_DEFAULT is currently supported.
+     * @param int|float $value The value to format
+     * @param int       $type  Type of the formatting, one of the format type constants
+     *                         Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
      * @return bool|string The formatted value or false on error
      *

@@ -59,6 +59,23 @@ class DebugClassLoaderTest extends TestCase
         $this->fail('DebugClassLoader did not register');
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage boo
+     */
+    public function testThrowingClass()
+    {
+        try {
+            class_exists(__NAMESPACE__.'\Fixtures\Throwing');
+            $this->fail('Exception expected');
+        } catch (\Exception $e) {
+            $this->assertSame('boo', $e->getMessage());
+        }
+
+        // the second call also should throw
+        class_exists(__NAMESPACE__.'\Fixtures\Throwing');
+    }
+
     public function testUnsilencing()
     {
         if (\PHP_VERSION_ID >= 70000) {
@@ -128,6 +145,7 @@ class DebugClassLoaderTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage Case mismatch between loaded and declared class names
      */
     public function testNameCaseMismatch()
     {
@@ -149,6 +167,7 @@ class DebugClassLoaderTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage Case mismatch between loaded and declared class names
      */
     public function testPsr4CaseMismatch()
     {

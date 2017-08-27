@@ -72,6 +72,7 @@ class Application
     private $terminal;
     private $defaultCommand;
     private $singleCommand;
+    private $initialized;
 
     /**
      * @param string $name    The name of the application
@@ -83,12 +84,6 @@ class Application
         $this->version = $version;
         $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
-        $this->helperSet = $this->getDefaultHelperSet();
-        $this->definition = $this->getDefaultInputDefinition();
-
-        foreach ($this->getDefaultCommands() as $command) {
-            $this->add($command);
-        }
     }
 
     public function setDispatcher(EventDispatcherInterface $dispatcher)
@@ -195,10 +190,11 @@ class Application
 
         if (!$name) {
             $name = $this->defaultCommand;
-            $this->definition->setArguments(array_merge(
-                $this->definition->getArguments(),
+            $definition = $this->getDefinition();
+            $definition->setArguments(array_merge(
+                $definition->getArguments(),
                 array(
-                    'command' => new InputArgument('command', InputArgument::OPTIONAL, $this->definition->getArgument('command')->getDescription(), $name),
+                    'command' => new InputArgument('command', InputArgument::OPTIONAL, $definition->getArgument('command')->getDescription(), $name),
                 )
             ));
         }
@@ -248,6 +244,10 @@ class Application
      */
     public function getHelperSet()
     {
+        if (!$this->helperSet) {
+            $this->helperSet = $this->getDefaultHelperSet();
+        }
+
         return $this->helperSet;
     }
 
@@ -268,6 +268,10 @@ class Application
      */
     public function getDefinition()
     {
+        if (!$this->definition) {
+            $this->definition = $this->getDefaultInputDefinition();
+        }
+
         if ($this->singleCommand) {
             $inputDefinition = $this->definition;
             $inputDefinition->setArguments();
@@ -424,6 +428,8 @@ class Application
      */
     public function add(Command $command)
     {
+        $this->init();
+
         $command->setApplication($this);
 
         if (!$command->isEnabled()) {
@@ -456,6 +462,8 @@ class Application
      */
     public function get($name)
     {
+        $this->init();
+
         if (!isset($this->commands[$name])) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
@@ -483,6 +491,8 @@ class Application
      */
     public function has($name)
     {
+        $this->init();
+
         return isset($this->commands[$name]);
     }
 
@@ -560,6 +570,8 @@ class Application
      */
     public function find($name)
     {
+        $this->init();
+
         $allCommands = array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
@@ -626,6 +638,8 @@ class Application
      */
     public function all($namespace = null)
     {
+        $this->init();
+
         if (null === $namespace) {
             return $this->commands;
         }
@@ -1138,5 +1152,17 @@ class Application
         }
 
         return $namespaces;
+    }
+
+    private function init()
+    {
+        if ($this->initialized) {
+            return;
+        }
+        $this->initialized = true;
+
+        foreach ($this->getDefaultCommands() as $command) {
+            $this->add($command);
+        }
     }
 }

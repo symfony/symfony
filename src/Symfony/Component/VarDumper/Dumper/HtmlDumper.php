@@ -155,10 +155,10 @@ if (!doc.addEventListener) {
 function toggle(a, recursive) {
     var s = a.nextSibling || {}, oldClass = s.className, arrow, newClass;
 
-    if ('sf-dump-compact' == oldClass) {
+    if (/\bsf-dump-compact\b/.test(oldClass)) {
         arrow = '▼';
         newClass = 'sf-dump-expanded';
-    } else if ('sf-dump-expanded' == oldClass) {
+    } else if (/\bsf-dump-expanded\b/.test(oldClass)) {
         arrow = '▶';
         newClass = 'sf-dump-compact';
     } else {
@@ -166,13 +166,13 @@ function toggle(a, recursive) {
     }
 
     a.lastChild.innerHTML = arrow;
-    s.className = newClass;
+    s.className = s.className.replace(/\bsf-dump-(compact|expanded)\b/, newClass);
 
     if (recursive) {
         try {
             a = s.querySelectorAll('.'+oldClass);
             for (s = 0; s < a.length; ++s) {
-                if (a[s].className !== newClass) {
+                if (-1 == a[s].className.indexOf(newClass)) {
                     a[s].className = newClass;
                     a[s].previousSibling.lastChild.innerHTML = arrow;
                 }
@@ -334,7 +334,7 @@ return function (root, x) {
                 if (f && t && f[0] !== t[0]) {
                     r.innerHTML = r.innerHTML.replace(new RegExp('^'+f[0].replace(rxEsc, '\\$1'), 'mg'), t[0]);
                 }
-                if ('sf-dump-compact' == r.className) {
+                if (/\bsf-dump-compact\b/.test(r.className)) {
                     toggle(s, isCtrlKey(e));
                 }
             }
@@ -378,6 +378,7 @@ return function (root, x) {
             a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
+
             x = 1;
             if ('sf-dump' != elt.parentNode.className) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
@@ -386,7 +387,7 @@ return function (root, x) {
             if (x > options.maxDepth) {
                 toggle(a);
             }
-        } else if ('sf-dump-ref' == elt.className && (a = elt.getAttribute('href'))) {
+        } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {
             a = a.substr(1);
             elt.className += ' '+a;
 

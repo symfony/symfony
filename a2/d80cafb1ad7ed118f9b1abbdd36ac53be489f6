@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by sstok at 2017-08-27T13:48:55Z
+
+FYI there is no need open a new pull-request, you can switch the target branch of the pull-request after creating. You will however need to rebase and/or cherry-pick the commit(s) to prevent unrelated commits (from the previous target branch) are still included.
+
+See also: http://symfony.com/doc/current/contributing/code/patches.html
+Don't worry if this is to complex as in most cases the maintainers can merge to another branch, without you having to-do anything.
+
+Just some helpful information for your next contribution 👍
+
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2017-08-27T13:51:01Z
+
+Like I said in #24002 Im trying to fly through writing some code over the bank holiday weekend and just fired off this quick PR. Next time I'll take more time over it, Im no stranger to contributing to Open Source projects, but Im just rushing today :) - thanks :)

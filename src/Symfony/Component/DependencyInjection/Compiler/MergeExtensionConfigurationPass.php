@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\DependencyInjection\Parameterbag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 /**
  * Merges extension configs into the container builder.

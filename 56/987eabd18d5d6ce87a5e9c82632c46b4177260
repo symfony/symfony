@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-08-25T17:39:25Z
+
+Do we know what kind of edge cases are triggering this ? The exception in case of mistake in the class name or the namespace was actually useful to me. It would be great to know what triggers this edge case
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-25T18:34:33Z
+
+Just found why, I'm going to update the PR asap.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-25T21:16:43Z
+
+Ready. Basically replaces #16651 (still fixing #15297)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-27T08:28:10Z
+
+now with a test case
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-08-27T09:59:22Z
+
+I can confirm it fixes my issue! Thanks!
+
+By the way: What is the best/easiest way to test a symfony pr in an existing project, when not using symfony/symfony (because of flex)?
+Normally I add the fork to my composer.json repositories and require the pr branch. But there is no fork of symfony/debug.. ;)

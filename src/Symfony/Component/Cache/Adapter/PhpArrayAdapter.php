@@ -38,6 +38,7 @@ class PhpArrayAdapter implements AdapterInterface
     {
         $this->file = $file;
         $this->fallbackPool = $fallbackPool;
+        $this->zendMultiByte = ini_get('zend.multibyte');
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) {
                 $item = new CacheItem();

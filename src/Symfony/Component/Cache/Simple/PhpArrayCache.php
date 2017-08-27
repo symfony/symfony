@@ -34,6 +34,7 @@ class PhpArrayCache implements CacheInterface
     {
         $this->file = $file;
         $this->fallbackPool = $fallbackPool;
+        $this->zendMultiByte = ini_get('zend.multibyte');
     }
 
     /**

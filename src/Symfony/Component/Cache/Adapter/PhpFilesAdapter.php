@@ -35,5 +35,6 @@ class PhpFilesAdapter extends AbstractAdapter
 
         $e = new \Exception();
         $this->includeHandler = function () use ($e) { throw $e; };
+        $this->zendMultiByte = ini_get('zend.multibyte');
     }
 }

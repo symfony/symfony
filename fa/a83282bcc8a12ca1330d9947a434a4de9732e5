@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-08-22T16:51:05Z
+
+As phpunit 6 itself is not really backwards compatible due to the namespace changes: does the phpunit bridge add any backwards compat layer for it? Or will my tests just fail if my testsuite is running on phpunit 5 currently (with php 7.2) without using any namespaced phpunit base classes?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-22T21:48:23Z
+
+@dmaicher if you run your testsuite on PHPUnit 6 while using `PHPUnit_Framework_TestCase` as base class, things will break totally.
+However, using the PHPUnit bridge with PHPUnit 5.7 on PHP 7.2 will also make your CI red: the bridge makes the run fail when encountering deprecations, and PHPUnit 5.7 triggers a deprecation coming from PHP 7.2.
+
+However, making your testsuite compatible with several PHPUnit versions is possible. PHPUnit 4.8.35 and 5.4.3+ are providing the `PHPUnit\Framework\TestCase` class as a forward compatibility layer, allowing you to migrate to the namespace API in your `extends` clause. This is the way to go.
+And note that PHPUnit 6 is the only actively maintained version of PHPUnit, so migrating to it is a must-have IMO.
+And the migration to namespaced base testcase can be done easily. If you don't care about getting `extends \PHPUnit\Framework\TestCase` instead of using a use statement, it is a simple search&replace.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-08-24T07:02:55Z
+
+Maybe it will help for #23671. 👍 but there will be some work to do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-24T11:46:30Z
+
+I think this should be merged in 3.3 instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-28T09:16:28Z
+
+:+1: for 3.3
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-28T10:44:54Z
+
+rebased on 3.3

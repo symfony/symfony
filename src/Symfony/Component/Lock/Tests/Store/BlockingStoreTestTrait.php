@@ -43,6 +43,13 @@ trait BlockingStoreTestTrait
             return;
         }
 
+        // this function is not available in macOS. See https://bugs.php.net/bug.php?id=70708
+        if (!function_exists('pcntl_sigwaitinfo')) {
+            $this->markTestSkipped('pcntl_sigwaitinfo() PHP function is required.');
+
+            return;
+        }
+
         /** @var StoreInterface $store */
         $store = $this->getStore();
         $key = new Key(uniqid(__METHOD__, true));

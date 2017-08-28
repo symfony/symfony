@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-3.4.0
------
-
- * PHPUnit 6 is installed when using PHP 7.2+
-
 3.3.0
 -----
 

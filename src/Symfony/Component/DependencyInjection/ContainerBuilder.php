@@ -641,10 +641,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($this->getParameterBag() instanceof EnvPlaceholderParameterBag && $container->getParameterBag() instanceof EnvPlaceholderParameterBag) {
+            $envPlaceholders = $container->getParameterBag()->getEnvPlaceholders();
             $this->getParameterBag()->mergeEnvPlaceholders($container->getParameterBag());
+        } else {
+            $envPlaceholders = array();
         }
 
         foreach ($container->envCounters as $env => $count) {
+            if (!$count && !isset($envPlaceholders[$env])) {
+                continue;
+            }
             if (!isset($this->envCounters[$env])) {
                 $this->envCounters[$env] = $count;
             } else {

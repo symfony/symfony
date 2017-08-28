@@ -45,12 +45,14 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 // this extension was not called
                 continue;
             }
-            // EnvPlaceholderParameterBag tracks env vars when calling resolveValue().
-            // Clone so that tracking is done in a dedicated bag.
-            $resolvingBag = clone $container->getParameterBag();
+            $resolvingBag = $container->getParameterBag();
+            if ($resolvingBag instanceof EnvPlaceholderParameterBag && $extension instanceof Extension) {
+                // create a dedicated bag so that we can track env vars per-extension
+                $resolvingBag = new MergeExtensionConfigurationParameterBag($resolvingBag);
+            }
             $config = $resolvingBag->resolveValue($config);
 
-            $tmpContainer = new ContainerBuilder($container->getParameterBag());
+            $tmpContainer = new ContainerBuilder($resolvingBag);
             $tmpContainer->setResourceTracking($container->isTrackingResources());
             $tmpContainer->addObjectResource($extension);
             if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
@@ -63,13 +65,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             $extension->load($config, $tmpContainer);
 
-            if ($resolvingBag instanceof EnvPlaceholderParameterBag) {
-                // $resolvingBag keeps track of env vars encoutered *before* merging configs
-                if ($extension instanceof Extension) {
-                    // but we don't want to keep track of env vars that are *overridden* when configs are merged
-                    $resolvingBag = new MergeExtensionConfigurationParameterBag($extension, $resolvingBag);
-                }
-                $container->getParameterBag()->mergeEnvPlaceholders($resolvingBag);
+            if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
+                // don't keep track of env vars that are *overridden* when configs are merged
+                $resolvingBag->freezeAfterProcessing($extension);
             }
 
             $container->merge($tmpContainer);
@@ -86,21 +84,18 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
  */
 class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
 {
-    private $beforeProcessingEnvPlaceholders;
+    private $processedEnvPlaceholders;
 
-    public function __construct(Extension $extension, parent $resolvingBag)
+    public function __construct(parent $parameterBag)
     {
-        $this->beforeProcessingEnvPlaceholders = $resolvingBag->getEnvPlaceholders();
-        $config = $this->resolveEnvPlaceholders($extension->getProcessedConfigs());
-        parent::__construct($this->resolveValue($config));
+        parent::__construct($parameterBag->all());
+        $this->mergeEnvPlaceholders($parameterBag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function get($name)
+    public function freezeAfterProcessing(Extension $extension)
     {
-        return $this->has($name) || (0 === strpos($name, 'env(') && ')' === substr($name, -1) && 'env()' !== $name) ? parent::get($name) : '';
+        $this->processedEnvPlaceholders = array();
+        $this->processMergedConfig($extension->getProcessedConfigs(), parent::getEnvPlaceholders());
     }
 
     /**
@@ -108,33 +103,22 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
      */
     public function getEnvPlaceholders()
     {
-        // contains the list of env vars that are still used after configs have been merged
-        $envPlaceholders = parent::getEnvPlaceholders();
-
-        foreach ($envPlaceholders as $env => $placeholders) {
-            if (isset($this->beforeProcessingEnvPlaceholders[$env])) {
-                // for still-used env vars, keep track of their before-processing placeholders
-                $envPlaceholders[$env] += $this->beforeProcessingEnvPlaceholders[$env];
-            }
-        }
-
-        return $envPlaceholders;
+        return null !== $this->processedEnvPlaceholders ? $this->processedEnvPlaceholders : parent::getEnvPlaceholders();
     }
 
-    /**
-     * Replaces-back env placeholders to their original "%env(FOO)%" version.
-     */
-    private function resolveEnvPlaceholders($value)
+    private function processMergedConfig($value, array $envPlaceholders)
     {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                $value[$this->resolveEnvPlaceholders($k)] = $this->resolveEnvPlaceholders($v);
+                $this->processMergedConfig($k, $envPlaceholders);
+                $this->processMergedConfig($v, $envPlaceholders);
             }
         } elseif (is_string($value)) {
-            foreach ($this->beforeProcessingEnvPlaceholders as $env => $placeholders) {
+            foreach ($envPlaceholders as $env => $placeholders) {
                 foreach ($placeholders as $placeholder) {
                     if (false !== stripos($value, $placeholder)) {
-                        $value = str_ireplace($placeholder, "%env($env)%", $value);
+                        $this->processedEnvPlaceholders[$env] = $placeholders;
+                        break;
                     }
                 }
             }

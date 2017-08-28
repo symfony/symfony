@@ -71,9 +71,15 @@ trait ApcuTrait
      */
     protected function doClear($namespace)
     {
-        return isset($namespace[0]) && class_exists('APCuIterator', false) && ('cli' !== PHP_SAPI || ini_get('apc.enable_cli'))
-            ? apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY))
-            : apcu_clear_cache();
+        if (!isset($namespace[0]) || !('cli' !== PHP_SAPI || ini_get('apc.enable_cli'))) {
+            return apcu_clear_cache();
+        }
+
+        if (class_exists('APCuIterator', false)) {
+            return apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY));
+        }
+
+        return apcu_delete(new \APCIterator('user', sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY));
     }
 
     /**

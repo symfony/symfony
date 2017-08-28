@@ -26,6 +26,7 @@
         "psr/link": "^1.0",
         "psr/log": "~1.0",
         "psr/simple-cache": "^1.0",
+        "symfony/polyfill-apcu": "~1.1",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php56": "~1.0",
@@ -96,7 +97,6 @@
         "predis/predis": "~1.0",
         "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
         "symfony/phpunit-bridge": "~3.2",
-        "symfony/polyfill-apcu": "~1.1",
         "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0",
         "sensio/framework-extra-bundle": "^3.0.2"

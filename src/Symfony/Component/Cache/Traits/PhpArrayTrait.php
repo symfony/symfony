@@ -25,7 +25,7 @@ trait PhpArrayTrait
     private $file;
     private $values;
     private $fallbackPool;
-    private $zendMultiByte;
+    private $zendDetectUnicode;
 
     /**
      * Store an array of cached values.
@@ -127,14 +127,14 @@ EOF;
      */
     private function initialize()
     {
-        if ($this->zendMultiByte) {
-            $zmb = ini_set('zend.multibyte', 0);
+        if ($this->zendDetectUnicode) {
+            $zmb = ini_set('zend.detect_unicode', 0);
         }
         try {
             $this->values = file_exists($this->file) ? (include $this->file ?: array()) : array();
         } finally {
-            if ($this->zendMultiByte) {
-                ini_set('zend.multibyte', $zmb);
+            if ($this->zendDetectUnicode) {
+                ini_set('zend.detect_unicode', $zmb);
             }
         }
     }

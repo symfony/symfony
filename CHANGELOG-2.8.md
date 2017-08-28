@@ -7,6 +7,19 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.27 (2017-08-28)
+
+ * bug #23989 [Debug] Remove false-positive check in DebugClassLoader (nicolas-grekas)
+ * bug #23982 [VarDumper] Strengthen dumped JS (nicolas-grekas)
+ * bug #23925 [Validator] Fix use of GroupSequenceProvider in child classes (linniksa)
+ * bug #23945 [Validator] Fix Greek translation (azhurb)
+ * bug #23909 [Console] Initialize lazily to render exceptions properly (nicolas-grekas)
+ * bug #23856 [DI] Fix dumping abstract with YamlDumper (nicolas-grekas)
+ * bug #23752 Ignore memcached missing key error on session destroy (jderusse)
+ * bug #23658 [HttpFoundation] Generate safe fallback filename for wrongly encoded filename (xelaris)
+ * bug #23783 Avoid infinite loops when profiler data is malformed (javiereguiluz)
+ * bug #23729 [Bridge\ProxyManager] Dont call __destruct() on non-instantiated services (nicolas-grekas)
+
 * 2.8.26 (2017-08-01)
 
  * bug #22244 [Console] Fix passing options with defaultCommand (Jakub Sacha)

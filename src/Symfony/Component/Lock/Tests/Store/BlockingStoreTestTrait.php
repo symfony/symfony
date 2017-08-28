@@ -31,6 +31,7 @@ trait BlockingStoreTestTrait
      * This test is time sensible: the $clockDelay could be adjust.
      *
      * @requires extension pcntl
+     * @requires function pcntl_sigwaitinfo
      */
     public function testBlockingLocks()
     {
@@ -39,13 +40,6 @@ trait BlockingStoreTestTrait
 
         if (\PHP_VERSION_ID < 50600 || defined('HHVM_VERSION_ID')) {
             $this->markTestSkipped('The PHP engine does not keep resource in child forks');
-
-            return;
-        }
-
-        // this function is not available in macOS. See https://bugs.php.net/bug.php?id=70708
-        if (!function_exists('pcntl_sigwaitinfo')) {
-            $this->markTestSkipped('pcntl_sigwaitinfo() PHP function is required.');
 
             return;
         }

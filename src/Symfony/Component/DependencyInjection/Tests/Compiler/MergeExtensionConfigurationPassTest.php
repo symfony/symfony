@@ -81,7 +81,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertSame(array('FOO', 'BAZ'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(array('BAZ', 'FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
         $this->assertSame(array('BAZ' => 1, 'FOO' => 0), $container->getEnvCounters());
     }
 }

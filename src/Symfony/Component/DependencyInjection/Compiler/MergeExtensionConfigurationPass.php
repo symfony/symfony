@@ -95,7 +95,18 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     public function freezeAfterProcessing(Extension $extension)
     {
         $this->processedEnvPlaceholders = array();
-        $this->processMergedConfig($extension->getProcessedConfigs(), parent::getEnvPlaceholders());
+
+        // serialize config to catch env vars nested in object graphs
+        $config = serialize($extension->getProcessedConfigs());
+
+        foreach (parent::getEnvPlaceholders() as $env => $placeholders) {
+            foreach ($placeholders as $placeholder) {
+                if (false !== stripos($config, $placeholder)) {
+                    $this->processedEnvPlaceholders[$env] = $placeholders;
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -104,26 +115,5 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     public function getEnvPlaceholders()
     {
         return null !== $this->processedEnvPlaceholders ? $this->processedEnvPlaceholders : parent::getEnvPlaceholders();
-    }
-
-    private function processMergedConfig($value, array $envPlaceholders)
-    {
-        if (is_array($value)) {
-            foreach ($value as $k => $v) {
-                $this->processMergedConfig($k, $envPlaceholders);
-                $this->processMergedConfig($v, $envPlaceholders);
-            }
-        } elseif (is_string($value)) {
-            foreach ($envPlaceholders as $env => $placeholders) {
-                foreach ($placeholders as $placeholder) {
-                    if (false !== stripos($value, $placeholder)) {
-                        $this->processedEnvPlaceholders[$env] = $placeholders;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $value;
     }
 }

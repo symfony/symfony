@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-26T08:15:59Z
+
+We should throw an exception when namespace is used and resource isn't.
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-08-27T11:44:33Z
+
+1. An exception is now thrown when the `namespace` attribute is used but not `resource`
+2. Should I close #23986? Are we going with this implementation?
+3. I opened this PR against master but it should be against 3.4 - should I change or can you do that when merging?
+4. If we are going to go with this implementation, I will open a doc PR.
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-08-28T14:09:54Z
+
+Ok, rebased/retargeted to 3.4 and doc PR opened.

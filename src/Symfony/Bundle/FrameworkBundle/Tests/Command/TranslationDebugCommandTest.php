@@ -130,10 +130,10 @@ class TranslationDebugCommandTest extends TestCase
                 })
             );
 
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader')->getMock();
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Reader\TranslationReader')->getMock();
         $loader
             ->expects($this->any())
-            ->method('loadMessages')
+            ->method('read')
             ->will(
                 $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
@@ -197,7 +197,7 @@ class TranslationDebugCommandTest extends TestCase
             ->method('get')
             ->will($this->returnValueMap(array(
                 array('translation.extractor', 1, $extractor),
-                array('translation.loader', 1, $loader),
+                array('translation.reader', 1, $loader),
                 array('translator', 1, $translator),
                 array('kernel', 1, $kernel),
             )));

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
@@ -21,6 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
@@ -36,17 +36,17 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     protected static $defaultName = 'translation:update';
 
     private $writer;
-    private $loader;
+    private $reader;
     private $extractor;
     private $defaultLocale;
 
     /**
      * @param TranslationWriterInterface $writer
-     * @param TranslationLoader          $loader
+     * @param TranslationReaderInterface $reader
      * @param ExtractorInterface         $extractor
      * @param string                     $defaultLocale
      */
-    public function __construct($writer = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
+    public function __construct($writer = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
     {
         if (!$writer instanceof TranslationWriterInterface) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
@@ -59,7 +59,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
         parent::__construct();
 
         $this->writer = $writer;
-        $this->loader = $loader;
+        $this->reader = $reader;
         $this->extractor = $extractor;
         $this->defaultLocale = $defaultLocale;
     }
@@ -127,7 +127,7 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->writer) {
             $this->writer = $this->getContainer()->get('translation.writer');
-            $this->loader = $this->getContainer()->get('translation.loader');
+            $this->reader = $this->getContainer()->get('translation.reader');
             $this->extractor = $this->getContainer()->get('translation.extractor');
             $this->defaultLocale = $this->getContainer()->getParameter('kernel.default_locale');
         }
@@ -201,7 +201,7 @@ EOF
         foreach ($transPaths as $path) {
             $path .= 'translations';
             if (is_dir($path)) {
-                $this->loader->loadMessages($path, $currentCatalogue);
+                $this->reader->read($path, $currentCatalogue);
             }
         }
 

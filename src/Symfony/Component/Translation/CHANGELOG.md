@@ -7,6 +7,7 @@ CHANGELOG
  * Added `TranslationDumperPass`
  * Added `TranslationExtractorPass`
  * Added `TranslatorPass`
+ * Added `TranslationReader` and `TranslationReaderInterface`
  * Added `<notes>` section to the Xliff 2.0 dumper.
  * Improved Xliff 2.0 loader to load `<notes>` section.
  * Added `TranslationWriterInterface`

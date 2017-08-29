@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\LoggingTranslator;
@@ -43,15 +43,15 @@ class TranslationDebugCommand extends ContainerAwareCommand
     protected static $defaultName = 'debug:translation';
 
     private $translator;
-    private $loader;
+    private $reader;
     private $extractor;
 
     /**
-     * @param TranslatorInterface $translator
-     * @param TranslationLoader   $loader
-     * @param ExtractorInterface  $extractor
+     * @param TranslatorInterface        $translator
+     * @param TranslationReaderInterface $reader
+     * @param ExtractorInterface         $extractor
      */
-    public function __construct($translator = null, TranslationLoader $loader = null, ExtractorInterface $extractor = null)
+    public function __construct($translator = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null)
     {
         if (!$translator instanceof TranslatorInterface) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
@@ -64,7 +64,7 @@ class TranslationDebugCommand extends ContainerAwareCommand
         parent::__construct();
 
         $this->translator = $translator;
-        $this->loader = $loader;
+        $this->reader = $reader;
         $this->extractor = $extractor;
     }
 
@@ -142,7 +142,7 @@ EOF
         // BC to be removed in 4.0
         if (null === $this->translator) {
             $this->translator = $this->getContainer()->get('translator');
-            $this->loader = $this->getContainer()->get('translation.loader');
+            $this->reader = $this->getContainer()->get('translation.reader');
             $this->extractor = $this->getContainer()->get('translation.extractor');
         }
 
@@ -331,7 +331,7 @@ EOF
         foreach ($transPaths as $path) {
             $path = $path.'translations';
             if (is_dir($path)) {
-                $this->loader->loadMessages($path, $currentCatalogue);
+                $this->reader->read($path, $currentCatalogue);
             }
         }
 
@@ -357,7 +357,7 @@ EOF
                 foreach ($transPaths as $path) {
                     $path = $path.'translations';
                     if (is_dir($path)) {
-                        $this->loader->loadMessages($path, $fallbackCatalogue);
+                        $this->reader->read($path, $fallbackCatalogue);
                     }
                 }
                 $fallbackCatalogues[] = $fallbackCatalogue;

@@ -19,13 +19,17 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 class TranslatorPass implements CompilerPassInterface
 {
     private $translatorServiceId;
-    private $loaderServiceId;
+    private $readerServiceId;
     private $loaderTag;
 
-    public function __construct($translatorServiceId = 'translator.default', $loaderServiceId = 'translation.loader', $loaderTag = 'translation.loader')
+    public function __construct($translatorServiceId = 'translator.default', $readerServiceId = 'translation.loader', $loaderTag = 'translation.loader')
     {
+        if ('translation.loader' === $readerServiceId && 2 > func_num_args()) {
+            @trigger_error('The default value for $readerServiceId will change in 4.0 to "translation.reader".', E_USER_DEPRECATED);
+        }
+
         $this->translatorServiceId = $translatorServiceId;
-        $this->loaderServiceId = $loaderServiceId;
+        $this->readerServiceId = $readerServiceId;
         $this->loaderTag = $loaderTag;
     }
 
@@ -45,11 +49,23 @@ class TranslatorPass implements CompilerPassInterface
             }
         }
 
-        if ($container->hasDefinition($this->loaderServiceId)) {
-            $definition = $container->getDefinition($this->loaderServiceId);
+        if ($container->hasDefinition($this->readerServiceId)) {
+            $definition = $container->getDefinition($this->readerServiceId);
             foreach ($loaders as $id => $formats) {
                 foreach ($formats as $format) {
                     $definition->addMethodCall('addLoader', array($format, $loaderRefs[$id]));
+                }
+            }
+        }
+
+        // Duplicated code to support "translation.reader", to be removed in 4.0
+        if ('translation.reader' !== $this->readerServiceId) {
+            if ($container->hasDefinition('translation.reader')) {
+                $definition = $container->getDefinition('translation.reader');
+                foreach ($loaders as $id => $formats) {
+                    foreach ($formats as $format) {
+                        $definition->addMethodCall('addLoader', array($format, $loaderRefs[$id]));
+                    }
                 }
             }
         }

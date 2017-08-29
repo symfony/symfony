@@ -66,10 +66,9 @@ class Configuration implements ConfigurationInterface
                     ->defaultTrue()
                 ->end()
                 ->arrayNode('trusted_proxies')
+                    ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) {
-                            @trigger_error('The "framework.trusted_proxies" configuration key has been deprecated in Symfony 3.3. Use the Request::setTrustedProxies() method in your front controller instead.', E_USER_DEPRECATED);
-
                             return !is_array($v) && null !== $v;
                         })
                         ->then(function ($v) { return is_bool($v) ? array() : preg_split('/\s*,\s*/', $v); })
@@ -663,8 +662,9 @@ class Configuration implements ConfigurationInterface
                     ->{!class_exists(FullStack::class) && class_exists(Validation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->scalarNode('cache')
+                            // Can be removed in 4.0, when validator.mapping.cache.doctrine.apc is removed
+                            ->setDeprecated('The "%path%.%node%" option is deprecated since Symfony 3.2 and will be removed in 4.0. Configure the "cache.validator" service under "framework.cache.pools" instead.')
                             ->beforeNormalization()
-                                // Can be removed in 4.0, when validator.mapping.cache.doctrine.apc is removed
                                 ->ifString()->then(function ($v) {
                                     if ('validator.mapping.cache.doctrine.apc' === $v && !class_exists('Doctrine\Common\Cache\ApcCache')) {
                                         throw new LogicException('Doctrine APC cache for the validator cannot be enabled as the Doctrine Cache package is not installed.');
@@ -727,7 +727,9 @@ class Configuration implements ConfigurationInterface
                     ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
-                        ->scalarNode('cache')->end()
+                        ->scalarNode('cache')
+                            ->setDeprecated('The "%path%.%node%" option is deprecated since Symfony 3.1 and will be removed in 4.0. Configure the "cache.serializer" service under "framework.cache.pools" instead.')
+                        ->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()
                         ->arrayNode('mapping')

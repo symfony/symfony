@@ -1198,8 +1198,6 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['cache']) && $config['cache']) {
-            @trigger_error('The "framework.validation.cache" option is deprecated since Symfony 3.2 and will be removed in 4.0. Configure the "cache.validator" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
-
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.$this->getKernelRootHash($container)
@@ -1454,8 +1452,6 @@ class FrameworkExtension extends Extension
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
         if (isset($config['cache']) && $config['cache']) {
-            @trigger_error('The "framework.serializer.cache" option is deprecated since Symfony 3.1 and will be removed in 4.0. Configure the "cache.serializer" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
-
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
                 'serializer_'.$this->getKernelRootHash($container)

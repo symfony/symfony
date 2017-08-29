@@ -53,7 +53,9 @@ security:
             switch_user: true
             x509: true
             remote_user: true
-            logout: true
+            logout:
+                delete_cookies:
+                    cookie-name: ~
             remember_me:
                 key: TheKey
         host:

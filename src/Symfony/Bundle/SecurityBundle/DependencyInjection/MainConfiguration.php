@@ -264,6 +264,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->fixXmlConfig('delete_cookie')
                 ->children()
                     ->arrayNode('delete_cookies')
+                        ->normalizeKeys(false)
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return is_array($v) && is_int(key($v)); })
                             ->then(function ($v) { return array_map(function ($v) { return array('name' => $v); }, $v); })

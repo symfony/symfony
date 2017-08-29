@@ -70,7 +70,9 @@ $container->loadFromExtension('security', array(
             'switch_user' => true,
             'x509' => true,
             'remote_user' => true,
-            'logout' => true,
+            'logout' => array(
+                'delete_cookies' => array('cookie-name' => true),
+            ),
             'remember_me' => array('key' => 'TheKey'),
         ),
         'host' => array(

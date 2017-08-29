@@ -55,7 +55,11 @@
             <switch-user />
             <x509 />
             <remote-user />
-            <logout />
+            <logout>
+                <delete-cookies>
+                    <cookie-name/>
+                </delete-cookies>
+            </logout>
             <remember-me key="TheyKey"/>
         </firewall>
 

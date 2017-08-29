@@ -62,7 +62,7 @@ class DateCaster
         }
 
         if (\PHP_VERSION_ID >= 70100 && isset($i->f)) {
-            $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:'.self::formatSeconds($i->s, $i->f) : '';
+            $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:'.self::formatSeconds($i->s, substr($i->f, 2)) : '';
         } else {
             $format .= $i->h || $i->i || $i->s ? '%H:%I:%S' : '';
         }

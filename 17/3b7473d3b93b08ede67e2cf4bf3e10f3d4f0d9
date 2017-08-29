@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-07-30T12:35:57Z
+
+I want to ask you about naming.
+
+We have a `TranslationWriter` which uses `DumperInterface`.
+We also have a `TranslationLoader` which uses `LoaderInterface`.
+
+Should this interface be called `TranslationReaderInterface` instead? Then we got a reader/writer.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-01T10:28:51Z
+
+👍  Reader/Writer naming looks natural. It's also used by the best programming languages:
+
+* Java: https://docs.oracle.com/javase/7/docs/api/java/io/package-summary.html
+* C#: https://msdn.microsoft.com/en-us/library/system.io.stream(v=vs.110).aspx
+* Go: https://golang.org/pkg/io/
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-01T10:52:25Z
+
+I've renamed the interface now. I'm happy if I could get a review to this PR.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-01T13:52:09Z
+
+Thank you @chalasr. I made this PR simpler by just adding the interface. When/If merged, I will update #23666
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-02T14:18:20Z
+
+Is it anything else I can do to get this PR merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-02T17:02:09Z
+
+I think it would be nice to have the implementation of `TranslationReaderInterface` in this PR. Merging a PR with an interface that is not even used internally looks weird to me.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-02T17:10:20Z
+
+I made 4 different PRs to keep things separate. I think I made a headache for myself. I will add an implementation here and close https://github.com/symfony/symfony/pull/23666
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-02T18:12:43Z
+
+@Nyholm Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-03T09:27:42Z
+
+@Nyholm this line needs to be updated https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php#L980 for instantiating the `TranslatorPass` with the same args as `FrameworkBundle` does. Once fixed we should be OK regarding BC layers  :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-03T09:36:33Z
+
+Thank you. I've updated the PR
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-03T16:39:13Z
+
+Thank you for the review. Ive updated accordingly.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-06T19:15:17Z
+
+PR is rebased and test are green.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-08T08:34:02Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-22T13:00:13Z
+
+Should I rebase this one more time?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-22T13:01:40Z
+
+yes please (and squash meanwhile if you want)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-22T13:07:04Z
+
+Are we sure we want to move away from `Loader`s and introduce `Reader`s? Loaders are what we are using everywhere else in the framework. Dumpers are also everywhere, except here as we have `Writer`s. Not sure what is best? Be more consistent with other languages or more consistent with Symfony?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-22T13:13:43Z
+
+> Are we sure we want to move away from Loaders and introduce Readers?
+
+Yes. We do not give up the concept of "Loader" we just rename it for clarity.
+
+### Before
+
+* We have a `TranslationWriter` (implements `TranslationWriterInterface`) which uses `DumperInterface`.
+* We also have a `TranslationLoader` which uses `LoaderInterface`.
+
+### After
+
+* We have a `TranslationWriter` (implements `TranslationWriterInterface`) which uses `DumperInterface`.
+* We also have a `TranslationReader` (implements `TranslationReaderInterface`)  which uses `LoaderInterface`.
+
+If we do not rename it to *Reader then we would have a `TranslationLoaderInterface` and `LoaderInterface` which is confusing.
+
+------------
+
+I'll rebase and squash shortly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-22T13:23:54Z
+
+@Nyholm very clear. Confusion was on my end. Looks good to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-29T13:51:48Z
+
+@Nyholm can you rebase please?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-08-29T13:55:01Z
+
+Of course.

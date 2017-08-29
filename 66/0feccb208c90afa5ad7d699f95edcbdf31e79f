@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-25T18:51:06Z
+
+First proposal:
+
+![screenshot from 2017-07-25 20-48-58](https://user-images.githubusercontent.com/4578773/28588454-eb81ef1e-717a-11e7-8a1a-b2e98bef310b.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-26T09:12:25Z
+
+If we only want start/end/interval to be nicely dumped, that would already work as is right?
+
+Im not sure about the fancy period formatting :) though i like your creativity :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-26T14:22:24Z
+
+agree with @ro0NL, not really convinced myself sorry...
+maybe something like "every $period from $start to $end" (& variants)?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-07-27T17:41:18Z
+
+Ok, I made tests green and I updated format. Example with end date (1) and with recurrences (2):
+
+```
+1) every + 1d, from 2017-01-01 00:00:00 (included) to 2017-01-03 00:00:00
+2) every + 1d, from 2017-01-01 00:00:00 (included) for 2x
+```
+
+I kept tooltip with the dates included in the period. I find this useful, and you?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-03T12:54:45Z
+
+Fail not related.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-14T18:33:51Z
+
+Can you review this PR please? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-16T16:41:14Z
+
+is the screenshot up to date?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-17T09:42:50Z
+
+Screenshot updated in PR description.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-28T18:48:12Z
+
+Changes done + screenshot updated.

@@ -505,13 +505,9 @@ class Application
      */
     public function has($name)
     {
-<<<<<<< HEAD
-        return isset($this->commands[$name]) || ($this->commandLoader && $this->commandLoader->has($name));
-=======
         $this->init();
 
-        return isset($this->commands[$name]);
->>>>>>> 3.3
+        return isset($this->commands[$name]) || ($this->commandLoader && $this->commandLoader->has($name));
     }
 
     /**
@@ -588,13 +584,9 @@ class Application
      */
     public function find($name)
     {
-<<<<<<< HEAD
-        $allCommands = $this->commandLoader ? array_merge($this->commandLoader->getNames(), array_keys($this->commands)) : array_keys($this->commands);
-=======
         $this->init();
 
-        $allCommands = array_keys($this->commands);
->>>>>>> 3.3
+        $allCommands = $this->commandLoader ? array_merge($this->commandLoader->getNames(), array_keys($this->commands)) : array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
 

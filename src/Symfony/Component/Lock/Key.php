@@ -72,19 +72,21 @@ final class Key
         return $this->state[$stateKey];
     }
 
+    /**
+     * @param float $ttl The expiration delay of locks in seconds.
+     */
+    public function reduceLifetime($ttl)
+    {
+        $newExpiringDate = \DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $ttl));
+
+        if (null === $this->expiringDate || $newExpiringDate < $this->expiringDate) {
+            $this->expiringDate = $newExpiringDate;
+        }
+    }
+
     public function resetExpiringDate()
     {
         $this->expiringDate = null;
-    }
-
-    /**
-     * @param \DateTimeImmutable $expiringDate
-     */
-    public function reduceExpiringDate(\DateTimeImmutable $expiringDate)
-    {
-        if (null === $this->expiringDate || $this->expiringDate > $expiringDate) {
-            $this->expiringDate = $expiringDate;
-        }
     }
 
     /**

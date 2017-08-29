@@ -58,7 +58,7 @@ class MemcachedStore implements StoreInterface
     {
         $token = $this->getToken($key);
 
-        $key->reduceExpiringDate(\DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $this->initialTtl)));
+        $key->reduceLifetime($this->initialTtl);
         if ($this->memcached->add((string) $key, $token, (int) ceil($this->initialTtl))) {
             return;
         }
@@ -88,7 +88,7 @@ class MemcachedStore implements StoreInterface
 
         list($value, $cas) = $this->getValueAndCas($key);
 
-        $key->reduceExpiringDate(\DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $ttl)));
+        $key->reduceLifetime($ttl);
         // Could happens when we ask a putOff after a timeout but in luck nobody steal the lock
         if (\Memcached::RES_NOTFOUND === $this->memcached->getResultCode()) {
             if ($this->memcached->add((string) $key, $token, $ttl)) {

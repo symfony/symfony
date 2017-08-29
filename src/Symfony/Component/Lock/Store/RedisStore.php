@@ -57,7 +57,7 @@ class RedisStore implements StoreInterface
             end
         ';
 
-        $key->reduceExpiringDate(\DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $this->initialTtl)));
+        $key->reduceLifetime($this->initialTtl);
         if (!$this->evaluate($script, (string) $key, array($this->getToken($key), (int) ceil($this->initialTtl * 1000)))) {
             throw new LockConflictedException();
         }
@@ -81,7 +81,7 @@ class RedisStore implements StoreInterface
             end
         ';
 
-        $key->reduceExpiringDate(\DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $ttl)));
+        $key->reduceLifetime($ttl);
         if (!$this->evaluate($script, (string) $key, array($this->getToken($key), (int) ceil($ttl * 1000)))) {
             throw new LockConflictedException();
         }

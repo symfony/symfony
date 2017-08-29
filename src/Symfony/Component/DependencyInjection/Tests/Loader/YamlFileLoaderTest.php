@@ -390,6 +390,45 @@ class YamlFileLoaderTest extends TestCase
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
     }
 
+    public function testPrototypeWithNamespace()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_prototype_namespace.yml');
+
+        $ids = array_keys($container->getDefinitions());
+        sort($ids);
+
+        $this->assertSame(array(
+            Prototype\OtherDir\Component1\Dir1\Service1::class,
+            Prototype\OtherDir\Component1\Dir2\Service2::class,
+            Prototype\OtherDir\Component2\Dir1\Service4::class,
+            Prototype\OtherDir\Component2\Dir2\Service5::class,
+            'service_container',
+        ), $ids);
+
+        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component1\Dir1\Service1::class)->hasTag('foo'));
+        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component2\Dir1\Service4::class)->hasTag('foo'));
+        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component1\Dir1\Service1::class)->hasTag('bar'));
+        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component2\Dir1\Service4::class)->hasTag('bar'));
+
+        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component1\Dir2\Service2::class)->hasTag('bar'));
+        $this->assertTrue($container->getDefinition(Prototype\OtherDir\Component2\Dir2\Service5::class)->hasTag('bar'));
+        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component1\Dir2\Service2::class)->hasTag('foo'));
+        $this->assertFalse($container->getDefinition(Prototype\OtherDir\Component2\Dir2\Service5::class)->hasTag('foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /A "resource" attribute must be set when the "namespace" attribute is set for service ".+" in .+/
+     */
+    public function testPrototypeWithNamespaceAndNoResource()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_prototype_namespace_without_resource.yml');
+    }
+
     public function testDefaults()
     {
         $container = new ContainerBuilder();

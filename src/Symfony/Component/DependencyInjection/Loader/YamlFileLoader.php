@@ -63,6 +63,7 @@ class YamlFileLoader extends FileLoader
 
     private static $prototypeKeywords = array(
         'resource' => 'resource',
+        'namespace' => 'namespace',
         'exclude' => 'exclude',
         'parent' => 'parent',
         'shared' => 'shared',
@@ -560,12 +561,17 @@ class YamlFileLoader extends FileLoader
             }
         }
 
+        if (array_key_exists('namespace', $service) && !array_key_exists('resource', $service)) {
+            throw new InvalidArgumentException(sprintf('A "resource" attribute must be set when the "namespace" attribute is set for service "%s" in %s. Check your YAML syntax.', $id, $file));
+        }
+
         if (array_key_exists('resource', $service)) {
             if (!is_string($service['resource'])) {
                 throw new InvalidArgumentException(sprintf('A "resource" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
             }
             $exclude = isset($service['exclude']) ? $service['exclude'] : null;
-            $this->registerClasses($definition, $id, $service['resource'], $exclude);
+            $namespace = isset($service['namespace']) ? $service['namespace'] : $id;
+            $this->registerClasses($definition, $namespace, $service['resource'], $exclude);
         } else {
             $this->setDefinition($id, $definition);
         }
@@ -804,7 +810,7 @@ class YamlFileLoader extends FileLoader
     {
         if ($throw = $this->isLoadingInstanceof) {
             $keywords = self::$instanceofKeywords;
-        } elseif ($throw = isset($definition['resource'])) {
+        } elseif ($throw = (isset($definition['resource']) || isset($definition['namespace']))) {
             $keywords = self::$prototypeKeywords;
         } else {
             $keywords = self::$serviceKeywords;

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
@@ -22,6 +21,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
@@ -37,22 +37,16 @@ class TranslationUpdateCommand extends Command
     protected static $defaultName = 'translation:update';
 
     private $writer;
-    private $loader;
+    private $reader;
     private $extractor;
     private $defaultLocale;
 
-    /**
-     * @param TranslationWriterInterface $writer
-     * @param TranslationLoader          $loader
-     * @param ExtractorInterface         $extractor
-     * @param string                     $defaultLocale
-     */
-    public function __construct(TranslationWriterInterface $writer, TranslationLoader $loader, ExtractorInterface $extractor, $defaultLocale)
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, $defaultLocale)
     {
         parent::__construct();
 
         $this->writer = $writer;
-        $this->loader = $loader;
+        $this->reader = $reader;
         $this->extractor = $extractor;
         $this->defaultLocale = $defaultLocale;
     }
@@ -162,7 +156,7 @@ EOF
         foreach ($transPaths as $path) {
             $path .= 'translations';
             if (is_dir($path)) {
-                $this->loader->loadMessages($path, $currentCatalogue);
+                $this->reader->read($path, $currentCatalogue);
             }
         }
 

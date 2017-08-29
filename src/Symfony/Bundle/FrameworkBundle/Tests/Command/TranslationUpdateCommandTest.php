@@ -101,10 +101,10 @@ class TranslationUpdateCommandTest extends TestCase
                 })
             );
 
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader')->getMock();
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Reader\TranslationReader')->getMock();
         $loader
             ->expects($this->any())
-            ->method('loadMessages')
+            ->method('read')
             ->will(
                 $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);

@@ -77,6 +77,31 @@ class ApcuAdapterTest extends AdapterTestCase
         $this->assertNull($item->get());
     }
 
+    public function testNamespace()
+    {
+        $namespace = str_replace('\\', '.', get_class($this));
+
+        $pool1 = new ApcuAdapter($namespace.'_1', 0, 'p1');
+
+        $item = $pool1->getItem('foo');
+        $this->assertFalse($item->isHit());
+        $this->assertTrue($pool1->save($item->set('bar')));
+
+        $item = $pool1->getItem('foo');
+        $this->assertTrue($item->isHit());
+        $this->assertSame('bar', $item->get());
+
+        $pool2 = new ApcuAdapter($namespace.'_2', 0, 'p1');
+
+        $item = $pool2->getItem('foo');
+        $this->assertFalse($item->isHit());
+        $this->assertNull($item->get());
+
+        $item = $pool1->getItem('foo');
+        $this->assertTrue($item->isHit());
+        $this->assertSame('bar', $item->get());
+    }
+
     public function testWithCliSapi()
     {
         try {

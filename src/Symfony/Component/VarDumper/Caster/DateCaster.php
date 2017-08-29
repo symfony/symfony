@@ -78,6 +78,40 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $z : $z + $a;
     }
 
+    public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, $isNested, $filter)
+    {
+        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) { // see https://bugs.php.net/bug.php?id=71635
+            return $a;
+        }
+
+        $dates = array();
+        if (\PHP_VERSION_ID >= 70107) { // see https://bugs.php.net/bug.php?id=74639
+            foreach (clone $p as $i => $d) {
+                if (3 === $i) {
+                    $now = new \DateTimeImmutable();
+                    $dates[] = sprintf('%s more', ($end = $p->getEndDate())
+                        ? ceil(($end->format('U.u') - $d->format('U.u')) / ($now->add($p->getDateInterval())->format('U.u') - $now->format('U.u')))
+                        : $p->recurrences - $i
+                    );
+                    break;
+                }
+                $dates[] = sprintf('%s) %s', $i + 1, $d->format('Y-m-d H:i:s'));
+            }
+        }
+
+        $period = sprintf(
+            'every %s, from %s (%s) %s',
+            self::formatInterval($p->getDateInterval()),
+            $p->getStartDate()->format('Y-m-d H:i:s'),
+            $p->include_start_date ? 'included' : 'excluded',
+            ($end = $p->getEndDate()) ? 'to '.$end->format('Y-m-d H:i:s') : 'recurring '.$p->recurrences.' time/s'
+        );
+
+        $p = array(Caster::PREFIX_VIRTUAL.'period' => new ConstStub($period, implode("\n", $dates)));
+
+        return $filter & Caster::EXCLUDE_VERBOSE ? $p : $p + $a;
+    }
+
     private static function formatSeconds($s, $us)
     {
         return sprintf('%02d.%s', $s, 0 === ($len = strlen($t = rtrim($us, '0'))) ? '0' : ($len <= 3 ? str_pad($t, 3, '0') : $us));

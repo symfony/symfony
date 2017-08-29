@@ -25,26 +25,33 @@ class TranslationPassTest extends TestCase
         $loader = (new Definition())
             ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'));
 
+        $reader = new Definition();
+
         $translator = (new Definition())
             ->setArguments(array(null, null, null, null));
 
         $container = new ContainerBuilder();
         $container->setDefinition('translator.default', $translator);
-        $container->setDefinition('translation.loader', $loader);
+        $container->setDefinition('translation.reader', $reader);
+        $container->setDefinition('translation.xliff_loader', $loader);
 
-        $pass = new TranslatorPass();
+        $pass = new TranslatorPass('translator.default', 'translation.reader');
         $pass->process($container);
 
-        $expected = (new Definition())
-            ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'))
-            ->addMethodCall('addLoader', array('xliff', new Reference('translation.loader')))
-            ->addMethodCall('addLoader', array('xlf', new Reference('translation.loader')))
+        $expectedReader = (new Definition())
+            ->addMethodCall('addLoader', array('xliff', new Reference('translation.xliff_loader')))
+            ->addMethodCall('addLoader', array('xlf', new Reference('translation.xliff_loader')))
         ;
-        $this->assertEquals($expected, $loader);
+        $this->assertEquals($expectedReader, $reader);
 
-        $this->assertSame(array('translation.loader' => array('xliff', 'xlf')), $translator->getArgument(3));
+        $expectedLoader = (new Definition())
+            ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'))
+        ;
+        $this->assertEquals($expectedLoader, $loader);
 
-        $expected = array('translation.loader' => new ServiceClosureArgument(new Reference('translation.loader')));
+        $this->assertSame(array('translation.xliff_loader' => array('xliff', 'xlf')), $translator->getArgument(3));
+
+        $expected = array('translation.xliff_loader' => new ServiceClosureArgument(new Reference('translation.xliff_loader')));
         $this->assertEquals($expected, $container->getDefinition((string) $translator->getArgument(0))->getArgument(0));
     }
 }

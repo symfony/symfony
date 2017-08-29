@@ -59,6 +59,23 @@ class DebugClassLoaderTest extends TestCase
     }
 
     /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage boo
+     */
+    public function testThrowingClass()
+    {
+        try {
+            class_exists(__NAMESPACE__.'\Fixtures\Throwing');
+            $this->fail('Exception expected');
+        } catch (\Exception $e) {
+            $this->assertSame('boo', $e->getMessage());
+        }
+
+        // the second call also should throw
+        class_exists(__NAMESPACE__.'\Fixtures\Throwing');
+    }
+
+    /**
      * @expectedException \RuntimeException
      */
     public function testNameCaseMismatch()

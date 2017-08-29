@@ -34,6 +34,7 @@ class PhpArrayCache implements CacheInterface
     {
         $this->file = $file;
         $this->fallbackPool = $fallbackPool;
+        $this->zendDetectUnicode = ini_get('zend.detect_unicode');
     }
 
     /**

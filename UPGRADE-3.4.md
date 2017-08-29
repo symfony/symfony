@@ -114,6 +114,12 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Translation\DependencyInjection\TranslatorPass` class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Reader\TranslationReader` class instead.
+   
+ * The `translation.loader` service has been deprecated and will be removed in 4.0. Use the `translation.reader` service instead.
+
 HttpKernel
 ----------
 

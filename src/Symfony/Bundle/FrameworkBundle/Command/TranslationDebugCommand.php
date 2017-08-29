@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +21,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\LoggingTranslator;
@@ -44,15 +44,15 @@ class TranslationDebugCommand extends Command
     protected static $defaultName = 'debug:translation';
 
     private $translator;
-    private $loader;
+    private $reader;
     private $extractor;
 
-    public function __construct(TranslatorInterface $translator, TranslationLoader $loader, ExtractorInterface $extractor)
+    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor)
     {
         parent::__construct();
 
         $this->translator = $translator;
-        $this->loader = $loader;
+        $this->reader = $reader;
         $this->extractor = $extractor;
     }
 
@@ -295,7 +295,7 @@ EOF
         foreach ($transPaths as $path) {
             $path = $path.'translations';
             if (is_dir($path)) {
-                $this->loader->loadMessages($path, $currentCatalogue);
+                $this->reader->read($path, $currentCatalogue);
             }
         }
 
@@ -321,7 +321,7 @@ EOF
                 foreach ($transPaths as $path) {
                     $path = $path.'translations';
                     if (is_dir($path)) {
-                        $this->loader->loadMessages($path, $fallbackCatalogue);
+                        $this->reader->read($path, $fallbackCatalogue);
                     }
                 }
                 $fallbackCatalogues[] = $fallbackCatalogue;

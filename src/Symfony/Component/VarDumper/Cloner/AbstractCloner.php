@@ -112,6 +112,7 @@ abstract class AbstractCloner implements ClonerInterface
         'DateTimeInterface' => array('Symfony\Component\VarDumper\Caster\DateCaster', 'castDateTime'),
         'DateInterval' => array('Symfony\Component\VarDumper\Caster\DateCaster', 'castInterval'),
         'DateTimeZone' => array('Symfony\Component\VarDumper\Caster\DateCaster', 'castTimeZone'),
+        'DatePeriod' => array('Symfony\Component\VarDumper\Caster\DateCaster', 'castPeriod'),
 
         ':curl' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'),
         ':dba' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'),

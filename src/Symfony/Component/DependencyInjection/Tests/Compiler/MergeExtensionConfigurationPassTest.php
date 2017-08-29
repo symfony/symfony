@@ -76,12 +76,13 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->registerExtension(new FooExtension());
         $container->prependExtensionConfig('foo', array('bar' => '%env(FOO)%'));
-        $container->prependExtensionConfig('foo', array('bar' => '%env(BAR)%'));
+        $container->prependExtensionConfig('foo', array('bar' => '%env(BAR)%', 'baz' => '%env(BAZ)%'));
 
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertSame(array('FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(array('BAZ', 'FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(array('BAZ' => 1, 'FOO' => 0), $container->getEnvCounters());
     }
 }
 
@@ -94,6 +95,7 @@ class FooConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('bar')->end()
+                ->scalarNode('baz')->end()
             ->end();
 
         return $treeBuilder;
@@ -116,5 +118,10 @@ class FooExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
+
+        if (isset($config['baz'])) {
+            $container->getParameterBag()->get('env(BOZ)');
+            $container->resolveEnvPlaceholders($config['baz']);
+        }
     }
 }

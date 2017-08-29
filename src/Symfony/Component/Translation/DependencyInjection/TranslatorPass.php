@@ -19,13 +19,13 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 class TranslatorPass implements CompilerPassInterface
 {
     private $translatorServiceId;
-    private $loaderServiceId;
+    private $readerServiceId;
     private $loaderTag;
 
-    public function __construct($translatorServiceId = 'translator.default', $loaderServiceId = 'translation.loader', $loaderTag = 'translation.loader')
+    public function __construct($translatorServiceId = 'translator.default', $readerServiceId = 'translation.reader', $loaderTag = 'translation.loader')
     {
         $this->translatorServiceId = $translatorServiceId;
-        $this->loaderServiceId = $loaderServiceId;
+        $this->readerServiceId = $readerServiceId;
         $this->loaderTag = $loaderTag;
     }
 
@@ -45,8 +45,8 @@ class TranslatorPass implements CompilerPassInterface
             }
         }
 
-        if ($container->hasDefinition($this->loaderServiceId)) {
-            $definition = $container->getDefinition($this->loaderServiceId);
+        if ($container->hasDefinition($this->readerServiceId)) {
+            $definition = $container->getDefinition($this->readerServiceId);
             foreach ($loaders as $id => $formats) {
                 foreach ($formats as $format) {
                     $definition->addMethodCall('addLoader', array($format, $loaderRefs[$id]));

@@ -153,4 +153,34 @@ class LockTest extends TestCase
 
         $lock->release();
     }
+
+    /**
+     * @dataProvider provideExpiredDates
+     */
+    public function testExpiration($ttls, $expected)
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $lock = new Lock($key, $store, 10);
+
+        foreach ($ttls as $ttl) {
+            if (null === $ttl) {
+                $key->resetExpiringDate();
+            } else {
+                $key->reduceLifetime($ttl);
+            }
+        }
+        $this->assertSame($expected, $lock->isExpired());
+    }
+
+    public function provideExpiredDates()
+    {
+        yield array(array(-1.0), true);
+        yield array(array(1, -1.0), true);
+        yield array(array(-1.0, 1), true);
+
+        yield array(array(), false);
+        yield array(array(1), false);
+        yield array(array(-1.0, null), false);
+    }
 }

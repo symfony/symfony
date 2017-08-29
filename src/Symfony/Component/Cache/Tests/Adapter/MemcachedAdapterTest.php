@@ -17,7 +17,6 @@ use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 class MemcachedAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = array(
-        'testExpiration' => 'Testing expiration slows down the test suite',
         'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     );

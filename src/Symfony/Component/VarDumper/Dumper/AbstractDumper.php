@@ -159,7 +159,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Dumps the current line.
      *
-     * @param int $depth The recursive depth in the dumped structure for the line being dumped
+     * @param int $depth The recursive depth in the dumped structure for the line being dumped,
+     *                   or -1 to signal the end-of-dump to the line dumper callable
      */
     protected function dumpLine($depth)
     {

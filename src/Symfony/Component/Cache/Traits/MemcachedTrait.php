@@ -30,6 +30,7 @@ trait MemcachedTrait
     );
 
     private $client;
+    private $lazyClient;
 
     public static function isSupported()
     {
@@ -41,14 +42,18 @@ trait MemcachedTrait
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required');
         }
-        $opt = $client->getOption(\Memcached::OPT_SERIALIZER);
-        if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
-            throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
+        if (get_class($client) === 'Memcached') {
+            $opt = $client->getOption(\Memcached::OPT_SERIALIZER);
+            if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
+                throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
+            }
+            $this->maxIdLength -= strlen($client->getOption(\Memcached::OPT_PREFIX_KEY));
+            $this->client = $client;
+        } else {
+            $this->lazyClient = $client;
         }
-        $this->maxIdLength -= strlen($client->getOption(\Memcached::OPT_PREFIX_KEY));
 
         parent::__construct($namespace, $defaultLifetime);
-        $this->client = $client;
     }
 
     /**
@@ -187,7 +192,11 @@ trait MemcachedTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        return $this->checkResultCode($this->client->setMulti($values, $lifetime));
+        if ($lifetime && $lifetime > 30 * 86400) {
+            $lifetime += time();
+        }
+
+        return $this->checkResultCode($this->getClient()->setMulti($values, $lifetime));
     }
 
     /**
@@ -197,7 +206,7 @@ trait MemcachedTrait
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
-            return $this->checkResultCode($this->client->getMulti($ids));
+            return $this->checkResultCode($this->getClient()->getMulti($ids));
         } catch (\Error $e) {
             throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
         } finally {
@@ -210,7 +219,7 @@ trait MemcachedTrait
      */
     protected function doHave($id)
     {
-        return false !== $this->client->get($id) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
+        return false !== $this->getClient()->get($id) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
 
     /**
@@ -219,7 +228,7 @@ trait MemcachedTrait
     protected function doDelete(array $ids)
     {
         $ok = true;
-        foreach ($this->checkResultCode($this->client->deleteMulti($ids)) as $result) {
+        foreach ($this->checkResultCode($this->getClient()->deleteMulti($ids)) as $result) {
             if (\Memcached::RES_SUCCESS !== $result && \Memcached::RES_NOTFOUND !== $result) {
                 $ok = false;
             }
@@ -233,7 +242,7 @@ trait MemcachedTrait
      */
     protected function doClear($namespace)
     {
-        return $this->checkResultCode($this->client->flush());
+        return $this->checkResultCode($this->getClient()->flush());
     }
 
     private function checkResultCode($result)
@@ -245,5 +254,25 @@ trait MemcachedTrait
         }
 
         throw new CacheException(sprintf('MemcachedAdapter client error: %s.', strtolower($this->client->getResultMessage())));
+    }
+
+    /**
+     * @return \Memcached
+     */
+    private function getClient()
+    {
+        if ($this->client) {
+            return $this->client;
+        }
+
+        $opt = $this->lazyClient->getOption(\Memcached::OPT_SERIALIZER);
+        if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
+            throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
+        }
+        if ('' !== $prefix = (string) $this->lazyClient->getOption(\Memcached::OPT_PREFIX_KEY)) {
+            throw new CacheException(sprintf('MemcachedAdapter: "prefix_key" option must be empty when using proxified connections, "%s" given.', $prefix));
+        }
+
+        return $this->client = $this->lazyClient;
     }
 }

@@ -38,6 +38,7 @@ class PhpArrayAdapter implements AdapterInterface
     {
         $this->file = $file;
         $this->fallbackPool = $fallbackPool;
+        $this->zendDetectUnicode = ini_get('zend.detect_unicode');
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) {
                 $item = new CacheItem();

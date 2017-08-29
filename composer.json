@@ -27,7 +27,8 @@
         "psr/log": "~1.0",
         "psr/simple-cache": "^1.0",
         "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/polyfill-mbstring": "~1.0"
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php72": "~1.5"
     },
     "replace": {
         "symfony/asset": "self.version",

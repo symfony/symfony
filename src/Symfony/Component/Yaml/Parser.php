@@ -18,6 +18,8 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
  * Parser parses YAML strings to convert them to PHP arrays.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
 class Parser
 {

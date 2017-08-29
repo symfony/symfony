@@ -203,6 +203,8 @@ Validator
 Yaml
 ----
 
+ * the `Dumper`, `Parser`, and `Yaml` classes are marked as final
+
  * using the `!php/object:` tag is deprecated and won't be supported in 4.0. Use
    the `!php/object` tag (without the colon) instead.
 

@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-28T21:01:48Z
+
+This updates the `symfony/symfony` deps, isn't the root issue part of Cache or FrameworkBundle?
+
+---------------------------------------------------------------------------
+
+by guillaumelecerf at 2017-08-28T21:08:23Z
+
+@chalasr : fixed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-28T21:15:03Z
+
+If we are OK to make Cache requires polyfill-apcu (a bit weird to me since it can be used without apcu), a test case would be nice to prevent future regressions.
+
+---------------------------------------------------------------------------
+
+by guillaumelecerf at 2017-08-28T21:18:30Z
+
+@chalasr : symfony/polyfill-apcu is used to provide APCuIterator for both PHP 5.5 + apcu 4.x and PHP 7.0.
+See https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Cache/Traits/ApcuTrait.php#L74-L76
+
+Will add a test ;)
+
+---------------------------------------------------------------------------
+
+by guillaumelecerf at 2017-08-28T23:12:40Z
+
+Test added, but Travis does not report it as the tests are run with the require-dev dependencies, e.g. with symfony/polyfill-apcu.
+I was able to make it fail by removing symfony/polyfill-apcu:
+https://travis-ci.org/symfony/symfony/jobs/269383629#L847
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-29T14:02:54Z
+
+the root composer file also needs to be patched as you did before
+
+---------------------------------------------------------------------------
+
+by guillaumelecerf at 2017-08-29T14:06:05Z
+
+@nicolas-grekas : you mean both composer.json files ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-29T14:06:42Z
+
+yes, both need the patch

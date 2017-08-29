@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-28T15:08:59Z
+
+Thanks for the reviews! I've fixed the error pointed out by @julienfalque. About this question from @nicolas-grekas:
+
+> to be safe, what about removing \0 from $text also?
+
+I'm not sure I fully understand what you mean. Can you show me the code changes you want me to do? Thanks!

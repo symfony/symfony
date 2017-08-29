@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-23T11:53:08Z
+
+What's the status of this PR? I'd like to merge/close all PRs about the lock component ASAP to avoid having to revert the component for 3.4.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-23T12:02:02Z
+
+@fabpot PR waiting for review/approval. As far as I know, nothing to add from my side.

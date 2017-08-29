@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -96,6 +97,22 @@ class ContextListener implements ListenerInterface
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
+
+            if (null !== $this->logger) {
+                $impersonatorUser = null;
+                foreach ($token->getRoles() as $role) {
+                    if ($role instanceof SwitchUserRole) {
+                        $impersonatorUser = $role->getSource()->getUsername();
+                        break;
+                    }
+                }
+
+                $this->logger->debug('Refreshed existing security token.', array(
+                    'token_class' => get_class($token),
+                    'user' => $token->getUsername(),
+                    'impersonator_user' => $impersonatorUser,
+                ));
+            }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
                 $this->logger->warning('Expected a security token from the session, got something else.', array('key' => $this->sessionKey, 'received' => $token));

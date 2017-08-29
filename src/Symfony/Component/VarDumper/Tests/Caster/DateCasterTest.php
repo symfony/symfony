@@ -100,10 +100,9 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testDumpInterval($intervalSpec, $invert, $expected)
+    public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
     {
-        $interval = new \DateInterval($intervalSpec);
-        $interval->invert = $invert;
+        $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
 DateInterval {
@@ -117,10 +116,9 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testDumpIntervalExcludingVerbosity($intervalSpec, $invert, $expected)
+    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
     {
-        $interval = new \DateInterval($intervalSpec);
-        $interval->invert = $invert;
+        $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
 DateInterval {
@@ -134,10 +132,9 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testCastInterval($intervalSpec, $invert, $xInterval, $xSeconds)
+    public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
     {
-        $interval = new \DateInterval($intervalSpec);
-        $interval->invert = $invert;
+        $interval = $this->createInterval($intervalSpec, $ms, $invert);
         $stub = new Stub();
 
         $cast = DateCaster::castInterval($interval, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
@@ -167,40 +164,42 @@ Symfony\Component\VarDumper\Caster\ConstStub {
 }
 EODUMP;
 
-        $this->assertDumpEquals($xDump, $cast["\0~\0interval"]);
+        $this->assertDumpMatchesFormat($xDump, $cast["\0~\0interval"]);
     }
 
     public function provideIntervals()
     {
         $i = new \DateInterval('PT0S');
-        $ms = \PHP_VERSION_ID >= 70100 && isset($i->f) ? '.0' : '';
+        $ms = ($withMs = \PHP_VERSION_ID >= 70100 && isset($i->f)) ? '.0' : '';
 
         return array(
-            array('PT0S', 0, '0s', '0s'),
-            array('PT1S', 0, '+ 00:00:01'.$ms, '1s'),
-            array('PT2M', 0, '+ 00:02:00'.$ms, '120s'),
-            array('PT3H', 0, '+ 03:00:00'.$ms, '10 800s'),
-            array('P4D', 0, '+ 4d', '345 600s'),
-            array('P5M', 0, '+ 5m', null),
-            array('P6Y', 0, '+ 6y', null),
-            array('P1Y2M3DT4H5M6S', 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
-            array('PT1M60S', 0, '+ 00:02:00'.$ms, null),
-            array('PT1H60M', 0, '+ 02:00:00'.$ms, null),
-            array('P1DT24H', 0, '+ 2d', null),
-            array('P1M32D', 0, '+ 1m 32d', null),
+            array('PT0S', 0, 0, '0s', '0s'),
+            array('PT0S', 0.1, 0, $withMs ? '+ 00:00:00.100' : '0s', '%is'),
+            array('PT1S', 0, 0, '+ 00:00:01'.$ms, '1s'),
+            array('PT2M', 0, 0, '+ 00:02:00'.$ms, '120s'),
+            array('PT3H', 0, 0, '+ 03:00:00'.$ms, '10 800s'),
+            array('P4D', 0, 0, '+ 4d', '345 600s'),
+            array('P5M', 0, 0, '+ 5m', null),
+            array('P6Y', 0, 0, '+ 6y', null),
+            array('P1Y2M3DT4H5M6S', 0, 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
+            array('PT1M60S', 0, 0, '+ 00:02:00'.$ms, null),
+            array('PT1H60M', 0, 0, '+ 02:00:00'.$ms, null),
+            array('P1DT24H', 0, 0, '+ 2d', null),
+            array('P1M32D', 0, 0, '+ 1m 32d', null),
 
-            array('PT0S', 1, '0s', '0s'),
-            array('PT1S', 1, '- 00:00:01'.$ms, '-1s'),
-            array('PT2M', 1, '- 00:02:00'.$ms, '-120s'),
-            array('PT3H', 1, '- 03:00:00'.$ms, '-10 800s'),
-            array('P4D', 1, '- 4d', '-345 600s'),
-            array('P5M', 1, '- 5m', null),
-            array('P6Y', 1, '- 6y', null),
-            array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06'.$ms, null),
-            array('PT1M60S', 1, '- 00:02:00'.$ms, null),
-            array('PT1H60M', 1, '- 02:00:00'.$ms, null),
-            array('P1DT24H', 1, '- 2d', null),
-            array('P1M32D', 1, '- 1m 32d', null),
+            array('PT0S', 0, 1, '0s', '0s'),
+            array('PT0S', 0.1, 1, $withMs ? '- 00:00:00.100' : '0s', '%is'),
+            array('PT1S', 0, 1, '- 00:00:01'.$ms, '-1s'),
+            array('PT2M', 0, 1, '- 00:02:00'.$ms, '-120s'),
+            array('PT3H', 0, 1, '- 03:00:00'.$ms, '-10 800s'),
+            array('P4D', 0, 1, '- 4d', '-345 600s'),
+            array('P5M', 0, 1, '- 5m', null),
+            array('P6Y', 0, 1, '- 6y', null),
+            array('P1Y2M3DT4H5M6S', 0, 1, '- 1y 2m 3d 04:05:06'.$ms, null),
+            array('PT1M60S', 0, 1, '- 00:02:00'.$ms, null),
+            array('PT1H60M', 0, 1, '- 02:00:00'.$ms, null),
+            array('P1DT24H', 0, 1, '- 2d', null),
+            array('P1M32D', 0, 1, '- 1m 32d', null),
         );
     }
 
@@ -349,7 +348,7 @@ array:1 [
 ]
 EODUMP;
 
-        $this->assertDumpMatchesFormat($xDump, $cast);
+        $this->assertDumpEquals($xDump, $cast);
 
         $xDump = <<<EODUMP
 Symfony\Component\VarDumper\Caster\ConstStub {
@@ -373,26 +372,26 @@ EODUMP;
         $ms = \PHP_VERSION_ID >= 70100 && isset($i->f) ? '.0' : '';
 
         $periods = array(
-            array('2017-01-01', 'P1D', '2017-01-03', 0, 'every + 1d, from 2017-01-01 00:00:00 (included) to 2017-01-03 00:00:00', '1) 2017-01-01%a2) 2017-01-02'),
-            array('2017-01-01', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 00:00:00 (included) recurring 2 time/s', '1) 2017-01-01%a2) 2017-01-02'),
+            array('2017-01-01', 'P1D', '2017-01-03', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02'),
+            array('2017-01-01', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01%a2) 2017-01-02'),
 
-            array('2017-01-01', 'P1D', '2017-01-04', 0, 'every + 1d, from 2017-01-01 00:00:00 (included) to 2017-01-04 00:00:00', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'),
-            array('2017-01-01', 'P1D', 2, 0, 'every + 1d, from 2017-01-01 00:00:00 (included) recurring 3 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'),
+            array('2017-01-01', 'P1D', '2017-01-04', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-04 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'),
+            array('2017-01-01', 'P1D', 2, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 3 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'),
 
-            array('2017-01-01', 'P1D', '2017-01-05', 0, 'every + 1d, from 2017-01-01 00:00:00 (included) to 2017-01-05 00:00:00', '1) 2017-01-01%a2) 2017-01-02%a1 more'),
-            array('2017-01-01', 'P1D', 3, 0, 'every + 1d, from 2017-01-01 00:00:00 (included) recurring 4 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03%a1 more'),
+            array('2017-01-01', 'P1D', '2017-01-05', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-05 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a1 more'),
+            array('2017-01-01', 'P1D', 3, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 4 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03%a1 more'),
 
-            array('2017-01-01', 'P1D', '2017-01-21', 0, 'every + 1d, from 2017-01-01 00:00:00 (included) to 2017-01-21 00:00:00', '1) 2017-01-01%a17 more'),
-            array('2017-01-01', 'P1D', 19, 0, 'every + 1d, from 2017-01-01 00:00:00 (included) recurring 20 time/s', '1) 2017-01-01%a17 more'),
+            array('2017-01-01', 'P1D', '2017-01-21', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-21 00:00:00.0', '1) 2017-01-01%a17 more'),
+            array('2017-01-01', 'P1D', 19, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 20 time/s', '1) 2017-01-01%a17 more'),
 
-            array('2017-01-01 01:00:00', 'P1D', '2017-01-03 01:00:00', 0, 'every + 1d, from 2017-01-01 01:00:00 (included) to 2017-01-03 01:00:00', '1) 2017-01-01 01:00:00%a2) 2017-01-02 01:00:00'),
-            array('2017-01-01 01:00:00', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 01:00:00 (included) recurring 2 time/s', '1) 2017-01-01 01:00:00%a2) 2017-01-02 01:00:00'),
+            array('2017-01-01 01:00:00', 'P1D', '2017-01-03 01:00:00', 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) to 2017-01-03 01:00:00.0', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'),
+            array('2017-01-01 01:00:00', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'),
 
-            array('2017-01-01', 'P1DT1H', '2017-01-03', 0, "every + 1d 01:00:00$ms, from 2017-01-01 00:00:00 (included) to 2017-01-03 00:00:00", '1) 2017-01-01 00:00:00%a2) 2017-01-02 01:00:00'),
-            array('2017-01-01', 'P1DT1H', 1, 0, "every + 1d 01:00:00$ms, from 2017-01-01 00:00:00 (included) recurring 2 time/s", '1) 2017-01-01 00:00:00%a2) 2017-01-02 01:00:00'),
+            array('2017-01-01', 'P1DT1H', '2017-01-03', 0, "every + 1d 01:00:00$ms, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0", '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'),
+            array('2017-01-01', 'P1DT1H', 1, 0, "every + 1d 01:00:00$ms, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s", '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'),
 
-            array('2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00 (excluded) to 2017-01-04 00:00:00', '1) 2017-01-02%a2) 2017-01-03'),
-            array('2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'),
+            array('2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) to 2017-01-04 00:00:00.0', '1) 2017-01-02%a2) 2017-01-03'),
+            array('2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'),
         );
 
         if (\PHP_VERSION_ID < 70107) {
@@ -400,5 +399,16 @@ EODUMP;
         }
 
         return $periods;
+    }
+
+    private function createInterval($intervalSpec, $ms, $invert)
+    {
+        $interval = new \DateInterval($intervalSpec);
+        if (\PHP_VERSION_ID >= 70100 && isset($interval->f)) {
+            $interval->f = $ms;
+        }
+        $interval->invert = $invert;
+
+        return $interval;
     }
 }

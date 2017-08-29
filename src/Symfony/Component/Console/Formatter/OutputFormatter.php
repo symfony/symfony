@@ -50,6 +50,7 @@ class OutputFormatter implements OutputFormatterInterface
         if ('\\' === substr($text, -1)) {
             $len = strlen($text);
             $text = rtrim($text, '\\');
+            $text = str_replace("\0", '', $text);
             $text .= str_repeat("\0", $len - strlen($text));
         }
 

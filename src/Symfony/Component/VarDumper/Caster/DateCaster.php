@@ -85,7 +85,7 @@ class DateCaster
 
     public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, $isNested, $filter)
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50605) {
+        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) { // see https://bugs.php.net/bug.php?id=71635
             return $a;
         }
 

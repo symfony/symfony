@@ -334,7 +334,7 @@ EODUMP;
      */
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50605) {
+        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) {
             $this->markTestSkipped();
         }
 

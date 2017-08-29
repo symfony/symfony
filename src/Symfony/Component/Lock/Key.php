@@ -19,6 +19,7 @@ namespace Symfony\Component\Lock;
 final class Key
 {
     private $resource;
+    private $expiringDate;
     private $state = array();
 
     /**
@@ -69,5 +70,30 @@ final class Key
     public function getState($stateKey)
     {
         return $this->state[$stateKey];
+    }
+
+    /**
+     * @param float $ttl The expiration delay of locks in seconds.
+     */
+    public function reduceLifetime($ttl)
+    {
+        $newExpiringDate = \DateTimeImmutable::createFromFormat('U.u', (string) (microtime(true) + $ttl));
+
+        if (null === $this->expiringDate || $newExpiringDate < $this->expiringDate) {
+            $this->expiringDate = $newExpiringDate;
+        }
+    }
+
+    public function resetExpiringDate()
+    {
+        $this->expiringDate = null;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getExpiringDate()
+    {
+        return $this->expiringDate;
     }
 }

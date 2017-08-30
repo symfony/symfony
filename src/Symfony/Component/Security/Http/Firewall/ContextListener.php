@@ -92,27 +92,14 @@ class ContextListener implements ListenerInterface
         $token = unserialize($token);
 
         if (null !== $this->logger) {
-            $this->logger->debug('Read existing security token from the session.', array('key' => $this->sessionKey));
+            $this->logger->debug('Read existing security token from the session.', array(
+                'key' => $this->sessionKey,
+                'token_class' => is_object($token) ? get_class($token) : null,
+            ));
         }
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
-
-            if (null !== $this->logger) {
-                $impersonatorUser = null;
-                foreach ($token->getRoles() as $role) {
-                    if ($role instanceof SwitchUserRole) {
-                        $impersonatorUser = $role->getSource()->getUsername();
-                        break;
-                    }
-                }
-
-                $this->logger->debug('Refreshed existing security token.', array(
-                    'token_class' => get_class($token),
-                    'user' => $token->getUsername(),
-                    'impersonator_user' => $impersonatorUser,
-                ));
-            }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
                 $this->logger->warning('Expected a security token from the session, got something else.', array('key' => $this->sessionKey, 'received' => $token));
@@ -186,7 +173,19 @@ class ContextListener implements ListenerInterface
                 $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
-                    $this->logger->debug('User was reloaded from a user provider.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
+                    $impersonatorUsername = null;
+                    foreach ($token->getRoles() as $role) {
+                        if ($role instanceof SwitchUserRole) {
+                            $impersonatorUsername = $role->getSource()->getUsername();
+                            break;
+                        }
+                    }
+
+                    $this->logger->debug('User was reloaded from a user provider.', array(
+                        'provider' => get_class($provider),
+                        'username' => $refreshedUser->getUsername(),
+                        'impersonator_username' => $impersonatorUsername,
+                    ));
                 }
 
                 return $token;

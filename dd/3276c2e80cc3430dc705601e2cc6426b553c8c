@@ -1,0 +1,211 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-28T12:53:30Z
+
+I'm thinking in more options to avoid type the FQCN, so what about to search the form type inside registered types or installed bundles?
+```bash
+$ bin/console debug:form EasyAdminFormType
+```
+if there is more than one registered with the same suffix, we could display the first and print at the bottom a comment with another matches?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-28T16:11:39Z
+
+Failure on deps=high is normal.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-28T16:37:55Z
+
+> I'm thinking in more options to avoid type the FQCN, so what about to search the form type inside registered types or installed bundles?
+
+At first, I'd suggest to add the list of "preferred" namespaces to use as an optional constructor argument of the command.
+Then, we might either:
+1. Populate it with only core namepaces (form component types + doctrine bridge as you did here) and let bundles or users add their own.
+2. Or hook in the `FormPass` to gather namespaces for all known types.
+
+> if there is more than one registered with the same suffix, we could display the first and print at the bottom a comment with another matches?
+
+If there is more than one match let's show a message saying the argument is ambiguous.
+In interactive mode, ask the user to choose the it from a list using a choice question.
+In non interactive mode, I think we should only display the list of matches without their information.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-28T17:50:13Z
+
+@ogizanagi Sorry, I didn't see your last comment before submit these changes.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-28T17:57:27Z
+
+Last update: We use the namespace from all known form types as base to search the form type. We show a comment when there is more than one type found.
+
+This mean, if there is at least one form type registered, its namespace will be used to find other ones not registered.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-29T09:58:51Z
+
+Not a blocker to me (and don't work on it right now, we need more opinions), but other debug commands are using `*Descriptors` to get the output in different formats (md, txt, json, xml). I'm wondering if it can be useful. It also lighten the command itself by delegating the output construction to a proper class.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-29T18:10:12Z
+
+The `debug:container` command lists all services when run without any arg.
+I think it'll be great to replicate this behavior and get the full list of registered types when the `class` argument is not provided (and extensions?).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-30T22:01:34Z
+
+> The debug:container command lists all services when run without any arg.
+I think it'll be great to replicate this behavior and get the full list of registered types when the class argument is not provided (and extensions?).
+
+@ogizanagi I thought on this also at the beginning, but then I gave up, because this information can be obtained by using the command `debug:container` _precisely_. So I'm not convinced the command should show these list too, even if it's related to the Form Component.
+
+Even though, if any else votes for this, I'll be glad to implement it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-30T22:10:13Z
+
+> other debug commands are using *Descriptors to get the output in different formats (md, txt, json, xml). I'm wondering if it can be useful. It also lighten the command itself by delegating the output construction to a proper class.
+
+@ogizanagi I had left this to the end, but now that you mention it, this suggestion https://github.com/symfony/symfony/pull/23694#discussion_r130253487 could be the proper class to use descriptors.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-31T08:26:27Z
+
+> Even though, if any else votes for this, I'll be glad to implement it.-
+
+I also think that listing them all when no arg is passed would be nice, getting the same with `debug:container` requires some filters.
+
+About descriptors, I think that not using them is fine. The ones which describe component specific data are in the framework (container, router, ..), using them would prevent having the command in the form component.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-31T08:34:23Z
+
+> The ones which describe component specific data are in the framework (container, router, ..), using them would prevent having the command in the form component.
+
+@chalasr : We could add our own in the component itself (or even just the `TextDescriptor` one for now and eventually add other ones later). It does not have to be handled in the `FrameworkBundle` ones.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-07-31T15:46:00Z
+
+> We could add our own in the component itself (or even just the TextDescriptor one for now and eventually add other ones later).
+
+@ogizanagi: `TextDescriptor` added, needs review.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-01T15:58:37Z
+
+Last update:
+ * Making optional `class` argument
+ * Show general information about services form types, type extensions and guessers on `debug:form` (without args)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-03T14:59:16Z
+
+Tests added (deps=high failure is normal, it requires to merge this PR in `master` branch)
+
+I've finished so far, ready for reviews.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-04T14:35:35Z
+
+Talking with @ogizanagi in Slack we're suggesting remove the general information on run `debug:form` for now, because the list of registered form types look a bit unexpected/weird and doesn't have much value rigth now (e.g. In Symfony 4 the list is compound by `EntityType` only). Also, the same list is available running `debug:container --tag=form.type --show-private` with more information.
+
+In other issue/pr we will discuss about this option, maybe hacking the `CoreExtension::loadTypes()` to show the built-in list makes sense..., but for now `debug:form <type>` should be enough to introduce the command.
+
+Ready for reviews!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-06T13:41:42Z
+
+- [x] Rebase
+- [x] Using class name id for command service (https://github.com/symfony/symfony/pull/23624#discussion_r131510829)
+- [x] Add class header to "Overridden options" column to know the source of the options.
+- [x] Add OptionsResolverWrapper class to fix https://github.com/symfony/symfony/pull/23694#discussion_r131520963
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-06T17:03:31Z
+
+Just a question... would dropping Overridden options help, in terms of simplifying the code? And just show them under Inherited options?
+
+The Overridden options are just an implementation detail of the type.. imo. no real need to differentiate here.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-06T20:36:27Z
+
+@ro0NL: I think to know which options has been overridden by a form type should be useful, otherwise won't know where each option is modified in the whole hierarchy (including those defined by type extensions).
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-06T21:11:33Z
+
+To avoid confusion I've renamed the header title of the column "Inherited options" to "Parent options" as all of them (except the "Options" column) are inherited options.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-27T17:05:48Z
+
+Ready for me (just squashing commits).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T07:16:21Z
+
+why are the class "internal"? isn't their design clean already?
+since we build a framework, we have to balance open-closed . "closing" all the time means increasing the risk for users to ignore the annotations - and reduces the extension possibilities of the framework (which is paradoxical for a framework)
+dunno if this applies here - just wanted to write it down :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-30T07:29:12Z
+
+All other descriptor classes were always made internal and it simplifies maintenance. I don't think we ever had requests to open these since they exist. Regarding the `OptionsResolverWrapper`, I don't see use-cases in userland (and would probably not belong to the form component if the use case was legit).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-30T12:08:02Z
+
+> instead of removing it here, the definition should be part of the file loaded only when the config is enabled, inside `registerFormConfiguration`.
+
+@stof I'm no sure :/ as It was the modus operandi and the consensus for other commands https://github.com/symfony/symfony/pull/23624, https://github.com/symfony/symfony/pull/23801, https://github.com/symfony/symfony/pull/23694#discussion_r130334283
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-30T12:10:45Z
+
+> Regarding the `OptionsResolverWrapper`, I don't see use-cases in userland (and would probably not belong to the form component if the use case was legit).
+
+@ogizanagi should I move the `OptionsResolverWrapper` class to `OptionsResolver` Component?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-30T12:20:06Z
+
+@yceruto I would let it as is. If one asks for extensibility with a legit use case, we can move it easily, removing the internal flag.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-30T13:27:07Z
+
+Same opinion as @chalasr

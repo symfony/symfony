@@ -96,6 +96,9 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 
         $ids = array();
         foreach ($graph->getNode($id)->getInEdges() as $edge) {
+            if ($edge->isWeak()) {
+                return false;
+            }
             $ids[] = $edge->getSourceNode()->getId();
         }
 

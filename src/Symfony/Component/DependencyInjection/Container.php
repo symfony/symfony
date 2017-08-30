@@ -23,26 +23,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * Container is a dependency injection container.
  *
  * It gives access to object instances (services).
- *
  * Services and parameters are simple key/pair stores.
- *
- * Parameter and service keys are case insensitive.
- *
- * A service can also be defined by creating a method named
- * getXXXService(), where XXX is the camelized version of the id:
- *
- * <ul>
- *   <li>request -> getRequestService()</li>
- *   <li>mysql_session_storage -> getMysqlSessionStorageService()</li>
- *   <li>symfony.mysql_session_storage -> getSymfony_MysqlSessionStorageService()</li>
- * </ul>
- *
- * The container can have three possible behaviors when a service does not exist:
+ * The container can have four possible behaviors when a service
+ * does not exist (or is not initialized for the last case):
  *
  *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception (the default)
  *  * NULL_ON_INVALID_REFERENCE:      Returns null
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
+ *  * IGNORE_ON_UNINITIALIZED_REFERENCE: Ignores/returns null for uninitialized services or invalid references
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -304,9 +293,9 @@ class Container implements ResettableContainerInterface
 
             try {
                 if (isset($this->fileMap[$id])) {
-                    return $this->load($this->fileMap[$id]);
+                    return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->load($this->fileMap[$id]);
                 } elseif (isset($this->methodMap[$id])) {
-                    return $this->{$this->methodMap[$id]}();
+                    return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->{$this->methodMap[$id]}();
                 } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
                     $id = $normalizedId;
                     continue;
@@ -315,7 +304,7 @@ class Container implements ResettableContainerInterface
                     // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
                     @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
 
-                    return $this->{$method}();
+                    return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->{$method}();
                 }
 
                 break;

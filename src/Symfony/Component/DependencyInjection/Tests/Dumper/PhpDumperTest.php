@@ -631,6 +631,44 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_private_in_expression.php', $dumper->dump());
     }
 
+    public function testUninitializedReference()
+    {
+        $container = include self::$fixturesPath.'/containers/container_uninitialized_ref.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_uninitialized_ref.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Uninitialized_Reference')));
+
+        require self::$fixturesPath.'/php/services_uninitialized_ref.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Uninitialized_Reference();
+
+        $bar = $container->get('bar');
+
+        $this->assertNull($bar->foo1);
+        $this->assertNull($bar->foo2);
+        $this->assertNull($bar->foo3);
+        $this->assertNull($bar->closures[0]());
+        $this->assertNull($bar->closures[1]());
+        $this->assertNull($bar->closures[2]());
+        $this->assertSame(array(), iterator_to_array($bar->iter));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Uninitialized_Reference();
+
+        $container->get('foo1');
+        $container->get('baz');
+
+        $bar = $container->get('bar');
+
+        $this->assertEquals(new \stdClass(), $bar->foo1);
+        $this->assertNull($bar->foo2);
+        $this->assertEquals(new \stdClass(), $bar->foo3);
+        $this->assertEquals(new \stdClass(), $bar->closures[0]());
+        $this->assertNull($bar->closures[1]());
+        $this->assertEquals(new \stdClass(), $bar->closures[2]());
+        $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
+    }
+
     public function testDumpHandlesLiteralClassWithRootNamespace()
     {
         $container = new ContainerBuilder();

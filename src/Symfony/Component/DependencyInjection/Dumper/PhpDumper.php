@@ -277,7 +277,7 @@ EOF;
                 if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $behavior[$id]) {
                     $code .= sprintf($template, $name, $this->getServiceCall($id));
                 } else {
-                    $code .= sprintf($template, $name, $this->getServiceCall($id, new Reference($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)));
+                    $code .= sprintf($template, $name, $this->getServiceCall($id, new Reference($id, $behavior[$id])));
                 }
             }
         }
@@ -1295,12 +1295,14 @@ EOF;
      */
     private function getServiceConditionals($value)
     {
-        if (!$services = ContainerBuilder::getServiceConditionals($value)) {
-            return null;
-        }
-
         $conditions = array();
-        foreach ($services as $service) {
+        foreach (ContainerBuilder::getInitializedConditionals($value) as $service) {
+            if (!$this->container->hasDefinition($service)) {
+                return 'false';
+            }
+            $conditions[] = sprintf("isset(\$this->services['%s'])", $service);
+        }
+        foreach (ContainerBuilder::getServiceConditionals($value) as $service) {
             if ($this->container->hasDefinition($service) && !$this->container->getDefinition($service)->isPublic()) {
                 continue;
             }
@@ -1335,8 +1337,8 @@ EOF;
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();
-                } elseif (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $behavior[$id]) {
-                    $behavior[$id] = $argument->getInvalidBehavior();
+                } else {
+                    $behavior[$id] = min($behavior[$id], $argument->getInvalidBehavior());
                 }
 
                 ++$calls[$id];
@@ -1665,7 +1667,9 @@ EOF;
             return '$this';
         }
 
-        if ($this->asFiles && $this->container->hasDefinition($id)) {
+        if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
+            $code = 'null';
+        } elseif ($this->asFiles && $this->container->hasDefinition($id)) {
             if ($this->container->getDefinition($id)->isShared()) {
                 $code = sprintf("\$this->load(__DIR__.'/%s.php')", $this->generateMethodName($id));
             } else {

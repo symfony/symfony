@@ -146,8 +146,8 @@ class Application
         }
 
         if ($this->autoExit) {
-            if ($exitCode > 255) {
-                $exitCode = 255;
+            if ($exitCode > 254) {
+                $exitCode = 254;
             }
 
             exit($exitCode);

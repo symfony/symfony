@@ -598,9 +598,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 }
             }
 
-            if ($oldContainer = file_exists($cache->getPath()) ? @include $cache->getPath() : false) {
-                $oldContainer = new \ReflectionClass($oldContainer);
-            }
+            $oldContainer = file_exists($cache->getPath()) && is_object($oldContainer = @include $cache->getPath()) ? new \ReflectionClass($oldContainer) : false;
 
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 

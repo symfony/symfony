@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed the backup feature of the `FileDumper` class
+ * removed `TranslationWriter::writeTranslations()` method
 
 3.4.0
 -----

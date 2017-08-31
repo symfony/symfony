@@ -1039,14 +1039,10 @@ EOF;
 
         $php = array();
         $dynamicPhp = array();
-        $normalizedParams = array();
 
         foreach ($this->container->getParameterBag()->all() as $key => $value) {
             if ($key !== $resolvedKey = $this->container->resolveEnvPlaceholders($key)) {
                 throw new InvalidArgumentException(sprintf('Parameter name cannot use env parameters: %s.', $resolvedKey));
-            }
-            if ($key !== $lcKey = strtolower($key)) {
-                $normalizedParams[] = sprintf('        %s => %s,', $this->export($lcKey), $this->export($key));
             }
             $export = $this->exportParameters(array($value));
             $export = explode('0 => ', substr(rtrim($export, " )\n"), 7, -1), 2);
@@ -1066,12 +1062,10 @@ EOF;
      */
     public function getParameter($name)
     {
-        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
-            $name = $this->normalizeParameterName($name);
+        $name = (string) $name;
 
-            if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
-                throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
-            }
+        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
+            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
         if (isset($this->loadedDynamicParameters[$name])) {
             return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
@@ -1085,7 +1079,7 @@ EOF;
      */
     public function hasParameter($name)
     {
-        $name = $this->normalizeParameterName($name);
+        $name = (string) $name;
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
@@ -1154,30 +1148,6 @@ EOF;
     {
 {$getDynamicParameter}
     }
-
-
-EOF;
-
-        $code .= '    private $normalizedParameterNames = '.($normalizedParams ? sprintf("array(\n%s\n    );", implode("\n", $normalizedParams)) : 'array();')."\n";
-        $code .= <<<'EOF'
-
-    private function normalizeParameterName($name)
-    {
-        if (isset($this->normalizedParameterNames[$normalizedName = strtolower($name)]) || isset($this->parameters[$normalizedName]) || array_key_exists($normalizedName, $this->parameters)) {
-            $normalizedName = isset($this->normalizedParameterNames[$normalizedName]) ? $this->normalizedParameterNames[$normalizedName] : $normalizedName;
-            if ((string) $name !== $normalizedName) {
-                @trigger_error(sprintf('Parameter names will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.4.', $name, $normalizedName), E_USER_DEPRECATED);
-            }
-        } else {
-            $normalizedName = $this->normalizedParameterNames[$normalizedName] = (string) $name;
-        }
-
-        return $normalizedName;
-    }
-
-EOF;
-
-        $code .= <<<EOF
 
     /*{$this->docStar}
      * Gets the default parameters.
@@ -1643,7 +1613,7 @@ EOF;
         if ('service_container' === $id) {
             return '$this';
         }
-        
+
         if ($this->container->hasDefinition($id)) {
             $definition = $this->container->getDefinition($id);
 

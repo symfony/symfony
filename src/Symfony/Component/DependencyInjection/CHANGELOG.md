@@ -21,6 +21,7 @@ CHANGELOG
  * removed silent behavior for unused attributes and elements
  * removed support for setting and accessing private services in `Container`
  * removed support for setting pre-defined services in `Container`
+ * removed support for case insensitivity of parameter names
 
 3.4.0
 -----

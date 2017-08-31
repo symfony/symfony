@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-21T06:49:29Z
+
+@nicolas-grekas Is passing `PruneableInterface` mocks to `ChainCache|ChainAdaper` and ensuring `prune()` is called on the mocks a solid enough way to test the `Chain` implementations?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-21T06:52:36Z
+
+I think it is yes
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-21T15:51:06Z
+
+Aside from the tests, which take up the bulk of the additions, this amends `ChainAdapter`, `PdoAdapter`, `ChainCache`, and `PdoCache` so they implement `PruneableInterface`. All _seems to work_ as expected. :-)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-21T15:51:20Z
+
+Test failures seem unrelated, FYI.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-22T14:03:33Z
+
+rebase unlocked
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-22T19:00:39Z
+
+Wonderful; thanks. Rebased.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-22T21:04:40Z
+
+Update pushed that addresses your review comments.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-23T16:33:10Z
+
+Pushed a commit that re-declares `namespace` for the `PdoTrait` context and grabs a copy from the `init` method; this is later utilized in the `prune` call. Let me know if that is the implementation you had in mind.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-23T19:01:26Z
+
+@nicolas-grekas Comments addressed and changes pushed. I've squashed everything, as well.
+
+I'm sure you noticed I didn't add `PruneableInterface` to the `apcu` caches, as, after considering it and playing around a bit, I came to the same conclusion you mentioned in https://github.com/symfony/symfony/pull/23451#issuecomment-316735763:
+
+> not sure about [apcu] esp. since this will be unusable from the command because of different shared memory segments used by the webserver/FPM
+
+*If you decide it does add value*, though, let me know and I'll be happy to include it here. Otherwise, thanks for the quick reviews again!
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-24T21:44:05Z
+
+Pushed two very small changes in latest commit:
+- Amend `PruneableInterface` documentation description to clarify its purpose and fix a typo to read *"Interface extends psr-6 and psr-16 caches to allow for pruning (deletion) of all expired cache items."*.
+- Remove unused and forgotten `sprintf` from `PdoPruneableTrait::isPruned()` method (was a holdover from when I was passing some replacements into the string in an earlier iteration).
+
+Trivial stuff, but just mentioning so as not to slip in changes without people knowing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T07:19:59Z
+
+@robfrawley the title of this PR still says "WIP", what's the real status? (btw, I personally prefer *not* putting statuses in PR title, we have labels for that :) )
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-08-10T04:57:08Z
+
+@nicolas-grekas Sorry about the delay, but now I've updated the title to remove the "WIP" --- as far as I'm concerned this is ready for merge. (Note taken about the use of titles versus labels ;) ).
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-08-14T03:43:19Z
+
+Are there any additional changed you need me to implement? Also, when you have a moment, can you review the documentation PR (symfony/symfony-docs#8209) and advise if it adequately describes the changes from this PR as well as #23451.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-08-30T20:10:36Z
+
+Test failure unrelated.

@@ -50,6 +50,8 @@ DependencyInjection
 
  * Top-level anonymous services in XML are deprecated and will throw an exception in Symfony 4.0.
 
+ * Case insensitivity of parameter names is deprecated and will be removed in 4.0.
+
 Debug
 -----
 

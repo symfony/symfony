@@ -20,6 +20,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DateCaster
 {
+    private const PERIOD_LIMIT = 3;
+
     public static function castDateTime(\DateTimeInterface $d, array $a, Stub $stub, $isNested, $filter)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
@@ -80,14 +82,10 @@ class DateCaster
 
     public static function castPeriod(\DatePeriod $p, array $a, Stub $stub, $isNested, $filter)
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID < 50620 || (\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70005)) { // see https://bugs.php.net/bug.php?id=71635
-            return $a;
-        }
-
         $dates = array();
         if (\PHP_VERSION_ID >= 70107) { // see https://bugs.php.net/bug.php?id=74639
             foreach (clone $p as $i => $d) {
-                if (3 === $i) {
+                if (self::PERIOD_LIMIT === $i) {
                     $now = new \DateTimeImmutable();
                     $dates[] = sprintf('%s more', ($end = $p->getEndDate())
                         ? ceil(($end->format('U.u') - $d->format('U.u')) / ($now->add($p->getDateInterval())->format('U.u') - $now->format('U.u')))

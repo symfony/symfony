@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-28T20:56:00Z
+
+I suggest to review this one after https://github.com/symfony/symfony/pull/23667.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-28T21:03:45Z
+
+Ok, but #23667 does not seem to affect the ``TranslationWriter`` like here.

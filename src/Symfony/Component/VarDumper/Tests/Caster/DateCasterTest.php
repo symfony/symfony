@@ -100,10 +100,9 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testDumpInterval($intervalSpec, $invert, $expected)
+    public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
     {
-        $interval = new \DateInterval($intervalSpec);
-        $interval->invert = $invert;
+        $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
 DateInterval {
@@ -117,10 +116,9 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testDumpIntervalExcludingVerbosity($intervalSpec, $invert, $expected)
+    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
     {
-        $interval = new \DateInterval($intervalSpec);
-        $interval->invert = $invert;
+        $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
 DateInterval {
@@ -134,10 +132,9 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testCastInterval($intervalSpec, $invert, $xInterval, $xSeconds)
+    public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
     {
-        $interval = new \DateInterval($intervalSpec);
-        $interval->invert = $invert;
+        $interval = $this->createInterval($intervalSpec, $ms, $invert);
         $stub = new Stub();
 
         $cast = DateCaster::castInterval($interval, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
@@ -173,34 +170,37 @@ EODUMP;
     public function provideIntervals()
     {
         $i = new \DateInterval('PT0S');
-        $ms = \PHP_VERSION_ID >= 70100 && isset($i->f) ? '.0' : '';
+        $ms = ($withMs = \PHP_VERSION_ID >= 70100 && isset($i->f)) ? '.0' : '';
+        $ms1 = $withMs ? '.100' : '';
 
         return array(
-            array('PT0S', 0, '0s', '0s'),
-            array('PT1S', 0, '+ 00:00:01'.$ms, '1s'),
-            array('PT2M', 0, '+ 00:02:00'.$ms, '120s'),
-            array('PT3H', 0, '+ 03:00:00'.$ms, '10 800s'),
-            array('P4D', 0, '+ 4d', '345 600s'),
-            array('P5M', 0, '+ 5m', null),
-            array('P6Y', 0, '+ 6y', null),
-            array('P1Y2M3DT4H5M6S', 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
-            array('PT1M60S', 0, '+ 00:02:00'.$ms, null),
-            array('PT1H60M', 0, '+ 02:00:00'.$ms, null),
-            array('P1DT24H', 0, '+ 2d', null),
-            array('P1M32D', 0, '+ 1m 32d', null),
+            array('PT0S', 0, 0, '0s', '0s'),
+            array('PT0S', 0.1, 0, '+ 00:00:00'.$ms1, '0s'),
+            array('PT1S', 0, 0, '+ 00:00:01'.$ms, '1s'),
+            array('PT2M', 0, 0, '+ 00:02:00'.$ms, '120s'),
+            array('PT3H', 0, 0, '+ 03:00:00'.$ms, '10 800s'),
+            array('P4D', 0, 0, '+ 4d', '345 600s'),
+            array('P5M', 0, 0, '+ 5m', null),
+            array('P6Y', 0, 0, '+ 6y', null),
+            array('P1Y2M3DT4H5M6S', 0, 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
+            array('PT1M60S', 0, 0, '+ 00:02:00'.$ms, null),
+            array('PT1H60M', 0, 0, '+ 02:00:00'.$ms, null),
+            array('P1DT24H', 0, 0, '+ 2d', null),
+            array('P1M32D', 0, 0, '+ 1m 32d', null),
 
-            array('PT0S', 1, '0s', '0s'),
-            array('PT1S', 1, '- 00:00:01'.$ms, '-1s'),
-            array('PT2M', 1, '- 00:02:00'.$ms, '-120s'),
-            array('PT3H', 1, '- 03:00:00'.$ms, '-10 800s'),
-            array('P4D', 1, '- 4d', '-345 600s'),
-            array('P5M', 1, '- 5m', null),
-            array('P6Y', 1, '- 6y', null),
-            array('P1Y2M3DT4H5M6S', 1, '- 1y 2m 3d 04:05:06'.$ms, null),
-            array('PT1M60S', 1, '- 00:02:00'.$ms, null),
-            array('PT1H60M', 1, '- 02:00:00'.$ms, null),
-            array('P1DT24H', 1, '- 2d', null),
-            array('P1M32D', 1, '- 1m 32d', null),
+            array('PT0S', 0, 1, '0s', '0s'),
+            array('PT0S', 0.1, 1, '- 00:00:00'.$ms1, '0s'),
+            array('PT1S', 0, 1, '- 00:00:01'.$ms, '-1s'),
+            array('PT2M', 0, 1, '- 00:02:00'.$ms, '-120s'),
+            array('PT3H', 0, 1, '- 03:00:00'.$ms, '-10 800s'),
+            array('P4D', 0, 1, '- 4d', '-345 600s'),
+            array('P5M', 0, 1, '- 5m', null),
+            array('P6Y', 0, 1, '- 6y', null),
+            array('P1Y2M3DT4H5M6S', 0, 1, '- 1y 2m 3d 04:05:06'.$ms, null),
+            array('PT1M60S', 0, 1, '- 00:02:00'.$ms, null),
+            array('PT1H60M', 0, 1, '- 02:00:00'.$ms, null),
+            array('P1DT24H', 0, 1, '- 2d', null),
+            array('P1M32D', 0, 1, '- 1m 32d', null),
         );
     }
 
@@ -400,5 +400,16 @@ EODUMP;
         }
 
         return $periods;
+    }
+
+    private function createInterval($intervalSpec, $ms, $invert)
+    {
+        $interval = new \DateInterval($intervalSpec);
+        if (\PHP_VERSION_ID >= 70100 && isset($interval->f)) {
+            $interval->f = $ms;
+        }
+        $interval->invert = $invert;
+
+        return $interval;
     }
 }

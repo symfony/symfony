@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-24T07:17:23Z
+
+with new false positive from php-cs-fixer...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-24T11:34:00Z
+
+> put a colon after the namespace while colons are not allowed in validateKey
+
+I put a colon *because* they are not allowed *when given from the outside*. Here, we're *past* the interface, so the PSR-6/16 constraints do not apply. Which is very nice for us: using a colon makes it impossible to have any confusion with user input.
+
+> why an integer is not allowed as cache key
+
+because PSR-6/16 states that a key must be a string. So `6` is not allowed, but `"6"` is.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2017-08-26T15:12:06Z
+
+I'm a bit torn on this, as it adds extra lookup for every lookup. Would it be possible to rather do this on first usage, and afterwards get it using multi get together with the item lookup? Then if version has changed either refetch the items, or in future when there is stale cache support on _get_ we can still return the items when callee indicated it does not need fresh items, however have the new version set for next caller.
+
+If that won't fly, then at least make sure this is only done once on multi get lookus. in current patch here it will be done for every key before lookup on all is done, which I would consider a bug.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-26T15:27:14Z
+
+As the PR is now, the version retrieval is done only once, on first need. That's how Doctrine does it also afaik. Isn't it good enough?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2017-08-26T15:32:33Z
+
+Ah, sorry missed that completely. It's fine with me, but you can bet there will be bug report for this down the line for long running processes :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-27T08:04:28Z
+
+> there will be bug report for this down the line for long running processes
+
+so, I added a public method to explicitly reset the memoized version, for the long running process use case. This looks much more reasonable to me than fetching the key on every fetch, as even multi-fetch are not always grouped (eg RedisCluster or RedisArray), thus would pay an extra cost at each fetch.
+
+This requires long running processes to do something like that in their main loop:
+`$pool->enableVersioning() || $pool->enableVersioning(false);`
+
+Yes, this is a "new feature" (because a new public method is). Yet, it is required to compensate for a behavior change (long running process don't have their cache cleared anymore). And the behavior change is also technically a BC break. Yet also I think this is a really edge-case one and the issue is at the design level so that it cannot be solved otherwise.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-27T08:36:40Z
+
+A use case for such each case would be to implement a reverse proxy base on ReactPHP (php-pm for instance). With cache invalidation with the clear method.
+(I'm not sur it exists and it'd a good idea.. just a brainstorm idea of what could be wrong)
+
+---------------------------------------------------------------------------
+
+by andrerom at 2017-08-27T08:42:47Z
+
+Yes, ReactPHP or similar will hit this. But I agree with @nicolas-grekas that main usage should not pay a penalty because of it. One option would be to clearly document handlers/ connection classes that don't support flushing pool and hence not recommended for use with long running php processes such as ReactPHP/cron/script.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-27T08:57:39Z
+
+> to clearly document handlers/ connection classes that don't support flushing
+
+well, with this patch, *all* handlers do support flushing. But for long running processes, the concern leaks, and I have no better reasonable idea to make it not.
+
+So, we would require ppl to call `$pool->enableVersioning()` on pools that have versioning enabled.
+(or call `$pool->enableVersioning() || $pool->enableVersioning(false)`, which works whether versioning is on or not, without changing the versioning-enabled state.)

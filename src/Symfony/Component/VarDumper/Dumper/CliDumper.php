@@ -51,6 +51,9 @@ class CliDumper extends AbstractDumper
         "\033" => '\e',
     );
 
+    protected $collapseNextHash = false;
+    protected $expandNextHash = false;
+
     /**
      * {@inheritdoc}
      */
@@ -253,6 +256,11 @@ class CliDumper extends AbstractDumper
     {
         $this->dumpKey($cursor);
 
+        if ($this->collapseNextHash) {
+            $cursor->skipChildren = true;
+            $this->collapseNextHash = $hasChild = false;
+        }
+
         $class = $this->utf8Encode($class);
         if (Cursor::HASH_OBJECT === $type) {
             $prefix = $class && 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
@@ -368,7 +376,15 @@ class CliDumper extends AbstractDumper
                                 break;
                         }
 
-                        $this->line .= $bin.$this->style($style, $key[1], $attr).': ';
+                        if (isset($attr['collapse'])) {
+                            if ($attr['collapse']) {
+                                $this->collapseNextHash = true;
+                            } else {
+                                $this->expandNextHash = true;
+                            }
+                        }
+
+                        $this->line .= $bin.$this->style($style, $key[1], $attr).(isset($attr['separator']) ? $attr['separator'] : ': ');
                     } else {
                         // This case should not happen
                         $this->line .= '-'.$bin.'"'.$this->style('private', $key, array('class' => '')).'": ';
@@ -395,6 +411,21 @@ class CliDumper extends AbstractDumper
     {
         if (null === $this->colors) {
             $this->colors = $this->supportsColors();
+        }
+
+        if (isset($attr['ellipsis'], $attr['ellipsis-type'])) {
+            $prefix = substr($value, 0, -$attr['ellipsis']);
+            if ('cli' === PHP_SAPI && 'path' === $attr['ellipsis-type'] && isset($_SERVER[$pwd = '\\' === DIRECTORY_SEPARATOR ? 'CD' : 'PWD']) && 0 === strpos($prefix, $_SERVER[$pwd])) {
+                $prefix = '.'.substr($prefix, strlen($_SERVER[$pwd]));
+            }
+            if (!empty($attr['ellipsis-tail'])) {
+                $prefix .= substr($value, -$attr['ellipsis'], $attr['ellipsis-tail']);
+                $value = substr($value, -$attr['ellipsis'] + $attr['ellipsis-tail']);
+            } else {
+                $value = substr($value, -$attr['ellipsis']);
+            }
+
+            return $this->style('default', $prefix).$this->style($style, $value);
         }
 
         $style = $this->styles[$style];

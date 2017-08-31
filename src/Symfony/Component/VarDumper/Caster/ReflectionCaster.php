@@ -122,7 +122,7 @@ class ReflectionCaster
             $function = new FrameStub($frame, false, true);
             $function = ExceptionCaster::castFrameStub($function, array(), $function, true);
             $a[$prefix.'executing'] = new EnumStub(array(
-                $frame['class'].$frame['type'].$frame['function'].'()' => $function[$prefix.'src'],
+                "\0~separator= \0".$frame['class'].$frame['type'].$frame['function'].'()' => $function[$prefix.'src'],
             ));
         }
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
@@ -74,11 +75,33 @@ class ArrayNodeTest extends TestCase
     public function testPreNormalize($denormalized, $normalized)
     {
         $node = new ArrayNode('foo');
+        $node->addChild(new ScalarNode('foo_bar'));
+        $node->addChild(new ScalarNode('foo-bar'));
+        $node->addChild(new ScalarNode('foo-bar_moo'));
+        $node->addChild(new ScalarNode('anything_with_dash_and_no_underscore'));
+        $node->addChild(new ScalarNode('no_dash'));
 
-        $r = new \ReflectionMethod($node, 'preNormalize');
-        $r->setAccessible(true);
+        $prototypeNode = new ArrayNode('subfoo');
+        $prototypeNode->addChild(new ScalarNode('bar'));
+        $prototype = new PrototypedArrayNode('plural');
+        $prototype->setPrototype($prototypeNode);
+        $prototype->setKeyAttribute('x');
 
-        $this->assertSame($normalized, $r->invoke($node, $denormalized));
+        $node->setXmlRemappings(array(
+            array('singular', 'plural'),
+        ));
+        $node->addChild($prototype);
+
+        $node->setNormalizationClosures(array(
+            function ($v) use ($normalized) {
+                $this->assertSame($normalized, $v);
+
+                return $v;
+            },
+        ));
+
+        $this->assertSame($normalized, $node->normalize($denormalized));
+
     }
 
     public function getPreNormalizationTests()
@@ -100,6 +123,10 @@ class ArrayNodeTest extends TestCase
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
             ),
+            array(
+                array('singular' => array(array('x' => 'foo', 'bar' => 'foo'), array('x' => 'bar', 'bar' => 'bar'))),
+                array('plural' => array('foo' => array('bar' => 'foo'), 'bar' => array('bar' => 'bar'))),
+            )
         );
     }
 

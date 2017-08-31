@@ -33,6 +33,7 @@
         "symfony/security-csrf": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0"
+        "symfony/console": "~3.4|~4.0"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",

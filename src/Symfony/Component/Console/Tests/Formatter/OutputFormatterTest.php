@@ -28,6 +28,9 @@ class OutputFormatterTest extends TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals('foo<bar', $formatter->format('foo\\<bar'));
+        $this->assertEquals('foo << bar', $formatter->format('foo << bar'));
+        $this->assertEquals('foo << bar \\', $formatter->format('foo << bar \\'));
+        $this->assertEquals("foo << \033[32mbar \\ baz\033[39m \\", $formatter->format('foo << <info>bar \\ baz</info> \\'));
         $this->assertEquals('<info>some info</info>', $formatter->format('\\<info>some info\\</info>'));
         $this->assertEquals('\\<info>some info\\</info>', OutputFormatter::escape('<info>some info</info>'));
 

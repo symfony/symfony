@@ -96,5 +96,11 @@
         <service id="Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand">
             <tag name="console.command" command="lint:yaml" />
         </service>
+
+        <service id="Symfony\Component\Form\Command\DebugCommand">
+            <argument type="service" id="form.registry" />
+            <argument type="collection" /> <!-- All form types namespaces are stored here by FormPass -->
+            <tag name="console.command" command="debug:form" />
+        </service>
     </services>
 </container>

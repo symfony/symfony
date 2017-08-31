@@ -200,6 +200,8 @@ class FrameworkExtension extends Extension
             if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
+        } else {
+            $container->removeDefinition('Symfony\Component\Form\Command\DebugCommand');
         }
 
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);

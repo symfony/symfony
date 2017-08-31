@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-29T12:53:12Z
+
+So, this happens when the DI extension doesn't call `Extension::processConfiguration()`, which is the case in PropelBundle (fixed in propelorm/PropelBundle#461.)
+
+Shouldn't be common, so I wouldn't recommend a new release (yet.)
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-08-29T13:06:59Z
+
+@nicolas-grekas Thanks! I can confirm:
+
+1. It works with your PropelBundle fix, without this pr
+2. It works with your pr without changing PropelBundle
+3. And of course, it also works with both changes together.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2017-08-29T19:47:28Z
+
+Hi guys, thanks for the fix!
+
+What about release that one since every bundle without the fix may have issue?
+
+@gharlan confirms that this PR fix the issue without change in the bundles.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-29T20:25:09Z
+
+@jeremyFreeAgent if you have the issue (do you?), you'd better fix it in your bundle also because its current behavior will prevent correct tracking of ENV vars anyway.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2017-08-29T21:06:34Z
+
+@nicolas-grekas I was not talking about _my_ bundle but the _community_ bundles. I mean okay we can PR every bundle we spot with that issue but what about _basic users of Symfony_ that will only update Symfony and expect everything still works?
+
+BTW I have PR the fix in https://github.com/sensiolabs/SensioLabsConnectBundle/pull/17 and It was merged :)
+
+---------------------------------------------------------------------------
+
+by samvdb at 2017-08-30T14:03:35Z
+
+I can confirm the same bug using 8p/guzzle-bundle.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T14:07:11Z
+
+@samvdb can you submit a PR on https://github.com/8p/GuzzleBundle/blob/master/DependencyInjection/GuzzleExtension.php to fix that extension the same way as done in https://github.com/sensiolabs/SensioLabsConnectBundle/pull/17?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T14:10:34Z
+
+BTW, I'll propose to deprecate not calling `Extension::processConfiguration()` in 3.4, and throw an exception in 4.0
+
+---------------------------------------------------------------------------
+
+by samvdb at 2017-08-30T14:13:44Z
+
+@nicolas-grekas PR is open, can confirm this fixes the issue.
+https://github.com/8p/GuzzleBundle/pull/120
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-30T14:30:11Z
+
+@nicolas-grekas could we detect that this method was not called, and use the previous behavior for replacing env placeholders in this case ? This would not solve the shadowing of the config in case a variable is not used anymore in the end. But it would mean that the contain keeps working when the config is now shadowed.
+Otherwise, it means we broke BC in a patch version.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T14:33:56Z
+
+@stof see patch, that should be what L97 does.

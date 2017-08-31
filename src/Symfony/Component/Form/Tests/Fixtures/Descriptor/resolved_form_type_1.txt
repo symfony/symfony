@@ -12,12 +12,12 @@
   choice_translation_domain   empty_data           auto_initialize           csrf_protection        
   choice_value                error_bubbling       block_name                csrf_token_id          
   choices                                          by_reference              csrf_token_manager     
-  choices_as_values                                data                                             
-  expanded                                         disabled                                         
-  group_by                                         inherit_data                                     
-  multiple                                         label                                            
-  placeholder                                      label_attr                                       
-  preferred_choices                                label_format                                     
+  expanded                                         data                                             
+  group_by                                         disabled                                         
+  multiple                                         inherit_data                                     
+  placeholder                                      label                                            
+  preferred_choices                                label_attr                                       
+                                                   label_format                                     
                                                    mapped                                           
                                                    method                                           
                                                    post_max_size_message                            

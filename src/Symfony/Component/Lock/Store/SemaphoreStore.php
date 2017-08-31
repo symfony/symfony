@@ -30,6 +30,8 @@ class SemaphoreStore implements StoreInterface
      * @param bool|null $blocking When not null, checked again the blocking mode.
      *
      * @return bool
+     *
+     * @internal
      */
     public static function isSupported($blocking = null)
     {

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by gharlan at 2017-08-29T17:18:24Z
+
+It looks like this:
+
+![screenshot 2017-08-29 19 17 57](https://user-images.githubusercontent.com/330436/29834336-d0fb425a-8cee-11e7-8167-ed0cd1e42930.png)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-29T18:47:11Z
+
+The new entry seems redundant with the previous one (logged by `refreshUser()`), couldn't we enhance it instead?
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-08-29T19:49:19Z
+
+I agree and would be happy to reduce the messages.
+But I'm not sure if the "User was reloaded from a user provider" message is the "correct" place to provide the impersonator.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-29T21:36:24Z
+
+Actually only the user is refreshed, not the token itself :)
+Personally I'm fine with adding such info to the existing log (the key should be `impersonator_username` to be consistent with `username` and because `user` feels like it holds the whole user object).
+About the `token_class` var, I think that having it in the very first log (`Read existing security token from session.`) would be useful as well, WDYT?
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-08-30T09:13:47Z
+
+Like this (code changed)?
+
+![screenshot 2017-08-30 11 12 43](https://user-images.githubusercontent.com/330436/29864880-48a912b6-8d74-11e7-96cd-374313aae506.png)

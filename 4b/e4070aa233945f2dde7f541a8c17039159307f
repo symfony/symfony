@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-08-30T10:37:12Z
+
+I think this is useful. It makes sense in several cases to iterate over initialized services for cleanup tasks. Having this kind of reference would allow to use IteratorArgument and private services instead of having to use public services and a list of ids as today.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T19:35:19Z
+
+Implementation pushed, not yet tested.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T09:08:17Z
+
+PR is now ready, with pretty good test coverage.
+(failures are false positives)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T21:27:10Z
+
+fabbot patch applied

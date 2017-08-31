@@ -173,19 +173,16 @@ class ContextListener implements ListenerInterface
                 $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
-                    $impersonatorUsername = null;
+                    $context = array('provider' => get_class($provider), 'username' => $refreshedUser->getUsername());
+
                     foreach ($token->getRoles() as $role) {
                         if ($role instanceof SwitchUserRole) {
-                            $impersonatorUsername = $role->getSource()->getUsername();
+                            $context['impersonator_username'] = $role->getSource()->getUsername();
                             break;
                         }
                     }
 
-                    $this->logger->debug('User was reloaded from a user provider.', array(
-                        'provider' => get_class($provider),
-                        'username' => $refreshedUser->getUsername(),
-                        'impersonator_username' => $impersonatorUsername,
-                    ));
+                    $this->logger->debug('User was reloaded from a user provider.', $context);
                 }
 
                 return $token;

@@ -54,6 +54,7 @@ trait MemcachedTrait
         }
 
         parent::__construct($namespace, $defaultLifetime);
+        $this->enableVersioning();
     }
 
     /**
@@ -242,7 +243,7 @@ trait MemcachedTrait
      */
     protected function doClear($namespace)
     {
-        return $this->checkResultCode($this->getClient()->flush());
+        return false;
     }
 
     private function checkResultCode($result)

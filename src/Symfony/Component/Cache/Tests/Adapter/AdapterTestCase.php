@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\PruneableInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
@@ -103,6 +104,7 @@ abstract class AdapterTestCase extends CachePoolTest
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
+        /** @var PruneableInterface|CacheItemPoolInterface $cache */
         $cache = $this->createCachePool();
 
         $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {
@@ -115,6 +117,18 @@ abstract class AdapterTestCase extends CachePoolTest
 
             $cache->save($item);
         };
+
+        $doSet('foo', 'foo-val', new \DateInterval('PT05S'));
+        $doSet('bar', 'bar-val', new \DateInterval('PT10S'));
+        $doSet('baz', 'baz-val', new \DateInterval('PT15S'));
+        $doSet('qux', 'qux-val', new \DateInterval('PT20S'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertTrue($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'bar'));
+        $this->assertTrue($this->isPruned($cache, 'baz'));
+        $this->assertTrue($this->isPruned($cache, 'qux'));
 
         $doSet('foo', 'foo-val');
         $doSet('bar', 'bar-val', new \DateInterval('PT20S'));

@@ -165,7 +165,7 @@ class LockTest extends TestCase
 
         foreach ($ttls as $ttl) {
             if (null === $ttl) {
-                $key->resetExpiringDate();
+                $key->resetLifetime();
             } else {
                 $key->reduceLifetime($ttl);
             }

@@ -101,6 +101,7 @@ trait ExpiringStoreTestTrait
 
         $store->save($key);
         $store->putOffExpiration($key, 1);
-        $this->assertNotNull($key->getExpiringDate());
+        $this->assertGreaterThanOrEqual(0, $key->getRemainingLifetime());
+        $this->assertLessThanOrEqual(1, $key->getRemainingLifetime());
     }
 }

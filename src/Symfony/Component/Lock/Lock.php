@@ -94,7 +94,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
         }
 
         try {
-            $this->key->resetExpiringDate();
+            $this->key->resetLifetime();
             $this->store->putOffExpiration($this->key, $this->ttl);
 
             if ($this->key->isExpired()) {
@@ -140,8 +140,13 @@ final class Lock implements LockInterface, LoggerAwareInterface
         return $this->key->isExpired();
     }
 
-    public function getExpiringDate()
+    /**
+     * Returns the remaining lifetime.
+     *
+     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     */
+    public function getRemainingLifetime()
     {
-        return $this->key->getExpiringDate();
+        return $this->key->getRemainingLifetime();
     }
 }

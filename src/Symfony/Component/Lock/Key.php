@@ -72,6 +72,11 @@ final class Key
         return $this->state[$stateKey];
     }
 
+    public function resetLifetime()
+    {
+        $this->expiringTime = null;
+    }
+
     /**
      * @param float $ttl The expiration delay of locks in seconds.
      */
@@ -84,17 +89,14 @@ final class Key
         }
     }
 
-    public function resetExpiringDate()
-    {
-        $this->expiringTime = null;
-    }
-
     /**
-     * @return \DateTimeImmutable
+     * Returns the remaining lifetime.
+     *
+     * @return float|null Remaining lifetime in seconds. Null when the key won't expire.
      */
-    public function getExpiringDate()
+    public function getRemainingLifetime()
     {
-        return \DateTimeImmutable::createFromFormat('U.u', (string) $this->expiringTime);
+        return null === $this->expiringTime ? null : $this->expiringTime - microtime(true);
     }
 
     /**

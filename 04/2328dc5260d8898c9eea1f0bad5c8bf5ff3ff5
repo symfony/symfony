@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-31T18:48:40Z
+
+The conflict rule is not needed (at least for the tests to pass), dev-dependencies are installed for testing the FrameworkBundle, and the min version already is set to `^3.4`.
+I think the issue comes from the fact packagist is only seeing 0898e9f01e1dedc70fb4f77b594227619d7e1711 [as last commit on `symfony/form:master`](https://packagist.org/packages/symfony/form#dev-master), hence the command is not available yet.
+But 3.4 has properly been merged on master though: https://github.com/symfony/form/commits/master
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T18:51:18Z
+
+see 086e457eebba77d45bd0e69fbf215f629a943cdb
+would be great to fix master now :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T18:55:02Z
+
+@nicolas-grekas nice catch. I'll look at master tomorrow if @yceruto can't before
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-31T19:41:05Z
+
+Re-opening this one, as the conflict rule looks legit to me though: We don't do a `class_exists` check on `DebugCommand` which is only available as of `symfony/form` 3.4. So Using FrameworkBundle 3.4+ with `symfony/form` 3.3 will raise a:
+
+> PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\ClassNotFoundException: Attempted to load class "DebugCommand" from namespace "Symfony\Component\Form\Command".
+
+We could tweak the FrameworkExtension, but I think we're already used to bump the min-version by adding a conflict rule in such cases in the FrameworkBundle.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T20:11:51Z
+
+Agree (my own PR but it was not intended for that).

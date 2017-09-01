@@ -27,14 +27,6 @@ class NativeRequestHandler implements RequestHandlerInterface
     private $serverParams;
 
     /**
-     * {@inheritdoc}
-     */
-    public function __construct(ServerParams $params = null)
-    {
-        $this->serverParams = $params ?: new ServerParams();
-    }
-
-    /**
      * The allowed keys of the $_FILES array.
      *
      * @var array
@@ -46,6 +38,11 @@ class NativeRequestHandler implements RequestHandlerInterface
         'tmp_name',
         'type',
     );
+
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
 
     /**
      * {@inheritdoc}
@@ -124,6 +121,14 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         $form->submit($data, 'PATCH' !== $method);
+    }
+
+    public function isFileUpload($data)
+    {
+        // POST data will always be strings or arrays of strings. Thus, we can be sure
+        // that the submitted data is a file upload if the "error" value is an integer
+        // (this value must have been injected by PHP itself).
+        return is_array($data) && isset($data['error']) && is_int($data['error']);
     }
 
     /**

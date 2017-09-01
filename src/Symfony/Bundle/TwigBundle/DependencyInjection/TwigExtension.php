@@ -109,7 +109,7 @@ class TwigExtension extends Extension
         $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
         $container->getDefinition('twig.template_iterator')->replaceArgument(2, $config['paths']);
 
-        $bundleHierarchy = $this->getBundleHierarchy($container);
+        $bundleHierarchy = $this->getBundleHierarchy($container, $config);
 
         foreach ($bundleHierarchy as $name => $bundle) {
             $namespace = $this->normalizeBundleName($name);
@@ -126,6 +126,11 @@ class TwigExtension extends Extension
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+        }
+        $container->addResource(new FileExistenceResource($dir));
+
+        if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']))) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
         $container->addResource(new FileExistenceResource($dir));
@@ -174,7 +179,7 @@ class TwigExtension extends Extension
         }
     }
 
-    private function getBundleHierarchy(ContainerBuilder $container)
+    private function getBundleHierarchy(ContainerBuilder $container, array $config)
     {
         $bundleHierarchy = array();
 
@@ -188,6 +193,11 @@ class TwigExtension extends Extension
             }
 
             if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+                $bundleHierarchy[$name]['paths'][] = $dir;
+            }
+            $container->addResource(new FileExistenceResource($dir));
+
+            if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name)) {
                 $bundleHierarchy[$name]['paths'][] = $dir;
             }
             $container->addResource(new FileExistenceResource($dir));

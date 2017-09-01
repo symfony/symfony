@@ -60,6 +60,7 @@ class ComparatorTest extends TestCase
     {
         return array(
             array('<', '1000', array('500', '999'), array('1000', '1500')),
+            array('===', '1000', array('1000'), array(1000)),
         );
     }
 }

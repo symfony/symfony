@@ -10,6 +10,8 @@
  */
 
 namespace Symfony\Component\Finder\Comparator;
+use DateTime;
+use DateTimeZone;
 
 /**
  * DateCompare compiles date comparisons.
@@ -21,19 +23,23 @@ class DateComparator extends Comparator
     /**
      * Constructor.
      *
-     * @param string $test A comparison string
+     * @param string|array $test A comparison string maybe with timezone
      *
      * @throws \InvalidArgumentException If the test is not understood
      */
     public function __construct($test)
     {
+        $timezone = null;
+        if (is_array($test)) {
+            list($test, $timezone) = $test;
+        }
+
         if (!preg_match('#^\s*(==|!=|[<>]=?|after|since|before|until)?\s*(.+?)\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a date test.', $test));
         }
 
         try {
-            $date = new \DateTime($matches[2]);
-            $target = $date->format('U');
+            $target = $this->getTimeStamp($matches[2], $timezone);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid date.', $matches[2]));
         }
@@ -49,5 +55,45 @@ class DateComparator extends Comparator
 
         $this->setOperator($operator);
         $this->setTarget($target);
+    }
+
+    /**
+     * @inheritdoc
+     * @param int|array $test A test timestamp maybe with timezone
+     */
+    public function test($test)
+    {
+        $timezone = null;
+        if (is_array($test)) {
+            list($test, $timezone) = $test;
+        }
+
+        $test = $this->getTimeStamp(date('Y-m-d H:i:s', $test), $timezone);
+
+        return parent::test($test);
+    }
+
+    /**
+     * Calculates timestamp based on the time zone
+     *
+     * @param string $date
+     * @param string|\DateTimeZone $timezone
+     * @return string
+     */
+    protected function getTimeStamp($date, $timezone = null)
+    {
+        if ($timezone) {
+            if (!$timezone instanceof DateTimeZone) {
+                $timezone = new DateTimeZone($timezone);
+            }
+            $datetime = new DateTime($date, $timezone);
+            $datetime->setTimezone(new DateTimeZone('GMT'));
+        } else {
+            $datetime = new DateTime($date);
+        }
+
+        $timestamp = $datetime->format('U');
+
+        return $timestamp;
     }
 }

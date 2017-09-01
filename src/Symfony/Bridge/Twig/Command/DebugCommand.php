@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -153,11 +152,16 @@ EOF
 
         $rows = array();
         foreach ($this->getLoaderPaths() as $namespace => $paths) {
+            if (count($paths) > 1) {
+                $rows[] = array('', '');
+            }
             foreach ($paths as $path) {
-                $rows[] = array($namespace, '* '.$path);
+                $rows[] = array($namespace, '- '.$path);
                 $namespace = '';
             }
-            $rows[] = new TableSeparator();
+            if (count($paths) > 1) {
+                $rows[] = array('', '');
+            }
         }
         array_pop($rows);
         $io->section('Loader Paths');

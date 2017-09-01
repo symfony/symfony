@@ -69,4 +69,12 @@ class JsonBundleReaderTest extends TestCase
     {
         $this->reader->read(__DIR__.'/Fixtures/json', 'en_Invalid');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
+     */
+    public function testReaderDoesNotBreakOutOfGivenPath()
+    {
+        $this->reader->read(__DIR__.'/Fixtures/json', '../invalid_directory/en');
+    }
 }

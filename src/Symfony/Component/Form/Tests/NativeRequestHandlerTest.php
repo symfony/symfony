@@ -216,4 +216,15 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
             'size' => 100,
         );
     }
+
+    protected function getInvalidFile()
+    {
+        return array(
+            'name' => 'upload.txt',
+            'type' => 'text/plain',
+            'tmp_name' => 'owfdskjasdfsa',
+            'error' => '0',
+            'size' => '100',
+        );
+    }
 }

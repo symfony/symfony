@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.38
+------
+
+ * [BC BREAK] the `isFileUpload()` method was added to the `RequestHandlerInterface`
+
 2.7.0
 -----
 

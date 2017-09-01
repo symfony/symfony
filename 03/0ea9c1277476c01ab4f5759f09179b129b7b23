@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-31T14:01:39Z
+
+we have several similar thing in tests, can you remove them too?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-31T14:15:03Z
+
+> we have several similar thing in tests, can you remove them too?
+
+Tests seem ok. What exactly do you think?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-31T14:24:13Z
+
+@maidmaid indeed tests have already been cleaned in https://github.com/symfony/symfony/commit/24fc394ad351b1853b20af2bb5ac51fad8fabbad
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-31T14:56:19Z
+
+Changes done.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-31T15:26:26Z
+
+Sounds good to me.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-01T08:16:34Z
+
+@maidmaid This line should probably be updated: https://github.com/maidmaid/symfony/blob/bf1b1a33fbf814a3a52a1ca189b8a4f7e4bdbbe5/src/Symfony/Component/Console/Tests/Command/LockableTraitTest.php#L44
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-09-01T09:47:21Z
+
+@xabbuh Yes, I did it :) https://github.com/symfony/symfony/pull/24053/files#diff-f2de6c045c2bfc6f6ec08644b7a98335R46
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-01T10:10:12Z
+
+@maidmaid I meant the test case :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-09-01T10:21:29Z
+
+@xabbuh Sorry, I don't understand well, could you be more precise please?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-01T10:29:29Z
+
+@maidmaid Take a look at the line in the test I linked to in https://github.com/symfony/symfony/pull/24053#issuecomment-326519763. There we still pass `false` to `isSupported()`.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-09-01T10:30:26Z
+
+The test case should be updated, it has false as an argument
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-09-01T10:49:06Z
+
+Oh, of course, I confused the trait with the test, sorry! Changes done.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-01T10:56:03Z
+
+Can you also remove the `use` statement for `NotSupportedException` in `SemaphoreStore`?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-09-01T10:58:41Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-09-01T11:10:24Z
+
+Changes done.

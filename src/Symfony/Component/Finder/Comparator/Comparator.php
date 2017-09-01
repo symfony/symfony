@@ -64,7 +64,7 @@ class Comparator
             $operator = '==';
         }
 
-        if (!in_array($operator, array('>', '<', '>=', '<=', '==', '!='))) {
+        if (!in_array($operator, array('>', '<', '>=', '<=', '==', '!=', '==='))) {
             throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
         }
 
@@ -91,6 +91,8 @@ class Comparator
                 return $test <= $this->target;
             case '!=':
                 return $test != $this->target;
+            case '===':
+                return $test === $this->target;
         }
 
         return $test == $this->target;

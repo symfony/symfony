@@ -149,6 +149,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testClassRouteLoad()
     {
         $classRouteData = array(
+            'name' => 'prefix_',
             'path' => '/prefix',
             'schemes' => array('https'),
             'methods' => array('GET'),
@@ -173,7 +174,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         ;
 
         $routeCollection = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass');
-        $route = $routeCollection->get($methodRouteData['name']);
+        $route = $routeCollection->get($classRouteData['name'].$methodRouteData['name']);
 
         $this->assertSame($classRouteData['path'].$methodRouteData['path'], $route->getPath(), '->load concatenates class and method route path');
         $this->assertEquals(array_merge($classRouteData['schemes'], $methodRouteData['schemes']), $route->getSchemes(), '->load merges class and method route schemes');
@@ -240,7 +241,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
         $this->assertNull($route, '->load ignores class route');
 
-        $route = $routeCollection->get($methodRouteData['name']);
+        $route = $routeCollection->get($classRouteData['name'].$methodRouteData['name']);
 
         $this->assertSame($classRouteData['path'].$methodRouteData['path'], $route->getPath(), '->load concatenates class and method route path');
         $this->assertEquals(array_merge($classRouteData['schemes'], $methodRouteData['schemes']), $route->getSchemes(), '->load merges class and method route schemes');

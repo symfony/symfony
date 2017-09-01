@@ -30,9 +30,7 @@ class FrozenParameterBag extends ParameterBag
      */
     public function __construct(array $parameters = array())
     {
-        foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
-        }
+        $this->parameters = array_change_key_case($parameters);
         $this->resolved = true;
     }
 

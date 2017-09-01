@@ -6,6 +6,8 @@ CHANGELOG
 
  * removed `ExceptionInterface`
  * removed `Symfony\Component\Finder\Iterator\FilterIterator`
+ * added supported for timezone compare in the `DateComparator`
+ * added support for the === operator in the `Comparator`
 
 3.4.0
 -----

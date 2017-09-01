@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project.
@@ -120,6 +121,7 @@ EOF
                 }
             }
             $data['tests'] = array_keys($data['tests']);
+            $data['loader_paths'] = $this->getLoaderPaths();
             $io->writeln(json_encode($data));
 
             return 0;
@@ -145,7 +147,34 @@ EOF
             $io->listing($items);
         }
 
+        $list = array();
+        foreach ($this->getLoaderPaths() as $namespace => $paths) {
+            $list = array_merge($list, array_map(function ($path) use ($namespace) {
+                return $namespace.($namespace ? ': ' : '').$path;
+            }, $paths));
+        }
+        $io->section('Loader Paths');
+        $io->listing($list);
+
         return 0;
+    }
+
+    private function getLoaderPaths()
+    {
+        if (!($loader = $this->twig->getLoader()) instanceof FilesystemLoader) {
+            return array();
+        }
+
+        $paths = array();
+        foreach ($loader->getNamespaces() as $namespace) {
+            if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
+                $paths[''] = $loader->getPaths($namespace);
+            } else {
+                $paths['@'.$namespace] = $loader->getPaths($namespace);
+            }
+        }
+
+        return $paths;
     }
 
     private function getMetadata($type, $entity)

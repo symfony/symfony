@@ -21,9 +21,18 @@ class FrozenParameterBagTest extends TestCase
         $parameters = array(
             'foo' => 'foo',
             'bar' => 'bar',
+            'fooBar' => 'fooBar',
         );
         $bag = new FrozenParameterBag($parameters);
-        $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
+        $this->assertEquals(
+            array(
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'foobar' => 'fooBar',
+            ),
+            $bag->all(),
+            '__construct() takes an array of parameters as its first argument and lowercase it keys'
+        );
     }
 
     /**

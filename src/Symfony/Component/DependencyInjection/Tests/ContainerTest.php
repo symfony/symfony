@@ -121,18 +121,13 @@ class ContainerTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.4.
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "foo" is deprecated since version 3.4.
-     */
     public function testGetSetParameterWithMixedCase()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
 
         $sc->setParameter('Foo', 'baz1');
-        $this->assertEquals('baz1', $sc->getParameter('foo'), '->setParameter() converts the key to lowercase');
-        $this->assertEquals('baz1', $sc->getParameter('FOO'), '->getParameter() converts the key to lowercase');
+        $this->assertEquals('bar', $sc->getParameter('foo'));
+        $this->assertEquals('baz1', $sc->getParameter('Foo'));
     }
 
     public function testGetServiceIds()

@@ -146,7 +146,7 @@ DependencyInjection
    <service id="Doctrine\Common\Annotations\Reader" alias="annotations.reader" public="false" />
    ```
 
- * Service identifiers are now case sensitive.
+ * Service identifiers and parameter names are now case sensitive.
 
  * The `Reference` and `Alias` classes do not make service identifiers lowercase anymore.
 

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,11 +31,13 @@ class DebugCommand extends Command
     protected static $defaultName = 'debug:twig';
 
     private $twig;
+    private $projectDir;
 
     /**
      * @param Environment $twig
+     * @param string|null $projectDir
      */
-    public function __construct($twig = null)
+    public function __construct($twig = null, $projectDir = null)
     {
         if (!$twig instanceof Environment) {
             @trigger_error(sprintf('Passing a command name as the first argument of "%s" is deprecated since version 3.4 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
@@ -47,6 +50,7 @@ class DebugCommand extends Command
         parent::__construct();
 
         $this->twig = $twig;
+        $this->projectDir = $projectDir;
     }
 
     public function setTwigEnvironment(Environment $twig)
@@ -147,14 +151,17 @@ EOF
             $io->listing($items);
         }
 
-        $list = array();
+        $rows = array();
         foreach ($this->getLoaderPaths() as $namespace => $paths) {
-            $list = array_merge($list, array_map(function ($path) use ($namespace) {
-                return $namespace.($namespace ? ': ' : '').$path;
-            }, $paths));
+            foreach ($paths as $path) {
+                $rows[] = array($namespace, '* '.$path);
+                $namespace = '';
+            }
+            $rows[] = new TableSeparator();
         }
+        array_pop($rows);
         $io->section('Loader Paths');
-        $io->listing($list);
+        $io->table(array('Namespace', 'Paths'), $rows);
 
         return 0;
     }
@@ -165,16 +172,26 @@ EOF
             return array();
         }
 
-        $paths = array();
+        $loaderPaths = array();
         foreach ($loader->getNamespaces() as $namespace) {
+            $paths = array_map(function ($path) use ($namespace) {
+                if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
+                    $path = ltrim(substr($path, strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                }
+
+                return $path;
+            }, $loader->getPaths($namespace));
+
             if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
-                $paths[''] = $loader->getPaths($namespace);
+                $namespace = '(None)';
             } else {
-                $paths['@'.$namespace] = $loader->getPaths($namespace);
+                $namespace = '@'.$namespace;
             }
+
+            $loaderPaths[$namespace] = $paths;
         }
 
-        return $paths;
+        return $loaderPaths;
     }
 
     private function getMetadata($type, $entity)

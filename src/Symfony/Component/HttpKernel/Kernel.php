@@ -26,7 +26,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
@@ -625,7 +624,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $container->addCompilerPass(new AddAnnotatedClassesToCachePass($this));
-        $container->addResource(new EnvParametersResource('SYMFONY__'));
 
         return $container;
     }

@@ -222,10 +222,8 @@ class Parser
                 }
                 $context = 'mapping';
 
-                // force correct settings
-                Inline::parse(null, $flags, $this->refs);
+                Inline::initialize($flags, $this->getRealCurrentLineNb());
                 try {
-                    Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
                     $i = 0;
                     $evaluateKey = !(Yaml::PARSE_KEYS_AS_STRINGS & $flags);
 

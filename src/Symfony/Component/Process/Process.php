@@ -319,8 +319,6 @@ class Process implements \IteratorAggregate
             @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
         }
 
-        $options = array('suppress_errors' => true);
-
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
             $this->options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup, $env);
@@ -341,7 +339,7 @@ class Process implements \IteratorAggregate
             @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behaviour is deprecated since version 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $options);
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $this->options);
 
         foreach ($envBackup as $k => $v) {
             putenv(false === $v ? $k : "$k=$v");

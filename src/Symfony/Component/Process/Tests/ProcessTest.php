@@ -49,8 +49,6 @@ class ProcessTest extends TestCase
     }
 
     /**
-     * @see https://github.com/symfony/symfony/issues/18249
-     *
      * @group legacy
      * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd()
      */

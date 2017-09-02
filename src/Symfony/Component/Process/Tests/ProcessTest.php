@@ -54,6 +54,27 @@ class ProcessTest extends TestCase
      */
     public function testInvalidCwd()
     {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped("Windows handles this automatically.")
+        }
+
+        // Check that it works fine if the CWD exists
+        $cmd = new Process('echo test', __DIR__);
+        $cmd->run();
+
+        $cmd = new Process('echo test', __DIR__.'/notfound/');
+        $cmd->run();
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Warning
+     */
+    public function testInvalidCwdOnWindows()
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $this->markTestSkipped("Unix handles this automatically.")
+        }
+
         // Check that it works fine if the CWD exists
         $cmd = new Process('echo test', __DIR__);
         $cmd->run();

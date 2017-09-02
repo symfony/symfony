@@ -55,7 +55,7 @@ class ProcessTest extends TestCase
     public function testInvalidCwd()
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $this->markTestSkipped("Windows handles this automatically.")
+            $this->markTestSkipped("Windows handles this automatically.");
         }
 
         // Check that it works fine if the CWD exists
@@ -72,7 +72,7 @@ class ProcessTest extends TestCase
     public function testInvalidCwdOnWindows()
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            $this->markTestSkipped("Unix handles this automatically.")
+            $this->markTestSkipped("Unix handles this automatically.");
         }
 
         // Check that it works fine if the CWD exists

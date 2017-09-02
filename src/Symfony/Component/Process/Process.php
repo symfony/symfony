@@ -334,7 +334,7 @@ class Process implements \IteratorAggregate
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
-        if (!file_exists($this->cwd)) {
+        if (!is_dir($this->cwd)) {
             @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd()', E_USER_DEPRECATED);
         }
 

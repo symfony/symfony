@@ -55,14 +55,11 @@ class ProcessTest extends TestCase
     public function testInvalidCwd()
     {
         // Check that it works fine if the CWD exists
-        $cmd = new Process('echo test > testing1.txt', __DIR__);
-        $this->assertEquals(0, $cmd->run());
+        $cmd = new Process('echo test', __DIR__);
+        $cmd->run();
 
-        $cmd = new Process('echo test > testing2.txt', __DIR__.'/notfound/');
-        $this->assertEquals(0, $cmd->run());
-
-        @unlink(__DIR__.'/testing1.txt');
-        @unlink(getcwd().'/testing2.txt');
+        $cmd = new Process('echo test', __DIR__.'/notfound/');
+        $cmd->run();
     }
 
     public function testThatProcessDoesNotThrowWarningDuringRun()

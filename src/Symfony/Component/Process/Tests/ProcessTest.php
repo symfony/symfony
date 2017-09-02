@@ -67,6 +67,8 @@ class ProcessTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd(). This behaviour is deprecated since version 3.4 and will be removed in 4.0.
      * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testInvalidCwdOnWindows()

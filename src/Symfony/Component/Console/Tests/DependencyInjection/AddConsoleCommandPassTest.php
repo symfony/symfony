@@ -73,7 +73,8 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
         $this->assertSame(array('my:command' => 'my-command', 'my:alias' => 'my-command'), $commandLoader->getArgument(1));
         $this->assertEquals(array(array('my-command' => new ServiceClosureArgument(new TypedReference('my-command', MyCommand::class)))), $commandLocator->getArguments());
-        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_mycommand' => false), $container->getParameter('console.command.ids'));
+        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_mycommand' => 'my-command'), $container->getParameter('console.command.ids'));
+        $this->assertSame(array('my-command' => true), $container->getParameter('console.lazy_command.ids'));
         $this->assertSame(array(array('setName', array('my:command')), array('setAliases', array(array('my:alias')))), $command->getMethodCalls());
     }
 
@@ -95,7 +96,8 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
         $this->assertSame(array('default' => 'with-default-name'), $commandLoader->getArgument(1));
         $this->assertEquals(array(array('with-default-name' => new ServiceClosureArgument(new TypedReference('with-default-name', NamedCommand::class)))), $commandLocator->getArguments());
-        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_namedcommand' => false), $container->getParameter('console.command.ids'));
+        $this->assertSame(array('console.command.symfony_component_console_tests_dependencyinjection_namedcommand' => 'with-default-name'), $container->getParameter('console.command.ids'));
+        $this->assertSame(array('with-default-name' => true), $container->getParameter('console.lazy_command.ids'));
 
         $container = new ContainerBuilder();
         $container

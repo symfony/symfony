@@ -335,7 +335,7 @@ class Process implements \IteratorAggregate
         }
 
         if (!is_dir($this->cwd)) {
-            @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd()', E_USER_DEPRECATED);
+            @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behaviour is deprecated since version 3.4 and will be removed in 4.0', E_USER_DEPRECATED);
         }
 
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $options);

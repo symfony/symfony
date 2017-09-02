@@ -50,15 +50,15 @@ class ProcessTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd()
+     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd(). This behaviour is deprecated since version 3.4 and will be removed in 4.0.
      */
     public function testInvalidCwd()
     {
         // Check that it works fine if the CWD exists
-        $cmd = new Process('touch testing1.txt', __DIR__);
+        $cmd = new Process('echo test > testing1.txt', __DIR__);
         $this->assertEquals(0, $cmd->run());
 
-        $cmd = new Process('touch testing2.txt', __DIR__.'/notfound/');
+        $cmd = new Process('echo test > testing2.txt', __DIR__.'/notfound/');
         $this->assertEquals(0, $cmd->run());
 
         @unlink(__DIR__.'/testing1.txt');

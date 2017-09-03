@@ -50,7 +50,7 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      */
-    public static function parse($input, $flags = 0)
+    public static function parse(string $input, int $flags = 0)
     {
         $yaml = new Parser();
 
@@ -70,7 +70,7 @@ class Yaml
      *
      * @return string A YAML string representing the original PHP value
      */
-    public static function dump($input, $inline = 2, $indent = 4, $flags = 0)
+    public static function dump($input, int $inline = 2, int $indent = 4, int $flags = 0): string
     {
         $yaml = new Dumper($indent);
 

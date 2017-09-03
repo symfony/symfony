@@ -45,7 +45,7 @@ final class Dotenv
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function load($path, ...$paths)
+    public function load(string $path, string ...$paths): void
     {
         array_unshift($paths, $path);
 
@@ -65,7 +65,7 @@ final class Dotenv
      *
      * @param array $values An array of env variables
      */
-    public function populate($values)
+    public function populate(array $values): void
     {
         $loadedVars = array_flip(explode(',', getenv('SYMFONY_DOTENV_VARS')));
         unset($loadedVars['']);
@@ -104,7 +104,7 @@ final class Dotenv
      *
      * @throws FormatException when a file has a syntax error
      */
-    public function parse($data, $path = '.env')
+    public function parse(string $data, string $path = '.env'): array
     {
         $this->path = $path;
         $this->data = str_replace(array("\r\n", "\r"), "\n", $data);

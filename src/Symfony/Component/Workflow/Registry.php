@@ -61,7 +61,7 @@ class Registry
         return $matched;
     }
 
-    private function supports(Workflow $workflow, SupportStrategyInterface $supportStrategy, $subject, $workflowName)
+    private function supports(Workflow $workflow, SupportStrategyInterface $supportStrategy, $subject, $workflowName): bool
     {
         if (null !== $workflowName && $workflowName !== $workflow->getName()) {
             return false;

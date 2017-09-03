@@ -29,7 +29,7 @@ final class HttpHeaderSerializer
      *
      * @return string|null
      */
-    public function serialize($links)
+    public function serialize(iterable $links)
     {
         $elements = array();
         foreach ($links as $link) {

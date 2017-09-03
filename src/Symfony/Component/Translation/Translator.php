@@ -280,10 +280,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->loadFallbackCatalogues($locale);
     }
 
-    /**
-     * @param string $locale
-     */
-    private function initializeCacheCatalogue($locale)
+    private function initializeCacheCatalogue(string $locale): void
     {
         if (isset($this->catalogues[$locale])) {
             /* Catalogue already initialized. */
@@ -306,7 +303,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->catalogues[$locale] = include $cache->getPath();
     }
 
-    private function dumpCatalogue($locale, ConfigCacheInterface $cache)
+    private function dumpCatalogue($locale, ConfigCacheInterface $cache): void
     {
         $this->initializeCatalogue($locale);
         $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
@@ -331,7 +328,7 @@ EOF
         $cache->write($content, $this->catalogues[$locale]->getResources());
     }
 
-    private function getFallbackContent(MessageCatalogue $catalogue)
+    private function getFallbackContent(MessageCatalogue $catalogue): string
     {
         $fallbackContent = '';
         $current = '';
@@ -366,7 +363,7 @@ EOF
         return $this->cacheDir.'/catalogue.'.$locale.'.'.strtr(substr(base64_encode(hash('sha256', serialize($this->fallbackLocales), true)), 0, 7), '/', '_').'.php';
     }
 
-    private function doLoadCatalogue($locale)
+    private function doLoadCatalogue($locale): void
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
@@ -380,7 +377,7 @@ EOF
         }
     }
 
-    private function loadFallbackCatalogues($locale)
+    private function loadFallbackCatalogues($locale): void
     {
         $current = $this->catalogues[$locale];
 
@@ -436,7 +433,7 @@ EOF
      *
      * @return ConfigCacheFactoryInterface $configCacheFactory
      */
-    private function getConfigCacheFactory()
+    private function getConfigCacheFactory(): ConfigCacheFactoryInterface
     {
         if (!$this->configCacheFactory) {
             $this->configCacheFactory = new ConfigCacheFactory($this->debug);

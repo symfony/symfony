@@ -209,8 +209,8 @@ Process
 
  * The `Symfony\Component\Process\ProcessBuilder` class has been deprecated,
    use the `Symfony\Component\Process\Process` class directly instead.
-   
- * The `Symfony\Component\Process\Process` __construct `cwd` argument will throw 
+
+ * The `Symfony\Component\Process\Process` constructor's $cwd argument will throw 
    a deprecation warning on `run` if the folder does not exist.
 
 Profiler

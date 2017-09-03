@@ -298,6 +298,20 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testSetDeprecated()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->children()
+                ->arrayNode('foo')->setDeprecated('The "%path%" node is deprecated.')->end()
+            ->end()
+        ;
+        $deprecatedNode = $node->getNode()->getChildren()['foo'];
+
+        $this->assertTrue($deprecatedNode->isDeprecated());
+        $this->assertSame('The "root.foo" node is deprecated.', $deprecatedNode->getDeprecationMessage($deprecatedNode->getName(), $deprecatedNode->getPath()));
+    }
+
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.

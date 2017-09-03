@@ -21,7 +21,6 @@ class PredisClusterAdapterTest extends AbstractRedisAdapterTest
 
     public static function tearDownAfterClass()
     {
-        self::$redis->getConnection()->getConnectionByKey('foo')->executeCommand(self::$redis->createCommand('FLUSHDB'));
         self::$redis = null;
     }
 }

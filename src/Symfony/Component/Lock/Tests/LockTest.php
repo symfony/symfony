@@ -165,7 +165,7 @@ class LockTest extends TestCase
 
         foreach ($ttls as $ttl) {
             if (null === $ttl) {
-                $key->resetExpiringDate();
+                $key->resetLifetime();
             } else {
                 $key->reduceLifetime($ttl);
             }
@@ -175,12 +175,12 @@ class LockTest extends TestCase
 
     public function provideExpiredDates()
     {
-        yield array(array(-1.0), true);
-        yield array(array(1, -1.0), true);
-        yield array(array(-1.0, 1), true);
+        yield array(array(-0.1), true);
+        yield array(array(0.1, -0.1), true);
+        yield array(array(-0.1, 0.1), true);
 
         yield array(array(), false);
-        yield array(array(1), false);
-        yield array(array(-1.0, null), false);
+        yield array(array(0.1), false);
+        yield array(array(-0.1, null), false);
     }
 }

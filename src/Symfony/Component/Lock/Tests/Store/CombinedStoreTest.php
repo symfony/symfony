@@ -175,12 +175,12 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store1
             ->expects($this->once())
             ->method('putOffExpiration')
-            ->with($key, $ttl)
+            ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
         $this->store2
             ->expects($this->once())
             ->method('putOffExpiration')
-            ->with($key, $ttl)
+            ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
 
         $this->strategy
@@ -203,12 +203,12 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store1
             ->expects($this->once())
             ->method('putOffExpiration')
-            ->with($key, $ttl)
+            ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
         $this->store2
             ->expects($this->once())
             ->method('putOffExpiration')
-            ->with($key, $ttl)
+            ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
 
         $this->store1
@@ -242,7 +242,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store1
             ->expects($this->once())
             ->method('putOffExpiration')
-            ->with($key, $ttl)
+            ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
         $this->store2
             ->expects($this->never())

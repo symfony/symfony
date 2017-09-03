@@ -53,6 +53,22 @@ trait ExpiringStoreTestTrait
     }
 
     /**
+     * Tests the store thrown exception when TTL expires.
+     *
+     * @expectedException \Symfony\Component\Lock\Exception\LockExpiredException
+     */
+    public function testAbortAfterExpiration()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+
+        /** @var StoreInterface $store */
+        $store = $this->getStore();
+
+        $store->save($key);
+        $store->putOffExpiration($key, 1 / 1000000);
+    }
+
+    /**
      * Tests the refresh can push the limits to the expiration.
      *
      * This test is time sensible: the $clockDelay could be adjust.
@@ -69,10 +85,10 @@ trait ExpiringStoreTestTrait
         $store = $this->getStore();
 
         $store->save($key);
-        $store->putOffExpiration($key, 1.0 * $clockDelay / 1000000);
+        $store->putOffExpiration($key, $clockDelay / 1000000);
         $this->assertTrue($store->exists($key));
 
-        usleep(2.1 * $clockDelay);
+        usleep(2 * $clockDelay);
         $this->assertFalse($store->exists($key));
     }
 
@@ -85,6 +101,7 @@ trait ExpiringStoreTestTrait
 
         $store->save($key);
         $store->putOffExpiration($key, 1);
-        $this->assertNotNull($key->getExpiringDate());
+        $this->assertGreaterThanOrEqual(0, $key->getRemainingLifetime());
+        $this->assertLessThanOrEqual(1, $key->getRemainingLifetime());
     }
 }

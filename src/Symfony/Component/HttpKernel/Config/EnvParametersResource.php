@@ -17,6 +17,8 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
  * EnvParametersResource represents resources stored in prefixed environment variables.
  *
  * @author Chris Wilkinson <chriswilkinson84@gmail.com>
+ *
+ * @deprecated since version 3.4, to be removed in 4.0
  */
 class EnvParametersResource implements SelfCheckingResourceInterface, \Serializable
 {

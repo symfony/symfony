@@ -17,6 +17,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 
 /**
@@ -64,6 +65,10 @@ final class Lock implements LockInterface, LoggerAwareInterface
                 $this->refresh();
             }
 
+            if ($this->key->isExpired()) {
+                throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $this->key));
+            }
+
             return true;
         } catch (LockConflictedException $e) {
             $this->logger->warning('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', array('resource' => $this->key));
@@ -89,8 +94,13 @@ final class Lock implements LockInterface, LoggerAwareInterface
         }
 
         try {
-            $this->key->resetExpiringDate();
+            $this->key->resetLifetime();
             $this->store->putOffExpiration($this->key, $this->ttl);
+
+            if ($this->key->isExpired()) {
+                throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $this->key));
+            }
+
             $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $this->ttl));
         } catch (LockConflictedException $e) {
             $this->logger->warning('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', array('resource' => $this->key));
@@ -127,15 +137,16 @@ final class Lock implements LockInterface, LoggerAwareInterface
      */
     public function isExpired()
     {
-        if (null === $expireDate = $this->key->getExpiringDate()) {
-            return false;
-        }
-
-        return $expireDate <= new \DateTime();
+        return $this->key->isExpired();
     }
 
-    public function getExpiringDate()
+    /**
+     * Returns the remaining lifetime.
+     *
+     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     */
+    public function getRemainingLifetime()
     {
-        return $this->key->getExpiringDate();
+        return $this->key->getRemainingLifetime();
     }
 }

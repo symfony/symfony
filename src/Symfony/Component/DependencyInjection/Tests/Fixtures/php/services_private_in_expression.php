@@ -67,6 +67,6 @@ class ProjectServiceContainer extends Container
      */
     protected function getPublicFooService()
     {
-        return $this->services['public_foo'] = new \stdClass(($this->privates['private_foo'] ?? ($this->privates['private_foo'] = new \stdClass())));
+        return $this->services['public_foo'] = new \stdClass(($this->privates['private_foo'] ?? $this->privates['private_foo'] = new \stdClass()));
     }
 }

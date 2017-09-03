@@ -530,13 +530,13 @@ class FrameworkExtension extends Extension
     /**
      * Loads the workflow configuration.
      *
-     * @param array            $workflows A workflow configuration array
+     * @param array            $config    A workflow configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerWorkflowConfiguration(array $workflows, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$workflows) {
+        if (!$config['enabled']) {
             if (!class_exists(Workflow\Workflow::class)) {
                 $container->removeDefinition(WorkflowDumpCommand::class);
             }
@@ -552,7 +552,7 @@ class FrameworkExtension extends Extension
 
         $registryDefinition = $container->getDefinition('workflow.registry');
 
-        foreach ($workflows as $name => $workflow) {
+        foreach ($config['workflows'] as $name => $workflow) {
             if (!array_key_exists('type', $workflow)) {
                 $workflow['type'] = 'workflow';
                 @trigger_error(sprintf('The "type" option of the "framework.workflows.%s" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.', $name), E_USER_DEPRECATED);

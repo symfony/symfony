@@ -54,7 +54,7 @@ class ProcessTest extends TestCase
      */
     public function testInvalidCwd()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows handles this automatically.');
         }
 
@@ -67,13 +67,12 @@ class ProcessTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd(). This behaviour is deprecated since version 3.4 and will be removed in 4.0.
-     * @expectedException \PHPUnit_Framework_Error_Warning
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage The provided cwd does not exist.
      */
     public function testInvalidCwdOnWindows()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Unix handles this automatically.');
         }
 

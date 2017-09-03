@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-31T09:44:03Z
+
+It's perfectly valid to use the Config component without XML files. Thus I suggest to instead handle the missing XML extension case gracefully in the `XmlUtils` class instead.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2017-08-31T10:06:02Z
+
+@xabbuh I've added extension check to `loadFile` only, because `libxml` is required by `php7.1` , `convertDomElementToArray` has argument with instanceof `\DOMElement`
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-31T10:33:31Z
+
+FrameworkBundle should have the requirement though, because it depends on XML support.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-31T10:33:53Z
+
+the requirement should be `ext-dom` btw
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2017-08-31T10:52:48Z
+
+@stof `ext-xml` requirements was added in #22676 and as @xabbuh mentioned it's valid use case to use `symfony/config` without `ext-xml` or `ext-dom`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T12:02:21Z
+
+What @stof means is that the requirement on FrameworkBundle should be `ext-dom` instead of `ext-xml`, that could be fixed here if you wish to do it.
+For Config, we should just throw in XmlUtiils if  `!extension_loaded('xml')` as suggested by @xabbuh .
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T12:17:32Z
+
+Btw, this should be rebased on 2.7 and the target branch changed accordingly.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2017-08-31T13:21:10Z
+
+@chalasr it's possible to disable xml and enable dom only, ref.: https://github.com/symfony/symfony/pull/24047#discussion_r136290351, so changing FrameworkBundle requirements from `ext-xml` to `ext-dom` is quite dangerous
+
+I can put `!extension_loaded('dom')` in the file, but I didn't done that initially because `\Symfony\Component\Config\Util\XmlUtils::phpize` is quite useful method :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-31T13:26:02Z
+
+@oleg-andreyev the question is whether we need only ext-dom or also ext-xml. If we need ext-xml, the requirement should stay like that.
+
+But anyway, for the config component, it must stay an optional dependency (the component contains many other things not requiring XML)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T13:26:21Z
+
+For Config we should deal with `xml` only, not `dom` which is a requirement for FrameworkBundle only. So the check should be `!extension_loaded('xml')`.
+
+>  I didn't done that initially because \Symfony\Component\Config\Util\XmlUtils::phpize is quite useful method :)
+
+Well, I don't have the code in mind, but if `phpize()` can be used without the `xml` extension, we should not forbid using it, adding the check only where it breaks already if `xml` extension not loaded. But I guess it does break, isn't it?
+
+edit: let's let FrameworkBundle as is if `dom` doesn't guarantee `xml`,  as said
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2017-08-31T13:55:53Z
+
+@chalasr I don't see where `ext-dom` in requirements for FrameworkBundle.
+
+sum up:
+- I've updated `XmlUtils::loadFile` because it's using `\DOMDocument`
+- I didn't update `XmlUtils::phpize` could be used without `ext-xml` or `ext-dom`
+- I didn't update `XmlUtils::convertDomElementToArray`, because it has input argument `\DOMElement $element`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T17:53:42Z
+
+The existing tests for this method should be updated to add `@requires extension dom` (and/or xml) so that the component test suite can be ran even if the extension is not loaded.
+
+---------------------------------------------------------------------------
+
+by oleg-andreyev at 2017-09-01T10:23:49Z
+
+> add @requires extension dom
+
+@chalasr I'm a bit surprised, but without `ext-dom` we won't be able to run phpunit
+Ref.: `\PHPUnit\Util\Xml::load`, lol
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-01T12:25:40Z
+
+@oleg-andreyev fair enough 😅
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-02T07:22:39Z
+
+@oleg-andreyev Can you rebase your branch against 2.7 to see tests green?

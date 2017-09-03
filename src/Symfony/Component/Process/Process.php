@@ -318,7 +318,6 @@ class Process implements \IteratorAggregate
         } elseif (null !== $env) {
             @trigger_error('Not inheriting environment variables is deprecated since Symfony 3.3 and will always happen in 4.0. Set "Process::inheritEnvironmentVariables()" to true instead.', E_USER_DEPRECATED);
         }
-
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
             $this->options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup, $env);

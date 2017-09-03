@@ -8,6 +8,7 @@ CHANGELOG
  * deprecated commands auto registration
  * added `AddCacheClearerPass`
  * added `AddCacheWarmerPass`
+ * deprecated `EnvParametersResource`
 
 3.3.0
 -----

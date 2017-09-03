@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-28T17:50:59Z
+
+Can this wait 3.4? We'd like to close 3.3 asap :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-04-28T17:58:35Z
+
+From the 3 pending PR related to the components Lock, this one is the most important.
+
+It avoid to acquire an expired Lock (due to  network latency for instance). Cf discussion in the issue.
+
+That's said, with an adequate warning in the documentation, this PR is not an absolute requirement.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-07-31T06:06:11Z
+
+PR rebased and fixed add messages in Exceptions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-23T11:52:59Z
+
+What's the status of this PR? I'd like to merge/close all PRs about the lock component ASAP to avoid having to revert the component for 3.4.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-23T12:03:45Z
+
+@fabpot waiting for approvals. As saids in https://github.com/symfony/symfony/pull/22542#issuecomment-298065618 this PR is the most important IMO related to lock component.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-31T11:06:00Z
+
+PR rebased with few changes
+
+- LockExpiredException does not extends LockConflictedException anymore because they are not related
+- Add a `isExpired` check in the `lock::acquire` and `lock::refresh` for more strength
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-31T14:05:00Z
+
+failling test not related to this PR
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-03T12:09:22Z
+
+👍

@@ -67,7 +67,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
                 // don't keep track of env vars that are *overridden* when configs are merged
-                $resolvingBag->freezeAfterProcessing($extension);
+                $resolvingBag->freezeAfterProcessing($extension, $tmpContainer);
             }
 
             $container->merge($tmpContainer);
@@ -92,12 +92,16 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
         $this->mergeEnvPlaceholders($parameterBag);
     }
 
-    public function freezeAfterProcessing(Extension $extension)
+    public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container)
     {
+        if (!$config = $extension->getProcessedConfigs()) {
+            // Extension::processConfiguration() wasn't called, we cannot know how configs were merged
+            return;
+        }
         $this->processedEnvPlaceholders = array();
 
-        // serialize config to catch env vars nested in object graphs
-        $config = serialize($extension->getProcessedConfigs());
+        // serialize config and container to catch env vars nested in object graphs
+        $config = serialize($config).serialize($container->getDefinitions()).serialize($container->getAliases()).serialize($container->getParameterBag()->all());
 
         foreach (parent::getEnvPlaceholders() as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {

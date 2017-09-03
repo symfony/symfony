@@ -27,6 +27,8 @@ class SemaphoreStore implements StoreInterface
      * Returns whether or not the store is supported.
      *
      * @return bool
+     *
+     * @internal
      */
     public static function isSupported()
     {

@@ -27,6 +27,7 @@ interface ContainerInterface extends PsrContainerInterface
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
     const NULL_ON_INVALID_REFERENCE = 2;
     const IGNORE_ON_INVALID_REFERENCE = 3;
+    const IGNORE_ON_UNINITIALIZED_REFERENCE = 4;
 
     /**
      * Sets a service.

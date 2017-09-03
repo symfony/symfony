@@ -39,4 +39,5 @@ class Cursor
     public $hashCut = 0;
     public $stop = false;
     public $attr = array();
+    public $skipChildren = false;
 }

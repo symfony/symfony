@@ -23,17 +23,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * Container is a dependency injection container.
  *
  * It gives access to object instances (services).
- *
  * Services and parameters are simple key/pair stores.
- *
- * Parameter keys are case insensitive.
- *
- * The container can have three possible behaviors when a service does not exist:
+ * The container can have four possible behaviors when a service
+ * does not exist (or is not initialized for the last case):
  *
  *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception (the default)
  *  * NULL_ON_INVALID_REFERENCE:      Returns null
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
+ *  * IGNORE_ON_UNINITIALIZED_REFERENCE: Ignores/returns null for uninitialized services or invalid references
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -226,9 +224,9 @@ class Container implements ResettableContainerInterface
 
         try {
             if (isset($this->fileMap[$id])) {
-                return $this->load($this->fileMap[$id]);
+                return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->load($this->fileMap[$id]);
             } elseif (isset($this->methodMap[$id])) {
-                return $this->{$this->methodMap[$id]}();
+                return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->{$this->methodMap[$id]}();
             }
         } catch (\Exception $e) {
             unset($this->services[$id]);

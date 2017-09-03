@@ -34,6 +34,7 @@ trait PdoTrait
     private $username = '';
     private $password = '';
     private $connectionOptions = array();
+    private $namespace;
 
     private function init($connOrDsn, $namespace, $defaultLifetime, array $options)
     {
@@ -63,6 +64,7 @@ trait PdoTrait
         $this->username = isset($options['db_username']) ? $options['db_username'] : $this->username;
         $this->password = isset($options['db_password']) ? $options['db_password'] : $this->password;
         $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
+        $this->namespace = $namespace;
 
         parent::__construct($namespace, $defaultLifetime);
     }
@@ -135,6 +137,27 @@ trait PdoTrait
         }
 
         $conn->exec($sql);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        $deleteSql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol <= :time";
+
+        if ('' !== $this->namespace) {
+            $deleteSql .= " AND $this->idCol LIKE :namespace";
+        }
+
+        $delete = $this->getConnection()->prepare($deleteSql);
+        $delete->bindValue(':time', time(), \PDO::PARAM_INT);
+
+        if ('' !== $this->namespace) {
+            $delete->bindValue(':namespace', sprintf('%s%%', $this->namespace), \PDO::PARAM_STR);
+        }
+
+        return $delete->execute();
     }
 
     /**

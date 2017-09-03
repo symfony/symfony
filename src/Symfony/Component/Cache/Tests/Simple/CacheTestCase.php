@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Cache\IntegrationTests\SimpleCacheTest;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\PruneableInterface;
 
 abstract class CacheTestCase extends SimpleCacheTest
@@ -76,7 +77,20 @@ abstract class CacheTestCase extends SimpleCacheTest
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');
         }
 
+        /** @var PruneableInterface|CacheInterface $cache */
         $cache = $this->createSimpleCache();
+
+        $cache->set('foo', 'foo-val', new \DateInterval('PT05S'));
+        $cache->set('bar', 'bar-val', new \DateInterval('PT10S'));
+        $cache->set('baz', 'baz-val', new \DateInterval('PT15S'));
+        $cache->set('qux', 'qux-val', new \DateInterval('PT20S'));
+
+        sleep(30);
+        $cache->prune();
+        $this->assertTrue($this->isPruned($cache, 'foo'));
+        $this->assertTrue($this->isPruned($cache, 'bar'));
+        $this->assertTrue($this->isPruned($cache, 'baz'));
+        $this->assertTrue($this->isPruned($cache, 'qux'));
 
         $cache->set('foo', 'foo-val');
         $cache->set('bar', 'bar-val', new \DateInterval('PT20S'));

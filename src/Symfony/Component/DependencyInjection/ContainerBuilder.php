@@ -529,6 +529,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
+        if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
+            return parent::get($id, $invalidBehavior);
+        }
         if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
             return $service;
         }
@@ -1100,6 +1103,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                             continue 2;
                         }
                     }
+                    foreach (self::getInitializedConditionals($v) as $s) {
+                        if (!$this->get($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
+                            continue 2;
+                        }
+                    }
 
                     yield $k => $this->resolveServices($v);
                 }
@@ -1108,6 +1116,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 foreach ($value->getValues() as $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
                         if (!$this->has($s)) {
+                            continue 2;
+                        }
+                    }
+                    foreach (self::getInitializedConditionals($v) as $s) {
+                        if (!$this->get($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
                             continue 2;
                         }
                     }
@@ -1321,6 +1334,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param mixed $value An array of conditionals to return
      *
      * @return array An array of Service conditionals
+     *
+     * @internal since version 3.4
      */
     public static function getServiceConditionals($value)
     {
@@ -1331,6 +1346,30 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
         } elseif ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+            $services[] = (string) $value;
+        }
+
+        return $services;
+    }
+
+    /**
+     * Returns the initialized conditionals.
+     *
+     * @param mixed $value An array of conditionals to return
+     *
+     * @return array An array of uninitialized conditionals
+     *
+     * @internal
+     */
+    public static function getInitializedConditionals($value)
+    {
+        $services = array();
+
+        if (is_array($value)) {
+            foreach ($value as $v) {
+                $services = array_unique(array_merge($services, self::getInitializedConditionals($v)));
+            }
+        } elseif ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE) {
             $services[] = (string) $value;
         }
 
@@ -1389,10 +1428,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function callMethod($service, $call)
     {
-        $services = self::getServiceConditionals($call[1]);
-
-        foreach ($services as $s) {
+        foreach (self::getServiceConditionals($call[1]) as $s) {
             if (!$this->has($s)) {
+                return;
+            }
+        }
+        foreach (self::getInitializedConditionals($call[1]) as $s) {
+            if (!$this->get($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
                 return;
             }
         }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache;
 
 /**
- * Interface for adapters and simple cache implementations that allow pruning expired items.
+ * Interface extends psr-6 and psr-16 caches to allow for pruning (deletion) of all expired cache items.
  */
 interface PruneableInterface
 {

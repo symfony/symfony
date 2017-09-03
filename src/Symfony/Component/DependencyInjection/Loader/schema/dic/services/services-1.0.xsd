@@ -263,6 +263,7 @@
       <xsd:enumeration value="null" />
       <xsd:enumeration value="ignore" />
       <xsd:enumeration value="exception" />
+      <xsd:enumeration value="ignore_uninitialized" />
     </xsd:restriction>
   </xsd:simpleType>
 

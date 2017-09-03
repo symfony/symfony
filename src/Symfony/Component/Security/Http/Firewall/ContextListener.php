@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -91,7 +92,10 @@ class ContextListener implements ListenerInterface
         $token = unserialize($token);
 
         if (null !== $this->logger) {
-            $this->logger->debug('Read existing security token from the session.', array('key' => $this->sessionKey));
+            $this->logger->debug('Read existing security token from the session.', array(
+                'key' => $this->sessionKey,
+                'token_class' => is_object($token) ? get_class($token) : null,
+            ));
         }
 
         if ($token instanceof TokenInterface) {
@@ -169,7 +173,16 @@ class ContextListener implements ListenerInterface
                 $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
-                    $this->logger->debug('User was reloaded from a user provider.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
+                    $context = array('provider' => get_class($provider), 'username' => $refreshedUser->getUsername());
+
+                    foreach ($token->getRoles() as $role) {
+                        if ($role instanceof SwitchUserRole) {
+                            $context['impersonator_username'] = $role->getSource()->getUsername();
+                            break;
+                        }
+                    }
+
+                    $this->logger->debug('User was reloaded from a user provider.', $context);
                 }
 
                 return $token;

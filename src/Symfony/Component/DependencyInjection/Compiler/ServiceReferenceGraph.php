@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * it themselves which improves performance quite a lot.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @final since version 3.4
  */
 class ServiceReferenceGraph
 {
@@ -85,12 +87,13 @@ class ServiceReferenceGraph
      * @param string $destValue
      * @param string $reference
      * @param bool   $lazy
+     * @param bool   $weak
      */
-    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null, bool $lazy = false)
+    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null, bool $lazy = false, bool $weak = false)
     {
         $sourceNode = $this->createNode($sourceId, $sourceValue);
         $destNode = $this->createNode($destId, $destValue);
-        $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy);
+        $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy, $weak);
 
         $sourceNode->addOutEdge($edge);
         $destNode->addInEdge($edge);

@@ -302,6 +302,8 @@ class XmlDumper extends Dumper
                     $element->setAttribute('on-invalid', 'null');
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
+                } elseif ($behaviour == ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE) {
+                    $element->setAttribute('on-invalid', 'ignore_uninitialized');
                 }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');

@@ -50,6 +50,9 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                 $referencingAliases = array();
                 $sourceIds = array();
                 foreach ($edges as $edge) {
+                    if ($edge->isWeak()) {
+                        continue;
+                    }
                     $node = $edge->getSourceNode();
                     $sourceIds[] = $node->getId();
 

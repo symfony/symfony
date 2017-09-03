@@ -278,7 +278,7 @@ EOF;
                 if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $behavior[$id]) {
                     $code .= sprintf($template, $name, $this->getServiceCall($id));
                 } else {
-                    $code .= sprintf($template, $name, $this->getServiceCall($id, new Reference($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)));
+                    $code .= sprintf($template, $name, $this->getServiceCall($id, new Reference($id, $behavior[$id])));
                 }
             }
         }
@@ -1243,12 +1243,14 @@ EOF;
      */
     private function getServiceConditionals($value)
     {
-        if (!$services = ContainerBuilder::getServiceConditionals($value)) {
-            return null;
-        }
-
         $conditions = array();
-        foreach ($services as $service) {
+        foreach (ContainerBuilder::getInitializedConditionals($value) as $service) {
+            if (!$this->container->hasDefinition($service)) {
+                return 'false';
+            }
+            $conditions[] = sprintf("isset(\$this->%s['%s'])", $this->container->getDefinition($service)->isPublic() ? 'services' : 'privates', $service);
+        }
+        foreach (ContainerBuilder::getServiceConditionals($value) as $service) {
             if ($this->container->hasDefinition($service) && !$this->container->getDefinition($service)->isPublic()) {
                 continue;
             }
@@ -1283,8 +1285,8 @@ EOF;
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();
-                } elseif (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $behavior[$id]) {
-                    $behavior[$id] = $argument->getInvalidBehavior();
+                } else {
+                    $behavior[$id] = min($behavior[$id], $argument->getInvalidBehavior());
                 }
 
                 ++$calls[$id];
@@ -1617,7 +1619,9 @@ EOF;
         if ($this->container->hasDefinition($id)) {
             $definition = $this->container->getDefinition($id);
 
-            if ($this->isTrivialInstance($definition)) {
+            if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
+                $code = 'null';
+            } elseif ($this->isTrivialInstance($definition)) {
                 $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
                 $code = sprintf('($this->privates[\'%s\'] = %s)', $id, $code);
             } elseif ($this->asFiles && $definition->isShared()) {
@@ -1628,6 +1632,8 @@ EOF;
             if ($definition->isShared()) {
                 $code = sprintf('($this->%s[\'%s\'] ?? %s)', $definition->isPublic() ? 'services' : 'privates', $id, $code);
             }
+        } elseif (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
+            $code = 'null';
         } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {

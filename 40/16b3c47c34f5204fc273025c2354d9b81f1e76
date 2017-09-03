@@ -1,0 +1,137 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-23T15:59:38Z
+
+What about other similar cases in the code base. I don't see why we should make the change here and not for similar use cases.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-23T16:01:58Z
+
+@fabpot this component is easy to change, because everything is final.
+
+For other components, we could start using them in constructors, but mostly nothing else (returns types could be added later, once we have PHP 7.2 as min requirement)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-06-23T16:32:42Z
+
+@fabpot @stof I found a few cases where making the change is as easy (final, no contract, no parent). See b2c916f681d4c8410714ecc5586beac943e2495c.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-26T08:13:12Z
+
+Internal class and methods could be easy to update to (see https://github.com/symfony/symfony/compare/master...xabbuh:yaml-scalar-type-hints?expand=1 for how this could look like in the Yaml component).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-03T07:06:44Z
+
+I like @xabbuh changes. @chalasr Do you have time to make those changes across the board when possible without BC breaks.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-03T09:45:19Z
+
+Sure.
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-03T09:51:31Z
+
+private methods could be candidates too
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-07-12T18:06:07Z
+
+I wonder if such changes will not trigger a lot of issues from people who used to use weak cast.
+
+For instance, `ProgressBar::setMaxSteps($steps);` with `$steps = '10';` because the variable come from logic which return a string like parsing XML file, or whatever...
+
+Same for `ProgressBar::setMessage(null);`
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-07-12T19:43:30Z
+
+It seems some useful phpdoc is lost in some places.
+
+Don't get me wrong, some changes like this one are good:
+
+```diff
+-/**
+- * Sets the exit code.
+- *
+- * @param int $exitCode The command exit code
+- */
+- public function setExitCode($exitCode)
++ public function setExitCode(int $exitCode)
+```
+
+But for example this change is not good IMO:
+
+```diff
+- /**
+- * @return string|null The context key (will be null if the firewall is stateless)
+- */
+- public function getContext()
++ public function getContext(): ?string
+```
+
+because we loose all the useful information that cannot be guessed from the method signature.
+
+Also since some docblocks were entirely removed, `@throws` annotations are lost in the process.
+
+Maybe all non-useful information should be removed but all annotations that can not be covered by code should be kept?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-12T20:32:47Z
+
+@mnapoli Agreed, I'll re-add the docs where it seems useful.
+
+@jderusse unless strict types are used, with your first example this won't cause any issue. It would do with the second, but that's better imho as it doesn't respect the contract at first (using null while the method expects a string), it already breaks.
+
+Note that this only updates final/internal/private stuff, we may add a typehint on an internal class that we wouldn't for the same on a non internal one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T14:34:13Z
+
+@symfony/deciders do we want to do this? LGTM personally.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-05T14:58:10Z
+
+Added @xabbuh's changes for Yaml.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-08-05T19:34:58Z
+
+👍 To do this.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-05T19:50:00Z
+
+As it is now there are still a lot of useful comments (in the phpdoc) that are removed in this PR, it might be better to preserve all comments that bring additional information?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-06T10:04:20Z
+
+@mnapoli I tried to remove comments only where naming+typehints are clear enough. For instance, `FirewallConfig` methods returning `?string` were documented as `@return string|null The firewall's xxx if configured, null otherwise`. The class name says that these values are parsed configuration, the return type says it can be null. Wouldn't the comment be redundant? I think so.
+
+There are not that much removed comments actually, would you mind commenting on the ones that should be kept to you?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T20:56:30Z
+
+Updated by @xabbuh next to #24028 to add some more typehints, his changes look good to me.
+PR ready.

@@ -1,8 +1,8 @@
 
-                                                                
-  [Symfony\Component\Console\Exception\InvalidOptionException]  
-  The "--foo" option does not exist.                            
-                                                                
+In ArrayInput.php line 172:
+                                      
+  The "--foo" option does not exist.  
+                                      
 
 list [--raw] [--format FORMAT] [--] [<namespace>]
 

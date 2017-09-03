@@ -736,13 +736,13 @@ class Application
     protected function doRenderException(\Exception $e, OutputInterface $output)
     {
         do {
-            $title = sprintf(
-                '  [%s%s]  ',
-                get_class($e),
-                $output->isVerbose() && 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : ''
-            );
-
-            $len = Helper::strlen($title);
+            $message = $e->getMessage();
+            if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
+                $title = sprintf('  [%s%s]  ', get_class($e), 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
+                $len = Helper::strlen($title);
+            } else {
+                $len = 0;
+            }
 
             $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
             // HHVM only accepts 32 bits integer in str_split, even when PHP_INT_MAX is a 64 bit integer: https://github.com/facebook/hhvm/issues/1327
@@ -750,7 +750,7 @@ class Application
                 $width = 1 << 31;
             }
             $lines = array();
-            foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
+            foreach ('' !== $message ? preg_split('/\r?\n/', $message) : array() as $line) {
                 foreach ($this->splitStringByWidth($line, $width - 4) as $line) {
                     // pre-format lines to get the right string length
                     $lineLength = Helper::strlen($line) + 4;
@@ -761,8 +761,11 @@ class Application
             }
 
             $messages = array();
+            $messages[] = sprintf('<comment>%s</comment>', OutputFormatter::escape(sprintf('In %s line %s:', basename($e->getFile()) ?: 'n/a', $e->getLine() ?: 'n/a')));
             $messages[] = $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', $len));
-            $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - Helper::strlen($title))));
+            if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
+                $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - Helper::strlen($title))));
+            }
             foreach ($lines as $line) {
                 $messages[] = sprintf('<error>  %s  %s</error>', OutputFormatter::escape($line[0]), str_repeat(' ', $len - $line[1]));
             }
@@ -776,12 +779,6 @@ class Application
 
                 // exception related properties
                 $trace = $e->getTrace();
-                array_unshift($trace, array(
-                    'function' => '',
-                    'file' => $e->getFile() !== null ? $e->getFile() : 'n/a',
-                    'line' => $e->getLine() !== null ? $e->getLine() : 'n/a',
-                    'args' => array(),
-                ));
 
                 for ($i = 0, $count = count($trace); $i < $count; ++$i) {
                     $class = isset($trace[$i]['class']) ? $trace[$i]['class'] : '';

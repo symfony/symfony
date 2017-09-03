@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-01T18:20:12Z
+
+It should be just deprecated, the implementation doesn't fit any generic use case - and we now have real env vars.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T18:22:32Z
+
+Do you propose to soft deprecate it in 3.4? Core would still use it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-01T18:30:44Z
+
+Sounds good yes
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T18:39:20Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-01T19:26:46Z
+
+Can you add an entry in UPGRADE-4.0 about the removal?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T19:34:27Z
+
+If this goes first, i can do that in #24067. Along with the actual removal :)
+
+edit: or do we care about the state of UPGRADE-4.0 in 3.4?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-01T19:35:55Z
+
+I'd say no, just to not forgot about it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T19:39:25Z
+
+Which raises the question; do we need that file in 3.4 anyway? If you should follow the master version
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-01T19:40:08Z
+
+I would update the 4.0 UPGRADE file in this PR, that's what we've been doing for years :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-01T19:42:29Z
+
+@ro0NL If the author doesn't do the removing PR (or if we remove while merging up) it's good to have this file already up to date.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T19:50:46Z
+
+> it's good to have this file already up to date.
+
+Yeah but without the actual code change it's technically not true (yet) :) I see the POV, and as long as lowest branch is leading there's no real issue. Just wanted to point out it can be fragile, and maintaining a single version of truth might make sense :)
+
+@fabpot it already went wrong :) https://www.diffchecker.com/vQeHcX37
+
+basically the same file is out of sync between branches.
+
+Updated anyway :)

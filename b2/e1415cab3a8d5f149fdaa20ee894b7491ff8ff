@@ -1,0 +1,133 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-26T13:05:29Z
+
+IMHO having only the clean exception message when not in verbose mode is good enough... just set the verbose mode if you need more.
+
+> The feature #21003 solve the problem if you are in a standard Symfony edition, if you leave the default settings and if you are in dev mode
+
+I think it's useless to have the exception log in stderr since the ran command already writes the proper message into so it's just having two traces for the same error, which doesn't make sense to me. I just proposed to fix that in https://github.com/symfony/symfony-standard/pull/1044.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T19:46:10Z
+
+I'm sympathetic to the intend here. I also felt bad with just the message several times.
+Can you please share a screenshot with before/after situations?
+IMHO, I'd even like a short exception trace like the one displayed by `Exception::_toString()`.
+It's an exception guys, we don't need to be that short. It's not a normal situation, we can display a bit more. (personal rant :) )
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-29T19:49:39Z
+
+My opinion is the opposite of Nico and it aligns with Robin's comments :)  Symfony errors have always been human-friendly and to get the full machine-friendly details, you must add `-v` or `-vv`, etc.
+
+Most of you will disagree with me ... but not only I'd not add the file+line, but I'd also remove the weird exception class name in the error blocks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T20:02:06Z
+
+But CLI apps are not like Web ones: you can wait several minutes, and get the exception.
+Thought, if everything is in the logs, then fine.
+About the removal of the exception class, don't forget that the message is optional.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-01-29T22:46:48Z
+
+I too could have used this on multiple occasions with long-running processes.
+
+---------------------------------------------------------------------------
+
+by arno14 at 2017-01-30T08:49:16Z
+
+Here are some screenshot:
+
+This is the actual exception output
+![screenshot_basic](https://cloud.githubusercontent.com/assets/567812/22416693/75edd5a4-e6d0-11e6-9177-a83ac8d57c49.png)
+
+The one with exception class and line (does not correspond to the actual PR, I corrected some things)
+![screenshot_file_line_and_line](https://cloud.githubusercontent.com/assets/567812/22416642/2f2eab70-e6d0-11e6-84b2-be7ed2c8bb85.png)
+
+For test:
+The output with __toStringMethod
+![screenshot_exception_to_string](https://cloud.githubusercontent.com/assets/567812/22416474/10b33d42-e6cf-11e6-9ebe-a5c29efce32f.png)
+
+the same with -vvv option
+![screenshot_exception_very_verbose](https://cloud.githubusercontent.com/assets/567812/22416489/1ef462aa-e6cf-11e6-85f6-7d1e43b2b39c.png)
+
+An other use case is running command via cron, unless you configure your cron to run with -vvv you will have very view information if an exception occured.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T09:27:16Z
+
+I understand the intention too, but I still think that verbose mode should be used for that (especially in a cron), anyway console errors are now logged and you can configure the console handler for having them in stderr if wanted.
+
+If I want more to be displayed, then I would prefer writing my own exception class or any console helper and tweak the message into (maybe could we provide such in the console?) instead of expecting the application to do it automatically.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-30T16:13:23Z
+
+I'm also against this change. Verbose modes are indeed the right way to get more information about errors. It's annoying when you run (as a user) a command and you get a stack trace displayed. That's the same when browsing the web and getting an exception message. Sure, on the CLI, it cannot be exploited like for the web, but that's not user friendly. So, I'm :-1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-02T14:14:21Z
+
+Closing as discussed, thanks for the PR anyway!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T14:43:48Z
+
+I'm reopening because I'm just wasting my time debugging transient errors, just because the console displays useless errors.
+The context is a "composer install" command that runs post-scripts. One of them is failing and I have no way to add `-vvv` to those (because composer script).
+
+all I get is e.g. a terse
+
+```
+!!    [Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException]
+!!    You have requested a non-existent service "".
+```
+
+Alternatively, we could have an env var to control verbosity... But we cannot say all is fine as is. Please hint a direction that would solve the DX issue and be OK to you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T14:50:27Z
+
+Note that the worst error I got in this context is (when playing with Flex+SF4):
+```
+ErrorException
+preg_replace(): blablah
+```
+which is just garbage as an error message, I have no idea where this can be in the code base.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T16:54:25Z
+
+PR ready for reconsideration, here is the new screenshot:
+![capture du 2017-08-30 18-49-57](https://user-images.githubusercontent.com/243674/29884735-a3518dc0-8db4-11e7-9be5-1757b89fb26d.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-30T17:36:58Z
+
+Do we really need the exception class on the message? Now that we have the exact file and line, that's probably a detail people don't need to care about, right?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-02T08:28:06Z
+
+I agree that the FQCN does not seem useful anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T15:14:25Z
+
+Exception class now removed in non-verbose modes, see fixtures.

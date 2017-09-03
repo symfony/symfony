@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-23T22:24:20Z
+
+Issue spotted: This is a race condition with Cache's tests. (run in parallel in the travis test suite).
+
+Redis is flushed (regardless the namespace) at the end of each tests. For instance https://github.com/symfony/symfony/blob/18ed089e801d15c0c0f092b9bb2d88fa81222b38/src/Symfony/Component/Cache/Tests/Adapter/AbstractRedisAdapterTest.php#L42-L46
+
+Memcache does not take the namespace into account in the doClear method https://github.com/symfony/symfony/blob/18ed089e801d15c0c0f092b9bb2d88fa81222b38/src/Symfony/Component/Cache/Traits/MemcachedTrait.php#L234-L237. This method is called several time by the method `testBasicUsage`, `testClear`, `testClearWithDeferredItems` and all other tests due to the call in the `teardown` method.
+
+For the redis tests, I think we can remove the usage of `flushDb` in tests as performed in my PR. But for memcached, I have no replacement ping @nicolas-grekas. (BTW is it expected that calling clear on a namespaces adapter removes items from other namespaces?)
+
+Other fix: do not run `Cache` and `Lock` in parallele.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-24T07:57:37Z
+
+Memecached fixed by #23969

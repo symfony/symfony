@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by sanpii at 2017-09-01T19:40:04Z
+
+I don’t understand why the tests failed on travis. I can’t reproduce the problem on my computer (with php 7.0 and `--prefer-lowest`).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-03T19:39:38Z
+
+Should be better after #24083.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-04T07:43:23Z
+
+rebase needed to account for #24083.
+
+---------------------------------------------------------------------------
+
+by sanpii at 2017-09-04T08:02:41Z
+
+Done, thank you @chalasr.
+
+It’s better but it still failed with hhvm and php 5.5 due to deprecation notices.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-04T09:11:56Z
+
+@sanpii Looks like this triggers extra deprecations, I suspect that we trigger when we should not (e.g. because the node has a default value, we trigger even if not explicitly set). I'll look into later today.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-04T17:08:53Z
+
+VariableNode (= all nodes which are not `ArrayNode`) should not trigger the deprecation itself, as it is always the child of a rootNode which is responsible for triggering when a child is marked as deprecated. PR ready (fixing the implementation)

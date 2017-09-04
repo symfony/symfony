@@ -360,6 +360,10 @@ EODUMP;
             array('2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'),
         );
 
+        if (\PHP_VERSION_ID < 70107) {
+            array_walk($periods, function (&$i) { $i[5] = ''; });
+        }
+
         return $periods;
     }
 

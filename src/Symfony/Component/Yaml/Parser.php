@@ -127,7 +127,7 @@ class Parser
 
             $isRef = $mergeNode = false;
             if (self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#u', rtrim($this->currentLine), $values)) {
-                if ($context && 'mapping' == $context) {
+                if ($context && 'mapping' === $context) {
                     throw new ParseException('You cannot define a sequence item when in a mapping', $this->getRealCurrentLineNb() + 1, $this->currentLine);
                 }
                 $context = 'sequence';
@@ -138,7 +138,7 @@ class Parser
                 }
 
                 // array
-                if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
+                if (!isset($values['value']) || '' === trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $exceptionOnInvalidType, $objectSupport, $objectForMap);
                 } else {
                     if (isset($values['leadspaces'])
@@ -162,7 +162,7 @@ class Parser
                 self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
                 && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))
             ) {
-                if ($context && 'sequence' == $context) {
+                if ($context && 'sequence' === $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence', $this->currentLineNb + 1, $this->currentLine);
                 }
                 $context = 'mapping';
@@ -235,7 +235,7 @@ class Parser
 
                 if ($mergeNode) {
                     // Merge keys
-                } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
+                } elseif (!isset($values['value']) || '' === trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     // hash
                     // if next line is less indented or equal, then it means that the current value is null
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
@@ -445,7 +445,7 @@ class Parser
 
             if ($indent >= $newIndent) {
                 $data[] = substr($this->currentLine, $newIndent);
-            } elseif (0 == $indent) {
+            } elseif (0 === $indent) {
                 $this->moveToPreviousLine();
 
                 break;
@@ -686,7 +686,7 @@ class Parser
      */
     private function isCurrentLineBlank()
     {
-        return '' == trim($this->currentLine, ' ');
+        return '' === trim($this->currentLine, ' ');
     }
 
     /**
@@ -725,7 +725,7 @@ class Parser
 
         // remove leading comments
         $trimmedValue = preg_replace('#^(\#.*?\n)+#s', '', $value, -1, $count);
-        if ($count == 1) {
+        if ($count === 1) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
             $value = $trimmedValue;
@@ -733,7 +733,7 @@ class Parser
 
         // remove start of the document marker (---)
         $trimmedValue = preg_replace('#^\-\-\-.*?\n#s', '', $value, -1, $count);
-        if ($count == 1) {
+        if ($count === 1) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
             $value = $trimmedValue;

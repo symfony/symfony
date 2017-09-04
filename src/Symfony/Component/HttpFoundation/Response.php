@@ -306,12 +306,12 @@ class Response
         }
 
         // Fix protocol
-        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+        if ('HTTP/1.0' !== $request->server->get('SERVER_PROTOCOL')) {
             $this->setProtocolVersion('1.1');
         }
 
         // Check if we need to send extra expire info headers
-        if ('1.0' == $this->getProtocolVersion() && 'no-cache' == $this->headers->get('Cache-Control')) {
+        if ('1.0' === $this->getProtocolVersion() && 'no-cache' === $this->headers->get('Cache-Control')) {
             $this->headers->set('pragma', 'no-cache');
             $this->headers->set('expires', -1);
         }
@@ -1124,7 +1124,7 @@ class Response
      */
     public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location === $this->headers->get('Location'));
     }
 
     /**
@@ -1167,7 +1167,7 @@ class Response
      */
     protected function ensureIEOverSSLCompatibility(Request $request)
     {
-        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) === 1 && true === $request->isSecure()) {
             if ((int) preg_replace('/(MSIE )(.*?);/', '$2', $match[0]) < 9) {
                 $this->headers->remove('Cache-Control');
             }

@@ -392,7 +392,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $response = $this->forward($subRequest, $catch, $entry);
 
-        if (304 == $response->getStatusCode()) {
+        if (304 === $response->getStatusCode()) {
             $this->record($request, 'valid');
 
             // return the response and not the cache entry if the response is valid but not cached

@@ -423,7 +423,7 @@ class ProgressHelper extends Helper
         $text = '';
         foreach ($this->timeFormats as $format) {
             if ($secs < $format[0]) {
-                if (count($format) == 2) {
+                if (count($format) === 2) {
                     $text = $format[1];
                     break;
                 } else {

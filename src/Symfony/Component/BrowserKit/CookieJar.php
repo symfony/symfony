@@ -52,13 +52,13 @@ class CookieJar
             foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
                 if ($cookieDomain) {
                     $cookieDomain = '.'.ltrim($cookieDomain, '.');
-                    if ($cookieDomain != substr('.'.$domain, -strlen($cookieDomain))) {
+                    if ($cookieDomain !== substr('.'.$domain, -strlen($cookieDomain))) {
                         continue;
                     }
                 }
 
                 foreach ($pathCookies as $cookiePath => $namedCookies) {
-                    if ($cookiePath != substr($path, 0, strlen($cookiePath))) {
+                    if ($cookiePath !== substr($path, 0, strlen($cookiePath))) {
                         continue;
                     }
                     if (isset($namedCookies[$name])) {
@@ -202,18 +202,18 @@ class CookieJar
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {
                 $domain = '.'.ltrim($domain, '.');
-                if ($domain != substr('.'.$parts['host'], -strlen($domain))) {
+                if ($domain !== substr('.'.$parts['host'], -strlen($domain))) {
                     continue;
                 }
             }
 
             foreach ($pathCookies as $path => $namedCookies) {
-                if ($path != substr($parts['path'], 0, strlen($path))) {
+                if ($path !== substr($parts['path'], 0, strlen($path))) {
                     continue;
                 }
 
                 foreach ($namedCookies as $cookie) {
-                    if ($cookie->isSecure() && 'https' != $parts['scheme']) {
+                    if ($cookie->isSecure() && 'https' !== $parts['scheme']) {
                         continue;
                     }
 

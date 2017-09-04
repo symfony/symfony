@@ -247,7 +247,7 @@ class Esi implements SurrogateInterface
         // remove ESI/1.0 from the Surrogate-Control header
         if ($response->headers->has('Surrogate-Control')) {
             $value = $response->headers->get('Surrogate-Control');
-            if ('content="ESI/1.0"' == $value) {
+            if ('content="ESI/1.0"' === $value) {
                 $response->headers->remove('Surrogate-Control');
             } elseif (preg_match('#,\s*content="ESI/1.0"#', $value)) {
                 $response->headers->set('Surrogate-Control', preg_replace('#,\s*content="ESI/1.0"#', '', $value));

@@ -242,7 +242,7 @@ class ResponseHeaderBag extends HeaderBag
             throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
         }
 
-        if ('' == $filenameFallback) {
+        if ('' === $filenameFallback) {
             $filenameFallback = $filename;
         }
 

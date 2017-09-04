@@ -695,7 +695,7 @@ EOF;
         foreach ($this->container->getDefinitions() as $definitionId => $definition) {
             foreach ($definition->getMethodCalls() as $call) {
                 foreach ($call[1] as $argument) {
-                    if ($argument instanceof Reference && $id == (string) $argument) {
+                    if ($argument instanceof Reference && $id === (string) $argument) {
                         $arguments = array();
                         foreach ($call[1] as $value) {
                             $arguments[] = $this->dumpValue($value);

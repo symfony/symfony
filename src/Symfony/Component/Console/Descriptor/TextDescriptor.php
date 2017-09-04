@@ -179,7 +179,7 @@ class TextDescriptor extends Descriptor
                 $this->writeText("\n");
             }
         } else {
-            if ('' != $help = $application->getHelp()) {
+            if ('' !== $help = $application->getHelp()) {
                 $this->writeText("$help\n\n", $options);
             }
 

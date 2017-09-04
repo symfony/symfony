@@ -286,7 +286,7 @@ class Profiler
 
     private function getTimestamp($value)
     {
-        if (null === $value || '' == $value) {
+        if (null === $value || '' === $value) {
             return;
         }
 

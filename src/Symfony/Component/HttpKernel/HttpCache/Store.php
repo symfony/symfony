@@ -210,7 +210,7 @@ class Store implements StoreInterface
                 $entry[1]['vary'] = array('');
             }
 
-            if ($vary != $entry[1]['vary'][0] || !$this->requestsMatch($vary, $entry[0], $storedEnv)) {
+            if ($vary !== $entry[1]['vary'][0] || !$this->requestsMatch($vary, $entry[0], $storedEnv)) {
                 $entries[] = $entry;
             }
         }
@@ -407,7 +407,7 @@ class Store implements StoreInterface
             @fwrite($fp, $data);
             @fclose($fp);
 
-            if ($data != file_get_contents($tmpFile)) {
+            if ($data !== file_get_contents($tmpFile)) {
                 return false;
             }
 

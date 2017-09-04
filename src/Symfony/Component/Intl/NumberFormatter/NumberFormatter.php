@@ -330,7 +330,7 @@ class NumberFormatter
      */
     public function formatCurrency($value, $currency)
     {
-        if ($this->style == self::DECIMAL) {
+        if ($this->style === self::DECIMAL) {
             return $this->format($value);
         }
 
@@ -369,13 +369,13 @@ class NumberFormatter
     public function format($value, $type = self::TYPE_DEFAULT)
     {
         // The original NumberFormatter does not support this format type
-        if ($type == self::TYPE_CURRENCY) {
+        if ($type === self::TYPE_CURRENCY) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;
         }
 
-        if ($this->style == self::CURRENCY) {
+        if ($this->style === self::CURRENCY) {
             throw new NotImplementedException(sprintf(
                 '%s() method does not support the formatting of currencies (instance with CURRENCY style). %s',
                 __METHOD__, NotImplementedException::INTL_INSTALL_MESSAGE
@@ -383,7 +383,7 @@ class NumberFormatter
         }
 
         // Only the default type is supported.
-        if ($type != self::TYPE_DEFAULT) {
+        if ($type !== self::TYPE_DEFAULT) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'type', $type, 'Only TYPE_DEFAULT is supported');
         }
 
@@ -526,7 +526,7 @@ class NumberFormatter
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
     {
-        if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
+        if ($type === self::TYPE_DEFAULT || $type === self::TYPE_CURRENCY) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;
@@ -589,7 +589,7 @@ class NumberFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'attr', $value, $message);
         }
 
-        if (self::$supportedAttributes['ROUNDING_MODE'] == $attr && $this->isInvalidRoundingMode($value)) {
+        if (self::$supportedAttributes['ROUNDING_MODE'] === $attr && $this->isInvalidRoundingMode($value)) {
             $message = sprintf(
                 'The supported values for ROUNDING_MODE are: %s',
                 implode(', ', array_keys(self::$roundingModes))
@@ -598,11 +598,11 @@ class NumberFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'attr', $value, $message);
         }
 
-        if (self::$supportedAttributes['GROUPING_USED'] == $attr) {
+        if (self::$supportedAttributes['GROUPING_USED'] === $attr) {
             $value = $this->normalizeGroupingUsedValue($value);
         }
 
-        if (self::$supportedAttributes['FRACTION_DIGITS'] == $attr) {
+        if (self::$supportedAttributes['FRACTION_DIGITS'] === $attr) {
             $value = $this->normalizeFractionDigitsValue($value);
         }
 
@@ -773,7 +773,7 @@ class NumberFormatter
      */
     private function getUninitializedPrecision($value, $precision)
     {
-        if ($this->style == self::CURRENCY) {
+        if ($this->style === self::CURRENCY) {
             return $precision;
         }
 
@@ -809,11 +809,11 @@ class NumberFormatter
      */
     private function convertValueDataType($value, $type)
     {
-        if ($type == self::TYPE_DOUBLE) {
+        if ($type === self::TYPE_DOUBLE) {
             $value = (float) $value;
-        } elseif ($type == self::TYPE_INT32) {
+        } elseif ($type === self::TYPE_INT32) {
             $value = $this->getInt32Value($value);
-        } elseif ($type == self::TYPE_INT64) {
+        } elseif ($type === self::TYPE_INT64) {
             $value = $this->getInt64Value($value);
         }
 
@@ -853,7 +853,7 @@ class NumberFormatter
             // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
             // The negative PHP_INT_MAX was being converted to float
             if (
-                $value == -self::$int32Max - 1 &&
+                $value === -self::$int32Max - 1 &&
                 ((\PHP_VERSION_ID < 50400 && \PHP_VERSION_ID >= 50314) || \PHP_VERSION_ID >= 50404 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone')))
             ) {
                 return (int) $value;

@@ -137,7 +137,7 @@ class OutputFormatter implements OutputFormatterInterface
             $pos = $match[1];
             $text = $match[0];
 
-            if (0 != $pos && '\\' == $message[$pos - 1]) {
+            if (0 !== $pos && '\\' === $message[$pos - 1]) {
                 continue;
             }
 
@@ -146,7 +146,7 @@ class OutputFormatter implements OutputFormatterInterface
             $offset = $pos + strlen($text);
 
             // opening tag?
-            if ($open = '/' != $text[1]) {
+            if ($open = '/' !== $text[1]) {
                 $tag = $matches[1][$i][0];
             } else {
                 $tag = isset($matches[3][$i][0]) ? $matches[3][$i][0] : '';
@@ -202,9 +202,9 @@ class OutputFormatter implements OutputFormatterInterface
         foreach ($matches as $match) {
             array_shift($match);
 
-            if ('fg' == $match[0]) {
+            if ('fg' === $match[0]) {
                 $style->setForeground($match[1]);
-            } elseif ('bg' == $match[0]) {
+            } elseif ('bg' === $match[0]) {
                 $style->setBackground($match[1]);
             } else {
                 try {

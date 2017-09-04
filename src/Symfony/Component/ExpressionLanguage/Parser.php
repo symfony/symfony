@@ -305,7 +305,7 @@ class Parser
     public function parsePostfixExpression($node)
     {
         $token = $this->stream->current;
-        while ($token->type == Token::PUNCTUATION_TYPE) {
+        while ($token->type === Token::PUNCTUATION_TYPE) {
             if ('.' === $token->value) {
                 $this->stream->next();
                 $token = $this->stream->current;

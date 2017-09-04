@@ -146,7 +146,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         $classes = array();
         $filename = $class.'.php';
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-            if ($filename == $file->getFileName() && $class = $this->convertFileToClass($path, $file->getPathName(), $prefix)) {
+            if ($filename === $file->getFileName() && $class = $this->convertFileToClass($path, $file->getPathName(), $prefix)) {
                 $classes[] = $class;
             }
         }

@@ -296,7 +296,7 @@ class GraphvizDumper extends Dumper
     {
         $aliases = array();
         foreach ($this->container->getAliases() as $alias => $origin) {
-            if ($id == $origin) {
+            if ($id === $origin) {
                 $aliases[] = $alias;
             }
         }

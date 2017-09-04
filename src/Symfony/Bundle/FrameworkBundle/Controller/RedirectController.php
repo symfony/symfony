@@ -45,7 +45,7 @@ class RedirectController extends ContainerAware
      */
     public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
     {
-        if ('' == $route) {
+        if ('' === $route) {
             throw new HttpException($permanent ? 410 : 404);
         }
 
@@ -83,7 +83,7 @@ class RedirectController extends ContainerAware
      */
     public function urlRedirectAction(Request $request, $path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
     {
-        if ('' == $path) {
+        if ('' === $path) {
             throw new HttpException($permanent ? 410 : 404);
         }
 
@@ -117,7 +117,7 @@ class RedirectController extends ContainerAware
                 }
             }
 
-            if (null !== $httpPort && 80 != $httpPort) {
+            if (null !== $httpPort && 80 !== $httpPort) {
                 $port = ":$httpPort";
             }
         } elseif ('https' === $scheme) {
@@ -129,7 +129,7 @@ class RedirectController extends ContainerAware
                 }
             }
 
-            if (null !== $httpsPort && 443 != $httpsPort) {
+            if (null !== $httpsPort && 443 !== $httpsPort) {
                 $port = ":$httpsPort";
             }
         }

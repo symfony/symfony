@@ -207,7 +207,7 @@ class CliDumper extends AbstractDumper
                 if ('' !== $str) {
                     $this->line .= $this->style('str', $str, $attr);
                 }
-                if ($i++ == $m) {
+                if ($i++ === $m) {
                     if ($m) {
                         if ('' !== $str) {
                             $this->dumpLine($cursor->depth);

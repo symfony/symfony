@@ -156,7 +156,7 @@ class Ssi implements SurrogateInterface
         // remove SSI/1.0 from the Surrogate-Control header
         if ($response->headers->has('Surrogate-Control')) {
             $value = $response->headers->get('Surrogate-Control');
-            if ('content="SSI/1.0"' == $value) {
+            if ('content="SSI/1.0"' === $value) {
                 $response->headers->remove('Surrogate-Control');
             } elseif (preg_match('#,\s*content="SSI/1.0"#', $value)) {
                 $response->headers->set('Surrogate-Control', preg_replace('#,\s*content="SSI/1.0"#', '', $value));

@@ -133,7 +133,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $rules = array();
         foreach ($container->getDefinition('security.access_map')->getMethodCalls() as $call) {
-            if ($call[0] == 'add') {
+            if ($call[0] === 'add') {
                 $rules[] = array((string) $call[1][0], $call[1][1], $call[1][2]);
             }
         }

@@ -713,7 +713,7 @@ class Process
      */
     public function isStarted()
     {
-        return $this->status != self::STATUS_READY;
+        return $this->status !== self::STATUS_READY;
     }
 
     /**
@@ -725,7 +725,7 @@ class Process
     {
         $this->updateStatus(false);
 
-        return $this->status == self::STATUS_TERMINATED;
+        return $this->status === self::STATUS_TERMINATED;
     }
 
     /**
@@ -1255,7 +1255,7 @@ class Process
         $that = $this;
         $out = self::OUT;
         $callback = function ($type, $data) use ($that, $callback, $out) {
-            if ($out == $type) {
+            if ($out === $type) {
                 $that->addOutput($data);
             } else {
                 $that->addErrorOutput($data);

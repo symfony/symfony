@@ -78,7 +78,7 @@ class ClassCollectionLoader
                 sort($meta[1]);
                 sort($classes);
 
-                if ($meta[1] != $classes) {
+                if ($meta[1] !== $classes) {
                     $reload = true;
                 } else {
                     foreach ($meta[0] as $resource) {

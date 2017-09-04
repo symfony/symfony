@@ -131,7 +131,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return true;
         }
 
-        if ($this->currentId == $id) {
+        if ($this->currentId === $id) {
             return false;
         }
 

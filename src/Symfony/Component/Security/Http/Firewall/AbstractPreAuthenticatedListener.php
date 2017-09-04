@@ -69,7 +69,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
+            if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }

@@ -154,7 +154,7 @@ class TraceableEventDispatcherTest extends TestCase
         $dispatchedEvents = 0;
         $dispatcher->addListener('foo', $listener1 = function () use ($dispatcher, &$loop) {
             ++$loop;
-            if (2 == $loop) {
+            if (2 === $loop) {
                 $dispatcher->dispatch('foo');
             }
         });

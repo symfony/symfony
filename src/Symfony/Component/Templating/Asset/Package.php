@@ -74,7 +74,7 @@ class Package implements PackageInterface
 
         $versionized = sprintf($this->format, ltrim($path, '/'), $version);
 
-        if ($path && '/' == $path[0]) {
+        if ($path && '/' === $path[0]) {
             $versionized = '/'.$versionized;
         }
 

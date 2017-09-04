@@ -93,9 +93,9 @@ EOF
 
         $matches = false;
         foreach ($traces as $trace) {
-            if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {
+            if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES === $trace['level']) {
                 $output->writeln(sprintf('<fg=yellow>Route "%s" almost matches but %s</>', $trace['name'], lcfirst($trace['log'])));
-            } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {
+            } elseif (TraceableUrlMatcher::ROUTE_MATCHES === $trace['level']) {
                 $output->writeln(sprintf('<fg=green>Route "%s" matches</>', $trace['name']));
 
                 $routerDebugcommand = $this->getApplication()->find('debug:router');

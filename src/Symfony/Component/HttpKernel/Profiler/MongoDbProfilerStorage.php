@@ -250,7 +250,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $collection = $matches[3];
         preg_match('#^mongodb://(([^:]+):?(.*)(?=@))?@?([^/]*)(.*)$#', $server, $matchesServer);
 
-        if ('' == $matchesServer[5] && '' != $matches[2]) {
+        if ('' === $matchesServer[5] && '' !== $matches[2]) {
             $server .= '/'.$matches[2];
         }
 

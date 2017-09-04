@@ -67,7 +67,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 break;
             }
 
-            if ($item == '') {
+            if ($item === '') {
                 continue;
             }
 
@@ -123,7 +123,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         $result = array();
 
         foreach ($profileList as $item) {
-            if ($item == '') {
+            if ($item === '') {
                 continue;
             }
 

@@ -329,7 +329,7 @@ class Crawler extends \SplObjectStorage
     public function eq($position)
     {
         foreach ($this as $i => $node) {
-            if ($i == $position) {
+            if ($i === $position) {
                 return $this->createSubCrawler($node);
             }
         }
@@ -952,7 +952,7 @@ class Crawler extends \SplObjectStorage
     public function getNode($position)
     {
         foreach ($this as $i => $node) {
-            if ($i == $position) {
+            if ($i === $position) {
                 return $node;
             }
         }

@@ -210,7 +210,7 @@ class ImageValidator extends FileValidator
             }
         }
 
-        if (!$constraint->allowSquare && $width == $height) {
+        if (!$constraint->allowSquare && $width === $height) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->allowSquareMessage)
                     ->setParameter('{{ width }}', $width)

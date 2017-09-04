@@ -39,9 +39,9 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $scheme = $request->isSecure() ? 'http' : 'https';
-        if ('http' === $scheme && 80 != $this->httpPort) {
+        if ('http' === $scheme && 80 !== $this->httpPort) {
             $port = ':'.$this->httpPort;
-        } elseif ('https' === $scheme && 443 != $this->httpsPort) {
+        } elseif ('https' === $scheme && 443 !== $this->httpsPort) {
             $port = ':'.$this->httpsPort;
         } else {
             $port = '';

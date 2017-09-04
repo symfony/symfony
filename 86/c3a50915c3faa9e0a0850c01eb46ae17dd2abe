@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T14:15:57Z
+
+(note: should be merged in 3.4)
+
+---------------------------------------------------------------------------
+
+by Toflar at 2017-09-03T15:57:32Z
+
+Updated. I also wonder if we should also purge the `$tagsAdapter` which might be a different instance. However, I'm not sure. While thinking about this I also wondered what happens if the `$defaultLifetime` of the `$tagsAdapter` is set to some value lower than the `$itemsAdapter`. Tags would get killed (not only in the pruning process but also if I e.g. use the Redis adapter) and the logic would be broken, no? I guess tags should never be purged unless no item is associated with a tag anymore?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T16:09:54Z
+
+About tagsAdapter, I wondered the same, and I have the same conclusion: since tags should be stored "forever", there can't be anything to prune. The code btw should bypass $defaultLifetime and force "forever", isn't it already the case?
+
+> tags should never be purged unless no item is associated with a tag anymore
+
+true, but there is no way to have that "not used anymore" info, so nothing we can prune here (and if we could, there still would be a possible race condition, so better not look a it.)
+
+---------------------------------------------------------------------------
+
+by Toflar at 2017-09-03T17:19:50Z
+
+> isn't it already the case?
+
+I searched the code and from what I understand, I can't see where that should happen. So I hoped maybe you could shed some light on it 😄  Imho an item is created using the `createCacheItem` closure and this is never touched for the `$tagsAdapter`. The only place where I see the default lifetime being updated is as soon as the first `invalidateTags()` call is executed (but only for the matching items of course). Also, I don't know how you would want to check or force this from within the `TagAwareAdapter` because most of the logic is not accessible from the outside (on purpose, I suppose).
+
+> true, but there is no way to have that "not used anymore" info, so nothing we can prune here (and if we could, there still would be a possible race condition, so better not look a it.)
+
+I would like to help out here but to be honest I really have a hard time understanding exactly how the tagging works internally. The whole closure stuff makes it pretty hard to understand if you're checking out the cache component internals for the first time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T17:29:38Z
+
+OK, these lines make the tags last "forever", by passing any default lifetime:
+https://github.com/Toflar/symfony/blob/130ef7b6568858a7d1a18801a04a95193ab18fb8/src/Symfony/Component/Cache/Adapter/TagAwareAdapter.php#L89-L90
+
+So all is good PR ready.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-09-04T04:28:13Z
+
+Documentation in symfony/symfony-docs#8209 PR amended to include note about how `TagAwareAdapter` now implements `PruneableInterface`.

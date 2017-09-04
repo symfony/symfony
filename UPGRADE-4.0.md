@@ -146,7 +146,7 @@ DependencyInjection
    <service id="Doctrine\Common\Annotations\Reader" alias="annotations.reader" public="false" />
    ```
 
- * Service identifiers are now case sensitive.
+ * Service identifiers and parameter names are now case sensitive.
 
  * The `Reference` and `Alias` classes do not make service identifiers lowercase anymore.
 
@@ -391,6 +391,9 @@ FrameworkBundle
    fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()`
    or `KernelTestCase::getKernelClass()` method instead.
 
+ * The methods `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
+   have been removed.
+
  * The `Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory` class has been removed.
    Use `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
 
@@ -541,6 +544,8 @@ Process
  * Extending `Process::run()`, `Process::mustRun()` and `Process::restart()` is
    not supported anymore.
 
+ * The `getEnhanceWindowsCompatibility()` and `setEnhanceWindowsCompatibility()` methods of the `Process` class have been removed.
+
 ProxyManager
 ------------
 
@@ -556,6 +561,8 @@ Security
 
  * The `AccessDecisionManager::setVoters()` method has been removed. Pass the
    voters to the constructor instead.
+
+ * Support for defining voters that don't implement the `VoterInterface` has been removed.
 
 SecurityBundle
 --------------
@@ -683,6 +690,21 @@ Validator
    }
    ```
 
+ * Setting the `checkDNS` option of the `Url` constraint to `true` is dropped
+   in favor of `Url::CHECK_DNS_TYPE_*` constants values.
+
+   Before:
+
+   ```php
+   $constraint = new Url(['checkDNS' => true]);
+   ```
+
+   After:
+
+   ```php
+   $constraint = new Url(['checkDNS' => Url::CHECK_DNS_TYPE_ANY]);
+   ```
+
 VarDumper
 ---------
 
@@ -715,6 +737,12 @@ VarDumper
    ```php
    VarDumperTestTrait::assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '');
    ```
+
+WebProfilerBundle
+-----------------
+
+ * Removed the `getTemplates()` method of the `TemplateManager` class in favor
+   of the `getNames()` method
 
 Workflow
 --------

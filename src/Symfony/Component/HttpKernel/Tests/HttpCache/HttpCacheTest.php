@@ -269,7 +269,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->setNextResponse(200, array('Cache-Control' => 'public, max-age=10000'), '', function ($request, $response) use (&$count) {
             ++$count;
-            $response->setContent(1 == $count ? 'Hello World' : 'Goodbye World');
+            $response->setContent(1 === $count ? 'Hello World' : 'Goodbye World');
         });
 
         $this->request('GET', '/');
@@ -296,7 +296,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->setNextResponse(200, array('Cache-Control' => 'public, max-age=10000'), '', function ($request, $response) use (&$count) {
             ++$count;
-            $response->setContent(1 == $count ? 'Hello World' : 'Goodbye World');
+            $response->setContent(1 === $count ? 'Hello World' : 'Goodbye World');
         });
 
         $this->request('GET', '/');
@@ -329,7 +329,7 @@ class HttpCacheTest extends HttpCacheTestCase
             ++$count;
             $response->headers->set('Cache-Control', 'public, max-age=10000');
             $response->setETag($count);
-            $response->setContent(1 == $count ? 'Hello World' : 'Goodbye World');
+            $response->setContent(1 === $count ? 'Hello World' : 'Goodbye World');
         });
 
         $this->request('GET', '/');
@@ -359,7 +359,7 @@ class HttpCacheTest extends HttpCacheTestCase
             ++$count;
             $response->headers->set('Cache-Control', 'public, max-age=10000');
             $response->setETag($count);
-            $response->setContent(1 == $count ? 'Hello World' : 'Goodbye World');
+            $response->setContent(1 === $count ? 'Hello World' : 'Goodbye World');
         });
 
         $this->request('GET', '/');
@@ -768,7 +768,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
             $response->headers->set('Cache-Control', 'public');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
-            if ($time->format(DATE_RFC2822) == $request->headers->get('IF_MODIFIED_SINCE')) {
+            if ($time->format(DATE_RFC2822) === $request->headers->get('IF_MODIFIED_SINCE')) {
                 $response->setStatusCode(304);
                 $response->setContent('');
             }
@@ -819,7 +819,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public');
             $response->headers->set('ETag', '"12345"');
-            if ($response->getETag() == $request->headers->get('IF_NONE_MATCH')) {
+            if ($response->getETag() === $request->headers->get('IF_NONE_MATCH')) {
                 $response->setStatusCode(304);
                 $response->setContent('');
             }
@@ -981,11 +981,11 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testInvalidatesCachedResponsesOnPost()
     {
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
-            if ('GET' == $request->getMethod()) {
+            if ('GET' === $request->getMethod()) {
                 $response->setStatusCode(200);
                 $response->headers->set('Cache-Control', 'public, max-age=500');
                 $response->setContent('Hello World');
-            } elseif ('POST' == $request->getMethod()) {
+            } elseif ('POST' === $request->getMethod()) {
                 $response->setStatusCode(303);
                 $response->headers->set('Location', '/');
                 $response->headers->remove('Cache-Control');

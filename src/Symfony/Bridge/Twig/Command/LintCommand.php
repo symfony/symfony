@@ -219,11 +219,11 @@ EOF
         foreach ($this->getContext($template, $line) as $no => $code) {
             $output->writeln(sprintf(
                 '%s %-6s %s',
-                $no == $line ? '<error>>></error>' : '  ',
+                $no === $line ? '<error>>></error>' : '  ',
                 $no,
                 $code
             ));
-            if ($no == $line) {
+            if ($no === $line) {
                 $output->writeln(sprintf('<error>>> %s</error> ', $exception->getRawMessage()));
             }
         }

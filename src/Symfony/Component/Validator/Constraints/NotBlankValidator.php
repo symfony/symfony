@@ -30,7 +30,7 @@ class NotBlankValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\NotBlank');
         }
 
-        if (false === $value || (empty($value) && '0' != $value)) {
+        if (false === $value || (empty($value) && '0' !== $value)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))

@@ -40,7 +40,7 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
 
-        if ('matches' == $operator) {
+        if ('matches' === $operator) {
             $compiler
                 ->raw('preg_match(')
                 ->compile($this->nodes['right'])
@@ -114,11 +114,11 @@ class BinaryNode extends Node
             case '&':
                 return $left & $right;
             case '==':
-                return $left == $right;
+                return $left === $right;
             case '===':
                 return $left === $right;
             case '!=':
-                return $left != $right;
+                return $left !== $right;
             case '!==':
                 return $left !== $right;
             case '<':

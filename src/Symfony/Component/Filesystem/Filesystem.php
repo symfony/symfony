@@ -334,7 +334,7 @@ class Filesystem
 
         $ok = false;
         if (is_link($targetDir)) {
-            if (readlink($targetDir) != $originDir) {
+            if (readlink($targetDir) !== $originDir) {
                 $this->remove($targetDir);
             } else {
                 $ok = true;

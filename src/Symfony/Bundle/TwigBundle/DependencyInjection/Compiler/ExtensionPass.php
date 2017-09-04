@@ -66,7 +66,7 @@ class ExtensionPass implements CompilerPassInterface
             // inject Twig in the hinclude service if Twig is the only registered templating engine
             if (
                 !$container->hasParameter('templating.engines')
-                || array('twig') == $container->getParameter('templating.engines')
+                || array('twig') === $container->getParameter('templating.engines')
             ) {
                 $container->getDefinition('fragment.renderer.hinclude')
                     ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))

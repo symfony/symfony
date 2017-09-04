@@ -45,7 +45,7 @@ class MemcachedMock
      */
     public function addServer($host, $port = 11211, $weight = 0)
     {
-        if ('127.0.0.1' == $host && 11211 == $port) {
+        if ('127.0.0.1' === $host && 11211 === $port) {
             $this->connected = true;
 
             return true;

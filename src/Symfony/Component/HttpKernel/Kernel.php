@@ -440,7 +440,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 if (isset($directChildren[$parentName])) {
                     throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
                 }
-                if ($parentName == $name) {
+                if ($parentName === $name) {
                     throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
                 }
                 $directChildren[$parentName] = $name;

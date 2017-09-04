@@ -38,7 +38,7 @@ class CountValidator extends ConstraintValidator
 
         if (null !== $constraint->max && $count > $constraint->max) {
             if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+                $this->context->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
                     ->setParameter('{{ count }}', $count)
                     ->setParameter('{{ limit }}', $constraint->max)
                     ->setInvalidValue($value)
@@ -46,7 +46,7 @@ class CountValidator extends ConstraintValidator
                     ->setCode(Count::TOO_MANY_ERROR)
                     ->addViolation();
             } else {
-                $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+                $this->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
                     ->setParameter('{{ count }}', $count)
                     ->setParameter('{{ limit }}', $constraint->max)
                     ->setInvalidValue($value)
@@ -60,7 +60,7 @@ class CountValidator extends ConstraintValidator
 
         if (null !== $constraint->min && $count < $constraint->min) {
             if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+                $this->context->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
                     ->setParameter('{{ count }}', $count)
                     ->setParameter('{{ limit }}', $constraint->min)
                     ->setInvalidValue($value)
@@ -68,7 +68,7 @@ class CountValidator extends ConstraintValidator
                     ->setCode(Count::TOO_FEW_ERROR)
                     ->addViolation();
             } else {
-                $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+                $this->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
                     ->setParameter('{{ count }}', $count)
                     ->setParameter('{{ limit }}', $constraint->min)
                     ->setInvalidValue($value)

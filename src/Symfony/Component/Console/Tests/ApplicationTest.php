@@ -1099,7 +1099,7 @@ class ApplicationTest extends TestCase
         $this->assertCount(2, $originalDimensions);
 
         $width = 80;
-        if ($originalDimensions[0] == $width) {
+        if ($originalDimensions[0] === $width) {
             $width = 100;
         }
 

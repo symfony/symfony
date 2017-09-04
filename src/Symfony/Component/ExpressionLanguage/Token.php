@@ -63,6 +63,6 @@ class Token
      */
     public function test($type, $value = null)
     {
-        return $this->type === $type && (null === $value || $this->value == $value);
+        return $this->type === $type && (null === $value || $this->value === $value);
     }
 }

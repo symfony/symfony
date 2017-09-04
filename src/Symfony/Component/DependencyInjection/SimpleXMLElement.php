@@ -55,7 +55,7 @@ class SimpleXMLElement extends \SimpleXMLElement
             $key = isset($arg['key']) ? (string) $arg['key'] : (!$arguments ? 0 : max(array_keys($arguments)) + 1);
 
             // parameter keys are case insensitive
-            if ('parameter' == $name && $lowercase) {
+            if ('parameter' === $name && $lowercase) {
                 $key = strtolower($key);
             }
 
@@ -68,9 +68,9 @@ class SimpleXMLElement extends \SimpleXMLElement
             switch ($arg['type']) {
                 case 'service':
                     $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-                    if (isset($arg['on-invalid']) && 'ignore' == $arg['on-invalid']) {
+                    if (isset($arg['on-invalid']) && 'ignore' === $arg['on-invalid']) {
                         $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-                    } elseif (isset($arg['on-invalid']) && 'null' == $arg['on-invalid']) {
+                    } elseif (isset($arg['on-invalid']) && 'null' === $arg['on-invalid']) {
                         $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                     }
 

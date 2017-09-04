@@ -98,7 +98,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
     {
         // comparing the identifier with === might lead to problems, so we
         // waive this restriction
-        return $this->identifier == $identity->getIdentifier()
+        return $this->identifier === $identity->getIdentifier()
                && $this->type === $identity->getType();
     }
 

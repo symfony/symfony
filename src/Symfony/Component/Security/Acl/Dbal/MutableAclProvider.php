@@ -700,7 +700,7 @@ QUERY;
      */
     protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
     {
-        if ($usid->getUsername() == $oldUsername) {
+        if ($usid->getUsername() === $oldUsername) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 
@@ -1005,7 +1005,7 @@ QUERY;
 
         if (isset($propertyChanges['aceOrder'])
             && $propertyChanges['aceOrder'][1] > $propertyChanges['aceOrder'][0]
-            && $propertyChanges == $aces->offsetGet($ace)) {
+            && $propertyChanges === $aces->offsetGet($ace)) {
             $aces->next();
             if ($aces->valid()) {
                 $this->updateAce($aces, $aces->current());

@@ -40,7 +40,7 @@ class EncoderFactory implements EncoderFactoryInterface
             $encoderKey = $encoderName;
         } else {
             foreach ($this->encoders as $class => $encoder) {
-                if ((is_object($user) && $user instanceof $class) || (!is_object($user) && (is_subclass_of($user, $class) || $user == $class))) {
+                if ((is_object($user) && $user instanceof $class) || (!is_object($user) && (is_subclass_of($user, $class) || $user === $class))) {
                     $encoderKey = $class;
                     break;
                 }

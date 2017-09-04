@@ -66,9 +66,9 @@ class HttpFoundationExtension extends AbstractExtension
                 $scheme = $this->requestContext->getScheme();
                 $port = '';
 
-                if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
+                if ('http' === $scheme && 80 !== $this->requestContext->getHttpPort()) {
                     $port = ':'.$this->requestContext->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
+                } elseif ('https' === $scheme && 443 !== $this->requestContext->getHttpsPort()) {
                     $port = ':'.$this->requestContext->getHttpsPort();
                 }
 

@@ -168,7 +168,7 @@ EOF
                 ));
             }
 
-            if ($input->getOption('output-format') == 'xlf') {
+            if ($input->getOption('output-format') === 'xlf') {
                 $output->writeln('Xliff output version is <info>1.2</info>');
             }
         }

@@ -32,7 +32,7 @@ class MemcacheMock
      */
     public function connect($host, $port = null, $timeout = null)
     {
-        if ('127.0.0.1' == $host && 11211 == $port) {
+        if ('127.0.0.1' === $host && 11211 === $port) {
             $this->connected = true;
 
             return true;
@@ -52,7 +52,7 @@ class MemcacheMock
      */
     public function pconnect($host, $port = null, $timeout = null)
     {
-        if ('127.0.0.1' == $host && 11211 == $port) {
+        if ('127.0.0.1' === $host && 11211 === $port) {
             $this->connected = true;
 
             return true;
@@ -78,7 +78,7 @@ class MemcacheMock
      */
     public function addServer($host, $port = 11211, $persistent = null, $weight = null, $timeout = null, $retry_interval = null, $status = null, $failure_callback = null, $timeoutms = null)
     {
-        if ('127.0.0.1' == $host && 11211 == $port) {
+        if ('127.0.0.1' === $host && 11211 === $port) {
             $this->connected = true;
 
             return true;

@@ -160,7 +160,7 @@ class Cookie
 
             if ('secure' === strtolower($part)) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (!$url || !isset($urlParts['scheme']) || 'https' != $urlParts['scheme']) {
+                if (!$url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
                     continue;
                 }
 
@@ -302,6 +302,6 @@ class Cookie
      */
     public function isExpired()
     {
-        return null !== $this->expires && 0 != $this->expires && $this->expires < time();
+        return null !== $this->expires && 0 !== $this->expires && $this->expires < time();
     }
 }

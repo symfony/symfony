@@ -83,7 +83,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a numeric.');
         }
 
-        if (self::FRACTIONAL == $this->type) {
+        if (self::FRACTIONAL === $this->type) {
             $value *= 100;
         }
 
@@ -126,7 +126,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
-        if (self::FRACTIONAL == $this->type) {
+        if (self::FRACTIONAL === $this->type) {
             $value /= 100;
         }
 

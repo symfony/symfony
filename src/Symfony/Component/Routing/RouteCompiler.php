@@ -192,7 +192,7 @@ class RouteCompiler implements RouteCompilerInterface
      */
     private static function findNextSeparator($pattern)
     {
-        if ('' == $pattern) {
+        if ('' === $pattern) {
             // return empty string if pattern is empty or false (false which can be returned by substr)
             return '';
         }
@@ -230,7 +230,7 @@ class RouteCompiler implements RouteCompilerInterface
                     // matched the optional subpattern is not passed back.
                     $regexp = "(?:$regexp";
                     $nbTokens = count($tokens);
-                    if ($nbTokens - 1 == $index) {
+                    if ($nbTokens - 1 === $index) {
                         // Close the optional subpatterns
                         $regexp .= str_repeat(')?', $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
                     }

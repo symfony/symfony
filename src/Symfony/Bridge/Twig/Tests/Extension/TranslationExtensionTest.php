@@ -33,7 +33,7 @@ class TranslationExtensionTest extends TestCase
      */
     public function testTrans($template, $expected, array $variables = array())
     {
-        if ($expected != $this->getTemplate($template)->render($variables)) {
+        if ($expected !== $this->getTemplate($template)->render($variables)) {
             echo $template."\n";
             $loader = new TwigArrayLoader(array('index' => $template));
             $twig = new Environment($loader, array('debug' => true, 'cache' => false));

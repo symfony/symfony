@@ -644,7 +644,7 @@ class Request
      */
     public static function normalizeQueryString($qs)
     {
-        if ('' == $qs) {
+        if ('' === $qs) {
             return '';
         }
 
@@ -1017,7 +1017,7 @@ class Request
         $userinfo = $this->getUser();
 
         $pass = $this->getPassword();
-        if ('' != $pass) {
+        if ('' !== $pass) {
             $userinfo .= ":$pass";
         }
 
@@ -1036,7 +1036,7 @@ class Request
         $scheme = $this->getScheme();
         $port = $this->getPort();
 
-        if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
+        if (('http' === $scheme && $port === 80) || ('https' === $scheme && $port === 443)) {
             return $this->getHost();
         }
 
@@ -1555,7 +1555,7 @@ class Request
      */
     public function isNoCache()
     {
-        return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
+        return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' === $this->headers->get('Pragma');
     }
 
     /**
@@ -1687,7 +1687,7 @@ class Request
      */
     public function isXmlHttpRequest()
     {
-        return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
+        return 'XMLHttpRequest' === $this->headers->get('X-Requested-With');
     }
 
     /*
@@ -1713,7 +1713,7 @@ class Request
             // IIS with ISAPI_Rewrite
             $requestUri = $this->headers->get('X_REWRITE_URL');
             $this->headers->remove('X_REWRITE_URL');
-        } elseif ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '') {
+        } elseif ($this->server->get('IIS_WasUrlRewritten') === '1' && $this->server->get('UNENCODED_URL') !== '') {
             // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
             $requestUri = $this->server->get('UNENCODED_URL');
             $this->server->remove('UNENCODED_URL');
@@ -1728,7 +1728,7 @@ class Request
         } elseif ($this->server->has('ORIG_PATH_INFO')) {
             // IIS 5.0, PHP as CGI
             $requestUri = $this->server->get('ORIG_PATH_INFO');
-            if ('' != $this->server->get('QUERY_STRING')) {
+            if ('' !== $this->server->get('QUERY_STRING')) {
                 $requestUri .= '?'.$this->server->get('QUERY_STRING');
             }
             $this->server->remove('ORIG_PATH_INFO');
@@ -1769,7 +1769,7 @@ class Request
                 $seg = $segs[$index];
                 $baseUrl = '/'.$seg.$baseUrl;
                 ++$index;
-            } while ($last > $index && (false !== $pos = strpos($path, $baseUrl)) && 0 != $pos);
+            } while ($last > $index && (false !== $pos = strpos($path, $baseUrl)) && 0 !== $pos);
         }
 
         // Does the baseUrl have anything in common with the request_uri?

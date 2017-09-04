@@ -36,7 +36,7 @@ class Lexer
         $end = strlen($expression);
 
         while ($cursor < $end) {
-            if (' ' == $expression[$cursor]) {
+            if (' ' === $expression[$cursor]) {
                 ++$cursor;
 
                 continue;
@@ -63,7 +63,7 @@ class Lexer
                 }
 
                 list($expect, $cur) = array_pop($brackets);
-                if ($expression[$cursor] != strtr($expect, '([{', ')]}')) {
+                if ($expression[$cursor] !== strtr($expect, '([{', ')]}')) {
                     throw new SyntaxError(sprintf('Unclosed "%s"', $expect), $cur, $expression);
                 }
 

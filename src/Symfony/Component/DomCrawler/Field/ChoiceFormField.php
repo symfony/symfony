@@ -64,7 +64,7 @@ class ChoiceFormField extends FormField
         }
 
         foreach ($this->options as $option) {
-            if ($option['value'] == $this->value && $option['disabled']) {
+            if ($option['value'] === $this->value && $option['disabled']) {
                 return true;
             }
         }
@@ -214,7 +214,7 @@ class ChoiceFormField extends FormField
         $this->options = array();
         $this->multiple = false;
 
-        if ('input' == $this->node->nodeName) {
+        if ('input' === $this->node->nodeName) {
             $this->type = strtolower($this->node->getAttribute('type'));
             $optionValue = $this->buildOptionValue($this->node);
             $this->options[] = $optionValue;
@@ -286,7 +286,7 @@ class ChoiceFormField extends FormField
         }
 
         foreach ($options as $option) {
-            if ($option['value'] == $optionValue) {
+            if ($option['value'] === $optionValue) {
                 return true;
             }
         }

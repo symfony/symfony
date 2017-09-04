@@ -136,7 +136,7 @@ class DefaultTranslator implements TranslatorInterface
     {
         $ids = explode('|', $id);
 
-        if (1 == $number) {
+        if (1 === $number) {
             return strtr($ids[0], $parameters);
         }
 

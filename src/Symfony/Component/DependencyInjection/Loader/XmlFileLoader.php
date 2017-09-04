@@ -359,7 +359,7 @@ class XmlFileLoader extends FileLoader
                 $key = $arg->getAttribute('key');
 
                 // parameter keys are case insensitive
-                if ('parameter' == $name && $lowercase) {
+                if ('parameter' === $name && $lowercase) {
                     $key = strtolower($key);
                 }
             }
@@ -368,9 +368,9 @@ class XmlFileLoader extends FileLoader
                 case 'service':
                     $onInvalid = $arg->getAttribute('on-invalid');
                     $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-                    if ('ignore' == $onInvalid) {
+                    if ('ignore' === $onInvalid) {
                         $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-                    } elseif ('null' == $onInvalid) {
+                    } elseif ('null' === $onInvalid) {
                         $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                     }
 

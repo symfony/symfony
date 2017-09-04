@@ -1083,7 +1083,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             foreach ($definition->getMethodCalls() as $call) {
                 foreach ($call[1] as $argument) {
-                    if ($argument instanceof Reference && $id == (string) $argument) {
+                    if ($argument instanceof Reference && $id === (string) $argument) {
                         $this->callMethod($this->get($definitionId), $call);
                     }
                 }

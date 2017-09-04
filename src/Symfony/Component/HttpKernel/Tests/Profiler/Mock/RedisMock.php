@@ -32,7 +32,7 @@ class RedisMock
      */
     public function connect($host, $port = 6379, $timeout = 0)
     {
-        if ('127.0.0.1' == $host && 6379 == $port) {
+        if ('127.0.0.1' === $host && 6379 === $port) {
             $this->connected = true;
 
             return true;

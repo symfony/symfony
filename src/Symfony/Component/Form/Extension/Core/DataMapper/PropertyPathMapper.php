@@ -83,7 +83,7 @@ class PropertyPathMapper implements DataMapperInterface
             if (null !== $propertyPath && $config->getMapped() && $form->isSubmitted() && $form->isSynchronized() && !$form->isDisabled()) {
                 // If the field is of type DateTime and the data is the same skip the update to
                 // keep the original object hash
-                if ($form->getData() instanceof \DateTime && $form->getData() == $this->propertyAccessor->getValue($data, $propertyPath)) {
+                if ($form->getData() instanceof \DateTime && $form->getData() === $this->propertyAccessor->getValue($data, $propertyPath)) {
                     continue;
                 }
 

@@ -403,7 +403,7 @@ class Form extends Link implements \ArrayAccess
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            if ('input' == $this->button->nodeName && 'image' == strtolower($this->button->getAttribute('type'))) {
+            if ('input' === $this->button->nodeName && 'image' === strtolower($this->button->getAttribute('type'))) {
                 $name = $this->button->getAttribute('name');
                 $this->button->setAttribute('value', '0');
 
@@ -452,9 +452,9 @@ class Form extends Link implements \ArrayAccess
         }
 
         $nodeName = $node->nodeName;
-        if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
+        if ('select' === $nodeName || 'input' === $nodeName && 'checkbox' === strtolower($node->getAttribute('type'))) {
             $this->set(new Field\ChoiceFormField($node));
-        } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
+        } elseif ('input' === $nodeName && 'radio' === strtolower($node->getAttribute('type'))) {
             // there may be other fields with the same name that are no choice
             // fields already registered (see https://github.com/symfony/symfony/issues/11689)
             if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
@@ -462,11 +462,11 @@ class Form extends Link implements \ArrayAccess
             } else {
                 $this->set(new Field\ChoiceFormField($node));
             }
-        } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
+        } elseif ('input' === $nodeName && 'file' === strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $nodeName && !in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
+        } elseif ('input' === $nodeName && !in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
             $this->set(new Field\InputFormField($node));
-        } elseif ('textarea' == $nodeName) {
+        } elseif ('textarea' === $nodeName) {
             $this->set(new Field\TextareaFormField($node));
         }
     }

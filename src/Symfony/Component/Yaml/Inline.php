@@ -132,7 +132,7 @@ class Inline
                     $repr = (string) $value;
                     if (is_infinite($value)) {
                         $repr = str_ireplace('INF', '.Inf', $repr);
-                    } elseif (floor($value) == $value && $repr == $value) {
+                    } elseif (floor($value) === $value && $repr === $value) {
                         // Preserve float data type since storing a whole number will result in integer value.
                         $repr = '!!float '.$repr;
                     }
@@ -144,7 +144,7 @@ class Inline
                 }
 
                 return $repr;
-            case '' == $value:
+            case '' === $value:
                 return "''";
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
@@ -279,7 +279,7 @@ class Inline
         $output = substr($match[0], 1, strlen($match[0]) - 2);
 
         $unescaper = new Unescaper();
-        if ('"' == $scalar[$i]) {
+        if ('"' === $scalar[$i]) {
             $output = $unescaper->unescapeDoubleQuotedString($output);
         } else {
             $output = $unescaper->unescapeSingleQuotedString($output);
@@ -513,12 +513,12 @@ class Inline
                         $raw = $scalar;
                         $cast = (int) $scalar;
 
-                        return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                        return '0' === $scalar[0] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
                         $raw = $scalar;
                         $cast = (int) $scalar;
 
-                        return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
+                        return '0' === $scalar[1] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
                     case Parser::preg_match(self::getHexRegex(), $scalar):
                         return '0x' === $scalar[0].$scalar[1] ? hexdec($scalar) : (float) $scalar;

@@ -102,10 +102,10 @@ class LazyLoadingMetadataFactoryTest extends TestCase
               ->method('write')
               ->withConsecutive(
                   $this->callback(function ($metadata) use ($interfaceAConstraints) {
-                      return $interfaceAConstraints == $metadata->getConstraints();
+                      return $interfaceAConstraints === $metadata->getConstraints();
                   }),
                   $this->callback(function ($metadata) use ($parentClassConstraints) {
-                      return $parentClassConstraints == $metadata->getConstraints();
+                      return $parentClassConstraints === $metadata->getConstraints();
                   })
               );
 
@@ -139,7 +139,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
                   array(self::INTERFACE_A_CLASS)
               )
               ->willReturnCallback(function ($name) use ($metadata, $parentClass, $interfaceClass) {
-                  if ($parentClass == $name) {
+                  if ($parentClass === $name) {
                       return $metadata;
                   }
 

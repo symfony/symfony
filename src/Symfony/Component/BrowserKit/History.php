@@ -49,7 +49,7 @@ class History
      */
     public function isEmpty()
     {
-        return count($this->stack) == 0;
+        return count($this->stack) === 0;
     }
 
     /**
@@ -93,7 +93,7 @@ class History
      */
     public function current()
     {
-        if (-1 == $this->position) {
+        if (-1 === $this->position) {
             throw new \LogicException('The page history is empty.');
         }
 

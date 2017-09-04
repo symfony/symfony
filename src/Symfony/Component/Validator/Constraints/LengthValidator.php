@@ -86,7 +86,7 @@ class LengthValidator extends ConstraintValidator
 
         if (null !== $constraint->max && $length > $constraint->max) {
             if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+                $this->context->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ limit }}', $constraint->max)
                     ->setInvalidValue($value)
@@ -94,7 +94,7 @@ class LengthValidator extends ConstraintValidator
                     ->setCode(Length::TOO_LONG_ERROR)
                     ->addViolation();
             } else {
-                $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+                $this->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ limit }}', $constraint->max)
                     ->setInvalidValue($value)
@@ -108,7 +108,7 @@ class LengthValidator extends ConstraintValidator
 
         if (null !== $constraint->min && $length < $constraint->min) {
             if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+                $this->context->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ limit }}', $constraint->min)
                     ->setInvalidValue($value)
@@ -116,7 +116,7 @@ class LengthValidator extends ConstraintValidator
                     ->setCode(Length::TOO_SHORT_ERROR)
                     ->addViolation();
             } else {
-                $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+                $this->buildViolation($constraint->min === $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ limit }}', $constraint->min)
                     ->setInvalidValue($value)

@@ -259,10 +259,10 @@ class DialogHelper extends InputAwareHelper
         }
 
         if (false === $default) {
-            return $answer && 'y' == strtolower($answer[0]);
+            return $answer && 'y' === strtolower($answer[0]);
         }
 
-        return !$answer || 'y' == strtolower($answer[0]);
+        return !$answer || 'y' === strtolower($answer[0]);
     }
 
     /**

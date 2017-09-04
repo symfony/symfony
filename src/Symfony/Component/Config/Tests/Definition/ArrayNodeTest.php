@@ -216,4 +216,13 @@ class ArrayNodeTest extends TestCase
         $node = new ArrayNode('foo');
         $node->getDefaultValue();
     }
+
+    public function testSetDeprecated()
+    {
+        $node = new ArrayNode('foo');
+        $node->setDeprecated('"%node%" is deprecated');
+
+        $this->assertTrue($node->isDeprecated());
+        $this->assertSame('"foo" is deprecated', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+    }
 }

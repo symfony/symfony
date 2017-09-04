@@ -40,6 +40,15 @@ class ScalarNodeTest extends TestCase
         );
     }
 
+    public function testSetDeprecated()
+    {
+        $node = new ScalarNode('foo');
+        $node->setDeprecated('"%node%" is deprecated');
+
+        $this->assertTrue($node->isDeprecated());
+        $this->assertSame('"foo" is deprecated', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+    }
+
     /**
      * @dataProvider getInvalidValues
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException

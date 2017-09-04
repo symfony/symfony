@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-29T22:01:36Z
+
+Fail not related.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T13:51:25Z
+
+can you add a test with non-zero ms?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-08-31T14:06:25Z
+
+Mmh, non-zero ms cases are based on the ``formatSeconds()`` method which is already tested here: https://github.com/symfony/symfony/blob/89d85f3ea15c9ec29be374d77cd3f245fb8ec75a/src/Symfony/Component/VarDumper/Tests/Caster/DateCasterTest.php#L91-L96 Is it really usefull?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-04T07:47:05Z
+
+tests are red
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-09-04T17:06:19Z
+
+Fixed.

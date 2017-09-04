@@ -1711,12 +1711,12 @@ EOF;
             return '$this';
         }
 
-        if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
-            $code = 'null';
-        } elseif ($this->container->hasDefinition($id)) {
+        if ($this->container->hasDefinition($id)) {
             $definition = $this->container->getDefinition($id);
 
-            if ($this->isTrivialInstance($definition)) {
+            if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
+                $code = 'null';
+            } elseif ($this->isTrivialInstance($definition)) {
                 $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
                 if ($definition->isShared()) {
                     $code = sprintf('$this->services[\'%s\'] = %s', $id, $code);
@@ -1726,6 +1726,8 @@ EOF;
             } else {
                 $code = sprintf('$this->%s()', $this->generateMethodName($id));
             }
+        } elseif (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
+            return 'null';
         } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ScalarNodeTest extends TestCase
@@ -42,11 +43,33 @@ class ScalarNodeTest extends TestCase
 
     public function testSetDeprecated()
     {
-        $node = new ScalarNode('foo');
-        $node->setDeprecated('"%node%" is deprecated');
+        $childNode = new ScalarNode('foo');
+        $childNode->setDeprecated('"%node%" is deprecated');
 
-        $this->assertTrue($node->isDeprecated());
-        $this->assertSame('"foo" is deprecated', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+        $this->assertTrue($childNode->isDeprecated());
+        $this->assertSame('"foo" is deprecated', $childNode->getDeprecationMessage($childNode->getName(), $childNode->getPath()));
+
+        $node = new ArrayNode('root');
+        $node->addChild($childNode);
+
+        $deprecationTriggered = 0;
+        $deprecationHandler = function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
+            if (E_USER_DEPRECATED === $level) {
+                return ++$deprecationTriggered;
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
+        };
+
+        $prevErrorHandler = set_error_handler($deprecationHandler);
+        $node->finalize(array());
+        restore_error_handler();
+        $this->assertSame(0, $deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
+
+        $prevErrorHandler = set_error_handler($deprecationHandler);
+        $node->finalize(array('foo' => ''));
+        restore_error_handler();
+        $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
     /**

@@ -14,11 +14,12 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\PruneableInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface
+class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
 {
     const TAGS_PREFIX = "\0tags\0";
 
@@ -333,5 +334,17 @@ class TagAwareAdapter implements TagAwareAdapterInterface
         }
 
         return $tagVersions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        if ($this->itemsAdapter instanceof PruneableInterface) {
+            return $this->itemsAdapter->prune();
+        }
+
+        return false;
     }
 }

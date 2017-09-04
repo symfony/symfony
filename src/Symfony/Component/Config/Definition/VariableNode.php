@@ -84,10 +84,6 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function finalizeValue($value)
     {
-        if ($this->deprecationMessage) {
-            @trigger_error($this->getDeprecationMessage($this->getName(), $this->getPath()), E_USER_DEPRECATED);
-        }
-
         if (!$this->allowEmptyValue && $this->isValueEmpty($value)) {
             $ex = new InvalidConfigurationException(sprintf(
                 'The path "%s" cannot contain an empty value, but got %s.',

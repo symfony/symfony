@@ -34,7 +34,7 @@ class DateCaster
         ;
 
         $a = array();
-        $a[$prefix.'date'] = new ConstStub($d->format('Y-m-d H:i:'.self::formatSeconds($d->format('s'), $d->format('u')).($location ? ' e (P)' : ' P')), $title);
+        $a[$prefix.'date'] = new ConstStub(self::formatDateTime($d, $location ? ' e (P)' : ' P'), $title);
 
         $stub->class .= $d->format(' @U');
 
@@ -63,7 +63,7 @@ class DateCaster
             $format .= ($i->y ? '%yy ' : '').($i->m ? '%mm ' : '').($i->d ? '%dd ' : '');
         }
 
-        $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:'.self::formatSeconds($i->s, $i->f) : '';
+        $format .= $i->h || $i->i || $i->s || $i->f ? '%H:%I:'.self::formatSeconds($i->s, substr($i->f, 2)) : '';
         $format = '%R ' === $format ? '0s' : $format;
 
         return $i->format(rtrim($format));
@@ -93,21 +93,26 @@ class DateCaster
                     );
                     break;
                 }
-                $dates[] = sprintf('%s) %s', $i + 1, $d->format('Y-m-d H:i:s'));
+                $dates[] = sprintf('%s) %s', $i + 1, self::formatDateTime($d));
             }
         }
 
         $period = sprintf(
             'every %s, from %s (%s) %s',
             self::formatInterval($p->getDateInterval()),
-            $p->getStartDate()->format('Y-m-d H:i:s'),
+            self::formatDateTime($p->getStartDate()),
             $p->include_start_date ? 'included' : 'excluded',
-            ($end = $p->getEndDate()) ? 'to '.$end->format('Y-m-d H:i:s') : 'recurring '.$p->recurrences.' time/s'
+            ($end = $p->getEndDate()) ? 'to '.self::formatDateTime($end) : 'recurring '.$p->recurrences.' time/s'
         );
 
         $p = array(Caster::PREFIX_VIRTUAL.'period' => new ConstStub($period, implode("\n", $dates)));
 
         return $filter & Caster::EXCLUDE_VERBOSE ? $p : $p + $a;
+    }
+
+    private static function formatDateTime(\DateTimeInterface $d, $extra = '')
+    {
+        return $d->format('Y-m-d H:i:'.self::formatSeconds($d->format('s'), $d->format('u')).$extra);
     }
 
     private static function formatSeconds($s, $us)

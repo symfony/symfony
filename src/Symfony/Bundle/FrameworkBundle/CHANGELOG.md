@@ -46,6 +46,33 @@ CHANGELOG
  * Deprecated `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`, use 
    `Symfony\Component\Translation\Reader\TranslationReader` instead
  * Deprecated `translation.loader` service, use `translation.reader` instead
+ * `AssetsInstallCommand::__construct()` now takes an instance of
+   `Symfony\Component\Filesystem\Filesystem` as first argument
+ * `CacheClearCommand::__construct()` now takes an instance of
+   `Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface` as
+    first argument
+ * `CachePoolClearCommand::__construct()` now takes an instance of
+   `Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer` as
+    first argument
+ * `EventDispatcherDebugCommand::__construct()` now takes an instance of
+   `Symfony\Component\EventDispatcher\EventDispatcherInterface` as
+    first argument
+ * `RouterDebugCommand::__construct()` now takes an instance of
+   `Symfony\Component\Routing\RouterInteface` as
+    first argument
+ * `RouterMatchCommand::__construct()` now takes an instance of
+   `Symfony\Component\Routing\RouterInteface` as
+    first argument
+ * `TranslationDebugCommand::__construct()` now takes an instance of
+   `Symfony\Component\Translation\TranslatorInterface` as
+    first argument
+ * `TranslationUpdateCommand::__construct()` now takes an instance of
+   `Symfony\Component\Translation\TranslatorInterface` as
+    first argument
+ * `AssetsInstallCommand`, `CacheClearCommand`, `CachePoolClearCommand`,
+   `EventDispatcherDebugCommand`, `RouterDebugCommand`, `RouterMatchCommand`,
+   `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
+    and `YamlLintCommand` classes have been marked as final
 
 3.3.0
 -----

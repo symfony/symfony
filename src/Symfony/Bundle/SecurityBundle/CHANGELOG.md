@@ -17,6 +17,11 @@ CHANGELOG
    `VoterInterface` on the class is now deprecated and will be removed in 4.0.
  * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
  * added info about called security listeners in profiler 
+ * `InitAclCommand::__construct()` now takes an instance of
+   `Doctrine\DBAL\Connection`  as first argument
+ * `SetAclCommand::__construct()` now takes an instance of
+   `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
+   as first argument
 
 3.3.0
 -----

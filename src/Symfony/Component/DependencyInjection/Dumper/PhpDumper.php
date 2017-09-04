@@ -485,7 +485,7 @@ EOF;
      */
     private function isTrivialInstance(Definition $definition)
     {
-        if ($definition->isPublic() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
+        if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
             return false;
         }
         if ($definition->isDeprecated() || $definition->isLazy() || $definition->getFactory() || 3 < count($definition->getArguments())) {
@@ -1623,7 +1623,9 @@ EOF;
                 $code = 'null';
             } elseif ($this->isTrivialInstance($definition)) {
                 $code = substr($this->addNewInstance($definition, '', '', $id), 8, -2);
-                $code = sprintf('($this->privates[\'%s\'] = %s)', $id, $code);
+                if ($definition->isShared()) {
+                    $code = sprintf('$this->%s[\'%s\'] = %s', $definition->isPublic() ? 'services' : 'privates', $id, $code);
+                }
             } elseif ($this->asFiles && $definition->isShared()) {
                 $code = sprintf("\$this->load(__DIR__.'/%s.php')", $this->generateMethodName($id));
             } else {
@@ -1632,15 +1634,19 @@ EOF;
             if ($definition->isShared()) {
                 $code = sprintf('($this->%s[\'%s\'] ?? %s)', $definition->isPublic() ? 'services' : 'privates', $id, $code);
             }
-        } elseif (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
-            $code = 'null';
-        } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+
+            return $code;
+        }
+        if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
+            return 'null';
+        }
+        if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
             $code = sprintf('$this->get(\'%s\')', $id);
         }
 
-        return $code;
+        return sprintf('($this->services[\'%s\'] ?? %s)', $id, $code);
     }
 
     /**

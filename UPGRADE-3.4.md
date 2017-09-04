@@ -120,7 +120,52 @@ FrameworkBundle
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Translation\Reader\TranslationReader` class instead.
    
- * The `translation.loader` service has been deprecated and will be removed in 4.0. Use the `translation.reader` service instead.
+ * The `translation.loader` service has been deprecated and will be removed in 4.0.
+   Use the `translation.reader` service instead..
+
+ * `AssetsInstallCommand::__construct()` now takes an instance of
+   `Symfony\Component\Filesystem\Filesystem` as first argument.
+   Not passing it is deprecated and will throw a `TypeError` in 4.0.
+
+ * `CacheClearCommand::__construct()` now takes an instance of
+   `Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `CachePoolClearCommand::__construct()` now takes an instance of
+   `Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `EventDispatcherDebugCommand::__construct()` now takes an instance of
+   `Symfony\Component\EventDispatcher\EventDispatcherInterface` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `RouterDebugCommand::__construct()` now takes an instance of
+   `Symfony\Component\Routing\RouterInteface` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `RouterMatchCommand::__construct()` now takes an instance of
+   `Symfony\Component\Routing\RouterInteface` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `TranslationDebugCommand::__construct()` now takes an instance of
+   `Symfony\Component\Translation\TranslatorInterface` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `TranslationUpdateCommand::__construct()` now takes an instance of
+   `Symfony\Component\Translation\TranslatorInterface` as
+    first argument. Not passing it is deprecated and will throw
+    a `TypeError` in 4.0.
+
+ * `AssetsInstallCommand`, `CacheClearCommand`, `CachePoolClearCommand`,
+   `EventDispatcherDebugCommand`, `RouterDebugCommand`, `RouterMatchCommand`,
+   `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
+    and `YamlLintCommand` classes have been marked as final
 
 HttpKernel
 ----------
@@ -169,6 +214,15 @@ SecurityBundle
    the `AccessDecisionManager` and this functionality will be removed in 4.0.
 
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
+
+ * `InitAclCommand::__construct()` now takes an instance of
+   `Doctrine\DBAL\Connection`  as first argument. Not passing it is
+    deprecated and will throw a `TypeError` in 4.0.
+
+ * `SetAclCommand::__construct()` now takes an instance of
+   `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
+    as first argument. Not passing it is deprecated and will throw a `TypeError`
+    in 4.0.
 
 Translation
 -----------

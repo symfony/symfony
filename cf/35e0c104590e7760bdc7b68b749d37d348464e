@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-09-04T11:15:08Z
+
+if we ensure that the protected factory method is still generated for them, yes, the initialization can be inlined IMO. We cannot remove the protected method though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-04T11:19:24Z
+
+Same to me - so yes, the methods are generated (they were in the fixtures already.)

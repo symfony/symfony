@@ -8,11 +8,11 @@
         <defaults public="false" />
 
         <!-- ResolvedFormTypeFactory -->
-        <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" public="true" />
+        <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" />
         <service id="Symfony\Component\Form\ResolvedFormTypeFactoryInterface" alias="form.resolved_type_factory" />
 
         <!-- FormRegistry -->
-        <service id="form.registry" class="Symfony\Component\Form\FormRegistry" public="true">
+        <service id="form.registry" class="Symfony\Component\Form\FormRegistry">
             <argument type="collection">
                 <!--
                 We don't need to be able to add more extensions.
@@ -191,17 +191,8 @@
             <argument type="string">%validator.translation_domain%</argument>
         </service>
 
-        <service id="deprecated.form.registry" class="stdClass" public="true">
-            <property name="registry" type="collection">
-                <property type="service" id="form.type_guesser.validator" />
-                <property type="service" id="form.type.choice" />
-                <property type="service" id="form.type.form" />
-                <property type="service" id="form.type_extension.form.http_foundation" />
-                <property type="service" id="form.type_extension.form.validator" />
-                <property type="service" id="form.type_extension.repeated.validator" />
-                <property type="service" id="form.type_extension.submit.validator" />
-                <property type="service" id="form.type_extension.upload.validator" />
-            </property>
+        <service id="deprecated.form.registry" class="stdClass">
+            <property name="registry" type="collection" />
             <deprecated>The service "%service_id%" is internal and deprecated since Symfony 3.3 and will be removed in Symfony 4.0</deprecated>
         </service>
     </services>

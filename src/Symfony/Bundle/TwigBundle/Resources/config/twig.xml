@@ -63,7 +63,7 @@
             <argument type="service" id="debug.stopwatch" on-invalid="null" />
         </service>
 
-        <service id="twig.profile" class="Twig\Profiler\Profile" public="true" />
+        <service id="twig.profile" class="Twig\Profiler\Profile" />
 
         <service id="data_collector.twig" class="Symfony\Bridge\Twig\DataCollector\TwigDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="257" />
@@ -100,7 +100,7 @@
 
         <service id="twig.extension.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelExtension" />
 
-        <service id="twig.runtime.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelRuntime" public="true">
+        <service id="twig.runtime.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelRuntime">
             <argument type="service" id="fragment.handler" />
             <tag name="twig.runtime" />
         </service>
@@ -112,16 +112,16 @@
 
         <service id="twig.extension.debug" class="Twig\Extension\DebugExtension" />
 
-        <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor" public="true">
+        <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
             <argument type="service" id="twig" />
             <tag name="translation.extractor" alias="twig" />
         </service>
 
-        <service id="workflow.twig_extension" class="Symfony\Bridge\Twig\Extension\WorkflowExtension" public="true">
+        <service id="workflow.twig_extension" class="Symfony\Bridge\Twig\Extension\WorkflowExtension">
             <argument type="service" id="workflow.registry" />
         </service>
 
-        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener" public="true">
+        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>

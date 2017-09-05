@@ -1,6 +1,9 @@
 imports:
     - { resource: ./../config/framework.yml }
 
+services:
+    test.security.acl.provider: '@security.acl.provider'
+
 doctrine:
     dbal:
         driver:   pdo_sqlite

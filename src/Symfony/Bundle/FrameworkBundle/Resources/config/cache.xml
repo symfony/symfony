@@ -27,7 +27,7 @@
             <tag name="cache.pool" />
         </service>
 
-        <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true" public="true">
+        <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
             <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
@@ -38,7 +38,7 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true" public="true">
+        <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
@@ -49,7 +49,7 @@
             </call>
         </service>
 
-        <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true" public="true">
+        <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
             <tag name="cache.pool" provider="cache.default_doctrine_provider" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Doctrine provider service -->
@@ -60,7 +60,7 @@
             </call>
         </service>
 
-        <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true" public="true">
+        <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
@@ -71,14 +71,14 @@
             </call>
         </service>
 
-        <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true" public="true">
+        <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
             <tag name="cache.pool" provider="cache.default_psr6_provider" clearer="cache.default_clearer" />
             <argument /> <!-- PSR-6 provider service -->
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
         </service>
 
-        <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true" public="true">
+        <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true">
             <tag name="cache.pool" provider="cache.default_redis_provider" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Redis connection service -->
@@ -89,7 +89,7 @@
             </call>
         </service>
 
-        <service id="cache.adapter.memcached" class="Symfony\Component\Cache\Adapter\MemcachedAdapter" abstract="true" public="true">
+        <service id="cache.adapter.memcached" class="Symfony\Component\Cache\Adapter\MemcachedAdapter" abstract="true">
             <tag name="cache.pool" provider="cache.default_memcached_provider" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Memcached connection service -->
@@ -100,7 +100,7 @@
             </call>
         </service>
 
-        <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" public="true">
+        <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
             <tag name="kernel.cache_clearer" />
         </service>
 

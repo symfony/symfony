@@ -1040,11 +1040,17 @@ EOF;
      */
     private function addPrivateServices()
     {
-        if (!$definitions = $this->container->getDefinitions()) {
-            return '';
+        $code = '';
+
+        $aliases = $this->container->getAliases();
+        ksort($aliases);
+        foreach ($aliases as $id => $alias) {
+            if ($alias->isPrivate()) {
+                $code .= '            '.$this->export($id)." => true,\n";
+            }
         }
 
-        $code = '';
+        $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if (!$definition->isPublic()) {

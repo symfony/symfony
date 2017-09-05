@@ -67,7 +67,7 @@ class SetAclCommandTest extends WebTestCase
         $permissionMap = new BasicPermissionMap();
 
         /** @var \Symfony\Component\Security\Acl\Model\AclProviderInterface $aclProvider */
-        $aclProvider = $application->getKernel()->getContainer()->get('security.acl.provider');
+        $aclProvider = $application->getKernel()->getContainer()->get('test.security.acl.provider');
         $acl = $aclProvider->findAcl($objectIdentity, array($securityIdentity1));
 
         $this->assertTrue($acl->isGranted($permissionMap->getMasks($grantedPermission1, null), array($securityIdentity1)));
@@ -95,7 +95,7 @@ class SetAclCommandTest extends WebTestCase
         $role = 'ROLE_ADMIN';
 
         $application = $this->getApplication();
-        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('security.acl.provider')));
+        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('test.security.acl.provider')));
 
         $setAclCommand = $application->find('acl:set');
         $setAclCommandTester = new CommandTester($setAclCommand);
@@ -111,7 +111,7 @@ class SetAclCommandTest extends WebTestCase
         $permissionMap = new BasicPermissionMap();
 
         /** @var \Symfony\Component\Security\Acl\Model\AclProviderInterface $aclProvider */
-        $aclProvider = $application->getKernel()->getContainer()->get('security.acl.provider');
+        $aclProvider = $application->getKernel()->getContainer()->get('test.security.acl.provider');
         $acl = $aclProvider->findAcl($objectIdentity, array($roleSecurityIdentity, $userSecurityIdentity));
 
         $this->assertTrue($acl->isGranted($permissionMap->getMasks($grantedPermission, null), array($roleSecurityIdentity)));
@@ -137,7 +137,7 @@ class SetAclCommandTest extends WebTestCase
         $role = 'ROLE_USER';
 
         $application = $this->getApplication();
-        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('security.acl.provider')));
+        $application->add(new SetAclCommand($application->getKernel()->getContainer()->get('test.security.acl.provider')));
 
         $setAclCommand = $application->find('acl:set');
         $setAclCommandTester = new CommandTester($setAclCommand);
@@ -154,7 +154,7 @@ class SetAclCommandTest extends WebTestCase
         $permissionMap = new BasicPermissionMap();
 
         /** @var \Symfony\Component\Security\Acl\Model\AclProviderInterface $aclProvider */
-        $aclProvider = $application->getKernel()->getContainer()->get('security.acl.provider');
+        $aclProvider = $application->getKernel()->getContainer()->get('test.security.acl.provider');
 
         $acl1 = $aclProvider->findAcl($objectIdentity1, array($roleSecurityIdentity));
         $this->assertTrue($acl1->isGranted($permissionMap->getMasks($grantedPermission, null), array($roleSecurityIdentity)));

@@ -49,6 +49,7 @@ class DecoratorServicePass implements CompilerPassInterface
             if ($container->hasAlias($inner)) {
                 $alias = $container->getAlias($inner);
                 $public = $alias->isPublic();
+                $private = $alias->isPrivate();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
             } else {
                 $decoratedDefinition = $container->getDefinition($inner);
@@ -57,6 +58,7 @@ class DecoratorServicePass implements CompilerPassInterface
                     $definition->setAutowiringTypes($types);
                 }
                 $public = $decoratedDefinition->isPublic();
+                $private = $decoratedDefinition->isPrivate();
                 $decoratedDefinition->setPublic(false);
                 $decoratedDefinition->setTags(array());
                 if ($decoratedDefinition->getAutowiringTypes(false)) {
@@ -65,7 +67,7 @@ class DecoratorServicePass implements CompilerPassInterface
                 $container->setDefinition($renamedId, $decoratedDefinition);
             }
 
-            $container->setAlias($inner, new Alias($id, $public));
+            $container->setAlias($inner, $id)->setPublic($public && !$private)->setPrivate($private);
         }
     }
 }

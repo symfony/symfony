@@ -35,6 +35,9 @@ class DebugExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
+        $container->getDefinition('debug.dump_listener')->setPrivate(true);
+        $container->getDefinition('var_dumper.cli_dumper')->setPrivate(true);
+
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems', array($config['max_items']))
             ->addMethodCall('setMinDepth', array($config['min_depth']))

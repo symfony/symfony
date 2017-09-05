@@ -12,7 +12,7 @@
             <call method="setKernel"><argument type="service" id="kernel" on-invalid="ignore" /></call>
         </service>
 
-        <service id="data_collector.request" class="Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector" public="true">
+        <service id="data_collector.request" class="Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector">
             <tag name="kernel.event_subscriber" />
             <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="335" />
         </service>
@@ -47,7 +47,7 @@
             <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="325" />
         </service>
 
-        <service id="data_collector.router" class="Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector" public="true">
+        <service id="data_collector.router" class="Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector">
             <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
             <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="285" />
         </service>

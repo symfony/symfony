@@ -7,12 +7,12 @@
     <services>
         <defaults public="false" />
 
-        <service id="templating.helper.logout_url" class="Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper" public="true">
+        <service id="templating.helper.logout_url" class="Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper">
             <tag name="templating.helper" alias="logout_url" />
             <argument type="service" id="security.logout_url_generator" />
         </service>
 
-        <service id="templating.helper.security" class="Symfony\Bundle\SecurityBundle\Templating\Helper\SecurityHelper" public="true">
+        <service id="templating.helper.security" class="Symfony\Bundle\SecurityBundle\Templating\Helper\SecurityHelper">
             <tag name="templating.helper" alias="security" />
             <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
         </service>

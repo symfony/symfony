@@ -7,7 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="property_info" class="Symfony\Component\PropertyInfo\PropertyInfoExtractor" public="true">
+        <service id="property_info" class="Symfony\Component\PropertyInfo\PropertyInfoExtractor">
             <argument type="collection" />
             <argument type="collection" />
             <argument type="collection" />

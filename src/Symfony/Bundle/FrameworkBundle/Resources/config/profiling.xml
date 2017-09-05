@@ -17,7 +17,7 @@
             <argument>%profiler.storage.dsn%</argument>
         </service>
 
-        <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener" public="true">
+        <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="profiler" />
             <argument type="service" id="request_stack" />

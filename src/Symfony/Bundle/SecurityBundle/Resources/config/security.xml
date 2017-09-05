@@ -51,7 +51,7 @@
             <argument type="collection" />
         </service>
 
-        <service id="security.encoder_factory" alias="security.encoder_factory.generic" public="true" />
+        <service id="security.encoder_factory" alias="security.encoder_factory.generic" />
         <service id="Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface" alias="security.encoder_factory" />
 
         <service id="security.user_password_encoder.generic" class="Symfony\Component\Security\Core\Encoder\UserPasswordEncoder">
@@ -105,7 +105,7 @@
 
 
         <!-- Firewall related services -->
-        <service id="security.firewall" class="Symfony\Bundle\SecurityBundle\EventListener\FirewallListener" public="true">
+        <service id="security.firewall" class="Symfony\Bundle\SecurityBundle\EventListener\FirewallListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
@@ -118,7 +118,7 @@
             <argument /> <!-- Request matchers -->
         </service>
 
-        <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true" public="true">
+        <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
             <argument />  <!-- FirewallConfig -->
@@ -169,7 +169,7 @@
 
 
         <!-- Validator -->
-        <service id="security.validator.user_password" class="Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator" public="true">
+        <service id="security.validator.user_password" class="Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator">
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />

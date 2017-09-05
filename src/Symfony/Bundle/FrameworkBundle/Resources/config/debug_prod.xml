@@ -11,7 +11,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="debug.debug_handlers_listener" class="Symfony\Component\HttpKernel\EventListener\DebugHandlersListener" public="true">
+        <service id="debug.debug_handlers_listener" class="Symfony\Component\HttpKernel\EventListener\DebugHandlersListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="php" />
             <argument>null</argument><!-- Exception handler -->

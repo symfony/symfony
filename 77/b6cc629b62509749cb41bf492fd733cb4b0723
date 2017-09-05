@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-01T16:26:33Z
+
+I have another outputs for this list, which do you prefer?
+ * **(A)**: `@namespace: path` (it looks more like how one use it `@`) (current PR)
+ * **(B)**: `path: namespace` (it looks more like how one define it in `twig.paths` configuration, `yaml`'s style)
+ * **(C)**: `path: @namespace` (it looks like both A & B together)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-01T16:31:17Z
+
+For the record, I prefer the current version (A).
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-01T17:24:26Z
+
+Outputting namespace first looks better to me (so A), as what is important is the different paths related to a given namespace. Paths used for separate namespaces are irrelevant regarding their order
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-01T19:28:30Z
+
+Updated screenshot in description with the latest changes.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-01T19:58:02Z
+
+I find using `*` before each path and TableSeparator between each namespace really cluttering. :/
+
+Which of the following outputs would you prefer?
+
+1) <details><summary>Asterisk bullets, with separator (current)</summary><img width="689" alt="screenshot 2017-09-01 a 21 46 11" src="https://user-images.githubusercontent.com/2211145/29985437-5d3e366a-8f5f-11e7-94b1-62c8d319fd97.PNG"></details>
+
+2) <details><summary>No bullet, with separator </summary><img width="681" alt="screenshot 2017-09-01 a 21 46 31" src="https://user-images.githubusercontent.com/2211145/29985438-5d415994-8f5f-11e7-8a31-87eb57b4275f.PNG"></details>
+
+3) <details><summary>Asterisk bullets, no separator </summary><img width="693" alt="screenshot 2017-09-01 a 21 46 52" src="https://user-images.githubusercontent.com/2211145/29985439-5d41f386-8f5f-11e7-9fa7-0a655da20d26.PNG"></details>
+
+4) <details><summary>Dash bullets, no separator </summary><img width="692" alt="screenshot 2017-09-01 a 21 47 07" src="https://user-images.githubusercontent.com/2211145/29985440-5d428076-8f5f-11e7-9ca1-b76b05e0a2d2.PNG"></details>
+
+5) <details><summary>No bullet, no separator </summary><img width="683" alt="screenshot 2017-09-01 a 21 47 32" src="https://user-images.githubusercontent.com/2211145/29985441-5d4477a0-8f5f-11e7-8d79-ddde9f78eb9d.PNG"></details>
+
+6) <details><summary>Dash bullets with blank separator (as proposed below)</summary><img width="683" alt="screenshot 2017-09-01 a 21 47 32" src="https://user-images.githubusercontent.com/2211145/29986237-d2a00836-8f62-11e7-8207-a868a5f38797.PNG"></details>
+
+7) <details><summary>Dash bullets with blank separator only if needed (as proposed below)</summary><img width="697" alt="screenshot 2017-09-01 a 22 42 54" src="https://user-images.githubusercontent.com/2211145/29987129-ed06da7a-8f66-11e7-83cb-72c793470c7a.PNG"></details>
+
+My own vote would go to 4 or 5 (but 7's not bad, that's true 😄).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-01T20:09:05Z
+
+<del>and  6 :) (Dash bullets with blank separator)</del> as proposed above :)
+
+ 7. Dash bullets with blank separator only if needed.
+![7](https://user-images.githubusercontent.com/2028198/29986784-ee5a4094-8f32-11e7-86c8-c78183630221.png)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-01T20:18:45Z
+
+The problem I see with no row separator is that there is no grouping view per namespace, so one could get confused (missing namespace :confused:)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-01T20:34:20Z
+
+My vote is for 7.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T20:58:34Z
+
+What about a `--layout=[1-7]` option :) And definitely support for layout=random :joy:
+
+7 is nice, agree with @yceruto; you getter a better view of path inheritance per namespace.
+
+Tend to prefer `(Main) / (Root)` over `(None)` and have it on top.
+
+edit: on 2nd thought (None) is fine :)

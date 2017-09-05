@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T16:44:51Z
+
+have some patience :) done.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T16:46:23Z
+
+Deprecation can be done in 3.4, let me know if you want a PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-01T17:28:41Z
+
+I suggest deprecating EnvParametersResource in 3.4, in favor of env placeholders. The implementation of this resource is tied to the old logic reading magic env variables. It is not a generic resource for env variable usage anyway, so using it in other contexts that HttpKernel would be weird.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-01T17:56:48Z
+
+Basically it's a resource to verify freshness of any env var, tied to a prefix. i think it fits config component, it's generic enough for that imo, but im not sure it be useful to anyone =/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T14:51:00Z
+
+#24068 is now merged up to master, can you rebase and remove the deprecated class meanwhile please?

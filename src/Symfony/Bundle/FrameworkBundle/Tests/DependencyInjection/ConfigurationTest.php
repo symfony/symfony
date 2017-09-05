@@ -331,7 +331,10 @@ class ConfigurationTest extends TestCase
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
             ),
-            'workflows' => array(),
+            'workflows' => array(
+                'enabled' => false,
+                'workflows' => array(),
+            ),
             'php_errors' => array(
                 'log' => true,
                 'throw' => true,

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Bukashk0zzz at 2017-08-25T06:32:56Z
+
+There are needed any work on this PR from me?
+I saw that tests failed in 3.4 with php 7.1 already.
+Haven't any idea why 'Class 'Memcached' not found' in AppVeyor tests
+
+---------------------------------------------------------------------------
+
+by Bukashk0zzz at 2017-08-25T08:23:35Z
+
+@nicolas-grekas fixed.
+
+---------------------------------------------------------------------------
+
+by Bukashk0zzz at 2017-08-27T09:27:17Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by Bukashk0zzz at 2017-09-05T06:18:27Z
+
+@nicolas-grekas Fixed. Also updated tests for this case.

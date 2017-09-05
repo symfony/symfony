@@ -106,7 +106,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
-        $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new FragmentRendererPass());
         $this->addCompilerPassIfExists($container, SerializerPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
         $container->addCompilerPass(new DataCollectorTranslatorPass());

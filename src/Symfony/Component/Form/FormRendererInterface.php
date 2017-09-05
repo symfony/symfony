@@ -76,7 +76,7 @@ interface FormRendererInterface
      * Check the token in your action using the same token ID.
      *
      * <code>
-     * $csrfProvider = $this->get('security.csrf.token_generator');
+     * // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
      * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *     throw new \RuntimeException('CSRF attack detected.');
      * }

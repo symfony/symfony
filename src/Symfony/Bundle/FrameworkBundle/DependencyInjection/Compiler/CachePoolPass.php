@@ -37,6 +37,8 @@ class CachePoolPass implements CompilerPassInterface
         }
         $seed .= '.'.$container->getParameter('kernel.name').'.'.$container->getParameter('kernel.environment');
 
+        $pools = array();
+        $clearers = array();
         $attributes = array(
             'provider',
             'namespace',
@@ -47,10 +49,8 @@ class CachePoolPass implements CompilerPassInterface
             if ($pool->isAbstract()) {
                 continue;
             }
-            $isLazy = $pool->isLazy();
             while ($adapter instanceof ChildDefinition) {
                 $adapter = $container->findDefinition($adapter->getParent());
-                $isLazy = $isLazy || $adapter->isLazy();
                 if ($t = $adapter->getTag('cache.pool')) {
                     $tags[0] += $t[0];
                 }
@@ -82,17 +82,29 @@ class CachePoolPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "clearer", "provider", "namespace" and "default_lifetime", found "%s".', $id, implode('", "', array_keys($tags[0]))));
             }
 
-            $attr = array();
             if (null !== $clearer) {
-                $attr['clearer'] = $clearer;
+                $clearers[$clearer][$id] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
             }
-            if (!$isLazy) {
-                $pool->setLazy(true);
-                $attr['unlazy'] = true;
+
+            $pools[$id] = new Reference($id, $container::IGNORE_ON_UNINITIALIZED_REFERENCE);
+        }
+
+        $clearer = 'cache.global_clearer';
+        while ($container->hasAlias($clearer)) {
+            $clearer = (string) $container->getAlias($clearer);
+        }
+        if ($container->hasDefinition($clearer)) {
+            $clearers['cache.global_clearer'] = $pools;
+        }
+
+        foreach ($clearers as $id => $pools) {
+            $clearer = $container->getDefinition($id);
+            if ($clearer instanceof ChilDefinition) {
+                $clearer->replaceArgument(0, $pools);
+            } else {
+                $clearer->setArgument(0, $pools);
             }
-            if ($attr) {
-                $pool->addTag('cache.pool', $attr);
-            }
+            $clearer->addTag('cache.pool.clearer');
         }
     }
 

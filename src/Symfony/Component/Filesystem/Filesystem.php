@@ -532,6 +532,16 @@ class Filesystem
         $dir = dirname($filename);
 
         if (!is_dir($dir)) {
+            $oldCwd = getcwd();
+
+            if (!@chdir(dirname($dir))) {
+                // When the parent directory misses the executable permission bit, we are unable to enter it and thus
+                // cannot check if the target directory exists.
+                throw new IOException(sprintf('Unable to detect if the target directory "%s" exists.', $dir));
+            }
+
+            chdir($oldCwd);
+
             $this->mkdir($dir);
         }
 

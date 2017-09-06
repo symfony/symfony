@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-06T11:04:16Z
+
+Maybe It should be done on 3.X only? (because of PHP 5.3)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-06T11:26:43Z
+
+Travis is planning to drop precise this winter - so we'll have to do that update anyway.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-06T12:35:00Z
+
+:+1:

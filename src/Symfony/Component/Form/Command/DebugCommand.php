@@ -51,6 +51,16 @@ class DebugCommand extends Command
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
             ))
             ->setDescription('Displays form type information')
+            ->setHelp(<<<'EOF'
+The <info>%command.name%</info> command displays information about a form type.
+
+Either the fully-qualified class name or the short class name can be used:
+
+  <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
+  <info>php %command.full_name% ChoiceType</info>
+
+EOF
+            )
         ;
     }
 

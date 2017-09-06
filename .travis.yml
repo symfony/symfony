@@ -1,6 +1,6 @@
 language: php
 
-dist: precise
+dist: trusty
 sudo: false
 
 git:
@@ -20,10 +20,8 @@ env:
 
 matrix:
     include:
-        # Use the newer stack for HHVM as HHVM does not support Precise anymore since a long time and so Precise has an outdated version
         - php: hhvm-3.18
           sudo: required
-          dist: trusty
           group: edge
         - php: 5.5
         - php: 5.6
@@ -104,7 +102,6 @@ before_install:
       echo opcache.enable_cli = 1 >> $INI
       echo hhvm.jit = 0 >> $INI
       echo apc.enable_cli = 1 >> $INI
-      echo extension = ldap.so >> $INI
       echo extension = redis.so >> $INI
       echo extension = memcached.so >> $INI
       [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI

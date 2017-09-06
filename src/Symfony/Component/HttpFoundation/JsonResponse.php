@@ -145,21 +145,22 @@ class JsonResponse extends Response
             // If only PHP did the same...
             $data = json_encode($data, $this->encodingOptions);
         } else {
-            try {
-                if (!interface_exists('JsonSerializable', false)) {
-                    set_error_handler(function () { return false; });
+            if (!interface_exists('JsonSerializable', false)) {
+                set_error_handler(function () { return false; });
+                try {
                     $data = @json_encode($data, $this->encodingOptions);
-                    restore_error_handler();
-                } else {
-                    $data = json_encode($data, $this->encodingOptions);
-                }
-            } catch (\Exception $e) {
-                if (!interface_exists('JsonSerializable', false)) {
+                } finally {
                      restore_error_handler();
-                } elseif ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
-                    throw $e->getPrevious() ?: $e;
                 }
-                throw $e;
+            } else {
+                try {
+                    $data = json_encode($data, $this->encodingOptions);
+                } catch (\Exception $e) {
+                    if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                        throw $e->getPrevious() ?: $e;
+                    }
+                    throw $e;
+                }
             }
         }
 

@@ -128,6 +128,11 @@ before_install:
 
     - |
       # Install extra PHP extensions
+      if [[ ! $skip && $PHP = 7.0 ]]; then
+          wget https://github.com/symfony/binary-utils/releases/download/v0.1/ldap-php70.tar.bz2
+          tar -xjf ldap-php70.tar.bz2
+          echo extension = $(pwd)/ldap.so >> $INI
+      fi
       if [[ ! $skip && $PHP = 5.* ]]; then
           ([[ $deps ]] || tfold ext.symfony_debug 'cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> '"$INI") &&
           tfold ext.apcu4 'echo yes | pecl install -f apcu-4.0.11'

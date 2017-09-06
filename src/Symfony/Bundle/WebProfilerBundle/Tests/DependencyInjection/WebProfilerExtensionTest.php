@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -52,7 +52,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
         $this->container = new ContainerBuilder();
-        $this->container->register('event_dispatcher', ContainerAwareEventDispatcher::class)->addArgument(new Reference('service_container'));
+        $this->container->register('event_dispatcher', EventDispatcher::class);
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));
         $this->container->register('twig', 'Twig\Environment');
         $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument(array());

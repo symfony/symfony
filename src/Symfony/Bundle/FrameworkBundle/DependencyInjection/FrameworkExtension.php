@@ -469,13 +469,13 @@ class FrameworkExtension extends Extension
     /**
      * Loads the workflow configuration.
      *
-     * @param array            $workflows A workflow configuration array
+     * @param array            $config    A workflow configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerWorkflowConfiguration(array $workflows, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$workflows) {
+        if (!$config['enabled']) {
             if (!class_exists(Workflow\Workflow::class)) {
                 $container->removeDefinition(WorkflowDumpCommand::class);
             }
@@ -491,7 +491,7 @@ class FrameworkExtension extends Extension
 
         $registryDefinition = $container->getDefinition('workflow.registry');
 
-        foreach ($workflows as $name => $workflow) {
+        foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
 
             $transitions = array();
@@ -532,15 +532,15 @@ class FrameworkExtension extends Extension
             }
 
             // Create Workflow
+            $workflowId = sprintf('%s.%s', $type, $name);
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
-            $workflowDefinition->replaceArgument(0, $definitionDefinition);
+            $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
             if (isset($markingStoreDefinition)) {
                 $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             }
             $workflowDefinition->replaceArgument(3, $name);
 
             // Store to container
-            $workflowId = sprintf('%s.%s', $type, $name);
             $container->setDefinition($workflowId, $workflowDefinition);
             $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
 
@@ -615,7 +615,7 @@ class FrameworkExtension extends Extension
 
         if (class_exists(Stopwatch::class)) {
             $container->register('debug.stopwatch', Stopwatch::class)->addArgument(true);
-            $container->setAlias(Stopwatch::class, 'debug.stopwatch');
+            $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
 
         $debug = $container->getParameter('kernel.debug');

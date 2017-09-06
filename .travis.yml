@@ -1,6 +1,6 @@
 language: php
 
-dist: precise
+dist: trusty
 sudo: false
 
 git:
@@ -93,7 +93,6 @@ before_install:
       echo session.gc_probability = 0 >> $INI
       echo opcache.enable_cli = 1 >> $INI
       echo apc.enable_cli = 1 >> $INI
-      echo extension = ldap.so >> $INI
       echo extension = redis.so >> $INI
       echo extension = memcached.so >> $INI
       echo extension = mongodb.so >> $INI
@@ -174,10 +173,7 @@ install:
           elif [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then
-              echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'" &&
-              # Test the PhpUnit bridge on PHP 5.3, using the original phpunit script
-              tfold src/Symfony/Bridge/PhpUnit \
-              "cd src/Symfony/Bridge/PhpUnit && wget https://phar.phpunit.de/phpunit-4.8.phar && phpenv global 5.3 && composer update --no-progress --ansi && php phpunit-4.8.phar"
+              echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'"
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold tty-group $PHPUNIT --group tty

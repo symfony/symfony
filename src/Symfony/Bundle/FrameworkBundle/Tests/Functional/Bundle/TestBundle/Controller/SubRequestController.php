@@ -21,10 +21,8 @@ class SubRequestController implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    public function indexAction()
+    public function indexAction($handler)
     {
-        $handler = $this->container->get('fragment.handler');
-
         $errorUrl = $this->generateUrl('subrequest_fragment_error', array('_locale' => 'fr', '_format' => 'json'));
         $altUrl = $this->generateUrl('subrequest_fragment', array('_locale' => 'fr', '_format' => 'json'));
 

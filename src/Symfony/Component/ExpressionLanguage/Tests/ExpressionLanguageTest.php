@@ -202,6 +202,16 @@ class ExpressionLanguageTest extends TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessageRegExp  /Unable to call method "\w+" of object "\w+"./
+     */
+    public function testCallBadCallable()
+    {
+        $el = new ExpressionLanguage();
+        $el->evaluate('foo.myfunction()', array('foo' => new \stdClass()));
+    }
+
+    /**
      * @dataProvider getRegisterCallbacks
      * @expectedException \LogicException
      */

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
@@ -42,6 +43,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+use Symfony\Component\Workflow\Registry;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -298,6 +300,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertSame(array('approved_by_journalist', 'approved_by_spellchecker'), $transitions[3]->getArgument(1));
         $this->assertSame(array('draft'), $transitions[4]->getArgument(1));
+    }
+
+    public function testWorkflowServicesCanBeEnabled()
+    {
+        $container = $this->createContainerFromFile('workflows_enabled');
+
+        $this->assertTrue($container->has(Registry::class));
+        $this->assertTrue($container->hasDefinition(WorkflowDumpCommand::class));
     }
 
     public function testRouter()

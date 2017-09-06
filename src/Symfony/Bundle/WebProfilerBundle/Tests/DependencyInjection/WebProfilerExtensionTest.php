@@ -17,7 +17,8 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -51,6 +52,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
         $this->container = new ContainerBuilder();
+        $this->container->register('event_dispatcher', EventDispatcher::class);
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));
         $this->container->register('twig', 'Twig\Environment');
         $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument(array());
@@ -66,6 +68,7 @@ class WebProfilerExtensionTest extends TestCase
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
         $this->container->setParameter('data_collector.templates', array());
         $this->container->set('kernel', $this->kernel);
+        $this->container->addCompilerPass(new RegisterListenersPass());
     }
 
     protected function tearDown()
@@ -88,7 +91,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
 
-        $this->assertSaneContainer($this->getDumpedContainer());
+        $this->assertSaneContainer($this->getCompiledContainer());
     }
 
     /**
@@ -101,7 +104,7 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
-        $this->assertSaneContainer($this->getDumpedContainer(), '', array('web_profiler.csp.handler'));
+        $this->assertSaneContainer($this->getCompiledContainer(), '', array('web_profiler.csp.handler'));
 
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
@@ -118,19 +121,11 @@ class WebProfilerExtensionTest extends TestCase
         );
     }
 
-    private function getDumpedContainer()
+    private function getCompiledContainer()
     {
-        static $i = 0;
-        $class = 'WebProfilerExtensionTestContainer'.$i++;
-
         $this->container->compile();
+        $this->container->set('kernel', $this->kernel);
 
-        $dumper = new PhpDumper($this->container);
-        eval('?>'.$dumper->dump(array('class' => $class)));
-
-        $container = new $class();
-        $container->set('kernel', $this->kernel);
-
-        return $container;
+        return $this->container;
     }
 }

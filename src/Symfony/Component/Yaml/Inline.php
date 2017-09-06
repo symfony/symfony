@@ -34,6 +34,22 @@ class Inline
     private static $constantSupport = false;
 
     /**
+     * @param int      $flags
+     * @param int|null $parsedLineNumber
+     */
+    public static function initialize($flags, $parsedLineNumber = null)
+    {
+        self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
+        self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
+        self::$objectForMap = (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags);
+        self::$constantSupport = (bool) (Yaml::PARSE_CONSTANT & $flags);
+
+        if (null !== $parsedLineNumber) {
+            self::$parsedLineNumber = $parsedLineNumber;
+        }
+    }
+
+    /**
      * Converts a YAML string to a PHP value.
      *
      * @param string $value      A YAML string
@@ -46,10 +62,7 @@ class Inline
      */
     public static function parse(string $value = null, int $flags = 0, array $references = array())
     {
-        self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
-        self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
-        self::$objectForMap = (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags);
-        self::$constantSupport = (bool) (Yaml::PARSE_CONSTANT & $flags);
+        self::initialize($flags);
 
         $value = trim($value);
 

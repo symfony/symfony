@@ -179,10 +179,8 @@ class Parser
                 }
                 $context = 'mapping';
 
-                // force correct settings
-                Inline::parse(null, $flags, $this->refs);
+                Inline::initialize($flags, $this->getRealCurrentLineNb());
                 try {
-                    Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
                     $key = Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);

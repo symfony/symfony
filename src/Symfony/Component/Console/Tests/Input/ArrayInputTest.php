@@ -167,5 +167,8 @@ class ArrayInputTest extends TestCase
     {
         $input = new ArrayInput(array('-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo', 'test2' => "A\nB'C"));
         $this->assertEquals('-f -b=bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
+
+        $input = new ArrayInput(array('-b' => array('bval_1', 'bval_2'), '--f' => array('fval_1', 'fval_2')));
+        $this->assertSame('-b=bval_1 -b=bval_2 --f=fval_1 --f=fval_2', (string) $input);
     }
 }

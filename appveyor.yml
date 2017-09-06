@@ -17,8 +17,8 @@ init:
 install:
     - mkdir c:\php && cd c:\php
     - appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/cacert.pem
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-5.3.11-nts-Win32-VC9-x86.zip
-    - 7z x php-5.3.11-nts-Win32-VC9-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-5.3.9-nts-Win32-VC9-x86.zip
+    - 7z x php-5.3.9-nts-Win32-VC9-x86.zip -y >nul
     - appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/ICU-51.2-dlls.zip
     - 7z x ICU-51.2-dlls.zip -y >nul
     - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.1.3-Win32-VC14-x86.zip
@@ -62,7 +62,7 @@ test_script:
     - cd c:\php && 7z x php-7.1.3-Win32-VC14-x86.zip -y >nul && copy /Y php.ini-min php.ini
     - cd c:\projects\symfony
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
-    - cd c:\php && 7z x php-5.3.11-nts-Win32-VC9-x86.zip -y >nul && copy /Y php.ini-min php.ini
+    - cd c:\php && 7z x php-5.3.9-nts-Win32-VC9-x86.zip -y >nul && copy /Y php.ini-min php.ini
     - cd c:\projects\symfony
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!

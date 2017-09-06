@@ -121,7 +121,7 @@ class JsonResponse extends Response
             $data = json_encode($data, $this->encodingOptions);
         } else {
             try {
-                if (\PHP_VERSION_ID < 50400) {
+                if (!interface_exists('JsonSerializable', false)) {
                     // PHP 5.3 triggers annoying warnings for some
                     // types that can't be serialized as JSON (INF, resources, etc.)
                     // but doesn't provide the JsonSerializable interface.
@@ -153,7 +153,7 @@ class JsonResponse extends Response
                 if (\PHP_VERSION_ID < 50500) {
                     restore_error_handler();
                 }
-                if (\PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                if (interface_exists('JsonSerializable', false) && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                     throw $e->getPrevious() ?: $e;
                 }
                 throw $e;

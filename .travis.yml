@@ -1,6 +1,6 @@
 language: php
 
-dist: precise
+dist: trusty
 sudo: false
 
 git:
@@ -13,17 +13,14 @@ addons:
 
 env:
     global:
-        - MIN_PHP=5.3.9
+        - MIN_PHP=5.4.9
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/versions/5.6/bin/php
 
 matrix:
     include:
-        # Use the newer stack for HHVM as HHVM does not support Precise anymore since a long time and so Precise has an outdated version
         - php: hhvm-3.18
           sudo: required
-          dist: trusty
           group: edge
-        - php: 5.3
         - php: 5.4
         - php: 5.5
         - php: 5.6
@@ -99,7 +96,6 @@ before_install:
       echo opcache.enable_cli = 1 >> $INI
       echo hhvm.jit = 0 >> $INI
       echo apc.enable_cli = 1 >> $INI
-      echo extension = ldap.so >> $INI
       [[ $PHP = 5.* ]] && echo extension = memcache.so >> $INI
       if [[ $PHP = 5.* ]]; then
           echo extension = mongo.so >> $INI

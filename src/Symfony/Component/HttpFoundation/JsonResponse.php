@@ -151,7 +151,7 @@ class JsonResponse extends Response
                 // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
                 $data = json_encode($data, $this->encodingOptions);
             } catch (\Exception $e) {
-                if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                if (interface_exists('JsonSerializable') && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                     throw $e->getPrevious() ?: $e;
                 }
                 throw $e;

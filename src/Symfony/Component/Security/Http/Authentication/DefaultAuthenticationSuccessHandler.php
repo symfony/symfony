@@ -122,12 +122,11 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $targetUrl;
         }
 
-        if ($this->options['use_referer']) {
-            $targetUrl = $request->headers->get('Referer');
+        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
             if (false !== $pos = strpos($targetUrl, '?')) {
                 $targetUrl = substr($targetUrl, 0, $pos);
             }
-            if ($targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
+            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
                 return $targetUrl;
             }
         }

@@ -127,30 +127,31 @@ class JsonResponse extends Response
                     // but doesn't provide the JsonSerializable interface.
                     set_error_handler(function () { return false; });
                     $data = @json_encode($data, $this->encodingOptions);
-                } else {
+                    restore_error_handler();
+                } elseif (\PHP_VERSION_ID < 50500) {
                     // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
                     // objects in a new exception that needs to be removed.
                     // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
-                    if (\PHP_VERSION_ID < 50500) {
-                        // Clear json_last_error()
-                        json_encode(null);
-                        $errorHandler = set_error_handler('var_dump');
-                        restore_error_handler();
-                        set_error_handler(function () use ($errorHandler) {
-                            if (JSON_ERROR_NONE === json_last_error()) {
-                                return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
-                            }
-                        });
-                    }
-
+                    // Clear json_last_error()
+                    json_encode(null);
+                    $errorHandler = set_error_handler('var_dump');
+                    restore_error_handler();
+                    set_error_handler(function () use ($errorHandler) {
+                        if (JSON_ERROR_NONE === json_last_error()) {
+                            return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
+                        }
+                    });
+                    $data = json_encode($data, $this->encodingOptions);
+                    restore_error_handler();
+                } else {
                     $data = json_encode($data, $this->encodingOptions);
                 }
-
-                if (\PHP_VERSION_ID < 50500) {
+            } catch (\Error $e) {
+                if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
                     restore_error_handler();
                 }
             } catch (\Exception $e) {
-                if (\PHP_VERSION_ID < 50500) {
+                if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
                     restore_error_handler();
                 }
                 if (interface_exists('JsonSerializable', false) && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {

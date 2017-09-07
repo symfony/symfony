@@ -1,0 +1,158 @@
+---------------------------------------------------------------------------
+
+by marfillaster at 2017-08-16T14:52:29Z
+
+👍 I totally approve this solution. The chained processing is just genius.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-16T16:14:37Z
+
+Is `%env(json:base64:file:FOO)%` really more understandable than `json_decode(base64_decode(file_get_content(getenv('FOO'))))`?
+This is yet another custom syntax that Symfony users will need to learn, whereas plain old PHP would do the same with a few more characters. Maybe these kind of problems could be solved with #22407/#23834 and allowing to write some entries as PHP closures? This is a more complex solution though ("easy to say"), but the end result would be maybe much simpler for users?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-16T17:09:15Z
+
+@mnapoli I think you're forgetting about how things work. Despite your claim in #22407, a PHP DSL would not help at all reading from the env. The reason is compilation of the container. The DSL is read once, at compile time. `%env(FOO)%` is the syntax that we already use to be able to declare that intention of compiling down to dynamic calls. The namespaced env vars only build on top of this to add more processing capabilities to env, nothing more. It's not only about syntactic sugar.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-16T17:22:58Z
+
+👍  sorry :)
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2017-08-17T14:47:46Z
+
+I cannot agree more on this PR 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-17T16:28:00Z
+
+The `str_ireplace` seems to trigger an unexpected `Array to string conversion`
+
+```php
+$_ENV['REAL'] = '{"real":true}';
+$c = new ContainerBuilder();
+$c->setParameter('json_real', '%env(json:REAL)%');
+
+$c->register('foo', 'stdClass')->setProperties(array(
+    'json_real' => '%json_real%',
+));
+
+$c->compile(true);
+```
+____
+
+Somehow real and default envs get mixed up, probably due reference generation in EnvBag::get()
+
+```php
+$_ENV['REAL'] = 'runtime';
+$c = new ContainerBuilder();
+$c->setParameter('env(REAL)', 'compiletime');
+$c->setParameter('real', '%env(REAL)%');
+
+$c->register('teatime', 'stdClass')->setProperties(array(
+    'real' => '%real%',
+    'real_inline' => '%env(REAL)%',
+));
+
+$c->compile(true);
+
+dump($c->get('teatime'));
+```
+```
+{#136
+  +"real": "runtime"
+  +"real_inline": "compiletime"
+}
+```
+
+This looks bad :thinking:
+
+____
+
+What im worried about is the current default strategy. With this feature things may work unexpected due the exact lookup. `setParameter('env(REAL)', ...)` will not be used if combined with any prefix, you need to expose all variants :(
+
+Also related; if in above example you leave out the default ("compiletime"); you'll get
+
+```
+The service "teatime" has a dependency on a non-existent parameter "env(real)"
+```
+
+Yet we did a real lookup already.. so what's the deal here?
+
+____
+
+Otherwise it seems to work just great :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-17T20:38:18Z
+
+@ro0NL thanks for the detailed report. Good news, both (the 3 in fact) your examples apply to 3.3 also, which means you found bugs. Nothing related to this PR specifically. Those happen only in `compile(true)` mode, which I'm going to fix in another PR on 3.3.
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-08-17T20:43:56Z
+
+What is the reason for no `bool` prefix?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-18T07:18:04Z
+
+@kbond no reason, fixed.
+Now with a new `const` filter also.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-18T08:59:22Z
+
+@nicolas-grekas you're right about 3.3. Thought this PR include a change in compile() that might affect it.. but you reverted that already or im mistaken with another PR. I saw something related to setting env placeholders somewhere ;-) Nevertheless the test results are based on this PR.
+
+:+1: for bool.
+
+At this point im not sure about the number to string conversion in EnvBag::resolve, is that still needed / expected?
+
+What about a normalized default value lookup (ie. `env(NAME)`, and forbid setting prefixed envs as parameters?
+
+Does `resolve` need a circular reference check... or what will happen in that case?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-18T16:15:53Z
+
+> forbid setting prefixed envs as parameters
+
+that is hard-coding the way namespaces are used in the current env provider. But other env providers may use trailing `:` in the way they want, so that default prefixed env might be required. I wouldn't close this possibility.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-21T14:39:43Z
+
+@ro0NL the bug you spotted are fixed on 3.3 in #23940. The circular dependency issue is also fixed.
+Provided types are now exposed via new `EnvPlaceholderParameterBag::get/setProvidedTypes()` methods.
+PR should be ready for another round of review.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-04T13:39:48Z
+
+@nicolas-grekas should we build a special feature to allow a `%env(int:FOO)%` placeholder to be accepted by the `Config\Definition` component for an integer node (and so on) ? I think some people might expect it to work, but it would be hard (the `Config\Definition` component knows nothing about these placeholder)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-04T13:58:10Z
+
+@stof that's exactly what #23888 tries to achieve. But right now, progress is blocked by this PR being pending (because this PR provides type hints to env vars based on their prefix, to be leveraged there.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-06T21:23:44Z
+
+Still some `provider` usages (like variable names for instance).

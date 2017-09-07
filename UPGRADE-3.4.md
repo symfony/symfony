@@ -52,6 +52,9 @@ DependencyInjection
 
  * Case insensitivity of parameter names is deprecated and will be removed in 4.0.
 
+ * The `ResolveDefinitionTemplatesPass` class is deprecated and will be removed in 4.0.
+   Use the `ResolveChildDefinitionsPass` class instead.
+
 Debug
 -----
 

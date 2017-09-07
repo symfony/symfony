@@ -49,7 +49,7 @@ class PassConfig
 
         $this->optimizationPasses = array(array(
             new ExtensionCompilerPass(),
-            new ResolveDefinitionTemplatesPass(),
+            new ResolveChildDefinitionsPass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(false),

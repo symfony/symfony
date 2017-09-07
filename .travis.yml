@@ -102,6 +102,9 @@ before_install:
       elif [[ $PHP = 7.* ]]; then
           echo extension = mongodb.so >> $INI
       fi
+      if [[ $PHP = 7.0.* ]]; then
+          echo extension = ldap.so >> $INI
+      fi
 
       # Matrix lines for intermediate PHP versions are skipped for pull requests
       if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then

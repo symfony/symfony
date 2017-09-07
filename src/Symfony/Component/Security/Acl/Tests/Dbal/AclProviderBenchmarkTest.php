@@ -121,7 +121,7 @@ class AclProviderBenchmarkTest extends TestCase
     {
         static $id = 1000;
 
-        if ($id === 1000 || ($id < 1500 && rand(0, 1))) {
+        if (1000 === $id || ($id < 1500 && rand(0, 1))) {
             $this->insertClassStmt->execute(array($id, $this->getRandomString(rand(20, 100), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\_')));
             ++$id;
 
@@ -158,7 +158,7 @@ class AclProviderBenchmarkTest extends TestCase
     {
         static $id = 1000;
 
-        if ($id === 1000 || ($id < 11000 && rand(0, 1))) {
+        if (1000 === $id || ($id < 11000 && rand(0, 1))) {
             $this->insertSidStmt->execute(array(
                 $id,
                 $this->getRandomString(rand(5, 30)),
@@ -193,9 +193,9 @@ class AclProviderBenchmarkTest extends TestCase
             $sids[$sid][] = $fieldName;
 
             $strategy = rand(0, 2);
-            if ($strategy === 0) {
+            if (0 === $strategy) {
                 $strategy = PermissionGrantingStrategy::ALL;
-            } elseif ($strategy === 1) {
+            } elseif (1 === $strategy) {
                 $strategy = PermissionGrantingStrategy::ANY;
             } else {
                 $strategy = PermissionGrantingStrategy::EQUAL;

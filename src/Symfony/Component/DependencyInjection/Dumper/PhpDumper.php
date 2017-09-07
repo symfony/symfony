@@ -533,7 +533,7 @@ class PhpDumper extends Dumper
 
             $class = $this->dumpValue($callable[0]);
             // If the class is a string we can optimize call_user_func away
-            if (strpos($class, "'") === 0) {
+            if (0 === strpos($class, "'")) {
                 return sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
             }
 
@@ -753,7 +753,7 @@ EOF;
 
                 $class = $this->dumpValue($callable[0]);
                 // If the class is a string we can optimize call_user_func away
-                if (strpos($class, "'") === 0) {
+                if (0 === strpos($class, "'")) {
                     return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '');
                 }
 
@@ -766,7 +766,7 @@ EOF;
                 $class = $this->dumpValue($definition->getFactoryClass(false));
 
                 // If the class is a string we can optimize call_user_func away
-                if (strpos($class, "'") === 0) {
+                if (0 === strpos($class, "'")) {
                     return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $definition->getFactoryMethod(false), $arguments ? implode(', ', $arguments) : '');
                 }
 

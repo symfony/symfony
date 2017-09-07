@@ -58,9 +58,9 @@ class SortableIteratorTest extends RealIteratorTestCase
 
         $iterator = new SortableIterator($inner, $mode);
 
-        if ($mode === SortableIterator::SORT_BY_ACCESSED_TIME
-            || $mode === SortableIterator::SORT_BY_CHANGED_TIME
-            || $mode === SortableIterator::SORT_BY_MODIFIED_TIME
+        if (SortableIterator::SORT_BY_ACCESSED_TIME === $mode
+            || SortableIterator::SORT_BY_CHANGED_TIME === $mode
+            || SortableIterator::SORT_BY_MODIFIED_TIME === $mode
         ) {
             if ('\\' === DIRECTORY_SEPARATOR && SortableIterator::SORT_BY_MODIFIED_TIME !== $mode) {
                 $this->markTestSkipped('Sorting by atime or ctime is not supported on Windows');

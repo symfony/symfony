@@ -75,7 +75,7 @@ class IpUtils
         if (false !== strpos($ip, '/')) {
             list($address, $netmask) = explode('/', $ip, 2);
 
-            if ($netmask === '0') {
+            if ('0' === $netmask) {
                 return self::$checkedIps[$cacheKey] = filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
             }
 

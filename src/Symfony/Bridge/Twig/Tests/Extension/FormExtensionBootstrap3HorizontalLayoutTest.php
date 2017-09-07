@@ -75,7 +75,7 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        if ($label !== null) {
+        if (null !== $label) {
             $vars += array('label' => $label);
         }
 

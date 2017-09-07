@@ -77,7 +77,7 @@ abstract class KernelTestCase extends TestCase
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
         foreach ($reversedArgs as $argIndex => $testArg) {
-            if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
+            if (preg_match('/^-[^ \-]*c$/', $testArg) || '--configuration' === $testArg) {
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
             } elseif (0 === strpos($testArg, '--configuration=')) {

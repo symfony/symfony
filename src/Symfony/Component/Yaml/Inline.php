@@ -481,7 +481,7 @@ class Inline
             case 'false' === $scalarLower:
                 return false;
             // Optimise for returning strings.
-            case $scalar[0] === '+' || $scalar[0] === '-' || $scalar[0] === '.' || $scalar[0] === '!' || is_numeric($scalar[0]):
+            case '+' === $scalar[0] || '-' === $scalar[0] || '.' === $scalar[0] || '!' === $scalar[0] || is_numeric($scalar[0]):
                 switch (true) {
                     case 0 === strpos($scalar, '!str'):
                         return (string) substr($scalar, 5);

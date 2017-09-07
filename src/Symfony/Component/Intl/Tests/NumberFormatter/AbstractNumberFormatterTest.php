@@ -621,7 +621,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $this->assertSame($expected, $parsedValue, $message);
         $this->assertSame($expectedPosition, $position, $message);
 
-        if ($expected === false) {
+        if (false === $expected) {
             $errorCode = IntlGlobals::U_PARSE_ERROR;
             $errorMessage = 'Number parsing failed: U_PARSE_ERROR';
         } else {
@@ -631,10 +631,10 @@ abstract class AbstractNumberFormatterTest extends TestCase
 
         $this->assertSame($errorMessage, $this->getIntlErrorMessage());
         $this->assertSame($errorCode, $this->getIntlErrorCode());
-        $this->assertSame($errorCode !== 0, $this->isIntlFailure($this->getIntlErrorCode()));
+        $this->assertSame(0 !== $errorCode, $this->isIntlFailure($this->getIntlErrorCode()));
         $this->assertSame($errorMessage, $formatter->getErrorMessage());
         $this->assertSame($errorCode, $formatter->getErrorCode());
-        $this->assertSame($errorCode !== 0, $this->isIntlFailure($formatter->getErrorCode()));
+        $this->assertSame(0 !== $errorCode, $this->isIntlFailure($formatter->getErrorCode()));
     }
 
     public function parseProvider()

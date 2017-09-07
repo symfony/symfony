@@ -53,11 +53,11 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
         $result = array();
 
         foreach ($profileList as $item) {
-            if ($limit === 0) {
+            if (0 === $limit) {
                 break;
             }
 
-            if ($item == '') {
+            if ('' == $item) {
                 continue;
             }
 
@@ -119,7 +119,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
         $profileList = explode("\n", $indexContent);
 
         foreach ($profileList as $item) {
-            if ($item == '') {
+            if ('' == $item) {
                 continue;
             }
 

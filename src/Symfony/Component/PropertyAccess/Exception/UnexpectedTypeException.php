@@ -27,7 +27,7 @@ class UnexpectedTypeException extends RuntimeException
      */
     public function __construct($value, $path, $pathIndex = null)
     {
-        if (func_num_args() === 3 && $path instanceof PropertyPathInterface) {
+        if (3 === func_num_args() && $path instanceof PropertyPathInterface) {
             $message = sprintf(
                 'PropertyAccessor requires a graph of objects or arrays to operate on, '.
                 'but it found type "%s" while trying to traverse path "%s" at property "%s".',

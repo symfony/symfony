@@ -443,7 +443,7 @@ EOF
             $locales[] = $fallback;
         }
 
-        if (strrchr($locale, '_') !== false) {
+        if (false !== strrchr($locale, '_')) {
             array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 

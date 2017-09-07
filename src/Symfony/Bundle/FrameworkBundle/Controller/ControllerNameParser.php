@@ -141,7 +141,7 @@ class ControllerNameParser
             }
 
             $lev = levenshtein($nonExistentBundleName, $bundleName);
-            if ($lev <= strlen($nonExistentBundleName) / 3 && ($alternative === null || $lev < $shortest)) {
+            if ($lev <= strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
                 $alternative = $bundleName;
                 $shortest = $lev;
             }

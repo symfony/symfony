@@ -315,7 +315,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
                 foreach ($this->loadedAcls[$acl->getObjectIdentity()->getType()] as $sameTypeAcl) {
                     if (isset($sharedPropertyChanges['classAces'])) {
-                        if ($acl !== $sameTypeAcl && $classAcesProperty->getValue($sameTypeAcl) !== $sharedPropertyChanges['classAces'][0]) {
+                        if ($acl !== $sameTypeAcl && $sharedPropertyChanges['classAces'][0] !== $classAcesProperty->getValue($sameTypeAcl)) {
                             throw new ConcurrentModificationException('The "classAces" property has been modified concurrently.');
                         }
 
@@ -323,7 +323,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                     }
 
                     if (isset($sharedPropertyChanges['classFieldAces'])) {
-                        if ($acl !== $sameTypeAcl && $classFieldAcesProperty->getValue($sameTypeAcl) !== $sharedPropertyChanges['classFieldAces'][0]) {
+                        if ($acl !== $sameTypeAcl && $sharedPropertyChanges['classFieldAces'][0] !== $classFieldAcesProperty->getValue($sameTypeAcl)) {
                             throw new ConcurrentModificationException('The "classFieldAces" property has been modified concurrently.');
                         }
 
@@ -870,7 +870,7 @@ QUERY;
                         $classId = $this->createOrRetrieveClassId($oid->getType());
                     }
 
-                    $objectIdentityId = $name === 'classFieldAces' ? null : $ace->getAcl()->getId();
+                    $objectIdentityId = 'classFieldAces' === $name ? null : $ace->getAcl()->getId();
 
                     $this->connection->executeQuery($this->getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $i, $sid, $ace->getStrategy(), $ace->getMask(), $ace->isGranting(), $ace->isAuditSuccess(), $ace->isAuditFailure()));
                     $aceId = $this->connection->executeQuery($this->getSelectAccessControlEntryIdSql($classId, $objectIdentityId, $field, $i))->fetchColumn();
@@ -944,7 +944,7 @@ QUERY;
                     $classId = $this->createOrRetrieveClassId($oid->getType());
                 }
 
-                $objectIdentityId = $name === 'classAces' ? null : $ace->getAcl()->getId();
+                $objectIdentityId = 'classAces' === $name ? null : $ace->getAcl()->getId();
 
                 $this->connection->executeQuery($this->getInsertAccessControlEntrySql($classId, $objectIdentityId, null, $i, $sid, $ace->getStrategy(), $ace->getMask(), $ace->isGranting(), $ace->isAuditSuccess(), $ace->isAuditFailure()));
                 $aceId = $this->connection->executeQuery($this->getSelectAccessControlEntryIdSql($classId, $objectIdentityId, null, $i))->fetchColumn();

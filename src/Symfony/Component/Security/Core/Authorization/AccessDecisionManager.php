@@ -172,7 +172,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return false;
         }
 
-        if ($grant == $deny && $grant != 0) {
+        if ($grant == $deny && 0 != $grant) {
             return $this->allowIfEqualGrantedDeniedDecisions;
         }
 

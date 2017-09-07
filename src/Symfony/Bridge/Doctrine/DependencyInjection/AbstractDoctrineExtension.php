@@ -199,13 +199,13 @@ abstract class AbstractDoctrineExtension extends Extension
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
-                if ($driverType == 'annotation') {
+                if ('annotation' == $driverType) {
                     $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 } else {
                     $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
                 $mappingDriverDef->setArguments($args);
-            } elseif ($driverType == 'annotation') {
+            } elseif ('annotation' == $driverType) {
                 $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
                     new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths),
@@ -333,7 +333,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 $memcacheClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.memcache.class').'%';
                 $memcacheInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcache_instance.class').'%';
                 $memcacheHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcache_host').'%';
-                $memcachePort = !empty($cacheDriver['port']) || (isset($cacheDriver['port']) && $cacheDriver['port'] === 0) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcache_port').'%';
+                $memcachePort = !empty($cacheDriver['port']) || (isset($cacheDriver['port']) && 0 === $cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcache_port').'%';
                 $cacheDef = new Definition($memcacheClass);
                 $memcacheInstance = new Definition($memcacheInstanceClass);
                 $memcacheInstance->addMethodCall('connect', array(

@@ -327,7 +327,7 @@ class UuidValidator extends ConstraintValidator
         //   0b10xx
         // & 0b1100 (12)
         // = 0b1000 (8)
-        if ((hexdec($value[self::STRICT_VARIANT_POSITION]) & 12) !== 8) {
+        if (8 !== (hexdec($value[self::STRICT_VARIANT_POSITION]) & 12)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))

@@ -60,7 +60,7 @@ class Definition
      */
     public function setFactory($factory)
     {
-        if (is_string($factory) && strpos($factory, '::') !== false) {
+        if (is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
         }
 

@@ -75,10 +75,10 @@ class ObjectNormalizer extends AbstractNormalizer
                 ) {
                     $name = $reflMethod->getName();
 
-                    if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
+                    if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
                         // getters and hassers
                         $attributes[lcfirst(substr($name, 3))] = true;
-                    } elseif (strpos($name, 'is') === 0) {
+                    } elseif (0 === strpos($name, 'is')) {
                         // issers
                         $attributes[lcfirst(substr($name, 2))] = true;
                     }
@@ -148,7 +148,7 @@ class ObjectNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
+            $allowed = false === $allowedAttributes || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {

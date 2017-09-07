@@ -728,7 +728,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 do {
                     $token = $tokens[++$i];
                     $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
-                } while ($token[0] !== T_END_HEREDOC);
+                } while (T_END_HEREDOC !== $token[0]);
                 $rawChunk = '';
             } elseif (T_WHITESPACE === $token[0]) {
                 if ($ignoreSpace) {

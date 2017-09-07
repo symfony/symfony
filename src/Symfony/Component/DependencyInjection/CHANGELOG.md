@@ -9,6 +9,7 @@ CHANGELOG
  * deprecated the ability to check for the initialization of a private service with the `Container::initialized()` method
  * deprecated support for top-level anonymous services in XML
  * deprecated case insensitivity of parameter names
+ * deprecated the `ResolveDefinitionTemplatesPass` class in favor of `ResolveChildDefinitionsPass`
 
 3.3.0
 -----

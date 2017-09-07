@@ -13,13 +13,11 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/**
- * @group legacy
- */
-class ResolveDefinitionTemplatesPassTest extends TestCase
+class ResolveChildDefinitionsPassTest extends TestCase
 {
     public function testProcess()
     {
@@ -399,9 +397,17 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
     }
 
+    /**
+     * @group legacy
+     */
+    public function testAliasExistsForBackwardsCompatibility()
+    {
+        $this->assertInstanceOf(ResolveChildDefinitionsPass::class, new ResolveDefinitionTemplatesPass());
+    }
+
     protected function process(ContainerBuilder $container)
     {
-        $pass = new ResolveDefinitionTemplatesPass();
+        $pass = new ResolveChildDefinitionsPass();
         $pass->process($container);
     }
 }

@@ -76,16 +76,13 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
-        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->findAndSortTaggedServices('my_custom_tag', $container));
     }
 }
 
 class PriorityTaggedServiceTraitImplementation
 {
-    use PriorityTaggedServiceTrait;
-
-    public function test($tagName, ContainerBuilder $container)
-    {
-        return $this->findAndSortTaggedServices($tagName, $container);
+    use PriorityTaggedServiceTrait {
+        findAndSortTaggedServices as public;
     }
 }

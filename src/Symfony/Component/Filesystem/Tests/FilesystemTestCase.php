@@ -61,6 +61,7 @@ class FilesystemTestCase extends TestCase
             $this->longPathNamesWindows = array();
         }
 
+        chmod($this->workspace, 0777);
         $this->filesystem->remove($this->workspace);
         umask($this->umask);
     }

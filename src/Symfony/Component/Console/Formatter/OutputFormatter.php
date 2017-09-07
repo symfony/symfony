@@ -69,7 +69,7 @@ class OutputFormatter implements OutputFormatterInterface
     {
         $this->decorated = (bool) $decorated;
 
-        $this->setStyle('error', new OutputFormatterStyle('white', 'red'));
+        $this->setStyle('error', new OutputFormatterStyle('black', 'red'));
         $this->setStyle('info', new OutputFormatterStyle('green'));
         $this->setStyle('comment', new OutputFormatterStyle('yellow'));
         $this->setStyle('question', new OutputFormatterStyle('black', 'cyan'));

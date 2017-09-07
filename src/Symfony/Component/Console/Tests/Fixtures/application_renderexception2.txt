@@ -1,5 +1,4 @@
 
-In ArrayInput.php line 178:
                                       
   The "--foo" option does not exist.  
                                       

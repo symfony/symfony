@@ -39,12 +39,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('toolbar')->defaultFalse()->end()
                 ->scalarNode('position')
                     ->defaultValue('bottom')
-                    ->beforeNormalization()
-                        ->ifTrue(function ($v) { return null !== $v; })
-                        ->then(function () {
-                            @trigger_error('The "web_profiler.position" configuration key has been deprecated in Symfony 3.4 and it will be removed in 4.0.', E_USER_DEPRECATED);
-                        })
-                    ->end()
+                    ->setDeprecated('The "web_profiler.position" configuration key has been deprecated in Symfony 3.4 and it will be removed in 4.0.')
                     ->validate()
                         ->ifNotInArray(array('bottom', 'top'))
                         ->thenInvalid('The CSS position %s is not supported')

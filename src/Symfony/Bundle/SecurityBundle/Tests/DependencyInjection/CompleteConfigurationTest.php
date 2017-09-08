@@ -387,6 +387,24 @@ abstract class CompleteConfigurationTest extends TestCase
         $container = $this->getContainer('access_decision_manager_service_and_strategy');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Invalid firewall "main": user provider "undefined" not found.
+     */
+    public function testFirewallUndefinedUserProvider()
+    {
+        $this->getContainer('firewall_undefined_provider');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Invalid firewall "main": user provider "undefined" not found.
+     */
+    public function testFirewallListenerUndefinedProvider()
+    {
+        $this->getContainer('listener_undefined_provider');
+    }
+
     protected function getContainer($file)
     {
         $file = $file.'.'.$this->getFileExtension();

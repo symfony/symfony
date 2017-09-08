@@ -1396,20 +1396,26 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected function getEnv($name)
     {
         $value = parent::getEnv($name);
+        $bag = $this->getParameterBag();
 
-        if (!is_string($value) || !$this->getParameterBag() instanceof EnvPlaceholderParameterBag) {
+        if (!is_string($value) || !$bag instanceof EnvPlaceholderParameterBag) {
             return $value;
         }
 
-        foreach ($this->getParameterBag()->getEnvPlaceholders() as $env => $placeholders) {
+        foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
             if (isset($placeholders[$value])) {
-                $bag = new ParameterBag($this->getParameterBag()->all());
+                $bag = new ParameterBag($bag->all());
 
                 return $bag->unescapeValue($bag->get("env($name)"));
             }
         }
 
-        return $value;
+        $this->resolving["env($name)"] = true;
+        try {
+            return $bag->unescapeValue($this->resolveEnvPlaceholders($bag->escapeValue($value), true));
+        } finally {
+            unset($this->resolving["env($name)"]);
+        }
     }
 
     /**

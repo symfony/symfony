@@ -13,10 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ResolveDefinitionTemplatesPassTest extends TestCase
+class ResolveChildDefinitionsPassTest extends TestCase
 {
     public function testProcess()
     {
@@ -372,7 +372,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $pass = new ResolveDefinitionTemplatesPass();
+        $pass = new ResolveChildDefinitionsPass();
         $pass->process($container);
     }
 }

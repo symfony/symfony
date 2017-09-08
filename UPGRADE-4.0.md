@@ -159,6 +159,9 @@ DependencyInjection
  * The `DefinitionDecorator` class has been removed. Use the `ChildDefinition`
    class instead.
 
+ * The `ResolveDefinitionTemplatesPass` class has been removed.
+   Use the `ResolveChildDefinitionsPass` class instead.
+
  * Using unsupported configuration keys in YAML configuration files raises an
    exception.
 

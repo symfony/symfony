@@ -310,6 +310,9 @@ class SecurityExtension extends Extension
         // Provider id (take the first registered provider if none defined)
         if (isset($firewall['provider'])) {
             $defaultProvider = $this->getUserProviderId($firewall['provider']);
+            if (!in_array($defaultProvider, $providerIds, true)) {
+                throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
+            }
         } else {
             $defaultProvider = reset($providerIds);
         }
@@ -400,7 +403,7 @@ class SecurityExtension extends Extension
         $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $configuredEntryPoint);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint);
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);
 
@@ -455,7 +458,7 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, $defaultEntryPoint)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $providerIds, $defaultEntryPoint)
     {
         $listeners = array();
         $hasListeners = false;
@@ -465,7 +468,14 @@ class SecurityExtension extends Extension
                 $key = str_replace('-', '_', $factory->getKey());
 
                 if (isset($firewall[$key])) {
-                    $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
+                    if (isset($firewall[$key]['provider'])) {
+                        if (!in_array($firewall[$key]['provider'], $providerIds, true)) {
+                            throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
+                        }
+                        $userProvider = $this->getUserProviderId($firewall[$key]['provider']);
+                    } else {
+                        $userProvider = $defaultProvider;
+                    }
 
                     list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 

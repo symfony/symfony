@@ -665,6 +665,70 @@ class ContainerBuilderTest extends TestCase
         $container->compile(true);
     }
 
+    public function testDynamicEnv()
+    {
+        putenv('DUMMY_FOO=some%foo%');
+        putenv('DUMMY_BAR=%bar%');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', 'Foo%env(resolve:DUMMY_BAR)%');
+        $container->setParameter('bar', 'Bar');
+        $container->setParameter('baz', '%env(resolve:DUMMY_FOO)%');
+
+        $container->compile(true);
+        putenv('DUMMY_FOO');
+        putenv('DUMMY_BAR');
+
+        $this->assertSame('someFooBar', $container->getParameter('baz'));
+    }
+
+    public function testCastEnv()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FAKE)', '123');
+
+        $container->register('foo', 'stdClass')->setProperties(array(
+            'fake' => '%env(int:FAKE)%',
+        ));
+
+        $container->compile(true);
+
+        $this->assertSame(123, $container->get('foo')->fake);
+    }
+
+    public function testEnvAreNullable()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FAKE)', null);
+
+        $container->register('foo', 'stdClass')->setProperties(array(
+            'fake' => '%env(int:FAKE)%',
+        ));
+
+        $container->compile(true);
+
+        $this->assertNull($container->get('foo')->fake);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException
+     * @expectedExceptionMessage Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").
+     */
+    public function testCircularDynamicEnv()
+    {
+        putenv('DUMMY_ENV_VAR=some%foo%');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%bar%');
+        $container->setParameter('bar', '%env(resolve:DUMMY_ENV_VAR)%');
+
+        try {
+            $container->compile(true);
+        } finally {
+            putenv('DUMMY_ENV_VAR');
+        }
+    }
+
     /**
      * @expectedException \LogicException
      */

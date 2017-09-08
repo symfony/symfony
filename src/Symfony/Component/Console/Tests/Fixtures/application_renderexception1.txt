@@ -1,5 +1,4 @@
 
-In Application.php line 607:
                                  
   Command "foo" is not defined.  
                                  

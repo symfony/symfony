@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -48,9 +49,11 @@ class Container implements ResettableContainerInterface
     protected $methodMap = array();
     protected $aliases = array();
     protected $loading = array();
+    protected $resolving = array();
 
     private $envCache = array();
     private $compiled = false;
+    private $getEnv;
 
     /**
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
@@ -336,23 +339,37 @@ class Container implements ResettableContainerInterface
      */
     protected function getEnv($name)
     {
+        if (isset($this->resolving[$envName = "env($name)"])) {
+            throw new ParameterCircularReferenceException(array_keys($this->resolving));
+        }
         if (isset($this->envCache[$name]) || array_key_exists($name, $this->envCache)) {
             return $this->envCache[$name];
         }
-        if (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
-            return $this->envCache[$name] = $_SERVER[$name];
+        if (!$this->has($id = 'container.env_var_processors_locator')) {
+            $this->set($id, new ServiceLocator(array()));
         }
-        if (isset($_ENV[$name])) {
-            return $this->envCache[$name] = $_ENV[$name];
+        if (!$this->getEnv) {
+            $this->getEnv = new \ReflectionMethod($this, __FUNCTION__);
+            $this->getEnv->setAccessible(true);
+            $this->getEnv = $this->getEnv->getClosure($this);
         }
-        if (false !== ($env = getenv($name)) && null !== $env) { // null is a possible value because of thread safety issues
-            return $this->envCache[$name] = $env;
-        }
-        if (!$this->hasParameter("env($name)")) {
-            throw new EnvNotFoundException($name);
-        }
+        $processors = $this->get($id);
 
-        return $this->envCache[$name] = $this->getParameter("env($name)");
+        if (false !== $i = strpos($name, ':')) {
+            $prefix = substr($name, 0, $i);
+            $localName = substr($name, 1 + $i);
+        } else {
+            $prefix = 'string';
+            $localName = $name;
+        }
+        $processor = $processors->has($prefix) ? $processors->get($prefix) : new EnvVarProcessor($this);
+
+        $this->resolving[$envName] = true;
+        try {
+            return $this->envCache[$name] = $processor->getEnv($prefix, $localName, $this->getEnv);
+        } finally {
+            unset($this->resolving[$envName]);
+        }
     }
 
     private function __clone()

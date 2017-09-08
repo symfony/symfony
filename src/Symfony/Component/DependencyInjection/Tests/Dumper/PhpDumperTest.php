@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
@@ -318,13 +319,82 @@ class PhpDumperTest extends TestCase
 
     public function testEnvParameter()
     {
+        $rand = mt_rand();
+        putenv('Baz='.$rand);
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services26.yml');
+        $container->setParameter('env(json_file)', self::$fixturesPath.'/array.json');
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_EnvParameters', 'file' => self::$fixturesPath.'/php/services26.php')));
+
+        require self::$fixturesPath.'/php/services26.php';
+        $container = new \Symfony_DI_PhpDumper_Test_EnvParameters();
+        $this->assertSame($rand, $container->getParameter('baz'));
+        $this->assertSame(array(123, 'abc'), $container->getParameter('json'));
+        $this->assertSame('sqlite:///foo/bar/var/data.db', $container->getParameter('db_dsn'));
+        putenv('Baz');
+    }
+
+    public function testResolvedBase64EnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', base64_encode('world'));
+        $container->setParameter('hello', '%env(base64:foo)%');
+        $container->compile(true);
+
+        $expected = array(
+          'env(foo)' => 'd29ybGQ=',
+          'hello' => 'world',
+        );
+        $this->assertSame($expected, $container->getParameterBag()->all());
+    }
+
+    public function testDumpedBase64EnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', base64_encode('world'));
+        $container->setParameter('hello', '%env(base64:foo)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_base64_env.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Base64Parameters')));
+
+        require self::$fixturesPath.'/php/services_base64_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_Base64Parameters();
+        $this->assertSame('world', $container->getParameter('hello'));
+    }
+
+    public function testCustomEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', str_rot13('world'));
+        $container->setParameter('hello', '%env(rot13:foo)%');
+        $container->register(Rot13EnvVarProcessor::class)->addTag('container.env_var_processor');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_rot13_env.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Rot13Parameters')));
+
+        require self::$fixturesPath.'/php/services_rot13_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_Rot13Parameters();
+        $this->assertSame('world', $container->getParameter('hello'));
+    }
+
+    public function testFileEnvProcessor()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', __FILE__);
+        $container->setParameter('random', '%env(file:foo)%');
+        $container->compile(true);
+
+        $this->assertStringEqualsFile(__FILE__, $container->getParameter('random'));
     }
 
     /**
@@ -338,6 +408,31 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException
+     * @expectedExceptionMessage Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").
+     */
+    public function testCircularDynamicEnv()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%bar%');
+        $container->setParameter('bar', '%env(resolve:DUMMY_ENV_VAR)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(array('class' => $class = __FUNCTION__));
+
+        eval('?>'.$dump);
+        $container = new $class();
+
+        putenv('DUMMY_ENV_VAR=%foo%');
+        try {
+            $container->getParameter('bar');
+        } finally {
+            putenv('DUMMY_ENV_VAR');
+        }
     }
 
     public function testInlinedDefinitionReferencingServiceContainer()
@@ -701,5 +796,18 @@ class PhpDumperTest extends TestCase
 
         $this->assertSame('bar', $container->getParameter('Foo'));
         $this->assertSame('foo', $container->getParameter('BAR'));
+    }
+}
+
+class Rot13EnvVarProcessor implements EnvVarProcessorInterface
+{
+    public function getEnv($prefix, $name, \Closure $getEnv)
+    {
+        return str_rot13($getEnv($name));
+    }
+
+    public static function getProvidedTypes()
+    {
+        return array('rot13' => 'string');
     }
 }

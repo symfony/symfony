@@ -26,11 +26,13 @@ CHANGELOG
 3.4.0
 -----
 
+ * added `EnvVarProcessorInterface` and corresponding "container.env_var_processor" tag for processing env vars
  * added support for ignore-on-uninitialized references
  * deprecated service auto-registration while autowiring
  * deprecated the ability to check for the initialization of a private service with the `Container::initialized()` method
  * deprecated support for top-level anonymous services in XML
  * deprecated case insensitivity of parameter names
+ * deprecated the `ResolveDefinitionTemplatesPass` class in favor of `ResolveChildDefinitionsPass`
 
 3.3.0
 -----

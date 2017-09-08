@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
+class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
     protected function processValue($value, $isRoot = false)
     {

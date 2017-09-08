@@ -9,14 +9,14 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * Symfony_DI_PhpDumper_Test_EnvParameters.
+ * Symfony_DI_PhpDumper_Test_Rot13Parameters.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
  * @final since Symfony 3.3
  */
-class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
+class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -27,15 +27,12 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      */
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
-        }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = array();
         $this->methodMap = array(
-            'test' => 'getTestService',
+            'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor' => 'getRot13EnvVarProcessorService',
+            'container.env_var_processors_locator' => 'getContainer_EnvVarProcessorsLocatorService',
         );
 
         $this->aliases = array();
@@ -67,15 +64,25 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     }
 
     /**
-     * Gets the public 'test' shared service.
+     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor' shared service.
      *
-     * @return object A %env(FOO)% instance
+     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
      */
-    protected function getTestService()
+    protected function getRot13EnvVarProcessorService()
     {
-        $class = $this->getEnv('FOO');
+        return $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor();
+    }
 
-        return $this->services['test'] = new $class($this->getEnv('Bar'), 'foo'.$this->getEnv('string:FOO').'baz', $this->getEnv('int:Baz'));
+    /**
+     * Gets the public 'container.env_var_processors_locator' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\ServiceLocator
+     */
+    protected function getContainer_EnvVarProcessorsLocatorService()
+    {
+        return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('rot13' => function () {
+            return ($this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] ?? $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor());
+        }));
     }
 
     /**
@@ -130,11 +137,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     }
 
     private $loadedDynamicParameters = array(
-        'bar' => false,
-        'baz' => false,
-        'json' => false,
-        'db_dsn' => false,
-        'env(json_file)' => false,
+        'hello' => false,
     );
     private $dynamicParameters = array();
 
@@ -150,11 +153,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     private function getDynamicParameter($name)
     {
         switch ($name) {
-            case 'bar': $value = $this->getEnv('FOO'); break;
-            case 'baz': $value = $this->getEnv('int:Baz'); break;
-            case 'json': $value = $this->getEnv('json:file:json_file'); break;
-            case 'db_dsn': $value = $this->getEnv('resolve:DB'); break;
-            case 'env(json_file)': $value = ($this->targetDirs[1].'/array.json'); break;
+            case 'hello': $value = $this->getEnv('rot13:foo'); break;
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
         }
         $this->loadedDynamicParameters[$name] = true;
@@ -170,9 +169,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     protected function getDefaultParameters()
     {
         return array(
-            'project_dir' => '/foo/bar',
-            'env(FOO)' => 'foo',
-            'env(DB)' => 'sqlite://%project_dir%/var/data.db',
+            'env(foo)' => 'jbeyq',
         );
     }
 }

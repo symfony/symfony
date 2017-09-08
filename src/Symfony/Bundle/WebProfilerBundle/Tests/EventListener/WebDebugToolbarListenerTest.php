@@ -23,6 +23,49 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class WebDebugToolbarListenerTest extends TestCase
 {
     /**
+     * @dataProvider getHtmlResponseTests
+     */
+    public function testInjectToolbarToHtmlResponseInterface($content, $expected, WebDebugToolbarListener $listener)
+    {
+        $m = new \ReflectionMethod($listener, 'injectToolbar');
+        $m->setAccessible(true);
+
+        $response = new TestStreamedResponseHtml(function () use ($content) {
+            echo $content;
+        });
+
+        $m->invoke($listener, $response, Request::create('/'), array('csp_script_nonce' => 'scripto', 'csp_style_nonce' => 'stylo'));
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($expected, $content);
+    }
+
+    public function getHtmlResponseTests()
+    {
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+
+        return array(
+            array(
+                '<html><head></head><body></body></html>',
+                "<html><head></head><body></body></html>\nWDT",
+                $listener,
+            ),
+            array(
+                '<html><head></head><body>Hello</body></html>',
+                "<html><head></head><body>Hello</body></html>\nWDT",
+                $listener,
+            ),
+            array(
+                '<html><head></head><body>Empty WDT</body></html>',
+                '<html><head></head><body>Empty WDT</body></html>',
+                new WebDebugToolbarListener($this->getTwigMock('')),
+            ),
+        );
+    }
+
+    /**
      * @dataProvider getInjectToolbarTests
      */
     public function testInjectToolbar($content, $expected)

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-03T09:40:10Z
+
+Would it be acceptable to backport https://github.com/symfony/symfony/blob/8c70b3939c8e69df40055fa74fc1d23e36e6a610/src/Symfony/Bundle/FrameworkBundle/Console/Application.php#L177 as forward compatibility layer?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-03T09:52:21Z
+
+@ogizanagi That was my first intention, but in https://github.com/symfony/flex/issues/142#issuecomment-326029873 @stof pointed that adding invalid service ids in the `console.command.ids` parameter is a BC break. I'm still not totally sure if we should care in fact.

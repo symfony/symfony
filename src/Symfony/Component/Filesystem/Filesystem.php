@@ -525,13 +525,21 @@ class Filesystem
      * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
      *                           Deprecated since version 2.3.12, to be removed in 3.0.
      *
-     * @throws IOException If the file cannot be written to.
+     * @throws IOException if the file cannot be written to
      */
     public function dumpFile($filename, $content, $mode = 0666)
     {
         $dir = dirname($filename);
 
         if (!is_dir($dir)) {
+            if (is_file($dir)) {
+                throw new IOException(sprintf('The parent path of "%s" is a file.', $dir));
+            }
+
+            if (is_link($dir)) {
+                throw new IOException(sprintf('The parent path of "%s" is a symlink to a nonexistent directory.', $dir));
+            }
+
             $this->mkdir($dir);
         }
 

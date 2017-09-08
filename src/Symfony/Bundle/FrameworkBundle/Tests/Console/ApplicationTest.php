@@ -183,16 +183,16 @@ class ApplicationTest extends TestCase
         }
 
         $container
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('hasParameter')
-            ->with($this->equalTo('console.command.ids'))
-            ->will($this->returnValue(true))
+            ->withConsecutive(array('console.command.ids'), array('console.lazy_command.ids'))
+            ->willReturnOnConsecutiveCalls(true, true)
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getParameter')
-            ->with($this->equalTo('console.command.ids'))
-            ->will($this->returnValue(array()))
+            ->withConsecutive(array('console.lazy_command.ids'), array('console.command.ids'))
+            ->willReturnOnConsecutiveCalls(array(), array())
         ;
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();

@@ -1115,6 +1115,10 @@ class FilesystemTest extends FilesystemTestCase
         mkdir($target);
         chmod($this->workspace, 0666);
 
+        if (false !== @chdir($this->workspace)) {
+            $this->markTestSkipped('Test skipped as the used PHP version does not prevent entering directories without the required permissions.');
+        }
+
         $this->filesystem->dumpFile($file, 'baz');
     }
 

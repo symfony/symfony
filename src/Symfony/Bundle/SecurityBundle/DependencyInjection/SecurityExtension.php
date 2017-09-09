@@ -331,10 +331,10 @@ class SecurityExtension extends Extension
 
         // Provider id (take the first registered provider if none defined)
         if (isset($firewall['provider'])) {
-            $defaultProvider = $this->getUserProviderId($firewall['provider']);
-            if (!in_array($defaultProvider, $providerIds, true)) {
+            if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall['provider'])])) {
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
+            $defaultProvider = $providerIds[$normalizedName];
         } else {
             $defaultProvider = reset($providerIds);
         }
@@ -491,10 +491,10 @@ class SecurityExtension extends Extension
 
                 if (isset($firewall[$key])) {
                     if (isset($firewall[$key]['provider'])) {
-                        if (!in_array($firewall[$key]['provider'], $providerIds, true)) {
+                        if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall[$key]['provider'])])) {
                             throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
                         }
-                        $userProvider = $this->getUserProviderId($firewall[$key]['provider']);
+                        $userProvider = $providerIds[$normalizedName];
                     } else {
                         $userProvider = $defaultProvider;
                     }
@@ -596,7 +596,7 @@ class SecurityExtension extends Extension
         $providerIds = array();
         foreach ($config['providers'] as $name => $provider) {
             $id = $this->createUserDaoProvider($name, $provider, $container);
-            $providerIds[] = $id;
+            $providerIds[str_replace('-', '_', $name)] = $id;
         }
 
         return $providerIds;

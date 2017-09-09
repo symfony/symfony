@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-08T16:32:19Z
+
+We need a conflict rule for `"symfony/config": "<3.4"` in WebProfilerBundle's composer.json, because the bundle makes use of the `setDeprecated()` feature  (3.4+, see deps=low build). Almost good :)

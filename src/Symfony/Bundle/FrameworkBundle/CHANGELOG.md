@@ -73,8 +73,6 @@ CHANGELOG
    `EventDispatcherDebugCommand`, `RouterDebugCommand`, `RouterMatchCommand`,
    `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
     and `YamlLintCommand` classes have been marked as final
- * Deprecated the `web_profiler.position` config option (in Symfony 4.0 the toolbar
-   will always be displayed at the bottom).
 
 3.3.0
 -----

@@ -36,7 +36,6 @@ class ConfigurationTest extends TestCase
             array(array('intercept_redirects' => true), array('intercept_redirects' => true, 'toolbar' => false, 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
             array(array('intercept_redirects' => false), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
             array(array('toolbar' => true), array('intercept_redirects' => false, 'toolbar' => true, 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
-            array(array(), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
             array(array('excluded_ajax_paths' => 'test'), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => 'test')),
         );
     }

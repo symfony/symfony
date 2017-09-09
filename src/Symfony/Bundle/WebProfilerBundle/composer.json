@@ -30,6 +30,7 @@
         "symfony/stopwatch": "~3.4|~4.0"
     },
     "conflict": {
+        "symfony/config": "<3.4",
         "symfony/dependency-injection": "<3.4",
         "symfony/event-dispatcher": "<3.4",
         "symfony/var-dumper": "<3.4"

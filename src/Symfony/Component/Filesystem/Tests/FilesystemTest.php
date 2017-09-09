@@ -1102,26 +1102,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(745, $filename);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessageRegExp /^Unable to detect if the target directory ".*" exists\.$/
-     */
-    public function testDumpFailsWithExceptionIfExecutablePermissionsForTheParentDirectoryAreMissing()
-    {
-        $this->markAsSkippedIfChmodIsMissing();
-
-        $target = $this->workspace.DIRECTORY_SEPARATOR.'foo';
-        $file = $target.DIRECTORY_SEPARATOR.'foobar';
-        mkdir($target);
-        chmod($this->workspace, 0666);
-
-        if (false !== @chdir($this->workspace)) {
-            $this->markTestSkipped('Test skipped as the used PHP version does not prevent entering directories without the required permissions.');
-        }
-
-        $this->filesystem->dumpFile($file, 'baz');
-    }
-
     public function testCopyShouldKeepExecutionPermission()
     {
         $this->markAsSkippedIfChmodIsMissing();

@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-07T18:06:55Z
+
+This still doesn't work.
+The content of array is:
+```
+array(1) {
+  [0] =>
+  string(32) "account.security.user_provider"
+}
+```
+
+but `$userProvider` contains `security.user.provider.concrete.account`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-07T19:39:42Z
+
+@mvrhov That should be better now (using `{ provider_name: { id: some_service }` was not handled). Could you please retry?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-08T04:31:10Z
+
+This seem to work now
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-08T07:51:15Z
+
+Thanks for confirming.
+
+Build failures unrelated. Ready
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T08:30:38Z
+
+any test case?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-08T11:50:41Z
+
+now with tests :)
+
+---------------------------------------------------------------------------
+
+by jrysig at 2017-09-08T21:55:16Z
+
+This patch works fine for me, thank you.
+With current Symfony 3.4.x-dev I'm getting error:
+Invalid firewall "main": user provider "fos_userbundle" not found.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-09T06:56:35Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-09T16:31:03Z
+
+IMO this should get merged ASAP as 3.4 is broken ATM. And then as @chalasr said it can be polished.

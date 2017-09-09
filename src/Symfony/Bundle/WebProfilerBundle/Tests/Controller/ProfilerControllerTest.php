@@ -157,7 +157,7 @@ class ProfilerControllerTest extends TestCase
         if ($withCSP) {
             $nonceGenerator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
 
-            return new ProfilerController($urlGenerator, $profiler, $twig, array(), 'bottom', new ContentSecurityPolicyHandler($nonceGenerator));
+            return new ProfilerController($urlGenerator, $profiler, $twig, array(), new ContentSecurityPolicyHandler($nonceGenerator));
         }
 
         return new ProfilerController($urlGenerator, $profiler, $twig, array());

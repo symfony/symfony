@@ -1069,18 +1069,6 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The definition for "\foo" has no class.
-     */
-    public function testNoClassFromNsSeparatorId()
-    {
-        $container = new ContainerBuilder();
-
-        $definition = $container->register('\\foo');
-        $container->compile();
-    }
-
     public function testServiceLocator()
     {
         $container = new ContainerBuilder();
@@ -1128,6 +1116,26 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $container->get('bar');
+    }
+
+    public function testNamespacedClassServiceWithRootNs()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register($expected = '\\My\\DateTime');
+
+        $container->compile();
+
+        $this->assertSame($expected, $definition->getClass());
+    }
+
+    public function testClassServiceWithRootNs()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register($expected = '\\DateTime');
+
+        $container->compile();
+
+        $this->assertSame($expected, $definition->getClass());
     }
 }
 

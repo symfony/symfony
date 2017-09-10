@@ -195,4 +195,16 @@ class ParserTest extends TestCase
             ),
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
+     * @expectedExceptionMessage Did you mean "baz"?
+     */
+    public function testNameProposal()
+    {
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+
+        $parser->parse($lexer->tokenize('foo > bar'), array('foo', 'baz'));
+    }
 }

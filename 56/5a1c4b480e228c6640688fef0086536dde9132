@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-02T08:31:23Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T14:46:00Z
+
+I get why suggestions are useful, but I don't the the `getSubject()` method. In what kind of code would the method be useful? This give the subject, but provides no info about the "why" (the message does).
+Should we remove that  `getSubject()` method?
+
+---------------------------------------------------------------------------
+
+by fmata at 2017-09-03T16:36:46Z
+
+The `getSubject()` method is useful to highlight in the UI which part is wrong in the expression.
+
+However, is there any chance to get this merged in 2.7/2.8 ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T16:41:33Z
+
+> useful to highlight in the UI which part is wrong in the expression
+
+so, this is highly reliant on the fact that "getSubject" returns a subpart of "getMessage", isn't it?
+nowhere else in the code base do we do this kind of things. I'm not sure we should start. Instead, you can just highlight what's in double quotes I think.
+
+> any chance to get this merged in 2.7/2.8
+
+this is a new feature - and all new features go to 3.4, so I don't think so...
+
+---------------------------------------------------------------------------
+
+by fmata at 2017-09-03T16:47:44Z
+
+> so, this is highly reliant on the fact that "getSubject" returns a subpart of "getMessage", isn't it?
+
+Yes
+
+I did it to not rely on the message which can be updated anytime in a future release...
+But if you think it's a blocker, I can revert the public method.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T16:51:55Z
+
+I think it's better to revert that public method yes. And if anyone else reading this thinks that it was a good idea, it could be submitted later on in another PR (but I doubt it will happen...)
+
+---------------------------------------------------------------------------
+
+by fmata at 2017-09-03T17:55:08Z
+
+`getSubject()` and related stuffs reverted. Test added.

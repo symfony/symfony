@@ -46,7 +46,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @return string An ISO 8601 or relative date string like date interval presentation
      *
-     * @throws UnexpectedTypeException If the given value is not a \DateInterval instance.
+     * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
     public function transform($value)
     {
@@ -67,8 +67,8 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @return \DateInterval An instance of \DateInterval
      *
-     * @throws UnexpectedTypeException       If the given value is not a string.
-     * @throws TransformationFailedException If the date interval could not be parsed.
+     * @throws UnexpectedTypeException       if the given value is not a string
+     * @throws TransformationFailedException if the date interval could not be parsed
      */
     public function reverseTransform($value)
     {

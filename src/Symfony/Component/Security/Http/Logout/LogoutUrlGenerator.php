@@ -132,7 +132,7 @@ class LogoutUrlGenerator
      *
      * @return array The logout listener found
      *
-     * @throws \InvalidArgumentException if no LogoutListener is registered for the key or could not be found automatically.
+     * @throws \InvalidArgumentException if no LogoutListener is registered for the key or could not be found automatically
      */
     private function getListener($key)
     {

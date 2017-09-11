@@ -15,7 +15,7 @@ trait InternalTrait2
     }
 
     /**
-     * @internal but should not trigger a deprecation.
+     * @internal but should not trigger a deprecation
      */
     public function usedInInternalClass()
     {

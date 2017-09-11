@@ -583,6 +583,11 @@ Process
 
  * The `getEnhanceWindowsCompatibility()` and `setEnhanceWindowsCompatibility()` methods of the `Process` class have been removed.
 
+Profiler
+--------
+
+ * The `profiler.matcher` option has been removed.
+
 ProxyManager
 ------------
 

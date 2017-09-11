@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-12T18:03:23Z
+
+ping @Tobion @maryo
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-08-12T22:24:47Z
+
+Seems good enough. But https://github.com/symfony/symfony/issues/23808#issuecomment-321513830 would be the more correct solution.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-15T13:26:21Z
+
+@mlazovla what's your stand about that "more correct solution"?
+
+---------------------------------------------------------------------------
+
+by mlazovla at 2017-08-15T15:07:54Z
+
+Maryo's new solution looks more universal than my PR. But I am not sure if it broke some edge case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-25T10:45:44Z
+
+So, should we merge and later on do what @maryo describes? Anyone willing to give it a try?

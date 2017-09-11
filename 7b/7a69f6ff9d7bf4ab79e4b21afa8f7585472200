@@ -1,0 +1,174 @@
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-08T09:42:18Z
+
+> The "/tmp/fabbot/m_75504550859b26057bb9fe5.98914794/src" directory does not exist.
+
+nice crash @fabpot
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-08T09:43:14Z
+
+damn, all CIs are crashing...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-08T12:41:07Z
+
+3.1 is EOMed, this should be rebased on 3.3.  That will trigger a new fabbot's review btw (other CIs might be broken, we are able to know if it's related or not).
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-08T12:49:37Z
+
+I'm not sure I understand I should do (since I don't know what 'EOMed' means)
+Shouldn't 3.1 be the target as it is the lowest branch effected?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-08T12:51:19Z
+
+3.1 is not maintained anymore (EOM => End Of Maintenance), thus the lowest maintained branch affected by this should be 3.3.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-08T13:06:07Z
+
+> The "/tmp/fabbot/m_75504550859b26057bb9fe5.98914794/src" directory does not exist.
+> nice crash @fabpot
+
+The crash does not come from fabbot. It's because of the PHPCSFixer [config](https://github.com/symfony/symfony/blob/8357f2ae4ab490e4b561317ebfd99cc09a09d885/.php_cs.dist#L16).
+
+Fabbot only write new/updated files on the disk. In this case, there are no file updated in the src/ folder. So the finder crashes.
+
+We should add a `if is_dir` to prevent this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T14:54:50Z
+
+@jvasseur any comment?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-09-08T15:01:10Z
+
+This means we will stop getting any CS fix for this file. I think we should stop `php-cs-fixer` from doing the `protected` -> `private` change for the whole codebase instead, since it doesn't bring a lot of value (we already push for using private everywhere).
+
+BTW since this fixer can change code behavior (event if it's a bit of an edge case) it should be marked as risky.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-08T15:04:11Z
+
+any fixer could be marked as risky if you violate php or have test that compare how code "looks like" (like here, dumper of class - `null` vs `NULL`).
+I rather suggest you to stop violating PHP OOP in CacheItem ;)
+or, continue violating it if you really need to, yet change way of accessing variable from protected to private - it's still possible, just use different key prefix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T15:09:29Z
+
+@SpacePossum is there a way to achieve what @jvasseur says? ie exclude that protected->private transformation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T15:16:45Z
+
+@keradus I don't know who's that "you" you're referring to, but that's OSS, so if you want to propose a change, you can submit PRs and trigger a discussion on actual code, not only talk in the abstract. I'd be happy to explain on that PR why I think the current code has merits that surpass the principles you defend. Changing to private and accessing with a different key is also possible. I'll let you do the PR.
+Until this is done, I agree with @jvasseur, the CS fixer is just wrong here, we don't follow those rules, the code proves it.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-08T16:40:30Z
+
+>This means we will stop getting any CS fix for this file.
+
+Yes, this is sadly the side effect of the proposed change. I say "sadly" because I would like a way of configuring rules for different directories. However, reality is I didn't find the time to make it.
+
+>I think we should stop php-cs-fixer from doing the protected -> private change for the whole codebase instead, since it doesn't bring a lot of value (we already push for using private everywhere).
+
+I think to would be a loss for SF. It is not about the good code you got not now, it is more to prevent it from happening in the future. Good reviews help, but having a tool to do it for you saves time for reviewers pointing out stuff and focus on the real value of a PR.
+
+> BTW since this fixer can change code behavior (event if it's a bit of an edge case) it should be marked as risky.
+
+I didn't look into the implementation of the fixer for a while so I cannot say anything useful about it now. Therefore I would like to advice you to open an issue about it on the fixer repo itself. I tend to forget requests like these and an issue there might prevent that, but feel free to ignore my suggestion.
+One note though, since the current configuration allows [risky](https://github.com/symfony/symfony/blob/3.4/.php_cs.dist#L13) rules moving the fixer to the SF risky set will still cause fabbot.io to report it.
+
+>any fixer could be marked as risky if you violate php or have test that compare how code "looks like" (like here, dumper of class - null vs NULL).
+
+Yes, anyone relying on the source itself through `dumper`, reflection, tokenizing, file size, etc. will find that all fixers are risky.
+We consider `risky` possibly changing code behavior, however we try to support other systems relying on PHPDoc (Doctrine for example) as well and not break those (even if it wouldn't break PHP code execution itself) (but than again, you know way better than me :) ).
+
+> I rather suggest you to stop violating PHP OOP in CacheItem ;)
+or, continue violating it if you really need to, yet change way of accessing variable from protected to private - it's still possible, just use different key prefix.
+
+Using the different key-prefix sounds like a good idea to me.
+
+>@SpacePossum is there a way to achieve what @jvasseur says? ie exclude that protected->private transformation?
+
+You can remove the rule as a whole or remove all rules from being applied to a file (this PR).
+Sadly no middle ground like `apply only this set to these files`.
+
+>@keradus I don't know who's that "you" you're referring to, but that's OSS, so if you want to propose a change, you can submit PRs and trigger a discussion on actual code, not only talk in the abstract. I'd be happy to explain on that PR why I think the current code has merits that surpass the principles you defend. Changing to private and accessing with a different key is also possible. I'll let you do the PR.
+
+I think a dedicated issue about this would work as well? I would be interested as for me this has been an TIL day about PHP while I thought I knew a bit about it :)
+
+>Until this is done, I agree with @jvasseur, the CS fixer is just wrong here, we don't follow those rules, the code proves it.
+
+Not following a rule doesn't make the fixer wrong, it means it is configured in a way that doesn't suit you.
+The difference I try to point out is that we (PHP CS Fixer community) do try to provide a good tool that is useful for SF and others. We try to keep the amount of noise down for SF based on previous PR's and such. We might get it wrong sometimes, but we also try to follow up on that and fix the mistakes.
+
+This PR can also wait until the talk about the file has been finished. It can also be closed as not relevant. For me it was just an attempt to reduce the noise caused by the fixer on the file, if it causes even more noise; than the PR should be stopped ;)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-08T16:52:58Z
+
+Yet, PHP allows defining protected members in a final class. About "why we rely on that", this is a framework after all, we have needs that final applications don't have.
+Same principle applies for `func_get_args()`, reflection, closure binding and other stuff that you might not need (or want) in your final applications.
+
+:+1: for disabling this rule in the core rather than excluding this file from the inspection. This file is not a hack, excluding it would be.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T17:43:23Z
+
+> Not following a rule doesn't make the fixer wrong, it means it is configured in a way that doesn't suit you
+
+100% what I meant, php-cs-fixer is a fantastic tool indeed, a big thank for making it alive really! I only meant configuration was not aligned to actual practice. Can you please drop a PR disabling that rule (and enabling yoda_style & co as discussed in the previous PR?)
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-08T21:04:17Z
+
+> configuration was not aligned to actual practice
+
+debatable, whole repo except one file is following it ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-08T22:07:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-11T05:19:09Z
+
+updated,
+lemme know if I should remove the commit from @lyrixx (I picked it to see `fabbot.io` running here)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-11T05:58:27Z
+
+@SpacePossum thanks, I just merged @lyrixx' commit up to 3.3 so you can rebase and get rid of it here.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-11T06:27:26Z
+
+Thanks so much :+1:
+commit has been removed by rebasing

@@ -29,7 +29,7 @@ interface LdapClientInterface
      * @param string $dn       A LDAP dn
      * @param string $password A password
      *
-     * @throws ConnectionException If dn / password could not be bound.
+     * @throws ConnectionException if dn / password could not be bound
      */
     public function bind($dn = null, $password = null);
 

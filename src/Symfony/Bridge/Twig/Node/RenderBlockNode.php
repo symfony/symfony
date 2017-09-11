@@ -24,15 +24,18 @@ use Twig\Node\Expression\FunctionExpression;
  */
 class RenderBlockNode extends FunctionExpression
 {
+    use NamedArgumentsResolverTrait;
+
     public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
-        $arguments = iterator_to_array($this->getNode('arguments'));
+        $name = $this->getAttribute('name');
+        $arguments = $this->resolveNamedArguments($name, array('view', 'variables'));
         $compiler->write('$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->renderBlock(');
 
         if (isset($arguments[0])) {
             $compiler->subcompile($arguments[0]);
-            $compiler->raw(', \''.$this->getAttribute('name').'\'');
+            $compiler->raw(', \''.$name.'\'');
 
             if (isset($arguments[1])) {
                 $compiler->raw(', ');

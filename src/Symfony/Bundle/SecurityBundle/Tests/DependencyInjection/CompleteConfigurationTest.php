@@ -405,6 +405,18 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->getContainer('listener_undefined_provider');
     }
 
+    public function testFirewallWithUserProvider()
+    {
+        $this->getContainer('firewall_provider');
+        $this->addToAssertionCount(1);
+    }
+
+    public function testFirewallListenerWithProvider()
+    {
+        $this->getContainer('listener_provider');
+        $this->addToAssertionCount(1);
+    }
+
     protected function getContainer($file)
     {
         $file = $file.'.'.$this->getFileExtension();

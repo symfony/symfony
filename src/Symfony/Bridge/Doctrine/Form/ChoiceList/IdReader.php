@@ -79,8 +79,8 @@ class IdReader
     /**
      * Returns whether the class has a single-column ID.
      *
-     * @return bool Returns `true` if the class has a single-column ID and
-     *              `false` otherwise.
+     * @return bool returns `true` if the class has a single-column ID and
+     *              `false` otherwise
      */
     public function isSingleId(): bool
     {
@@ -90,8 +90,8 @@ class IdReader
     /**
      * Returns whether the class has a single-column integer ID.
      *
-     * @return bool Returns `true` if the class has a single-column integer ID
-     *              and `false` otherwise.
+     * @return bool returns `true` if the class has a single-column integer ID
+     *              and `false` otherwise
      */
     public function isIntId(): bool
     {

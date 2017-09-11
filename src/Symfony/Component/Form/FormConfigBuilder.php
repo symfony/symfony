@@ -185,8 +185,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws InvalidArgumentException If the data class is not a valid class or if
-     *                                  the name contains invalid characters.
+     * @throws InvalidArgumentException if the data class is not a valid class or if
+     *                                  the name contains invalid characters
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
@@ -852,8 +852,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @param string|int $name The tested form name
      *
-     * @throws UnexpectedTypeException  If the name is not a string or an integer.
-     * @throws InvalidArgumentException If the name contains invalid characters.
+     * @throws UnexpectedTypeException  if the name is not a string or an integer
+     * @throws InvalidArgumentException if the name contains invalid characters
      */
     public static function validateName($name)
     {

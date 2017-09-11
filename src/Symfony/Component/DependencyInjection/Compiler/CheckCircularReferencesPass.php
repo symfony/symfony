@@ -51,7 +51,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
      *
      * @param ServiceReferenceGraphEdge[] $edges An array of Edges
      *
-     * @throws ServiceCircularReferenceException When a circular reference is found.
+     * @throws ServiceCircularReferenceException when a circular reference is found
      */
     private function checkOutEdges(array $edges)
     {

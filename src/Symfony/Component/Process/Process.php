@@ -1523,7 +1523,7 @@ class Process implements \IteratorAggregate
      *
      * @param string $functionName The function name that was called
      *
-     * @throws LogicException If the process has not run.
+     * @throws LogicException if the process has not run
      */
     private function requireProcessIsStarted($functionName)
     {
@@ -1537,7 +1537,7 @@ class Process implements \IteratorAggregate
      *
      * @param string $functionName The function name that was called
      *
-     * @throws LogicException If the process is not yet terminated.
+     * @throws LogicException if the process is not yet terminated
      */
     private function requireProcessIsTerminated($functionName)
     {

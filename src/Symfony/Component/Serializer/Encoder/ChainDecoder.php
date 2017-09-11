@@ -62,7 +62,7 @@ class ChainDecoder implements ContextAwareDecoderInterface
      *
      * @return DecoderInterface
      *
-     * @throws RuntimeException If no decoder is found.
+     * @throws RuntimeException if no decoder is found
      */
     private function getDecoder($format, array $context)
     {

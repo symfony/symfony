@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Formats debug file links.
@@ -23,10 +23,11 @@ class FileLinkFormatter implements \Serializable
 {
     private $fileLinkFormat;
     private $requestStack;
+    private $router;
     private $baseDir;
-    private $urlFormat;
+    private $queryString;
 
-    public function __construct($fileLinkFormat = null, RequestStack $requestStack = null, $baseDir = null, $urlFormat = null)
+    public function __construct($fileLinkFormat = null, RequestStack $requestStack = null, $baseDir = null, $queryString = null, UrlGeneratorInterface $router = null)
     {
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
@@ -36,8 +37,9 @@ class FileLinkFormatter implements \Serializable
 
         $this->fileLinkFormat = $fileLinkFormat;
         $this->requestStack = $requestStack;
+        $this->router = $router;
         $this->baseDir = $baseDir;
-        $this->urlFormat = $urlFormat;
+        $this->queryString = $queryString;
     }
 
     public function format($file, $line)
@@ -75,7 +77,15 @@ class FileLinkFormatter implements \Serializable
         if ($this->fileLinkFormat) {
             return $this->fileLinkFormat;
         }
-        if ($this->requestStack && $this->baseDir && $this->urlFormat) {
+
+        if (null !== $this->router) {
+            return array(
+                $this->router->generate('_profiler_open_file').$this->queryString,
+                $this->baseDir.DIRECTORY_SEPARATOR, '',
+            );
+        }
+
+        if (null !== $this->requestStack) {
             $request = $this->requestStack->getMasterRequest();
             if ($request instanceof Request) {
                 return array(

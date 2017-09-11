@@ -56,7 +56,8 @@
             <argument>%debug.file_link_format%</argument>
             <argument type="service" id="request_stack" on-invalid="ignore" />
             <argument>null</argument>
-            <argument>/_profiler/open?file=%%f&amp;line=%%l#line%%l</argument>
+            <argument>?file=%%f&amp;line=%%l#line%%l</argument>
+            <argument type="service" id="router" on-invalid="null" />
         </service>
     </services>
 </container>

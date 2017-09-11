@@ -67,7 +67,7 @@ trait RedisTrait
      * @param string $dsn
      * @param array  $options See self::$defaultConnectionOptions
      *
-     * @throws InvalidArgumentException When the DSN is invalid.
+     * @throws InvalidArgumentException when the DSN is invalid
      *
      * @return \Redis|\Predis\Client According to the "class" option
      */

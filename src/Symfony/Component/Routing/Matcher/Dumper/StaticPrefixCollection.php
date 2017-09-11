@@ -225,7 +225,7 @@ class StaticPrefixCollection
      *
      * @param string $prefix
      *
-     * @throws \LogicException When a prefix does not belong in a group.
+     * @throws \LogicException when a prefix does not belong in a group
      */
     private function guardAgainstAddingNotAcceptedRoutes($prefix)
     {

@@ -275,8 +275,8 @@ interface ExecutionContextInterface
      * has been called with a plain value and constraint, this method returns
      * null.
      *
-     * @return MetadataInterface|null The metadata of the currently validated
-     *                                value.
+     * @return MetadataInterface|null the metadata of the currently validated
+     *                                value
      */
     public function getMetadata();
 

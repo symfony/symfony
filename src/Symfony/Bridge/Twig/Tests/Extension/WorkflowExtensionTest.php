@@ -14,7 +14,6 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\Transition;

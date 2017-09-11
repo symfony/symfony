@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-11T20:30:06Z
+
+> Status quo is that some annotation are in the middle - having first word uppercased, but no final stop.
+
+Can we fix them (or avoid lcfirst already updated ones)?

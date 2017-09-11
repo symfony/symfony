@@ -60,6 +60,9 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Returns a bundle and optionally its descendants by its name.
      *
+     * The second argument is deprecated as of 3.4 and will be removed in 4.0. This method
+     * will always return an instance of BundleInterface in 4.0.
+     *
      * @param string $name  Bundle name
      * @param bool   $first Whether to return the first bundle only or together with its descendants
      *

@@ -204,8 +204,17 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function getBundle($name, $first = true)
+    public function getBundle($name, $first = true/*, $noDeprecation = false */)
     {
+        $noDeprecation = false;
+        if (func_num_args() >= 3) {
+            $noDeprecation = func_get_arg(2);
+        }
+
+        if (!$first && !$noDeprecation) {
+            @trigger_error(sprintf('Passing "false" as the second argument to %s() is deprecated as of 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         if (!isset($this->bundleMap[$name])) {
             throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, get_class($this)));
         }
@@ -241,7 +250,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $isResource = 0 === strpos($path, 'Resources') && null !== $dir;
         $overridePath = substr($path, 9);
         $resourceBundle = null;
-        $bundles = $this->getBundle($bundleName, false);
+        $bundles = $this->getBundle($bundleName, false, true);
         $files = array();
 
         foreach ($bundles as $bundle) {
@@ -468,6 +477,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $this->bundles[$name] = $bundle;
 
             if ($parentName = $bundle->getParent()) {
+                @trigger_error('Bundle inheritance is deprecated as of 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+
                 if (isset($directChildren[$parentName])) {
                     throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
                 }

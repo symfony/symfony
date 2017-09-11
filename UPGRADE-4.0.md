@@ -493,6 +493,8 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Bundle inheritance has been removed.
+
  * Relying on convention-based commands discovery is not supported anymore.
    Use PSR-4 based service discovery instead.
 

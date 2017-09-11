@@ -56,6 +56,8 @@ interface BundleInterface extends ContainerAwareInterface
      * bundle.
      *
      * @return string The Bundle name it overrides or null if no parent
+     *
+     * @deprecated This method is deprecated as of 3.4 and will be removed in 4.0.
      */
     public function getParent();
 

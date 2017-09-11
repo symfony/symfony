@@ -154,9 +154,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Adds children with a default value when none are defined.
      *
-     * @param int|string|array|null $children The number of children|The child name|The children names to be added
-     *
      * This method is applicable to prototype nodes only.
+     *
+     * @param int|string|array|null $children the number of children|The child name|The children names to be added
      *
      * @return $this
      */

@@ -455,11 +455,11 @@ class Response
     /**
      * Sets the response status code.
      *
-     * @param int   $code HTTP status code
-     * @param mixed $text HTTP status text
-     *
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
+     *
+     * @param int   $code HTTP status code
+     * @param mixed $text HTTP status text
      *
      * @return $this
      *

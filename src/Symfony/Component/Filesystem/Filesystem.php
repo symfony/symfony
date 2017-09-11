@@ -659,7 +659,7 @@ class Filesystem
      * @param string $filename The file to be written to
      * @param string $content  The data to write into the file
      *
-     * @throws IOException If the file cannot be written to
+     * @throws IOException if the file cannot be written to
      */
     public function dumpFile($filename, $content)
     {

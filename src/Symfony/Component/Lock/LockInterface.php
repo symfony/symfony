@@ -28,7 +28,7 @@ interface LockInterface
      *
      * @param bool $blocking Whether or not the Lock should wait for the release of someone else
      *
-     * @return bool Whether or not the lock had been acquired.
+     * @return bool whether or not the lock had been acquired
      *
      * @throws LockConflictedException If the lock is acquired by someone else in blocking mode
      * @throws LockAcquiringException  If the lock can not be acquired

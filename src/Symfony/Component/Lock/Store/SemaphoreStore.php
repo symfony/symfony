@@ -27,7 +27,7 @@ class SemaphoreStore implements StoreInterface
     /**
      * Returns whether or not the store is supported.
      *
-     * @param bool|null $blocking When not null, checked again the blocking mode.
+     * @param bool|null $blocking when not null, checked again the blocking mode
      *
      * @return bool
      *

@@ -13,6 +13,7 @@ return PhpCsFixer\Config::create()
         'braces' => array('allow_single_line_closure' => true),
         'heredoc_to_nowdoc' => false,
         'phpdoc_annotation_without_dot' => false,
+        'protected_to_private' => false,
     ))
     ->setRiskyAllowed(true)
     ->setFinder(

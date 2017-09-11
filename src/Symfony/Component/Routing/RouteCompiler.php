@@ -40,8 +40,8 @@ class RouteCompiler implements RouteCompilerInterface
      * {@inheritdoc}
      *
      * @throws \LogicException  If a variable is referenced more than once
-     * @throws \DomainException If a variable name starts with a digit or if it is too long to be successfully used as
-     *                          a PCRE subpattern.
+     * @throws \DomainException if a variable name starts with a digit or if it is too long to be successfully used as
+     *                          a PCRE subpattern
      */
     public static function compile(Route $route)
     {

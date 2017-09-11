@@ -56,8 +56,8 @@ interface ConstraintViolationInterface
     /**
      * Returns the parameters to be inserted into the raw violation message.
      *
-     * @return array A possibly empty list of parameters indexed by the names
-     *               that appear in the message template.
+     * @return array a possibly empty list of parameters indexed by the names
+     *               that appear in the message template
      *
      * @see getMessageTemplate()
      * @deprecated since version 2.7, to be replaced by getParameters() in 3.0.
@@ -111,8 +111,8 @@ interface ConstraintViolationInterface
     /**
      * Returns the value that caused the violation.
      *
-     * @return mixed The invalid value that caused the validated constraint to
-     *               fail.
+     * @return mixed the invalid value that caused the validated constraint to
+     *               fail
      */
     public function getInvalidValue();
 

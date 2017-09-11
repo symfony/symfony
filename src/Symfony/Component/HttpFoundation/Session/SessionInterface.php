@@ -25,7 +25,7 @@ interface SessionInterface
      *
      * @return bool True if session started
      *
-     * @throws \RuntimeException If session fails to start.
+     * @throws \RuntimeException if session fails to start
      */
     public function start();
 

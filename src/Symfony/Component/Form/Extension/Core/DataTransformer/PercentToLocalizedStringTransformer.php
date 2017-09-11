@@ -70,8 +70,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return string Percentage value
      *
-     * @throws TransformationFailedException If the given value is not numeric or
-     *                                       if the value could not be transformed.
+     * @throws TransformationFailedException if the given value is not numeric or
+     *                                       if the value could not be transformed
      */
     public function transform($value)
     {
@@ -105,8 +105,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return int|float Normalized value
      *
-     * @throws TransformationFailedException If the given value is not a string or
-     *                                       if the value could not be transformed.
+     * @throws TransformationFailedException if the given value is not a string or
+     *                                       if the value could not be transformed
      */
     public function reverseTransform($value)
     {

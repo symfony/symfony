@@ -258,7 +258,7 @@ class NumberFormatter
      * Constructor.
      *
      * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
-     * @param int    $style   Style of the formatting, one of the format style constants
+     * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
      * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
@@ -295,7 +295,7 @@ class NumberFormatter
      * Static constructor.
      *
      * @param string $locale  The locale code. The only supported locale is "en" (or null using the default locale, i.e. "en")
-     * @param int    $style   Style of the formatting, one of the format style constants
+     * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only currently supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
      * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
@@ -355,8 +355,8 @@ class NumberFormatter
     /**
      * Format a number.
      *
-     * @param int|float $value The value to format
-     * @param int       $type  Type of the formatting, one of the format type constants
+     * @param int|float $value the value to format
+     * @param int       $type  Type of the formatting, one of the format type constants.
      *                         Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
      * @return bool|string The formatted value or false on error
@@ -516,9 +516,9 @@ class NumberFormatter
     /**
      * Parse a number.
      *
-     * @param string $value    The value to parse
-     * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
-     * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param string $value    the value to parse
+     * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default.
+     * @param int    $position offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return int|float|false The parsed value of false on error
      *
@@ -566,10 +566,10 @@ class NumberFormatter
     /**
      * Set an attribute.
      *
-     * @param int $attr  An attribute specifier, one of the numeric attribute constants
+     * @param int $attr  An attribute specifier, one of the numeric attribute constants.
      *                   The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
      *                   NumberFormatter::GROUPING_USED and NumberFormatter::ROUNDING_MODE.
-     * @param int $value The attribute value
+     * @param int $value the attribute value
      *
      * @return bool true on success or false on failure
      *

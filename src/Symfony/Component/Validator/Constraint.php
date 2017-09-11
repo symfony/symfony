@@ -209,7 +209,7 @@ abstract class Constraint
      *
      * @throws InvalidOptionsException If an invalid option name is given
      *
-     * @internal This method should not be used or overwritten in userland code.
+     * @internal this method should not be used or overwritten in userland code
      */
     public function __get($option)
     {

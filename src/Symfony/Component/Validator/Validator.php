@@ -108,7 +108,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     /**
      * {@inheritdoc}
      *
-     * @throws ValidatorException If the metadata for the value does not support properties.
+     * @throws ValidatorException if the metadata for the value does not support properties
      */
     public function validateProperty($containingValue, $property, $groups = null)
     {
@@ -139,7 +139,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     /**
      * {@inheritdoc}
      *
-     * @throws ValidatorException If the metadata for the value does not support properties.
+     * @throws ValidatorException if the metadata for the value does not support properties
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null)
     {

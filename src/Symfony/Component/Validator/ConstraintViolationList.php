@@ -164,7 +164,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      *
      * @param string|string[] $codes The codes to find
      *
-     * @return static New instance which contains only specific errors.
+     * @return static new instance which contains only specific errors
      */
     public function findByCodes($codes)
     {

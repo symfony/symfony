@@ -150,7 +150,7 @@ class JsonResponse extends Response
                 try {
                     $data = @json_encode($data, $this->encodingOptions);
                 } finally {
-                     restore_error_handler();
+                    restore_error_handler();
                 }
             } else {
                 try {

@@ -137,8 +137,8 @@ class CommandTester
     /**
      * Sets the user inputs.
      *
-     * @param array An array of strings representing each input
-     *              passed to the command input stream.
+     * @param array an array of strings representing each input
+     *              passed to the command input stream
      *
      * @return CommandTester
      */

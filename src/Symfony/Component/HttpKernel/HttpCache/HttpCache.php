@@ -704,7 +704,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Response $entry
      *
-     * @return bool True when the stale response may be served, false otherwise.
+     * @return bool true when the stale response may be served, false otherwise
      */
     private function mayServeStaleWhileRevalidate(Response $entry)
     {
@@ -722,7 +722,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request $request The request to wait for
      *
-     * @return bool True if the lock was released before the internal timeout was hit; false if the wait timeout was exceeded.
+     * @return bool true if the lock was released before the internal timeout was hit; false if the wait timeout was exceeded
      */
     private function waitForLock(Request $request)
     {

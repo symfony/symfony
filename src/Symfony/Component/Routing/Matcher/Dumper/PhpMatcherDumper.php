@@ -182,7 +182,7 @@ EOF;
      *
      * @param StaticPrefixCollection $collection           A StaticPrefixCollection instance
      * @param bool                   $supportsRedirections Whether redirections are supported by the base class
-     * @param string                 $ifOrElseIf           Either "if" or "elseif" to influence chaining.
+     * @param string                 $ifOrElseIf           either "if" or "elseif" to influence chaining
      *
      * @return string PHP code
      */

@@ -475,7 +475,7 @@ class Command
     }
 
     /**
-     * @return bool Whether the command should be publicly shown or not.
+     * @return bool whether the command should be publicly shown or not
      */
     public function isHidden()
     {

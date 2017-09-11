@@ -219,6 +219,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
                         ->arrayNode('matcher')
+                            ->setDeprecated('The "profiler.matcher" configuration key has been deprecated in Symfony 3.4 and it will be removed in 4.0.')
                             ->canBeEnabled()
                             ->performNoDeepMerging()
                             ->fixXmlConfig('ip')

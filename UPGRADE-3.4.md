@@ -210,6 +210,11 @@ Process
  * The `Symfony\Component\Process\ProcessBuilder` class has been deprecated,
    use the `Symfony\Component\Process\Process` class directly instead.
 
+Profiler
+--------
+
+ * The `profiler.matcher` option has been deprecated.
+
 SecurityBundle
 --------------
 

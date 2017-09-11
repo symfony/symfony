@@ -253,7 +253,7 @@ class Configuration implements ConfigurationInterface
                                 $workflows = $v;
                                 unset($workflows['enabled']);
 
-                                if (count($workflows) === 1 && isset($workflows[0]['enabled'])) {
+                                if (1 === count($workflows) && isset($workflows[0]['enabled'])) {
                                     $workflows = array();
                                 }
 

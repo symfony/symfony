@@ -701,7 +701,7 @@ class Definition
      *
      * @return $this
      *
-     * @throws InvalidArgumentException When the message template is invalid.
+     * @throws InvalidArgumentException when the message template is invalid
      */
     public function setDeprecated($status = true, $template = null)
     {

@@ -232,7 +232,7 @@ EOT
      * @param string $targetDir
      * @param bool   $relative
      *
-     * @throws IOException If link can not be created.
+     * @throws IOException if link can not be created
      */
     private function symlink($originDir, $targetDir, $relative = false)
     {

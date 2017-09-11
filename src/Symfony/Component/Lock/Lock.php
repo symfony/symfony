@@ -149,4 +149,27 @@ final class Lock implements LockInterface, LoggerAwareInterface
     {
         return $this->key->getRemainingLifetime();
     }
+
+    /**
+     * Execute a callback inside a Lock Transaction.
+     *
+     * @param callable $callback The callback to execute
+     * @param bool     $blocking Whether or not the Lock should wait for the release of someone else
+     *
+     * @return bool Whether or not the callback had been executed.
+     */
+    public function with(callable $callback, $blocking = false)
+    {
+        if (!$this->acquire($blocking)) {
+            return false;
+        }
+
+        try {
+            $callback();
+
+            return true;
+        } finally {
+            $this->release();
+        }
+    }
 }

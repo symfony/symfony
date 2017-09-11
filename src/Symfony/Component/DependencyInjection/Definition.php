@@ -148,7 +148,7 @@ class Definition
      *
      * @return $this
      *
-     * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
+     * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
     public function setDecoratedService($id, $renamedId = null, $priority = 0)
     {

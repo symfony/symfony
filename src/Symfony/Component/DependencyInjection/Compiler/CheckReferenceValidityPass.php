@@ -85,7 +85,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      *
      * @param array $arguments An array of Reference objects
      *
-     * @throws RuntimeException when there is a reference to an abstract definition.
+     * @throws RuntimeException when there is a reference to an abstract definition
      */
     private function validateReferences(array $arguments)
     {

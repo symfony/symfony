@@ -53,7 +53,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                          'The definition for "%s" has no class attribute, and appears to reference a '
                         .'class or interface in the global namespace. Leaving out the "class" attribute '
                         .'is only allowed for namespaced classes. Please specify the class attribute '
-                        .'explicitly to get rid of this error.',
+                        .'explicitly or change its service identifier to \\%1$s to get rid of this error.',
                         $id
                     ));
                 }

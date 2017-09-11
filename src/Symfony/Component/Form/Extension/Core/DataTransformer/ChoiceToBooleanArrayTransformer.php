@@ -49,13 +49,13 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      * depending on whether a given option is selected. If this field is rendered
      * as select tag, the value is not modified.
      *
-     * @param mixed $choice An array if "multiple" is set to true, a scalar
-     *                      value otherwise.
+     * @param mixed $choice an array if "multiple" is set to true, a scalar
+     *                      value otherwise
      *
      * @return mixed An array
      *
-     * @throws TransformationFailedException If the given value is not scalar or
-     *                                       if the choices can not be retrieved.
+     * @throws TransformationFailedException if the given value is not scalar or
+     *                                       if the choices can not be retrieved
      */
     public function transform($choice)
     {
@@ -89,10 +89,10 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @return mixed A scalar value
      *
-     * @throws TransformationFailedException If the given value is not an array,
+     * @throws TransformationFailedException if the given value is not an array,
      *                                       if the recuperation of the choices
      *                                       fails or if some choice can't be
-     *                                       found.
+     *                                       found
      */
     public function reverseTransform($values)
     {

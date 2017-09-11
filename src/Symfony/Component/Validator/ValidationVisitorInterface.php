@@ -62,8 +62,8 @@ interface ValidationVisitorInterface
      * @param bool   $traverse     Whether to traverse the value if it is traversable
      * @param bool   $deep         Whether to traverse nested traversable values recursively
      *
-     * @throws Exception\NoSuchMetadataException If no metadata can be found for
-     *                                           the given value.
+     * @throws Exception\NoSuchMetadataException if no metadata can be found for
+     *                                           the given value
      */
     public function validate($value, $group, $propertyPath, $traverse = false, $deep = false);
 

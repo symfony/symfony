@@ -371,7 +371,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return $this
      *
-     * @throws Exception\AlreadySubmittedException If the button has already been submitted.
+     * @throws Exception\AlreadySubmittedException if the button has already been submitted
      */
     public function submit($submittedData, $clearMissing = true)
     {

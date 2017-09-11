@@ -74,8 +74,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @return string|array Localized date string/array
      *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     *                                       or if the date could not be transformed.
+     * @throws TransformationFailedException if the given value is not a \DateTimeInterface
+     *                                       or if the date could not be transformed
      */
     public function transform($dateTime)
     {
@@ -151,11 +151,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Returns a preconfigured IntlDateFormatter instance.
      *
-     * @param bool $ignoreTimezone Use UTC regardless of the configured timezone.
+     * @param bool $ignoreTimezone use UTC regardless of the configured timezone
      *
      * @return \IntlDateFormatter
      *
-     * @throws TransformationFailedException in case the date formatter can not be constructed.
+     * @throws TransformationFailedException in case the date formatter can not be constructed
      */
     protected function getIntlDateFormatter($ignoreTimezone = false)
     {

@@ -236,7 +236,7 @@ class FormHelper extends Helper
      *
      * @return string A CSRF token
      *
-     * @throws \BadMethodCallException When no CSRF provider was injected in the constructor.
+     * @throws \BadMethodCallException when no CSRF provider was injected in the constructor
      */
     public function csrfToken($tokenId)
     {

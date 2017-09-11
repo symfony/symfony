@@ -26,8 +26,8 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event to dispatch. The name of
      *                          the event is the name of the method that is
      *                          invoked on listeners.
-     * @param Event  $event     The event to pass to the event handlers/listeners
-     *                          If not supplied, an empty Event instance is created.
+     * @param Event  $event     the event to pass to the event handlers/listeners
+     *                          If not supplied, an empty Event instance is created
      *
      * @return Event
      */

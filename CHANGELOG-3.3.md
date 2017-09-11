@@ -7,6 +7,23 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.9 (2017-09-11)
+
+ * bug #24141 [DomCrawler] Fix conversion to int on GetPhpFiles (MaraBlaga)
+ * bug #23853 Filtering empty uuids in ORMQueryBuilderLoader. (mlazovla)
+ * bug #24101 [Security] Fix exception when use_referer option is true and referer is not set or empty (linniksa)
+ * bug #24105 [Filesystem] check permissions if dump target dir is missing (xabbuh)
+ * bug #24126 [HttpKernel] "controller.service_arguments" services should be public (nicolas-grekas)
+ * bug #24113 [FrameworkBundle] Get KERNEL_CLASS through $_ENV too for KernelTestCase (yceruto)
+ * bug #24115 [FrameworkBundle] Get KERNEL_DIR through $_ENV too for KernelTestCase (yceruto)
+ * bug #24041 [ExpressionLanguage] throws an exception on calling uncallable method (fmata)
+ * bug #24096 Fix ArrayInput::toString() for VALUE_IS_ARRAY options/args (chalasr)
+ * bug #24082 [DI] Minor fix in dumped code (nicolas-grekas)
+ * bug #23969 [Cache] Use namespace versioning for backends that dont support clearing by keys (nicolas-grekas)
+ * bug #24021 [DI] Don't track merged configs when the extension doesn't expose it (nicolas-grekas)
+ * bug #24011 [Cache] Always require symfony/polyfill-apcu to provide APCuIterator everywhere (guillaumelecerf)
+ * bug #23730 Fixed the escaping of back slashes and << in console output (javiereguiluz)
+
 * 3.3.8 (2017-08-28)
 
  * bug #24016 [DI] Fix tracking env var placeholders nested in object graphs (nicolas-grekas)

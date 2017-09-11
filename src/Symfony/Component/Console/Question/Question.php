@@ -190,7 +190,7 @@ class Question
      *
      * @return $this
      *
-     * @throws InvalidArgumentException In case the number of attempts is invalid.
+     * @throws InvalidArgumentException in case the number of attempts is invalid
      */
     public function setMaxAttempts($attempts)
     {

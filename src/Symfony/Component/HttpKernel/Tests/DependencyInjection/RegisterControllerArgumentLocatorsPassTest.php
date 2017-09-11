@@ -268,6 +268,21 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEmpty(array_keys($locator));
     }
 
+    public function testControllersAreMadePublic()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', ArgumentWithoutTypeController::class)
+            ->setPublic(false)
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $this->assertTrue($container->getDefinition('foo')->isPublic());
+    }
+
     /**
      * @dataProvider provideBindings
      */

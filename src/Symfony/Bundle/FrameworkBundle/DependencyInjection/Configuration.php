@@ -186,6 +186,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
                         ->arrayNode('matcher')
+                            ->setDeprecated('The "profiler.matcher" configuration key has been deprecated in Symfony 3.4 and it will be removed in 4.0.')
                             ->canBeEnabled()
                             ->performNoDeepMerging()
                             ->fixXmlConfig('ip')
@@ -220,7 +221,7 @@ class Configuration implements ConfigurationInterface
                                 $workflows = $v;
                                 unset($workflows['enabled']);
 
-                                if (count($workflows) === 1 && isset($workflows[0]['enabled'])) {
+                                if (1 === count($workflows) && isset($workflows[0]['enabled'])) {
                                     $workflows = array();
                                 }
 

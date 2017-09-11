@@ -24,6 +24,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Deprecated `profiler.matcher` option
  * Added support for `EventSubscriberInterface` on `MicroKernelTrait`
  * Removed `doctrine/cache` from the list of required dependencies in `composer.json`
  * Deprecated `validator.mapping.cache.doctrine.apc` service

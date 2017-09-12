@@ -63,7 +63,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, $formatter, string $defaultLocale, array $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = array(), array $options = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;

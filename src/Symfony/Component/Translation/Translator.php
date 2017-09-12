@@ -85,14 +85,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct($locale, $formatter = null, $cacheDir = null, $debug = false)
+    public function __construct($locale, MessageFormatterInterface $formatter = null, $cacheDir = null, $debug = false)
     {
         $this->setLocale($locale);
 
-        if ($formatter instanceof MessageSelector) {
-            $formatter = new MessageFormatter($formatter);
-            @trigger_error(sprintf('Passing a "%s" instance into the "%s" as a second argument is deprecated since version 3.4 and will be removed in 4.0. Inject a "%s" implementation instead.', MessageSelector::class, __METHOD__, MessageFormatterInterface::class), E_USER_DEPRECATED);
-        } elseif (null === $formatter) {
+        if (null === $formatter) {
             $formatter = new MessageFormatter();
         }
 

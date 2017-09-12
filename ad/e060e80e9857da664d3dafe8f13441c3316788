@@ -1,0 +1,508 @@
+---------------------------------------------------------------------------
+
+by Nicofuma at 2016-03-25T16:29:27Z
+
+What will be the replacement for `$translator->transChoice('some_message2', 10, array('%count%' => 10));` ?
+
+`$translator->trans('some_message2', ['__number__' => 10, '%count%' => 10], null, null, TransChoiceMessageFormatter::NAME);` ?
+
+It looks a bit weird to me. I think that if `trans` and `transChoice` are merged together we should have a way to automatically choose between the 2 (maybe automatically takes a `'%count%'` key is their isn't any `'__number__'` one or something like that?)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-25T17:10:14Z
+
+@Nicofuma merging them together looks better!
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T17:18:16Z
+
+How would you envision this in the templates? Adding class names/constants is pretty annoying in twig. It also means that I have to pass _a lot_ of default values if I want to specify that. It feels like you have a lot more boilerplate to achieve the same. Having to write down `__number__` doesn't feel ideal either but having to rely on another pre-defined key is kind of magic as well.
+
+What I know from experiences:
+- For transchoice, you always have to define a number
+- specifying the domain and locale is kind of annoying for most cases for the solution you present (messages domain/default locale)
+- A lot of times I translate without parameters but with a different domain
+
+So I think we can agree that something is bothersome in the current implementation but i don't think the solution you present will solve it and will possibly even decrease the DX.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-25T18:13:10Z
+
+Using multiple formatter is something rare but this allow us to migrate safely to [IntlMessageFormatter](https://github.com/symfony/symfony/pull/15068#issuecomment-117635934).
+Right now if we combine trans with transChoice in one formatter it'll reduce some boilerplate,
+
+`__number__` is provider for only BC break not for end-users, we can use `%count%` like we did in [twig transChoice](https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Extension/TranslationExtension.php#L98)
+
+``` twig
+{{ 'Hello world'|transchoice(count) }} //Before
+{{ 'Hello world'|trans({ '%count%': count }) }} // After
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T18:24:19Z
+
+So how would that be determined? I can have a `%count%` in my arguments without it being a transchoice.
+
+``` php
+$translator->trans($v, ['%count%' => 10], null, null, TransChoiceMessageFormatter::NAME);
+// vs
+$translator->transChoice($v, 10);
+```
+
+Where would it be less boilerplate? Maybe I missed something?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-25T18:33:05Z
+
+@iltar
+
+> So how would that be determined? I can have a %count% in my arguments without it being a transchoice.
+
+agreed we should find another pre-defined key :/
+
+> Where would it be less boilerplate? Maybe I missed something?
+
+As I said before TransChoiceMessageFormatter will be meged into TransMessageFormatter so we don't need to pass the formatter argument by default but we need to rely on a pre-defined key
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-25T18:37:34Z
+
+What about `trans_count` ?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T18:41:25Z
+
+Ah okay, so it's the part where the key defines what type is used. In php you could use a constant but that would be cumbersome in twig. You could expose the value like `{{ 'foo' | trans({trans.count: 10}) }}`.
+
+Something else that popped my mind, simply no key: `$translator->trans('foo', [10])`. Sadly it's typehinted as array for this case. In twig it could be `{{ 'foo' | trans(10) }}` though.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-29T06:54:13Z
+
+At first glance this looks to me like a serious step back in DX:
+
+``` twig
+{# before #}
+{{ 'Hello world'|transchoice(count) }}
+
+{# after #}
+{{ 'Hello world'|trans({ '%count%': count }) }}
+```
+
+``` php
+// before
+$translator->transChoice('some_message2', 10, array('%count%' => 10));
+
+// after
+$translator->trans('some_message2', [TransMessageFormatter::TRANS_CHOICE => 10]);
+```
+
+My questions: What's wrong with the current `transChoice()` method? What's the problem we're trying to solve? Why the new code is longer to type and harder to learn? Thanks!
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-03-29T11:07:29Z
+
+@javiereguiluz: take a look at how [message formatter](http://php.net/manual/en/messageformatter.formatmessage.php) class works.
+This is what aitboudad would like to support.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-29T11:18:54Z
+
+@mvrhov yes, but I'd prefer if we first focus on the before/after changes for end users and then we care about the internal implementation. For now I feel that this proposal is worse than the current situation.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-30T09:36:14Z
+
+@javiereguiluz having 2 fonctions that achieve the same behavior looks wrong to me
+and I think `tranchoice` will be useless for custom formattter such as [IntlMessageFormatter](http://php.net/manual/en/class.messageformatter.php) or [ExpressionsMessageFormatter](https://github.com/symfony/symfony/issues/17610). The main goal for me is to make IntlMessageFormatter as default formatter.
+
+we can keep `tranchoice` as a helper method but IMO it shouldn't be part of [TranslatorInterface](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Translation/TranslatorInterface.php#L48)
+if you have any suggestions I would be happy to implement it ;)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-30T09:42:50Z
+
+@aitboudad Actually the only times I've used the transchoice, I've done so via twig and never in the code. I find it a rare occasion having to use the translator directly in the code in the first place (but does happen).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-30T09:50:34Z
+
+@aitboudad here it is how Translator works today from the controller and the templates:
+
+``` php
+// simple
+$this->get('translator')->trans('Hello');
+
+// placeholders
+$this->get('translator')->trans('Hello %name%', ['%name%' => 'Fabien']);
+
+// pluralization
+$this->get('translator')->transChoice(
+    'There is one apple|There are %count% apples',
+    10,
+    array('%count%' => 10)
+);
+
+// selecting the catalogue
+$this->get('translator')->trans('Hello', [], 'admin');
+
+// selecting the locale
+$this->get('translator')->trans('Hello', [], 'messages', 'fr_FR');
+```
+
+``` twig
+{# simple #}
+{% trans %}Hello{% endtrans %}
+{{ 'Hello'|trans }}
+
+{# placeholders #}
+{% trans with { '%name%': 'Fabien' } %}Hello %name%{% endtrans %}
+{{ 'Hello'|trans({'%name%': 'Fabien'}) }}
+
+{# pluralization #}
+{% transchoice count %}
+    {0} There are no apples|{1} There is one apple|]1,Inf[ There are %count% apples
+{% endtranschoice %}
+
+{{ '{0} There ...|{1} There ...'|transchoice(count) }}
+
+{# selecting the catalogue #}
+{% trans from 'admin' %}Hello{% endtrans %}
+{{ 'Hello'|trans({}, 'app') }}
+
+{# selecting the locale #}
+{% trans into 'fr_FR' %}Hello{% endtrans %}
+{{ 'Hello'|trans({}, 'messages', 'fr_FR') }}
+```
+
+Please, provide the equivalent examples for the new way of using the Translator that you are proposing, so we can compare. Thanks!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-30T10:09:19Z
+
+@javiereguiluz
+For php:
+
+``` patch
+ // pluralization
++ use Symfony\Component\Translation\Formatter\TransMessageFormatter;
++
+-$this->get('translator')->transChoice(
++$this->get('translator')->trans(
+     'There is one apple|There are %count% apples',
+-    10,
+-    array('%count%' => 10)
++    array(TransMessageFormatter::TRANS_CHOICE => 10)
+ );
+```
+
+in Twig (I defined global variable `transchoice` = `TransMessageFormatter::TRANS_CHOICE`):
+
+``` patch
+ {# pluralization #}
+-{% transchoice count %}
++{% trans with { transchoice: count } %}
+     {0} There are no apples|{1} There is one apple|]1,Inf[ There are %count% apples
+-{% endtranschoice %}
++{% endtrans %}
+
+-{{ '{0} There ...|{1} There ...'|transchoice(count) }}
++{{ '{0} There ...|{1} There ...'|trans({transchoice: count}) }}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-30T10:28:01Z
+
+@aitboudad thanks for the info. I've updated your comment to add the missing `use` import.
+
+Does the new system mean that `%count%` is a hardcoded variable name in translation messages? If not, how could we implement this example with the new proposal?
+
+``` php
+$this->get('translator')->trans(
+    'There is one apple|There are %num% apples', 5, ['%num%' => 'five']
+);
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-30T10:36:56Z
+
+@javiereguiluz
+
+``` php
+$this->get('translator')->trans(
+    'There is one apple|There are %num% apples',
+    array(TransMessageFormatter::TRANS_CHOICE => 5, '%num%' => 'five')
+);
+```
+
+we can still using `%count%`:
+
+``` php
+$this->get('translator')->trans(
+    'There is one apple|There are %count% apples',
+    array(TransMessageFormatter::TRANS_CHOICE => 5, '%count%' => 'five')
+);
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-07-05T15:58:50Z
+
+I've updated the PR and I think it's is ready for review,
+
+Please note I added an optional formatter `PluralMessageFormatterInterface` for those who want to still use `transChoice` for pluralization and leave `transChoice` as it is.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-07-05T16:14:51Z
+
+for Twig, your diff is wrong. this is how it would look like:
+
+``` diff
+ {# pluralization #}
+-{% transchoice count %}
++{% trans with { (transchoice): count } %}
+     {0} There are no apples|{1} There is one apple|]1,Inf[ There are %count% apples
+-{% endtranschoice %}
++{% endtrans %}
+
+-{{ '{0} There ...|{1} There ...'|transchoice(count) }}
++{{ '{0} There ...|{1} There ...'|trans({(transchoice): count}) }}
+```
+
+Without the braces, the key will not be an expression and so won't read the variable.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-07-05T16:21:26Z
+
+@stof thanks I decided to leave deprecation `transChoice` for another PR or even for `3.3`, let us to discuss about the formatter part right now :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-09-18T08:47:58Z
+
+Hi,
+I removed the ability to use multiple formatters to simplify thing (it should be done in another PR).
+I think this PR is ready now! ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-09-21T17:08:56Z
+
+Travis/fabbot failures is not related.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-09-30T08:01:52Z
+
+@symfony/deciders any chance to get your votes :) ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-09-30T08:08:43Z
+
+I still think the new proposal is a big step back in DX. Example:
+
+#### Before
+
+``` php
+$this->get('translator')->transChoice('...', 10, ['%count%' => 10]);
+```
+
+#### After
+
+``` php
+use Symfony\Component\Translation\Formatter\TransMessageFormatter;
+
+$this->get('translator')->trans('...', 10, [TransMessageFormatter::TRANS_CHOICE => 10]);
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-09-30T08:11:41Z
+
+@javiereguiluz please review the code, I abandoned the idea of multiple formatters at least right now, thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-09-30T08:14:49Z
+
+@aitboudad I'm sorry. Could it be possible to get a before/after comparison of the latest changes?
+
+This is the before in PHP and twig:
+
+``` php
+// simple
+$this->get('translator')->trans('Hello');
+
+// placeholders
+$this->get('translator')->trans('Hello %name%', ['%name%' => 'Fabien']);
+
+// pluralization
+$this->get('translator')->transChoice(
+    'There is one apple|There are %count% apples',
+    10,
+    array('%count%' => 10)
+);
+
+// selecting the catalogue
+$this->get('translator')->trans('Hello', [], 'admin');
+
+// selecting the locale
+$this->get('translator')->trans('Hello', [], 'messages', 'fr_FR');
+```
+
+``` twig
+{# simple #}
+{% trans %}Hello{% endtrans %}
+{{ 'Hello'|trans }}
+
+{# placeholders #}
+{% trans with { '%name%': 'Fabien' } %}Hello %name%{% endtrans %}
+{{ 'Hello'|trans({'%name%': 'Fabien'}) }}
+
+{# pluralization #}
+{% transchoice count %}
+    {0} There are no apples|{1} There is one apple|]1,Inf[ There are %count% apples
+{% endtranschoice %}
+
+{{ '{0} There ...|{1} There ...'|transchoice(count) }}
+
+{# selecting the catalogue #}
+{% trans from 'admin' %}Hello{% endtrans %}
+{{ 'Hello'|trans({}, 'app') }}
+
+{# selecting the locale #}
+{% trans into 'fr_FR' %}Hello{% endtrans %}
+{{ 'Hello'|trans({}, 'messages', 'fr_FR') }}
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-09-30T08:24:35Z
+
+@javiereguiluz there are no changes on those parts :), the only thing to note is with this PR we can choose the way of formating translation message through config (Ex [intl formatter](https://github.com/symfony/symfony/pull/20007))
+
+``` yml
+framework:
+    translator:
+        formatter: translator.formatter.intl
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-30T12:34:38Z
+
+You also need to document the deprecation in the upgrade files.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-06T10:59:54Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-16T14:40:04Z
+
+@aitboudad is it possible just use message formatter without translation inside Twig/PHP? For example when we need site with only one locale but need pluralization rules
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-12-16T14:55:33Z
+
+@Koc I guess yes and I think it's something nice to have but needs some additional work :), the only required part is (formatter + key/value store)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-12-16T15:11:08Z
+
+@symfony/deciders Is there anything else before merging this PR ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-16T16:53:10Z
+
+Should be rebased. But otherwise  this looks good to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T12:14:02Z
+
+@aitboudad could you rebase again please?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-07-12T15:52:04Z
+
+Rebased :), the requested changes from `fabbot.io` seems wrong
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T14:42:45Z
+
+@aitboudad can we add a BC layer and add deprecations to remove the BC break?
+Should target 3.4 btw (with no BC break of course).
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-08-05T14:49:35Z
+
+@nicolas-grekas already done, there is no BC break.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T16:58:01Z
+
+@aitboudad I changed the branch to 3.4, but I cannot push --force on your fork, so here is the rebase:
+https://github.com/nicolas-grekas/symfony/tree/translation-formatters
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-08-05T17:25:08Z
+
+@nicolas-grekas you can push now!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T19:37:16Z
+
+@aitboudad thanks, I just push forced one last time, addressing a few minor things meanwhile.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T20:58:47Z
+
+I think this PR is ready to merge, failures are false positives.
+@aitboudad would you be able to work on a doc PR if worth it?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-08-06T18:54:32Z
+
+why not :), I'll try to work on it next weekend.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-09-11T09:13:31Z
+
+@nicolas-grekas I missed to mention the doc PR #8284, I guess the PR is ready to merge.

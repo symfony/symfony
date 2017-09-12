@@ -18,6 +18,7 @@ CHANGELOG
  * Improved Xliff 2.0 loader to load `<notes>` section.
  * Added `TranslationWriterInterface`
  * Deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
+ * added support for adding custom message formatter and decoupling the default one.
 
 3.2.0
 -----

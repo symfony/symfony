@@ -9,7 +9,7 @@
 
         <service id="translator.default" class="Symfony\Bundle\FrameworkBundle\Translation\Translator" public="true">
             <argument /> <!-- translation loaders locator -->
-            <argument type="service" id="translator.selector" />
+            <argument type="service" id="translator.formatter" />
             <argument>%kernel.default_locale%</argument>
             <argument type="collection" /> <!-- translation loaders ids -->
             <argument type="collection">
@@ -26,6 +26,10 @@
             <argument type="service" id="translator.logging.inner" />
             <argument type="service" id="logger" />
             <tag name="monolog.logger" channel="translation" />
+        </service>
+
+        <service id="translator.formatter.default" class="Symfony\Component\Translation\Formatter\MessageFormatter">
+            <argument type="service" id="translator.selector" />
         </service>
 
         <service id="translation.loader.php" class="Symfony\Component\Translation\Loader\PhpFileLoader" public="true">

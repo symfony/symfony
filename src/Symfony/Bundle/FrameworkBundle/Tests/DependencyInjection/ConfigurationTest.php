@@ -157,6 +157,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class),
                 'fallbacks' => array('en'),
                 'logging' => true,
+                'formatter' => 'translator.formatter.default',
                 'paths' => array(),
             ),
             'validation' => array(

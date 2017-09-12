@@ -73,6 +73,26 @@ class MergeCollectionListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($dataToMergeInto, 'array or (\Traversable and \ArrayAccess)');
         }
 
+        // Reorder $dataToMergeInto as $data is
+        $itemsToCheck = is_object($data) ? clone $data : $data;
+        $orderedItems = array();
+        $itemsLeft = array();
+
+        foreach ($dataToMergeInto as $beforeKey => $beforeItem) {
+            foreach ($itemsToCheck as $afterKey => $afterItem) {
+                if ($afterItem === $beforeItem) {
+                    // Item found, assign it to the final position
+                    $orderedItems[$afterKey] = $beforeItem;
+                    unset($itemsToCheck[$afterKey]);
+                    continue 2;
+                }
+            }
+
+            // Item not found. Will be added at the end of the ordered items
+            $itemsLeft[] = $beforeItem;
+        }
+
+        $dataToMergeInto = $orderedItems + $itemsLeft;
         // If we are not allowed to change anything, return immediately
         if ((!$this->allowAdd && !$this->allowDelete) || $data === $dataToMergeInto) {
             $event->setData($dataToMergeInto);

@@ -19,10 +19,9 @@ namespace Symfony\Component\Console\Output;
 interface OutputAwareInterface
 {
     /**
-     * Set the console output
+     * Set the console output.
      *
      * @param OutputInterface $output
-     * @return void
      */
     public function setOutput(OutputInterface $output);
 }

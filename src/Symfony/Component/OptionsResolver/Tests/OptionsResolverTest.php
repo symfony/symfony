@@ -1556,4 +1556,70 @@ class OptionsResolverTest extends TestCase
 
         count($this->resolver);
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Failsafe
+    ////////////////////////////////////////////////////////////////////////////
+
+    public function testResolveWillIgnoreNonExistingOptionInFailsafe()
+    {
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setDefault('a', '2');
+        $this->resolver->enableFailsafe();
+
+        $this->assertSame(array('z' => '1', 'a' => '2'), $this->resolver->resolve(array('foo' => 'bar')));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     */
+    public function testResolveFailsIfRequiredOptionMissingInFailsafe()
+    {
+        $this->resolver->setRequired('foo');
+        $this->resolver->enableFailsafe();
+
+        $this->resolver->resolve();
+    }
+
+    public function testResolveWillFallbackDefaultIfInvalidTypeInFailsafe()
+    {
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setAllowedTypes('z', 'string');
+        $this->resolver->enableFailsafe();
+
+        $this->assertSame(array('z' => '1'), $this->resolver->resolve(array('z' => 12)));
+    }
+
+    public function testResolveWillFallbackDefaultIfInvalidValueInFailsafe()
+    {
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setAllowedValues('z', array('1', '2', '3'));
+        $this->resolver->enableFailsafe();
+
+        $this->assertSame(array('z' => '1'), $this->resolver->resolve(array('z' => 12)));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveWillFailIfDefaultInvalidTypeInFailsafe()
+    {
+        $this->resolver->setDefault('z', 12);
+        $this->resolver->setAllowedTypes('z', 'string');
+        $this->resolver->enableFailsafe();
+
+        $this->resolver->resolve(array('z' => 12));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveWillFailIfDefaultInvalidValueInFailsafe()
+    {
+        $this->resolver->setDefault('z', 12);
+        $this->resolver->setAllowedValues('z', array('1', '2', '3'));
+        $this->resolver->enableFailsafe();
+
+        $this->resolver->resolve(array('z' => 12));
+    }
 }

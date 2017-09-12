@@ -73,6 +73,27 @@ class MergeCollectionListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($dataToMergeInto, 'array or (\Traversable and \ArrayAccess)');
         }
 
+        // Valid only if $dataToMergeInto is an array
+        // since we are assigning an array value to it
+        if (is_array($dataToMergeInto)) {
+            $orderedData = array();
+            $itemsToCheck = is_object($data) ? clone $data : $data;
+
+            // Get common values in the right order
+            foreach ($itemsToCheck as $afterKey => $afterValue) {
+                foreach ($dataToMergeInto as $beforeKey => $beforeValue) {
+                    if ($beforeValue === $afterValue) {
+                        $orderedData[$beforeKey] = $beforeValue;
+                    }
+                }
+            }
+
+            $missingData = array_diff($dataToMergeInto, $orderedData);
+
+            // Merge all values keeping the index
+            $dataToMergeInto = $orderedData + $missingData;
+        }
+
         // If we are not allowed to change anything, return immediately
         if ($data === $dataToMergeInto || (!$this->allowAdd && !$this->allowDelete)) {
             $event->setData($dataToMergeInto);

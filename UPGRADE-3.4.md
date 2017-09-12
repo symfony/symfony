@@ -239,6 +239,27 @@ Translation
    and will be removed in 4.0, use `Symfony\Component\Translation\Writer\TranslationWriter::write` 
    instead. 
 
+ * Passing a `Symfony\Component\Translation\MessageSelector` to `Translator` has been
+   deprecated. You should pass a message formatter instead
+
+   Before:
+
+   ```php
+   use Symfony\Component\Translation\Translator;
+   use Symfony\Component\Translation\MessageSelector;
+
+   $translator = new Translator('fr_FR', new MessageSelector());
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Translation\Translator;
+   use Symfony\Component\Translation\Formatter\MessageFormatter;
+
+   $translator = new Translator('fr_FR', new MessageFormatter());
+   ```
+
 TwigBridge
 ----------
 

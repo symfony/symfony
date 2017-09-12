@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 
 /**
  * HttpDigestFactory creates services for HTTP digest authentication.
@@ -69,7 +70,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
 
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
-        if (null !== $defaultEntryPoint) {
+        if (null !== $defaultEntryPoint && $defaultEntryPoint instanceof DigestAuthenticationEntryPoint) {
             return $defaultEntryPoint;
         }
 

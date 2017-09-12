@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint;
 
 /**
  * HttpBasicFactory creates services for HTTP basic authentication.
@@ -67,7 +68,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
 
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
-        if (null !== $defaultEntryPoint) {
+        if (null !== $defaultEntryPoint && $defaultEntryPoint instanceof BasicAuthenticationEntryPoint) {
             return $defaultEntryPoint;
         }
 

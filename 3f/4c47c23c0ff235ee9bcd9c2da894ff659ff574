@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-12T19:13:04Z
+
+I guess fabbot failure (unrelated) should be fixed from `2.7`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-12T20:10:22Z
+
+Should we merge this one as a bugfix into the `3.3` branch instead?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-12T20:52:32Z
+
+As a bugfix should be into `2.7`, no? Let's me know the final decision. I'm for a bugfix rather than a feature ( similar to https://github.com/symfony/symfony/pull/24115)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-12T22:20:21Z
+
+As env vars are "officially" supported since 3.3, I'd vote for a merge in 3.3
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-12T22:59:03Z
+
+Done.

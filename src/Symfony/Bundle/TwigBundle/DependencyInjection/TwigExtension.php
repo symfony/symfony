@@ -130,12 +130,16 @@ class TwigExtension extends Extension
             foreach ($bundle['paths'] as $path) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
+
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($config['default_path'].'/bundles/'.$namespace, $namespace));
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
         $container->addResource(new FileExistenceResource($dir));
+
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($config['default_path']));
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');

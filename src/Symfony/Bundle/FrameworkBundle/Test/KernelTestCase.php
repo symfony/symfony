@@ -83,10 +83,27 @@ abstract class KernelTestCase extends TestCase
             static::$class = static::getKernelClass();
         }
 
-        return new static::$class(
-            isset($options['environment']) ? $options['environment'] : 'test',
-            isset($options['debug']) ? $options['debug'] : true
-        );
+        if (isset($options['environment'])) {
+            $env = $options['environment'];
+        } elseif (isset($_SERVER['APP_ENV'])) {
+            $env = $_SERVER['APP_ENV'];
+        } elseif (isset($_ENV['APP_ENV'])) {
+            $env = $_ENV['APP_ENV'];
+        } else {
+            $env = 'test';
+        }
+
+        if (isset($options['debug'])) {
+            $debug = $options['debug'];
+        } elseif (isset($_SERVER['APP_DEBUG'])) {
+            $debug = $_SERVER['APP_DEBUG'];
+        } elseif (isset($_ENV['APP_DEBUG'])) {
+            $debug = $_ENV['APP_DEBUG'];
+        } else {
+            $debug = true;
+        }
+
+        return new static::$class($env, $debug);
     }
 
     /**

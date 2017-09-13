@@ -61,7 +61,7 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
      *
      * @return string The definition id with aliases resolved
      */
-    private function getDefinitionId($id, $container)
+    private function getDefinitionId($id, ContainerBuilder $container)
     {
         $seen = array();
         while ($container->hasAlias($id)) {

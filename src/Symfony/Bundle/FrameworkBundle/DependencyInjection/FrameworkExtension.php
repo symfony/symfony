@@ -1203,7 +1203,7 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, $config['debug'])
                 ->addTag('annotations.cached_reader', array('provider' => $cacheService))
             ;
-            $container->setAlias('annotation_reader', 'annotations.cached_reader');
+            $container->setAlias('annotation_reader', 'annotations.cached_reader')->setPrivate(true);
             $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
         } else {
             $container->removeDefinition('annotations.cached_reader');

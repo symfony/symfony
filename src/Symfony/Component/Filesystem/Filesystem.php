@@ -444,6 +444,7 @@ class Filesystem
     {
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
+        $originDirLen = strlen($originDir);
 
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
@@ -452,8 +453,9 @@ class Filesystem
                 $flags = \FilesystemIterator::SKIP_DOTS;
                 $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
             }
+            $targetDirLen = strlen($targetDir);
             foreach ($deleteIterator as $file) {
-                $origin = str_replace($targetDir, $originDir, $file->getPathname());
+                $origin = $originDir.substr($file->getPathname(), $targetDirLen);
                 if (!$this->exists($origin)) {
                     $this->remove($file);
                 }
@@ -475,7 +477,7 @@ class Filesystem
         }
 
         foreach ($iterator as $file) {
-            $target = str_replace($originDir, $targetDir, $file->getPathname());
+            $target = $targetDir.substr($file->getPathname(), $originDirLen);
 
             if ($copyOnWindows) {
                 if (is_file($file)) {

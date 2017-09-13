@@ -12,8 +12,12 @@
 namespace Symfony\Component\Form\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Util\OptionsResolverWrapper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -25,9 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class Descriptor implements DescriptorInterface
 {
-    /**
-     * @var SymfonyStyle
-     */
+    /** @var StyleInterface */
     protected $output;
     protected $type;
     protected $ownOptions = array();
@@ -43,9 +45,12 @@ abstract class Descriptor implements DescriptorInterface
      */
     public function describe(OutputInterface $output, $object, array $options = array())
     {
-        $this->output = $output;
+        $this->output = $output instanceof StyleInterface ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
 
         switch (true) {
+            case null === $object:
+                $this->describeDefaults($options);
+                break;
             case $object instanceof ResolvedFormTypeInterface:
                 $this->describeResolvedFormType($object, $options);
                 break;
@@ -54,7 +59,23 @@ abstract class Descriptor implements DescriptorInterface
         }
     }
 
+    abstract protected function describeDefaults(array $options = array());
+
     abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array());
+
+    protected function getCoreTypes()
+    {
+        $coreExtension = new CoreExtension();
+        $coreExtensionRefObject = new \ReflectionObject($coreExtension);
+        $loadTypesRefMethod = $coreExtensionRefObject->getMethod('loadTypes');
+        $loadTypesRefMethod->setAccessible(true);
+        $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
+
+        $coreTypes = array_map(function (FormTypeInterface $type) { return get_class($type); }, $coreTypes);
+        sort($coreTypes);
+
+        return $coreTypes;
+    }
 
     protected function collectOptions(ResolvedFormTypeInterface $type)
     {

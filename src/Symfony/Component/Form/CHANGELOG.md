@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `DebugCommand`
+
 3.3.0
 -----
 

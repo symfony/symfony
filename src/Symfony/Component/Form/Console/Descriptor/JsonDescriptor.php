@@ -20,6 +20,16 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  */
 class JsonDescriptor extends Descriptor
 {
+    protected function describeDefaults(array $options = array())
+    {
+        $data['builtin_form_types'] = $this->getCoreTypes();
+        $data['service_form_types'] = array_values(array_diff($options['types'], $data['builtin_form_types']));
+        $data['type_extensions'] = $options['extensions'];
+        $data['type_guessers'] = $options['guessers'];
+
+        $this->writeData($data, $options);
+    }
+
     protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array())
     {
         $this->collectOptions($resolvedFormType);

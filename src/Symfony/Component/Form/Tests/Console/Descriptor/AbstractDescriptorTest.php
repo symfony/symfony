@@ -24,6 +24,19 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 abstract class AbstractDescriptorTest extends TestCase
 {
+    /** @dataProvider getDescribeDefaultsTestData */
+    public function testDescribeDefaults($object, array $options, $fixtureName)
+    {
+        $expectedDescription = $this->getExpectedDescription($fixtureName);
+        $describedObject = $this->getObjectDescription($object, $options);
+
+        if ('json' === $this->getFormat()) {
+            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), JSON_PRETTY_PRINT));
+        } else {
+            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $describedObject)));
+        }
+    }
+
     /** @dataProvider getDescribeResolvedFormTypeTestData */
     public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName)
     {
@@ -35,6 +48,15 @@ abstract class AbstractDescriptorTest extends TestCase
         } else {
             $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $describedObject)));
         }
+    }
+
+    public function getDescribeDefaultsTestData()
+    {
+        $options['types'] = array('Symfony\Bridge\Doctrine\Form\Type\EntityType');
+        $options['extensions'] = array('Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension');
+        $options['guessers'] = array('Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser');
+
+        yield array(null, $options, 'defaults_1');
     }
 
     public function getDescribeResolvedFormTypeTestData()

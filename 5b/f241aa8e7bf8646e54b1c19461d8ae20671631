@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-12T19:24:10Z
+
+I would split the test case into two (one with the `delete` option, the other one without it) to make them independent from each other.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-28T09:05:37Z
+
+@gitlost could you please split the test case in two as suggested by @xabbuh ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-13T15:26:18Z
+
+ping @symfony/deciders

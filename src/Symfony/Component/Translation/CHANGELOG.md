@@ -6,6 +6,7 @@ CHANGELOG
 
  * removed the backup feature of the `FileDumper` class
  * removed `TranslationWriter::writeTranslations()` method
+ * removed support for passing `MessageSelector` instances to the constructor of the `Translator` class
 
 3.4.0
 -----

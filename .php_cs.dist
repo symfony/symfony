@@ -22,7 +22,6 @@ return PhpCsFixer\Config::create()
         'heredoc_to_nowdoc' => false,
         'no_break_comment' => false,
         'no_unreachable_default_argument_value' => false,
-        'phpdoc_annotation_without_dot' => false,
         'protected_to_private' => false,
     ))
     ->setRiskyAllowed(true)

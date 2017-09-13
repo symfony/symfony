@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-13T08:50:44Z
+
+Please no overrides dir. just keep it inside a bundles dir. Does it really matter. The one working on code knows.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-13T10:59:06Z
+
+Changed to `bundles` directory.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-13T13:15:55Z
+
+Tests added.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-13T13:22:58Z
+
+Just a question; should we deprecate the old paths (hardcoded in src).
+
+Ie trigger in case of `if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {` etc. Wouldnt that me more concise?
+
+Only if not configured as path already of course.

@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nemoneph at 2017-07-24T18:23:33Z
+
+Thanks for the review @javiereguiluz
+
+I've made some updates:
+
+-> use a comma for separate the values instead of |
+-> if locale is empty, set the default value to '-' (check/set this in TranslationDataCollector is enough ?)
+-> if the fallback_locales is empty, set the default value to '-'
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-25T12:48:25Z
+
+Adding to milestone 3.4 since this is where new features are merged.
+
+---------------------------------------------------------------------------
+
+by nemoneph at 2017-07-25T17:20:35Z
+
+@javiereguiluz  Yes make sense.
+
+Here the update:
+
+-> remove phpdoc
+-> use default('-') in view instead of TranslationDataCollector
+
+---------------------------------------------------------------------------
+
+by nemoneph at 2017-09-05T17:24:47Z
+
+@xabbuh Thx, update done.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-11T15:32:59Z
+
+I think you could best rebase these changes onto the `3.4` branch now and change the target branch here.
+
+---------------------------------------------------------------------------
+
+by nemoneph at 2017-09-11T17:10:40Z
+
+@xabbuh Yes, it's done too now.

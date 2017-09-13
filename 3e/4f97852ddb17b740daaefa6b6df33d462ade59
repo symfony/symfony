@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-12T17:11:07Z
+
+The failure seems to be related to a commit hash that was not propagated from the subtree split of the Translation component to packagist.org.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-12T17:57:46Z
+
+I've updated Packagist, is it better now?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-13T07:35:19Z
+
+finally, Travis CI got that change too

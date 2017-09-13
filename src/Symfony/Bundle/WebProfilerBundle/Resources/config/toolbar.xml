@@ -7,7 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="web_profiler.debug_toolbar" class="Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener" public="true">
+        <service id="web_profiler.debug_toolbar" class="Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="twig" />
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>

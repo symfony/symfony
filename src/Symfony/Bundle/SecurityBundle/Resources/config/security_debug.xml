@@ -18,6 +18,6 @@
             <argument type="service" id="security.logout_url_generator" />
         </service>
 
-        <service id="security.firewall" alias="debug.security.firewall" public="true" />
+        <service id="security.firewall" alias="debug.security.firewall" />
     </services>
 </container>

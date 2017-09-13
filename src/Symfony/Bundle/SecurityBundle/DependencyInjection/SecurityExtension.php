@@ -73,8 +73,19 @@ class SecurityExtension extends Extension
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
 
+        $container->getDefinition('security.authentication.guard_handler')->setPrivate(true);
+        $container->getDefinition('security.firewall')->setPrivate(true);
+        $container->getDefinition('security.firewall.context')->setPrivate(true);
+        $container->getDefinition('security.validator.user_password')->setPrivate(true);
+        $container->getDefinition('security.rememberme.response_listener')->setPrivate(true);
+        $container->getDefinition('templating.helper.logout_url')->setPrivate(true);
+        $container->getDefinition('templating.helper.security')->setPrivate(true);
+        $container->getAlias('security.encoder_factory')->setPrivate(true);
+
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('security_debug.xml');
+
+            $container->getAlias('security.firewall')->setPrivate(true);
         }
 
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
@@ -88,7 +99,7 @@ class SecurityExtension extends Extension
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 
         if (isset($config['access_decision_manager']['service'])) {
-            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
+            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service'])->setPrivate(true);
         } else {
             $container
                 ->getDefinition('security.access.decision_manager')
@@ -151,13 +162,13 @@ class SecurityExtension extends Extension
         $loader->load('security_acl.xml');
 
         if (isset($config['cache']['id'])) {
-            $container->setAlias('security.acl.cache', $config['cache']['id']);
+            $container->setAlias('security.acl.cache', $config['cache']['id'])->setPrivate(true);
         }
         $container->getDefinition('security.acl.voter.basic_permissions')->addArgument($config['voter']['allow_if_object_identity_unavailable']);
 
         // custom ACL provider
         if (isset($config['provider'])) {
-            $container->setAlias('security.acl.provider', $config['provider']);
+            $container->setAlias('security.acl.provider', $config['provider'])->setPrivate(true);
 
             return;
         }
@@ -168,6 +179,10 @@ class SecurityExtension extends Extension
     private function configureDbalAclProvider(array $config, ContainerBuilder $container, $loader)
     {
         $loader->load('security_acl_dbal.xml');
+
+        $container->getDefinition('security.acl.dbal.schema')->setPrivate(true);
+        $container->getAlias('security.acl.dbal.connection')->setPrivate(true);
+        $container->getAlias('security.acl.provider')->setPrivate(true);
 
         if (null !== $config['connection']) {
             $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));

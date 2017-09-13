@@ -26,13 +26,13 @@
             <argument>%session.metadata.update_threshold%</argument>
         </service>
 
-        <service id="session.storage.native" class="Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage" public="true">
+        <service id="session.storage.native" class="Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage">
             <argument>%session.storage.options%</argument>
             <argument type="service" id="session.handler" />
             <argument type="service" id="session.storage.metadata_bag" />
         </service>
 
-        <service id="session.storage.php_bridge" class="Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage" public="true">
+        <service id="session.storage.php_bridge" class="Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage">
             <argument type="service" id="session.handler" />
             <argument type="service" id="session.storage.metadata_bag" />
         </service>
@@ -53,7 +53,7 @@
 
         <service id="session.handler.write_check" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler" />
 
-        <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\SessionListener" public="true">
+        <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\SessionListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service">
                 <service class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -65,11 +65,11 @@
             </argument>
         </service>
 
-        <service id="session.save_listener" class="Symfony\Component\HttpKernel\EventListener\SaveSessionListener" public="true">
+        <service id="session.save_listener" class="Symfony\Component\HttpKernel\EventListener\SaveSessionListener">
             <tag name="kernel.event_subscriber" />
         </service>
 
         <!-- for BC -->
-        <service id="session.storage.filesystem" alias="session.storage.mock_file" public="true" />
+        <service id="session.storage.filesystem" alias="session.storage.mock_file" />
     </services>
 </container>

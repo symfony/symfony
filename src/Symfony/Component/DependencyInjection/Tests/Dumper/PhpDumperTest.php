@@ -779,6 +779,52 @@ class PhpDumperTest extends TestCase
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation Requesting the "private" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "private_alias" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "decorated_private" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "decorated_private_alias" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "private_not_inlined" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "private_not_removed" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "private_child" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Requesting the "private_parent" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     */
+    public function testLegacyPrivateServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_legacy_privates.yml');
+
+        $container->getDefinition('private')->setPrivate(true);
+        $container->getDefinition('private_not_inlined')->setPrivate(true);
+        $container->getDefinition('private_not_removed')->setPrivate(true);
+        $container->getDefinition('decorated_private')->setPrivate(true);
+        $container->getDefinition('private_child')->setPrivate(true);
+        $container->getAlias('decorated_private_alias')->setPrivate(true);
+        $container->getAlias('private_alias')->setPrivate(true);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_legacy_privates.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Legacy_Privates', 'file' => self::$fixturesPath.'/php/services_legacy_privates.php')));
+
+        require self::$fixturesPath.'/php/services_legacy_privates.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Legacy_Privates();
+
+        $container->get('private');
+        $container->get('private_alias');
+        $container->get('alias_to_private');
+        $container->get('decorated_private');
+        $container->get('decorated_private_alias');
+        $container->get('private_not_inlined');
+        $container->get('private_not_removed');
+        $container->get('private_child');
+        $container->get('private_parent');
+        $container->get('public_child');
+    }
+
+    /**
      * This test checks the trigger of a deprecation note and should not be removed in major releases.
      *
      * @group legacy

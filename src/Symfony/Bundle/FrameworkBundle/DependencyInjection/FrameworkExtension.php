@@ -115,6 +115,15 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
 
+        $container->getDefinition('kernel.class_cache.cache_warmer')->setPrivate(true);
+        $container->getDefinition('uri_signer')->setPrivate(true);
+        $container->getDefinition('config_cache_factory')->setPrivate(true);
+        $container->getDefinition('response_listener')->setPrivate(true);
+        $container->getDefinition('file_locator')->setPrivate(true);
+        $container->getDefinition('streamed_response_listener')->setPrivate(true);
+        $container->getDefinition('locale_listener')->setPrivate(true);
+        $container->getDefinition('validate_request_listener')->setPrivate(true);
+
         // forward compatibility with Symfony 4.0 where the ContainerAwareEventDispatcher class is removed
         if (!class_exists(ContainerAwareEventDispatcher::class)) {
             $definition = $container->getDefinition('event_dispatcher');
@@ -131,6 +140,12 @@ class FrameworkExtension extends Extension
 
         $loader->load('fragment_renderer.xml');
 
+        $container->getDefinition('fragment.handler')->setPrivate(true);
+        $container->getDefinition('fragment.renderer.inline')->setPrivate(true);
+        $container->getDefinition('fragment.renderer.hinclude')->setPrivate(true);
+        $container->getDefinition('fragment.renderer.esi')->setPrivate(true);
+        $container->getDefinition('fragment.renderer.ssi')->setPrivate(true);
+
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
 
@@ -145,8 +160,19 @@ class FrameworkExtension extends Extension
         // Property access is used by both the Form and the Validator component
         $loader->load('property_access.xml');
 
+        $container->getDefinition('property_accessor')->setPrivate(true);
+
         // Load Cache configuration first as it is used by other components
         $loader->load('cache.xml');
+
+        $container->getDefinition('cache.adapter.system')->setPrivate(true);
+        $container->getDefinition('cache.adapter.apcu')->setPrivate(true);
+        $container->getDefinition('cache.adapter.doctrine')->setPrivate(true);
+        $container->getDefinition('cache.adapter.filesystem')->setPrivate(true);
+        $container->getDefinition('cache.adapter.psr6')->setPrivate(true);
+        $container->getDefinition('cache.adapter.redis')->setPrivate(true);
+        $container->getDefinition('cache.adapter.memcached')->setPrivate(true);
+        $container->getDefinition('cache.default_clearer')->setPrivate(true);
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -202,6 +228,10 @@ class FrameworkExtension extends Extension
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
+
+            $container->getDefinition('test.client.history')->setPrivate(true);
+            $container->getDefinition('test.client.cookiejar')->setPrivate(true);
+            $container->getDefinition('test.session.listener')->setPrivate(true);
         }
 
         if ($this->isConfigEnabled($container, $config['session'])) {
@@ -389,12 +419,28 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
+
+        $container->getDefinition('form.resolved_type_factory')->setPrivate(true);
+        $container->getDefinition('form.registry')->setPrivate(true);
+        $container->getDefinition('form.type_guesser.validator')->setPrivate(true);
+        $container->getDefinition('form.type.form')->setPrivate(true);
+        $container->getDefinition('form.type.choice')->setPrivate(true);
+        $container->getDefinition('form.type_extension.form.http_foundation')->setPrivate(true);
+        $container->getDefinition('form.type_extension.form.validator')->setPrivate(true);
+        $container->getDefinition('form.type_extension.repeated.validator')->setPrivate(true);
+        $container->getDefinition('form.type_extension.submit.validator')->setPrivate(true);
+        $container->getDefinition('form.type_extension.upload.validator')->setPrivate(true);
+        $container->getDefinition('deprecated.form.registry')->setPrivate(true);
+
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
+
+            $container->getDefinition('form.type_extension.csrf')->setPrivate(true);
+            $container->getDefinition('deprecated.form.registry.csrf')->setPrivate(true);
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
             $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
@@ -419,6 +465,9 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('esi.xml');
+
+        $container->getDefinition('esi')->setPrivate(true);
+        $container->getDefinition('esi_listener')->setPrivate(true);
     }
 
     /**
@@ -437,6 +486,9 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('ssi.xml');
+
+        $container->getDefinition('ssi')->setPrivate(true);
+        $container->getDefinition('ssi_listener')->setPrivate(true);
     }
 
     /**
@@ -480,8 +532,16 @@ class FrameworkExtension extends Extension
         $loader->load('collectors.xml');
         $loader->load('cache_debug.xml');
 
+        $container->getDefinition('data_collector.request')->setPrivate(true);
+        $container->getDefinition('data_collector.router')->setPrivate(true);
+        $container->getDefinition('profiler_listener')->setPrivate(true);
+
         if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');
+
+            $container->getDefinition('form.resolved_type_factory')->setPrivate(true);
+            $container->getDefinition('data_collector.form.extractor')->setPrivate(true);
+            $container->getDefinition('data_collector.form')->setPrivate(true);
         }
 
         if ($this->validatorConfigEnabled) {
@@ -490,6 +550,9 @@ class FrameworkExtension extends Extension
 
         if ($this->translationConfigEnabled) {
             $loader->load('translation_debug.xml');
+
+            $container->getDefinition('data_collector.translation')->setPrivate(true);
+
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
 
@@ -506,7 +569,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['matcher'])) {
             if (isset($config['matcher']['service'])) {
-                $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
+                $container->setAlias('profiler.request_matcher', $config['matcher']['service'])->setPrivate(true);
             } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
                 $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
                 $definition->setPublic(false);
@@ -552,6 +615,10 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('workflow.xml');
+
+        $container->getDefinition('workflow.marking_store.multiple_state')->setPrivate(true);
+        $container->getDefinition('workflow.marking_store.single_state')->setPrivate(true);
+        $container->getDefinition('workflow.registry')->setPrivate(true);
 
         $registryDefinition = $container->getDefinition('workflow.registry');
 
@@ -626,6 +693,7 @@ class FrameworkExtension extends Extension
             // Enable the AuditTrail
             if ($workflow['audit_trail']['enabled']) {
                 $listener = new Definition(Workflow\EventListener\AuditTrailListener::class);
+                $listener->setPrivate(true);
                 $listener->addTag('monolog.logger', array('channel' => 'workflow'));
                 $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.leave', $name), 'method' => 'onLeave'));
                 $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition'));
@@ -636,6 +704,7 @@ class FrameworkExtension extends Extension
 
             // Add Guard Listener
             $guard = new Definition(Workflow\EventListener\GuardListener::class);
+            $guard->setPrivate(true);
             $configuration = array();
             foreach ($workflow['transitions'] as $transitionName => $config) {
                 if (!isset($config['guard'])) {
@@ -681,8 +750,10 @@ class FrameworkExtension extends Extension
     {
         $loader->load('debug_prod.xml');
 
+        $container->getDefinition('debug.debug_handlers_listener')->setPrivate(true);
+
         if (class_exists(Stopwatch::class)) {
-            $container->register('debug.stopwatch', Stopwatch::class)->addArgument(true);
+            $container->register('debug.stopwatch', Stopwatch::class)->addArgument(true)->setPrivate(true);
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
 
@@ -694,6 +765,9 @@ class FrameworkExtension extends Extension
 
         if ($debug && class_exists(Stopwatch::class)) {
             $loader->load('debug.xml');
+            $container->getDefinition('debug.event_dispatcher')->setPrivate(true);
+            $container->getDefinition('debug.controller_resolver')->setPrivate(true);
+            $container->getDefinition('debug.argument_resolver')->setPrivate(true);
         }
 
         $definition = $container->findDefinition('debug.debug_handlers_listener');
@@ -733,6 +807,8 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('routing.xml');
+
+        $container->getDefinition('router_listener')->setPrivate(true);
 
         $container->setParameter('router.resource', $config['resource']);
         $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.container_class'));
@@ -792,8 +868,14 @@ class FrameworkExtension extends Extension
     {
         $loader->load('session.xml');
 
+        $container->getDefinition('session.storage.native')->setPrivate(true);
+        $container->getDefinition('session.storage.php_bridge')->setPrivate(true);
+        $container->getDefinition('session_listener')->setPrivate(true);
+        $container->getDefinition('session.save_listener')->setPrivate(true);
+        $container->getAlias('session.storage.filesystem')->setPrivate(true);
+
         // session storage
-        $container->setAlias('session.storage', $config['storage_id']);
+        $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
         $options = array();
         foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
             if (isset($config[$key])) {
@@ -816,7 +898,7 @@ class FrameworkExtension extends Extension
                 $handlerId = 'session.handler.write_check';
             }
 
-            $container->setAlias('session.handler', $handlerId);
+            $container->setAlias('session.handler', $handlerId)->setPrivate(true);
         }
 
         $container->setParameter('session.save_path', $config['save_path']);
@@ -853,6 +935,9 @@ class FrameworkExtension extends Extension
     {
         if ($config['formats']) {
             $loader->load('request.xml');
+
+            $container->getDefinition('request.add_request_formats_listener')->setPrivate(true);
+
             $container
                 ->getDefinition('request.add_request_formats_listener')
                 ->replaceArgument(0, $config['formats'])
@@ -870,6 +955,9 @@ class FrameworkExtension extends Extension
     private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
+
+        $container->getDefinition('templating.name_parser')->setPrivate(true);
+        $container->getDefinition('templating.filename_parser')->setPrivate(true);
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
@@ -889,10 +977,10 @@ class FrameworkExtension extends Extension
 
             // Use a delegation unless only a single loader was registered
             if (1 === count($loaders)) {
-                $container->setAlias('templating.loader', (string) reset($loaders));
+                $container->setAlias('templating.loader', (string) reset($loaders))->setPrivate(true);
             } else {
                 $container->getDefinition('templating.loader.chain')->addArgument($loaders);
-                $container->setAlias('templating.loader', 'templating.loader.chain');
+                $container->setAlias('templating.loader', 'templating.loader.chain')->setPrivate(true);
             }
         }
 
@@ -937,13 +1025,25 @@ class FrameworkExtension extends Extension
         if (in_array('php', $config['engines'], true)) {
             $loader->load('templating_php.xml');
 
+            $container->getDefinition('templating.helper.slots')->setPrivate(true);
+            $container->getDefinition('templating.helper.request')->setPrivate(true);
+            $container->getDefinition('templating.helper.session')->setPrivate(true);
+            $container->getDefinition('templating.helper.router')->setPrivate(true);
+            $container->getDefinition('templating.helper.assets')->setPrivate(true);
+            $container->getDefinition('templating.helper.actions')->setPrivate(true);
+            $container->getDefinition('templating.helper.code')->setPrivate(true);
+            $container->getDefinition('templating.helper.translator')->setPrivate(true);
+            $container->getDefinition('templating.helper.form')->setPrivate(true);
+            $container->getDefinition('templating.helper.stopwatch')->setPrivate(true);
+            $container->getDefinition('templating.globals')->setPrivate(true);
+
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
             if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
                 $loader->load('templating_debug.xml');
 
                 $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
-                $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
+                $container->setAlias('debug.templating.engine.php', 'templating.engine.php')->setPrivate(true);
             }
 
             if (\PHP_VERSION_ID < 70000) {
@@ -976,6 +1076,12 @@ class FrameworkExtension extends Extension
     private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('assets.xml');
+
+        $container->getDefinition('assets.packages')->setPrivate(true);
+        $container->getDefinition('assets.context')->setPrivate(true);
+        $container->getDefinition('assets.path_package')->setPrivate(true);
+        $container->getDefinition('assets.url_package')->setPrivate(true);
+        $container->getDefinition('assets.static_version_strategy')->setPrivate(true);
 
         $defaultVersion = null;
 
@@ -1073,6 +1179,35 @@ class FrameworkExtension extends Extension
 
         $loader->load('translation.xml');
 
+        $container->getDefinition('translator.default')->setPrivate(true);
+        $container->getDefinition('translation.loader.php')->setPrivate(true);
+        $container->getDefinition('translation.loader.yml')->setPrivate(true);
+        $container->getDefinition('translation.loader.xliff')->setPrivate(true);
+        $container->getDefinition('translation.loader.po')->setPrivate(true);
+        $container->getDefinition('translation.loader.mo')->setPrivate(true);
+        $container->getDefinition('translation.loader.qt')->setPrivate(true);
+        $container->getDefinition('translation.loader.csv')->setPrivate(true);
+        $container->getDefinition('translation.loader.res')->setPrivate(true);
+        $container->getDefinition('translation.loader.dat')->setPrivate(true);
+        $container->getDefinition('translation.loader.ini')->setPrivate(true);
+        $container->getDefinition('translation.loader.json')->setPrivate(true);
+        $container->getDefinition('translation.dumper.php')->setPrivate(true);
+        $container->getDefinition('translation.dumper.xliff')->setPrivate(true);
+        $container->getDefinition('translation.dumper.po')->setPrivate(true);
+        $container->getDefinition('translation.dumper.mo')->setPrivate(true);
+        $container->getDefinition('translation.dumper.yml')->setPrivate(true);
+        $container->getDefinition('translation.dumper.qt')->setPrivate(true);
+        $container->getDefinition('translation.dumper.csv')->setPrivate(true);
+        $container->getDefinition('translation.dumper.ini')->setPrivate(true);
+        $container->getDefinition('translation.dumper.json')->setPrivate(true);
+        $container->getDefinition('translation.dumper.res')->setPrivate(true);
+        $container->getDefinition('translation.extractor.php')->setPrivate(true);
+        $container->getDefinition('translator_listener')->setPrivate(true);
+        $container->getDefinition('translation.loader')->setPrivate(true);
+        $container->getDefinition('translation.reader')->setPrivate(true);
+        $container->getDefinition('translation.extractor')->setPrivate(true);
+        $container->getDefinition('translation.writer')->setPrivate(true);
+
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
@@ -1168,6 +1303,10 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('validator.xml');
+
+        $container->getDefinition('validator.builder')->setPrivate(true);
+        $container->getDefinition('validator.expression')->setPrivate(true);
+        $container->getDefinition('validator.email')->setPrivate(true);
 
         $validatorBuilder = $container->getDefinition('validator.builder');
 
@@ -1281,6 +1420,8 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('annotations.xml');
+
+        $container->getAlias('annotation_reader')->setPrivate(true);
 
         if ('none' !== $config['cache']) {
             if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
@@ -1408,6 +1549,9 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('serializer.xml');
+
+        $container->getDefinition('serializer.mapping.cache.symfony')->setPrivate(true);
+
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
         $serializerLoaders = array();
@@ -1498,8 +1642,11 @@ class FrameworkExtension extends Extension
     {
         $loader->load('property_info.xml');
 
+        $container->getDefinition('property_info')->setPrivate(true);
+
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
+            $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }

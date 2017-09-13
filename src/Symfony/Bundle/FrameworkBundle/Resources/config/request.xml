@@ -7,7 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="request.add_request_formats_listener" class="Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener" public="true">
+        <service id="request.add_request_formats_listener" class="Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener">
             <tag name="kernel.event_subscriber" />
             <argument/>
         </service>

@@ -249,6 +249,7 @@
             </div>
         </div>
 
+        {% if profile.hasCollector('dotenv') %}
         <div class="tab {{ profile.collector('dotenv').envs is empty ? 'disabled' }}">
               <h3 class="tab-title">.env</h3>
 
@@ -264,6 +265,7 @@
                   {% endif %}
               </div>
         </div>
+        {% endif %}
 
         {% if profile.parent %}
         <div class="tab">

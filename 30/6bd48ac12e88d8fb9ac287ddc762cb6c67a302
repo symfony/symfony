@@ -1,0 +1,162 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T18:47:36Z
+
+@chalasr @stof thanks for the first round of review, comments addressed.
+
+In order to allow deprecating public aliases, I changed the implementation to not rely on a tag anymore. Instead, I added `Alias/Definition::isPrivate()`. The PR is ready for a second round review. It only needs tests now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T06:22:02Z
+
+@ro0NL setPrivate is OK for eg bundles to me so they can do the same as we do here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-08T07:03:09Z
+
+Guessed so. But are we sure about `setPublic` & `setPrivate` doing different things, which is here to stay for the long run. This requires documentation, but i think it needs a better name...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T07:07:34Z
+
+> setPublic & setPrivate doing different things
+
+they don't need to do different things in 4.0, that's the solution.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T07:08:18Z
+
+And in fact, they already don't do different things already - except for internal details.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-08T07:17:22Z
+
+Yeah but `setPublic(false)` wont enable `isPrivate() === true`.. right? That's unexpected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T07:39:55Z
+
+> but setPublic(false) wont enable isPrivate() === true.. right
+
+locally, that's correct - making it so would just discard any benefits of introducing it.
+But the `ResolveChildDefinitionsPass` turns `isPrivate()` to `setPublic(false)` in the end, so semantically, they're the same.
+The special behavior related to `isPrivate()` is 3.4-only and tailored to the purpose of making currently public services private in 4.0.
+For this reason also, `setPrivate()` cannot be set via a (yaml/xml) loader - only a DI ext can. So only "advanced" users can use it.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-08T09:02:38Z
+
+I think we need to improve the documentation about the difference between `setPublic(false)` and `setPrivate(true)` in the phpdoc (the phpdoc will be the place where advanced users will learn about it IMO, rather than learning it in symfony-docs, but the current phpdoc does not allow to understand the difference and why they should use one rather than the other)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T13:58:13Z
+
+PR is now ready and tested.
+Please help validate the list of still public services/aliases (see PR)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T18:20:49Z
+
+All services are now either private, or public with a justification notice (see PR.)
+Calling @symfony/deciders for review+votes before I remove that list of public services from the patch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-09T09:42:56Z
+
+failures are false positives
+list of remaining public services added to the PR's description and removed from patch
+ready for vote+merge
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-09T09:50:58Z
+
+Very nice work! Imagining myself as someone new to Symfony, I would have issues/doubts with these services:
+
+1) Everything related to "cache clear": it looks like something internal to Symfony which I shouldn't care about
+
+`cache.app_clearer` alias
+`cache_clearer` <- for the cache:clear command
+`cache.global_clearer` <- for the cache:pool:clear command to clear all pools
+
+2) Controllers: all these services
+
+`twig.controller.*`
+`web_profiler.controller.*`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-09T10:31:43Z
+
+@javiereguiluz We still have some places where we are forced to `get()` public services from the container internally, mostly places where we fetch unpredictable services which cannot be grouped by scope, like controllers which can be any service (no required tag), similar problem for those related to cache (have a look at CacheClearCommand/CachePoolClearCommand).
+The services you listed must remain public.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-09T11:12:32Z
+
+command related services can be made private in 4.0 :)
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-09T14:00:18Z
+
+If the controllers are the only big area which cannot be made private.. Maybe the controller tag should be introduced to make this possible?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-09T14:26:39Z
+
+There is already a tag to flag services as controllers (`controller.service_arguments`).
+BUT it works the other way around: the **routing** contains references to services.
+So that the correct logic to do that would be to parse the routing config to then flag controllers as such.
+That's not something we have right now, and I'm personally no planning to work on it at all: controllers as public services are just fine, there is nothing to "fix" here IMHO.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-09T16:29:48Z
+
+Just to complete this. But `controller.service_arguments` doesn't work for the controllers that are actually registered as services. And I find it weird that I'd have to tag with that when using "actions" for controllers e.g one class per action with `__invoke` and all dependencies injected via constructor.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-09T16:36:36Z
+
+@mvrhov I don't know anymore what you're talking about :) You don't have to use that tag at all, that's what   I said. You just have to make your controllers public.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-09T16:41:20Z
+
+@nicolas-grekas the thing that controllers must be public is more confusing than it looks. I can understand public services: you may inject this somewhere, so make it public. OK. But I don't inject or need or use or do anything with controllers. It's "a Symfony thing" and that's why I expect them to not be public.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-09T16:59:11Z
+
+OK, I've no solution for that - and I don't think there is anything wrong in fact.
+
+A service really needs to be public for one and only one reason: bootstrapping.
+That's because the app must start with something.
+There are at least three common bootstrapping contexts:
+- HTTP : here the entry point is routing thus controllers
+- CLI: the entry point is the Application thus commands
+- tests: the entry point is whatever you use in the body of your test cases
+
+all other uses are the bad sort of service locator.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-13T08:02:10Z
+
+ping @symfony/deciders, one vote missing :)

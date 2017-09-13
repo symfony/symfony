@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-09-13T13:54:50Z
+
+this is a left-over from the previous validation (which is now performed inside `findTaggedServiceIds` for abstract services, and removed for private services as they are now supported)

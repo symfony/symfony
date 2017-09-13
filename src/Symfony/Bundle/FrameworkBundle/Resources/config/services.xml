@@ -35,7 +35,7 @@
         <service id="filesystem" class="Symfony\Component\Filesystem\Filesystem" public="true" />
         <service id="Symfony\Component\Filesystem\Filesystem" alias="filesystem" />
 
-        <service id="file_locator" class="Symfony\Component\HttpKernel\Config\FileLocator" public="true">
+        <service id="file_locator" class="Symfony\Component\HttpKernel\Config\FileLocator">
             <argument type="service" id="kernel" />
             <argument>%kernel.root_dir%/Resources</argument>
             <argument type="collection">
@@ -44,11 +44,11 @@
         </service>
         <service id="Symfony\Component\HttpKernel\Config\FileLocator" alias="file_locator" />
 
-        <service id="uri_signer" class="Symfony\Component\HttpKernel\UriSigner" public="true">
+        <service id="uri_signer" class="Symfony\Component\HttpKernel\UriSigner">
             <argument>%kernel.secret%</argument>
         </service>
 
-        <service id="config_cache_factory" class="Symfony\Component\Config\ResourceCheckerConfigCacheFactory" public="true">
+        <service id="config_cache_factory" class="Symfony\Component\Config\ResourceCheckerConfigCacheFactory">
             <argument /> <!-- resource checkers -->
         </service>
 

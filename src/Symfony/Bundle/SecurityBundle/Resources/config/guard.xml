@@ -9,7 +9,6 @@
 
         <service id="security.authentication.guard_handler"
                  class="Symfony\Component\Security\Guard\GuardAuthenticatorHandler"
-                 public="true"
             >
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="event_dispatcher" on-invalid="null" />

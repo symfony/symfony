@@ -60,7 +60,7 @@
             <tag name="kernel.cache_warmer" />
         </service>
 
-        <service id="serializer.mapping.cache.symfony" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" public="true">
+        <service id="serializer.mapping.cache.symfony" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
             <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
             <argument>%serializer.mapping.cache.file%</argument>
             <argument type="service" id="cache.serializer" />

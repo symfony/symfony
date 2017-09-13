@@ -49,7 +49,7 @@
             </argument>
         </service>
 
-        <service id="annotation_reader" alias="annotations.reader" public="true" />
+        <service id="annotation_reader" alias="annotations.reader" />
         <service id="Doctrine\Common\Annotations\Reader" alias="annotation_reader" />
     </services>
 </container>

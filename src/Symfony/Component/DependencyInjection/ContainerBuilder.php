@@ -759,6 +759,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string       $alias The alias to create
      * @param string|Alias $id    The service to alias
      *
+     * @return Alias
+     *
      * @throws InvalidArgumentException if the id is not a string or an Alias
      * @throws InvalidArgumentException if the alias is for itself
      */
@@ -776,7 +778,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         unset($this->definitions[$alias]);
 
-        $this->aliasDefinitions[$alias] = $id;
+        return $this->aliasDefinitions[$alias] = $id;
     }
 
     /**

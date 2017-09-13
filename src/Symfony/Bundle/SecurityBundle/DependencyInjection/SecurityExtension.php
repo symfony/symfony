@@ -88,7 +88,7 @@ class SecurityExtension extends Extension
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 
         if (isset($config['access_decision_manager']['service'])) {
-            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
+            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service'])->setPrivate(true);
         } else {
             $container
                 ->getDefinition('security.access.decision_manager')
@@ -135,13 +135,13 @@ class SecurityExtension extends Extension
         $loader->load('security_acl.xml');
 
         if (isset($config['cache']['id'])) {
-            $container->setAlias('security.acl.cache', $config['cache']['id']);
+            $container->setAlias('security.acl.cache', $config['cache']['id'])->setPrivate(true);
         }
         $container->getDefinition('security.acl.voter.basic_permissions')->addArgument($config['voter']['allow_if_object_identity_unavailable']);
 
         // custom ACL provider
         if (isset($config['provider'])) {
-            $container->setAlias('security.acl.provider', $config['provider']);
+            $container->setAlias('security.acl.provider', $config['provider'])->setPrivate(true);
 
             return;
         }

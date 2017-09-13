@@ -27,6 +27,9 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/web-profiler-bundle": "~3.4|~4.0"
     },
+    "conflict": {
+        "symfony/dependency-injection": "<3.4"
+    },
     "suggest": {
         "symfony/config": "For service container configuration",
         "symfony/dependency-injection": "For using as a service from the container"

@@ -35,6 +35,7 @@ class Definition
     private $configurator;
     private $tags = array();
     private $public = true;
+    private $private = false;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
@@ -613,6 +614,35 @@ class Definition
     public function isPublic()
     {
         return $this->public;
+    }
+
+    /**
+     * Sets if this service is private.
+     *
+     * When set, the "private" state has a higher precedence than "public".
+     * In version 3.4, a "private" service always remains publicly accessible,
+     * but triggers a deprecation notice when accessed from the container,
+     * so that the service can be made really private in 4.0.
+     *
+     * @param bool $boolean
+     *
+     * @return $this
+     */
+    public function setPrivate($boolean)
+    {
+        $this->private = (bool) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is private.
+     *
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->private;
     }
 
     /**

@@ -62,7 +62,8 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
                 continue;
             }
             // Remove private definition and schedule for replacement
-            $definition->setPublic(true);
+            $definition->setPublic(!$target->isPrivate());
+            $definition->setPrivate($target->isPrivate());
             $container->setDefinition($definitionId, $definition);
             $container->removeDefinition($targetId);
             $replacements[$targetId] = $definitionId;

@@ -51,7 +51,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
             if ($aliasId !== $defId = $this->getDefinitionId($aliasId)) {
-                $container->setAlias($id, new Alias($defId, $alias->isPublic()));
+                $container->setAlias($id, $defId)->setPublic($alias->isPublic() && !$alias->isPrivate())->setPrivate($alias->isPrivate());
             }
         }
     }

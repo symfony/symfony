@@ -328,6 +328,7 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
+
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }
@@ -429,6 +430,7 @@ class FrameworkExtension extends Extension
 
         if ($this->translationConfigEnabled) {
             $loader->load('translation_debug.xml');
+
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
 
@@ -445,7 +447,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['matcher'])) {
             if (isset($config['matcher']['service'])) {
-                $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
+                $container->setAlias('profiler.request_matcher', $config['matcher']['service'])->setPrivate(true);
             } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
                 $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
                 $definition->setPublic(false);
@@ -561,6 +563,7 @@ class FrameworkExtension extends Extension
             // Enable the AuditTrail
             if ($workflow['audit_trail']['enabled']) {
                 $listener = new Definition(Workflow\EventListener\AuditTrailListener::class);
+                $listener->setPrivate(true);
                 $listener->addTag('monolog.logger', array('channel' => 'workflow'));
                 $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.leave', $name), 'method' => 'onLeave'));
                 $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition'));
@@ -571,6 +574,7 @@ class FrameworkExtension extends Extension
 
             // Add Guard Listener
             $guard = new Definition(Workflow\EventListener\GuardListener::class);
+            $guard->setPrivate(true);
             $configuration = array();
             foreach ($workflow['transitions'] as $transitionName => $config) {
                 if (!isset($config['guard'])) {
@@ -617,7 +621,7 @@ class FrameworkExtension extends Extension
         $loader->load('debug_prod.xml');
 
         if (class_exists(Stopwatch::class)) {
-            $container->register('debug.stopwatch', Stopwatch::class)->addArgument(true);
+            $container->register('debug.stopwatch', Stopwatch::class)->addArgument(true)->setPrivate(true);
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
 
@@ -718,7 +722,7 @@ class FrameworkExtension extends Extension
         $loader->load('session.xml');
 
         // session storage
-        $container->setAlias('session.storage', $config['storage_id']);
+        $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
         $options = array();
         foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
             if (isset($config[$key])) {
@@ -741,7 +745,7 @@ class FrameworkExtension extends Extension
                 $handlerId = 'session.handler.write_check';
             }
 
-            $container->setAlias('session.handler', $handlerId);
+            $container->setAlias('session.handler', $handlerId)->setPrivate(true);
         }
 
         $container->setParameter('session.save_path', $config['save_path']);
@@ -760,6 +764,7 @@ class FrameworkExtension extends Extension
     {
         if ($config['formats']) {
             $loader->load('request.xml');
+
             $container
                 ->getDefinition('request.add_request_formats_listener')
                 ->replaceArgument(0, $config['formats'])
@@ -796,10 +801,10 @@ class FrameworkExtension extends Extension
 
             // Use a delegation unless only a single loader was registered
             if (1 === count($loaders)) {
-                $container->setAlias('templating.loader', (string) reset($loaders));
+                $container->setAlias('templating.loader', (string) reset($loaders))->setPrivate(true);
             } else {
                 $container->getDefinition('templating.loader.chain')->addArgument($loaders);
-                $container->setAlias('templating.loader', 'templating.loader.chain');
+                $container->setAlias('templating.loader', 'templating.loader.chain')->setPrivate(true);
             }
         }
 
@@ -841,7 +846,7 @@ class FrameworkExtension extends Extension
                 $loader->load('templating_debug.xml');
 
                 $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
-                $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
+                $container->setAlias('debug.templating.engine.php', 'templating.engine.php')->setPrivate(true);
             }
 
             if ($container->has('assets.packages')) {
@@ -1284,6 +1289,7 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('serializer.xml');
+
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
         $serializerLoaders = array();
@@ -1367,6 +1373,7 @@ class FrameworkExtension extends Extension
 
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
+            $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }

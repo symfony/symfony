@@ -94,7 +94,7 @@
             <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
 
-        <service id="router_listener" class="Symfony\Component\HttpKernel\EventListener\RouterListener" public="true">
+        <service id="router_listener" class="Symfony\Component\HttpKernel\EventListener\RouterListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="router" />

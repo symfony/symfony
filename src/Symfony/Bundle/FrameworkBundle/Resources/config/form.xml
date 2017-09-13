@@ -8,11 +8,11 @@
         <defaults public="false" />
 
         <!-- ResolvedFormTypeFactory -->
-        <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" public="true" />
+        <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory" />
         <service id="Symfony\Component\Form\ResolvedFormTypeFactoryInterface" alias="form.resolved_type_factory" />
 
         <!-- FormRegistry -->
-        <service id="form.registry" class="Symfony\Component\Form\FormRegistry" public="true">
+        <service id="form.registry" class="Symfony\Component\Form\FormRegistry">
             <argument type="collection">
                 <!--
                 We don't need to be able to add more extensions.

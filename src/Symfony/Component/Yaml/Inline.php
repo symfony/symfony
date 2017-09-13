@@ -335,7 +335,7 @@ class Inline
             }
 
             if ($output && '%' === $output[0]) {
-                @trigger_error(sprintf('Not quoting the scalar "%s" starting with the "%%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', $output), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not quoting the scalar "%s" starting with the "%%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0 on line %d.', $output, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
             }
 
             if ($evaluate) {
@@ -487,19 +487,19 @@ class Inline
             }
 
             if (':' === $key) {
-                @trigger_error('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0 on line %d.', self::$parsedLineNumber + 1), E_USER_DEPRECATED);
             }
 
             if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags)) {
                 $evaluatedKey = self::evaluateScalar($key, $flags, $references);
 
                 if ('' !== $key && $evaluatedKey !== $key && !is_string($evaluatedKey) && !is_int($evaluatedKey)) {
-                    @trigger_error('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.', E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead on line %d.', self::$parsedLineNumber + 1), E_USER_DEPRECATED);
                 }
             }
 
             if (':' !== $key && !$isKeyQuoted && (!isset($mapping[$i + 1]) || !in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
-                @trigger_error('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0 on line %d.', self::$parsedLineNumber + 1), E_USER_DEPRECATED);
             }
 
             while ($i < $len) {
@@ -519,7 +519,7 @@ class Inline
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
                         if (isset($output[$key])) {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
                             $duplicate = true;
                         }
                         break;
@@ -530,7 +530,7 @@ class Inline
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
                         if (isset($output[$key])) {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
                             $duplicate = true;
                         }
                         break;
@@ -540,7 +540,7 @@ class Inline
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
                         if (isset($output[$key])) {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
                             $duplicate = true;
                         }
                         --$i;
@@ -624,7 +624,7 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
-                            @trigger_error('The !!php/object tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object tag instead.', E_USER_DEPRECATED);
+                            @trigger_error(sprintf('The !!php/object tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object tag instead on line %d.', self::$parsedLineNumber + 1), E_USER_DEPRECATED);
 
                             return unserialize(substr($scalar, 13));
                         }
@@ -652,7 +652,7 @@ class Inline
                     case 0 === strpos($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                     default:
-                        @trigger_error(sprintf('Using the unquoted scalar value "%s" is deprecated since version 3.3 and will be considered as a tagged value in 4.0. You must quote it.', $scalar), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('Using the unquoted scalar value "%s" is deprecated since version 3.3 and will be considered as a tagged value in 4.0. You must quote it on line %d.', $scalar, self::$parsedLineNumber + 1), E_USER_DEPRECATED);
                 }
 
             // Optimize for returning strings.
@@ -686,7 +686,7 @@ class Inline
                     case Parser::preg_match('/^(-|\+)?[0-9][0-9,]*(\.[0-9_]+)?$/', $scalar):
                     case Parser::preg_match('/^(-|\+)?[0-9][0-9_]*(\.[0-9_]+)?$/', $scalar):
                         if (false !== strpos($scalar, ',')) {
-                            @trigger_error('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0 on line %d.', self::$parsedLineNumber + 1), E_USER_DEPRECATED);
                         }
 
                         return (float) str_replace(array(',', '_'), '', $scalar);

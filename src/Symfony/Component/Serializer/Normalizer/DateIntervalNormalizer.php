@@ -96,7 +96,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === \DateInterval::class;
+        return \DateInterval::class === $type;
     }
 
     private function isISO8601($string)

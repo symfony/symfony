@@ -66,6 +66,7 @@ Filesystem
  * The `Symfony\Component\Filesystem\LockHandler` class has been deprecated,
    use the `Symfony\Component\Lock\Store\FlockStore` class
    or the `Symfony\Component\Lock\Store\FlockStore\SemaphoreStore` class directly instead.
+ * Support for passing relative paths to `Filesystem::makePathRelative()` is deprecated and will be removed in 4.0.
 
 Finder
 ------

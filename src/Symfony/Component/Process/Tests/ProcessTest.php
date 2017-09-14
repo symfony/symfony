@@ -76,9 +76,13 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('Unix handles this automatically.');
         }
 
-        // Check that it works fine if the CWD exists
-        $cmd = new Process('echo test', __DIR__);
-        $cmd->run();
+        try {
+            // Check that it works fine if the CWD exists
+            $cmd = new Process('echo test', __DIR__);
+            $cmd->run();
+        } catch(\Exception $e) {
+            $this->fail($e);
+        }
 
         $cmd = new Process('echo test', __DIR__.'/notfound/');
         $cmd->run();
@@ -1530,7 +1534,7 @@ Array
 (
     [0] => -
     [1] => a
-    [2] => 
+    [2] =>
     [3] => b
 )
 

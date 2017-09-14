@@ -4,14 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="debug.templating.engine.php.class">Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine</parameter>
-    </parameters>
-
     <services>
-        <service id="debug.templating.engine.php" class="%debug.templating.engine.php.class%" public="false">
+        <defaults public="false" />
+
+        <service id="debug.templating.engine.php" class="Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine">
             <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.engine.php.helpers_locator" />
             <argument type="service" id="templating.loader" />
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="templating.globals" />

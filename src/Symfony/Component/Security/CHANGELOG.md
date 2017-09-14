@@ -1,6 +1,39 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * The `AbstractFormLoginAuthenticator::onAuthenticationSuccess()` was removed.
+   You should implement this method yourself in your concrete authenticator.
+ * removed the `AccessDecisionManager::setVoters()` method
+ * removed the `RoleInterface`
+ * removed support for voters that don't implement the `VoterInterface`
+ * added a sixth `string $context` argument to `LogoutUrlGenerator::registerListener()`
+
+3.4.0
+-----
+
+ * Using voters that do not implement the `VoterInterface`is now deprecated in
+   the `AccessDecisionManager` and this functionality will be removed in 4.0.
+
+3.3.0
+-----
+
+ * deprecated `AccessDecisionManager::setVoters()` in favor of passing the
+   voters to the constructor.
+ * [EXPERIMENTAL] added a `json_login` listener for stateless authentication
+
+3.2.0
+-----
+
+ * added `$attributes` and `$subject` with getters/setters to `Symfony\Component\Security\Core\Exception\AccessDeniedException`
+
+3.0.0
+-----
+
+ * removed all deprecated code
+
 2.8.0
 -----
 

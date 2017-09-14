@@ -96,7 +96,10 @@ class XmlReferenceDumper
                     $rootAttributes[$key] = str_replace('-', ' ', $rootName).' '.$key;
                 }
 
-                if ($prototype instanceof ArrayNode) {
+                if ($prototype instanceof PrototypedArrayNode) {
+                    $prototype->setName($key);
+                    $children = array($key => $prototype);
+                } elseif ($prototype instanceof ArrayNode) {
                     $children = $prototype->getChildren();
                 } else {
                     if ($prototype->hasDefaultValue()) {
@@ -148,6 +151,10 @@ class XmlReferenceDumper
 
                     if ($child->isRequired()) {
                         $comments[] = 'Required';
+                    }
+
+                    if ($child->isDeprecated()) {
+                        $comments[] = sprintf('Deprecated (%s)', $child->getDeprecationMessage($child->getName(), $child->getPath()));
                     }
 
                     if ($child instanceof EnumNode) {

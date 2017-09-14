@@ -18,6 +18,13 @@ class CustomConfig
         $rootNode
             ->children()
                 ->scalarNode('custom')->end()
+                ->arrayNode('array')
+                    ->children()
+                        ->scalarNode('child1')->end()
+                        ->scalarNode('child2')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }

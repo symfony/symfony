@@ -23,17 +23,23 @@ class ServiceReferenceGraphEdge
     private $sourceNode;
     private $destNode;
     private $value;
+    private $lazy;
+    private $weak;
 
     /**
      * @param ServiceReferenceGraphNode $sourceNode
      * @param ServiceReferenceGraphNode $destNode
      * @param string                    $value
+     * @param bool                      $lazy
+     * @param bool                      $weak
      */
-    public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null)
+    public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null, $lazy = false, $weak = false)
     {
         $this->sourceNode = $sourceNode;
         $this->destNode = $destNode;
         $this->value = $value;
+        $this->lazy = $lazy;
+        $this->weak = $weak;
     }
 
     /**
@@ -64,5 +70,25 @@ class ServiceReferenceGraphEdge
     public function getDestNode()
     {
         return $this->destNode;
+    }
+
+    /**
+     * Returns true if the edge is lazy, meaning it's a dependency not requiring direct instantiation.
+     *
+     * @return bool
+     */
+    public function isLazy()
+    {
+        return $this->lazy;
+    }
+
+    /**
+     * Returns true if the edge is weak, meaning it shouldn't prevent removing the target service.
+     *
+     * @return bool
+     */
+    public function isWeak()
+    {
+        return $this->weak;
     }
 }

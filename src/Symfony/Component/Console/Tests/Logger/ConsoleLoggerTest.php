@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -58,6 +59,51 @@ class ConsoleLoggerTest extends TestCase
     public function getLogs()
     {
         return $this->output->getLogs();
+    }
+
+    /**
+     * @dataProvider provideOutputMappingParams
+     */
+    public function testOutputMapping($logLevel, $outputVerbosity, $isOutput, $addVerbosityLevelMap = array())
+    {
+        $out = new BufferedOutput($outputVerbosity);
+        $logger = new ConsoleLogger($out, $addVerbosityLevelMap);
+        $logger->log($logLevel, 'foo bar');
+        $logs = $out->fetch();
+        $this->assertEquals($isOutput ? "[$logLevel] foo bar".PHP_EOL : '', $logs);
+    }
+
+    public function provideOutputMappingParams()
+    {
+        $quietMap = array(LogLevel::EMERGENCY => OutputInterface::VERBOSITY_QUIET);
+
+        return array(
+            array(LogLevel::EMERGENCY, OutputInterface::VERBOSITY_NORMAL, true),
+            array(LogLevel::WARNING, OutputInterface::VERBOSITY_NORMAL, true),
+            array(LogLevel::INFO, OutputInterface::VERBOSITY_NORMAL, false),
+            array(LogLevel::DEBUG, OutputInterface::VERBOSITY_NORMAL, false),
+            array(LogLevel::INFO, OutputInterface::VERBOSITY_VERBOSE, false),
+            array(LogLevel::INFO, OutputInterface::VERBOSITY_VERY_VERBOSE, true),
+            array(LogLevel::DEBUG, OutputInterface::VERBOSITY_VERY_VERBOSE, false),
+            array(LogLevel::DEBUG, OutputInterface::VERBOSITY_DEBUG, true),
+            array(LogLevel::ALERT, OutputInterface::VERBOSITY_QUIET, false),
+            array(LogLevel::EMERGENCY, OutputInterface::VERBOSITY_QUIET, false),
+            array(LogLevel::ALERT, OutputInterface::VERBOSITY_QUIET, false, $quietMap),
+            array(LogLevel::EMERGENCY, OutputInterface::VERBOSITY_QUIET, true, $quietMap),
+        );
+    }
+
+    public function testHasErrored()
+    {
+        $logger = new ConsoleLogger(new BufferedOutput());
+
+        $this->assertFalse($logger->hasErrored());
+
+        $logger->warning('foo');
+        $this->assertFalse($logger->hasErrored());
+
+        $logger->error('bar');
+        $this->assertTrue($logger->hasErrored());
     }
 
     public function testImplements()

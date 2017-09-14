@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `ContainerAwareEventDispatcher` class
+
+3.3.0
+-----
+
+  * The ContainerAwareEventDispatcher class has been deprecated. Use EventDispatcher with closure factories instead.
+
+3.0.0
+-----
+
+  * The method `getListenerPriority($eventName, $listener)` has been added to the
+    `EventDispatcherInterface`.
+  * The methods `Event::setDispatcher()`, `Event::getDispatcher()`, `Event::setName()`
+    and `Event::getName()` have been removed.
+    The event dispatcher and the event name are passed to the listener call.
+
 2.5.0
 -----
 

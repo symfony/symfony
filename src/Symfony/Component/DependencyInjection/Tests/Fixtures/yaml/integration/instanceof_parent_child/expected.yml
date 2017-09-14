@@ -1,0 +1,7 @@
+services:
+    child_service_expected:
+        class: stdClass
+        # applied to _instanceof of parent
+        autowire: true
+        # from _instanceof, applies to parent, but does NOT inherit to here
+        # tags: [from_instanceof]

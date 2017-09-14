@@ -42,16 +42,4 @@ interface ControllerResolverInterface
      * @throws \LogicException If the controller can't be found
      */
     public function getController(Request $request);
-
-    /**
-     * Returns the arguments to pass to the controller.
-     *
-     * @param Request  $request    A Request instance
-     * @param callable $controller A PHP callable
-     *
-     * @return array An array of arguments to pass to the controller
-     *
-     * @throws \RuntimeException When value for argument given is not provided
-     */
-    public function getArguments(Request $request, $controller);
 }

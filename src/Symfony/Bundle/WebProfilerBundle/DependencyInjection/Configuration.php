@@ -37,13 +37,6 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->booleanNode('toolbar')->defaultFalse()->end()
-                ->scalarNode('position')
-                    ->defaultValue('bottom')
-                    ->validate()
-                        ->ifNotInArray(array('bottom', 'top'))
-                        ->thenInvalid('The CSS position %s is not supported')
-                    ->end()
-                ->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()
                 ->scalarNode('excluded_ajax_paths')->defaultValue('^/(app(_[\\w]+)?\\.php/)?_wdt')->end()
             ->end()

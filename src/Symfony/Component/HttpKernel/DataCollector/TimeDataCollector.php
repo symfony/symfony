@@ -39,7 +39,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
         if (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();
         } else {
-            $startTime = $request->server->get('REQUEST_TIME_FLOAT', $request->server->get('REQUEST_TIME'));
+            $startTime = $request->server->get('REQUEST_TIME_FLOAT');
         }
 
         $this->data = array(

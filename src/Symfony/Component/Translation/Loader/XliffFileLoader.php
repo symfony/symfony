@@ -15,6 +15,7 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -98,11 +99,16 @@ class XliffFileLoader implements LoaderInterface
             if ($notes = $this->parseNotesMetadata($translation->note, $encoding)) {
                 $metadata['notes'] = $notes;
             }
+
             if (isset($translation->target) && $translation->target->attributes()) {
                 $metadata['target-attributes'] = array();
                 foreach ($translation->target->attributes() as $key => $value) {
                     $metadata['target-attributes'][$key] = (string) $value;
                 }
+            }
+
+            if (isset($attributes['id'])) {
+                $metadata['id'] = (string) $attributes['id'];
             }
 
             $catalogue->setMetadata((string) $source, $metadata, $domain);
@@ -121,7 +127,8 @@ class XliffFileLoader implements LoaderInterface
 
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:2.0');
 
-        foreach ($xml->xpath('//xliff:unit/xliff:segment') as $segment) {
+        foreach ($xml->xpath('//xliff:unit') as $unit) {
+            $segment = $unit->segment;
             $source = $segment->source;
 
             // If the xlf file has another encoding specified, try to convert it because
@@ -135,6 +142,18 @@ class XliffFileLoader implements LoaderInterface
                 $metadata['target-attributes'] = array();
                 foreach ($segment->target->attributes() as $key => $value) {
                     $metadata['target-attributes'][$key] = (string) $value;
+                }
+            }
+
+            if (isset($unit->notes)) {
+                $metadata['notes'] = array();
+                foreach ($unit->notes->note as $noteNode) {
+                    $note = array();
+                    foreach ($noteNode->attributes() as $key => $value) {
+                        $note[$key] = (string) $value;
+                    }
+                    $note['content'] = (string) $noteNode;
+                    $metadata['notes'][] = $note;
                 }
             }
 
@@ -166,7 +185,6 @@ class XliffFileLoader implements LoaderInterface
      * @param \DOMDocument $dom
      * @param string       $schema source of the schema
      *
-     * @throws \RuntimeException
      * @throws InvalidResourceException
      */
     private function validateSchema($file, \DOMDocument $dom, $schema)
@@ -198,7 +216,7 @@ class XliffFileLoader implements LoaderInterface
             $schemaSource = file_get_contents(__DIR__.'/schema/dic/xliff-core/xliff-core-2.0.xsd');
             $xmlUri = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
         } else {
-            throw new \InvalidArgumentException(sprintf('No support implemented for loading XLIFF version "%s".', $xliffVersion));
+            throw new InvalidArgumentException(sprintf('No support implemented for loading XLIFF version "%s".', $xliffVersion));
         }
 
         return $this->fixXmlLocation($schemaSource, $xmlUri);
@@ -217,12 +235,13 @@ class XliffFileLoader implements LoaderInterface
         $newPath = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $newPath);
         if (0 === stripos($newPath, 'phar://')) {
-            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+            $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
             if ($tmpfile) {
                 copy($newPath, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));
             }
         }
+
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
         $newPath = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
 
@@ -262,7 +281,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param \DOMDocument $dom
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return string
      */
@@ -278,7 +297,7 @@ class XliffFileLoader implements LoaderInterface
             $namespace = $xliff->attributes->getNamedItem('xmlns');
             if ($namespace) {
                 if (substr_compare('urn:oasis:names:tc:xliff:document:', $namespace->nodeValue, 0, 34) !== 0) {
-                    throw new \InvalidArgumentException(sprintf('Not a valid XLIFF namespace "%s"', $namespace));
+                    throw new InvalidArgumentException(sprintf('Not a valid XLIFF namespace "%s"', $namespace));
                 }
 
                 return substr($namespace, 34);
@@ -289,7 +308,7 @@ class XliffFileLoader implements LoaderInterface
         return '1.2';
     }
 
-    /*
+    /**
      * @param \SimpleXMLElement|null $noteElement
      * @param string|null            $encoding
      *
@@ -303,6 +322,7 @@ class XliffFileLoader implements LoaderInterface
             return $notes;
         }
 
+        /** @var \SimpleXMLElement $xmlNote */
         foreach ($noteElement as $xmlNote) {
             $noteAttributes = $xmlNote->attributes();
             $note = array('content' => $this->utf8ToCharset((string) $xmlNote, $encoding));

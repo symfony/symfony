@@ -69,6 +69,9 @@ class EncoderFactory implements EncoderFactoryInterface
      */
     private function createEncoder(array $config)
     {
+        if (isset($config['algorithm'])) {
+            $config = $this->getEncoderConfigFromAlgorithm($config);
+        }
         if (!isset($config['class'])) {
             throw new \InvalidArgumentException(sprintf('"class" must be set in %s.', json_encode($config)));
         }
@@ -79,5 +82,42 @@ class EncoderFactory implements EncoderFactoryInterface
         $reflection = new \ReflectionClass($config['class']);
 
         return $reflection->newInstanceArgs($config['arguments']);
+    }
+
+    private function getEncoderConfigFromAlgorithm($config)
+    {
+        switch ($config['algorithm']) {
+            case 'plaintext':
+                return array(
+                    'class' => PlaintextPasswordEncoder::class,
+                    'arguments' => array($config['ignore_case']),
+                );
+
+            case 'pbkdf2':
+                return array(
+                    'class' => Pbkdf2PasswordEncoder::class,
+                    'arguments' => array(
+                        $config['hash_algorithm'],
+                        $config['encode_as_base64'],
+                        $config['iterations'],
+                        $config['key_length'],
+                    ),
+                );
+
+            case 'bcrypt':
+                return array(
+                    'class' => BCryptPasswordEncoder::class,
+                    'arguments' => array($config['cost']),
+                );
+        }
+
+        return array(
+            'class' => MessageDigestPasswordEncoder::class,
+            'arguments' => array(
+                $config['algorithm'],
+                $config['encode_as_base64'],
+                $config['iterations'],
+            ),
+        );
     }
 }

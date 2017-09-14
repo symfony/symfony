@@ -25,4 +25,9 @@ class ConstStub extends Stub
         $this->class = $name;
         $this->value = $value;
     }
+
+    public function __toString()
+    {
+        return (string) $this->value;
+    }
 }

@@ -1,6 +1,38 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * the first constructor argument of the `DoctrineChoiceLoader` class must be
+   an `ObjectManager` implementation
+ * removed the `MergeDoctrineCollectionListener::onBind()` method
+ * trying to reset a non-lazy manager service using the `ManagerRegistry::resetService()`
+   method throws an exception
+ * removed the `DoctrineParserCache` class
+
+3.4.0
+-----
+
+ * added support for doctrine/dbal v2.6 types
+
+3.1.0
+-----
+
+ * added "{{ value }}" message placeholder to UniqueEntityValidator
+ * deprecated `MergeDoctrineCollectionListener::onBind` in favor of
+   `MergeDoctrineCollectionListener::onSubmit`
+ * deprecated passing `ChoiceListFactoryInterface` as first argument of
+   `DoctrineChoiceLoader`'s constructor
+
+3.0.0
+-----
+
+ * removed `EntityChoiceList`
+ * removed `$manager` (2nd) and `$class` (3th) arguments of `ORMQueryBuilderLoader`
+ * removed passing a query builder closure to `ORMQueryBuilderLoader`
+ * removed `loader` and `property` options of the `DoctrineType`
+
 2.8.0
 -----
 

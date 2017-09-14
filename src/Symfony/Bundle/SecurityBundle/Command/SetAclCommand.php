@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,24 +27,20 @@ use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
  * Sets ACL for objects.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
+ *
+ * @final since version 3.4
  */
-class SetAclCommand extends ContainerAwareCommand
+class SetAclCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
+    protected static $defaultName = 'acl:set';
+
+    private $provider;
+
+    public function __construct(MutableAclProviderInterface $provider)
     {
-        if (!$this->getContainer()->has('security.acl.provider')) {
-            return false;
-        }
+        parent::__construct();
 
-        $provider = $this->getContainer()->get('security.acl.provider');
-        if (!$provider instanceof MutableAclProviderInterface) {
-            return false;
-        }
-
-        return parent::isEnabled();
+        $this->provider = $provider;
     }
 
     /**
@@ -53,7 +49,6 @@ class SetAclCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('acl:set')
             ->setDescription('Sets ACL for objects')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command sets ACL.
@@ -91,7 +86,7 @@ EOF
     {
         // Parse arguments
         $objectIdentities = array();
-        $maskBuilder = $this->getMaskBuilder();
+        $maskBuilder = new MaskBuilder();
         foreach ($input->getArgument('arguments') as $argument) {
             $data = explode(':', $argument, 2);
 
@@ -134,20 +129,15 @@ EOF
             }
         }
 
-        /** @var $container \Symfony\Component\DependencyInjection\ContainerInterface */
-        $container = $this->getContainer();
-        /** @var $aclProvider MutableAclProviderInterface */
-        $aclProvider = $container->get('security.acl.provider');
-
         // Sets ACL
         foreach ($objectIdentities as $objectIdentity) {
             // Creates a new ACL if it does not already exist
             try {
-                $aclProvider->createAcl($objectIdentity);
+                $this->provider->createAcl($objectIdentity);
             } catch (AclAlreadyExistsException $e) {
             }
 
-            $acl = $aclProvider->findAcl($objectIdentity, $securityIdentities);
+            $acl = $this->provider->findAcl($objectIdentity, $securityIdentities);
 
             foreach ($securityIdentities as $securityIdentity) {
                 if ($classScopeOption) {
@@ -157,17 +147,7 @@ EOF
                 }
             }
 
-            $aclProvider->updateAcl($acl);
+            $this->provider->updateAcl($acl);
         }
-    }
-
-    /**
-     * Gets the mask builder.
-     *
-     * @return MaskBuilder
-     */
-    protected function getMaskBuilder()
-    {
-        return new MaskBuilder();
     }
 }

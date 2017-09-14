@@ -45,50 +45,12 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCascadeValidationCanBeSetToTrue()
+    public function testValidatorInterface()
     {
-        $form = $this->createForm(array('cascade_validation' => true));
-
-        $this->assertTrue($form->getConfig()->getOption('cascade_validation'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCascadeValidationCanBeSetToFalse()
-    {
-        $form = $this->createForm(array('cascade_validation' => false));
-
-        $this->assertFalse($form->getConfig()->getOption('cascade_validation'));
-    }
-
-    public function testValidatorInterfaceSinceSymfony25()
-    {
-        // Mock of ValidatorInterface since apiVersion 2.5
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 
         $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
-    }
-
-    public function testValidatorInterfaceUntilSymfony24()
-    {
-        // Mock of ValidatorInterface until apiVersion 2.4
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\ValidatorInterface')->getMock();
-
-        $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
-        $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidValidatorInterface()
-    {
-        new FormTypeValidatorExtension(null);
     }
 
     protected function createForm(array $options = array())

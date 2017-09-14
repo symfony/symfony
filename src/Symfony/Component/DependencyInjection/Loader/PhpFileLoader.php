@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
-
 /**
  * PhpFileLoader loads service definitions from a PHP file.
  *
@@ -34,7 +32,7 @@ class PhpFileLoader extends FileLoader
 
         $path = $this->locator->locate($resource);
         $this->setCurrentDir(dirname($path));
-        $this->container->addResource(new FileResource($path));
+        $this->container->fileExists($path);
 
         include $path;
     }
@@ -44,6 +42,14 @@ class PhpFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'php' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'php' === $type;
     }
 }

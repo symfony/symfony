@@ -14,8 +14,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CallbackValidatorTest_Class
 {
@@ -44,13 +44,8 @@ class CallbackValidatorTest_Object
     }
 }
 
-class CallbackValidatorTest extends AbstractConstraintValidatorTest
+class CallbackValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new CallbackValidator();
@@ -186,106 +181,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacySingleMethodBc()
-    {
-        $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array('validate'));
-
-        $this->validator->validate($object, $constraint);
-
-        $this->buildViolation('My message')
-            ->setParameter('{{ value }}', 'foobar')
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySingleMethodBcExplicitName()
-    {
-        $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array('methods' => array('validate')));
-
-        $this->validator->validate($object, $constraint);
-
-        $this->buildViolation('My message')
-            ->setParameter('{{ value }}', 'foobar')
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyMultipleMethodsBc()
-    {
-        $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array('validate', 'validateStatic'));
-
-        $this->validator->validate($object, $constraint);
-
-        $this->buildViolation('My message')
-            ->setParameter('{{ value }}', 'foobar')
-            ->buildNextViolation('Static message')
-            ->setParameter('{{ value }}', 'baz')
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyMultipleMethodsBcExplicitName()
-    {
-        $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array(
-            'methods' => array('validate', 'validateStatic'),
-        ));
-
-        $this->validator->validate($object, $constraint);
-
-        $this->buildViolation('My message')
-            ->setParameter('{{ value }}', 'foobar')
-            ->buildNextViolation('Static message')
-            ->setParameter('{{ value }}', 'baz')
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySingleStaticMethodBc()
-    {
-        $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array(
-            array(__CLASS__.'_Class', 'validateCallback'),
-        ));
-
-        $this->validator->validate($object, $constraint);
-
-        $this->buildViolation('Callback message')
-            ->setParameter('{{ value }}', 'foobar')
-            ->assertRaised();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySingleStaticMethodBcExplicitName()
-    {
-        $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(array(
-            'methods' => array(array(__CLASS__.'_Class', 'validateCallback')),
-        ));
-
-        $this->validator->validate($object, $constraint);
-
-        $this->buildViolation('Callback message')
-            ->setParameter('{{ value }}', 'foobar')
-            ->assertRaised();
-    }
-
-    /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testExpectValidMethods()
@@ -303,20 +198,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(array('callback' => array('foo', 'bar'))));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @group legacy
-     */
-    public function testLegacyExpectEitherCallbackOrMethods()
-    {
-        $object = new CallbackValidatorTest_Object();
-
-        $this->validator->validate($object, new Callback(array(
-            'callback' => 'validate',
-            'methods' => array('validateStatic'),
-        )));
     }
 
     public function testConstraintGetTargets()
@@ -347,5 +228,29 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Callback(array('value' => array(__CLASS__.'_Class', 'validateCallback')));
 
         $this->assertEquals(new Callback(array(__CLASS__.'_Class', 'validateCallback')), $constraint);
+    }
+
+    public function testPayloadIsPassedToCallback()
+    {
+        $object = new \stdClass();
+        $payloadCopy = null;
+
+        $constraint = new Callback(array(
+            'callback' => function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
+                $payloadCopy = $payload;
+            },
+            'payload' => 'Hello world!',
+        ));
+        $this->validator->validate($object, $constraint);
+        $this->assertEquals('Hello world!', $payloadCopy);
+
+        $payloadCopy = null;
+        $constraint = new Callback(array(
+            'callback' => function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
+                $payloadCopy = $payload;
+            },
+        ));
+        $this->validator->validate($object, $constraint);
+        $this->assertNull($payloadCopy);
     }
 }

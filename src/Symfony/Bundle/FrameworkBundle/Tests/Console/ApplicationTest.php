@@ -15,8 +15,13 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationTest extends TestCase
 {
@@ -130,6 +135,36 @@ class ApplicationTest extends TestCase
         $this->assertSame($newCommand, $application->get('example'));
     }
 
+    public function testRunOnlyWarnsOnUnregistrableCommand()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class);
+        $container->register(ThrowingCommand::class, ThrowingCommand::class);
+        $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class));
+
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->method('getBundles')
+            ->willReturn(array($this->createBundleMock(
+                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
+            )));
+        $kernel
+            ->method('getContainer')
+            ->willReturn($container);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'fine'));
+        $output = $tester->getDisplay();
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertContains('Some commands could not be registered.', $output);
+        $this->assertContains('throwing', $output);
+        $this->assertContains('fine', $output);
+    }
+
     private function getKernel(array $bundles, $useDispatcher = false)
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
@@ -148,16 +183,16 @@ class ApplicationTest extends TestCase
         }
 
         $container
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('hasParameter')
-            ->with($this->equalTo('console.command.ids'))
-            ->will($this->returnValue(true))
+            ->withConsecutive(array('console.command.ids'), array('console.lazy_command.ids'))
+            ->willReturnOnConsecutiveCalls(true, true)
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getParameter')
-            ->with($this->equalTo('console.command.ids'))
-            ->will($this->returnValue(array()))
+            ->withConsecutive(array('console.lazy_command.ids'), array('console.command.ids'))
+            ->willReturnOnConsecutiveCalls(array(), array())
         ;
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
@@ -187,5 +222,13 @@ class ApplicationTest extends TestCase
         ;
 
         return $bundle;
+    }
+}
+
+class ThrowingCommand extends Command
+{
+    public function __construct()
+    {
+        throw new \Exception('throwing');
     }
 }

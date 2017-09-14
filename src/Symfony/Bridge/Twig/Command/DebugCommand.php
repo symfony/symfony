@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project.
@@ -26,27 +27,17 @@ use Twig\Environment;
  */
 class DebugCommand extends Command
 {
+    protected static $defaultName = 'debug:twig';
+
     private $twig;
+    private $projectDir;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($name = 'debug:twig')
+    public function __construct(Environment $twig, $projectDir = null)
     {
-        parent::__construct($name);
-    }
+        parent::__construct();
 
-    public function setTwigEnvironment(Environment $twig)
-    {
         $this->twig = $twig;
-    }
-
-    /**
-     * @return Environment $twig
-     */
-    protected function getTwigEnvironment()
-    {
-        return $this->twig;
+        $this->projectDir = $projectDir;
     }
 
     protected function configure()
@@ -80,24 +71,17 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $twig = $this->getTwigEnvironment();
-
-        if (null === $twig) {
-            $io->error('The Twig environment needs to be set.');
-
-            return 1;
-        }
-
         $types = array('functions', 'filters', 'tests', 'globals');
 
         if ($input->getOption('format') === 'json') {
             $data = array();
             foreach ($types as $type) {
-                foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
+                foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                     $data[$type][$name] = $this->getMetadata($type, $entity);
                 }
             }
             $data['tests'] = array_keys($data['tests']);
+            $data['loader_paths'] = $this->getLoaderPaths();
             $io->writeln(json_encode($data));
 
             return 0;
@@ -107,7 +91,7 @@ EOF
 
         foreach ($types as $index => $type) {
             $items = array();
-            foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
+            foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
                 }
@@ -123,7 +107,52 @@ EOF
             $io->listing($items);
         }
 
+        $rows = array();
+        foreach ($this->getLoaderPaths() as $namespace => $paths) {
+            if (count($paths) > 1) {
+                $rows[] = array('', '');
+            }
+            foreach ($paths as $path) {
+                $rows[] = array($namespace, '- '.$path);
+                $namespace = '';
+            }
+            if (count($paths) > 1) {
+                $rows[] = array('', '');
+            }
+        }
+        array_pop($rows);
+        $io->section('Loader Paths');
+        $io->table(array('Namespace', 'Paths'), $rows);
+
         return 0;
+    }
+
+    private function getLoaderPaths()
+    {
+        if (!($loader = $this->twig->getLoader()) instanceof FilesystemLoader) {
+            return array();
+        }
+
+        $loaderPaths = array();
+        foreach ($loader->getNamespaces() as $namespace) {
+            $paths = array_map(function ($path) use ($namespace) {
+                if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
+                    $path = ltrim(substr($path, strlen($this->projectDir)), DIRECTORY_SEPARATOR);
+                }
+
+                return $path;
+            }, $loader->getPaths($namespace));
+
+            if (FilesystemLoader::MAIN_NAMESPACE === $namespace) {
+                $namespace = '(None)';
+            } else {
+                $namespace = '@'.$namespace;
+            }
+
+            $loaderPaths[$namespace] = $paths;
+        }
+
+        return $loaderPaths;
     }
 
     private function getMetadata($type, $entity)

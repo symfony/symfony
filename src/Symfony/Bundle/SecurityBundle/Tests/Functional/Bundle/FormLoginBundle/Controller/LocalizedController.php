@@ -11,13 +11,16 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-class LocalizedController extends ContainerAware
+class LocalizedController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     public function loginAction(Request $request)
     {
         // get the login error if there is one
@@ -27,11 +30,11 @@ class LocalizedController extends ContainerAware
             $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
         }
 
-        return $this->container->get('templating')->renderResponse('FormLoginBundle:Localized:login.html.twig', array(
+        return new Response($this->container->get('twig')->render('@FormLogin/Localized/login.html.twig', array(
             // last username entered by the user
             'last_username' => $request->getSession()->get(Security::LAST_USERNAME),
             'error' => $error,
-        ));
+        )));
     }
 
     public function loginCheckAction()

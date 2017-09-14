@@ -31,7 +31,7 @@ class HashParser implements ParserInterface
     /**
      * {@inheritdoc}
      */
-    public function parse($source)
+    public function parse(string $source): array
     {
         // Matches an optional namespace, optional element, and required id
         // $source = 'test|input#ab6bd_field';

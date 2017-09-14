@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Mapping\Factory;
 
-use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
@@ -23,15 +22,12 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
+    use ClassResolverTrait;
+
     /**
      * @var LoaderInterface
      */
     private $loader;
-
-    /**
-     * @var Cache
-     */
-    private $cache;
 
     /**
      * @var array
@@ -40,12 +36,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
     /**
      * @param LoaderInterface $loader
-     * @param Cache|null      $cache
      */
-    public function __construct(LoaderInterface $loader, Cache $cache = null)
+    public function __construct(LoaderInterface $loader)
     {
         $this->loader = $loader;
-        $this->cache = $cache;
     }
 
     /**
@@ -54,20 +48,9 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     public function getMetadataFor($value)
     {
         $class = $this->getClass($value);
-        if (!$class) {
-            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', gettype($value)));
-        }
 
         if (isset($this->loadedClasses[$class])) {
             return $this->loadedClasses[$class];
-        }
-
-        if ($this->cache && ($this->loadedClasses[$class] = $this->cache->fetch($class))) {
-            return $this->loadedClasses[$class];
-        }
-
-        if (!class_exists($class) && !interface_exists($class)) {
-            throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
         $classMetadata = new ClassMetadata($class);
@@ -85,10 +68,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
             $classMetadata->merge($this->getMetadataFor($interface->name));
         }
 
-        if ($this->cache) {
-            $this->cache->save($class, $classMetadata);
-        }
-
         return $this->loadedClasses[$class] = $classMetadata;
     }
 
@@ -97,24 +76,14 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     public function hasMetadataFor($value)
     {
-        $class = $this->getClass($value);
+        try {
+            $this->getClass($value);
 
-        return class_exists($class) || interface_exists($class);
-    }
-
-    /**
-     * Gets a class name for a given class or instance.
-     *
-     * @param mixed $value
-     *
-     * @return string|bool
-     */
-    private function getClass($value)
-    {
-        if (!is_object($value) && !is_string($value)) {
-            return false;
+            return true;
+        } catch (InvalidArgumentException $invalidArgumentException) {
+            // Return false in case of exception
         }
 
-        return ltrim(is_object($value) ? get_class($value) : $value, '\\');
+        return false;
     }
 }

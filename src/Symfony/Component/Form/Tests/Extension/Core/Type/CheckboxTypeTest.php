@@ -17,16 +17,6 @@ class CheckboxTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CheckboxType';
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('checkbox');
-
-        $this->assertSame('checkbox', $form->getConfig()->getType()->getName());
-    }
-
     public function testDataIsFalseByDefault()
     {
         $form = $this->factory->create(static::TESTED_TYPE);

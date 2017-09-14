@@ -44,6 +44,20 @@ interface AttributeMetadataInterface
     public function getGroups();
 
     /**
+     * Sets the serialization max depth for this attribute.
+     *
+     * @param int|null $maxDepth
+     */
+    public function setMaxDepth($maxDepth);
+
+    /**
+     * Gets the serialization max depth for this attribute.
+     *
+     * @return int|null
+     */
+    public function getMaxDepth();
+
+    /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      *
      * @param AttributeMetadataInterface $attributeMetadata

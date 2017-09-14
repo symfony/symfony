@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
@@ -23,11 +24,6 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  */
 class DoctrineChoiceLoader implements ChoiceLoaderInterface
 {
-    /**
-     * @var ChoiceListFactoryInterface
-     */
-    private $factory;
-
     /**
      * @var ObjectManager
      */
@@ -60,20 +56,19 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      * passed which optimizes the object loading for one of the Doctrine
      * mapper implementations.
      *
-     * @param ChoiceListFactoryInterface $factory      The factory for creating
-     *                                                 the loaded choice list
      * @param ObjectManager              $manager      The object manager
      * @param string                     $class        The class name of the
      *                                                 loaded objects
      * @param IdReader                   $idReader     the reader for the object
      *                                                 IDs
      * @param null|EntityLoaderInterface $objectLoader The objects loader
+     * @param ChoiceListFactoryInterface $factory      The factory for creating
+     *                                                 the loaded choice list
      */
-    public function __construct(ChoiceListFactoryInterface $factory, ObjectManager $manager, $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
+    public function __construct(ObjectManager $manager, $class, $idReader = null, $objectLoader = null, $factory = null)
     {
         $classMetadata = $manager->getClassMetadata($class);
 
-        $this->factory = $factory;
         $this->manager = $manager;
         $this->class = $classMetadata->getName();
         $this->idReader = $idReader ?: new IdReader($manager, $classMetadata);
@@ -93,9 +88,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             ? $this->objectLoader->getEntities()
             : $this->manager->getRepository($this->class)->findAll();
 
-        $this->choiceList = $this->factory->createListFromChoices($objects, $value);
-
-        return $this->choiceList;
+        return $this->choiceList = new ArrayChoiceList($objects, $value);
     }
 
     /**
@@ -147,7 +140,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        $optimize = null === $value || is_array($value) && $value[0] === $this->idReader;
+        $optimize = null === $value || is_array($value) && $this->idReader === $value[0];
 
         if ($optimize && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
             $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);

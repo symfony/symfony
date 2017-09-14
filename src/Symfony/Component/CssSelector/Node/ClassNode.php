@@ -62,7 +62,7 @@ class ClassNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function getSpecificity()
+    public function getSpecificity(): Specificity
     {
         return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
     }
@@ -70,7 +70,7 @@ class ClassNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%s[%s.%s]', $this->getNodeName(), $this->selector, $this->name);
     }

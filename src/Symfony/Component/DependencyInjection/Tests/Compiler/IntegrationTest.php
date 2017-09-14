@@ -12,7 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -113,5 +115,110 @@ class IntegrationTest extends TestCase
         $this->assertTrue($container->hasDefinition('a'));
         $this->assertFalse($container->hasDefinition('b'));
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
+    }
+
+    /**
+     * @dataProvider getYamlCompileTests
+     */
+    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
+    {
+        // allow a container to be passed in, which might have autoconfigure settings
+        $container = $mainContainer ? $mainContainer : new ContainerBuilder();
+        $container->setResourceTracking(false);
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
+        $loader->load('main.yml');
+        $container->compile();
+        $actualService = $container->getDefinition($actualServiceId);
+
+        // create a fresh ContainerBuilder, to avoid autoconfigure stuff
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
+        $loader->load('expected.yml');
+        $container->compile();
+        $expectedService = $container->getDefinition($expectedServiceId);
+
+        // reset changes, we don't care if these differ
+        $actualService->setChanges(array());
+        $expectedService->setChanges(array());
+
+        $this->assertEquals($expectedService, $actualService);
+    }
+
+    public function getYamlCompileTests()
+    {
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class);
+        yield array(
+            'autoconfigure_child_not_applied',
+            'child_service',
+            'child_service_expected',
+            $container,
+        );
+
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class);
+        yield array(
+            'autoconfigure_parent_child',
+            'child_service',
+            'child_service_expected',
+            $container,
+        );
+
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class)
+            ->addTag('from_autoconfigure');
+        yield array(
+            'autoconfigure_parent_child_tags',
+            'child_service',
+            'child_service_expected',
+            $container,
+        );
+
+        yield array(
+            'child_parent',
+            'child_service',
+            'child_service_expected',
+        );
+
+        yield array(
+            'defaults_child_tags',
+            'child_service',
+            'child_service_expected',
+        );
+
+        yield array(
+            'defaults_instanceof_importance',
+            'main_service',
+            'main_service_expected',
+        );
+
+        yield array(
+            'defaults_parent_child',
+            'child_service',
+            'child_service_expected',
+        );
+
+        yield array(
+            'instanceof_parent_child',
+            'child_service',
+            'child_service_expected',
+        );
+    }
+}
+
+class IntegrationTestStub extends IntegrationTestStubParent
+{
+}
+
+class IntegrationTestStubParent
+{
+    public function enableSummer($enable)
+    {
+        // methods used in calls - added here to prevent errors for not existing
+    }
+
+    public function setSunshine($type)
+    {
     }
 }

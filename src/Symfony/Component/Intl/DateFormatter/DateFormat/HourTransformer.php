@@ -28,5 +28,5 @@ abstract class HourTransformer extends Transformer
      *
      * @return int The normalized hour value
      */
-    abstract public function normalizeHour($hour, $marker = null);
+    abstract public function normalizeHour(int $hour, string $marker = null): int;
 }

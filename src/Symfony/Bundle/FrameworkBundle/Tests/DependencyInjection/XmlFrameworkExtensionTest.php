@@ -22,4 +22,9 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTest
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
         $loader->load($file.'.xml');
     }
+
+    public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled()
+    {
+        $this->markTestSkipped('The assets key cannot be set to false using the XML configuration format.');
+    }
 }

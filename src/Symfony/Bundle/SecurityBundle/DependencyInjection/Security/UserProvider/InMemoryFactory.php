@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -26,13 +26,13 @@ class InMemoryFactory implements UserProviderFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config)
     {
-        $definition = $container->setDefinition($id, new DefinitionDecorator('security.user.provider.in_memory'));
+        $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
 
         foreach ($config['users'] as $username => $user) {
             $userId = $id.'_'.$username;
 
             $container
-                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
+                ->setDefinition($userId, new ChildDefinition('security.user.provider.in_memory.user'))
                 ->setArguments(array($username, (string) $user['password'], $user['roles']))
             ;
 
@@ -52,6 +52,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
             ->children()
                 ->arrayNode('users')
                     ->useAttributeAsKey('name')
+                    ->normalizeKeys(false)
                     ->prototype('array')
                         ->children()
                             ->scalarNode('password')->defaultValue(uniqid('', true))->end()

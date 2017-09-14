@@ -44,6 +44,8 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
         $this->data = $this->computeCount($messages);
         $this->data['messages'] = $messages;
+
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**

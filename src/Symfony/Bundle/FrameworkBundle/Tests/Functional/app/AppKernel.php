@@ -11,30 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app;
 
-// get the autoload file
-$dir = __DIR__;
-$lastDir = null;
-while ($dir !== $lastDir) {
-    $lastDir = $dir;
-
-    if (file_exists($dir.'/autoload.php')) {
-        require_once $dir.'/autoload.php';
-        break;
-    }
-
-    if (file_exists($dir.'/autoload.php.dist')) {
-        require_once $dir.'/autoload.php.dist';
-        break;
-    }
-
-    if (file_exists($dir.'/vendor/autoload.php')) {
-        require_once $dir.'/vendor/autoload.php';
-        break;
-    }
-
-    $dir = dirname($dir);
-}
-
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;

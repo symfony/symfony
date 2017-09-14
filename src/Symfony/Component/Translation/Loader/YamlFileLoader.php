@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Exception\ParseException;
 
@@ -31,7 +32,7 @@ class YamlFileLoader extends FileLoader
     {
         if (null === $this->yamlParser) {
             if (!class_exists('Symfony\Component\Yaml\Parser')) {
-                throw new \LogicException('Loading translations from the YAML format requires the Symfony Yaml component.');
+                throw new LogicException('Loading translations from the YAML format requires the Symfony Yaml component.');
             }
 
             $this->yamlParser = new YamlParser();

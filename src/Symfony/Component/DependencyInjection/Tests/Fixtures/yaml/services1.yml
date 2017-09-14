@@ -1,1 +1,10 @@
-
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        synthetic: true
+    Psr\Container\ContainerInterface:
+        alias: service_container
+        public: false
+    Symfony\Component\DependencyInjection\ContainerInterface:
+        alias: service_container
+        public: false

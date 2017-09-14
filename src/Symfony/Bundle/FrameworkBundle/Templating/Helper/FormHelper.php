@@ -121,27 +121,6 @@ class FormHelper extends Helper
     }
 
     /**
-     * Renders the HTML enctype in the form tag, if necessary.
-     *
-     * Example usage templates:
-     *
-     *     <form action="..." method="post" <?php echo $view['form']->enctype($form) ?>>
-     *
-     * @param FormView $view The view for which to render the encoding type
-     *
-     * @return string The HTML markup
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link start} instead.
-     */
-    public function enctype(FormView $view)
-    {
-        @trigger_error('The form helper $view[\'form\']->enctype() is deprecated since version 2.3 and will be removed in 3.0. Use $view[\'form\']->start() instead.', E_USER_DEPRECATED);
-
-        return $this->renderer->searchAndRenderBlock($view, 'enctype');
-    }
-
-    /**
      * Renders the HTML for a given view.
      *
      * Example usage:
@@ -244,24 +223,24 @@ class FormHelper extends Helper
      * echo $view['form']->csrfToken('rm_user_'.$user->getId());
      * </code>
      *
-     * Check the token in your action using the same intention.
+     * Check the token in your action using the same CSRF token id.
      *
      * <code>
-     * $csrfProvider = $this->get('security.csrf.token_generator');
+     * // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
      * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *     throw new \RuntimeException('CSRF attack detected.');
      * }
      * </code>
      *
-     * @param string $intention The intention of the protected action
+     * @param string $tokenId The CSRF token id of the protected action
      *
      * @return string A CSRF token
      *
      * @throws \BadMethodCallException when no CSRF provider was injected in the constructor
      */
-    public function csrfToken($intention)
+    public function csrfToken($tokenId)
     {
-        return $this->renderer->renderCsrfToken($intention);
+        return $this->renderer->renderCsrfToken($tokenId);
     }
 
     public function humanize($text)

@@ -5,13 +5,15 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
 
         <service id="assets.packages" class="Symfony\Component\Asset\Packages">
             <argument type="service" id="assets.empty_package" /> <!-- default package -->
             <argument type="collection" /> <!-- named packages -->
         </service>
+        <service id="Symfony\Component\Asset\Packages" alias="assets.packages" />
 
-        <service id="assets.empty_package" class="Symfony\Component\Asset\Package" public="false">
+        <service id="assets.empty_package" class="Symfony\Component\Asset\Package">
             <argument type="service" id="assets.empty_version_strategy" />
         </service>
 
@@ -36,7 +38,10 @@
             <argument /> <!-- format -->
         </service>
 
-        <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" public="false" />
+        <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" />
 
+        <service id="assets.json_manifest_version_strategy" class="Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy" abstract="true">
+            <argument /> <!-- manifest path -->
+        </service>
     </services>
 </container>

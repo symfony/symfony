@@ -80,6 +80,62 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * @return VariableNodeDefinition
+     */
+    public function variablePrototype()
+    {
+        return $this->prototype('variable');
+    }
+
+    /**
+     * @return ScalarNodeDefinition
+     */
+    public function scalarPrototype()
+    {
+        return $this->prototype('scalar');
+    }
+
+    /**
+     * @return BooleanNodeDefinition
+     */
+    public function booleanPrototype()
+    {
+        return $this->prototype('boolean');
+    }
+
+    /**
+     * @return IntegerNodeDefinition
+     */
+    public function integerPrototype()
+    {
+        return $this->prototype('integer');
+    }
+
+    /**
+     * @return FloatNodeDefinition
+     */
+    public function floatPrototype()
+    {
+        return $this->prototype('float');
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    public function arrayPrototype()
+    {
+        return $this->prototype('array');
+    }
+
+    /**
+     * @return EnumNodeDefinition
+     */
+    public function enumPrototype()
+    {
+        return $this->prototype('enum');
+    }
+
+    /**
      * Adds the default value if the node is not set in the configuration.
      *
      * This method is applicable to concrete nodes only (not to prototype nodes).
@@ -372,7 +428,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
             }
 
-            if (true === $this->atLeastOne) {
+            if (true === $this->atLeastOne || false === $this->allowEmptyValue) {
                 $node->setMinNumberOfElements(1);
             }
 
@@ -397,6 +453,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
+        $node->setDeprecated($this->deprecationMessage);
         $node->setIgnoreExtraKeys($this->ignoreExtraKeys, $this->removeExtraKeys);
         $node->setNormalizeKeys($this->normalizeKeys);
 
@@ -431,6 +488,12 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         if (null !== $this->key) {
             throw new InvalidDefinitionException(
                 sprintf('->useAttributeAsKey() is not applicable to concrete nodes at path "%s"', $path)
+            );
+        }
+
+        if (false === $this->allowEmptyValue) {
+            throw new InvalidDefinitionException(
+                sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s"', $path)
             );
         }
 

@@ -19,7 +19,7 @@ use Twig\Template;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererEngineInterface
+class TwigRendererEngine extends AbstractRendererEngine
 {
     /**
      * @var Environment
@@ -31,11 +31,9 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     private $template;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnvironment(Environment $environment)
+    public function __construct(array $defaultThemes, Environment $environment)
     {
+        parent::__construct($defaultThemes);
         $this->environment = $environment;
     }
 

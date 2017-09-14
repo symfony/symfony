@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <instanceof id="Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface" lazy="true" autowire="true">
+            <tag name="foo" />
+            <tag name="bar" />
+        </instanceof>
+
+        <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" />
+        <service id="Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface" alias="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar" />
+    </services>
+</container>

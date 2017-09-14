@@ -13,18 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new EqualToValidator();
@@ -54,6 +48,16 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
             array(new \DateTime('2000-01-01 UTC'), '2000-01-01 UTC'),
             array(new ComparisonTest_Class(5), new ComparisonTest_Class(5)),
             array(null, 1),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function provideValidComparisonsToPropertyPath()
+    {
+        return array(
+            array(5),
         );
     }
 

@@ -51,9 +51,6 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
     public function testStoreTokenInClosedSessionWithExistingSessionId()
     {
         session_id('foobar');

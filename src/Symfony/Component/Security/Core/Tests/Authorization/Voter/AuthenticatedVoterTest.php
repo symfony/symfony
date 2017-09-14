@@ -18,12 +18,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AuthenticatedVoterTest extends TestCase
 {
-    public function testSupportsClass()
-    {
-        $voter = new AuthenticatedVoter($this->getResolver());
-        $this->assertTrue($voter->supportsClass('stdClass'));
-    }
-
     /**
      * @dataProvider getVoteTests
      */

@@ -16,7 +16,7 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileTypeFilterIterator extends FilterIterator
+class FileTypeFilterIterator extends \FilterIterator
 {
     const ONLY_FILES = 1;
     const ONLY_DIRECTORIES = 2;

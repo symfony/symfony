@@ -252,6 +252,15 @@ class HttpUtilsTest extends TestCase
         $this->assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
     }
 
+    public function testGenerateUriPreservesFragment()
+    {
+        $utils = new HttpUtils($this->getUrlGenerator('/foo/bar?param=value#fragment'));
+        $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
+
+        $utils = new HttpUtils($this->getUrlGenerator('/foo/bar#fragment'));
+        $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage You must provide a UrlGeneratorInterface instance to be able to use routes.

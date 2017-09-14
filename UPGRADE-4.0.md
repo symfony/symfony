@@ -494,6 +494,14 @@ FrameworkBundle
    `Symfony\Component\Translation\TranslatorInterface` as
     first argument.
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpExtractor` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpStringTokenParser`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpStringTokenParser` class instead.
+
 HttpFoundation
 --------------
 
@@ -525,9 +533,9 @@ HttpFoundation
  * The ability to check only for cacheable HTTP methods using `Request::isMethodSafe()` is
    not supported anymore, use `Request::isMethodCacheable()` instead.
 
- * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`, 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`,
    `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy`,
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` and 
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` and
    `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` classes have been removed.
 
  * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
@@ -682,7 +690,7 @@ SecurityBundle
 
  * The firewall option `logout_on_user_change` is now always true, which will
    trigger a logout if the user changes between requests.
-   
+
  * Removed the HTTP digest authentication system. The `HttpDigestFactory` class
    has been removed. Use another authentication system like `http_basic` instead.
 

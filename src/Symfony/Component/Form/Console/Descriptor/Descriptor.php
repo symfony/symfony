@@ -14,10 +14,8 @@ namespace Symfony\Component\Form\Console\Descriptor;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Form\Extension\Core\CoreExtension;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Util\OptionsResolverWrapper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class Descriptor implements DescriptorInterface
 {
-    /** @var StyleInterface */
+    /** @var OutputStyle */
     protected $output;
     protected $type;
     protected $ownOptions = array();
@@ -45,7 +43,7 @@ abstract class Descriptor implements DescriptorInterface
      */
     public function describe(OutputInterface $output, $object, array $options = array())
     {
-        $this->output = $output instanceof StyleInterface ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
+        $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
 
         switch (true) {
             case null === $object:
@@ -54,28 +52,19 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ResolvedFormTypeInterface:
                 $this->describeResolvedFormType($object, $options);
                 break;
+            case $object instanceof OptionsResolver:
+                $this->describeOption($object, $options);
+                break;
             default:
                 throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
         }
     }
 
-    abstract protected function describeDefaults(array $options = array());
+    abstract protected function describeDefaults(array $options);
 
     abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array());
 
-    protected function getCoreTypes()
-    {
-        $coreExtension = new CoreExtension();
-        $coreExtensionRefObject = new \ReflectionObject($coreExtension);
-        $loadTypesRefMethod = $coreExtensionRefObject->getMethod('loadTypes');
-        $loadTypesRefMethod->setAccessible(true);
-        $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-
-        $coreTypes = array_map(function (FormTypeInterface $type) { return get_class($type); }, $coreTypes);
-        sort($coreTypes);
-
-        return $coreTypes;
-    }
+    abstract protected function describeOption(OptionsResolver $optionsResolver, array $options);
 
     protected function collectOptions(ResolvedFormTypeInterface $type)
     {
@@ -111,6 +100,26 @@ abstract class Descriptor implements DescriptorInterface
 
         $this->parents = array_keys($this->parents);
         $this->extensions = array_keys($this->extensions);
+    }
+
+    protected function getOptionDefinition(OptionsResolver $optionsResolver, $option)
+    {
+        $refObject = new \ReflectionObject($optionsResolver);
+        foreach (array('defaults', 'lazy', 'allowedTypes', 'allowedValues', 'normalizers') as $name) {
+            $property = $refObject->getProperty($name);
+            $property->setAccessible(true);
+            $value = $property->getValue($optionsResolver);
+            if (array_key_exists($option, $value)) {
+                $definition[$name] = $value[$option];
+            }
+        }
+        $definition['required'] = $optionsResolver->isRequired($option);
+
+        if (isset($definition['lazy']) && 1 === count($definition['lazy'])) {
+            $definition['lazy'] = $definition['lazy'][0];
+        }
+
+        return $definition;
     }
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type)

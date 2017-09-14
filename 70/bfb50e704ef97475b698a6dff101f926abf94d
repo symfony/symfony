@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-11T16:06:52Z
+
+About the todo:
+> Add an interface, make the "method" attribute optional and enable autoconfiguration.
+
+I suggest doing so in another PR
+
+> Add a config option to enable/disable this feature.
+
+I suggest not adding this at all
+
+> Configure leaking services of the core bundles as resettable.
+
+in next PRs to come yes!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-12T08:49:31Z
+
+About the config option: This feature should support PHPPM and other scenarios where we reuse the kernel after one request. I would consider those scenarios as rather exotic. The default case for php application is still a shared-nothing architecture and if I cannot disable this feature there, Symfony would consume CPU time to cleanup a container just to throw it away immediately afterwards.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-12T10:20:56Z
+
+I hope, I've caught every comment. The PR looks mergable to me now. I've left my todo list in the PR description so we know the steps for follow-up PRs.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-12T10:24:22Z
+
+The config option looks sensible to me, as we should indeed avoid resetting services when the process will die anyway.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-12T10:30:27Z
+
+I'm personally not sure about another config option, because config options add complexity for users.
+Here, this hook point is really nice for eg cache pools that could then clear their deferred item lists.
+This happens at destruct time right now, but this is kinda a hack, destruct time to do biz logic is not the best.
+We could instead document that the logic has to be as fast as possible (like emptying an array most of the time).
+
+If this needs a longer discussion, I suggest doing it after this PR has been merged?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-12T12:41:01Z
+
+> If this needs a longer discussion, I suggest doing it after this PR has been merged?
+
+I agree.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-12T13:10:33Z
+
+Has anyone looked at nginx's unit? Maybe you get something like phppm with it and thus this scenario will be a lot more common than now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-14T18:14:19Z
+
+@derrabus Can you make the 2 little changes asked by @ogizanagi so that I can merge this one? Thanks.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-14T20:26:35Z
+
+@fabpot Done.

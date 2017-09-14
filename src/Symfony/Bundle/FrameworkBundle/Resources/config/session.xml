@@ -38,6 +38,7 @@
         </service>
 
         <service id="session.flash_bag" class="Symfony\Component\HttpFoundation\Session\Flash\FlashBag" />
+        <service id="Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface" alias="session.flash_bag" />
 
         <service id="session.attribute_bag" class="Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag" />
 

@@ -271,16 +271,16 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $profile->setTime($data['time']);
         $profile->setCollectors($data['data']);
 
-        if (!$parent && $data['parent']) {
+        if (!$parent && $data['parent'] && $data['parent'] !== $token) {
             $parent = $this->read($data['parent']);
         }
 
-        if ($parent) {
+        if ($parent && $parent->getToken() !== $token) {
             $profile->setParent($parent);
         }
 
         foreach ($data['children'] as $token) {
-            if (!$token || !file_exists($file = $this->getFilename($token))) {
+            if (!$token || !file_exists($file = $this->getFilename($token)) || $token === $data['token']) {
                 continue;
             }
 

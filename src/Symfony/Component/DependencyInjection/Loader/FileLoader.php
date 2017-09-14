@@ -133,7 +133,7 @@ abstract class FileLoader extends BaseFileLoader
                 throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
             }
 
-            if (!$r->isInterface() && !$r->isTrait() && !$r->isAbstract()) {
+            if ($r->isInstantiable()) {
                 $classes[] = $class;
             }
         }

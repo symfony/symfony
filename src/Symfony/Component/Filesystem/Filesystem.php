@@ -359,7 +359,7 @@ class Filesystem
         }
 
         $stripDriveLetter = function ($path) {
-            if (strlen($path) > 2 && substr($path, 1, 2) === ':/' && ctype_alpha($path[0])) {
+            if (strlen($path) > 2 && ':' === $path[1] && '/' === $path[2] && ctype_alpha($path[0])) {
                 return substr($path, 2);
             }
 

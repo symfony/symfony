@@ -19,6 +19,10 @@ use Symfony\Component\Cache\Simple\Psr6Cache;
  */
 class Psr6CacheTest extends CacheTestCase
 {
+    protected $skippedTests = array(
+        'testPrune' => 'Psr6Cache just proxies',
+    );
+
     public function createSimpleCache($defaultLifetime = 0)
     {
         return new Psr6Cache(new FilesystemAdapter('', $defaultLifetime));

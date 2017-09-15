@@ -16,11 +16,12 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\AbstractTrait;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractCache implements CacheInterface, LoggerAwareInterface
+abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractTrait {
         deleteItems as private;

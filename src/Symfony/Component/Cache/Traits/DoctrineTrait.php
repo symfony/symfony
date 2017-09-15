@@ -23,6 +23,15 @@ trait DoctrineTrait
     /**
      * {@inheritdoc}
      */
+    public function reset()
+    {
+        parent::reset();
+        $this->provider->setNamespace($this->provider->getNamespace());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doFetch(array $ids)
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', parent::class.'::handleUnserializeCallback');

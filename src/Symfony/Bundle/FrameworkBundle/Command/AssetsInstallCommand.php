@@ -58,6 +58,7 @@ class AssetsInstallCommand extends Command
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
+            ->addOption('no-cleanup', null, InputOption::VALUE_NONE, 'Do not remove the assets of the bundles that no longer exist')
             ->setDescription('Installs bundles web assets under a public directory')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command installs bundle assets into a given
@@ -162,7 +163,7 @@ EOT
             }
         }
         // remove the assets of the bundles that no longer exist
-        if (is_dir($bundlesDir)) {
+        if (!$input->getOption('no-cleanup') && is_dir($bundlesDir)) {
             $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
             $this->filesystem->remove($dirsToRemove);
         }

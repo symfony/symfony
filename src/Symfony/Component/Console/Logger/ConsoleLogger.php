@@ -85,7 +85,7 @@ class ConsoleLogger extends AbstractLogger
         $output = $this->output;
 
         // Write to the error output if necessary and available
-        if ($this->formatLevelMap[$level] === self::ERROR) {
+        if (self::ERROR === $this->formatLevelMap[$level]) {
             if ($this->output instanceof ConsoleOutputInterface) {
                 $output = $output->getErrorOutput();
             }

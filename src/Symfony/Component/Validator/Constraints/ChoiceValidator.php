@@ -77,7 +77,7 @@ class ChoiceValidator extends ConstraintValidator
 
             $count = count($value);
 
-            if ($constraint->min !== null && $count < $constraint->min) {
+            if (null !== $constraint->min && $count < $constraint->min) {
                 $this->context->buildViolation($constraint->minMessage)
                     ->setParameter('{{ limit }}', $constraint->min)
                     ->setPlural((int) $constraint->min)
@@ -87,7 +87,7 @@ class ChoiceValidator extends ConstraintValidator
                 return;
             }
 
-            if ($constraint->max !== null && $count > $constraint->max) {
+            if (null !== $constraint->max && $count > $constraint->max) {
                 $this->context->buildViolation($constraint->maxMessage)
                     ->setParameter('{{ limit }}', $constraint->max)
                     ->setPlural((int) $constraint->max)

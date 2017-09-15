@@ -99,10 +99,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $rootNode = null;
         foreach ($dom->childNodes as $child) {
-            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+            if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new UnexpectedValueException('Document types are not allowed.');
             }
-            if (!$rootNode && $child->nodeType !== XML_PI_NODE) {
+            if (!$rootNode && XML_PI_NODE !== $child->nodeType) {
                 $rootNode = $child;
             }
         }
@@ -344,7 +344,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $value = array();
 
         foreach ($node->childNodes as $subnode) {
-            if ($subnode->nodeType === XML_PI_NODE) {
+            if (XML_PI_NODE === $subnode->nodeType) {
                 continue;
             }
 
@@ -393,7 +393,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                         $data = $this->serializer->normalize($data, $this->format, $this->context);
                     }
                     $parentNode->setAttribute($attributeName, $data);
-                } elseif ($key === '#') {
+                } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
                     // Is this array fully numeric keys?

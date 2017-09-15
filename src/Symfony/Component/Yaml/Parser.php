@@ -263,7 +263,7 @@ class Parser
 
                         $data += $refValue; // array union
                     } else {
-                        if (isset($values['value']) && $values['value'] !== '') {
+                        if (isset($values['value']) && '' !== $values['value']) {
                             $value = $values['value'];
                         } else {
                             $value = $this->getNextEmbedBlock();
@@ -544,7 +544,7 @@ class Parser
             $indent = $this->getCurrentLineIndentation();
 
             // terminate all block scalars that are more indented than the current line
-            if (!empty($blockScalarIndentations) && $indent < $previousLineIndentation && trim($this->currentLine) !== '') {
+            if (!empty($blockScalarIndentations) && $indent < $previousLineIndentation && '' !== trim($this->currentLine)) {
                 foreach ($blockScalarIndentations as $key => $blockScalarIndentation) {
                     if ($blockScalarIndentation >= $indent) {
                         unset($blockScalarIndentations[$key]);
@@ -680,7 +680,7 @@ class Parser
 
             while ($this->moveToNextLine()) {
                 // unquoted strings end before the first unindented line
-                if (null === $quotation && $this->getCurrentLineIndentation() === 0) {
+                if (null === $quotation && 0 === $this->getCurrentLineIndentation()) {
                     $this->moveToPreviousLine();
 
                     break;
@@ -876,7 +876,7 @@ class Parser
         //checking explicitly the first char of the trim is faster than loops or strpos
         $ltrimmedLine = ltrim($this->currentLine, ' ');
 
-        return '' !== $ltrimmedLine && $ltrimmedLine[0] === '#';
+        return '' !== $ltrimmedLine && '#' === $ltrimmedLine[0];
     }
 
     private function isCurrentLineLastLineInDocument()
@@ -902,7 +902,7 @@ class Parser
 
         // remove leading comments
         $trimmedValue = preg_replace('#^(\#.*?\n)+#s', '', $value, -1, $count);
-        if ($count == 1) {
+        if (1 == $count) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
             $value = $trimmedValue;
@@ -910,7 +910,7 @@ class Parser
 
         // remove start of the document marker (---)
         $trimmedValue = preg_replace('#^\-\-\-.*?\n#s', '', $value, -1, $count);
-        if ($count == 1) {
+        if (1 == $count) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
             $value = $trimmedValue;

@@ -37,7 +37,7 @@ class EmptyStringParser implements ParserInterface
     public function parse($source)
     {
         // Matches an empty string
-        if ($source == '') {
+        if ('' == $source) {
             return array(new SelectorNode(new ElementNode(null, '*')));
         }
 

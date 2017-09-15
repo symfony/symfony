@@ -94,7 +94,7 @@ EOF
         $format = $input->getOption('format');
         $path = $input->getArgument('path');
 
-        if ($path !== null && 'yaml' !== $format) {
+        if (null !== $path && 'yaml' !== $format) {
             $errorIo->error('The "path" option is only available for the "yaml" format.');
 
             return 1;
@@ -106,7 +106,7 @@ EOF
             $message = sprintf('Default configuration for "%s"', $name);
         }
 
-        if ($path !== null) {
+        if (null !== $path) {
             $message .= sprintf(' at path "%s"', $path);
         }
 

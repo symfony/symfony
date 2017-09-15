@@ -135,7 +135,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             throw new TransformationFailedException('The value of "invert" must be boolean');
         }
         foreach (self::$availableFields as $field => $char) {
-            if ($field !== 'invert' && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
+            if ('invert' !== $field && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
                 throw new TransformationFailedException(sprintf('This amount of "%s" is invalid', $field));
             }
         }

@@ -148,7 +148,7 @@ EOTXT;
 
     public function testJsonCast()
     {
-        if (ini_get('xdebug.overload_var_dump') == 2) {
+        if (2 == ini_get('xdebug.overload_var_dump')) {
             $this->markTestSkipped('xdebug is active');
         }
 

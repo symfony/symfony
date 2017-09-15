@@ -88,7 +88,7 @@ EOF
         $errorIo = $io->getErrorStyle();
 
         // check presence of force or dump-message
-        if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
+        if (true !== $input->getOption('force') && true !== $input->getOption('dump-messages')) {
             $errorIo->error('You must choose one of --force or --dump-messages');
 
             return 1;
@@ -199,19 +199,19 @@ EOF
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
-            if ($input->getOption('output-format') == 'xlf') {
+            if ('xlf' == $input->getOption('output-format')) {
                 $errorIo->comment('Xliff output version is <info>1.2</info>');
             }
 
             $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
         }
 
-        if ($input->getOption('no-backup') === true) {
+        if (true === $input->getOption('no-backup')) {
             $writer->disableBackup();
         }
 
         // save the files
-        if ($input->getOption('force') === true) {
+        if (true === $input->getOption('force')) {
             $errorIo->comment('Writing files...');
 
             $bundleTransPath = false;

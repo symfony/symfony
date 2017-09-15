@@ -127,7 +127,7 @@ class TemplateManager
         }
 
         try {
-            if ($loader instanceof SourceContextLoaderInterface) {
+            if ($loader instanceof SourceContextLoaderInterface || method_exists($loader, 'getSourceContext')) {
                 $loader->getSourceContext($template);
             } else {
                 $loader->getSource($template);

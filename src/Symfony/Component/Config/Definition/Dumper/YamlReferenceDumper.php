@@ -128,7 +128,7 @@ class YamlReferenceDumper
             $comments[] = 'Example: '.$example;
         }
 
-        $default = (string) $default != '' ? ' '.$default : '';
+        $default = '' != (string) $default ? ' '.$default : '';
         $comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
         $key = $prototypedArray ? '-' : $node->getName().':';

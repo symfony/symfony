@@ -529,7 +529,7 @@ class XmlFileLoader extends FileLoader
     {
         $children = array();
         foreach ($node->childNodes as $child) {
-            if ($child instanceof \DOMElement && $child->localName === $name && $child->namespaceURI === self::NS) {
+            if ($child instanceof \DOMElement && $child->localName === $name && self::NS === $child->namespaceURI) {
                 $children[] = $child;
             }
         }
@@ -626,7 +626,7 @@ EOF
         }
 
         foreach ($alias->childNodes as $child) {
-            if ($child instanceof \DOMElement && $child->namespaceURI === self::NS) {
+            if ($child instanceof \DOMElement && self::NS === $child->namespaceURI) {
                 @trigger_error(sprintf('Using the element "%s" is deprecated for the service "%s" which is defined as an alias in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
             }
         }
@@ -669,7 +669,7 @@ EOF
     private function loadFromExtensions(\DOMDocument $xml)
     {
         foreach ($xml->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement || $node->namespaceURI === self::NS) {
+            if (!$node instanceof \DOMElement || self::NS === $node->namespaceURI) {
                 continue;
             }
 

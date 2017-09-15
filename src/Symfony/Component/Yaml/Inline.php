@@ -606,7 +606,7 @@ class Inline
                 return true;
             case 'false' === $scalarLower:
                 return false;
-            case $scalar[0] === '!':
+            case '!' === $scalar[0]:
                 switch (true) {
                     case 0 === strpos($scalar, '!str'):
                         return (string) substr($scalar, 5);
@@ -656,7 +656,7 @@ class Inline
                 }
 
             // Optimize for returning strings.
-            case $scalar[0] === '+' || $scalar[0] === '-' || $scalar[0] === '.' || is_numeric($scalar[0]):
+            case '+' === $scalar[0] || '-' === $scalar[0] || '.' === $scalar[0] || is_numeric($scalar[0]):
                 switch (true) {
                     case Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar):
                         $scalar = str_replace('_', '', (string) $scalar);

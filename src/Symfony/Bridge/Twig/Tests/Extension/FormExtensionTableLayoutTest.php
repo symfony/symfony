@@ -80,7 +80,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        if ($label !== null) {
+        if (null !== $label) {
             $vars += array('label' => $label);
         }
 

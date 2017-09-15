@@ -516,9 +516,9 @@ class FrameworkExtension extends Extension
 
             $transitions = array();
             foreach ($workflow['transitions'] as $transition) {
-                if ($type === 'workflow') {
+                if ('workflow' === $type) {
                     $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
-                } elseif ($type === 'state_machine') {
+                } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
                             $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));

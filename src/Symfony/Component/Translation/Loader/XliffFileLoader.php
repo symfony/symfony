@@ -283,7 +283,7 @@ class XliffFileLoader implements LoaderInterface
 
             $namespace = $xliff->attributes->getNamedItem('xmlns');
             if ($namespace) {
-                if (substr_compare('urn:oasis:names:tc:xliff:document:', $namespace->nodeValue, 0, 34) !== 0) {
+                if (0 !== substr_compare('urn:oasis:names:tc:xliff:document:', $namespace->nodeValue, 0, 34)) {
                     throw new InvalidArgumentException(sprintf('Not a valid XLIFF namespace "%s"', $namespace));
                 }
 

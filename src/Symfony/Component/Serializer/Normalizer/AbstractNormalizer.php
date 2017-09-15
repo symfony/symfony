@@ -337,7 +337,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
 
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+                $allowed = false === $allowedAttributes || in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
                 if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {

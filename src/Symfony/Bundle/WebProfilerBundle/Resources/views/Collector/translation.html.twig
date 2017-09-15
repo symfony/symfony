@@ -13,6 +13,12 @@
 
         {% set text %}
             <div class="sf-toolbar-info-piece">
+                <b>Locale</b>
+                <span class="sf-toolbar-status">
+                    {{ collector.locale|default('-') }}
+                </span>
+            </div>
+            <div class="sf-toolbar-info-piece">
                 <b>Missing messages</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countMissings ? 'red' }}">
                     {{ collector.countMissings }}
@@ -61,6 +67,20 @@
 {% endblock %}
 
 {% block panelContent %}
+
+    <h2>Translation Locales</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.locale|default('-') }}</span>
+            <span class="label">Locale</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
+            <span class="label">Fallback locales</span>
+        </div>
+    </div>
+
     <h2>Translation Metrics</h2>
 
     <div class="metrics">

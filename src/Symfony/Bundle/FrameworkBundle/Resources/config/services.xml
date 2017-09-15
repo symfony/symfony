@@ -60,5 +60,11 @@
         <service id="Symfony\Component\Config\Resource\SelfCheckingResourceChecker">
             <tag name="config_cache.resource_checker" priority="-990" />
         </service>
+
+        <service id="Symfony\Component\HttpKernel\EventListener\ServiceResetListener">
+            <argument /> <!-- ResettableServicePass will inject an iterator of initialized services here ($serviceId => $serviceInstance) -->
+            <argument type="collection" /> <!-- ResettableServicePass will inject an array of reset methods here ($serviceId => $method) -->
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

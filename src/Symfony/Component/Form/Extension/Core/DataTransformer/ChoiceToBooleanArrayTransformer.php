@@ -109,7 +109,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
         foreach ($values as $i => $selected) {
             if ($selected) {
                 if (isset($choices[$i])) {
-                    return $choices[$i] === '' ? null : $choices[$i];
+                    return '' === $choices[$i] ? null : $choices[$i];
                 } elseif ($this->placeholderPresent && 'placeholder' === $i) {
                     return;
                 } else {

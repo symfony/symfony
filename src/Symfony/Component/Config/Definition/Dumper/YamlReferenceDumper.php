@@ -122,7 +122,7 @@ class YamlReferenceDumper
             $comments[] = 'Example: '.$example;
         }
 
-        $default = (string) $default != '' ? ' '.$default : '';
+        $default = '' != (string) $default ? ' '.$default : '';
         $comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
         $text = rtrim(sprintf('%-21s%s %s', $node->getName().':', $default, $comments), ' ');

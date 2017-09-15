@@ -1260,7 +1260,7 @@ class ViolationMapperTest extends TestCase
         // Only add it if we expect the error to come up on a different
         // level than LEVEL_0, because in this case the error would
         // (correctly) be mapped to the distraction field
-        if ($target !== self::LEVEL_0) {
+        if (self::LEVEL_0 !== $target) {
             $mapFromPath = new PropertyPath($mapFrom);
             $mapFromPrefix = $mapFromPath->isIndex(0)
                 ? '['.$mapFromPath->getElement(0).']'
@@ -1274,7 +1274,7 @@ class ViolationMapperTest extends TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        if ($target !== self::LEVEL_0) {
+        if (self::LEVEL_0 !== $target) {
             $this->assertCount(0, $distraction->getErrors(), 'distraction should not have an error, but has one');
         }
 

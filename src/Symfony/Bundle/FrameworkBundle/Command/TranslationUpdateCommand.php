@@ -73,7 +73,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         // check presence of force or dump-message
-        if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
+        if (true !== $input->getOption('force') && true !== $input->getOption('dump-messages')) {
             $io->error('You must choose one of --force or --dump-messages');
 
             return 1;
@@ -179,19 +179,19 @@ EOF
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
-            if ($input->getOption('output-format') == 'xlf') {
+            if ('xlf' == $input->getOption('output-format')) {
                 $io->comment('Xliff output version is <info>1.2</info>');
             }
 
             $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
         }
 
-        if ($input->getOption('no-backup') === true) {
+        if (true === $input->getOption('no-backup')) {
             $writer->disableBackup();
         }
 
         // save the files
-        if ($input->getOption('force') === true) {
+        if (true === $input->getOption('force')) {
             $io->comment('Writing files...');
 
             $bundleTransPath = false;

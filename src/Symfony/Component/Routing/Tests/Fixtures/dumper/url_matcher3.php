@@ -29,7 +29,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         if (0 === strpos($pathinfo, '/rootprefix')) {
             // static
-            if ($pathinfo === '/rootprefix/test') {
+            if ('/rootprefix/test' === $pathinfo) {
                 return array('_route' => 'static');
             }
 
@@ -41,7 +41,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // with-condition
-        if ($pathinfo === '/with-condition' && ($context->getMethod() == "GET")) {
+        if ('/with-condition' === $pathinfo && ($context->getMethod() == "GET")) {
             return array('_route' => 'with-condition');
         }
 

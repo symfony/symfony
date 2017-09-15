@@ -76,7 +76,7 @@ class GnuFindAdapter extends AbstractFindAdapter
      */
     protected function canBeUsed()
     {
-        return $this->shell->getType() === Shell::TYPE_UNIX && parent::canBeUsed();
+        return Shell::TYPE_UNIX === $this->shell->getType() && parent::canBeUsed();
     }
 
     /**

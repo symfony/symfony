@@ -513,7 +513,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
         $this->scopeChildren[$name] = array();
 
         // normalize the child relations
-        while ($parentScope !== self::SCOPE_CONTAINER) {
+        while (self::SCOPE_CONTAINER !== $parentScope) {
             $this->scopeChildren[$parentScope][] = $name;
             $parentScope = $this->scopes[$parentScope];
         }

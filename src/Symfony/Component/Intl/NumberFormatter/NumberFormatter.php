@@ -332,7 +332,7 @@ class NumberFormatter
      */
     public function formatCurrency($value, $currency)
     {
-        if ($this->style == self::DECIMAL) {
+        if (self::DECIMAL == $this->style) {
             return $this->format($value);
         }
 
@@ -371,13 +371,13 @@ class NumberFormatter
     public function format($value, $type = self::TYPE_DEFAULT)
     {
         // The original NumberFormatter does not support this format type
-        if ($type == self::TYPE_CURRENCY) {
+        if (self::TYPE_CURRENCY == $type) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;
         }
 
-        if ($this->style == self::CURRENCY) {
+        if (self::CURRENCY == $this->style) {
             throw new NotImplementedException(sprintf(
                 '%s() method does not support the formatting of currencies (instance with CURRENCY style). %s',
                 __METHOD__, NotImplementedException::INTL_INSTALL_MESSAGE
@@ -385,7 +385,7 @@ class NumberFormatter
         }
 
         // Only the default type is supported.
-        if ($type != self::TYPE_DEFAULT) {
+        if (self::TYPE_DEFAULT != $type) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'type', $type, 'Only TYPE_DEFAULT is supported');
         }
 
@@ -528,7 +528,7 @@ class NumberFormatter
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
     {
-        if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
+        if (self::TYPE_DEFAULT == $type || self::TYPE_CURRENCY == $type) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
 
             return false;
@@ -775,7 +775,7 @@ class NumberFormatter
      */
     private function getUninitializedPrecision($value, $precision)
     {
-        if ($this->style == self::CURRENCY) {
+        if (self::CURRENCY == $this->style) {
             return $precision;
         }
 
@@ -811,11 +811,11 @@ class NumberFormatter
      */
     private function convertValueDataType($value, $type)
     {
-        if ($type == self::TYPE_DOUBLE) {
+        if (self::TYPE_DOUBLE == $type) {
             $value = (float) $value;
-        } elseif ($type == self::TYPE_INT32) {
+        } elseif (self::TYPE_INT32 == $type) {
             $value = $this->getInt32Value($value);
-        } elseif ($type == self::TYPE_INT64) {
+        } elseif (self::TYPE_INT64 == $type) {
             $value = $this->getInt64Value($value);
         }
 

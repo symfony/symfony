@@ -246,7 +246,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private function getDocBlockFromMethod($class, $ucFirstProperty, $type)
     {
-        $prefixes = $type === self::ACCESSOR ? ReflectionExtractor::$accessorPrefixes : ReflectionExtractor::$mutatorPrefixes;
+        $prefixes = self::ACCESSOR === $type ? ReflectionExtractor::$accessorPrefixes : ReflectionExtractor::$mutatorPrefixes;
 
         foreach ($prefixes as $prefix) {
             $methodName = $prefix.$ucFirstProperty;

@@ -48,7 +48,7 @@ class StopwatchExtension extends AbstractExtension
              * Some stuff which will be recorded on the timeline
              * {% endstopwatch %}
              */
-            new StopwatchTokenParser($this->stopwatch !== null && $this->enabled),
+            new StopwatchTokenParser(null !== $this->stopwatch && $this->enabled),
         );
     }
 

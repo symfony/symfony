@@ -40,7 +40,7 @@ class SplCaster
             $prefix.'storage' => $c->getArrayCopy(),
         );
 
-        if ($class === 'ArrayObject') {
+        if ('ArrayObject' === $class) {
             $a = $b;
         } else {
             if (!($flags & \ArrayObject::STD_PROP_LIST)) {

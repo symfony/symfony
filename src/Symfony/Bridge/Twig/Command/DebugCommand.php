@@ -90,7 +90,7 @@ EOF
 
         $types = array('functions', 'filters', 'tests', 'globals');
 
-        if ($input->getOption('format') === 'json') {
+        if ('json' === $input->getOption('format')) {
             $data = array();
             foreach ($types as $type) {
                 foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
@@ -128,13 +128,13 @@ EOF
 
     private function getMetadata($type, $entity)
     {
-        if ($type === 'globals') {
+        if ('globals' === $type) {
             return $entity;
         }
-        if ($type === 'tests') {
+        if ('tests' === $type) {
             return;
         }
-        if ($type === 'functions' || $type === 'filters') {
+        if ('functions' === $type || 'filters' === $type) {
             $cb = $entity->getCallable();
             if (null === $cb) {
                 return;
@@ -164,7 +164,7 @@ EOF
                 array_shift($args);
             }
 
-            if ($type === 'filters') {
+            if ('filters' === $type) {
                 // remove the value the filter is applied on
                 array_shift($args);
             }
@@ -184,20 +184,20 @@ EOF
 
     private function getPrettyMetadata($type, $entity)
     {
-        if ($type === 'tests') {
+        if ('tests' === $type) {
             return '';
         }
 
         try {
             $meta = $this->getMetadata($type, $entity);
-            if ($meta === null) {
+            if (null === $meta) {
                 return '(unknown?)';
             }
         } catch (\UnexpectedValueException $e) {
             return ' <error>'.$e->getMessage().'</error>';
         }
 
-        if ($type === 'globals') {
+        if ('globals' === $type) {
             if (is_object($meta)) {
                 return ' = object('.get_class($meta).')';
             }
@@ -205,11 +205,11 @@ EOF
             return ' = '.substr(@json_encode($meta), 0, 50);
         }
 
-        if ($type === 'functions') {
+        if ('functions' === $type) {
             return '('.implode(', ', $meta).')';
         }
 
-        if ($type === 'filters') {
+        if ('filters' === $type) {
             return $meta ? '('.implode(', ', $meta).')' : '';
         }
     }

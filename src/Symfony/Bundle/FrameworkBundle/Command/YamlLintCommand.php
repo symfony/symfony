@@ -142,7 +142,7 @@ EOF
             }
         }
 
-        if ($errors === 0) {
+        if (0 === $errors) {
             $io->success(sprintf('All %d YAML files contain valid syntax.', count($filesInfo)));
         } else {
             $io->warning(sprintf('%d YAML files have valid syntax and %d contain errors.', count($filesInfo) - $errors, $errors));

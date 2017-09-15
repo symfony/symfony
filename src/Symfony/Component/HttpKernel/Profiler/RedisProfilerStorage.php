@@ -68,11 +68,11 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         $result = array();
 
         foreach ($profileList as $item) {
-            if ($limit === 0) {
+            if (0 === $limit) {
                 break;
             }
 
-            if ($item == '') {
+            if ('' == $item) {
                 continue;
             }
 
@@ -128,7 +128,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         $result = array();
 
         foreach ($profileList as $item) {
-            if ($item == '') {
+            if ('' == $item) {
                 continue;
             }
 
@@ -214,7 +214,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         if (null === $this->redis) {
             $data = parse_url($this->dsn);
 
-            if (false === $data || !isset($data['scheme']) || $data['scheme'] !== 'redis' || !isset($data['host']) || !isset($data['port'])) {
+            if (false === $data || !isset($data['scheme']) || 'redis' !== $data['scheme'] || !isset($data['host']) || !isset($data['port'])) {
                 throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The minimal expected format is "redis://[host]:port".', $this->dsn));
             }
 

@@ -105,7 +105,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $propertyName = $this->nameConverter->denormalize($propertyName);
             }
 
-            $allowed = $allowedAttributes === false || in_array($propertyName, $allowedAttributes);
+            $allowed = false === $allowedAttributes || in_array($propertyName, $allowedAttributes);
             $ignored = in_array($propertyName, $this->ignoredAttributes);
             if ($allowed && !$ignored && $reflectionClass->hasProperty($propertyName)) {
                 $property = $reflectionClass->getProperty($propertyName);

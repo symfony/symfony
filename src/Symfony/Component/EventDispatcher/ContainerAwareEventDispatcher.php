@@ -185,7 +185,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
                 $key = $serviceId.'.'.$method;
                 if (!isset($this->listeners[$eventName][$key])) {
                     $this->addListener($eventName, array($listener, $method), $priority);
-                } elseif ($listener !== $this->listeners[$eventName][$key]) {
+                } elseif ($this->listeners[$eventName][$key] !== $listener) {
                     parent::removeListener($eventName, array($this->listeners[$eventName][$key], $method));
                     $this->addListener($eventName, array($listener, $method), $priority);
                 }

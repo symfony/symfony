@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-15T10:55:01Z
+
+It was briefly talked about in https://github.com/symfony/symfony/pull/24182#discussion_r138551329
+Looking at the proposed diff, I'm personally not favorable to merging this.
+But I won't spend more time on CS things so I'll let others do however they want :)
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-15T11:29:09Z
+
+let us not violate PSR ;)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-15T11:32:00Z
+
+I don't like it either.
+Do we want to be PSR-2 compliant (it does not appear in the repository tags)? If yes [then it's a must](http://www.php-fig.org/psr/psr-2/#52-switch-case).
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-15T11:35:03Z
+
+http://symfony.com/doc/current/contributing/code/standards.html :
+> Symfony follows the standards defined in the PSR-0, PSR-1, PSR-2 and PSR-4 documents.
+
+it's not big cost to pay for not violating PSR

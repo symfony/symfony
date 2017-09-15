@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
@@ -122,6 +123,10 @@ class GuardAuthenticatorHandler
         $token = $this->tokenStorage->getToken();
         if ($token instanceof PostAuthenticationGuardToken && $providerKey === $token->getProviderKey()) {
             $this->tokenStorage->setToken(null);
+        }
+
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN_FAILURE, new InteractiveLoginFailureEvent($request, $authenticationException));
         }
 
         $response = $guardAuthenticator->onAuthenticationFailure($request, $authenticationException);

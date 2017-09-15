@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -199,6 +200,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $token = $this->tokenStorage->getToken();
         if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
             $this->tokenStorage->setToken(null);
+        }
+
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN_FAILURE, new InteractiveLoginFailureEvent($request, $failed));
         }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);

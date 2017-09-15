@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -109,7 +110,7 @@ class RememberMeListenerTest extends TestCase
      */
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
-        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
+        list($listener, $tokenStorage, $service, $manager, , $dispatcher) = $this->getListener(true, false);
 
         $tokenStorage
             ->expects($this->once())
@@ -135,11 +136,19 @@ class RememberMeListenerTest extends TestCase
             ->will($this->throwException($exception))
         ;
 
+        $request = new Request();
+        $loginFailureEvent = new InteractiveLoginFailureEvent($request, $exception);
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->equalTo(SecurityEvents::INTERACTIVE_LOGIN_FAILURE), $this->equalTo($loginFailureEvent))
+        ;
+
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue(new Request()))
+            ->will($this->returnValue($request))
         ;
 
         $listener->handle($event);

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Using voters that do not implement the `VoterInterface`is now deprecated in
    the `AccessDecisionManager` and this functionality will be removed in 4.0.
+ * Added `InteractiveLoginFailure` event
 
 3.3.0
 -----

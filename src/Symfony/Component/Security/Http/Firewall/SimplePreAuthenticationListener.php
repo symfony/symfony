@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -96,10 +97,14 @@ class SimplePreAuthenticationListener implements ListenerInterface
                 $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
             }
         } catch (AuthenticationException $e) {
-            $this->tokenStorage->setToken(null);
-
             if (null !== $this->logger) {
                 $this->logger->info('SimplePreAuthentication request failed.', array('exception' => $e, 'authenticator' => get_class($this->simpleAuthenticator)));
+            }
+
+            $this->tokenStorage->setToken(null);
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN_FAILURE, new InteractiveLoginFailureEvent($request, $e));
             }
 
             if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {

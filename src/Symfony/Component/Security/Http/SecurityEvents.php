@@ -27,6 +27,16 @@ final class SecurityEvents
     const INTERACTIVE_LOGIN = 'security.interactive_login';
 
     /**
+     * The INTERACTIVE_LOGIN_FAILURE event occurs after a user fails to log in
+     * interactively for authentication based on http, cookies or X509.
+     *
+     * @Event("Symfony\Component\Security\Http\Event\InteractiveLoginFailureEvent")
+     *
+     * @var string
+     */
+    const INTERACTIVE_LOGIN_FAILURE = 'security.interactive_login_failure';
+
+    /**
      * The SWITCH_USER event occurs before switch to another user and
      * before exit from an already switched user.
      *

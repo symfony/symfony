@@ -179,7 +179,7 @@ class Data
                     $item = clone $item;
                     $item->type = $item->class;
                     $item->class = $item->value;
-                    // No break;
+                    // no break
                 case Stub::TYPE_OBJECT:
                 case Stub::TYPE_RESOURCE:
                     $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;

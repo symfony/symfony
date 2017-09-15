@@ -275,7 +275,7 @@ class ArgvInput extends Input
         $values = (array) $values;
 
         foreach ($this->tokens as $token) {
-            if ($onlyParams && $token === '--') {
+            if ($onlyParams && '--' === $token) {
                 return false;
             }
             foreach ($values as $value) {
@@ -298,7 +298,7 @@ class ArgvInput extends Input
 
         while (0 < count($tokens)) {
             $token = array_shift($tokens);
-            if ($onlyParams && $token === '--') {
+            if ($onlyParams && '--' === $token) {
                 return false;
             }
 
@@ -328,7 +328,7 @@ class ArgvInput extends Input
                 return $match[1].$this->escapeToken($match[2]);
             }
 
-            if ($token && $token[0] !== '-') {
+            if ($token && '-' !== $token[0]) {
                 return $this->escapeToken($token);
             }
 

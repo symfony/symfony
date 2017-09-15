@@ -67,6 +67,7 @@
         "symfony/form": "<3.4",
         "symfony/property-info": "<3.4",
         "symfony/serializer": "<3.4",
+        "symfony/stopwatch": "<3.4",
         "symfony/translation": "<3.4",
         "symfony/validator": "<3.4",
         "symfony/workflow": "<3.4"

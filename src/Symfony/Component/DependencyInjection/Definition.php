@@ -95,7 +95,7 @@ class Definition
     {
         $this->changes['factory'] = true;
 
-        if (is_string($factory) && strpos($factory, '::') !== false) {
+        if (is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
         }
 
@@ -789,7 +789,7 @@ class Definition
     {
         $this->changes['configurator'] = true;
 
-        if (is_string($configurator) && strpos($configurator, '::') !== false) {
+        if (is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
         }
 

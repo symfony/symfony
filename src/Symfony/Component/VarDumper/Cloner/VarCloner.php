@@ -38,7 +38,7 @@ class VarCloner extends AbstractCloner
         $minDepth = $this->minDepth;
         $currentDepth = 0;              // Current tree depth
         $currentDepthFinalIndex = 0;    // Final $queue index for current tree depth
-        $minimumDepthReached = $minDepth === 0; // Becomes true when minimum tree depth has been reached
+        $minimumDepthReached = 0 === $minDepth; // Becomes true when minimum tree depth has been reached
         $cookie = (object) array();     // Unique object used to detect hard references
         $a = null;                      // Array cast for nested structures
         $stub = null;                   // Stub capturing the main properties of an original item value

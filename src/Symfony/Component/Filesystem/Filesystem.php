@@ -488,7 +488,7 @@ class Filesystem
         }
 
         // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
-        if (count($startPathArr) === 1 && $startPathArr[0] === '') {
+        if (1 === count($startPathArr) && '' === $startPathArr[0]) {
             $depth = 0;
         } else {
             $depth = count($startPathArr) - $index;
@@ -528,6 +528,7 @@ class Filesystem
     {
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
+        $originDirLen = strlen($originDir);
 
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
@@ -536,8 +537,9 @@ class Filesystem
                 $flags = \FilesystemIterator::SKIP_DOTS;
                 $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
             }
+            $targetDirLen = strlen($targetDir);
             foreach ($deleteIterator as $file) {
-                $origin = str_replace($targetDir, $originDir, $file->getPathname());
+                $origin = $originDir.substr($file->getPathname(), $targetDirLen);
                 if (!$this->exists($origin)) {
                     $this->remove($file);
                 }
@@ -559,7 +561,7 @@ class Filesystem
         }
 
         foreach ($iterator as $file) {
-            $target = str_replace($originDir, $targetDir, $file->getPathname());
+            $target = $targetDir.substr($file->getPathname(), $originDirLen);
 
             if ($copyOnWindows) {
                 if (is_file($file)) {
@@ -594,7 +596,7 @@ class Filesystem
     {
         return strspn($file, '/\\', 0, 1)
             || (strlen($file) > 3 && ctype_alpha($file[0])
-                && substr($file, 1, 1) === ':'
+                && ':' === substr($file, 1, 1)
                 && strspn($file, '/\\', 2, 1)
             )
             || null !== parse_url($file, PHP_URL_SCHEME)

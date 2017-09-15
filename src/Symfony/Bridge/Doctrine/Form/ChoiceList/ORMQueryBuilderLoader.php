@@ -77,7 +77,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
 
             // Like above, but we just filter out empty strings.
             $values = array_values(array_filter($values, function ($v) {
-                return (string) $v !== '';
+                return '' !== (string) $v;
             }));
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;

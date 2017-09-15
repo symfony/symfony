@@ -788,7 +788,7 @@ class Process implements \IteratorAggregate
      */
     public function isStarted()
     {
-        return $this->status != self::STATUS_READY;
+        return self::STATUS_READY != $this->status;
     }
 
     /**
@@ -800,7 +800,7 @@ class Process implements \IteratorAggregate
     {
         $this->updateStatus(false);
 
-        return $this->status == self::STATUS_TERMINATED;
+        return self::STATUS_TERMINATED == $this->status;
     }
 
     /**
@@ -1161,7 +1161,7 @@ class Process implements \IteratorAggregate
      */
     public function checkTimeout()
     {
-        if ($this->status !== self::STATUS_STARTED) {
+        if (self::STATUS_STARTED !== $this->status) {
             return;
         }
 
@@ -1352,7 +1352,7 @@ class Process implements \IteratorAggregate
         $callback = $this->callback;
         foreach ($result as $type => $data) {
             if (3 !== $type) {
-                $callback($type === self::STDOUT ? self::OUT : self::ERR, $data);
+                $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data);
             } elseif (!isset($this->fallbackStatus['signaled'])) {
                 $this->fallbackStatus['exitcode'] = (int) $data;
             }

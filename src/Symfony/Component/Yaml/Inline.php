@@ -547,6 +547,7 @@ class Inline
 
                         return $time;
                 }
+                // no break
             default:
                 return (string) $scalar;
         }

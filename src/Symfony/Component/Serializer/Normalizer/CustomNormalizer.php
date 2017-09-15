@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  */
 class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
+    private $cache = array();
+
     use SerializerAwareTrait;
 
     /**
@@ -64,10 +66,14 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (!class_exists($type)) {
-            return false;
+        if (isset($this->cache[$type])) {
+            return $this->cache[$type];
         }
 
-        return is_subclass_of($type, 'Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
+        if (!class_exists($type)) {
+            return $this->cache[$type] = false;
+        }
+
+        return $this->cache[$type] = is_subclass_of($type, 'Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
     }
 }

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-13T18:19:04Z
+
+Screenshot updated!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-13T18:34:23Z
+
+alpha order?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-13T19:37:10Z
+
+> I'm still a bit worried about the fact the command does only list types registered as a service, which can be a bit confusing for users not finding their own types or some third party ones...
+
+@ogizanagi we know the path of installed bundles, we have best practices that say us the directory where would put the form types, what do you think about a discovery option to search subclasses of `AbstractType` using the Finder component? This operation we would only do it using `--vvv` option. (in another PR)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-13T22:38:14Z
+
+Just updating the help description.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-14T06:00:03Z
+
+> we know the path of installed bundles, we have best practices that say us the directory where would put the form types, what do you think about a discovery option to search subclasses of AbstractType using the Finder component?
+
+Form types could be in so many places, including not in a bundle at all. Searching them by convention, which is more a beginner best practice than a canon, probably isn't a satisfying enough solution.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-14T13:40:45Z
+
+> Form types could be in so many places, including not in a bundle at all. Searching them by convention, which is more a beginner best practice than a canon, probably isn't a satisfying enough solution.
+
+True, it was just a vague idea, I meant, Forms path best practices can be used first, later anywhere, but probably it would be too much.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-14T13:47:08Z
+
+Convenience wise i like the discovery of types with `--discover` or `-v` as proposed. Making this command so much more useful; we need to do something IMHO.
+
+At least passing an arbitrary FQCN, which is a form type, should be allowed. Discovery wise i wouldnt be against a lookup in `src/Form; src/**/Form; vendor/*/*/Form; vendor/*/*/**Form/`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-14T14:12:28Z
+
+I have another PR ready for debug a form type "option" but I'd like avoid conflicts later with this one. Please @symfony/deciders or reviewers? @chalasr since you're familiarized with the command, can I ask for your opinion?

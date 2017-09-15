@@ -328,7 +328,7 @@ class ArgvInput extends Input
                 return $match[1].$self->escapeToken($match[2]);
             }
 
-            if ($token && $token[0] !== '-') {
+            if ($token && '-' !== $token[0]) {
                 return $self->escapeToken($token);
             }
 

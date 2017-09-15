@@ -15,7 +15,7 @@ class AlternatingRowType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formFactory) {
             $form = $event->getForm();
-            $type = $form->getName() % 2 === 0 ? 'text' : 'textarea';
+            $type = 0 === $form->getName() % 2 ? 'text' : 'textarea';
             $form->add('title', $type);
         });
     }

@@ -46,7 +46,7 @@ class TemplateController extends ContainerAware
 
         if ($private) {
             $response->setPrivate();
-        } elseif ($private === false || (null === $private && ($maxAge || $sharedAge))) {
+        } elseif (false === $private || (null === $private && ($maxAge || $sharedAge))) {
             $response->setPublic();
         }
 

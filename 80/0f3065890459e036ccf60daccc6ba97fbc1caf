@@ -1,0 +1,321 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T09:28:11Z
+
+yoda_style is nice
+semicolon_after_instruction doesn't look useful to me
+no_unneeded_final_method & no_unneeded_curly_braces would need an actual example to decide
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-07T09:41:15Z
+
+>no_unneeded_final_method & no_unneeded_curly_braces would need an actual example to decide
+
+```
+$ php php-cs-fixer describe no_unneeded_final_method
+Description of no_unneeded_final_method rule.
+A final class must not have final methods.
+```
+
+```diff
+--- Original
++++ New
+@@ @@
+<?php
+final class Foo {
+-    final public function foo() {}
+-    final protected function bar() {}
+-    final private function baz() {}
++    public function foo() {}
++    protected function bar() {}
++    private function baz() {}
+}
+```
+
+```
+$ php php-cs-fixer describe no_unneeded_curly_braces
+Description of no_unneeded_curly_braces rule.
+Removes unneeded curly braces that are superfluous and aren't part of a control structure's body.
+```
+
+```diff
+--- Original
++++ New
+@@ @@
+-<?php {
++<?php
+     echo 1;
+-}
+
+ switch ($b) {
+-    case 1: {
++    case 1:
+         break;
+-    }
++
+ }
+```
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-07T10:19:26Z
+
+just to complete the picture:
+```
+$ php-cs-fixer describe semicolon_after_instruction
+Description of semicolon_after_instruction rule.
+Instructions must be terminated with a semicolon.
+```
+
+```diff
+--- Original
++++ New
+@@ @@
+-<?php echo 1 ?>
++<?php echo 1; ?>
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-07T10:37:33Z
+
+I believe the `semicolon_after_instruction` would also affect how the multi line termination are done?
+
+##### [Example from the source](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Tests/Authorization/AccessDecisionManagerTest.php#L67-L76)
+```diff
+    protected function getVoterFor2Roles($token, $vote1, $vote2)
+    {
+        $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
+        $voter->expects($this->any())
+              ->method('vote')
+              ->will($this->returnValueMap(array(
+                  array($token, null, array('ROLE_FOO'), $vote1),
+                  array($token, null, array('ROLE_BAR'), $vote2),
+-              )))
+-        ;
++              )));
+
+        return $voter;
+    }
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-07T10:43:10Z
+
+The case given by @iltar looks wrong to me. The semi-colon was here, even though there was a newline before it. It is not a missing semi-colon.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-07T10:44:07Z
+
+`semicolon_after_instruction` shouldn't move semicolons around, it will insert one if it is missing.
+The logic behind is; if there is a close tag (`?>`) check if there is semicolon before it, if not check if needed and insert if so.
+The example you link to should therefor not be touched by the fixer (there is no close tag),
+my guess is that the diff is the result from `no_multiline_whitespace_before_semicolons`, which I didn't run (I hope...).
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-07T10:45:15Z
+
+My case was a question if that would be the case as well (sorry if I put it a bit weird), I manually diffed it to see if my assumption was correct about the rule.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-07T10:46:46Z
+
+all good :)
+so to answer; no the `semicolon_after_instruction` should not create the diff you showed, but we have another rule for that.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-07T10:54:39Z
+
+I'm not even sure if this is something that rule (with the `;` on newline) was agreed upon, I just know that it's being done differently in different files, just wanted to add it to make sure that was taking into account if the rule would've done that.
+
+I don't think the check `semicolon_after_instruction` is very useful, because Symfony doesn't really contain many `?>` in the source. The only places I've seen this being used, is in form templates and they don't really include the `;` before the `?>`, and in tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T10:55:03Z
+
+Oh btw, we should disable this (I mean, php-cs-fixer should *not* do that):
+```diff
+final class Foo {
+-    protected function bar() {}
++    private function bar() {}
+}
+```
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-07T11:10:52Z
+
+`semicolon_after_instruction`
+will not be added to the SF set :+1: I'll update the PR later.
+
+`no_unneeded_final_method` ,
+@nicolas-grekas by ` we should disable this:` you mean it should not be added to the current set?
+
+`no_unneeded_curly_braces`
+to be determined
+
+`yoda_style`
+to be determined
+
+`I'm not even sure if this is something that rule (with the ; on newline) was agreed upon,`
+took some digging, but here is this discussion https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/511#issuecomment-54270245 , concluding not to enforce this in SF. Let me know if you guys want this changed to be enforced.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T11:16:51Z
+
+I mean this should not be done by cs-fixer (it is right now, I already saw a false-positive by fabbot on a PR)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T11:17:57Z
+
+> yoda_style
+
+I'm definitely :+1: on that one, that will save us hundred of comments reminding we follow yoda style
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T11:19:19Z
+
+btw, if you know how to fix this false positive, that'd be great:
+https://fabbot.io/report/symfony/symfony/23901/1f92e459db0efd2576eaa63a4fa0fe39e68b32dd
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-07T11:24:55Z
+
+> we should disable this
+> I mean this should not be done by cs-fixer (it is right now, I already saw a false-positive by fabbot on a PR)
+
+what's the purpose of *protected* method inside of *final* class that *does not inherit* ?
+please provide case (fabbot-ed or not) when sth went wrong, but in example you did provided, there were no reason for `protected` instead of `private` visibility attribute
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T11:27:09Z
+
+The use case is easy: just try changing that with the existing code in CacheItem and you'll see by looking at tests. Hint: it relates to casting to arrays, which does not produce the same result in both cases.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-07T12:44:29Z
+
+I analysed the scenario.
+
+IMHO, accessing protected `key` property that way:
+```php
+        $item = (array) $item;
+        $key = $item["\0*\0key"];
+```
+is abusing the language to use `(array)` casting to extract encapsulated properties...
+
+The rule behind the fixer is good in general, you just hint edge cases, where it doesn't work for you due to using that workaround to get encapsulated property.
+If this class is violating OOP, it's hard to apply OOP good practices for it.
+
+I was looking how to fix `CacheItem` handling, and then I found that lovely piece of code to set protected variables (`CacheItem` has no public properties):
+```php
+        $this->createCacheItem = \Closure::bind(
+            function ($key, $value, $isHit) use ($defaultLifetime) {
+                $item = new CacheItem();
+                $item->key = $key;
+                $item->value = $value;
+                $item->isHit = $isHit;
+                $item->defaultLifetime = $defaultLifetime;
+
+                return $item;
+            },
+            null,
+            CacheItem::class
+        );
+```
+
+what's the thing here, why it has to abuse OOP that much ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T12:50:27Z
+
+If you want to have that rule, it belongs to a "code quality" tool - not to a CS fixer.
+Here, you're asking for changing the *implementation*. That's something very different than the *code style*.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-07T13:25:34Z
+
+Fixer went far beyond touching whitespaces only ages ago ;)
+Standard could not touch a formatting only, it's not an issue.
+
+Yet, you did not answer my question :(
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-07T14:29:33Z
+
+:+1: for all new proposed rules
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T07:06:28Z
+
+@keradus I did not answer your question because it's off topic for this PR. Yet, you say something is abusing OOP. To me, nothing does. Accessing private state internally is not abusing OOP. That's what it is here. Of course, "private" here doesn't mean "private by PHP rules". But still it's private - internal detail if you prefer. PHP is just a tool. If we were in C++, we would use friendship. Here, we do with what we have to achieve the same. SOLID everywhere.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-08T07:34:08Z
+
+you raised a concern and pointed the class, so i did investigated it ;)
+let me rephrase - code is abusing oop of php, you dont have friendship relation, sealed accessibility, nothing like that. in pointed code, there is a big workaround in way not promoted by majority of projects.
+Rule came to promote oop and encapsulation. I propose to keep it simply excluding that one file in config if there is no willing to stop abusing php visibility.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-08T07:42:23Z
+
+I agree with @keradus on this one. The solution is more of a hack and an exception (due to limited features). Protected functions in a final class make no sense, if this is done on purpose, it should explicitly be excluded from the check and also documented why (bus/truck/plane/etc factor).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T07:59:33Z
+
+What matters to me is fixing this false positive. An exclusion would do it so I'm fine with it.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-09-08T08:45:27Z
+
+>  and also documented why (bus/truck/plane/etc factor).
+
+big :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-11T06:00:37Z
+
+@SpacePossum can you open another PR to just enable the new rules (without applying them on the code base)? Than would enforce them for the new PRs, that'd be a good first step.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-11T06:25:53Z
+
+@nicolas-grekas that wouldn't work, but no worries.
+
+Since we've established that these rules should go the SF ruleset I've opened;
+https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/3037
+If that is all well and done the rules are added to the default SF ruleset and when we release the new version of the fixer these become available (and effective here) when `fabbot.io` has been updated to use the fixer version.
+Adding the rules now in this repo would crash `fabbot.io` because the new rules are not available to it.
+We're close to releasing the new version of the fixer, we didn't do it over the weekend because to some members were not available to wrap things up, but we're close :)
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2017-09-12T13:56:13Z
+
+`fabbot.io` licence header failure doesn't provide anything useful (https://fabbot.io/report/symfony/symfony/24123/ef371741353cb0ec6b1e8405ad5a4dbbd436f85c)
+not sure how to resolve

@@ -348,6 +348,9 @@ EOF;
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1Bundle/foo.txt'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceReturnsTheFirstThatMatchesWithParent()
     {
         $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
@@ -364,6 +367,9 @@ EOF;
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/bar.txt', $kernel->locateResource('@ParentAABundle/bar.txt'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceReturnsAllMatches()
     {
         $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
@@ -382,6 +388,9 @@ EOF;
             $kernel->locateResource('@Bundle1Bundle/foo.txt', null, false));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceReturnsAllMatchesBis()
     {
         $kernel = $this->getKernel(array('getBundle'));
@@ -430,6 +439,9 @@ EOF;
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceReturnsTheDirOneForResourcesAndBundleOnes()
     {
         $kernel = $this->getKernel(array('getBundle'));
@@ -446,6 +458,9 @@ EOF;
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testLocateResourceOverrideBundleAndResourcesFolders()
     {
         $parent = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, 'BaseBundle', 'BaseBundle');
@@ -519,6 +534,9 @@ EOF;
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testInitializeBundles()
     {
         $parent = $this->getBundle(null, null, 'ParentABundle');
@@ -537,6 +555,9 @@ EOF;
         $this->assertEquals(array($child, $parent), $map['ParentABundle']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInitializeBundlesSupportInheritanceCascade()
     {
         $grandparent = $this->getBundle(null, null, 'GrandParentBBundle');
@@ -559,6 +580,7 @@ EOF;
     }
 
     /**
+     * @group legacy
      * @expectedException \LogicException
      * @expectedExceptionMessage Bundle "ChildCBundle" extends bundle "FooBar", which is not registered.
      */
@@ -569,6 +591,9 @@ EOF;
         $kernel->boot();
     }
 
+    /**
+     * @group legacy
+     */
     public function testInitializeBundlesSupportsArbitraryBundleRegistrationOrder()
     {
         $grandparent = $this->getBundle(null, null, 'GrandParentCBundle');
@@ -591,6 +616,7 @@ EOF;
     }
 
     /**
+     * @group legacy
      * @expectedException \LogicException
      * @expectedExceptionMessage Bundle "ParentCBundle" is directly extended by two bundles "ChildC2Bundle" and "ChildC1Bundle".
      */
@@ -605,6 +631,7 @@ EOF;
     }
 
     /**
+     * @group legacy
      * @expectedException \LogicException
      * @expectedExceptionMessage Trying to register two bundles with the same name "DuplicateName"
      */
@@ -618,6 +645,7 @@ EOF;
     }
 
     /**
+     * @group legacy
      * @expectedException \LogicException
      * @expectedExceptionMessage Bundle "CircularRefBundle" can not extend itself.
      */

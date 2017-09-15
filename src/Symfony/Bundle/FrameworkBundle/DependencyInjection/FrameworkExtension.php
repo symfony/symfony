@@ -753,7 +753,10 @@ class FrameworkExtension extends Extension
         $container->getDefinition('debug.debug_handlers_listener')->setPrivate(true);
 
         if (class_exists(Stopwatch::class)) {
-            $container->register('debug.stopwatch', Stopwatch::class)->addArgument(true)->setPrivate(true);
+            $container->register('debug.stopwatch', Stopwatch::class)
+                ->addArgument(true)
+                ->setPrivate(true)
+                ->addTag('kernel.reset', array('method' => 'reset'));
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
 

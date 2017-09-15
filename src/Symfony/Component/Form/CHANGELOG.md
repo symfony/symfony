@@ -19,6 +19,11 @@ CHANGELOG
  * removed passing guesser services ids as the fourth argument of `DependencyInjectionExtension::__construct()`
  * removed the ability to validate an unsubmitted form.
 
+3.4.0
+-----
+
+ * added `DebugCommand`
+
 3.3.0
 -----
 

@@ -9,7 +9,6 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'array_syntax' => array('syntax' => 'long'),
-        'no_break_comment' => false,
         'protected_to_private' => false,
     ))
     ->setRiskyAllowed(true)

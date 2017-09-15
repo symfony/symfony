@@ -100,6 +100,9 @@
         <service id="Symfony\Component\Form\Command\DebugCommand">
             <argument type="service" id="form.registry" />
             <argument type="collection" /> <!-- All form types namespaces are stored here by FormPass -->
+            <argument type="collection" /> <!-- All services form types are stored here by FormPass -->
+            <argument type="collection" /> <!-- All type extensions are stored here by FormPass -->
+            <argument type="collection" /> <!-- All type guessers are stored here by FormPass -->
             <tag name="console.command" command="debug:form" />
         </service>
     </services>

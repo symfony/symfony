@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
@@ -767,6 +768,21 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals(DataUriNormalizer::class, $definition->getClass());
         $this->assertEquals(-920, $tag[0]['priority']);
+    }
+
+    public function testDateIntervalNormalizerRegistered()
+    {
+        if (!class_exists(DateIntervalNormalizer::class)) {
+            $this->markTestSkipped('The DateIntervalNormalizer has been introduced in the Serializer Component version 3.4.');
+        }
+
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.dateinterval');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertEquals(DateIntervalNormalizer::class, $definition->getClass());
+        $this->assertEquals(-915, $tag[0]['priority']);
     }
 
     public function testDateTimeNormalizerRegistered()

@@ -21,6 +21,15 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class DebugCommandTest extends TestCase
 {
+    public function testDebugDefaults()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array(), array('decorated' => false));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertContains('Built-in form types', $tester->getDisplay());
+    }
+
     public function testDebugSingleFormType()
     {
         $tester = $this->createCommandTester();

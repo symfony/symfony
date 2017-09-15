@@ -21,6 +21,26 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  */
 class TextDescriptor extends Descriptor
 {
+    protected function describeDefaults(array $options = array())
+    {
+        $coreTypes = $this->getCoreTypes();
+
+        $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
+        $shortClassNames = array_map(function ($fqcn) { return array_slice(explode('\\', $fqcn), -1)[0]; }, $coreTypes);
+        for ($i = 0; $i * 5 < count($shortClassNames); ++$i) {
+            $this->output->writeln(' '.implode(', ', array_slice($shortClassNames, $i * 5, 5)));
+        }
+
+        $this->output->section('Service form types');
+        $this->output->listing(array_diff($options['types'], $coreTypes));
+
+        $this->output->section('Type extensions');
+        $this->output->listing($options['extensions']);
+
+        $this->output->section('Type guessers');
+        $this->output->listing($options['guessers']);
+    }
+
     protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array())
     {
         $this->collectOptions($resolvedFormType);

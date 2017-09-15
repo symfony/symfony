@@ -77,6 +77,7 @@ class FormPass implements CompilerPassInterface
         if ($container->hasDefinition($this->formDebugCommandService)) {
             $commandDefinition = $container->getDefinition($this->formDebugCommandService);
             $commandDefinition->setArgument(1, array_keys($namespaces));
+            $commandDefinition->setArgument(2, array_keys($servicesMap));
         }
 
         return ServiceLocatorTagPass::register($container, $servicesMap);
@@ -85,6 +86,7 @@ class FormPass implements CompilerPassInterface
     private function processFormTypeExtensions(ContainerBuilder $container)
     {
         $typeExtensions = array();
+        $typeExtensionsClasses = array();
         foreach ($this->findAndSortTaggedServices($this->formTypeExtensionTag, $container) as $reference) {
             $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
@@ -97,10 +99,16 @@ class FormPass implements CompilerPassInterface
             }
 
             $typeExtensions[$extendedType][] = new Reference($serviceId);
+            $typeExtensionsClasses[] = $serviceDefinition->getClass();
         }
 
         foreach ($typeExtensions as $extendedType => $extensions) {
             $typeExtensions[$extendedType] = new IteratorArgument($extensions);
+        }
+
+        if ($container->hasDefinition($this->formDebugCommandService)) {
+            $commandDefinition = $container->getDefinition($this->formDebugCommandService);
+            $commandDefinition->setArgument(3, $typeExtensionsClasses);
         }
 
         return $typeExtensions;
@@ -109,8 +117,17 @@ class FormPass implements CompilerPassInterface
     private function processFormTypeGuessers(ContainerBuilder $container)
     {
         $guessers = array();
+        $guessersClasses = array();
         foreach ($container->findTaggedServiceIds($this->formTypeGuesserTag, true) as $serviceId => $tags) {
             $guessers[] = new Reference($serviceId);
+
+            $serviceDefinition = $container->getDefinition($serviceId);
+            $guessersClasses[] = $serviceDefinition->getClass();
+        }
+
+        if ($container->hasDefinition($this->formDebugCommandService)) {
+            $commandDefinition = $container->getDefinition($this->formDebugCommandService);
+            $commandDefinition->setArgument(4, $guessersClasses);
         }
 
         return new IteratorArgument($guessers);

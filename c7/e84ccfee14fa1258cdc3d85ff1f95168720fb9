@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by Lctrs at 2017-08-13T23:00:19Z
+
+PR updated to fix comment made by @ogizanagi and @chalasr.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2017-08-18T02:08:44Z
+
+Unless there are more comments that need to be addressed, it should be ready to merge then :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-31T11:08:02Z
+
+Could you add an entry in component's CHANGELOG.md file?
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2017-08-31T11:44:11Z
+
+@ogizanagi Done.
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2017-09-14T15:49:02Z
+
+@ogizanagi Is there anything else that prevent it from being merged ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-14T16:19:15Z
+
+@Lctrs : Nothing to me (appart from the comments I've just added, since the PR was tweaked since my last review). We just miss another approval (not mandatory here, but always good to take).
+
+ping @symfony/deciders , @dunglas :)

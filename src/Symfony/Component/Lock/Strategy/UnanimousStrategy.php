@@ -31,6 +31,6 @@ class UnanimousStrategy implements StrategyInterface
      */
     public function canBeMet($numberOfFailure, $numberOfItems)
     {
-        return $numberOfFailure === 0;
+        return 0 === $numberOfFailure;
     }
 }

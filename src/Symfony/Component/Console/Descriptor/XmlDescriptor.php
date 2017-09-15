@@ -95,9 +95,9 @@ class XmlDescriptor extends Descriptor
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));
 
-        if ($application->getName() !== 'UNKNOWN') {
+        if ('UNKNOWN' !== $application->getName()) {
             $rootXml->setAttribute('name', $application->getName());
-            if ($application->getVersion() !== 'UNKNOWN') {
+            if ('UNKNOWN' !== $application->getVersion()) {
                 $rootXml->setAttribute('version', $application->getVersion());
             }
         }

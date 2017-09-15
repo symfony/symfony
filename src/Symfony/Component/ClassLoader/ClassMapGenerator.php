@@ -62,7 +62,7 @@ class ClassMapGenerator
 
             $path = $file->getRealPath() ?: $file->getPathname();
 
-            if (pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
+            if ('php' !== pathinfo($path, PATHINFO_EXTENSION)) {
                 continue;
             }
 

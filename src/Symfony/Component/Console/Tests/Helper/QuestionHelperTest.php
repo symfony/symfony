@@ -840,6 +840,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     {
         exec('stty 2>&1', $output, $exitcode);
 
-        return $exitcode === 0;
+        return 0 === $exitcode;
     }
 }

@@ -50,7 +50,7 @@ class SvnRepository
     {
         exec('which svn', $output, $result);
 
-        if ($result !== 0) {
+        if (0 !== $result) {
             throw new RuntimeException('The command "svn" is not installed.');
         }
 
@@ -62,7 +62,7 @@ class SvnRepository
 
             exec('svn checkout '.$url.' '.$targetDir, $output, $result);
 
-            if ($result !== 0) {
+            if (0 !== $result) {
                 throw new RuntimeException('The SVN checkout of '.$url.'failed.');
             }
         }
@@ -128,7 +128,7 @@ class SvnRepository
 
             $svnInfo = simplexml_load_string(implode("\n", $output));
 
-            if ($result !== 0) {
+            if (0 !== $result) {
                 throw new RuntimeException('svn info failed');
             }
 

@@ -49,7 +49,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $reflClass = new \ReflectionClass($object);
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
             if (
-                $reflMethod->getNumberOfRequiredParameters() !== 0 ||
+                0 !== $reflMethod->getNumberOfRequiredParameters() ||
                 $reflMethod->isStatic() ||
                 $reflMethod->isConstructor() ||
                 $reflMethod->isDestructor()
@@ -67,7 +67,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
                 if (!$reflClass->hasProperty($attributeName)) {
                     $attributeName = lcfirst($attributeName);
                 }
-            } elseif (strpos($name, 'is') === 0) {
+            } elseif (0 === strpos($name, 'is')) {
                 // issers
                 $attributeName = substr($name, 2);
 

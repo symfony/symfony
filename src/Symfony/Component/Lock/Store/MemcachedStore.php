@@ -172,7 +172,7 @@ class MemcachedStore implements StoreInterface
 
         if ($this->useExtendedReturn) {
             $extendedReturn = $this->memcached->get((string) $key, null, \Memcached::GET_EXTENDED);
-            if ($extendedReturn === \Memcached::GET_ERROR_RETURN_VALUE) {
+            if (\Memcached::GET_ERROR_RETURN_VALUE === $extendedReturn) {
                 return array($extendedReturn, 0.0);
             }
 

@@ -74,7 +74,7 @@ class UrlValidator extends ConstraintValidator
 
         if ($constraint->checkDNS) {
             // backwards compatibility
-            if ($constraint->checkDNS === true) {
+            if (true === $constraint->checkDNS) {
                 $constraint->checkDNS = Url::CHECK_DNS_TYPE_ANY;
                 @trigger_error(sprintf('Use of the boolean TRUE for the "checkDNS" option in %s is deprecated.  Use Url::CHECK_DNS_TYPE_ANY instead.', Url::class), E_USER_DEPRECATED);
             }

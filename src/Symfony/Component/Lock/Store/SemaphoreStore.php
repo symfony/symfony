@@ -39,7 +39,7 @@ class SemaphoreStore implements StoreInterface
             return false;
         }
 
-        if ($blocking === false && \PHP_VERSION_ID < 50601) {
+        if (false === $blocking && \PHP_VERSION_ID < 50601) {
             return false;
         }
 

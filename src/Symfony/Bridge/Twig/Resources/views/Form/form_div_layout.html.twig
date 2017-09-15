@@ -181,17 +181,19 @@
 {%- endblock range_widget %}
 
 {%- block button_widget -%}
+    {%- set label_trans_params = {} -%}
     {%- if label is empty -%}
         {%- if label_format is not empty -%}
-            {% set label = label_format|replace({
+            {% set label = label_format %}
+            {% set label_trans_params = {
                 '%name%': name,
                 '%id%': id,
-            }) %}
+            } %}
         {%- else -%}
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans(label_trans_params, translation_domain) }}</button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}
@@ -214,17 +216,19 @@
         {% if required -%}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {%- endif -%}
+        {%- set label_trans_params = {} -%}
         {% if label is empty -%}
             {%- if label_format is not empty -%}
-                {% set label = label_format|replace({
+                {% set label = label_format %}
+                {% set label_trans_params = {
                     '%name%': name,
                     '%id%': id,
-                }) %}
+                } %}
             {%- else -%}
                 {% set label = name|humanize %}
             {%- endif -%}
         {%- endif -%}
-        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</label>
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ translation_domain is same as(false) ? label : label|trans(label_trans_params, translation_domain) }}</label>
     {%- endif -%}
 {%- endblock form_label -%}
 

@@ -148,10 +148,6 @@ class ConfigurationTest extends TestCase
                 'only_master_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
-                'matcher' => array(
-                    'enabled' => false,
-                    'ips' => array(),
-                ),
             ),
             'translator' => array(
                 'enabled' => !class_exists(FullStack::class),

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-12T11:31:37Z
+
+Should we also deprecate `Bundle::getParent()` default implem before removing it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-15T03:33:04Z
+
+@chalasr Not sure it makes sense. This method is mainly called by Symfony itself, and if a bundle defines a parent, the message won't be displayed. So, it seems to me better to not add this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-15T03:33:41Z
+
+RFR

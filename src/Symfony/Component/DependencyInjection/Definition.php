@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -432,6 +433,10 @@ class Definition
      */
     public function setAutoconfigured($autoconfigured)
     {
+        if (null !== $this->decoratedService && $autoconfigured) {
+            throw new BadMethodCallException('A decorator cannot be autoconfigured.');
+        }
+
         $this->changes['autoconfigured'] = true;
 
         $this->autoconfigured = $autoconfigured;

@@ -33,4 +33,31 @@ class TimezoneTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, '');
     }
+
+    public function testDateTimeZoneInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), array('input' => 'datetimezone'));
+
+        $this->assertSame('America/New_York', $form->createView()->vars['value']);
+
+        $form->submit('Europe/Amsterdam');
+
+        $this->assertEquals(new \DateTimeZone('Europe/Amsterdam'), $form->getData());
+
+        $form = $this->factory->create(static::TESTED_TYPE, array(new \DateTimeZone('America/New_York')), array('input' => 'datetimezone', 'multiple' => true));
+
+        $this->assertSame(array('America/New_York'), $form->createView()->vars['value']);
+
+        $form->submit(array('Europe/Amsterdam', 'Europe/Paris'));
+
+        $this->assertEquals(array(new \DateTimeZone('Europe/Amsterdam'), new \DateTimeZone('Europe/Paris')), $form->getData());
+    }
+
+    public function testFilterByRegions()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, array('regions' => \DateTimeZone::EUROPE))
+            ->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Amsterdam'), $choices, '', false, false);
+    }
 }

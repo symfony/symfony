@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-25T09:32:57Z
+
+Not sure, but we might consider favoring datetimezone as default input format; so it's consistent with datetime type.
+
+Also i need the next step basically; integrate timezone type with datetime. A `with_timezone` option or so..  that would save me a few steps :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-25T09:46:15Z
+
+Updated so that `ChoiceLoaderInterface` implem is deprecated and uses a CallbackLoader directly. Let me know if this is OK.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-05T14:31:47Z
+
+small conflict to fix
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-16T09:13:33Z
+
+Should be good :)

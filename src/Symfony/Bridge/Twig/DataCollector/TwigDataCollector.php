@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Loader\FilesystemLoader;
 use Twig\Markup;
 use Twig\Profiler\Dumper\HtmlDumper;
 use Twig\Profiler\Profile;
@@ -27,11 +28,13 @@ use Twig\Profiler\Profile;
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $profile;
+    private $loader;
     private $computed;
 
-    public function __construct(Profile $profile)
+    public function __construct(Profile $profile, FilesystemLoader $loader = null)
     {
         $this->profile = $profile;
+        $this->loader = $loader;
     }
 
     /**
@@ -47,6 +50,21 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function lateCollect()
     {
         $this->data['profile'] = serialize($this->profile);
+        $this->data['template_paths'] = array();
+
+        if (null !== $this->loader) {
+            $locator = (new \ReflectionObject($this->loader))->getMethod('findTemplate');
+            $locator->setAccessible(true);
+            $finder = function (Profile $profile) use (&$finder, $locator) {
+                if ($profile->isTemplate()) {
+                    $this->data['template_paths'][$profile->getName()] = $locator->invoke($this->loader, $profile->getName());
+                }
+                foreach ($profile as $p) {
+                    $finder($p);
+                }
+            };
+            $finder($this->profile);
+        }
     }
 
     public function getTime()
@@ -57,6 +75,11 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function getTemplateCount()
     {
         return $this->getComputedData('template_count');
+    }
+
+    public function getTemplatePaths()
+    {
+        return $this->data['template_paths'];
     }
 
     public function getTemplates()

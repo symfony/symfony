@@ -12,27 +12,14 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TimezoneType extends AbstractType implements ChoiceLoaderInterface
+class TimezoneType extends AbstractType
 {
-    /**
-     * Timezone loaded choice list.
-     *
-     * The choices are generated from the ICU function \DateTimeZone::listIdentifiers().
-     *
-     * @var ArrayChoiceList
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    private $choiceList;
-
     /**
      * {@inheritdoc}
      */
@@ -80,68 +67,6 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
     public function getBlockPrefix()
     {
         return 'timezone';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    public function loadChoiceList($value = null)
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        if (null !== $this->choiceList) {
-            return $this->choiceList;
-        }
-
-        return $this->choiceList = new ArrayChoiceList(self::getTimezones(\DateTimeZone::ALL), $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    public function loadChoicesForValues(array $values, $value = null)
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        // Optimize
-        $values = array_filter($values);
-        if (empty($values)) {
-            return array();
-        }
-
-        // If no callable is set, values are the same as choices
-        if (null === $value) {
-            return $values;
-        }
-
-        return $this->loadChoiceList($value)->getChoicesForValues($values);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    public function loadValuesForChoices(array $choices, $value = null)
-    {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
-        // Optimize
-        $choices = array_filter($choices);
-        if (empty($choices)) {
-            return array();
-        }
-
-        // If no callable is set, choices are the same as values
-        if (null === $value) {
-            return $choices;
-        }
-
-        return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 
     /**

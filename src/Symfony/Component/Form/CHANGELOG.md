@@ -18,6 +18,7 @@ CHANGELOG
  * removed passing a `ValueExporter` instance to the `FormDataExtractor::__construct()` method
  * removed passing guesser services ids as the fourth argument of `DependencyInjectionExtension::__construct()`
  * removed the ability to validate an unsubmitted form.
+ * removed `ChoiceLoaderInterface` implementation in `TimezoneType`
 
 3.4.0
 -----

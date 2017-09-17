@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
@@ -25,8 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 class NativeSessionStorage implements SessionStorageInterface
 {
     /**
-     * Array of SessionBagInterface.
-     *
      * @var SessionBagInterface[]
      */
     protected $bags;
@@ -42,7 +39,7 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $closed = false;
 
     /**
-     * @var AbstractProxy
+     * @var AbstractProxy|\SessionHandlerInterface
      */
     protected $saveHandler;
 
@@ -52,8 +49,6 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
-     * Constructor.
-     *
      * Depending on how you want the storage driver to behave you probably
      * want to override this constructor entirely.
      *
@@ -97,9 +92,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
      *
-     * @param array                                                            $options Session configuration options
-     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
-     * @param MetadataBag                                                      $metaBag MetadataBag
+     * @param array                         $options Session configuration options
+     * @param \SessionHandlerInterface|null $handler
+     * @param MetadataBag                   $metaBag MetadataBag
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
@@ -116,7 +111,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Gets the save handler instance.
      *
-     * @return AbstractProxy
+     * @return AbstractProxy|\SessionHandlerInterface
      */
     public function getSaveHandler()
     {
@@ -276,7 +271,7 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if ($this->saveHandler->isActive() && !$this->started) {
+        if (!$this->started && $this->saveHandler->isActive()) {
             $this->loadSession();
         } elseif (!$this->started) {
             $this->start();
@@ -358,7 +353,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *     ini_set('session.save_handler', 'files');
      *     ini_set('session.save_path', '/tmp');
      *
-     * or pass in a NativeSessionHandler instance which configures session.save_handler in the
+     * or pass in a \SessionHandler instance which configures session.save_handler in the
      * constructor, for a template see NativeFileSessionHandler or use handlers in
      * composer package drak/native-session
      *
@@ -367,17 +362,23 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see http://php.net/sessionhandler
      * @see http://github.com/drak/NativeSession
      *
-     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $saveHandler
+     * @param \SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
      */
     public function setSaveHandler($saveHandler = null)
     {
         if (!$saveHandler instanceof AbstractProxy &&
-            !$saveHandler instanceof NativeSessionHandler &&
             !$saveHandler instanceof \SessionHandlerInterface &&
             null !== $saveHandler) {
-            throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null.');
+            throw new \InvalidArgumentException('Must be instance of AbstractProxy; implement \SessionHandlerInterface; or be null.');
+        }
+
+        if ($saveHandler instanceof AbstractProxy) {
+            @trigger_error(
+                'Using session save handlers that are instances of AbstractProxy is deprecated since version 3.4 and will be removed in 4.0.',
+                E_USER_DEPRECATED
+            );
         }
 
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy

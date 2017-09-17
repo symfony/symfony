@@ -247,6 +247,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
                 $keys[] = Caster::PREFIX_PROTECTED.$key;
                 $keys[] = Caster::PREFIX_VIRTUAL.$key;
                 $keys[] = "\0$item->class\0$key";
+                // no break
             case Stub::TYPE_ARRAY:
             case Stub::TYPE_RESOURCE:
                 break;

@@ -656,11 +656,13 @@ class Inline
                 }
 
             // Optimize for returning strings.
+            // no break
             case '+' === $scalar[0] || '-' === $scalar[0] || '.' === $scalar[0] || is_numeric($scalar[0]):
                 switch (true) {
                     case Parser::preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar):
                         $scalar = str_replace('_', '', (string) $scalar);
                         // omitting the break / return as integers are handled in the next case
+                        // no break
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = (int) $scalar;

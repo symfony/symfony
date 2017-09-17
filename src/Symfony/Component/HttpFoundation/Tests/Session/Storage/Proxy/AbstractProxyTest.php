@@ -74,6 +74,9 @@ class AbstractProxyTest extends TestCase
         $this->assertNull($this->proxy->getSaveHandlerName());
     }
 
+    /**
+     * @group legacy
+     */
     public function testIsSessionHandlerInterface()
     {
         $this->assertFalse($this->proxy->isSessionHandlerInterface());
@@ -81,6 +84,9 @@ class AbstractProxyTest extends TestCase
         $this->assertTrue($sh->isSessionHandlerInterface());
     }
 
+    /**
+     * @group legacy
+     */
     public function testIsWrapper()
     {
         $this->assertFalse($this->proxy->isWrapper());

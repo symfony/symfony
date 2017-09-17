@@ -524,6 +524,15 @@ HttpFoundation
  * The ability to check only for cacheable HTTP methods using `Request::isMethodSafe()` is
    not supported anymore, use `Request::isMethodCacheable()` instead.
 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`, 
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy` and 
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` classes have been removed.
+
+ * The `SessionHandlerProxy::isSessionHandlerInterface()` and `SessionHandlerProxy::isWrapper()`
+   methods have been removed.
+
+ * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
+
 HttpKernel
 ----------
 

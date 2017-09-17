@@ -61,7 +61,7 @@ class PhpDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', 'stdClass');
+        $container->register('foo', 'stdClass')->setPublic(true);
         $container->getDefinition('foo')->setLazy(true);
         $container->compile();
 

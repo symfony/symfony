@@ -336,8 +336,10 @@ class YamlFileLoader extends FileLoader
             @trigger_error(sprintf('Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "%s" service or define it in XML instead.', $id), E_USER_DEPRECATED);
         }
         if (is_string($service) && 0 === strpos($service, '@')) {
-            $public = isset($defaults['public']) ? $defaults['public'] : true;
-            $this->container->setAlias($id, new Alias(substr($service, 1), $public));
+            $this->container->setAlias($id, $alias = new Alias(substr($service, 1)));
+            if (isset($defaults['public'])) {
+                $alias->setPublic($defaults['public']);
+            }
 
             return;
         }
@@ -357,8 +359,12 @@ class YamlFileLoader extends FileLoader
         $this->checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {
-            $public = array_key_exists('public', $service) ? (bool) $service['public'] : (isset($defaults['public']) ? $defaults['public'] : true);
-            $this->container->setAlias($id, new Alias($service['alias'], $public));
+            $this->container->setAlias($id, $alias = new Alias($service['alias']));
+            if (array_key_exists('public', $service)) {
+                $alias->setPublic($service['public']);
+            } elseif (isset($defaults['public'])) {
+                $alias->setPublic($defaults['public']);
+            }
 
             foreach ($service as $key => $value) {
                 if (!in_array($key, array('alias', 'public'))) {

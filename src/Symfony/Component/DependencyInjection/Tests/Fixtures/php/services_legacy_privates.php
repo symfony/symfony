@@ -38,7 +38,6 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
             'private_alias_decorator' => 'getPrivateAliasDecoratorService',
             'private_child' => 'getPrivateChildService',
             'private_decorator' => 'getPrivateDecoratorService',
-            'private_decorator.inner' => 'getPrivateDecorator_InnerService',
             'private_not_inlined' => 'getPrivateNotInlinedService',
             'private_not_removed' => 'getPrivateNotRemovedService',
             'private_parent' => 'getPrivateParentService',
@@ -50,10 +49,10 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
             'private' => true,
             'private_alias' => true,
             'private_child' => true,
-            'private_decorator.inner' => true,
             'private_not_inlined' => true,
             'private_not_removed' => true,
             'private_parent' => true,
+            'service_container' => true,
         );
         $this->aliases = array(
             'alias_to_private' => 'private',
@@ -156,16 +155,6 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
     protected function getPrivateChildService()
     {
         return $this->services['private_child'] = new \stdClass();
-    }
-
-    /**
-     * Gets the private 'private_decorator.inner' shared service.
-     *
-     * @return \stdClass
-     */
-    protected function getPrivateDecorator_InnerService()
-    {
-        return $this->services['private_decorator.inner'] = new \stdClass();
     }
 
     /**

@@ -20,18 +20,22 @@ services:
 
         factory: [Bar\FooClass, getInstance]
         configurator: sc_configure
+        public: true
     foo.baz:
         class: '%baz_class%'
         factory: ['%baz_class%', getInstance]
         configurator: ['%baz_class%', configureStatic1]
+        public: true
     bar:
         class: Bar\FooClass
         arguments: [foo, '@foo.baz', '%foo_bar%']
         configurator: ['@foo.baz', configure]
+        public: true
     foo_bar:
         class: '%foo_class%'
         shared: false
         arguments: ['@deprecated_service']
+        public: true
     method_call1:
         class: Bar\FooClass
         file: '%path%foo.php'
@@ -41,11 +45,13 @@ services:
             - [setBar, ['@?foo3']]
             - [setBar, ['@?foobaz']]
             - [setBar, ['@=service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")']]
+        public: true
 
     foo_with_inline:
         class: Foo
         calls:
             - [setBar, ['@inlined']]
+        public: true
 
     inlined:
         class: Bar
@@ -58,10 +64,12 @@ services:
         class: Baz
         calls:
             - [setFoo, ['@foo_with_inline']]
+        public: true
 
     request:
         class: Request
         synthetic: true
+        public: true
     configurator_service:
         class: ConfClass
         public: false
@@ -71,6 +79,7 @@ services:
     configured_service:
         class: stdClass
         configurator: ['@configurator_service', configureStdClass]
+        public: true
     configurator_service_simple:
         class: ConfClass
         public: false
@@ -78,18 +87,23 @@ services:
     configured_service_simple:
         class: stdClass
         configurator: ['@configurator_service_simple', configureStdClass]
+        public: true
     decorated:
         class: stdClass
+        public: true
     decorator_service:
         class: stdClass
         decorates: decorated
+        public: true
     decorator_service_with_name:
         class: stdClass
         decorates: decorated
         decoration_inner_name: decorated.pif-pouf
+        public: true
     deprecated_service:
         class: stdClass
         deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
+        public: true
     new_factory:
         class: FactoryClass
         public: false
@@ -97,13 +111,16 @@ services:
     factory_service:
         class: Bar
         factory: ['@foo.baz', getInstance]
+        public: true
     new_factory_service:
         class: FooBarBaz
         properties: { foo: bar }
         factory: ['@new_factory', getInstance]
+        public: true
     service_from_static_method:
         class: Bar\FooClass
         factory: [Bar\FooClass, getInstance]
+        public: true
     factory_simple:
         class: SimpleFactoryClass
         deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
@@ -112,14 +129,21 @@ services:
     factory_service_simple:
         class: Bar
         factory: ['@factory_simple', getInstance]
+        public: true
     lazy_context:
         class: LazyContext
         arguments: [!iterator {'k1': '@foo.baz', 'k2': '@service_container'}, !iterator []]
+        public: true
     lazy_context_ignore_invalid_ref:
         class: LazyContext
         arguments: [!iterator ['@foo.baz', '@?invalid'], !iterator []]
-    alias_for_foo: '@foo'
-    alias_for_alias: '@foo'
+        public: true
+    alias_for_foo:
+        alias: 'foo'
+        public: true
+    alias_for_alias:
+        alias: 'foo'
+        public: true
     Psr\Container\ContainerInterface:
         alias: service_container
         public: false

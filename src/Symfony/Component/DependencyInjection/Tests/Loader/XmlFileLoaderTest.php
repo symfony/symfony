@@ -234,7 +234,7 @@ class XmlFileLoaderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %sservices_without_id.xml at line 4.
+     * @expectedDeprecation Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %sservices_without_id.xml at line 5.
      */
     public function testLoadAnonymousServicesWithoutId()
     {

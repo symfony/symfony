@@ -1,4 +1,5 @@
 services:
+    _defaults: {public: true}
 
     foo: {class: stdClass, public: false}
 
@@ -23,6 +24,4 @@ services:
     private_not_inlined: {class: stdClass, public: false}
     private_not_removed: {class: stdClass, public: false}
 
-    private_child: {parent: foo}
-    private_parent: {parent: private}
     public_child: {parent: private, public: true}

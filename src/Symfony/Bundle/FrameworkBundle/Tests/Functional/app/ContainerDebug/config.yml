@@ -2,6 +2,7 @@ imports:
     - { resource: ../config/default.yml }
 
 services:
+    _defaults: { public: true }
     public:
         class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
     private_alias:

@@ -35,6 +35,9 @@ class ProjectServiceContainer extends Container
             'Bar\\Foo' => 'getFooService',
             'Foo\\Foo' => 'getFoo2Service',
         );
+        $this->privates = array(
+            'service_container' => true,
+        );
 
         $this->aliases = array();
     }

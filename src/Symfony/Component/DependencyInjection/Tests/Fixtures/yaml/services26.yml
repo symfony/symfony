@@ -9,6 +9,7 @@ parameters:
 
 services:
     test:
+        public: true
         class: '%env(FOO)%'
         arguments:
             - '%env(Bar)%'

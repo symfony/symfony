@@ -9,6 +9,7 @@ $container = new ContainerBuilder();
 
 $container
     ->register('foo1', 'stdClass')
+    ->setPublic(true)
 ;
 
 $container
@@ -24,6 +25,7 @@ $container
 $container
     ->register('baz', 'stdClass')
     ->setProperty('foo3', new Reference('foo3'))
+    ->setPublic(true)
 ;
 
 $container
@@ -41,6 +43,7 @@ $container
         'foo2' => new Reference('foo2', $container::IGNORE_ON_UNINITIALIZED_REFERENCE),
         'foo3' => new Reference('foo3', $container::IGNORE_ON_UNINITIALIZED_REFERENCE),
     )))
+    ->setPublic(true)
 ;
 
 return $container;

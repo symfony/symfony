@@ -52,7 +52,7 @@ class YamlDumperTest extends TestCase
         $this->assertEqualYamlStructure(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/yaml/services9.yml')), $dumper->dump(), '->dump() dumps services');
 
         $dumper = new YamlDumper($container = new ContainerBuilder());
-        $container->register('foo', 'FooClass')->addArgument(new \stdClass());
+        $container->register('foo', 'FooClass')->addArgument(new \stdClass())->setPublic(true);
         try {
             $dumper->dump();
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
@@ -85,6 +85,7 @@ class YamlDumperTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'Class1')
+            ->setPublic(true)
             ->addArgument((new Definition('Class2'))
                 ->addArgument(new Definition('Class2'))
             )

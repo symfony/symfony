@@ -1012,12 +1012,12 @@ class FrameworkExtension extends Extension
 
         // Use a delegation unless only a single engine was registered
         if (1 === count($engines)) {
-            $container->setAlias('templating', (string) reset($engines));
+            $container->setAlias('templating', (string) reset($engines))->setPublic(true);
         } else {
             foreach ($engines as $engine) {
                 $container->getDefinition('templating.engine.delegating')->addMethodCall('addEngine', array($engine));
             }
-            $container->setAlias('templating', 'templating.engine.delegating');
+            $container->setAlias('templating', 'templating.engine.delegating')->setPublic(true);
         }
 
         $container->getDefinition('fragment.renderer.hinclude')
@@ -1213,7 +1213,7 @@ class FrameworkExtension extends Extension
         $container->getDefinition('translation.writer')->setPrivate(true);
 
         // Use the "real" translator instead of the identity default
-        $container->setAlias('translator', 'translator.default');
+        $container->setAlias('translator', 'translator.default')->setPublic(true);
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
         $translator = $container->findDefinition('translator.default');
         $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));

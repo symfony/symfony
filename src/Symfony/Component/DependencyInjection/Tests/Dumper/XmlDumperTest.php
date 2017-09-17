@@ -57,7 +57,7 @@ class XmlDumperTest extends TestCase
         $this->assertEquals(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
 
         $dumper = new XmlDumper($container = new ContainerBuilder());
-        $container->register('foo', 'FooClass')->addArgument(new \stdClass());
+        $container->register('foo', 'FooClass')->addArgument(new \stdClass())->setPublic(true);
         try {
             $dumper->dump();
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
@@ -75,7 +75,7 @@ class XmlDumperTest extends TestCase
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
     <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" synthetic="true"/>
-    <service id="foo" class="FooClass">
+    <service id="foo" class="FooClass" public="true">
       <argument type="service">
         <service class="BarClass">
           <argument type="service">
@@ -99,7 +99,7 @@ class XmlDumperTest extends TestCase
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" synthetic=\"true\"/>
-    <service id=\"foo\" class=\"FooClass\Foo\">
+    <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\">
       <tag name=\"foo&quot;bar\bar\" foo=\"foo&quot;barřž€\"/>
       <argument>foo&lt;&gt;&amp;bar</argument>
     </service>
@@ -128,7 +128,7 @@ class XmlDumperTest extends TestCase
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" synthetic=\"true\"/>
-    <service id=\"foo\" class=\"FooClass\Foo\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
+    <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
     <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
@@ -138,7 +138,7 @@ class XmlDumperTest extends TestCase
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" synthetic=\"true\"/>
-    <service id=\"foo\" class=\"FooClass\Foo\" decorates=\"bar\"/>
+    <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\"/>
     <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>

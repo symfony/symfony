@@ -36,6 +36,9 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
             'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor' => 'getRot13EnvVarProcessorService',
             'container.env_var_processors_locator' => 'getContainer_EnvVarProcessorsLocatorService',
         );
+        $this->privates = array(
+            'service_container' => true,
+        );
 
         $this->aliases = array();
     }

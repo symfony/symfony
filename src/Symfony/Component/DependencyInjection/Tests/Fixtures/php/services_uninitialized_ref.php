@@ -35,6 +35,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         );
         $this->privates = array(
             'foo3' => true,
+            'service_container' => true,
         );
 
         $this->aliases = array();

@@ -224,4 +224,30 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         (new ResolveInstanceofConditionalsPass())->process($container);
     }
+
+    public function testMergeReset()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('bar', self::class)
+            ->addArgument('a')
+            ->addMethodCall('setB')
+            ->setDecoratedService('foo')
+            ->addTag('t')
+            ->setInstanceofConditionals(array(
+                parent::class => (new ChildDefinition(''))->addTag('bar'),
+            ))
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $abstract = $container->getDefinition('abstract.instanceof.bar');
+
+        $this->assertEmpty($abstract->getArguments());
+        $this->assertEmpty($abstract->getMethodCalls());
+        $this->assertNull($abstract->getDecoratedService());
+        $this->assertEmpty($abstract->getTags());
+        $this->assertTrue($abstract->isAbstract());
+    }
 }

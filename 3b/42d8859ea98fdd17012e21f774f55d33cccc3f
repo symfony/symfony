@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by agoat at 2017-04-06T20:15:03Z
+
++1
+
+---------------------------------------------------------------------------
+
+by LinkingYou at 2017-04-06T21:48:46Z
+
++1
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-06-09T09:39:14Z
+
+@xabbuh any updates on this? Can I do something to get this bugfix merged?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-06-10T02:47:04Z
+
+Overall, I love the bug fixes introduced in this PR with regard to relative paths. That said, it seems weird to allow empty input and expect any meaningful output.
+
+| Start | End | Expected |
+| --- | --- | --- |
+| `""` | `""` | `"./"` |
+| `"aa/"` | `""` | `"../"` |
+| `""` | `"aa/"` | `"aa/"` |
+
+Does this really make sense? Should passing empty strings be deprecated? I wouldn't say that most people would expect these outputs and it would likely just hide a bug within their API usage, IMHO.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-06-10T08:13:08Z
+
+I think it should be allowed to pass an empty string. If `"aa/"` is a valid path then `""` should be too, otherwise every developer that uses this method has to handle empty strings themselves. Your three examples are prefectly fine for me, did you expect any different output?
+
+But I think there are cases that cannot produce a meaningful result, like start `"../../"` and end `"../"`. For these cases it might make sense to throw an exception.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-08-07T12:23:00Z
+
+Is there anything I can do to get these fixes merged?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-10T07:05:40Z
+
+Does the PR now still solve anything at all? I miss a new test case that would fail otherwise.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-08-10T07:09:34Z
+
+Yes, it still solves all the issues described in the initial issue comment. Especially the BC break that was introduced in 3.2.7. I removed the test cases because @chalasr requested that I should add them in a feature pull request for version 3.4.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-10T07:17:56Z
+
+Well, but it doesn't make sense to introduce a bugfix that in fact implements a feature that should be part of 3.4. So we need to decide whether not fully supporting relative path arguments was a BC break (because we had tests for relative paths despite the API docs telling the opposite) or if that is a new feature. And then there should be one PR containing proper tests for what the code change does achieve.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-08-10T07:36:24Z
+
+I agree, that’s why my pull request included the doccomment change and the tests in the first place.
+
+IMO the “feature” that relative paths are supported was always there (including a unit test) and got broken in 3.2.7.
+
+Should I remove 193cdf802997e2b469e77d919cf74a740e2ba4ee and a2a1d0da857e20571577fd06b50baf70cedc8e3c from this pull request?
+
+---------------------------------------------------------------------------
+
+by xelaris at 2017-08-14T22:48:00Z
+
+As mentioned by @kubawerlos the SensioDistributionBundle relies on support for relative paths, when calling `Filesystem::makePathRelative` with `symfony-var-dir` and `symfony-bin-dir` from the extra settings in the `composer.json` (usually `"var"` and `"bin"`).
+When composer 1.5.0 was released a week ago, the version of `symfony/filesystem` included changed from v2.8.18 to v2.8.26. Since then the `SensioDistributionBundle` generates wrong require statements for `SymfonyRequirements.php`. Corresponding issues (sensiolabs/SensioDistributionBundle#324 and composer/composer#6599) were created in these repositories.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-10T10:01:33Z
+
+So there are already two known projects that got broken because of this issue. Wouldn’t it make sense to merge this?
+
+> Should I remove 193cdf802997e2b469e77d919cf74a740e2ba4ee and a2a1d0da857e20571577fd06b50baf70cedc8e3c from this pull request?
+
+I removed these commits now from this pull request.
+
+---------------------------------------------------------------------------
+
+by kubawerlos at 2017-09-10T11:56:24Z
+
+Haven't been tracing this, but in Symfony 3.3.8 it's back to correct paths.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-10T15:51:08Z
+
+@kubawerlos I don’t see any change to the `makePathRelative()` method since version 3.2.7, could you point to the commit where it got fixed?
+
+What is the result of `makePathRelative('aa/cc', 'bb/cc')` in your installation?
+
+---------------------------------------------------------------------------
+
+by kubawerlos at 2017-09-10T16:12:33Z
+
+@ausi just found it, it was fixed directly in [SensioDistributionBundle](https://github.com/sensiolabs/SensioDistributionBundle/commit/bf582cc96becd7ae53f9fe8c4647d0a41c243a42), so the problem still exists here.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-16T16:07:41Z
+
+@chalasr your review status still shows up as “requested changes”, are there any changes I’ve forgotton?

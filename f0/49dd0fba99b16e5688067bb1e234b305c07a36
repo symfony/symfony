@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-14T13:28:13Z
+
+This way of url generating causes more issues as it simply throws in all attributes: iltar/http-bundle#25
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-14T13:35:11Z
+
+@iltar we should open another issue for that

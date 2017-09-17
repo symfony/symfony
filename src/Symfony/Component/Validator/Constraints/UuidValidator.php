@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Validates whether the value is a valid UUID (also known as GUID).
  *
- * Strict validation will allow a variant 1 UUID as described per RFC 4122.
+ * Strict validation will allow a UUID as specified per RFC 4122.
  * Loose validation will allow any type of UUID.
  *
  * For better compatibility, both loose and strict, you should consider using a specialized UUID library like "ramsey/uuid" instead.

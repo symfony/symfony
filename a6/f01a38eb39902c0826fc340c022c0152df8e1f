@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-09-18T16:12:55Z
+
+I suggest we also deprecate the usage of parameters inside alias ids in 3.4 (no idea why someone would like to make the id of the alias parametrized, and never requested in discussions, so I doubt people actually rely on this undocumented feature)

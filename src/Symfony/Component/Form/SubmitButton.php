@@ -43,6 +43,12 @@ class SubmitButton extends Button implements ClickableInterface
      */
     public function submit($submittedData, $clearMissing = true)
     {
+        if ($this->getConfig()->getDisabled()) {
+            $this->clicked = false;
+
+            return $this;
+        }
+
         parent::submit($submittedData, $clearMissing);
 
         $this->clicked = null !== $submittedData;

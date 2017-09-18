@@ -1,0 +1,205 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-16T15:05:58Z
+
+Should we really allow variants 3? Being "future reserved" means they should not be used today, isn't it?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-16T16:42:25Z
+
+From the RFC pov it's a valid UUID, same as special nil variant.
+
+I've updated the approach do to be more BC friendly, if you pass versions (default behavior) we imply a variant 1 or 2. Thus INVALID_VARIANT_ERROR for variant 0 & 3 in this case, see tests.
+
+In 3.x we could add a new variant constraint option, with a default set to variant 1 & 2.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T01:45:52Z
+
+puhhh, when i tested it, it reported my UUIDs from the AD still as invalid (in strict mode).
+then i noticed the wikipedia stuff about byte order of MS GUIDs when transmitted in binary form and as it happens the LDAP entry of the AD contains the objectGUIDs in binary form.
+
+After switching to the right codec of ramsey/uuid to decode/encode the GUIDs, they are being validated in strict mode. The thing is that they are valid with the old validator too, because they are now valid RFC variant UUIDs and not MS legacy UUIDs.
+
+Just the byte order was f***ed up.
+
+(Btw. the UUID i posted in the issue, was invalid because the byte order wasnt fixed, when decoding from binary).
+
+So i cant really test this one, since my AD GUIDs are strictly valid with and without this PR
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T07:09:19Z
+
+Thanks. First im not 100% into UUID's on its lowest level. This PR is a result after some reading and checking other implems. So basically i reverse engineered it from tests + php-src code; https://3v4l.org/DB4i9
+
+Testing your input `d7bb0bc1-0b24-944c-bea2-ef7da43e5c5c` _still_ fails, it produces variant 1 with an invalid version. This is indeed about codecs, using the ramsey GuidStringCodec makes it a version 4.
+
+```php
+$u1 = \Ramsey\Uuid\Uuid::fromString('d7bb0bc1-0b24-944c-bea2-ef7da43e5c5c');
+$u2 = (new \Ramsey\Uuid\UuidFactory(new \Ramsey\Uuid\FeatureSet($guid = true)))->fromString('d7bb0bc1-0b24-944c-bea2-ef7da43e5c5c');
+
+dump(
+    $u1->getVariant() === \Ramsey\Uuid\Uuid::RFC_4122,
+    in_array($u1->getVersion(), array(1,2,3,4,5)), // version=9
+    $u2->getVariant() === \Ramsey\Uuid\Uuid::RFC_4122,
+    $u2->getVersion() === \Ramsey\Uuid\Uuid::UUID_TYPE_RANDOM // version=4
+);
+```
+
+```
+true
+false
+true
+true
+```
+
+Basically SF is stuck at version=9. IMHO we should stop here (im quite convinced of this patch right now) and switch to proper libs in 3.x for better compatibility and validation control on symfony side, as using `$guid=true` on ramsey side also invalidates a valid version 4 for example.
+
+We might drop a note in 2.7 and focus on 3.x behavior/api. Yet im quite proud of the patch :angel:
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T07:58:25Z
+
+your test isnt right. `d7bb0bc1-0b24-944c-bea2-ef7da43e5c5c` is a wrongly decoded UUID.
+
+this will fix the UUIDs string representation:
+```php
+$u1 = \Ramsey\Uuid\Uuid::fromString('d7bb0bc1-0b24-944c-bea2-ef7da43e5c5c');
+$u2 = (new \Ramsey\Uuid\UuidFactory(new \Ramsey\Uuid\FeatureSet($guid = true)))->fromBytes($u1->toBytes());
+```
+
+edit: btw i am on symfony 3.3, but the validator isnt quite right since its creation, idk if its worth to backport
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T08:34:43Z
+
+Agree :+1:
+
+```diff
+ /**
+- * Validates whether the value is a valid UUID per RFC 4122.
++ * Validates whether the value is a valid UUID (also known as GUID).
++ *
++ * Strict validation will allow a variant 1 UUID as described per RFC 4122. Loose validation will allow any type of UUID.
++ *
++ * For better compatibility, both loose and strict, you should consider using specialized a UUID library instead.
++ * A well known composer package is "ramsey/uuid".
+  *
+  * @author Colin O'Dell <colinodell@gmail.com>
+  * @author Bernhard Schussek <bschussek@gmail.com>
+  *
+  * @see http://tools.ietf.org/html/rfc4122
+  * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
++ * @see https://github.com/ramsey/uuid
+  */
+```
+
+?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-17T09:45:40Z
+
+> you should consider using a specialized UUID library like "ramsey/uuid" instead.
+
+:+1: otherwise
+ping @colinodell
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T09:52:44Z
+
+i would fix the variant "indexing". despite the RFC listing isnt numbered, we should count from 1 (see also https://stackoverflow.com/a/6953207 )
+
+so:
+1.    0     x     x    Reserved, NCS backward compatibility.
+2.    1     0     x    The variant specified in this document.
+3.    1     1     0    Reserved, Microsoft Corporation backward compatibility
+4.    1     1     1    Reserved for future definition.
+
+so the strict mode validates variant 2 UUIDs
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T09:57:05Z
+
+https://en.wikipedia.org/wiki/Universally_unique_identifier#Variants explicitly refers to variant 0, whereas stackoverflow implies (it's an `<ol>` really).
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T10:02:47Z
+
+wikipedia references https://opensource.apple.com/source/CF/CF-299.35/Base.subproj/uuid.c.auto.html when talking about variants. idk how relevant this file is
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T10:13:32Z
+
+RFC has the latest copyright year =/ From apple source `There are three "variants" of UUIDs that this code knows about`. RFC has 4.
+
+Furthermore apple says `variant #0 is what was defined in the 1989 HP/Apollo Network Computing Architecture (NCA)`.
+
+Whereas RFC says
+
+```
+   UUIDs were originally used in the
+   Apollo Network Computing System and later in the Open Software
+   Foundation's (OSF) Distributed Computing Environment (DCE), and then
+   in Microsoft Windows platforms.
+
+   This specification is derived from the DCE specification with the
+   kind permission of the OSF (now known as The Open Group).
+   Information from earlier versions of the DCE specification have been
+   incorporated into this document.
+```
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T10:34:56Z
+
+better dont mention variant indexes at all then
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T10:49:37Z
+
+It takes away the confusion which this RFC creates, and exposes the variant SF actually follows.
+
+```
+1     0     x    The variant specified in this document.
+```
+
+Written by RFC describing (listing) variants :disappointed: ("specified" is key).
+
+But i see your point; ramsey/uuid describes this as a simple named value (`RFC_4122|RESERVED_MICROSOFT|...`). But is more confusing IMHO. So in terms of correctness and this is doc related i'd stick with "variant 1".
+
+edit: correctness; as implied by wikipedia AFAIK. I have no other proof for it :)
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T11:18:02Z
+
+i think there is no confusion with the RFC, it just lists 4 variants, but dont assign them any index, just a description for every variant and the bit signature
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T11:26:19Z
+
+Updated.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-17T11:44:39Z
+
+good for me
+
+---------------------------------------------------------------------------
+
+by colinodell at 2017-09-17T13:38:25Z
+
+@nicolas-grekas Looks good to me :+1:

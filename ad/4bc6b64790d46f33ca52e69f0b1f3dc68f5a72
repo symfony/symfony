@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-17T11:40:54Z
+
+(failure false-positive, known composer bug)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-19T09:30:21Z
+
+Now with UPGRADE/CHANGELOG entries.

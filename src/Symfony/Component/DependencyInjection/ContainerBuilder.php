@@ -121,6 +121,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $autoconfiguredInstanceof = array();
 
+    private $kernelPass;
+
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
@@ -715,6 +717,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         array_unshift($this->extensionConfigs[$name], $config);
+    }
+
+    public function setKernelPass(CompilerPassInterface $kernelPass)
+    {
+        $this->kernelPass = $kernelPass;
+    }
+
+    public function getKernelPass()
+    {
+        return $this->kernelPass;
     }
 
     /**

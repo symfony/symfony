@@ -33,5 +33,9 @@ class ExtensionCompilerPass implements CompilerPassInterface
 
             $extension->process($container);
         }
+
+        if ($container->getKernelPass()) {
+            $container->getKernelPass()->process($container);
+        }
     }
 }

@@ -184,6 +184,8 @@ DependencyInjection
 
  * Top-level anonymous services in XML are no longer supported.
 
+ * The `ExtensionCompilerPass` has been moved to before-optimization passes with priority -1000.
+
 EventDispatcher
 ---------------
 

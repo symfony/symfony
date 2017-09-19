@@ -45,10 +45,10 @@ class PassConfig
                 new ResolveInstanceofConditionalsPass(),
                 new RegisterEnvVarProcessorsPass(),
             ),
+            -1000 => array(new ExtensionCompilerPass()),
         );
 
         $this->optimizationPasses = array(array(
-            new ExtensionCompilerPass(),
             new ResolveChildDefinitionsPass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),

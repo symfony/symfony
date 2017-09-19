@@ -135,12 +135,22 @@ CSV
         $this->assertEquals("\n\n", $this->encoder->encode(array(array()), 'csv'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     */
-    public function testEncodeNonFlattenableStructure()
+    public function testEncodeVariableStructure()
     {
-        $this->encoder->encode(array(array('a' => array('foo', 'bar')), array('a' => array())), 'csv');
+        $value = array(
+            array('a' => array('foo', 'bar')),
+            array('a' => array(), 'b' => 'baz'),
+            array('a' => array('bar', 'foo'), 'c' => 'pong'),
+        );
+        $csv = <<<CSV
+a.0,a.1,c,b
+foo,bar,,
+,,,baz
+bar,foo,pong,
+
+CSV;
+
+        $this->assertEquals($csv, $this->encoder->encode($value, 'csv'));
     }
 
     public function testSupportsDecoding()

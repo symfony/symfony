@@ -61,7 +61,7 @@ class DecoratorServicePass implements CompilerPassInterface
                 $container->setDefinition($renamedId, $decoratedDefinition);
             }
 
-            $container->setAlias($inner, $id)->setPublic($public && !$private)->setPrivate($private);
+            $container->setAlias($inner, $id)->setPublic($public)->setPrivate($private);
         }
     }
 }

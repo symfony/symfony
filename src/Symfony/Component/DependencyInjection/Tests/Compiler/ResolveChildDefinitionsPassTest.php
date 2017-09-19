@@ -375,13 +375,13 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', 'stdClass')
-            ->setPrivate(true)
             ->setPublic(true)
+            ->setPrivate(true)
         ;
 
         $container->setAlias('bar', 'foo')
-            ->setPrivate(false)
             ->setPublic(false)
+            ->setPrivate(false)
         ;
 
         $this->process($container);

@@ -20,7 +20,7 @@
     </parameter>
   </parameters>
   <services>
-    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" synthetic="true"/>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
   </services>

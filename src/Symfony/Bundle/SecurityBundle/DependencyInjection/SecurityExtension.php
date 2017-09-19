@@ -154,7 +154,7 @@ class SecurityExtension extends Extension
         $loader->load('security_acl_dbal.xml');
 
         if (null !== $config['connection']) {
-            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']))->setPrivate(true);
         }
 
         $container

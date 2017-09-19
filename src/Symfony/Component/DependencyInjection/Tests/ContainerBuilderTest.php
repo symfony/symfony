@@ -630,6 +630,7 @@ class ContainerBuilderTest extends TestCase
         $container->setParameter('env(HTTP_DUMMY_VAR)', '123');
         $container->register('teatime', 'stdClass')
             ->setProperty('foo', '%env(DUMMY_ENV_VAR)%')
+            ->setPublic(true)
         ;
         $container->compile(true);
 
@@ -687,9 +688,11 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('env(FAKE)', '123');
 
-        $container->register('foo', 'stdClass')->setProperties(array(
-            'fake' => '%env(int:FAKE)%',
-        ));
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperties(array(
+                'fake' => '%env(int:FAKE)%',
+            ));
 
         $container->compile(true);
 
@@ -701,7 +704,9 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('env(FAKE)', null);
 
-        $container->register('foo', 'stdClass')->setProperties(array(
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperties(array(
             'fake' => '%env(int:FAKE)%',
         ));
 
@@ -834,7 +839,7 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
 
-        $container->register('foo', 'BarClass');
+        $container->register('foo', 'BarClass')->setPublic(true);
         $container->getDefinition('foo')->setLazy(true);
 
         $container->compile();
@@ -933,7 +938,7 @@ class ContainerBuilderTest extends TestCase
 
         $container->addDefinitions(array(
             'bar' => $fooDefinition,
-            'bar_user' => $fooUserDefinition,
+            'bar_user' => $fooUserDefinition->setPublic(true),
         ));
 
         $container->compile();
@@ -947,7 +952,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-        $container->setDefinition('a', new Definition('stdClass'));
+        $container->register('a', 'stdClass')->setPublic(true);
         $container->compile();
         $container->set('a', new \stdClass());
     }
@@ -964,7 +969,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $def = new Definition('stdClass');
-        $def->setSynthetic(true);
+        $def->setSynthetic(true)->setPublic(true);
         $container->setDefinition('a', $def);
         $container->compile();
         $container->set('a', $a = new \stdClass());
@@ -1005,10 +1010,10 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
 
         $abstract = new Definition('AbstractClass');
-        $abstract->setAbstract(true);
+        $abstract->setAbstract(true)->setPublic(true);
 
         $container->setDefinition('abstract_service', $abstract);
-        $container->setAlias('abstract_alias', 'abstract_service');
+        $container->setAlias('abstract_alias', 'abstract_service')->setPublic(true);
 
         $container->compile();
 
@@ -1022,6 +1027,7 @@ class ContainerBuilderTest extends TestCase
             $container->set('a', new \BazClass());
             $definition = new Definition('BazClass');
             $definition->setLazy(true);
+            $definition->setPublic(true);
             $container->setDefinition('a', $definition);
         });
 
@@ -1049,6 +1055,7 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass');
         $container->register('bar', 'MethodCallClass')
+            ->setPublic(true)
             ->setProperty('simple', 'bar')
             ->setProperty('complex', new Reference('foo'))
             ->addMethodCall('callMe');
@@ -1062,9 +1069,10 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register(A::class);
+        $container->register(A::class)->setPublic(true);
         $bDefinition = $container->register('b', __NAMESPACE__.'\B');
         $bDefinition->setAutowired(true);
+        $bDefinition->setPublic(true);
 
         $container->compile();
 
@@ -1123,12 +1131,13 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo_service', ServiceLocator::class)
+            ->setPublic(true)
             ->addArgument(array(
                 'bar' => new ServiceClosureArgument(new Reference('bar_service')),
                 'baz' => new ServiceClosureArgument(new TypedReference('baz_service', 'stdClass')),
             ))
         ;
-        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
+        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')))->setPublic(true);
         $container->register('baz_service', 'stdClass')->setPublic(false);
         $container->compile();
 
@@ -1182,9 +1191,9 @@ class ContainerBuilderTest extends TestCase
     public function testCaseSensitivity()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass');
+        $container->register('foo', 'stdClass')->setPublic(true);
         $container->register('Foo', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(false);
-        $container->register('fOO', 'stdClass')->setProperty('Foo', new Reference('Foo'));
+        $container->register('fOO', 'stdClass')->setProperty('Foo', new Reference('Foo'))->setPublic(true);
 
         $this->assertSame(array('service_container', 'foo', 'Foo', 'fOO', 'Psr\Container\ContainerInterface', 'Symfony\Component\DependencyInjection\ContainerInterface'), $container->getServiceIds());
 
@@ -1198,6 +1207,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar', 'FOO' => 'BAR')));
         $container->register('foo', 'stdClass')
+            ->setPublic(true)
             ->setProperty('foo', '%FOO%');
 
         $container->compile();

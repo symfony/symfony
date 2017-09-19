@@ -9,6 +9,7 @@ $container = new ContainerBuilder();
 $container->
     register('foo', 'FooClass')->
     addArgument(new Reference('bar'))
+    ->setPublic(true)
 ;
 
 return $container;

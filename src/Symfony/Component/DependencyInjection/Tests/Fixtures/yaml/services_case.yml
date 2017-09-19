@@ -1,4 +1,5 @@
 services:
+    _defaults: {public: true}
     bar:
         class: stdClass
     Bar:

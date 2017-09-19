@@ -35,7 +35,7 @@ class Definition
     private $configurator;
     private $tags = array();
     private $public = true;
-    private $private = false;
+    private $private = true;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
@@ -602,6 +602,7 @@ class Definition
         $this->changes['public'] = true;
 
         $this->public = (bool) $boolean;
+        $this->private = false;
 
         return $this;
     }

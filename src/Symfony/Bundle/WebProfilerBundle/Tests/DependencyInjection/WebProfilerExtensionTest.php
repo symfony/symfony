@@ -123,6 +123,9 @@ class WebProfilerExtensionTest extends TestCase
 
     private function getCompiledContainer()
     {
+        if ($this->container->has('web_profiler.debug_toolbar')) {
+            $this->container->getDefinition('web_profiler.debug_toolbar')->setPublic(true);
+        }
         $this->container->compile();
         $this->container->set('kernel', $this->kernel);
 

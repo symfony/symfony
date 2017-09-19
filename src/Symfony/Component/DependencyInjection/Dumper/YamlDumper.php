@@ -74,8 +74,8 @@ class YamlDumper extends Dumper
             $code .= sprintf("        class: %s\n", $this->dumper->dump($class));
         }
 
-        if (!$definition->isPublic()) {
-            $code .= "        public: false\n";
+        if (!$definition->isPrivate()) {
+            $code .= sprintf("        public: %s\n", $definition->isPublic() ? 'true' : 'false');
         }
 
         $tagsCode = '';
@@ -170,11 +170,11 @@ class YamlDumper extends Dumper
      */
     private function addServiceAlias($alias, $id)
     {
-        if ($id->isPublic()) {
+        if ($id->isPrivate()) {
             return sprintf("    %s: '@%s'\n", $alias, $id);
         }
 
-        return sprintf("    %s:\n        alias: %s\n        public: false\n", $alias, $id);
+        return sprintf("    %s:\n        alias: %s\n        public: %s\n", $alias, $id, $id->isPublic() ? 'true' : 'false');
     }
 
     /**

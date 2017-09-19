@@ -122,8 +122,8 @@ class XmlDumper extends Dumper
         if (!$definition->isShared()) {
             $service->setAttribute('shared', 'false');
         }
-        if (!$definition->isPublic()) {
-            $service->setAttribute('public', 'false');
+        if (!$definition->isPrivate()) {
+            $service->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         }
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
@@ -235,8 +235,8 @@ class XmlDumper extends Dumper
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
         $service->setAttribute('alias', $id);
-        if (!$id->isPublic()) {
-            $service->setAttribute('public', 'false');
+        if (!$id->isPrivate()) {
+            $service->setAttribute('public', $id->isPublic() ? 'true' : 'false');
         }
         $parent->appendChild($service);
     }

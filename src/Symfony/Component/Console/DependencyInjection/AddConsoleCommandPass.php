@@ -65,8 +65,8 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 if (isset($serviceIds[$commandId]) || $container->hasAlias($commandId)) {
                     $commandId = $commandId.'_'.$id;
                 }
-                if (!$definition->isPublic()) {
-                    $container->setAlias($commandId, $id);
+                if (!$definition->isPublic() || $definition->isPrivate()) {
+                    $container->setAlias($commandId, $id)->setPublic(true);
                     $id = $commandId;
                 }
                 $serviceIds[$commandId] = $id;
@@ -97,6 +97,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
         $container
             ->register($this->commandLoaderServiceId, ContainerCommandLoader::class)
+            ->setPublic(true)
             ->setArguments(array(ServiceLocatorTagPass::register($container, $lazyCommandRefs), $lazyCommandMap));
 
         $container->setParameter('console.command.ids', $serviceIds);

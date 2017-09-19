@@ -1,6 +1,7 @@
 services:
     service_container:
         class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
         synthetic: true
     Psr\Container\ContainerInterface:
         alias: service_container

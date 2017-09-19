@@ -36,12 +36,14 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         foreach ($container->getDefinitions() as $definition) {
             if ($definition->isPrivate()) {
                 $definition->setPublic(false);
+                $definition->setPrivate(true);
             }
         }
 
         foreach ($container->getAliases() as $alias) {
             if ($alias->isPrivate()) {
                 $alias->setPublic(false);
+                $alias->setPrivate(true);
             }
         }
     }
@@ -140,7 +142,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
         } else {
-            $def->setPrivate($definition->isPrivate() || $parentDef->isPrivate());
+            $def->setPrivate($parentDef->isPrivate());
         }
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());

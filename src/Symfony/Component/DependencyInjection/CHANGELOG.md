@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * deprecated "public-by-default" definitions and aliases, the new default will be "private" in 4.0
  * added `EnvVarProcessorInterface` and corresponding "container.env_var_processor" tag for processing env vars
  * added support for ignore-on-uninitialized references
  * deprecated service auto-registration while autowiring

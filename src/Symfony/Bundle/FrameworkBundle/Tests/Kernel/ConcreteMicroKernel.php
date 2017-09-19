@@ -82,7 +82,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         ));
 
         $c->setParameter('halloween', 'Have a great day!');
-        $c->register('halloween', 'stdClass');
+        $c->register('halloween', 'stdClass')->setPublic(true);
     }
 
     /**

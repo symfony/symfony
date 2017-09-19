@@ -72,6 +72,7 @@ trait MicroKernelTrait
             if ($this instanceof EventSubscriberInterface) {
                 $container->register('kernel', static::class)
                     ->setSynthetic(true)
+                    ->setPublic(true)
                     ->addTag('kernel.event_subscriber')
                 ;
             }

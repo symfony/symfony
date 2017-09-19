@@ -52,6 +52,7 @@ class ProjectServiceContainer extends Container
         );
         $this->privates = array(
             'factory_simple' => true,
+            'service_container' => true,
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',

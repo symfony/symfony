@@ -185,7 +185,7 @@ class SecurityExtension extends Extension
         $container->getAlias('security.acl.provider')->setPrivate(true);
 
         if (null !== $config['connection']) {
-            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']))->setPrivate(true);
         }
 
         $container

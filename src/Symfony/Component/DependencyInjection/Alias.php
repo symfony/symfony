@@ -15,7 +15,7 @@ class Alias
 {
     private $id;
     private $public;
-    private $private = false;
+    private $private;
 
     /**
      * @param string $id     Alias identifier
@@ -25,6 +25,7 @@ class Alias
     {
         $this->id = (string) $id;
         $this->public = $public;
+        $this->private = 2 > func_num_args();
     }
 
     /**
@@ -47,6 +48,7 @@ class Alias
     public function setPublic($boolean)
     {
         $this->public = (bool) $boolean;
+        $this->private = false;
 
         return $this;
     }

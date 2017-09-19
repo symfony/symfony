@@ -4,6 +4,9 @@ UPGRADE FROM 3.3 to 3.4
 DependencyInjection
 -------------------
 
+ * Definitions and aliases will be made private by default in 4.0. You should either use service injection
+   or explicitly define your services as public if you really need to inject the container.
+
  * Relying on service auto-registration while autowiring is deprecated and won't be supported
    in Symfony 4.0. Explicitly inject your dependencies or create services
    whose ids are their fully-qualified class name.
@@ -154,7 +157,7 @@ FrameworkBundle
  * The `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`
    class has been deprecated and will be removed in 4.0. Use the
    `Symfony\Component\Translation\Reader\TranslationReader` class instead.
-   
+
  * The `translation.loader` service has been deprecated and will be removed in 4.0.
    Use the `translation.reader` service instead..
 
@@ -269,9 +272,9 @@ SecurityBundle
 Translation
 -----------
 
- * `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations` has been deprecated 
-   and will be removed in 4.0, use `Symfony\Component\Translation\Writer\TranslationWriter::write` 
-   instead. 
+ * `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations` has been deprecated
+   and will be removed in 4.0, use `Symfony\Component\Translation\Writer\TranslationWriter::write`
+   instead.
 
  * Passing a `Symfony\Component\Translation\MessageSelector` to `Translator` has been
    deprecated. You should pass a message formatter instead

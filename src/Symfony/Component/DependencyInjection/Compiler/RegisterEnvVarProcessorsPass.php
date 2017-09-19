@@ -52,6 +52,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
                 $bag->setProvidedTypes($types);
             }
             $container->register('container.env_var_processors_locator', ServiceLocator::class)
+                ->setPublic(true)
                 ->setArguments(array($processors))
             ;
         }

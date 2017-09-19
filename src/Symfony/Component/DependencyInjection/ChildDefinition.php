@@ -30,6 +30,7 @@ class ChildDefinition extends Definition
     public function __construct($parent)
     {
         $this->parent = $parent;
+        $this->setPrivate(false);
     }
 
     /**

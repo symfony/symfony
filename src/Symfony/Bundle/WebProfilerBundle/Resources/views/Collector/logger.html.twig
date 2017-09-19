@@ -187,7 +187,7 @@
     {% import _self as helper %}
     {% set channel_is_defined = (logs|first).channel is defined %}
 
-    <table class="logs">
+    <table class="logs"{% if show_level %} data-log-levels="Emergency,Alert,Critical,Error,Warning,Notice,Info"{% endif %}>
         <thead>
             <tr>
                 <th>{{ show_level ? 'Level' : 'Time' }}</th>
@@ -202,7 +202,7 @@
                     : log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error'
                     : log.priorityName == 'WARNING' ? 'status-warning'
                 %}
-                <tr class="{{ css_class }}">
+                <tr class="{{ css_class }}"{% if show_level %} data-log-level="{{ log.priorityName|lower }}"{% endif %}>
                     <td class="font-normal text-small" nowrap>
                         {% if show_level %}
                             <span class="colored text-bold">{{ log.priorityName }}</span>
@@ -225,6 +225,10 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% if show_level %}
+        <script>Sfjs.createLogLevels();</script>
+    {% endif %}
 {% endmacro %}
 
 {% macro render_log_message(category, log_index, log) %}

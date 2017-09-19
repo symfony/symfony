@@ -125,6 +125,14 @@ header .container { display: flex; justify-content: space-between; }
 
 .trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
 
+table.logs tr td:last-child { width: 100%; }
+
+.log-levels { width: 100%; margin: 0; padding: 0; display: flex; align-items: center; list-style: none; }
+.log-levels li { width: 100%; padding: 3px; margin: 0; cursor: pointer; text-align: center; border: 2px dashed #e0e0e0; border-radius: 5px; color: #888; }
+.log-levels li + li { margin-left: 10px; }
+.log-levels li.active { background: #eee; color: #666; border-style: solid; border-width: 1px; padding: 4px; border-color: #aaa; }
+.log-levels li.last-active { cursor: not-allowed; }
+
 @media (min-width: 575px) {
     .hidden-xs-down { display: initial; }
     .help-link { margin-left: 30px; }

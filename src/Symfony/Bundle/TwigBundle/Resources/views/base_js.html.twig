@@ -171,6 +171,53 @@
 
                     toggles[i].setAttribute('data-processed', 'true');
                 }
+            },
+
+            createLogLevels: function() {
+                document.querySelectorAll('.logs[data-log-levels]').forEach(function (el) {
+                    var bullets = document.createElement('ul'),
+                        levels = el.getAttribute('data-log-levels').toLowerCase().split(','),
+                        defaultLevel = el.hasAttribute('data-default-log-level') ? levels.indexOf(el.getAttribute('data-default-log-level').toLowerCase()) : levels.length - 1;
+                    addClass(bullets, 'log-levels');
+                    el.getAttribute('data-log-levels').split(',').forEach(function (level, i) {
+                        var bullet = document.createElement('li');
+                        bullet.innerText = level;
+                        bullet.setAttribute('data-log-level', String(i));
+                        bullets.appendChild(bullet);
+                        addEventListener(bullet, 'click', function() {
+                            if (i === this.parentNode.querySelectorAll('.active').length - 1) {
+                                return;
+                            }
+                            this.parentNode.querySelectorAll('li').forEach(function (bullet, j) {
+                                if (parseInt(bullet.getAttribute('data-log-level')) <= levels.indexOf(level.toLowerCase())) {
+                                    addClass(bullet, 'active');
+                                    if (i === j) {
+                                        addClass(bullet, 'last-active');
+                                    } else {
+                                        removeClass(bullet, 'last-active');
+                                    }
+                                } else {
+                                    removeClass(bullet, 'active');
+                                    removeClass(bullet, 'last-active');
+                                }
+                            });
+                            el.querySelectorAll('tr[data-log-level]').forEach(function (row) {
+                                row.style.display = i < levels.indexOf(row.getAttribute('data-log-level')) ? 'none' : '';
+                            });
+                        });
+                        if (i <= defaultLevel) {
+                            addClass(bullet, 'active');
+                            if (i === defaultLevel) {
+                                addClass(bullet, 'last-active');
+                            }
+                        } else {
+                            el.querySelectorAll('tr[data-log-level="'+level.toLowerCase()+'"]').forEach(function (row) {
+                                row.style.display = 'none';
+                            });
+                        }
+                    });
+                    el.parentNode.insertBefore(bullets, el);
+                });
             }
         };
     })();
@@ -178,6 +225,7 @@
     Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
         Sfjs.createTabs();
         Sfjs.createToggles();
+        Sfjs.createLogLevels();
     });
 
 /*]]>*/</script>

@@ -26,6 +26,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     const ENCLOSURE_KEY = 'csv_enclosure';
     const ESCAPE_CHAR_KEY = 'csv_escape_char';
     const KEY_SEPARATOR_KEY = 'csv_key_separator';
+    const HEADERS_KEY = 'csv_headers';
 
     private $delimiter;
     private $enclosure;
@@ -70,7 +71,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             }
         }
 
-        list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
+        list($delimiter, $enclosure, $escapeChar, $keySeparator, $headers) = $this->getCsvOptions($context);
 
         foreach ($data as &$value) {
             $flattened = array();
@@ -79,7 +80,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         unset($value);
 
-        $headers = $this->extractHeaders($data);
+        $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
 
         fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
 
@@ -196,8 +197,13 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $enclosure = isset($context[self::ENCLOSURE_KEY]) ? $context[self::ENCLOSURE_KEY] : $this->enclosure;
         $escapeChar = isset($context[self::ESCAPE_CHAR_KEY]) ? $context[self::ESCAPE_CHAR_KEY] : $this->escapeChar;
         $keySeparator = isset($context[self::KEY_SEPARATOR_KEY]) ? $context[self::KEY_SEPARATOR_KEY] : $this->keySeparator;
+        $headers = isset($context[self::HEADERS_KEY]) ? $context[self::HEADERS_KEY] : array();
 
-        return array($delimiter, $enclosure, $escapeChar, $keySeparator);
+        if (!is_array($headers)) {
+            throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, gettype($headers)));
+        }
+
+        return array($delimiter, $enclosure, $escapeChar, $keySeparator, $headers);
     }
 
     /**

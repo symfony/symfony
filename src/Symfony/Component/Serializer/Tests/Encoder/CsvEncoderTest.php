@@ -153,6 +153,26 @@ CSV;
         $this->assertEquals($csv, $this->encoder->encode($value, 'csv'));
     }
 
+    public function testEncodeCustomHeaders()
+    {
+        $context = array(
+            CsvEncoder::HEADERS_KEY => array(
+                'b',
+                'c',
+            ),
+        );
+        $value = array(
+            array('a' => 'foo', 'b' => 'bar'),
+        );
+        $csv = <<<CSV
+b,c,a
+bar,,foo
+
+CSV;
+
+        $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
+    }
+
     public function testSupportsDecoding()
     {
         $this->assertTrue($this->encoder->supportsDecoding('csv'));

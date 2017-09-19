@@ -33,7 +33,6 @@ class ProjectServiceContainer extends Container
         );
         $this->privates = array(
             'private_foo' => true,
-            'service_container' => true,
         );
 
         $this->aliases = array();

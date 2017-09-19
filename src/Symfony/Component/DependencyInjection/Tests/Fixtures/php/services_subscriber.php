@@ -38,7 +38,6 @@ class ProjectServiceContainer extends Container
         );
         $this->privates = array(
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
-            'service_container' => true,
         );
 
         $this->aliases = array();

@@ -31,7 +31,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->setProxyInstantiator(new RuntimeInstantiator());
 
-        $builder->register('foo1', 'ProxyManagerBridgeFooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
+        $builder->register('foo1', 'ProxyManagerBridgeFooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php')->setPublic(true);
         $builder->getDefinition('foo1')->setLazy(true);
 
         $builder->compile();

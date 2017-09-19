@@ -52,7 +52,6 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
             'private_not_inlined' => true,
             'private_not_removed' => true,
             'private_parent' => true,
-            'service_container' => true,
         );
         $this->aliases = array(
             'alias_to_private' => 'private',

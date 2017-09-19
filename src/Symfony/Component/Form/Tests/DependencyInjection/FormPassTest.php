@@ -51,8 +51,8 @@ class FormPassTest extends TestCase
         $container = $this->createContainerBuilder();
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
-        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type');
-        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type');
+        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
+        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
 
         $container->compile();
 
@@ -73,8 +73,8 @@ class FormPassTest extends TestCase
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
         $container->setDefinition(DebugCommand::class, $this->createDebugCommandDefinition());
-        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type');
-        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type');
+        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
+        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
 
         $container->compile();
 
@@ -163,6 +163,7 @@ class FormPassTest extends TestCase
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
         $container->register('my.type_extension', 'stdClass')
+            ->setPublic(true)
             ->addTag('form.type_extension');
 
         $container->compile();
@@ -178,8 +179,8 @@ class FormPassTest extends TestCase
         $definition2->addTag('form.type_guesser');
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
-        $container->setDefinition('my.guesser1', $definition1);
-        $container->setDefinition('my.guesser2', $definition2);
+        $container->setDefinition('my.guesser1', $definition1)->setPublic(true);
+        $container->setDefinition('my.guesser2', $definition2)->setPublic(true);
 
         $container->compile();
 
@@ -249,6 +250,7 @@ class FormPassTest extends TestCase
     private function createExtensionDefinition()
     {
         $definition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
+        $definition->setPublic(true);
         $definition->setArguments(array(
             array(),
             array(),
@@ -261,6 +263,7 @@ class FormPassTest extends TestCase
     private function createDebugCommandDefinition()
     {
         $definition = new Definition('Symfony\Component\Form\Command\DebugCommand');
+        $definition->setPublic(true);
         $definition->setArguments(array(
             $formRegistry = $this->getMockBuilder(FormRegistryInterface::class)->getMock(),
             array(),

@@ -56,10 +56,11 @@ class ServiceResetListenerTest extends TestCase
     private function buildContainer()
     {
         $container = new ContainerBuilder();
-        $container->register('one', ResettableService::class);
-        $container->register('two', ClearableService::class);
+        $container->register('one', ResettableService::class)->setPublic(true);
+        $container->register('two', ClearableService::class)->setPublic(true);
 
         $container->register('reset_subscriber', ServiceResetListener::class)
+            ->setPublic(true)
             ->addArgument(new IteratorArgument(array(
                 'one' => new Reference('one', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
                 'two' => new Reference('two', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),

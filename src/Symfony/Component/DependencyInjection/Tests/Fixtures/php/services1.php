@@ -27,9 +27,6 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         $this->services = array();
-        $this->privates = array(
-            'service_container' => true,
-        );
 
         $this->aliases = array();
     }

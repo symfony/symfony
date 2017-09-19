@@ -130,6 +130,13 @@ class TwigExtension extends Extension
             foreach ($bundle['paths'] as $path) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
+
+            // add exclusive namespace for root bundles only
+            // to override a bundle template that also extends itself
+            if (count($bundle['paths']) > 0 && 0 === count($bundle['parents'])) {
+                // the last path must be the bundle views directory
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array(end($bundle['paths']), '!'.$namespace));
+            }
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {

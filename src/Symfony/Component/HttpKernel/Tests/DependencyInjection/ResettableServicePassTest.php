@@ -18,11 +18,14 @@ class ResettableServicePassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('one', ResettableService::class)
+            ->setPublic(true)
             ->addTag('kernel.reset', array('method' => 'reset'));
         $container->register('two', ClearableService::class)
+            ->setPublic(true)
             ->addTag('kernel.reset', array('method' => 'clear'));
 
         $container->register(ServiceResetListener::class)
+            ->setPublic(true)
             ->setArguments(array(null, array()));
         $container->addCompilerPass(new ResettableServicePass('kernel.reset'));
 

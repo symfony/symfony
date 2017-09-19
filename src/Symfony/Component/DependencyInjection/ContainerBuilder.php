@@ -126,7 +126,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         parent::__construct($parameterBag);
 
         $this->trackResources = interface_exists('Symfony\Component\Config\Resource\ResourceInterface');
-        $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true));
+        $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true)->setPublic(true));
         $this->setAlias(PsrContainerInterface::class, new Alias('service_container', false));
         $this->setAlias(ContainerInterface::class, new Alias('service_container', false));
     }
@@ -563,6 +563,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
+        if ($this->isCompiled()) {
+            $id = $this->normalizeId($id);
+
+            if (isset($this->definitions[$id]) && $this->definitions[$id]->isPrivate()) {
+                @trigger_error(sprintf('Fetching the "%s" private service is deprecated and will fail in Symfony 4.0. Make the service public instead.', $id), E_USER_DEPRECATED);
+            }
+            if (isset($this->aliasDefinitions[$id]) && $this->aliasDefinitions[$id]->isPrivate()) {
+                @trigger_error(sprintf('Fetching the "%s" private alias is deprecated and will fail in Symfony 4.0. Make the alias public instead.', $id), E_USER_DEPRECATED);
+            }
+        }
+
+        return $this->doGet($id, $invalidBehavior);
+    }
+
+    private function doGet($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+    {
         $id = $this->normalizeId($id);
 
         if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
@@ -573,7 +589,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->get((string) $this->aliasDefinitions[$id], $invalidBehavior);
+            return $this->doGet((string) $this->aliasDefinitions[$id], $invalidBehavior);
         }
 
         try {
@@ -1122,7 +1138,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $callable[0] = $parameterBag->resolveValue($callable[0]);
 
                 if ($callable[0] instanceof Reference) {
-                    $callable[0] = $this->get((string) $callable[0], $callable[0]->getInvalidBehavior());
+                    $callable[0] = $this->doGet((string) $callable[0], $callable[0]->getInvalidBehavior());
                 } elseif ($callable[0] instanceof Definition) {
                     $callable[0] = $this->createService($callable[0], null);
                 }
@@ -1166,7 +1182,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         }
                     }
                     foreach (self::getInitializedConditionals($v) as $s) {
-                        if (!$this->get($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
+                        if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
                             continue 2;
                         }
                     }
@@ -1182,7 +1198,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         }
                     }
                     foreach (self::getInitializedConditionals($v) as $s) {
-                        if (!$this->get($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
+                        if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
                             continue 2;
                         }
                     }
@@ -1193,7 +1209,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $count;
             });
         } elseif ($value instanceof Reference) {
-            $value = $this->get((string) $value, $value->getInvalidBehavior());
+            $value = $this->doGet((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
         } elseif ($value instanceof Expression) {
@@ -1518,7 +1534,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
         foreach (self::getInitializedConditionals($call[1]) as $s) {
-            if (!$this->get($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
+            if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
                 return;
             }
         }

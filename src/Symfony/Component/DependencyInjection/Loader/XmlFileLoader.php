@@ -255,11 +255,7 @@ class XmlFileLoader extends FileLoader
             $definition->setChanges(array());
         }
 
-        if ($publicAttr = $service->getAttribute('public')) {
-            $definition->setPublic(XmlUtils::phpize($publicAttr));
-        }
-
-        foreach (array('class', 'shared', 'synthetic', 'lazy', 'abstract') as $key) {
+        foreach (array('class', 'public', 'shared', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 $method = 'set'.$key;
                 $definition->$method(XmlUtils::phpize($value));

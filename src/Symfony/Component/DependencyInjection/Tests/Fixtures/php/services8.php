@@ -29,9 +29,6 @@ class ProjectServiceContainer extends Container
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = array();
-        $this->privates = array(
-            'service_container' => true,
-        );
 
         $this->aliases = array();
     }

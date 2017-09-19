@@ -31,9 +31,6 @@ class ProjectServiceContainer extends Container
             'service_from_anonymous_factory' => 'getServiceFromAnonymousFactoryService',
             'service_with_method_call_and_factory' => 'getServiceWithMethodCallAndFactoryService',
         );
-        $this->privates = array(
-            'service_container' => true,
-        );
 
         $this->aliases = array();
     }

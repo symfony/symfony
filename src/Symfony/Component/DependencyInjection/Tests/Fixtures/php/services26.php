@@ -36,9 +36,6 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         $this->methodMap = array(
             'test' => 'getTestService',
         );
-        $this->privates = array(
-            'service_container' => true,
-        );
 
         $this->aliases = array();
     }

@@ -29,9 +29,6 @@ class Container extends AbstractContainer
     public function __construct()
     {
         $this->services = array();
-        $this->privates = array(
-            'service_container' => true,
-        );
 
         $this->aliases = array();
     }

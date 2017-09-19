@@ -52,11 +52,11 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
         $this->container = new ContainerBuilder();
-        $this->container->register('event_dispatcher', EventDispatcher::class);
-        $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));
-        $this->container->register('twig', 'Twig\Environment');
-        $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument(array());
-        $this->container->register('twig', 'Twig\Environment')->addArgument(new Reference('twig_loader'));
+        $this->container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
+        $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'))->setPublic(true);
+        $this->container->register('twig', 'Twig\Environment')->setPublic(true);
+        $this->container->register('twig_loader', 'Twig\Loader\ArrayLoader')->addArgument(array())->setPublic(true);
+        $this->container->register('twig', 'Twig\Environment')->addArgument(new Reference('twig_loader'))->setPublic(true);
         $this->container->setParameter('kernel.bundles', array());
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
@@ -65,6 +65,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('debug.file_link_format', null);
         $this->container->setParameter('profiler.class', array('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'));
         $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
+            ->setPublic(true)
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
         $this->container->setParameter('data_collector.templates', array());
         $this->container->set('kernel', $this->kernel);
@@ -123,6 +124,9 @@ class WebProfilerExtensionTest extends TestCase
 
     private function getCompiledContainer()
     {
+        if ($this->container->has('web_profiler.debug_toolbar')) {
+            $this->container->getDefinition('web_profiler.debug_toolbar')->setPublic(true);
+        }
         $this->container->compile();
         $this->container->set('kernel', $this->kernel);
 

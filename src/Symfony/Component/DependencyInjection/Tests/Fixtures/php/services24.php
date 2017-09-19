@@ -30,9 +30,6 @@ class ProjectServiceContainer extends Container
         $this->methodMap = array(
             'foo' => 'getFooService',
         );
-        $this->privates = array(
-            'service_container' => true,
-        );
 
         $this->aliases = array();
     }

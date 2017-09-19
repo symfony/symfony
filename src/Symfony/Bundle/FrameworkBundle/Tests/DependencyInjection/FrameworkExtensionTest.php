@@ -953,6 +953,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->loadFromFile($container, 'default_config');
         $container
             ->register('foo', \stdClass::class)
+            ->setPublic(true)
             ->setProperty('dispatcher', new Reference('event_dispatcher'));
         $container->compile();
         $this->assertInstanceOf(EventDispatcherInterface::class, $container->get('foo')->dispatcher);

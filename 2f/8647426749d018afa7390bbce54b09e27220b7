@@ -1,0 +1,970 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-08T19:41:53Z
+
+(continuing https://github.com/symfony/symfony/pull/23834#discussion_r131993356)
+
+> Isn't it simpler to use $this, and have the PhpFileLoader or equivalent being the current context?
+
+Fortunately, the current context is already the PhpFileLoader instance, so `$this` is the correct one.
+That's how I started in fact, but wasn't convinced. We can try harder. With functions, it looked nicer to me (no matter the implementation, which is not the thing I tried to optimize.)
+
+> This also leads to easy auto-completion in the file itself
+
+don't you have auto-completion here also with the functions in the current namespace?
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2017-08-08T19:44:01Z
+
+ > don't you have auto-completion here also with the functions in the current namespace?
+
+Yes, but with an ugly ugly hack ;-)
+
+Just using `$this` is perfectly fine
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-08T20:23:48Z
+
+Very happy to see this,
+
+> The referenced issue was using an array-like syntax (service(MyService::class) vs [MyService::class => service()]),
+> but having the $id of the services while creating or loading them allows better error messages, and is required for the load() function anyway. It also requires less keystrokes.
+
+Not sure about error messages, but the main motivation I had to write an array is that it looks more like configuration (i.e. an array of container definitions, much like a service provider). The example of a file containing method calls looks more like a script/actions.
+
+I believe also the issue with `$this` stems from the fact that global function calls affect a specific container instance. With an array that problem disappears because the array is simply a list of definitions, which can then be applied to a container but the list (the array) is not tied to a specific instance. Easier to reason about IMO.
+
+Maybe another option would be an in-between (same example as above):
+
+```php
+namespace Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+
+use App\MyService;
+
+return [
+
+    // loads another resource
+    import('another_file.yml'),
+
+    // applies to any following services
+    _defaults()->private()->autowire()->autoconfigure(),
+
+    // creates a parameter named "foo"
+    param('foo', 'bar'),
+
+    // creates a public service whose id<>class is "App\MyService"
+    service(MyService::class)->public(),
+
+    // loads all classes in the `../src` directory, relative to the current file
+    load('App\\', '../src/*', '../../src/{Entity,Repository}'),
+
+]
+```
+
+I concede it's a bit less practical to type (indentation, and don't forget the `,` at the end of the line) but now it looks more like a list of definitions.
+
+And I'm biased of course but a comparison with an array indexed by ids:
+
+```php
+namespace Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+
+use App\MyService;
+
+return [
+
+    // loads another resource
+    import('another_file.yml'),
+
+    // applies to any following services
+    _defaults()->private()->autowire()->autoconfigure(),
+
+    // creates a parameter named "foo"
+   'foo' => 'bar',
+
+    // creates a public service whose id<>class is "App\MyService"
+    MyService::class => service()->public(),
+
+    // loads all classes in the `../src` directory, relative to the current file
+    load('App\\', '../src/*', '../../src/{Entity,Repository}'),
+
+]
+```
+
+Not much difference in this example except for services and parameters. In a "regular" configuration file the difference will be more striking (I especially like shortcuts like for parameters, or setting up a service for autowiring, etc.).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-08T20:57:21Z
+
+@mnapoli there is a major feature that I did not emphasis enough in the description:
+accurate error reporting.
+
+All the array-like syntax can't report errors accurately. With the implementation in this PR, exceptions will report the line where the error occurred, taking the context into account (eg using a ChildDefinition with incompatible things in "_defaults".)
+
+That's THE feature that kills array-like variants to me. Imagine the number of people that WILL do mistake and spot where in a snap. That's of paramount importance.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-08T21:02:38Z
+
+Current status:
+
+![capture d ecran 2017-08-08 a 23 00 16](https://user-images.githubusercontent.com/720328/29094370-6235d720-7c8d-11e7-8cfa-d5a4360154b6.png)
+
+Yep that's a good point! The file/line of the definition could be stored by playing with `debug_backtrace()` but then it could be usable only in the exception message, not the exception stack trace I guess…
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-09T06:42:55Z
+
+I like the DX part of _writing_ this configuration, I'm concerned about debugging though. `PhpFileLoader::call()` does some nasty (yet interesting) stuff which might make finding bugs a lot harder for developers that think they might have found a bug, or developers that do encounter bugs with (for example) multiple containers. @Ocramius made a valid point, if it looks like an ugly hack, it probably is an ugly hack.
+
+I would also like to see a lot more information in the docblocks in `functions.php`, as this will be the API we would be using.
+
+While I'm not sure about the implementation, I think it's a very good step in the right direction when writing service configurations!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-09T07:36:53Z
+
+Nice :) I dont really get why you prefer __call though.
+
+About the implem. why not inverse the logic? Register the container from load() (`set($container)`?), and use `get()`? from there...
+
+Also consider some plural functions like `imports(), aliases(), params()`.
+
+> Not sure about error messages, but the main motivation I had to write an array is that it looks more like configuration (i.e. an array of container definitions, much like a service provider). The example of a file containing method calls looks more like a script/actions.
+
+Im btw in favor of the latter; no extra array boilerplate syntax.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-09T08:07:19Z
+
+@ro0NL `__call` is used only in places where function names are using reserved keywords of PHP 5.x (which are allowed when calling functions, but not when defining them). They can be replaced by actual methods in 4.0 when dropping support for PHP 5.X.
+
+Regarding the plural functions, this would be a pain for the returned configurator object allow further configuration.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-08-09T22:08:13Z
+
+I thought #23819 is the better way to go and replaces the need for this.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-10T06:41:52Z
+
+In my opinion, a fluent interface is only useful when it's fully used as a fluent interface. I type `$this->` and my IDE autocompletes everything. I don't have to learn anything, I don't have to read any doc and things are always up-to-date because it's autocompleted from the code.
+
+Defining a bunch of global functions `param()`, `service()`, etc. may look useful, but it's not that useful because I must learn all those global shortcuts. In fact, it increases the cognitive load of the framework and its learning curve.
+
+If we want to do that, we can think of a nice fluent interface to configure everything. Quick refactor of the previous examples:
+
+```php
+return $this
+    ->makePublicAllServices(false)
+    ->autowireAllServices(true)
+    ->autoconfigureAllServices(true)
+
+    ->import('another_file.yml')
+
+    ->parameter('key', 'value')
+
+    ->service(MyService::class)
+        ->public()
+    ->service(MyOtherService::class)
+        ->arguments(['dir' => '%kernel.project_dir%'])
+
+    ->load('App\\', '../src/*', '../../src/{Entity,Repository}')
+;
+```
+
+According to our latest community survey, 80% of Symfony developers use PHPStorm, so `$this->...`  would be autocompleted for them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-10T07:53:26Z
+
+@javiereguiluz, as @stof said:
+
+> this would be a pain for the returned configurator object allow further configuration.
+
+what it means is that long fluent string, with un-indentation to close a service, that you as a human sees as a termination of a service declaration, neither PHP nor PhpStorm sees it as such. I've been told by the same PhpStorm users that the fluent interface of the Config component is a pain because of this reason. The `;` to "commit" a service/param/etc. is the salvatory syntax that removes any ambiguities.
+
+Then, doing `$this->service()` instead of just `service()` is adding boilerplate for no reason.
+When you type in Yaml, you don't "return" nor reference "$this". Same here, the DSL is declarative. BTW, "$this" here is meaningless for PhpStorm because we are not inside a class. To make it meaningful, you need to add another type annotation. More boilerplate.
+
+Since functions are namespaced, PhpStorm is perfectly able to autocomplete them. About the mental overhead, that'll help a lot. The fact that the vocabulary closely matches what people are used to in yaml/xml also helps reduce the mental overhead.
+
+The more I work on this, the more I like the current syntax. It's straightforward.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-10T08:15:07Z
+
+> what it means is that long fluent string, with un-indentation to close a service, that you as a human sees as a termination of a service declaration, neither PHP nor PhpStorm sees it as such.
+
+You can solve this with code and without having to add those ugly `end()` methods. I did it for the fluent config of [this bundle](https://github.com/EasyCorp/easy-deploy-bundle/blob/master/doc/default-deployer.md).
+
+> I've been told by the same PhpStorm users that the fluent interface of the Config component is a pain because of this reason.
+
+I agree, the Config component is a pain, and not only because of the `end()` methods.
+
+I'm not saying that your proposal is wrong. I'm saying that your proposal requires me to learn and remember the names and usages of a bunch of global functions. The real fluent interface requires me to learn nothing. I type `$this->` and everything flows smoothly.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2017-08-10T08:17:14Z
+
+ > When you type in Yaml
+
+First mistake :P
+
+ > Then, doing `$this->service()` instead of just `service()` is adding boilerplate for no reason.
+
+It is giving you automatic documentation and auto-completion though, as @javiereguiluz stated.
+In addition to that, all you are doing with the `debug_backtrace()` mumbo-jumbo (that somebody will have to debug at some point) is just providing an implicit `$this`: that's a lot of magic just to save typing the first `$this`. As much as I hate fluent APIs, this is a perfect use-case for one.
+
+ > Since functions are namespaced, PhpStorm is perfectly able to autocomplete them.
+
+You still need to know the namespace and all possible existing functions in there in order to be able to work with it: auto-completion would be manually typing `\The\Names
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-10T08:28:47Z
+
+I think we need to put api functions at least in a dedicated namespace, to improve autocomplete;
+
+![image](https://user-images.githubusercontent.com/1047696/29161279-ebafd108-7db5-11e7-9403-2b573371480d.png)
+
+And while doing so it may open up to be used outside file loader context, ie why cant i do this?
+
+```php
+use Symfony\Component\DependencyInjection\X as fn;
+
+fn\set($container = new ContainerBuilder());
+// configure as usual
+
+$container->compile();
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-10T08:37:29Z
+
+> the debug_backtrace() mumbo-jumbo (that somebody will have to debug at some point)
+
+I think these 4 lines of internal details are a much more affordable technical debts than the Yaml component itself. One I'm wiling to push to the community.
+
+The fluent interface doesn't solve the helpers use case, which are also needed. Writing `$this->ref('foo')` instead of `ref('foo')` looks like another boilerplate that's better removed.
+
+> need to know the namespace
+
+true, that's gonna be easy: just copy past from existing examples, as everyone has to do anyway already with the other formats.
+
+> auto-completion would be manually typing `\The\Names
+
+that copy-pasteable "header" could also be
+`use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as set;` then `set\...`-autocomplete => `set\service()->...`-autocomplete, etc.
+
+or `use function Symfony\Component\DependencyInjection\Loader\PhpFileLoader\{ import, service, param, etc };` and then possible things would just be written explicitly at the top of the file.
+
+All in all I agree with you guys that this targets the highest possible autocompletion experience, so be sure  we're aligned on that.
+
+@javiereguiluz what you achieve in your bundle is really nice, but it works around the issue we have here, which is nesting, so that we can't really take inspiration from it (but it's really nice!).
+
+@ro0NL nice to see you tried, I wish everyone does. Yes, we need to do something here to un-pollute auto-completion.
+
+BTW to all, I dunno what you mean with all the ":-1:", but to me at least, it adds emotional drama to a discussion that should be mostly technical. Not sure it really helps.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-10T08:49:22Z
+
+About the nesting problem, it's simple to solve with smart coding:
+
+1) All methods return `self` to keep the fluent  interface.
+2) Some methods change the behavior of the previous methods.
+
+For example, `public()` and `arguments()` configure a service, so they change the definition of the immediately previous `service()` call. This just requires to save the global state of the config. But it's very simple to do because the number of methods is incredibly limited. This is not a general-purpose configurator.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-10T08:58:22Z
+
+That'd mean all possible options would be provided all the time. Here, that's maybe not visible at glance, but autocompletion is already context full: you'll get only the suggestions that make sense for the current context.
+Eg after parent(), you won't be suggested with autoconfigure(), because that's forbidden anyway. Etc.
+
+That's a major UX feature. Full fluentness doesn't deserve a higher priority to me.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-10T09:08:59Z
+
+To be honest, I like all of the suggestions as they all have their own pros and cons:
+ - `$this->`, more verbose but easier autocomplete
+ - `fn\set()` slightly less verbose and only a single use statement with nice autocomplete
+ - `set()` no "visual debt" (woops), but slightly more difficult UX wise for imports
+ - array notation feels odd because of the extra indent, but really simple and less magic internally
+ - The factory (from #23819) is very verbose but also very powerful
+
+The second and third go hand in hand as they can rely on the same API, but I think I can live with any of those implementations. My criteria would be:
+ - Internal workings can be ugly as long as it doesn't bother the developers (debugging shouldn't be too complex either in case of bugs)
+ - The public API should be intuitive, easy to remember and be IDE friendly without any docblock hacks to get things to work (UX factor)
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-10T11:06:09Z
+
+Just some feedback on my experience with using a similar syntax (i.e. no `$this->`): it works fine, yes you don't get autocompletion for the first letters but if what you have to memorize is `param` and `service` then it's not really an issue. All other scenarios will probably be copy-pasted from the documentation or examples, or even it's easy to autocomplete once you've typed the namespace or the first letters.
+
+So in my experience using that kind of API (on PHP-DI), it's not a problem. The shortness is very enjoyable.
+
+A suggestion: currently the "scope/context" is defined by the file. Why not use a closure to encapsulate the config? That would avoid playing with the backtrace, and that would be a bit clearer? (but that would indent the config by 1 tab)
+I'm thinking this could be also useful to "embedded" config in another file, for example to override a bit of container config in tests, or to write container config in a micro-application (i.e. not having to store it in a separate file). That's a pro (IMO) of array config since it's context-agnostic, so maybe the same could be achieve with a closure here (or any kind of callable?).
+
+Another suggestion: write more specific helpers, e.g. an `autowire()` function to autowire a service? (that way the config is shorter, more explicit, simpler, etc.)
+
+@iltar
+
+> The factory (from #23819) is very verbose but also very powerful
+
+Yes, but with PHP-based config (as opposed to XML/YAML) another possibility opens: using closures to create services (à la Pimple). That would allow to use the "very powerful" aspect of service providers, but still make it optional to not be forced to write verbose config.
+
+And that could be made compatible with Symfony's compilation pass. I've implemented that for PHP-DI 6 (https://github.com/PHP-DI/PHP-DI/pull/507), that might be interesting to leave the door open for that in Symfony?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-11T08:23:10Z
+
+Will param() ever have a configuration chain? it implies void currently.. so from the looks of it we can support `params()` (plural) as well.
+
+Also what about a env param wrapper? `env('X'`)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-11T15:19:16Z
+
+PR updated. This now uses a reduced set of functions. The interface is also now fully fluent. See updated description above and fixtures.
+I added a new `config($namespace, array $config);` function to allow configuring DI extensions.
+
+This made me realize that I forgot to mention another argument for using namespaced functions: extensiblility.
+With things as they are now, any bundle could provide dedicated helpers by providing them right into the namespace. We could imagine typing eg. `di\framework()->...` and be suggested with framework options. That's another major feature I had in mind since the beginning :)
+
+This is now ready for review.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2017-08-11T15:53:24Z
+
+isn't helpful to have a `env()` helper?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-11T16:27:56Z
+
+Typing `env('FOO')` vs `'%env(FOO)%'` doesn't deserve a wrapper in core to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-11T17:31:26Z
+
+@ro0NL I didn't add properties/calls on purpose, they are unneeded to me: not easier to type nor more readable.
+
+Not also that I renamed "arguments" to "with" (`->add(Foo::class)->with([...])`.)
+And last note: configurators implement `__invoke()` so that even typing `->add` is not required (see "php7" fixture).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-11T17:57:14Z
+
+Imo. it's more readable with computed values; `properties($props)` which is enabled with this format. It follows `with` kinda :) but certainly no blocker for me :+1:
+
+Agree the env wrapper is not really needed.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-11T21:18:36Z
+
+I'm really not fond of this new format, endless chaining is always a pain to work with because if you mess up the indentation it's over. Also visually it's very confusing because everything relies on indentation to be readable.
+
+In any case with that new format it seems that you could replace `di\services()` with `$container->services()`?
+That would solve the problem of the magic `$this` as well as allow to configure the container outside of a "magic file" (config file). IMO that's a very useful feature, it allows to easily configure the container anywhere, for example in tests (where you would want to configure a container on the fly) or micro-applications (i.e. embed the config anywhere). It's also less cryptic.
+
+Also I have thought a bit more about the drawback of array-based config and it seems it's like XML or YAML: if there's an error, the error message should contain the file and line. In PHP (with array-based config) it's doable with debug backtrace. The exception stack trace wouldn't point to the file but just like with XML or YAML, yet that doesn't make those formats unusable (because the message contains the file/line).
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-08-12T05:50:43Z
+
+The problem with chaining ias pointed out by @mnapoli is really annoying. Every autoformater will align all indentations and this is greatly annoying as you can't forget to trigger it.
+The one such place in symfony that you are forbidden to use autoformater is already configuration and I'm not fond of having another one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-12T06:15:33Z
+
+@mnapoli @mvrhov good news, non-fluent style works out of the box already:
+
+```php
+$add = di\services()->defaults()->private();
+$add('foo')->with([...])->public()->...;
+// etc.
+```
+
+> replace di\services() with $container->services()?
+
+this breaks extensibility. As I explained, having a namespace with functions allows bundles to add new helper functions in the namespace very easily. That's a feature I target.
+
+> easily configure the container anywhere
+
+configuring the container goes through loaders. Bypassing them for the shake of it wouldn't solve anything to me - and would only break the "import()" function.
+
+> array-based config) it's doable with debug backtrace
+
+I don't know why you're still looking for array-based style :) I won't work into that direction: the added complexity of implementation is certainly not worth it - let's not forget that storing one backtrace per-config option will likely be a memory/cpu killer btw.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-08-12T08:07:24Z
+
+> good news, non-fluent style works out of the box already:
+
+Technically that works, but DX-wise it's a regression compared to YAML or even XML? (what I mean is that it's very tricky, it will confuse some users)
+
+> this breaks extensibility.
+
+Oh right good point, you *could* do that though: `di\services($container)->…`. Not as simple I concede.
+
+> I don't know why you're still looking for array-based style :) I won't work into that direction: the added complexity of implementation is certainly not worth it - let's not forget that storing one backtrace per-config option will likely be a memory/cpu killer btw.
+
+Fair enough I won't bother again with that. Just to explain: I'm pushing for that because I think it's a good middleground for DX between habits and weirdness. Using functions and method chaining for a DSL in PHP is weird, it will be confusing as heck for users, especially since config is one of the most important part of Symfony. Array-based config is conceptually similar to classic config (YAML, …), it's a list of definitions. So I think it's a way to keep at least something familiar and minimize the weirdness that is introduced. Regarding the storing of the backtrace how would it be different from YAML? The config is validated at compile time so it doesn't really matter, and if it works for YAML it could certainly work for a PHP array.
+Anyway moving on ;)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-12T08:12:52Z
+
+I also liked the previous `di\service()` a bit better.. =/ i dont see why we need fluentness like this.
+
+> configuring the container goes through loaders. Bypassing them for the shake of it wouldn't solve anything to me
+
+Too bad.. missed opportunity to me. For small standalone stuff i often do `$container = require '/path/to/container.php'`. Which doesnt use file loaders, but builds the container straight away.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-12T09:05:53Z
+
+I tried to listen to everyone, taking into account as best as I could sometimes contradictory wishes.
+IMHO the result is great.
+PR is now green.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-08-13T12:12:00Z
+
+Please vote ( 👍  / 👎 ) :`add` feels strange for registering a service, I think `register` feels more natural when compared to the rest of the component.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-13T12:17:45Z
+
+It should be set() really :) and i prefer a 3 char keyword here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-13T13:21:49Z
+
+"add" is two letters :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-18T13:11:34Z
+
+Comments addressed.
+I also enhanced the phpdoc, and made all methods `final` so that we can add type hints in 4.0.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2017-08-18T14:38:18Z
+
+I think it should be `set` instead of `add`, because if the service is already registered it replaces it, right? Same for parameters.
+
+See also:
+https://github.com/symfony/symfony/pull/23834#issuecomment-322038397
+https://github.com/symfony/symfony/pull/23834#issuecomment-322038681
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-28T09:28:05Z
+
+updated to use "set" instead of "add"
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-02T15:25:47Z
+
+After several chats with @weaverryan and @fabpot, "functions" and the corresponding hack is now gone. You now need to return a closure, so that everything is straighforward.
+The config can be fluent - or not - you decide.
+
+Note that the configuration now handles a "get" method, so that you can fine tune a definition after you loaded a directory.
+
+Here is a non-fluent example;
+
+```php
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
+
+return function (ContainerConfigurator $c) {
+
+    $c->import('basic.php');
+
+    $s = $c->services()->defaults()
+        ->public()
+        ->private()
+        ->autoconfigure()
+        ->autowire()
+        ->tag('t', array('a' => 'b'))
+        ->bind(Foo::class, ref('bar'))
+        ->private();
+
+    $s->set(Foo::class)->argument(ref('bar'))->public();
+    $s->set('bar', Foo::class)->call('setFoo')->autoconfigure(false);
+
+};
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-02T15:55:48Z
+
+I like! 👍
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2017-09-02T16:46:49Z
+
+I tried it with symfony/demo and here is the result for the services file -> https://gist.github.com/B-Galati/0cc9c388bc3287d4400cd28172f5eb2e
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-09-02T17:39:12Z
+
+Nice! 👍
+
+I only don't like the abbreviated method names:
+
+```php
+$c->ref()
+$c->iter()
+$c->expr()
+```
+
+I would prefer this instead:
+
+```php
+$c->reference()
+$c->iterator()
+$c->expression()
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T07:04:14Z
+
+@gharlan the thing is these are shortcuts. Shortcut to what?
+- `$c->reference()` vs `new Reference()`
+- `$c->iterator()` vs `new IteratorArgument()`
+- `$c->expression()` vs `new Expression()`
+
+So using longer variants almost defeats the purpose of these. Said another way: if you prefer full length, don't use the shortcut (yes, there is a bit of additional feat when use the shortcuts, but that's pure DX sugar.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T07:14:34Z
+
+Btw, I'm not really fan of these either, but for another reason: the `$c->` prefix. The reason is that these helpers don't have any context (no "$this"). Having them as plain functions would be great to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T07:31:29Z
+
+Now implemented alongside with methods so one can use either `$c->ref()` or just `ref()`. When reading or "hand"writing, just `ref()` is best. When using auto-completion, `$c->reference()` is. So we don't favor only one IDE.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-03T07:34:34Z
+
+@nicolas-grekas 80% of Symfony developers use PHPStorm, so they'll never fully type `expression()` or `iterator()`. They'll just type `ex`+ Enter or `it` + Enter. However, using `expression()` or `iterator()` makes the code easier to read.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T07:40:07Z
+
+Agreed, so here it is now: `$c->expression()` for phpstorm users - `expr()` for the rest of the world (me included.) Both equally valid.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-03T08:00:16Z
+
+Side note: I created a "project" to keep track of the next steps required to move to php-only config:
+https://github.com/symfony/symfony/projects/6
+
+If anyone wants to help close those notes, that'd be awesome!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-04T08:31:27Z
+
+I just removed functions at all. So everyone is now forced to type `$c->reference()` all the time.
+I'm not happy at all with this move. To me it makes things worse for non-phpstorm users (20% is still a huge number of people) - and not better for phpstorm users.
+
+`$c->reference()` vs `ref()`:
+- higher visual debts
+- more to type for every one, phpstorm or not
+- teach-ability is equal - ppl have to know about references anyway, and even that "$c->" requires teaching itself
+- "reference" is not more understandable than "ref"
+- "$c->" conveys the idea that there is some context there, which is plain false. "ref()" doesn't convey that
+
+But since it looks like I'm the only one thinking this way, let's do. Or help me if you want not.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-04T08:41:51Z
+
+See https://github.com/symfony/symfony/pull/23834/commits/b037d3541a6e96f9d25ac30481db9b904dbe9484#diff-12215783b86872da2f1595fcbbd81b59
+to visually understand what we're talking about.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-04T08:52:48Z
+
+@nicolas-grekas it's true that using functions would be shorter, but this is the problem I see:
+
+```php
+$s->set('foo')
+  // `ref()` means probably `reference()`, but I don't see what is it related to. Reference of what?
+  ->with(array('foo', ref('foo.baz'))
+
+  // OK, this is a reference from the container.
+  ->with(array('foo', $c->reference('foo.baz'))
+```
+
+I'd love to use `service()` instead of `reference()`, but I know we can't change that.
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-09-04T13:26:04Z
+
+> $c->reference() vs ref():
+
+Contra functions:
+
+To use (call) the function `ref()` you have to:
+
+1. ... either use `namespace Symfony\Component\DependencyInjection\Loader\Configurator;` in your config file, which looks "wrong" to me. IMO you should not use "foreign" namespaces in your own files.
+2. ... or add `use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;` to your config file. This looks better to me. But I think it is not very common yet to use function imports.
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-09-04T13:52:52Z
+
+> I'd love to use service() instead of reference(), but I know we can't change that.
+
+Why? Couldn't we use `$c->service(...)`?
+I suggest to add also `$c->parameter('foo')` (which can be used instead of `'%foo%'`).
+
+And I have a question about the `argument()` method: Couldn't we remove the `$` char?
+
+So, instead of:
+
+```php
+    $s->set(AppExtension::class)
+        ->argument('$locales', '%app_locales%');
+```
+
+we could use this:
+
+```php
+    $s->set(AppExtension::class)
+        ->argument('locales', $c->parameter('app_locales'));
+```
+
+---------------------------------------------------------------------------
+
+by gharlan at 2017-09-04T14:03:25Z
+
+By the way, personally I wouldn't use the one-char-variables, but this is also a matter of taste.
+So "my" symfony demo config would look like this:
+https://gist.github.com/gharlan/01f4db2ac08f666fc2a5df6e80cf1ad3
+
+(instead of https://gist.github.com/B-Galati/0cc9c388bc3287d4400cd28172f5eb2e)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-06T07:53:34Z
+
+@weaverryan thanks for the review, comments addressed, there were bugfixes related the code smell you spotted :).
+
+A few days of thought, I think I have no choice but accept the `$c->` prefix. But the long names are just visual debts, so here we are, `$c->ref()` is the way.
+
+@gharlan to your proposals:
+- `$c->parameters('foo')` is a bad abstraction of parameters. All config format use `%foo%` consistently because there is no "foo-object" concept - it's plain inline value that you can find inside strings. `$c->parameters('foo')` is a "lying" abstraction that removes knowledge from users by not teaching them early enough that they have to learn "%foo%".
+- "couldn't we remove the `$` char": the `$` is required in all formats, because that's again not what any  formats abstract out, so no, we can't.
+
+PR ready.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-06T08:05:45Z
+
+@nicolas-grekas 98% of the proposed method names use full names (`alias()`, `load()`, `extension()`, `import()`, `inline()`, `tag()`, `setInstanceof()`, `exclude()`, `nullOnInvalid()`, `autoconfigure()`, `decorate()`, `bind()` etc.) Please, rename `ref()` to `reference()` and `expr()` to `expression()` to make 100% of methods use full names.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-06T10:09:58Z
+
+IMO arguments that are added, named or set by argument number should be explicitly distinguished.
+
+Instead of
+
+```php
+$s->set(Foo::class)->argument('value');
+$s->set(Foo::class)->argument('$name', 'value');
+$s->set(Foo::class)->argument(2, 'value');
+```
+it should be
+
+```php
+$s->set(Foo::class)->argument('value');
+$s->set(Foo::class)->argumentNamed('$name', 'value');
+$s->set(Foo::class)->argumentNumbered(2, 'value');
+```
+
+This way `function argument($nameOrValue, $value = null)` doesn't need the variable and mixed type arguments. And we can add concrete types to `argumentNamed` and `argumentNumbered`. Maybe we can also make the `$` sign optional for named argument as the intention is clear already.
+
+And bindings also have magic.
+
+Instead of
+```php
+$s->bind(Foo::class, $c->ref('bar'));
+$s->bind('$name', $c->ref('bar'));
+```
+it should be something like
+
+```php
+// bindClass() or bindType() wouldn't be that precise as an interface can be bound as well which is not a class and scalar types  can't be bound
+$s->bind(Foo::class, $c->ref('bar'));
+$s->bindName('$name', $c->ref('bar'));
+```
+
+Similarly, named services and auto-named services by class should be distinguished. It is confusing that for the same method `set` the class is either the first argument or the second.
+
+Instead of
+```php
+$s->set(Foo::class);
+$s->set('bar', Foo::class)
+```
+it should be something like
+
+```php
+$s->set(Foo::class);
+$s->setNamed('bar', Foo::class);
+```
+
+The intention should be clear from the method name and not from the type or value of the argument.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-06T19:33:55Z
+
+@Tobion in fact I removed argument() altogether: all the other loaders only allow setArgument because we always start empty so there is nothing to replace.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-06T20:02:18Z
+
+The api allows to `get` a definition, so I'd assume it can be used to modify one with includes individual arguments.
+But even without `arguments`, `with` should offer variadics IMO which makes it much more concise. And a different method for array with named keys.
+
+Instead of
+
+```php
+$s->set(Foo::class)->with(['foo']);
+$s->set(Foo::class)->with(['foo', 'bar']);
+$s->set(Foo::class)->with(['$name1' => 'foo', '$name2' => 'bar']);
+```
+i'd propose
+
+```php
+$s->set(Foo::class)->with('foo');
+$s->set(Foo::class)->with('foo', 'bar');
+$s->set(Foo::class)->withNamed(['$name1' => 'foo', '$name2' => 'bar']);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-07T07:19:12Z
+
+@Tobion I remember trying this idea of using variadics also, but I reverted it because it will looks confusing and unexpected. Many will do `$s->set(Foo::class)->with(['foo', 'bar']);` and expect to have defined two args then. But they will have a hard time figuring out their mistake. Using a single method that always takes an array is much easier to discover and use correctly IMHO.
+
+> The api allows to get a definition
+
+that's true, but only for local definitions you have 100% control over - so there is always a way to write your config in a way that matches your will. I don't think we should add complexity for everyone, to allow edge cases that are already solvable in other ways, even more verbose ones.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-09-07T08:06:16Z
+
+> [The] `with` [method] should offer variadic, which makes it much more concise.
+
+Yes! Please take some time to at least reconsider your stance on variadic functions here. There are so many places in the Symfony codebase where a variadic would be much better suited than an array, and this function is a prime example of such a case.
+
+> Many will [pass an array] and expect to have defined two args and they will have a hard time figuring out their mistake.
+
+I disagree; the mistake should be relatively obvious when they realize the first argument passed to their code is the wrong type and the second argument isn't passed at all (they might get a type error if they are using scalar type hints, they might get an error about the second argument being missing if a required one, they will surely get an error when their code tries to perform actions on a variable of an unexpected type and/or unexpected value, etc).
+
+While likely not applicable for this method, variadics are also superior to arrays in their ability to be type hinted (another reason I'd love they existed elsewhere in the codebase).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-07T19:34:00Z
+
+I'm +1 for the API as it is now. It's all subjective st this point, but I don't prefer @Tobion's proposals related to method naming and I don't find them more clear (my opinion of course).
+
+As for ref() vs reference(), I don't really care. The word "reference" doesn't communicate much anyways about what the function does - it's already an abstract concept you'll need to read about.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-07T19:49:06Z
+
+Wild idea.. but what about `$s->set(Foo::class)->with($c['bar'])->public();`? I.e. `$c['bar']` for refs.
+
+Or maybe just make it work with `with($c->get('bar'))` and drop the _ref_ concept thingy here.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-07T19:52:02Z
+
+Variadics for the arguments is a must IMO. This is a new API and should not take over the previous constraits. The old API was just not using it because at that time variadics were not supported explicitly by PHP with a syntax which makes it obvious. It also resembles how you would pass arguments yourself.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-07T19:58:03Z
+
+`with($arg, $argN)` is nice, but we cant support both in a single API. I tend to prefer `with([$arg, $argN])` which is 2 chars more.. but also allows for `with($args)`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-07T20:29:21Z
+
+@ro0NL just propose a different method for array then. Similarly I said there should be a `withNamed`
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-07T20:30:59Z
+
+I like the proposal to support `$c['bar']` for references.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-09-07T22:43:29Z
+
+@ro0NL
+
+> `with($arg, $argN)` is nice, but we cant support both in a single API. I tend to prefer `with([$arg, $argN])` which is 2 chars more.. but also allows for `with($args)`.
+
+With a variadic the latter is still supported, you'd use `with(...$args)` instead.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-08T05:23:50Z
+
+Good point. Fine either way for me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T07:03:43Z
+
+> the mistake should be relatively obvious when they realize the first argument passed to their code is the wrong type and the second argument isn't passed at all (they might get a type error if they are using scalar type hints, they might get an error about the second argument being missing if a required one, they will surely get an error when their code tries to perform actions on a variable of an unexpected type and/or unexpected value, etc).
+
+That's exactly the kind of trap we have a responsibility to not open. For this reason, we should not look anymore at variadics IMHO.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-08T07:35:11Z
+
+@Tobion just realized doing `with($c['bar'])` (or `$c->get('bar')` for that matter) wont work out nicely, you dont get a `Reference` as that would be created internally, but then there's no invalid behavior control at the config level... so not really useful i guess. Prefering a single way of doing things; thus `$c->reference()` or `$c->ref()` whatever :)
+
+Returning a `Ref` from offsetGet() is not the way to go IMHO.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-08T10:48:44Z
+
+> That's exactly the kind of trap we have a responsibility to not open. For this reason, we should not look anymore at variadics IMHO.
+
+You can say the same other way round. If I think it behaves variadic but it isn't and pass an array, then it's interpreted as multiple arguments instead of one. So that is no valid argument. If you do it the wrong way, you get the wrong result. That has nothing to do with variadics.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-09-08T11:26:55Z
+
+@nicolas-grekas *Changing* an interface from an array parameter to variadic parameters opens the "trap" and correlates to the "responsibility" you mention, **but** when creating a *brand new* API there is no "trap" or "responsibility". The real responsibility for a new API is to create an interface that best suits the needs of the component.
+
+The text you quoted was my response to "Many will [pass an array] and expect to have defined two args *and they will have a hard time figuring out their mistake*" --- I was debunking that they would have difficulty figuring out their error.
+
+As @Tobion pointed out as well, the above sentence could easily be reversed as "many will pass *individual parameters* (to a variadic) and expect to have defined two args (but the second one is silently ignored, thanks to how PHP handles extra parameters, which is also "trap")."
+
+I just don't see the harm you do, I guess. Regardless, I won't comment on it further if your stance remains unchanged.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-19T16:49:46Z
+
+Using variadics has clear advantage as it allows people to use variadics or an array `with(...[1])`. But doing the opposite prevents that. Why should I write `with([1])` when I could write `with(1)`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-20T04:33:48Z
+
+@Tobion during the last days, we considered 3 variants (being able to set a single arg and also being able to set all args at once has been a requirement):
+1. the Laravel-like (ie a polymorphic signature, incompatible with variadics):
+    `$service->with([1,2,'$k' => 3])->with('$name', 'value);`
+2. the variadic one (ie yours almost):
+    `$service->args(1,2,3)->arg('$name', 'value);`
+3. the classic one:
+    `$service->args([1,2,'$k' => 3])->arg('$name', 'value);`
+
+v3 is the most deceptive one, because it's the classic boring one. I personally also find v1 or v2 more smart. But following the least-surprise principle is always a wise advice. Considering also that in the routing DSL #24180, all methods with "s" take an array - and that the whole code base is consistent with this convention, choosing the variadic way (same for the polymorphic one) would be a surprise to many for sure. This reasoning supports choosing v3.
+
+To a wider audience: I think we should now end this discussion and consider celebrating a better way to configure our services soon. This PR confirmed that a PHP DSL is desirable. We also confirmed that the implementation is technically OK. The only thing left is the flavor of the DSL. As @weaverryan wisely said:
+
+> We won't get 100% agreement from everyone on everything.
+
+And that's fine. If we don't and make this discussion longer, we take the risk of having no PHP DSL at all... There is still non trivial work to do... (see https://github.com/symfony/symfony/projects/6).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-20T09:05:59Z
+
+> the whole code base is consistent with this convention
+
+It's because there has been no variadics in php 5.3. That means we could never use new php features because it might surprise people and it's not consistent with our existing code.
+
+Using an array, is not self-explaining at all. What does `$service->args([1 => 1, 2, '$k' => 3, 'foo' => 4])` mean? And what is the error message if there is one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-20T09:09:40Z
+
+@Tobion if someone (you?) wants to push stronger for variadics, I'd suggest doing so in a dedicated PR, after this one (and the Routing one) have been merged, so that we can move forward.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-09-20T10:46:21Z
+
+👍 as Nicolas said. I'd like to start playing with this and especially with the routing one.

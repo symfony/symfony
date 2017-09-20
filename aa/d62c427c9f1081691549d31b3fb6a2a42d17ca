@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-16T08:20:09Z
+
+> + inline Serializer::denormalizeObject()
+
+Done.
+For other comments: static state won't provide anything is practice, and are not better in terms of design.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-17T18:36:44Z
+
+Won't it make sense to backport what could be on lower branches?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-18T14:30:50Z
+
+> Won't it make sense to backport what could be on lower branches?
+
+AFAIK, we merge perf improvements as new feats usually (even if we diverged sometime from this rule, but we shouldn't anymore unless catastrophic. Not sure it's the case here?)

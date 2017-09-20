@@ -1,0 +1,15 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Class2
+        public: true
+        file: file.php
+        lazy: true
+        arguments: [!service { class: Class1, public: false }]
+    bar:
+        alias: foo
+        public: true

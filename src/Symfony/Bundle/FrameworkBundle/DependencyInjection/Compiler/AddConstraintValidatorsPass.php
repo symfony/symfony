@@ -19,7 +19,7 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('validator.validator_factory')) {
+        if (!$container->has('validator.validator_factory')) {
             return;
         }
 
@@ -42,6 +42,6 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
             $validators[$definition->getClass()] = $id;
         }
 
-        $container->getDefinition('validator.validator_factory')->replaceArgument(1, $validators);
+        $container->findDefinition('validator.validator_factory')->replaceArgument(1, $validators);
     }
 }

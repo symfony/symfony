@@ -25,6 +25,12 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    private static $supportedTypes = array(
+        \SplFileInfo::class => true,
+        \SplFileObject::class => true,
+        File::class => true,
+    );
+
     /**
      * @var MimeTypeGuesserInterface
      */
@@ -107,13 +113,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        $supportedTypes = array(
-            \SplFileInfo::class => true,
-            \SplFileObject::class => true,
-            'Symfony\Component\HttpFoundation\File\File' => true,
-        );
-
-        return isset($supportedTypes[$type]);
+        return isset(self::$supportedTypes[$type]);
     }
 
     /**

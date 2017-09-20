@@ -161,7 +161,15 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function denormalize($data, $type, $format = null, array $context = array())
     {
-        return $this->denormalizeObject($data, $type, $format, $context);
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
+        }
+
+        if ($normalizer = $this->getDenormalizer($data, $type, $format, $context)) {
+            return $normalizer->denormalize($data, $type, $format, $context);
+        }
+
+        throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type));
     }
 
     /**
@@ -231,32 +239,6 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function decode($data, $format, array $context = array())
     {
         return $this->decoder->decode($data, $format, $context);
-    }
-
-    /**
-     * Denormalizes data back into an object of the given class.
-     *
-     * @param mixed  $data    data to restore
-     * @param string $class   the expected class to instantiate
-     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
-     * @param array  $context The context data for this particular denormalization
-     *
-     * @return object
-     *
-     * @throws LogicException
-     * @throws UnexpectedValueException
-     */
-    private function denormalizeObject($data, $class, $format, array $context = array())
-    {
-        if (!$this->normalizers) {
-            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
-        }
-
-        if ($normalizer = $this->getDenormalizer($data, $class, $format, $context)) {
-            return $normalizer->denormalize($data, $class, $format, $context);
-        }
-
-        throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $class));
     }
 
     /**

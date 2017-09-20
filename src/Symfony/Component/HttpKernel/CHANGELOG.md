@@ -25,6 +25,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * made kernels implementing `CompilerPassInterface` able to process the container
  * deprecated bundle inheritance
  * added `RebootableInterface` and implemented it in `Kernel`
  * deprecated commands auto registration

@@ -31,6 +31,12 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     private $format;
     private $timezone;
 
+    private static $supportedTypes = array(
+        \DateTimeInterface::class => true,
+        \DateTimeImmutable::class => true,
+        \DateTime::class => true,
+    );
+
     /**
      * @param string             $format
      * @param \DateTimeZone|null $timezone
@@ -110,13 +116,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        $supportedTypes = array(
-            \DateTimeInterface::class => true,
-            \DateTimeImmutable::class => true,
-            \DateTime::class => true,
-        );
-
-        return isset($supportedTypes[$type]);
+        return isset(self::$supportedTypes[$type]);
     }
 
     /**

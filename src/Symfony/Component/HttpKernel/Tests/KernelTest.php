@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -750,6 +751,14 @@ EOF;
         $this->assertFileNotExists($containerFile);
     }
 
+    public function testKernelPass()
+    {
+        $kernel = new PassKernel();
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->getParameter('test.processed'));
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      *
@@ -884,5 +893,19 @@ class CustomProjectDirKernel extends Kernel
         if ($build = $this->buildContainer) {
             $build($container);
         }
+    }
+}
+
+class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
+{
+    public function __construct(\Closure $buildContainer = null)
+    {
+        parent::__construct();
+        Kernel::__construct('pass', true);
+    }
+
+    public function process(ContainerBuilder $container)
+    {
+        $container->setParameter('test.processed', true);
     }
 }

@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-13T08:05:41Z
+
+I like this proposal! Thanks for contributing it.
+
+My only super tiny concern is about a variable name. I propose to rename `RoutingConfigurator $route` to `RoutingConfigurator $routes` I know it's just a single letter difference, but to me it changes its meaning completely:
+
+```php
+// add something to the given route
+$route->add(...);
+
+// add a route to the given collection of routes
+$routes->add(...);
+```
+
+A more real comparison using your fixture:
+
+```php
+// BEFORE
+return function (RoutingConfigurator $route) {
+    $route
+        ->add('foo', '/foo')
+            ->condition('abc')
+            ->options(array('utf8' => true))
+        ->add('buz', 'zub')
+            ->controller('foo:act');
+
+    $route->import('php_dsl_sub.php')
+        ->prefix('/sub')
+        ->requirements(array('id' => '\d+'));
+
+    $route->add('ouf', '/ouf')
+        ->schemes(array('https'))
+        ->methods(array('GET'))
+        ->defaults(array('id' => 0));
+};
+
+// AFTER
+return function (RoutingConfigurator $routes) {
+    $routes
+        ->add('foo', '/foo')
+            ->condition('abc')
+            ->options(array('utf8' => true))
+        ->add('buz', 'zub')
+            ->controller('foo:act');
+
+    $routes->import('php_dsl_sub.php')
+        ->prefix('/sub')
+        ->requirements(array('id' => '\d+'));
+
+    $routes->add('ouf', '/ouf')
+        ->schemes(array('https'))
+        ->methods(array('GET'))
+        ->defaults(array('id' => 0));
+};
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-13T11:51:52Z
+
+@javiereguiluz fixtures updated.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-09-14T13:52:01Z
+
+The `collection` will make it so much easier to add routes with a common prefix without having to store those routes in a separate file! I love this 👏
+
+```php
+return function (RoutingConfigurator $routes) {
+    $news = $routes->collection('news_')
+        ->prefix('news/')
+        ->requirements(['id' => '\d+'])
+    ;
+
+    // No need to repeat the name prefix, the requirements are applied here but
+    // are still part of the same file.
+    $news('show', '{id}')->controller('News:show');
+    $news('edit', '{id}/edit')->controller('News:edit');
+    $news('delete', '{id}/delete')->controller('News:delete');
+};
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-20T06:51:50Z
+
+@javiereguiluz thanks, comments addressed.
+
+> Would you consider using variadics here and in methods() method too?
+
+I wouldn't, for the same "least surprise" reason. If someone wants to push stronger for variadics, I suggest doing so in a dedicated PR, after this one (and the DI one) have been merged.

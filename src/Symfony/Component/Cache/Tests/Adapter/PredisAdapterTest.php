@@ -22,6 +22,20 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
         self::$redis = new \Predis\Client(array('host' => getenv('REDIS_HOST')));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation This "%s" method is deprecated.
+     */
+    public function testCreateConnectionDeprecated()
+    {
+        $client = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+
+        $this->assertInstanceOf(\Predis\Client, $client);
+    }
+
+    /**
+     * @group legacy
+     */
     public function testCreateConnection()
     {
         $redisHost = getenv('REDIS_HOST');

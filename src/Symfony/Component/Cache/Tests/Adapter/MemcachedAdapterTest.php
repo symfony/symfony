@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
 class MemcachedAdapterTest extends AdapterTestCase
@@ -28,7 +27,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         if (!MemcachedAdapter::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
         }
-        self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
+        self::$client = MemcachedConnectionFactory::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
@@ -39,29 +38,24 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
+        $client = $defaultLifetime ? MemcachedConnectionFactory::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 
         return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public function testOptions()
+    /**
+     * @group legacy
+     * @expectedDeprecation This "%s" method is deprecated.
+     */
+    public function testCreateConnectionDeprecated()
     {
-        $client = MemcachedAdapter::createConnection(array(), array(
-            'libketama_compatible' => false,
-            'distribution' => 'modula',
-            'compression' => true,
-            'serializer' => 'php',
-            'hash' => 'md5',
-        ));
+        $client = MemcachedAdapter::createConnection('memcached://localhost');
 
-        $this->assertSame(\Memcached::SERIALIZER_PHP, $client->getOption(\Memcached::OPT_SERIALIZER));
-        $this->assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_HASH));
-        $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
-        $this->assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
-        $this->assertSame(\Memcached::DISTRIBUTION_MODULA, $client->getOption(\Memcached::OPT_DISTRIBUTION));
+        $this->assertInstanceOf(\Memcached::class, $client);
     }
 
     /**
+     * @group legacy
      * @dataProvider provideBadOptions
      * @expectedException \ErrorException
      * @expectedExceptionMessage constant(): Couldn't find constant Memcached::
@@ -81,6 +75,9 @@ class MemcachedAdapterTest extends AdapterTestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testDefaultOptions()
     {
         $this->assertTrue(MemcachedAdapter::isSupported());
@@ -93,6 +90,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
+     * @group legacy
      * @expectedException \Symfony\Component\Cache\Exception\CacheException
      * @expectedExceptionMessage MemcachedAdapter: "serializer" option must be "php" or "igbinary".
      */
@@ -106,6 +104,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider provideServersSetting
      */
     public function testServersSetting($dsn, $host, $port)
@@ -163,6 +162,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider provideDsnWithOptions
      */
     public function testDsnWithOptions($dsn, array $options, array $expectedOptions)

@@ -1,6 +1,13 @@
 UPGRADE FROM 3.3 to 3.4
 =======================
 
+Cache
+-----
+
+* The `AbstractAdapter::createConnection()`, `RedisTrait::createConnection()` 
+  and `MemcachedTrait::createConnection()` methods have been deprecated and 
+  will be removed in 4.0. Use the Dsn component instead.
+
 DependencyInjection
 -------------------
 

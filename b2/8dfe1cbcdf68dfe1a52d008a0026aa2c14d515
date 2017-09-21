@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-19T10:09:16Z
+
+@kevin-verschaeve nice catch! Thanks for fixing it.
+
+However, to make this work in any browser, could you please add instead the `.break-long-words` CSS class to the appropriate HTML element? We define that class in this very same CSS file as follows (it's ugly ... but it's the only style that worked right in every browser):
+
+```css
+.break-long-words { -ms-word-break: break-all; word-break: break-all; word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto; }
+```
+
+---------------------------------------------------------------------------
+
+by kevin-verschaeve at 2017-09-19T10:48:46Z
+
+@javiereguiluz Thanks, I have updated the PR.

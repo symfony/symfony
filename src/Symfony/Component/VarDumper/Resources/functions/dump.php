@@ -22,7 +22,7 @@ if (!function_exists('dump')) {
         foreach ($moreVars as $var) {
             VarDumper::dump($var);
         }
-        
+
         return $var;
     }
 }

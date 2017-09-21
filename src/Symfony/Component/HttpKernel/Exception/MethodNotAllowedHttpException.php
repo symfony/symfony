@@ -34,13 +34,14 @@ class MethodNotAllowedHttpException extends HttpException
     }
 
     /**
+     * @param array      $allow    An array of allowed methods
      * @param \Exception $previous The previous exception
      * @param int        $code     The internal exception code
      *
      * @return MethodNotAllowedHttpException
      */
-    public static function wrap(\Exception $previous, $code = 0)
+    public static function wrap(array $allow, \Exception $previous, $code = 0)
     {
-        return new static($previous->getMessage(), $previous, $code);
+        return new static($allow, $previous->getMessage(), $previous, $code);
     }
 }

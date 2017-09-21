@@ -21,6 +21,7 @@ use Symfony\Component\Dsn\Exception\InvalidArgumentException;
 class MemcachedConnectionFactory
 {
     private static $defaultClientOptions = array(
+        'class' => null,
         'persistent_id' => null,
         'username' => null,
         'password' => null,
@@ -44,7 +45,7 @@ class MemcachedConnectionFactory
      * @param string|string[] A DSN, or an array of DSNs
      * @param array           An array of options
      *
-     * @return \Memcached
+     * @return \Memcached According to the "class" option
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
@@ -53,12 +54,22 @@ class MemcachedConnectionFactory
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {
             $options += static::$defaultClientOptions;
-            $client = new \Memcached($options['persistent_id']);
+
+            $class = null === $options['class'] ? \Memcached::class : $options['class'];
+            unset($options['class']);
+            if (is_a($class, \Memcached::class, true)) {
+                $client = new \Memcached($options['persistent_id']);
+            } elseif (class_exists($class, false)) {
+                throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Memcached"', $class));
+            } else {
+                throw new InvalidArgumentException(sprintf('Class "%s" does not exist', $class));
+            }
+
             $username = $options['username'];
             $password = $options['password'];
 
             // parse any DSN in $dsns
-            $servers=[];
+            $servers = array();
             foreach ((array) $dsns as $dsn) {
                 if (0 !== strpos($dsn, 'memcached://')) {
                     throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s does not start with "memcached://"', $dsn));

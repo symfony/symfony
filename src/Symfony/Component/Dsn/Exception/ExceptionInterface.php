@@ -12,7 +12,7 @@
 namespace Symfony\Component\Dsn\Exception;
 
 /**
- * Interface for exceptions.
+ * Base ExceptionInterface for the Dsn Component.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

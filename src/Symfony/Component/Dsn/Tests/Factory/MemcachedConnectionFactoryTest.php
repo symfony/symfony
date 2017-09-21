@@ -14,6 +14,9 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dsn\Factory\MemcachedConnectionFactory;
 
+/**
+ * @requires extension memcached
+ */
 class MemcachedConnectionFactoryTest extends TestCase
 {
     public function testOptions()
@@ -29,7 +32,9 @@ class MemcachedConnectionFactoryTest extends TestCase
         $this->assertSame(\Memcached::SERIALIZER_PHP, $client->getOption(\Memcached::OPT_SERIALIZER));
         $this->assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_HASH));
         $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
-        $this->assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+        if (version_compare(phpversion('memcached'), '2.2.0', '>=')) {
+            $this->assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+        }
         $this->assertSame(\Memcached::DISTRIBUTION_MODULA, $client->getOption(\Memcached::OPT_DISTRIBUTION));
     }
 
@@ -77,7 +82,6 @@ class MemcachedConnectionFactoryTest extends TestCase
         $f = function ($s) { return array('host' => $s['host'], 'port' => $s['port']); };
         $this->assertSame(array($expect), array_map($f, $client1->getServerList()));
         $this->assertSame(array($expect), array_map($f, $client2->getServerList()));
-        $this->assertSame(array($expect), array_map($f, $client3->getServerList()));
     }
 
     public function provideServersSetting()

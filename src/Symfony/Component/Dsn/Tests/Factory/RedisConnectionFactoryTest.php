@@ -14,6 +14,9 @@ namespace Symfony\Component\Dsn\Tests\Adapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dsn\Factory\RedisConnectionFactory;
 
+/**
+ * @requires extension redis
+ */
 class RedisConnectionFactoryTest extends TestCase
 {
     public function testCreateConnection()

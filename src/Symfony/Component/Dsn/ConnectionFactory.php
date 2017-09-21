@@ -20,15 +20,15 @@ use Symfony\Component\Dsn\Factory\RedisConnectionFactory;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class ConnectionFactory
+final class ConnectionFactory
 {
-    const TYPE_REDIS = 1;
-    const TYPE_MEMCACHED = 2;
+    const TYPE_REDIS = 'redis';
+    const TYPE_MEMCACHED = 'memcached';
 
     /**
      * @param string $dsn
      *
-     * @return int
+     * @return string
      */
     public static function getType($dsn)
     {

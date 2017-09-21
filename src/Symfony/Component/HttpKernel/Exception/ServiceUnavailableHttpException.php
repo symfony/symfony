@@ -35,4 +35,15 @@ class ServiceUnavailableHttpException extends HttpException
 
         parent::__construct(503, $message, $previous, $headers, $code);
     }
+
+    /**
+     * @param \Exception $previous The previous exception
+     * @param int        $code     The internal exception code
+     *
+     * @return ServiceUnavailableHttpException
+     */
+    public static function wrap(\Exception $previous, $code = 0)
+    {
+        return new static($previous->getMessage(), $previous, $code);
+    }
 }

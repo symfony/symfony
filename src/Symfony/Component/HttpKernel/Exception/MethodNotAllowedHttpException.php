@@ -32,4 +32,16 @@ class MethodNotAllowedHttpException extends HttpException
 
         parent::__construct(405, $message, $previous, $headers, $code);
     }
+
+    /**
+     * @param array      $allow    An array of allowed methods
+     * @param \Exception $previous The previous exception
+     * @param int        $code     The internal exception code
+     *
+     * @return MethodNotAllowedHttpException
+     */
+    public static function wrap(array $allow, \Exception $previous, $code = 0)
+    {
+        return new static($allow, $previous->getMessage(), $previous, $code);
+    }
 }

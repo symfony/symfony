@@ -29,4 +29,15 @@ class PreconditionFailedHttpException extends HttpException
     {
         parent::__construct(412, $message, $previous, array(), $code);
     }
+
+    /**
+     * @param \Exception $previous The previous exception
+     * @param int        $code     The internal exception code
+     *
+     * @return PreconditionFailedHttpException
+     */
+    public static function wrap(\Exception $previous, $code = 0)
+    {
+        return new static($previous->getMessage(), $previous, $code);
+    }
 }

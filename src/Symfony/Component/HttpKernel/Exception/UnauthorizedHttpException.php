@@ -32,4 +32,16 @@ class UnauthorizedHttpException extends HttpException
 
         parent::__construct(401, $message, $previous, $headers, $code);
     }
+
+    /**
+     * @param string     $challenge WWW-Authenticate challenge string
+     * @param \Exception $previous  The previous exception
+     * @param int        $code      The internal exception code
+     *
+     * @return UnauthorizedHttpException
+     */
+    public static function wrap($challenge, \Exception $previous, $code = 0)
+    {
+        return new static($challenge, $previous->getMessage(), $previous, $code);
+    }
 }

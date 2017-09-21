@@ -37,4 +37,16 @@ class TooManyRequestsHttpException extends HttpException
 
         parent::__construct(429, $message, $previous, $headers, $code);
     }
+
+    /**
+     * @param int|string $retryAfter The number of seconds or HTTP-date after which the request may be retried
+     * @param \Exception $previous   The previous exception
+     * @param int        $code       The internal exception code
+     *
+     * @return TooManyRequestsHttpException
+     */
+    public static function wrap($retryAfter = null, \Exception $previous, $code = 0)
+    {
+        return new static($retryAfter, $previous->getMessage(), $previous, $code);
+    }
 }

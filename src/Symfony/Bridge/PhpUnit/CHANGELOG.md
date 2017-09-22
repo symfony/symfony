@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added a `CoverageListener` to enhance the code coverage report
+
 3.3.0
 -----
 

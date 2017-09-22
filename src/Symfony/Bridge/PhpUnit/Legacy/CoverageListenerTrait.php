@@ -36,8 +36,12 @@ class CoverageListenerTrait
     {
         $annotations = $test->getAnnotations();
 
-        if (isset($annotations['class']['covers']) || isset($annotations['method']['covers'])) {
-            return;
+        $ignoredAnnotations = array('covers', 'coversDefaultClass', 'coversNothing');
+
+        foreach ($ignoredAnnotations as $annotation) {
+            if (isset($annotations['class'][$annotation]) || isset($annotations['method'][$annotation])) {
+                return;
+            }
         }
 
         $sutFqcn = $this->findSutFqcn($test);
@@ -45,6 +49,7 @@ class CoverageListenerTrait
             if ($this->warningOnSutNotFound) {
                 $test->getTestResultObject()->addWarning($test, new Warning('Could not find the tested class.'), 0);
             }
+
             return;
         }
 
@@ -75,7 +80,7 @@ class CoverageListenerTrait
 
         $class = get_class($test);
 
-        $sutFqcn = str_replace('Tests\\', '', $class);
+        $sutFqcn = str_replace('\\Tests\\', '\\', $class);
         $sutFqcn = preg_replace('{Test$}', '', $sutFqcn);
 
         if (!class_exists($sutFqcn)) {

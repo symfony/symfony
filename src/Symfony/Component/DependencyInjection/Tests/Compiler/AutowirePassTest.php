@@ -157,6 +157,9 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(DInterface::class, (string) $container->getDefinition('h')->getArgument(1));
     }
 
+    /**
+     * @group legacy
+     */
     public function testExceptionsAreStored()
     {
         $container = new ContainerBuilder();

@@ -36,7 +36,7 @@ class AutowirePass extends AbstractRecursivePass
     private $autowiringExceptions = array();
 
     /**
-     * @param bool $throwOnAutowireException If false, retrieved errors via getAutowiringExceptions
+     * @param bool $throwOnAutowireException Errors can be retrieved via Definition::getErrors()
      */
     public function __construct($throwOnAutowireException = true)
     {
@@ -44,10 +44,14 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
+     * @deprecated since version 3.4, to be removed in 4.0.
+     *
      * @return AutowiringFailedException[]
      */
     public function getAutowiringExceptions()
     {
+        @trigger_error('Calling AutowirePass::getAutowiringExceptions() is deprecated since Symfony 3.4 and will be removed in 4.0. Use Definition::getErrors() instead.', E_USER_DEPRECATED);
+
         return $this->autowiringExceptions;
     }
 
@@ -106,6 +110,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $this->autowiringExceptions[] = $e;
+            $this->container->getDefinition($this->currentId)->addError($e->getMessage());
 
             return parent::processValue($value, $isRoot);
         }

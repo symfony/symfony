@@ -12,7 +12,7 @@ class CoverageListenerTest extends TestCase
             $this->markTestSkipped('This test cannot be run on Windows.');
         }
 
-        $dir = __DIR__.'/../Tests-Fixtures/coverage';
+        $dir = __DIR__.'/../Tests/Fixtures/coverage';
         $php = PHP_BINARY;
         $phpunit = $_SERVER['argv'][0];
 

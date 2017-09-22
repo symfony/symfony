@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace PhpUnitCoverageTest;
+
 class Foo
 {
     public function fooZ()

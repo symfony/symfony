@@ -22,5 +22,11 @@ if (!function_exists('dump')) {
         foreach ($moreVars as $var) {
             VarDumper::dump($var);
         }
+
+        if ($moreVars) {
+            return func_get_args();
+        }
+
+        return $var;
     }
 }

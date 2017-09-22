@@ -23,6 +23,10 @@ if (!function_exists('dump')) {
             VarDumper::dump($var);
         }
 
+        if ($moreVars) {
+            return func_get_args();
+        }
+
         return $var;
     }
 }

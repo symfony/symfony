@@ -12,6 +12,10 @@ class CoverageListenerTest extends TestCase
             $this->markTestSkipped('This test cannot be run on Windows.');
         }
 
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('This test cannot be run on HHVM.');
+        }
+
         $dir = __DIR__.'/../Tests/Fixtures/coverage';
         $php = PHP_BINARY;
         $phpunit = $_SERVER['argv'][0];

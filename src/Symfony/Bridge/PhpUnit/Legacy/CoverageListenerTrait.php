@@ -25,11 +25,13 @@ class CoverageListenerTrait
 {
     private $sutFqcnResolver;
     private $warningOnSutNotFound;
+    private $warnings;
 
     public function __construct(callable $sutFqcnResolver = null, $warningOnSutNotFound = false)
     {
         $this->sutFqcnResolver = $sutFqcnResolver;
         $this->warningOnSutNotFound = $warningOnSutNotFound;
+        $this->warnings = array();
     }
 
     public function startTest($test)
@@ -47,7 +49,13 @@ class CoverageListenerTrait
         $sutFqcn = $this->findSutFqcn($test);
         if (!$sutFqcn) {
             if ($this->warningOnSutNotFound) {
-                $test->getTestResultObject()->addWarning($test, new Warning('Could not find the tested class.'), 0);
+                $message = 'Could not find the tested class.';
+                // addWarning does not exist on old PHPUnit version
+                if (method_exists($test->getTestResultObject(), 'addWarning')) {
+                    $test->getTestResultObject()->addWarning($test, new Warning($message), 0);
+                } else {
+                    $this->warnings[] = sprintf("%s::%s\n%s", get_class($test), $test->getName(), $message);
+                }
             }
 
             return;
@@ -88,5 +96,18 @@ class CoverageListenerTrait
         }
 
         return $sutFqcn;
+    }
+
+    public function __destruct()
+    {
+        if (!$this->warnings) {
+            return;
+        }
+
+        echo "\n";
+
+        foreach ($this->warnings as $key => $warning) {
+            echo sprintf("%d) %s\n", ++$key, $warning);
+        }
     }
 }

@@ -157,6 +157,9 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(DInterface::class, (string) $container->getDefinition('h')->getArgument(1));
     }
 
+    /**
+     * @group legacy
+     */
     public function testExceptionsAreStored()
     {
         $container = new ContainerBuilder();
@@ -1090,7 +1093,7 @@ class SetterInjection extends SetterInjectionParent
         // should be called
     }
 
-    /** @inheritdoc*/
+    /** {@inheritdoc}*/
     public function setDependencies(Foo $foo, A $a)
     {
         // should be called

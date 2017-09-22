@@ -16,6 +16,11 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelForTest extends Kernel
 {
+    public function __construct($environment, $debug, $name = 'app')
+    {
+        parent::__construct($environment, $debug, $name);
+    }
+
     public function getBundleMap()
     {
         return $this->bundleMap;

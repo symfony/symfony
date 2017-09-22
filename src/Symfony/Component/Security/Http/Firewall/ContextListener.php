@@ -220,7 +220,7 @@ class ContextListener implements ListenerInterface
         }
 
         if ($userNotFoundByProvider) {
-            return null;
+            return;
         }
 
         throw new \RuntimeException(sprintf('There is no user provider for user "%s".', get_class($user)));

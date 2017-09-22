@@ -269,6 +269,10 @@ SecurityBundle
     as first argument. Not passing it is deprecated and will throw a `TypeError`
     in 4.0.
 
+ * Added `logout_on_user_change` to the firewall options. This config item will
+   trigger a logout when the user has changed. Should be set to true to avoid
+   deprecations in the configuration.
+
 Translation
 -----------
 

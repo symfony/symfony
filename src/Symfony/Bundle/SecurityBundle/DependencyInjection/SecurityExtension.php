@@ -265,14 +265,14 @@ class SecurityExtension extends Extension
         $providerIds = $this->createUserProviders($config, $container);
 
         // make the ContextListener aware of the configured user providers
-        $definition = $container->getDefinition('security.context_listener');
-        $arguments = $definition->getArguments();
+        $contextListenerDefinition = $container->getDefinition('security.context_listener');
+        $arguments = $contextListenerDefinition->getArguments();
         $userProviders = array();
         foreach ($providerIds as $userProviderId) {
             $userProviders[] = new Reference($userProviderId);
         }
         $arguments[1] = new IteratorArgument($userProviders);
-        $definition->setArguments($arguments);
+        $contextListenerDefinition->setArguments($arguments);
 
         $customUserChecker = false;
 
@@ -283,6 +283,12 @@ class SecurityExtension extends Extension
             if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
                 $customUserChecker = true;
             }
+
+            if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
+                @trigger_error('Setting logout_on_user_change to false is deprecated as of 3.4 and will always be true in 4.0. Set logout_on_user_change to true in your firewall configuration.', E_USER_DEPRECATED);
+            }
+
+            $contextListenerDefinition->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
 
             $configId = 'security.firewall.map.config.'.$name;
 

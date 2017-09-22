@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\Test;
+use PHPUnit\Framework\Warning;
 
 /**
  * PHP 5.3 compatible trait-like shared implementation.
@@ -23,10 +24,12 @@ use PHPUnit\Framework\Test;
 class CoverageListenerTrait
 {
     private $sutFqcnResolver;
+    private $warningOnSutNotFound;
 
-    public function __construct(callable $sutFqcnResolver = null)
+    public function __construct(callable $sutFqcnResolver = null, $warningOnSutNotFound = false)
     {
         $this->sutFqcnResolver = $sutFqcnResolver;
+        $this->warningOnSutNotFound = $warningOnSutNotFound;
     }
 
     public function startTest($test)
@@ -39,6 +42,9 @@ class CoverageListenerTrait
 
         $sutFqcn = $this->findSutFqcn($test);
         if (!$sutFqcn) {
+            if ($this->warningOnSutNotFound) {
+                $test->getTestResultObject()->addWarning($test, new Warning('Could not find the tested class.'), 0);
+            }
             return;
         }
 

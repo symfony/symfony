@@ -31,9 +31,9 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
     {
         private $trait;
 
-        public function __construct(callable $sutFqcnResolver = null)
+        public function __construct(callable $sutFqcnResolver = null, $warningOnSutNotFound = false)
         {
-            $this->trait = new CoverageListenerTrait($sutFqcnResolver);
+            $this->trait = new CoverageListenerTrait($sutFqcnResolver, $warningOnSutNotFound);
         }
 
         public function startTest(Test $test)

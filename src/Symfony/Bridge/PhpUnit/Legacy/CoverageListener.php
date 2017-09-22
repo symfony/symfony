@@ -23,9 +23,9 @@ class CoverageListener extends \PHPUnit_Framework_BaseTestListener
 {
     private $trait;
 
-    public function __construct(callable $sutFqcnResolver = null)
+    public function __construct(callable $sutFqcnResolver = null, $warningOnSutNotFound = false)
     {
-        $this->trait = new CoverageListenerTrait($sutFqcnResolver);
+        $this->trait = new CoverageListenerTrait($sutFqcnResolver, $warningOnSutNotFound);
     }
 
     public function startTest(\PHPUnit_Framework_Test $test)

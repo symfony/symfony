@@ -53,6 +53,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
         switch ($metadata->getTypeOfField($property)) {
             case Type::TARRAY:
+            case Type::SIMPLE_ARRAY:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), Guess::MEDIUM_CONFIDENCE);
             case Type::BOOLEAN:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\CheckboxType', array(), Guess::HIGH_CONFIDENCE);

@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Throws autowire exceptions from AutowirePass for definitions that still exist.
  *
+ * @deprecated AutowireExceptionPass is deprecated since version 3.4 and will be removed in 4.0.
+ *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 class AutowireExceptionPass implements CompilerPassInterface

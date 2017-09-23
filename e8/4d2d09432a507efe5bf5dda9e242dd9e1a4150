@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-21T16:50:25Z
+
+I wanted that yesterday, so definitely yes :)
+Should target 3.4 when merging.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-09-21T20:15:06Z
+
+This is wrong, because if I do a `dump($object, $foo, $bar)`, I know we will have `$object` but from an external point of view, this is not so obvious...
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-21T20:38:32Z
+
+@Taluu in that case the last argument is the var that is returned ;)
+```php
+dump($string, $float, $object)->method();
+```
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-09-21T20:53:02Z
+
+> @Taluu in that case the last argument is the var that is returned ;)
+
+Which means it is even less obvious than you think it was... maybe return `func_get_args()` or null in this case, so that it can't be misused?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-09-21T20:55:59Z
+
+That's the same thing (I read too fast), but still. If I am using `echo`, `var_dump`, `error_log` and so on, I am not expecting those to "return" the (last ?) argument. And returning all the args is not really intuitive too IMO.
+
+This is making something fluent just for the sake of making it fluent : https://ocramius.github.io/blog/fluent-interfaces-are-evil/
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-21T21:07:39Z
+
+This is just about easing inspecting some vars when developing. It's not just for the sake of making it fluent. Thanks to this, you just have to wrap a variable or an expression instead of writing a new line and possibly executing the same piece of code twice.
+
+> This is wrong, because if I do a dump($object, $foo, $bar), I know we will have $object but from an external point of view, this is not so obvious...
+
+> maybe return func_get_args() or null in this case, so that it can't be misused?
+
+Returning `func_get_args()` would defeat the purpose of this, as you won't be able to chain.
+What it returns in case of multiple arguments "_does not have to be particularly obvious when reading_", because you're not likely to read that code anyway: you generally are the one writing this code for debugging purpose so it won't remains. Either you know about the feature, how it behaves and use it, either you don't and keep dumping around the old way.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-09-21T21:14:31Z
+
+For the `func_get_args()` I agree, but on the other thing (returning something), I disagree.
+
+Something that would be more convenient IMO would be to `yield` each value on multiple args, rather than arbitrarily returning the last arg
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-21T21:26:12Z
+
+But what would be the usefulness of this in practice, appart from the debatable less arbitrary nature of the returned value? How would it be convenient? It'll return a generator and won't allow chaining, so again defeats the purpose of this PR.
+
+---------------------------------------------------------------------------
+
+by franzliedke at 2017-09-22T07:13:00Z
+
+When you dump multiple values, you're probably not using them inline anyways, so the benefit of simply adding and removing `dump()` around the variable would not be existent anyways...
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-09-22T07:19:00Z
+
+> Returning func_get_args() would defeat the purpose of this, as you won't be able to chain.
+
+I wrote "in that case", meaning when you pass multiple vars.
+
+---------------------------------------------------------------------------
+
+by JulienTant at 2017-09-22T07:31:53Z
+
+Don't forget that the goal of this PR is it so make `dump($object)->method();` works.
+
+We can accept that this PR is a first step, and create new PRs later to improve the behavior of what's returned in the case of multiple arguments ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-22T09:27:28Z
+
+@greg0ire you cannot make a function become a generator conditionally, as this is determined at compile time (based on the presence of a `yield` in it).
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-09-22T10:14:54Z
+
+TIL :bulb: , but I think you meant to answer to @Taluu
+
+---------------------------------------------------------------------------
+
+by hannesvdvreken at 2017-09-22T13:23:20Z
+
+We can have it return the exact same list of things of course..
+
+```php
+if ($moreVars) {
+    return func_get_args();
+}
+
+return $var;
+```
+
+and then we could do both
+
+```php
+dump($stuff)->someMethod();
+```
+
+and:
+
+```php
+$object->someMethod(...dump($arg1, $arg2, $arg3));
+```
+---
+imho: it would be a bit awkward to do
+
+```
+dump($foo, $bar, $object)->methodOnObject();
+```
+
+The goal is to dump some variables and make your application still work, kind of, without having to do too many keystrokes.
+
+---------------------------------------------------------------------------
+
+by freekmurze at 2017-09-22T13:43:13Z
+
+I really like what @hannesvdvreken proposed. I'll update this PR.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-09-22T14:03:47Z
+
+That's exactly what I proposed BTW :P Although I didn't think about the unpacking at the time, good thinking @hannesvdvreken !

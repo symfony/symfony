@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added a minimalist PSR-3 `Logger` class that writes in `stderr`
  * made kernels implementing `CompilerPassInterface` able to process the container
  * deprecated bundle inheritance
  * added `RebootableInterface` and implemented it in `Kernel`

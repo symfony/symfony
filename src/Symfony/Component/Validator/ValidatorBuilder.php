@@ -295,15 +295,15 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         foreach ($this->yamlMappings as $yamlMappings) {
             $loaders[] = new YamlFileLoader($yamlMappings);
         }
-        
+
         if ($this->annotationReader) {
             $loaders[] = new AnnotationLoader($this->annotationReader);
         }
-        
+
         foreach ($this->methodMappings as $methodName) {
             $loaders[] = new StaticMethodLoader($methodName);
         }
-        
+
 
         return $loaders;
     }

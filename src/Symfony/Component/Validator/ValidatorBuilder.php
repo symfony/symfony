@@ -304,7 +304,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $loaders[] = new StaticMethodLoader($methodName);
         }
 
-
         return $loaders;
     }
 

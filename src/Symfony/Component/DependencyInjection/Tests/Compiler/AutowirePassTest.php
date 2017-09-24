@@ -1093,7 +1093,7 @@ class SetterInjection extends SetterInjectionParent
         // should be called
     }
 
-    /** {@inheritdoc}*/
+    /** @inheritdoc*/
     public function setDependencies(Foo $foo, A $a)
     {
         // should be called

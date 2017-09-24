@@ -216,7 +216,7 @@ class Store implements StoreInterface
         }
 
         $headers = $this->persistResponse($response);
-        unset($headers['age']);
+        unset($headers['age'], $headers['set-cookie']);
 
         array_unshift($entries, array($storedEnv, $headers));
 

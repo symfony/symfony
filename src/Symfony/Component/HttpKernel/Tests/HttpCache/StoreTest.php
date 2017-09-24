@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Store;
@@ -261,6 +262,19 @@ class StoreTest extends TestCase
         $this->assertTrue($this->store->purge('http://example.com/foo'));
         $this->assertEmpty($this->getStoreMetadata($requestHttp));
         $this->assertEmpty($this->getStoreMetadata($requestHttps));
+    }
+
+    public function testNoResponseCookiesAreStored()
+    {
+        $request = Request::create('/foo');
+        $response = new Response('foo');
+        $response->headers->set('set-cookie', 'foo=bar');
+        $response->headers->setCookie(new Cookie('bar', 'foo'));
+        $this->store->write($request, $response);
+
+        $newResponse = $this->store->lookup($request);
+        $this->assertEmpty($newResponse->headers->getCookies());
+        $this->assertNull($newResponse->headers->get('set-cookie'));
     }
 
     protected function storeSimpleEntry($path = null, $headers = array())

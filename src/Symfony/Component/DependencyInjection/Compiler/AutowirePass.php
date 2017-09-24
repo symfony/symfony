@@ -44,7 +44,7 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * @deprecated since version 3.3, to be removed in 4.0.
+     * @deprecated since version 3.4, to be removed in 4.0.
      *
      * @return AutowiringFailedException[]
      */

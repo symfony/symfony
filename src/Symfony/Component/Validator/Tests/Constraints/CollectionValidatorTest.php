@@ -386,4 +386,116 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'foo' => 3,
         ), (array) $value);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testGroupShouldBePassedToTheContainingConstraint()
+    {
+        $value = array('baz' => 2);
+
+        $constraint = new Collection(
+            array(
+                'fields' => array(
+                    'baz' => array(
+                        new Range(array(
+                            'min' => 1,
+                            'groups' => 'bar',
+                        )),
+                    ),
+                ),
+                'groups' => 'foo',
+            )
+        );
+
+        $this->validator->validate($this->prepareTestData($value), $constraint);
+    }
+
+    /**
+     * @dataProvider multipleGroupsForCollectionProvider
+     *
+     * @param array $fooGroups
+     * @param array $barGroups
+     * @param array $collectionGroups
+     * @param array $expectedGroups
+     */
+    public function testValidateMultipleGroupsForCollectionConstraint(
+        array $fooGroups,
+        array $barGroups,
+        array $collectionGroups,
+        array $expectedGroups
+    ) {
+        $value = array('baz' => 2);
+
+        $fooConstraint = new Range(array(
+            'min' => 3,
+            'minMessage' => 'Group foo',
+            'groups' => $fooGroups,
+        ));
+        $barConstraint = new Range(array(
+            'min' => 5,
+            'minMessage' => 'Group bar',
+            'groups' => $barGroups,
+        ));
+
+        $constraint = new Collection(
+            array(
+                'fields' => array(
+                    'baz' => array(
+                        $fooConstraint,
+                        $barConstraint,
+                    ),
+                ),
+                'groups' => $collectionGroups,
+            )
+        );
+
+        $data = $this->prepareTestData($value);
+
+        $this->expectValidateValueAt(0, '[baz]', $value['baz'], array($fooConstraint, $barConstraint), $expectedGroups);
+
+        $this->validator->validate($data, $constraint);
+    }
+
+    public static function multipleGroupsForCollectionProvider()
+    {
+        return array(
+            array(
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+            ),
+            array(
+                array('foo', 'bar'),
+                array('bar'),
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+            ),
+            array(
+                array('foo'),
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+            ),
+            array(
+                array('foo'),
+                array('bar'),
+                array('foo', 'bar'),
+                array('foo', 'bar'),
+            ),
+            array(
+                array('foo'),
+                array('foo'),
+                array('foo', 'bar'),
+                array('foo'),
+            ),
+            array(
+                array('foo'),
+                array('foo'),
+                array('foo'),
+                array('foo'),
+            ),
+        );
+    }
 }

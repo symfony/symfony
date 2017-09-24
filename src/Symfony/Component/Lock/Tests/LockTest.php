@@ -183,4 +183,39 @@ class LockTest extends TestCase
         yield array(array(0.1), false);
         yield array(array(-0.1, null), false);
     }
+
+    public function testWithCallsCallback()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $callback = $this->getMockBuilder('stdClass')->setMethods(array('run'))->getMock();
+        $lock = new Lock($key, $store);
+
+        $callback->expects($this->once())
+            ->method('run');
+
+        $store
+            ->expects($this->once())
+            ->method('save');
+
+        $this->assertTrue($lock->with(array($callback, 'run')));
+    }
+
+    public function testWithReturnsFalse()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $callback = $this->getMockBuilder('stdClass')->setMethods(array('run'))->getMock();
+        $lock = new Lock($key, $store);
+
+        $callback->expects($this->never())
+            ->method('run');
+
+        $store
+            ->expects($this->once())
+            ->method('save')
+            ->willThrowException(new LockConflictedException());
+
+        $this->assertFalse($lock->with(array($callback, 'run')));
+    }
 }

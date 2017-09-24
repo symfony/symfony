@@ -525,11 +525,9 @@ HttpFoundation
    not supported anymore, use `Request::isMethodCacheable()` instead.
 
  * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`, 
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy` and 
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` classes have been removed.
-
- * The `SessionHandlerProxy::isSessionHandlerInterface()` and `SessionHandlerProxy::isWrapper()`
-   methods have been removed.
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy`,
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` and 
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` classes have been removed.
 
  * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
 

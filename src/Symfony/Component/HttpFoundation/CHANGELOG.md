@@ -5,8 +5,7 @@ CHANGELOG
 -----
 
  * deprecated the `NativeSessionHandler` class,
- * deprecated the `AbstractProxy` and `NativeProxy` classes in favor of `SessionHandlerProxy` class,
- * deprecated the `SessionHandlerProxy::isSessionHandlerInterface()` and `SessionHandlerProxy::isWrapper()` methods,
+ * deprecated the `AbstractProxy`, `NativeProxy` and `SessionHandlerProxy` classes,
  * deprecated setting session save handlers that do not implement `\SessionHandlerInterface` in `NativeSessionStorage::setSaveHandler()`
 
 3.3.0

@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
+ * @group legacy
  */
 class SessionHandlerProxyTest extends TestCase
 {

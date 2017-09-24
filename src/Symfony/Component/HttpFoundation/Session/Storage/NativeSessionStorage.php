@@ -24,8 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 class NativeSessionStorage implements SessionStorageInterface
 {
     /**
-     * Array of SessionBagInterface.
-     *
      * @var SessionBagInterface[]
      */
     protected $bags;
@@ -51,8 +49,6 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
-     * Constructor.
-     *
      * Depending on how you want the storage driver to behave you probably
      * want to override this constructor entirely.
      *
@@ -378,6 +374,13 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException('Must be instance of AbstractProxy; implement \SessionHandlerInterface; or be null.');
         }
 
+        if ($saveHandler instanceof AbstractProxy) {
+            @trigger_error(
+                'Using session save handlers that are instances of AbstractProxy is deprecated since version 3.4 and will be removed in 4.0.',
+                E_USER_DEPRECATED
+            );
+        }
+
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
@@ -388,8 +391,6 @@ class NativeSessionStorage implements SessionStorageInterface
 
         if ($this->saveHandler instanceof \SessionHandlerInterface) {
             session_set_save_handler($this->saveHandler, false);
-        } else {
-            @trigger_error('Using session save handlers that do not implement \SessionHandlerInterface is deprecated since version 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
         }
     }
 

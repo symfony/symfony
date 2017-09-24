@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
+@trigger_error('The '.__NAMESPACE__.'\AbstractProxy class is deprecated since version 3.4 and will be removed in 4.0. Use your session handler implementation directly.', E_USER_DEPRECATED);
+
 /**
- * @deprecated since version 3.4, to be removed in 4.0. Use SessionHandlerProxy instead.
+ * @deprecated since version 3.4, to be removed in 4.0. Use your session handler implementation directly.
  *
  * @author Drak <drak@zikula.org>
  */
@@ -20,8 +22,6 @@ abstract class AbstractProxy
 {
     /**
      * Flag if handler wraps an internal PHP session handler (using \SessionHandler).
-     *
-     * @deprecated since version 3.4 and will be removed in 4.0.
      *
      * @var bool
      */
@@ -45,28 +45,20 @@ abstract class AbstractProxy
     /**
      * Is this proxy handler and instance of \SessionHandlerInterface.
      *
-     * @deprecated since version 3.4 and will be removed in 4.0.
-     *
      * @return bool
      */
     public function isSessionHandlerInterface()
     {
-        @trigger_error('isSessionHandlerInterface() is deprecated since version 3.4 and will be removed in 4.0. A session handler proxy should always implement \SessionHandlerInterface.', E_USER_DEPRECATED);
-
         return $this instanceof \SessionHandlerInterface;
     }
 
     /**
      * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
      *
-     * @deprecated since version 3.4 and will be removed in 4.0.
-     *
      * @return bool
      */
     public function isWrapper()
     {
-        @trigger_error('isWrapper() is deprecated since version 3.4 and will be removed in 4.0. You should explicitly check if the handler proxy wraps a \SessionHandler instance.', E_USER_DEPRECATED);
-
         return $this->wrapper;
     }
 

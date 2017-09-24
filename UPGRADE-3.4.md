@@ -212,19 +212,13 @@ HttpFoundation
    class has been deprecated and will be removed in 4.0. Use the `\SessionHandler` class instead.
 
  * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy` class has been
-   deprecated and will be removed in 4.0. Use the `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy`
-   class instead.
+   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
 
  * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` class has been
-   deprecated and will be removed in 4.0. Use the `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy`
-   class instead.
+   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
 
- * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy::isSessionHandlerInterface()`
-   method has been deprecated and will be removed in 4.0.
-
- * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy::isWrapper()`
-   method has been deprecated and will be removed in 4.0. You can check explicitly if the proxy wraps
-   a `\SessionHandler` instance.
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` class has been
+   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
 
  * `NativeSessionStorage::setSaveHandler()` now takes an instance of `\SessionHandlerInterface` as argument.
    Not passing it is deprecated and will throw a `TypeError` in 4.0.

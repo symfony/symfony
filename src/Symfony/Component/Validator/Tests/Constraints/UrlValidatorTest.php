@@ -65,6 +65,30 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidRelativeUrls
+     * @dataProvider getValidUrls
+     */
+    public function testValidRelativeUrl($url)
+    {
+        $constraint = new Url(array(
+            'relativeProtocol' => true,
+        ));
+
+        $this->validator->validate($url, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidRelativeUrls()
+    {
+        return array(
+            array('//google.com'),
+            array('//symfony.fake/blog/'),
+            array('//symfony.com/search?type=&q=url+validator'),
+        );
+    }
+
     public function getValidUrls()
     {
         return array(
@@ -145,6 +169,46 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ value }}', '"'.$url.'"')
             ->setCode(Url::INVALID_URL_ERROR)
             ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getInvalidRelativeUrls
+     * @dataProvider getInvalidUrls
+     */
+    public function testInvalidRelativeUrl($url)
+    {
+        $constraint = new Url(array(
+            'message' => 'myMessage',
+            'relativeProtocol' => true,
+        ));
+
+        $this->validator->validate($url, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$url.'"')
+            ->setCode(Url::INVALID_URL_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidRelativeUrls()
+    {
+        return array(
+            array('/google.com'),
+            array('//goog_le.com'),
+            array('//google.com::aa'),
+            array('//google.com:aa'),
+            array('//127.0.0.1:aa/'),
+            array('//[::1'),
+            array('//hello.☎/'),
+            array('//:password@symfony.com'),
+            array('//:password@@symfony.com'),
+            array('//username:passwordsymfony.com'),
+            array('//usern@me:password@symfony.com'),
+            array('//example.com/exploit.html?<script>alert(1);</script>'),
+            array('//example.com/exploit.html?hel lo'),
+            array('//example.com/exploit.html?not_a%hex'),
+            array('//'),
+        );
     }
 
     public function getInvalidUrls()

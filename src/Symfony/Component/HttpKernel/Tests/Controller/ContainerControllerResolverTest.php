@@ -88,6 +88,49 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertEquals($invokableController, $controller);
     }
 
+    public function testNonInstantiableController()
+    {
+        $container = $this->createMockContainer();
+        $container->expects($this->once())
+            ->method('has')
+            ->with(NonInstantiableController::class)
+            ->will($this->returnValue(false))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', array(NonInstantiableController::class, 'action'));
+
+        $controller = $resolver->getController($request);
+
+        $this->assertSame(array(NonInstantiableController::class, 'action'), $controller);
+    }
+
+    public function testNonInstantiableControllerWithCorrespondingService()
+    {
+        $service = new \stdClass();
+
+        $container = $this->createMockContainer();
+        $container->expects($this->atLeastOnce())
+            ->method('has')
+            ->with(NonInstantiableController::class)
+            ->will($this->returnValue(true))
+        ;
+        $container->expects($this->atLeastOnce())
+            ->method('get')
+            ->with(NonInstantiableController::class)
+            ->will($this->returnValue($service))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', array(NonInstantiableController::class, 'action'));
+
+        $controller = $resolver->getController($request);
+
+        $this->assertSame(array($service, 'action'), $controller);
+    }
+
     /**
      * @dataProvider getUndefinedControllers
      */
@@ -143,6 +186,13 @@ class InvokableController
     }
 
     public function __invoke()
+    {
+    }
+}
+
+abstract class NonInstantiableController
+{
+    public static function action()
     {
     }
 }

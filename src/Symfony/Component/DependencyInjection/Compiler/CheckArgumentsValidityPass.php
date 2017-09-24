@@ -44,7 +44,6 @@ class CheckArgumentsValidityPass extends AbstractRecursivePass
                 if (!is_int($k)) {
                     $msg = sprintf('Invalid constructor argument for service "%s": integer expected but found string "%s". Check your service definition.', $this->currentId, $k);
                     $value->addError($msg);
-
                     if ($this->throwExceptions) {
                         throw new RuntimeException($msg);
                     }
@@ -67,7 +66,6 @@ class CheckArgumentsValidityPass extends AbstractRecursivePass
                     if (!is_int($k)) {
                         $msg = sprintf('Invalid argument for method call "%s" of service "%s": integer expected but found string "%s". Check your service definition.', $methodCall[0], $this->currentId, $k);
                         $value->addError($msg);
-
                         if ($this->throwExceptions) {
                             throw new RuntimeException($msg);
                         }

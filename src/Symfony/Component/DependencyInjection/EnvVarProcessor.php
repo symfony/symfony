@@ -15,6 +15,9 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
+/**
+ * @author Nicolas Grekas <p@tchwork.com>
+ */
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
     private $container;

@@ -15,6 +15,8 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
 
 /**
@@ -24,7 +26,7 @@ use Symfony\Component\Cache\Traits\PhpArrayTrait;
  * @author Titouan Galopin <galopintitouan@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class PhpArrayAdapter implements AdapterInterface
+class PhpArrayAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
 {
     use PhpArrayTrait;
 
@@ -37,7 +39,7 @@ class PhpArrayAdapter implements AdapterInterface
     public function __construct($file, AdapterInterface $fallbackPool)
     {
         $this->file = $file;
-        $this->fallbackPool = $fallbackPool;
+        $this->pool = $fallbackPool;
         $this->zendDetectUnicode = ini_get('zend.detect_unicode');
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) {
@@ -89,7 +91,7 @@ class PhpArrayAdapter implements AdapterInterface
             $this->initialize();
         }
         if (!isset($this->values[$key])) {
-            return $this->fallbackPool->getItem($key);
+            return $this->pool->getItem($key);
         }
 
         $value = $this->values[$key];
@@ -144,7 +146,7 @@ class PhpArrayAdapter implements AdapterInterface
             $this->initialize();
         }
 
-        return isset($this->values[$key]) || $this->fallbackPool->hasItem($key);
+        return isset($this->values[$key]) || $this->pool->hasItem($key);
     }
 
     /**
@@ -159,7 +161,7 @@ class PhpArrayAdapter implements AdapterInterface
             $this->initialize();
         }
 
-        return !isset($this->values[$key]) && $this->fallbackPool->deleteItem($key);
+        return !isset($this->values[$key]) && $this->pool->deleteItem($key);
     }
 
     /**
@@ -186,7 +188,7 @@ class PhpArrayAdapter implements AdapterInterface
         }
 
         if ($fallbackKeys) {
-            $deleted = $this->fallbackPool->deleteItems($fallbackKeys) && $deleted;
+            $deleted = $this->pool->deleteItems($fallbackKeys) && $deleted;
         }
 
         return $deleted;
@@ -201,7 +203,7 @@ class PhpArrayAdapter implements AdapterInterface
             $this->initialize();
         }
 
-        return !isset($this->values[$item->getKey()]) && $this->fallbackPool->save($item);
+        return !isset($this->values[$item->getKey()]) && $this->pool->save($item);
     }
 
     /**
@@ -213,7 +215,7 @@ class PhpArrayAdapter implements AdapterInterface
             $this->initialize();
         }
 
-        return !isset($this->values[$item->getKey()]) && $this->fallbackPool->saveDeferred($item);
+        return !isset($this->values[$item->getKey()]) && $this->pool->saveDeferred($item);
     }
 
     /**
@@ -221,7 +223,7 @@ class PhpArrayAdapter implements AdapterInterface
      */
     public function commit()
     {
-        return $this->fallbackPool->commit();
+        return $this->pool->commit();
     }
 
     /**
@@ -259,7 +261,7 @@ class PhpArrayAdapter implements AdapterInterface
         }
 
         if ($fallbackKeys) {
-            foreach ($this->fallbackPool->getItems($fallbackKeys) as $key => $item) {
+            foreach ($this->pool->getItems($fallbackKeys) as $key => $item) {
                 yield $key => $item;
             }
         }

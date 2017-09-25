@@ -50,6 +50,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         'testDeleteItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
 
         'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
+        'testPrune' => 'PhpArrayAdapter just proxies',
     );
 
     protected static $file;

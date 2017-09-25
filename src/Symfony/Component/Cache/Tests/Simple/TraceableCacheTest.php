@@ -19,6 +19,10 @@ use Symfony\Component\Cache\Simple\TraceableCache;
  */
 class TraceableCacheTest extends CacheTestCase
 {
+    protected $skippedTests = array(
+        'testPrune' => 'TraceableCache just proxies',
+    );
+
     public function createSimpleCache($defaultLifetime = 0)
     {
         return new TraceableCache(new FilesystemCache('', $defaultLifetime));

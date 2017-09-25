@@ -8,7 +8,7 @@
         <defaults public="false" />
 
         <service id="cache.app" parent="cache.adapter.filesystem" public="true">
-            <tag name="cache.pool" clearer="cache.app_clearer" />
+            <tag name="cache.pool" clearer="cache.app_clearer" reset="reset" />
         </service>
 
         <service id="cache.system" parent="cache.adapter.system" public="true">
@@ -90,7 +90,7 @@
         </service>
 
         <service id="cache.adapter.memcached" class="Symfony\Component\Cache\Adapter\MemcachedAdapter" abstract="true">
-            <tag name="cache.pool" provider="cache.default_memcached_provider" clearer="cache.default_clearer" />
+            <tag name="cache.pool" provider="cache.default_memcached_provider" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Memcached connection service -->
             <argument /> <!-- namespace -->

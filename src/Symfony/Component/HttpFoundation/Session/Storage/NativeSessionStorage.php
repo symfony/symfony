@@ -39,7 +39,7 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $closed = false;
 
     /**
-     * @var AbstractProxy
+     * @var AbstractProxy|\SessionHandlerInterface
      */
     protected $saveHandler;
 
@@ -92,9 +92,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
      *
-     * @param array                                       $options Session configuration options
-     * @param AbstractProxy|\SessionHandlerInterface|null $handler
-     * @param MetadataBag                                 $metaBag MetadataBag
+     * @param array                         $options Session configuration options
+     * @param \SessionHandlerInterface|null $handler
+     * @param MetadataBag                   $metaBag MetadataBag
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
@@ -111,7 +111,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Gets the save handler instance.
      *
-     * @return AbstractProxy
+     * @return AbstractProxy|\SessionHandlerInterface
      */
     public function getSaveHandler()
     {
@@ -362,7 +362,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see http://php.net/sessionhandler
      * @see http://github.com/drak/NativeSession
      *
-     * @param AbstractProxy|\SessionHandlerInterface|null $saveHandler
+     * @param \SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
      */

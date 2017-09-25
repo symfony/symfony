@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-09-19T12:35:59Z
+
+This feels strange to use a flag to switch from filename to yaml content based on an flag.
+
+Why not creating a `parseFile` method instead ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-20T08:56:50Z
+
+@jvasseur i think we prefer a single API, e.g. `parse() + flags`.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-09-20T09:23:19Z
+
+@ro0NL but this flag is fundamentally different from the others, the others modify the parsing behavior, this one change what the method expect as an argument.
+
+Let's look at the `YamlEncoder` for example, it allow passing flags in the serialization context (https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Encoder/YamlEncoder.php#L62) which is a good feature to allow controlling how the yaml is decoded. It works well for all the current flags, but it will break (or even worse create a security breach) if someone pass the `PARSE_FILE` flag. Yes it would be a developer error to pass this flag, but it's a clue that this flag is wrong and this should go in a separate method.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-20T10:04:52Z
+
+I tend to agree with @jvasseur here. Having a flag in the bitmask changing totally the meaning of the argument is dangerous.
+The description of the PR says that the usage of the flag avoids the security vulnerability we had in the past. but this is true only if the code calling the YAML parser controls the flag fully. As soon as it makes it configurable, the same risk exists again.
+And if the code does not make the flag configurable, using a different method to parse a file is not an issue (as it won't need to be configurable)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-20T10:19:23Z
+
+The example given by @jvasseur is indeed something we should consider and having a method like `parseFile()` will fully solve that issue. Updated accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-24T15:13:50Z
+
+@stof OK for you? Still :+1: on my side with `Yaml/Parser::parseFile()`.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-25T15:26:07Z
+
+Other components should be updated to use it

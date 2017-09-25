@@ -264,10 +264,11 @@ SecurityBundle
    `Doctrine\DBAL\Connection`  as first argument. Not passing it is
     deprecated and will throw a `TypeError` in 4.0.
 
- * `SetAclCommand::__construct()` now takes an instance of
-   `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
-    as first argument. Not passing it is deprecated and will throw a `TypeError`
-    in 4.0.
+ * The `acl:set` command has been deprecated along with the `SetAclCommand` class,
+   both will be removed in 4.0. Install symfony/acl-bundle instead
+
+ * The `init:acl` command has been deprecated along with the `InitAclCommand` class,
+   both will be removed in 4.0. Install symfony/acl-bundle and use `acl:init` instead
 
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid

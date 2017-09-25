@@ -656,12 +656,9 @@ SecurityBundle
 
  * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` nor implement `ContainerAwareInterface` anymore.
 
- * `InitAclCommand::__construct()` now requires an instance of
-   `Doctrine\DBAL\Connection`  as first argument.
+ * `InitAclCommand` has been removed. Use `Symfony\Bundle\AclBundle\Command\InitAclCommand` instead
 
- * `SetAclCommand::__construct()` now requires an instance of
-   `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
-    as first argument.
+ * `SetAclCommand` has been removed. Use `Symfony\Bundle\AclBundle\Command\SetAclCommand` instead
 
  * The firewall option `logout_on_user_change` is now always true, which will
    trigger a logout if the user changes between requests.

@@ -30,6 +30,8 @@ class ParserTest extends TestCase
     protected function tearDown()
     {
         $this->parser = null;
+
+        chmod(__DIR__.'/Fixtures/not_readable.yml', 0644);
     }
 
     /**
@@ -1696,7 +1698,7 @@ YAML
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage The built-in tag "!!foo" is not implemented.
+     * @expectedExceptionMessage The built-in tag "!!foo" is not implemented at line 1 (near "!!foo").
      */
     public function testExceptionWhenUsingUnsuportedBuiltInTags()
     {
@@ -1902,6 +1904,43 @@ YAML;
         );
 
         $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT | Yaml::PARSE_KEYS_AS_STRINGS));
+    }
+
+    public function testFilenamesAreParsedAsStringsWithoutFlag()
+    {
+        $file = __DIR__.'/Fixtures/index.yml';
+
+        $this->assertSame($file, $this->parser->parse($file));
+    }
+
+    public function testParseFile()
+    {
+        $this->assertInternalType('array', $this->parser->parseFile(__DIR__.'/Fixtures/index.yml'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp #^File ".+/Fixtures/nonexistent.yml" does not exist\.$#
+     */
+    public function testParsingNonExistentFilesThrowsException()
+    {
+        $this->parser->parseFile(__DIR__.'/Fixtures/nonexistent.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp #^File ".+/Fixtures/not_readable.yml" cannot be read\.$#
+     */
+    public function testParsingNotReadableFilesThrowsException()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('chmod is not supported on Windows');
+        }
+
+        $file = __DIR__.'/Fixtures/not_readable.yml';
+        chmod($file, 0200);
+
+        $this->parser->parseFile($file);
     }
 }
 

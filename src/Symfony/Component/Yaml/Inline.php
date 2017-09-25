@@ -26,7 +26,8 @@ class Inline
 {
     const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+)"|\'([^\']*+(?:\'\'[^\']*+)*+)\')';
 
-    public static $parsedLineNumber;
+    public static $parsedLineNumber = -1;
+    public static $parsedFilename;
 
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
@@ -34,19 +35,18 @@ class Inline
     private static $constantSupport = false;
 
     /**
-     * @param int      $flags
-     * @param int|null $parsedLineNumber
+     * @param int         $flags
+     * @param int|null    $parsedLineNumber
+     * @param string|null $parsedFilename
      */
-    public static function initialize($flags, $parsedLineNumber = null)
+    public static function initialize($flags, $parsedLineNumber = null, $parsedFilename = null)
     {
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
         self::$objectForMap = (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags);
         self::$constantSupport = (bool) (Yaml::PARSE_CONSTANT & $flags);
-
-        if (null !== $parsedLineNumber) {
-            self::$parsedLineNumber = $parsedLineNumber;
-        }
+        self::$parsedFilename = $parsedFilename;
+        self::$parsedLineNumber = null !== $parsedLineNumber ? $parsedLineNumber : -1;
     }
 
     /**
@@ -128,7 +128,7 @@ class Inline
 
         // some comments are allowed at the end
         if (preg_replace('/\s+#.*$/A', '', substr($value, $i))) {
-            throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)));
+            throw new ParseException(sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber, $value, self::$parsedFilename);
         }
 
         if (isset($mbEncoding)) {
@@ -322,7 +322,7 @@ class Inline
             if (null !== $delimiters) {
                 $tmp = ltrim(substr($scalar, $i), ' ');
                 if (!in_array($tmp[0], $delimiters)) {
-                    throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)));
+                    throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                 }
             }
         } else {
@@ -339,12 +339,12 @@ class Inline
                 $output = $match[1];
                 $i += strlen($output);
             } else {
-                throw new ParseException(sprintf('Malformed inline YAML string: %s.', $scalar));
+                throw new ParseException(sprintf('Malformed inline YAML string: %s.', $scalar), self::$parsedLineNumber, null, self::$parsedFilename);
             }
 
             // a non-quoted string cannot start with @ or ` (reserved) nor with a scalar indicator (| or >)
             if ($output && ('@' === $output[0] || '`' === $output[0] || '|' === $output[0] || '>' === $output[0])) {
-                throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]));
+                throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]), self::$parsedLineNumber, $output, self::$parsedFilename);
             }
 
             if ($output && '%' === $output[0]) {
@@ -372,7 +372,7 @@ class Inline
     private static function parseQuotedScalar($scalar, &$i)
     {
         if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
-            throw new ParseException(sprintf('Malformed inline YAML string: %s.', substr($scalar, $i)));
+            throw new ParseException(sprintf('Malformed inline YAML string: %s.', substr($scalar, $i)), self::$parsedLineNumber, $scalar, self::$parsedFilename);
         }
 
         $output = substr($match[0], 1, strlen($match[0]) - 2);
@@ -455,7 +455,7 @@ class Inline
             ++$i;
         }
 
-        throw new ParseException(sprintf('Malformed inline YAML string: %s.', $sequence));
+        throw new ParseException(sprintf('Malformed inline YAML string: %s.', $sequence), self::$parsedLineNumber, null, self::$parsedFilename);
     }
 
     /**
@@ -572,7 +572,7 @@ class Inline
             }
         }
 
-        throw new ParseException(sprintf('Malformed inline YAML string: %s.', $mapping));
+        throw new ParseException(sprintf('Malformed inline YAML string: %s.', $mapping), self::$parsedLineNumber, null, self::$parsedFilename);
     }
 
     /**
@@ -600,11 +600,11 @@ class Inline
 
             // an unquoted *
             if (false === $value || '' === $value) {
-                throw new ParseException('A reference must contain at least one character.');
+                throw new ParseException('A reference must contain at least one character.', self::$parsedLineNumber, $value, self::$parsedFilename);
             }
 
             if (!array_key_exists($value, $references)) {
-                throw new ParseException(sprintf('Reference "%s" does not exist.', $value));
+                throw new ParseException(sprintf('Reference "%s" does not exist.', $value), self::$parsedLineNumber, $value, self::$parsedFilename);
             }
 
             return $references[$value];
@@ -639,7 +639,7 @@ class Inline
                         }
 
                         if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
+                            throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
 
                         return;
@@ -651,7 +651,7 @@ class Inline
                         }
 
                         if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
+                            throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
 
                         return;
@@ -661,7 +661,7 @@ class Inline
                         }
 
                         if (self::$exceptionOnInvalidType) {
-                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
+                            throw new ParseException('Object support when parsing a YAML file has been disabled.', self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
 
                         return;
@@ -673,10 +673,10 @@ class Inline
                                 return constant($const);
                             }
 
-                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const));
+                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
                         if (self::$exceptionOnInvalidType) {
-                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar));
+                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
 
                         return;
@@ -686,10 +686,10 @@ class Inline
                                 return constant($const);
                             }
 
-                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const));
+                            throw new ParseException(sprintf('The constant "%s" is not defined.', $const), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
                         if (self::$exceptionOnInvalidType) {
-                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar));
+                            throw new ParseException(sprintf('The string "%s" could not be parsed as a constant. Have you forgotten to pass the "Yaml::PARSE_CONSTANT" flag to the parser?', $scalar), self::$parsedLineNumber, $scalar, self::$parsedFilename);
                         }
 
                         return;
@@ -781,7 +781,7 @@ class Inline
 
         // Built-in tags
         if ($tag && '!' === $tag[0]) {
-            throw new ParseException(sprintf('The built-in tag "!%s" is not implemented.', $tag));
+            throw new ParseException(sprintf('The built-in tag "!%s" is not implemented.', $tag), self::$parsedLineNumber, $value, self::$parsedFilename);
         }
 
         if (Yaml::PARSE_CUSTOM_TAGS & $flags) {
@@ -790,7 +790,7 @@ class Inline
             return $tag;
         }
 
-        throw new ParseException(sprintf('Tags support is not enabled. Enable the `Yaml::PARSE_CUSTOM_TAGS` flag to use "!%s".', $tag));
+        throw new ParseException(sprintf('Tags support is not enabled. Enable the `Yaml::PARSE_CUSTOM_TAGS` flag to use "!%s".', $tag), self::$parsedLineNumber, $value, self::$parsedFilename);
     }
 
     /**
@@ -805,11 +805,11 @@ class Inline
         $parsedBinaryData = self::parseScalar(preg_replace('/\s/', '', $scalar));
 
         if (0 !== (strlen($parsedBinaryData) % 4)) {
-            throw new ParseException(sprintf('The normalized base64 encoded data (data without whitespace characters) length must be a multiple of four (%d bytes given).', strlen($parsedBinaryData)));
+            throw new ParseException(sprintf('The normalized base64 encoded data (data without whitespace characters) length must be a multiple of four (%d bytes given).', strlen($parsedBinaryData)), self::$parsedLineNumber, $scalar, self::$parsedFilename);
         }
 
         if (!Parser::preg_match('#^[A-Z0-9+/]+={0,2}$#i', $parsedBinaryData)) {
-            throw new ParseException(sprintf('The base64 encoded data (%s) contains invalid characters.', $parsedBinaryData));
+            throw new ParseException(sprintf('The base64 encoded data (%s) contains invalid characters.', $parsedBinaryData), self::$parsedLineNumber, $scalar, self::$parsedFilename);
         }
 
         return base64_decode($parsedBinaryData, true);

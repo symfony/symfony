@@ -58,7 +58,7 @@ class YamlFileLoader extends FileLoader
         }
 
         try {
-            $parsedConfig = $this->yamlParser->parse(file_get_contents($path));
+            $parsedConfig = $this->yamlParser->parseFile($path);
         } catch (ParseException $e) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
         }

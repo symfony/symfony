@@ -654,7 +654,7 @@ class YamlFileLoader extends FileLoader
         }
 
         try {
-            $configuration = $this->yamlParser->parse(file_get_contents($file), Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);
+            $configuration = $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);
         } catch (ParseException $e) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $file), 0, $e);
         }

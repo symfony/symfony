@@ -7,7 +7,7 @@
         <div class="{{ block('form_label_class') }}"></div>
     {%- else -%}
         {%- if expanded is not defined or not expanded -%}
-            {%- set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
         {%- endif -%}
         {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ block('form_label_class'))|trim}) -%}
         {{- parent() -}}

@@ -58,6 +58,7 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
+            new AutowireRequiredMethodsPass(),
             new ResolveBindingsPass(),
             $autowirePass = new AutowirePass(false),
             new ResolveServiceSubscribersPass(),

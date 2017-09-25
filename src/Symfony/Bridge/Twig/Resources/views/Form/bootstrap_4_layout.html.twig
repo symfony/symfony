@@ -72,9 +72,9 @@
 {% block form_label -%}
     {%- if expanded is defined and expanded -%}
         {%- set element = 'legend' -%}
-        {%- set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' col-form-legend')|trim}) -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-legend')|trim}) -%}
     {%- endif -%}
-    {%- set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
     {{- parent() -}}
 {%- endblock form_label %}
 

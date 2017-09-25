@@ -65,6 +65,33 @@ class PropertyNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
+    public function testNormalizeWithParentClass()
+    {
+        $group = new GroupDummy();
+        $group->setFoo('foo');
+        $group->setBar('bar');
+        $group->setKevin('Kevin');
+        $group->setCoopTilleuls('coop');
+        $this->assertEquals(
+            array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin',
+                  'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, ),
+            $this->normalizer->normalize($group, 'any')
+        );
+    }
+
+    public function testDenormalizeWithParentClass()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin'),
+            GroupDummy::class,
+            'any'
+        );
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->getBar());
+        $this->assertEquals('Kevin', $obj->getKevin());
+        $this->assertNull($obj->getSymfony());
+    }
+
     public function testConstructorDenormalize()
     {
         $obj = $this->normalizer->denormalize(
@@ -147,12 +174,14 @@ class PropertyNormalizerTest extends TestCase
             'bar' => 'bar',
         ), $this->normalizer->normalize($obj, null, array(PropertyNormalizer::GROUPS => array('c'))));
 
-        // The PropertyNormalizer is not able to hydrate properties from parent classes
+        // The PropertyNormalizer is also able to hydrate properties from parent classes
         $this->assertEquals(array(
             'symfony' => 'symfony',
             'foo' => 'foo',
             'fooBar' => 'fooBar',
             'bar' => 'bar',
+            'kevin' => 'kevin',
+            'coopTilleuls' => 'coopTilleuls',
         ), $this->normalizer->normalize($obj, null, array(PropertyNormalizer::GROUPS => array('a', 'c'))));
     }
 

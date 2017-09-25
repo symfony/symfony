@@ -84,6 +84,21 @@ class PropertyNormalizer extends AbstractObjectNormalizer
                 return false;
             }
         } catch (\ReflectionException $reflectionException) {
+            $className = is_string($classOrObject) ? $classOrObject : get_class($classOrObject);
+            $class = new \ReflectionClass($className);
+
+            while ($parent = $class->getParentClass()) {
+                try {
+                    $reflectionProperty = new \ReflectionProperty($parent->getName(), $attribute);
+                    if ($reflectionProperty) {
+                        return true;
+                    }
+                } catch (\Exception $e) {
+                }
+
+                $class = $parent;
+            }
+
             return false;
         }
 
@@ -98,13 +113,15 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
 
-        foreach ($reflectionObject->getProperties() as $property) {
-            if (!$this->isAllowedAttribute($object, $property->name)) {
-                continue;
-            }
+        do {
+            foreach ($reflectionObject->getProperties() as $property) {
+                if (!$this->isAllowedAttribute($reflectionObject->getName(), $property->name)) {
+                    continue;
+                }
 
-            $attributes[] = $property->name;
-        }
+                $attributes[] = $property->name;
+            }
+        } while ($reflectionObject = $reflectionObject->getParentClass());
 
         return $attributes;
     }
@@ -117,7 +134,13 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         try {
             $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
         } catch (\ReflectionException $reflectionException) {
-            return;
+            $class = get_parent_class($object);
+            do {
+                $reflectionProperty = new \ReflectionProperty(get_parent_class($object), $attribute);
+                if (null === $reflectionProperty) {
+                    return;
+                }
+            } while ($class = get_parent_class($class));
         }
 
         // Override visibility
@@ -136,7 +159,13 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         try {
             $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
         } catch (\ReflectionException $reflectionException) {
-            return;
+            $class = get_parent_class($object);
+            do {
+                $reflectionProperty = new \ReflectionProperty(get_parent_class($object), $attribute);
+                if (null === $reflectionProperty) {
+                    return;
+                }
+            } while ($class = get_parent_class($class));
         }
 
         if ($reflectionProperty->isStatic()) {

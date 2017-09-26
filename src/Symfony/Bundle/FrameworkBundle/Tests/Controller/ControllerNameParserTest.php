@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Composer\Autoload\ClassLoader;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Component\HttpKernel\Kernel;
 
 class ControllerNameParserTest extends TestCase
 {
@@ -98,10 +99,17 @@ class ControllerNameParserTest extends TestCase
 
     public function getMissingControllersTest()
     {
-        return array(
-            array('FooBundle:Fake:index'),          // a normal bundle
-            array('SensioFooBundle:Fake:index'),    // a bundle with children
+        // a normal bundle
+        $bundles = array(
+            array('FooBundle:Fake:index'),
         );
+
+        // a bundle with children
+        if (Kernel::VERSION_ID < 40000) {
+            $bundles[] = array('SensioFooBundle:Fake:index');
+        }
+
+        return $bundles;
     }
 
     /**

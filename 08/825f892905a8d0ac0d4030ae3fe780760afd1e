@@ -1,0 +1,279 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-06-12T14:52:44Z
+
+@lyrixx is there a way to opt-out the guessing for some test cases (smoke tests used to cover things through functional tests for instance) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-06-12T14:56:55Z
+
+I like it :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-06-12T14:59:21Z
+
+@stof As soon as you add an annotation on your test class, the listener adds nothing.
+Thus, if it's really needed, we could make this listener configurable.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-06-14T18:24:40Z
+
+Nice!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-06-22T13:19:34Z
+
+This PR did not get so much attraction. IMHO, it's nice.
+
+Should I finished it or it will be a waste of time?
+(This is really easy, as we have to deal with many PHPUnit version (PSR4 vs Pear))
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-06-22T13:38:23Z
+
+IMO It should be finished, I may use it ;)
+
+---------------------------------------------------------------------------
+
+by sebastianbergmann at 2017-06-22T14:54:52Z
+
+A test listener should only listen. In the future, it will only be able to listen.
+
+The proper solution to this problem is to follow best practices and set `forceCoversAnnotation="true"` in your PHPUnit configuration.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-22T14:57:15Z
+
+@sebastianbergmann well, this listener is an attempt at guessing the covered class based on a convention instead of forcing to put the annotation everywhere. What would be the proper way to implement such convention-based coverage configuration in PHPUnit ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-22T15:04:46Z
+
+My first reaction was: why is it related to Symfony? Why isn't it something part of PHPUnit itself it that's something useful?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-06-22T15:09:22Z
+
+@fabpot that's a good question. I guess I created the PR in Symfony because I contribute more to Symfony than to PHPUnit. And we already have some listener in Symfony.
+
+---------------------------------------------------------------------------
+
+by medinae at 2017-06-22T17:26:09Z
+
+Useful feature 👍 I agree with @lyrixx as others similar listeners are existing in SF.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-03T07:22:03Z
+
+@lyrixx Can you add some information in the documentation?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-04T08:19:57Z
+
+@fabpot Keep in mind this PR is really not ready. I have to make it work for different PHPUnit version.
+
+anyway, what documentation are you referring to? (local PHP doc or the symfony/symfony-docs repo?)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-04T12:58:57Z
+
+I updated the PR to support PHPUnit 5.* and 6.*.
+
+Locally, I also updated all phpunit.xml.dist to add the listener, but the phpunit bridge is not required. Should I update them too?
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-09T19:01:03Z
+
+IMO, if we already try to figure out what is the expected class to be tested, we could already put it into code and do it only _once_, commit and forget about it. no need to do it all the times on runtime.
+Then, it could be watched to have the annotation for new tests, eg with suggestion of @sebastianbergmann  and PHP CS Fixer/fabbot `php_unit_test_class_requires_covers` rule
+
+anyway, big :+1: for strict coverage
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-19T06:29:10Z
+
+Would it be possible to add a test, by mean of a phpt for example? this would ensure that we can detect whenever phpunit changes its internals and breaks the feat.
+Since this is purely opt-in, I'm personally OK to accept it. With a doc PR :)
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-19T07:00:30Z
+
+@nicolas-grekas , why do it in runtime instead of actually store it as annotation at all test files, as I suggest ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-19T07:10:08Z
+
+@keradus the purpose of this PR is exactly to leverage a convention in order to *not* have to add `@cover` to all test files... because it's boring to repeat yourself in each and every test class I guess? :)
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-19T08:36:45Z
+
+explicit is better than implicit ;)
+on top of that, if automate guess wrongly, you don't know (as you don't even see what was chosen) and collect data not how you wish to. if for some reason you wish to have some non-standard cover restriction in given test, guessing on the fly won't help.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-19T12:34:03Z
+
+> if automate guess wrongly,
+
+how is it possible?
+
+and BTW this feature is opt-in ; So if you don't like it, don't use it ;)
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-07-19T15:25:53Z
+
+> how is it possible?
+
+it could as there is no tests, so if one day there will be some newer autoloader spec, dir structure or anything, it could silently fail matching src class for given test class
+
+> and BTW this feature is opt-in ; So if you don't like it, don't use it ;)
+
+of course, but still I think it's nice to think about other possible solutions.
+on one side you have logic hidden, on other you have it explicit
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T08:36:21Z
+
+Would be great to allow injecting a different convention, by providing the listener with a callable (typically a static method configured in phpunit.xml)
+The callable could be used per-method/test case btw?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-07T15:29:21Z
+
+> Would be great to allow injecting a different convention, by providing the listener with a callable (typically a static method configured in phpunit.xml)
+
+Done. You can see an implementation [here](https://github.com/lyrixx/phpunit-auto-cover/commit/c732eb73863401526faf6cdb93060972c61dc252)
+
+> The callable could be used per-method/test case btw?
+
+You mean configurable? if so => I don't think so. Or maybe with an annotation. But frankly, I think It's overkill.
+
+---
+
+Note: The failures is not related.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-22T12:44:09Z
+
+would need a doc PR, and a CHANGELOG entry I guess
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-08-23T12:34:55Z
+
+just to put focus to it again, PHPUnit is not developing really fast (new majors release quite often), and as @sebastianbergmann said:
+> A test listener should only listen. In the future, it will only be able to listen.
+>
+> The proper solution to this problem is to follow best practices and set forceCoversAnnotation="true" in your PHPUnit configuration.
+
+------
+
+in context of no tests and no indicator that `covers` annotation was added or not, we will have no nice indicator that listener is not working.
+best case scenario - it will "just" crash :D
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-23T13:25:51Z
+
+> A test listener should only listen. In the future, it will only be able to listen.
+
+Yes I saw that. But there is no clean extension point :( We already ask to Sebastien how to do that in a clean manner, but he did not tell us how to.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-08-24T10:47:07Z
+
+OK, so please add tests so we will be aware in nice way what's going on
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-24T10:57:08Z
+
+> OK, so please add tests so we will be aware in nice way what's going on
+
+Yes I will try. You already ask ... let me some time please.
+
+BTW, some others listener are not covered by tests either.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-08-24T12:01:25Z
+
+that's bad for them.
+while I'm not asking to fix everything at once, especially part you did not touch, there is no need to increase technical dept with new PRs (like increase not-tested code amount)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-21T09:50:48Z
+
+I have added some tests. But testing this Listener is not easy. What do you think of this test ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-21T11:02:40Z
+
+Arf, I don't know how to exclude my "Fixture" test from the Symfony test suite. I have try many things without success :/
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-22T10:43:58Z
+
+Hi.
+So:
+
+* I managed to fix test on travis & appveyor
+* fabbot is wrong
+* I addressed issues raised by @keradus
+* I added a note in the CHANGELOG
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-22T11:09:48Z
+
+https://github.com/symfony/symfony-docs/pull/8416
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T11:53:48Z
+
+Still :+1: on my side, ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-26T11:54:33Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T14:40:00Z
+
+@lyrixx can you add an entry in the CHANGELOG file please?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-26T16:10:06Z
+
+Oups, I forgot to push a commit. Fixed.

@@ -29,7 +29,7 @@
 
         <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
             <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
-            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="cache.pool" clearer="cache.system_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
@@ -101,6 +101,10 @@
         </service>
 
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
+            <argument type="collection" />
+        </service>
+
+        <service id="cache.system_clearer" parent="cache.default_clearer" public="true">
             <tag name="kernel.cache_clearer" />
         </service>
 

@@ -113,6 +113,9 @@ Form
 FrameworkBundle
 ---------------
 
+ * The `cache:clear` command doesn't clear "app" PSR-6 cache pools anymore,
+   but clears only "system" ones. Use the `cache:pool:clear` command to clear "app" pools.
+
  * The `doctrine/cache` dependency has been removed; require it via `composer
    require doctrine/cache` if you are using Doctrine cache in your project.
 

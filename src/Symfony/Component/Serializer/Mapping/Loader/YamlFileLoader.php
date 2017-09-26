@@ -113,7 +113,7 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new Parser();
         }
 
-        $classes = $this->yamlParser->parse(file_get_contents($this->file));
+        $classes = $this->yamlParser->parseFile($this->file);
 
         if (empty($classes)) {
             return array();

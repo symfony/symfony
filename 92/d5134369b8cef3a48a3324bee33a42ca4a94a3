@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-12T10:33:36Z
+
+The TwigBundle also deals with the bundle hierarchy when resolving paths for bundle templates: https://github.com/fabpot/symfony/blob/218626157e915f4e26cc8bb619637248c0008c72/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php#L164-L214 I bet we can simplify a lot of code there too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-15T16:56:35Z
+
+@xabbuh now removed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-21T18:14:21Z
+
+Tests are green now!

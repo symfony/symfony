@@ -652,6 +652,10 @@ Security
  * Calling `ContextListener::setLogoutOnUserChange(false)` won't have any
    effect anymore.
 
+ * Removed the HTTP digest authentication system. The `NonceExpiredException`,
+   `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` classes
+   have been removed. Use another authentication system like `http_basic` instead.
+
 SecurityBundle
 --------------
 
@@ -672,6 +676,9 @@ SecurityBundle
 
  * The firewall option `logout_on_user_change` is now always true, which will
    trigger a logout if the user changes between requests.
+   
+ * Removed the HTTP digest authentication system. The `HttpDigestFactory` class
+   has been removed. Use another authentication system like `http_basic` instead.
 
 Serializer
 ----------

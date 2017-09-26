@@ -8,6 +8,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener;
 
+/**
+ * @group legacy
+ */
 class DigestAuthenticationListenerTest extends TestCase
 {
     public function testHandleWithValidDigest()

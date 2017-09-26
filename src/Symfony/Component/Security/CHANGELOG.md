@@ -12,6 +12,7 @@ CHANGELOG
    property will trigger a deprecation when the user has changed. As of 4.0
    the user will always be logged out when the user has changed between
    requests.
+ * deprecated HTTP digest authentication
 
 3.3.0
 -----

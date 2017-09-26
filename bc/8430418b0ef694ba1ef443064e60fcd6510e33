@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by afurculita at 2017-09-18T10:33:36Z
+
+Comments addressed :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-20T10:38:36Z
+
+Please also update the `UPGRADE-4.0.md` file.
+
+---------------------------------------------------------------------------
+
+by afurculita at 2017-09-24T19:36:35Z
+
+Ready for review. I've also deprecated `SessionHandlerProxy`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T10:24:06Z
+
+@Tobion OK for you? Can I let you merge if yes?

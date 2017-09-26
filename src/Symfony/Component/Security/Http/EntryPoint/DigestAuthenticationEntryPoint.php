@@ -21,6 +21,8 @@ use Psr\Log\LoggerInterface;
  * DigestAuthenticationEntryPoint starts an HTTP Digest authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 3.4, to be removed in 4.0
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
@@ -31,6 +33,8 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
 
     public function __construct($realmName, $secret, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
+        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since 3.4 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+
         $this->realmName = $realmName;
         $this->secret = $secret;
         $this->nonceValiditySeconds = $nonceValiditySeconds;

@@ -16,6 +16,7 @@ CHANGELOG
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid
    deprecations in the configuration.
+ * deprecated HTTP digest authentication
 
 3.3.0
 -----

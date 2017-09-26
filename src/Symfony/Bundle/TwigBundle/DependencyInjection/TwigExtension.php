@@ -194,7 +194,7 @@ class TwigExtension extends Extension
             }
             $container->addResource(new FileExistenceResource($dir));
 
-            if (null === $bundle['parent']) {
+            if (!isset($bundle['parent']) || null === $bundle['parent']) {
                 continue;
             }
 

@@ -120,14 +120,21 @@ class TranslationUpdateCommandTest extends TestCase
             );
 
         if (null === $kernel) {
+            $returnValues = array(
+                array('foo', $this->getBundle($this->translationDir)),
+                array('test', $this->getBundle('test')),
+            );
+            if (HttpKernel\Kernel::VERSION_ID < 40000) {
+                $returnValues = array(
+                    array('foo', true, $this->getBundle($this->translationDir)),
+                    array('test', true, $this->getBundle('test')),
+                );
+            }
             $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
-                ->will($this->returnValueMap(array(
-                    array('foo', true, $this->getBundle($this->translationDir)),
-                    array('test', true, $this->getBundle('test')),
-                )));
+                ->will($this->returnValueMap($returnValues));
         }
 
         $kernel

@@ -73,6 +73,11 @@ class ControllerNameParser
             throw new \InvalidArgumentException($message, 0, $e);
         }
 
+        if (!is_array($allBundles)) {
+            // happens when HttpKernel is version 4+
+            $allBundles = array($allBundles);
+        }
+
         foreach ($allBundles as $b) {
             $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
             if (class_exists($try)) {

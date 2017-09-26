@@ -374,16 +374,13 @@ class FilesystemTest extends FilesystemTestCase
      */
     public function testFilesExistsFails()
     {
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Test covers edge case on Windows only.');
-        }
-
         $basePath = $this->workspace.'\\directory\\';
+        $maxPathLength = PHP_MAXPATHLEN - 2;
 
         $oldPath = getcwd();
         mkdir($basePath);
         chdir($basePath);
-        $file = str_repeat('T', 259 - strlen($basePath));
+        $file = str_repeat('T', $maxPathLength - strlen($basePath) + 1);
         $path = $basePath.$file;
         exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
         $this->longPathNamesWindows[] = $path; // save this so we can clean up later

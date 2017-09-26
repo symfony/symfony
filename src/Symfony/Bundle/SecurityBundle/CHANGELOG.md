@@ -9,6 +9,7 @@ CHANGELOG
  * made the first `UserPasswordEncoderCommand::_construct()` argument mandatory
  * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` anymore
  * removed support for voters that don't implement the `VoterInterface`
+ * removed HTTP digest authentication
 
 3.4.0
 -----

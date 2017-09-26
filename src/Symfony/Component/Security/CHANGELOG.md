@@ -10,6 +10,7 @@ CHANGELOG
  * removed the `RoleInterface`
  * removed support for voters that don't implement the `VoterInterface`
  * added a sixth `string $context` argument to `LogoutUrlGenerator::registerListener()`
+ * removed HTTP digest authentication
 
 3.4.0
 -----

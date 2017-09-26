@@ -18,7 +18,7 @@ use Symfony\Component\Dsn\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class MemcachedConnectionFactory
+class MemcachedFactory
 {
     private static $defaultClientOptions = array(
         'class' => null,
@@ -49,7 +49,7 @@ class MemcachedConnectionFactory
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($dsns, array $options = array())
+    public static function create($dsns, array $options = array())
     {
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {

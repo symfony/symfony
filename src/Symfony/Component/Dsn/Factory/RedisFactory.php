@@ -14,11 +14,11 @@ namespace Symfony\Component\Dsn\Factory;
 use Symfony\Component\Dsn\Exception\InvalidArgumentException;
 
 /**
- * Factory for Redis Dsn.
+ * Factory for Redis connections.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class RedisConnectionFactory
+class RedisFactory
 {
     private static $defaultConnectionOptions = array(
         'class' => null,
@@ -46,7 +46,7 @@ class RedisConnectionFactory
      *
      * @return \Redis|\Predis\Client According to the "class" option
      */
-    public static function createConnection($dsn, array $options = array())
+    public static function create($dsn, array $options = array())
     {
         if (0 !== strpos($dsn, 'redis://')) {
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis://"', $dsn));

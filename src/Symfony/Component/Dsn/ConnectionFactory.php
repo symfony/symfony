@@ -12,11 +12,11 @@
 namespace Symfony\Component\Dsn;
 
 use Symfony\Component\Dsn\Exception\InvalidArgumentException;
-use Symfony\Component\Dsn\Factory\MemcachedConnectionFactory;
-use Symfony\Component\Dsn\Factory\RedisConnectionFactory;
+use Symfony\Component\Dsn\Factory\MemcachedFactory;
+use Symfony\Component\Dsn\Factory\RedisFactory;
 
 /**
- * Factory for undetermined Dsn.
+ * Factory for undetermined DSN.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
@@ -42,26 +42,26 @@ final class ConnectionFactory
             return static::TYPE_MEMCACHED;
         }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Dsn: %s.', $dsn));
+        throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));
     }
 
     /**
-     * Create a connection for a redis Dsn.
+     * Create a connection for a given DSN.
      *
      * @param string $dsn
      * @param array  $options
      *
      * @return mixed
      */
-    public static function createConnection($dsn, array $options = array())
+    public static function create($dsn, array $options = array())
     {
         switch (static::getType($dsn)) {
             case static::TYPE_REDIS:
-                return RedisConnectionFactory::createConnection($dsn, $options);
+                return RedisFactory::create($dsn, $options);
             case static::TYPE_MEMCACHED:
-                return MemcachedConnectionFactory::createConnection($dsn, $options);
+                return MemcachedFactory::create($dsn, $options);
             default:
-                throw new InvalidArgumentException(sprintf('Unsupported Dsn: %s.', $dsn));
+                throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));
         }
     }
 }

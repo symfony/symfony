@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-23T11:21:20Z
+
+Yes, this is what I was referring to! This would reduce the amount of confusion and wtfs when working with the container.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-24T14:32:44Z
+
+Updated. But I was referring to the "main container builder" for those using the DI component standalone (https://github.com/symfony/symfony/issues/24282#issuecomment-331399225), without HttpKernel (so no bundle). Not sure how we could turn this better, but only mentioning `Bundle::build` is not pretty accurate to me :/
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-24T15:29:00Z
+
+Much better! Thanks @nicolas-grekas

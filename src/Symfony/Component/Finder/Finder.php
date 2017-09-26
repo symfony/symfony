@@ -614,6 +614,20 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Check if the any results were found.
+     *
+     * @return bool
+     */
+    public function hasResults()
+    {
+        foreach ($this->getIterator() as $_) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Counts all the results collected by the iterators.
      *
      * @return int

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated `Symfony\Component\Finder\Iterator\FilterIterator`
+ * added Finder::hasResults() method to check if any results were found
 
 3.3.0
 -----

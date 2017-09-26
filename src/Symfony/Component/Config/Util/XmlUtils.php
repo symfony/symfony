@@ -42,7 +42,7 @@ class XmlUtils
      *
      * @throws \Symfony\Component\Config\Util\Exception\XmlParsingException When parsing of XML file returns error
      * @throws \Symfony\Component\Config\Util\Exception\InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
-     * @throws \RuntimeException         When DOM extension is missing
+     * @throws \RuntimeException                                            When DOM extension is missing
      */
     public static function parse($content, $schemaOrCallable = null)
     {
@@ -117,8 +117,8 @@ class XmlUtils
      * @return \DOMDocument
      *
      * @throws \InvalidArgumentException                                    When loading of XML file returns error
-     * @throws \Symfony\Component\Config\Util\Exception\XmlParsingException When XML parsing returns any errors.
-     * @throws \RuntimeException         When DOM extension is missing
+     * @throws \Symfony\Component\Config\Util\Exception\XmlParsingException when XML parsing returns any errors
+     * @throws \RuntimeException                                            When DOM extension is missing
      */
     public static function loadFile($file, $schemaOrCallable = null)
     {

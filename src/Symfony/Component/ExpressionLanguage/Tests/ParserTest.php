@@ -155,6 +155,16 @@ class ParserTest extends TestCase
                 'bar',
                 array('foo' => 'bar'),
             ),
+
+            array(
+                new Node\BinaryNode('matches', new Node\ConstantNode('[x] Bug'), new Node\ConstantNode('/\[\s*x\s*\] Bug/')),
+                '"[x] Bug" matches "/\[\s*x\s*\] Bug/"',
+            ),
+
+            array(
+                new Node\BinaryNode('matches', new Node\ConstantNode('a\b'), new Node\ConstantNode('/^a\\b$/')),
+                '"a\b" matches "/^a\\b$/"',
+            ),
         );
     }
 

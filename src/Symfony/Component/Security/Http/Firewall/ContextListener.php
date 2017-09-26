@@ -33,7 +33,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ContextListener implements ListenerInterface
 {
     private $tokenStorage;
-    private $contextKey;
     private $sessionKey;
     private $logger;
     private $userProviders;
@@ -54,7 +53,6 @@ class ContextListener implements ListenerInterface
 
         $this->tokenStorage = $tokenStorage;
         $this->userProviders = $userProviders;
-        $this->contextKey = $contextKey;
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;

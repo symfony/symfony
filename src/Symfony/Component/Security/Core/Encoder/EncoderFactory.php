@@ -109,6 +109,12 @@ class EncoderFactory implements EncoderFactoryInterface
                     'class' => BCryptPasswordEncoder::class,
                     'arguments' => array($config['cost']),
                 );
+
+            case 'argon2i':
+                return array(
+                    'class' => Argon2iPasswordEncoder::class,
+                    'arguments' => array(),
+                );
         }
 
         return array(

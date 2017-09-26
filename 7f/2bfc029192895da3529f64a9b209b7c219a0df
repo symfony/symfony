@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-16T15:23:22Z
+
+Somewhat related: #11279 and co
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-17T14:25:48Z
+
+Regarding #11279, would it make sense to make this service available in AbstractController? (could be for another PR)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-18T14:40:09Z
+
+@chalasr in practice a `Session` instance is always provided. With this alias ppl could at least type-hint a controller/action argument. Isn't it enough?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-19T07:24:36Z
+
+Indeed!
+
+---------------------------------------------------------------------------
+
+by tifabien at 2017-09-19T18:26:40Z
+
+Do I need to rebase my branch on top of 3.4 or is it not necessary?

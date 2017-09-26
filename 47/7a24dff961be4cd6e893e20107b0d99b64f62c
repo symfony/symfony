@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-14T08:58:17Z
+
+Test failure not related to this PR it seems
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-08-16T13:25:21Z
+
+Woohoo! I'll try to review this tonight. Simple patch... but I'd like to try it in a few situations to check for side effects.
+
+About deprecating this in 3.4 and actually changing it in 4.0, I think I agree. It's a potentially impactful change... and a non-obvious one (if you upgraded to 3.4 and the new code logged you out, you might not notice this at first - as it may only affect an edge-case situation). Due to the fact that this may only happen in some situations, the deprecation also isn't a perfect notifier, but it'll give people a better chance.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-08-16T13:35:02Z
+
+Actually, on second thought, the deprecation is not quite right: there is no action the developer could take on 3.4 to stop hitting the deprecation. Instead, it's just a warning that says "hey! This code path will change in the future". Then, on 4.0, they will have different results than 3.4. That's a problem, since it's not how we intend for deprecations to work.
+
+@iltar wdyt about this?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-16T14:13:18Z
+
+@weaverryan it's a default behavior change that can break a lot of things, so I feel a deprecation is in place. However, you're right about this being kind of passive. What about a temporary parameter that you can turn on to trigger an exception here? Could be done in a similar fashion to several changes in 2.8 and 3.0, like swapping the choice keys/values, where the option gets removed for 5.0.
+
+ I'm not entirely sure on how to pass a message to the front-end though.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-08-16T22:40:56Z
+
+Yea, it seems to me, that we indeed *do* need to do something similar to the choice keys/values thing. Perhaps someone else has an idea but I think it's a good start. So, we could add the following config:
+
+```yml
+security:
+    firewall:
+        main:
+            logout_on_user_change: true
+```
+
+If this new config key is NOT set, then we'll trigger the deprecation warning. This would require everyone to set this value explicitly (to true or false)... which is kind of annoying, but super explicit. In 4.0, this option would still exist, but would throw an exception if not set. Then, if we wanted, in 5.0, it could default to `true` (so that you don't need to explicitly configure it). The `ContextListener` would use this to know if it should log the user out or not.
+
+This is the most conservative option I can think of: it absolutely doesn't break BC... but it's also kind of annoying. If you can't think of a better idea, let's do this first - it's easier to get a +1 or -1 from people if we're looking at real code.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-03T11:15:40Z
+
+Such key should not be mandatory for`stateless` firewalls.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-20T19:16:28Z
+
+@iltar Would you have time to finish this? I can try to help otherwise, feature freeze is coming.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-21T06:16:07Z
+
+@chalasr I'll put it on my todo list for upcoming Friday
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-21T09:38:34Z
+
+I've updated the code to actually return null in the case where the context is set to true. I have not yet added this config to the firewall, I first wanted to know if this is okay. It doesn't trigger a message for the user after it was unset though, not sure if that's possible to add in this scenario.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-22T14:24:49Z
+
+Not sure if the test failures are something I can fix, seems to be an issue because it pulls in a different version than what my PR provides
+
+---------------------------------------------------------------------------
+
+by ptrm04 at 2017-09-22T14:31:32Z
+
+@iltar - thanks a lot for looking into this! Very much appreciated.
+
+In the meantime should we update the page at https://symfony.com/doc/current/security/entity_provider.html#understanding-serialize-and-how-a-user-is-saved-in-the-session, especially the line of "_For example, if the username on the 2 User objects doesn't match for some reason, then the user will be logged out for security reasons_".
+
+At the moment it sounds like the appropriate description there should be "it checks the properties to determine if the roles should be reloaded"
+
+Just an example right here how people follow this guidance and accept answers (hope they test all that, to find out it is not working): https://stackoverflow.com/questions/42877881/symfony-check-if-users-email-changed-while-logged-in
+
+Also, when you currently change behind the scenes what the isEnabled() function returns between requests, it **will** log the user out (it is just other properties for which it does not log out the user), do you know where this behvaiour is triggered?
+
+Finally, is there **any workaround** at the moment for this - to logout the user if any serialized properties change?
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-22T16:00:45Z
+
+> Finally, is there any workaround at the moment for this - to logout the user if any serialized properties change?
+
+I guess you can reproduce a similar result by overriding some of the pre-defined classes and change the behavior in the authenticators, not 100% sure on that as it's quite a complicated change.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-25T06:59:40Z
+
+status: Needs Review
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-26T06:32:18Z
+
+In that case, I've added a note here. It feels a bit weird having a non-deprecated method that does nothing in 4.0, but it's even weirder to have a fresh installation of 4.0 cause a deprecation.
+
+---------------------------------------------------------------------------
+
+by eXtreme at 2017-09-26T08:15:19Z
+
+Great to see that finally being taken care of 👍

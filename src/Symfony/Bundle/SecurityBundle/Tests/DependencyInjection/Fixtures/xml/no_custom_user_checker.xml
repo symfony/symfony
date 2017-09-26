@@ -15,7 +15,6 @@
 
         <firewall name="secure" stateless="true">
             <http-basic />
-            <http-digest secret="TheSecret" />
             <form-login />
             <anonymous />
             <switch-user />

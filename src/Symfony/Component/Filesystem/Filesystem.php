@@ -114,9 +114,11 @@ class Filesystem
      */
     public function exists($files)
     {
+        $maxPathLength = PHP_MAXPATHLEN - 2;
+
         foreach ($this->toIterator($files) as $file) {
-            if ('\\' === DIRECTORY_SEPARATOR && strlen($file) > 258) {
-                throw new IOException('Could not check if file exist because path length exceeds 258 characters.', 0, null, $file);
+            if (strlen($file) > $maxPathLength) {
+                throw new IOException(sprintf('Could not check if file exist because path length exceeds %d characters.', $maxPathLength), 0, null, $file);
             }
 
             if (!file_exists($file)) {
@@ -291,8 +293,10 @@ class Filesystem
      */
     private function isReadable($filename)
     {
-        if ('\\' === DIRECTORY_SEPARATOR && strlen($filename) > 258) {
-            throw new IOException('Could not check if file is readable because path length exceeds 258 characters.', 0, null, $filename);
+        $maxPathLength = PHP_MAXPATHLEN - 2;
+
+        if (strlen($filename) > $maxPathLength) {
+            throw new IOException(sprintf('Could not check if file is readable because path length exceeds %d characters.', $maxPathLength), 0, null, $filename);
         }
 
         return is_readable($filename);
@@ -478,7 +482,7 @@ class Filesystem
         }
 
         // Determine how deep the start path is relative to the common path (ie, "web/bundles" = 2 levels)
-        if (count($startPathArr) === 1 && $startPathArr[0] === '') {
+        if (1 === count($startPathArr) && '' === $startPathArr[0]) {
             $depth = 0;
         } else {
             $depth = count($startPathArr) - $index;
@@ -584,7 +588,7 @@ class Filesystem
     {
         return strspn($file, '/\\', 0, 1)
             || (strlen($file) > 3 && ctype_alpha($file[0])
-                && substr($file, 1, 1) === ':'
+                && ':' === substr($file, 1, 1)
                 && strspn($file, '/\\', 2, 1)
             )
             || null !== parse_url($file, PHP_URL_SCHEME)

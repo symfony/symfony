@@ -11,6 +11,7 @@ $container->loadFromExtension('security', array(
     'firewalls' => array(
         'main' => array(
             'form_login' => array('provider' => 'undefined'),
+            'logout_on_user_change' => true,
         ),
     ),
 ));

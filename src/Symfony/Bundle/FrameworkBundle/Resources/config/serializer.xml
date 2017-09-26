@@ -52,6 +52,8 @@
             <argument>null</argument>
         </service>
 
+        <service id="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface" alias="serializer.mapping.class_metadata_factory" />
+
         <!-- Cache -->
         <service id="serializer.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer">
             <argument type="collection" /><!-- Loaders injected by the extension -->

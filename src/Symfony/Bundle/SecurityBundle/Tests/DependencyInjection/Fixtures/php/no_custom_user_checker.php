@@ -15,7 +15,6 @@ $container->loadFromExtension('security', array(
         'secure' => array(
             'stateless' => true,
             'http_basic' => true,
-            'http_digest' => array('secret' => 'TheSecret'),
             'form_login' => true,
             'anonymous' => true,
             'switch_user' => true,

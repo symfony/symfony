@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `setDeprecated()` method to indicate a deprecated node
+ * added `XmlUtils::parse()` method to parse an XML string
 
 3.3.0
 -----

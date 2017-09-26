@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Config\Util;
 
+use Symfony\Component\Config\Util\Exception\InvalidXmlException;
+use Symfony\Component\Config\Util\Exception\XmlParsingException;
+
 /**
  * XMLUtils is a bunch of utility methods to XML operations.
  *
@@ -18,6 +21,7 @@ namespace Symfony\Component\Config\Util;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
+ * @author Ole Rößner <ole@roessner.it>
  */
 class XmlUtils
 {
@@ -29,25 +33,21 @@ class XmlUtils
     }
 
     /**
-     * Loads an XML file.
+     * Parses an XML string.
      *
-     * @param string               $file             An XML file path
+     * @param string               $content          An XML string
      * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @return \DOMDocument
      *
-     * @throws \InvalidArgumentException When loading of XML file returns error
-     * @throws \RuntimeException         When DOM extension is missing
+     * @throws XmlParsingException When parsing of XML file returns error
+     * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
+     * @throws \RuntimeException   When DOM extension is missing
      */
-    public static function loadFile($file, $schemaOrCallable = null)
+    public static function parse($content, $schemaOrCallable = null)
     {
         if (!extension_loaded('dom')) {
             throw new \RuntimeException('Extension DOM is required.');
-        }
-
-        $content = @file_get_contents($file);
-        if ('' === trim($content)) {
-            throw new \InvalidArgumentException(sprintf('File %s does not contain valid XML, it is empty.', $file));
         }
 
         $internalErrors = libxml_use_internal_errors(true);
@@ -59,7 +59,7 @@ class XmlUtils
         if (!$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new \InvalidArgumentException(implode("\n", static::getXmlErrors($internalErrors)));
+            throw new XmlParsingException(implode("\n", static::getXmlErrors($internalErrors)));
         }
 
         $dom->normalizeDocument();
@@ -69,7 +69,7 @@ class XmlUtils
 
         foreach ($dom->childNodes as $child) {
             if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
+                throw new XmlParsingException('Document types are not allowed.');
             }
         }
 
@@ -90,15 +90,15 @@ class XmlUtils
             } else {
                 libxml_use_internal_errors($internalErrors);
 
-                throw new \InvalidArgumentException('The schemaOrCallable argument has to be a valid path to XSD file or callable.');
+                throw new XmlParsingException('The schemaOrCallable argument has to be a valid path to XSD file or callable.');
             }
 
             if (!$valid) {
                 $messages = static::getXmlErrors($internalErrors);
                 if (empty($messages)) {
-                    $messages = array(sprintf('The XML file "%s" is not valid.', $file));
+                    throw new InvalidXmlException('The XML is not valid.', 0, $e);
                 }
-                throw new \InvalidArgumentException(implode("\n", $messages), 0, $e);
+                throw new XmlParsingException(implode("\n", $messages), 0, $e);
             }
         }
 
@@ -106,6 +106,32 @@ class XmlUtils
         libxml_use_internal_errors($internalErrors);
 
         return $dom;
+    }
+
+    /**
+     * Loads an XML file.
+     *
+     * @param string               $file             An XML file path
+     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
+     *
+     * @return \DOMDocument
+     *
+     * @throws \InvalidArgumentException When loading of XML file returns error
+     * @throws XmlParsingException       When XML parsing returns any errors
+     * @throws \RuntimeException         When DOM extension is missing
+     */
+    public static function loadFile($file, $schemaOrCallable = null)
+    {
+        $content = @file_get_contents($file);
+        if ('' === trim($content)) {
+            throw new \InvalidArgumentException(sprintf('File %s does not contain valid XML, it is empty.', $file));
+        }
+
+        try {
+            return static::parse($content, $schemaOrCallable);
+        } catch (InvalidXmlException $e) {
+            throw new XmlParsingException(sprintf('The XML file "%s" is not valid.', $file), 0, $e->getPrevious());
+        }
     }
 
     /**

@@ -55,11 +55,25 @@ class XmlUtilsTest extends TestCase
             XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate'));
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('is not valid', $e->getMessage());
+            $this->assertRegExp('/The XML file "[\w:\/\\\.]+" is not valid\./', $e->getMessage());
         }
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate')));
         $this->assertSame(array(), libxml_get_errors());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Util\Exception\InvalidXmlException
+     * @expectedExceptionMessage The XML is not valid
+     */
+    public function testParseWithInvalidValidatorCallable()
+    {
+        $fixtures = __DIR__.'/../Fixtures/Util/';
+
+        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
+        $mock->expects($this->once())->method('validate')->willReturn(false);
+
+        XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), array($mock, 'validate'));
     }
 
     public function testLoadFileWithInternalErrorsEnabled()

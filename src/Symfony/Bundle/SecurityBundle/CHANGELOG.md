@@ -9,6 +9,7 @@ CHANGELOG
  * made the first `UserPasswordEncoderCommand::_construct()` argument mandatory
  * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` anymore
  * removed support for voters that don't implement the `VoterInterface`
+ * removed HTTP digest authentication
 
 3.4.0
 -----
@@ -25,6 +26,7 @@ CHANGELOG
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid
    deprecations in the configuration.
+ * deprecated HTTP digest authentication
 
 3.3.0
 -----

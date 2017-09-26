@@ -20,7 +20,6 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLogin
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasicLdapFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpDigestFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUserFactory;
@@ -47,7 +46,6 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new JsonLoginFactory());
         $extension->addSecurityListenerFactory(new HttpBasicFactory());
         $extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
-        $extension->addSecurityListenerFactory(new HttpDigestFactory());
         $extension->addSecurityListenerFactory(new RememberMeFactory());
         $extension->addSecurityListenerFactory(new X509Factory());
         $extension->addSecurityListenerFactory(new RemoteUserFactory());

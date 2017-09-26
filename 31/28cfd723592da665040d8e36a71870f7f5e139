@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by edoger at 2017-09-25T11:14:26Z
+
+@nicolas-grekas I have fixed it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-25T11:41:03Z
+
+You need to rebase this pull request to get rid of the merge commits.
+
+---------------------------------------------------------------------------
+
+by edoger at 2017-09-25T12:15:01Z
+
+@fabpot I have modified the submission log.
+
+---------------------------------------------------------------------------
+
+by edoger at 2017-09-25T14:04:48Z
+
+@fabpot Has been completed.
+
+---------------------------------------------------------------------------
+
+by edoger at 2017-09-26T01:54:28Z
+
+What? Does this affect HTTP Kernel?

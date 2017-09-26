@@ -15,26 +15,29 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
+class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, ResettableInterface
 {
     const TAGS_PREFIX = "\0tags\0";
 
-    private $itemsAdapter;
+    use ProxyTrait;
+
     private $deferred = array();
     private $createCacheItem;
     private $setCacheItemTags;
     private $getTagsByKey;
     private $invalidateTags;
-    private $tagsAdapter;
+    private $tagsPool;
 
-    public function __construct(AdapterInterface $itemsAdapter, AdapterInterface $tagsAdapter = null)
+    public function __construct(AdapterInterface $itemsPool, AdapterInterface $tagsPool = null)
     {
-        $this->itemsAdapter = $itemsAdapter;
-        $this->tagsAdapter = $tagsAdapter ?: $itemsAdapter;
+        $this->pool = $itemsPool;
+        $this->tags = $tagsPool ?: $itemsPool;
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, CacheItem $protoItem) {
                 $item = new CacheItem();
@@ -110,7 +113,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
         }
         $f = $this->invalidateTags;
 
-        return $f($this->tagsAdapter, $tags);
+        return $f($this->tags, $tags);
     }
 
     /**
@@ -121,10 +124,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
         if ($this->deferred) {
             $this->commit();
         }
-        if (!$this->itemsAdapter->hasItem($key)) {
+        if (!$this->pool->hasItem($key)) {
             return false;
         }
-        if (!$itemTags = $this->itemsAdapter->getItem(static::TAGS_PREFIX.$key)->get()) {
+        if (!$itemTags = $this->pool->getItem(static::TAGS_PREFIX.$key)->get()) {
             return true;
         }
 
@@ -165,9 +168,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
         }
 
         try {
-            $items = $this->itemsAdapter->getItems($tagKeys + $keys);
+            $items = $this->pool->getItems($tagKeys + $keys);
         } catch (InvalidArgumentException $e) {
-            $this->itemsAdapter->getItems($keys); // Should throw an exception
+            $this->pool->getItems($keys); // Should throw an exception
 
             throw $e;
         }
@@ -182,7 +185,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
     {
         $this->deferred = array();
 
-        return $this->itemsAdapter->clear();
+        return $this->pool->clear();
     }
 
     /**
@@ -204,7 +207,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
             }
         }
 
-        return $this->itemsAdapter->deleteItems($keys);
+        return $this->pool->deleteItems($keys);
     }
 
     /**
@@ -243,7 +246,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
         if ($this->deferred) {
             $items = $this->deferred;
             foreach ($items as $key => $item) {
-                if (!$this->itemsAdapter->saveDeferred($item)) {
+                if (!$this->pool->saveDeferred($item)) {
                     unset($this->deferred[$key]);
                     $ok = false;
                 }
@@ -257,17 +260,17 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
 
             foreach ($tagsByKey as $key => $tags) {
                 if ($tags) {
-                    $this->itemsAdapter->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
+                    $this->pool->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
                 } else {
                     $deletedTags[] = static::TAGS_PREFIX.$key;
                 }
             }
             if ($deletedTags) {
-                $this->itemsAdapter->deleteItems($deletedTags);
+                $this->pool->deleteItems($deletedTags);
             }
         }
 
-        return $this->itemsAdapter->commit() && $ok;
+        return $this->pool->commit() && $ok;
     }
 
     public function __destruct()
@@ -328,23 +331,11 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface
                 $tagVersions[$tag] = $tag.static::TAGS_PREFIX;
                 $tags[$tag.static::TAGS_PREFIX] = $tag;
             }
-            foreach ($this->tagsAdapter->getItems($tagVersions) as $tag => $version) {
+            foreach ($this->tags->getItems($tagVersions) as $tag => $version) {
                 $tagVersions[$tags[$tag]] = $version->get() ?: 0;
             }
         }
 
         return $tagVersions;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prune()
-    {
-        if ($this->itemsAdapter instanceof PruneableInterface) {
-            return $this->itemsAdapter->prune();
-        }
-
-        return false;
     }
 }

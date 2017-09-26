@@ -39,7 +39,7 @@ class YamlFileLoader extends FileLoader
         }
 
         try {
-            $messages = $this->yamlParser->parse(file_get_contents($resource));
+            $messages = $this->yamlParser->parseFile($resource);
         } catch (ParseException $e) {
             throw new InvalidResourceException(sprintf('Error parsing YAML, invalid file "%s"', $resource), 0, $e);
         }

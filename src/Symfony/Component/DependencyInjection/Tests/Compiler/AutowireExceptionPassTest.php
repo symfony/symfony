@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 
+/**
+ * @group legacy
+ */
 class AutowireExceptionPassTest extends TestCase
 {
     public function testThrowsException()

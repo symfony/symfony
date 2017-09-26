@@ -14,12 +14,13 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
+class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, ResettableInterface
 {
     use ArrayTrait;
 

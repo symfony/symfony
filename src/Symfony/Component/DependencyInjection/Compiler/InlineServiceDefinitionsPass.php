@@ -38,10 +38,14 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      *
      * The key is the inlined service id and its value is the list of services it was inlined into.
      *
+     * @deprecated since version 3.4, to be removed in 4.0.
+     *
      * @return array
      */
     public function getInlinedServiceIds()
     {
+        @trigger_error('Calling InlineServiceDefinitionsPass::getInlinedServiceIds() is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+
         return $this->inlinedServiceIds;
     }
 

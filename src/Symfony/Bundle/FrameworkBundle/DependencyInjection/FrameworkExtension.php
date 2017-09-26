@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -72,6 +73,7 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
@@ -146,15 +148,13 @@ class FrameworkExtension extends Extension
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
             }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['form'])) {
-                throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
-            }
-
             if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
                 throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
             }
 
-            $loader->load('identity_translator.xml');
+            if (class_exists(Translator::class)) {
+                $loader->load('identity_translator.xml');
+            }
         }
 
         if (isset($config['secret'])) {
@@ -200,7 +200,10 @@ class FrameworkExtension extends Extension
             $config['validation']['enabled'] = true;
 
             if (!class_exists('Symfony\Component\Validator\Validation')) {
-                throw new LogicException('The Validator component is required to use the Form component.');
+                $container->setParameter('validator.translation_domain', 'validators');
+
+                $container->removeDefinition('form.type_extension.form.validator');
+                $container->removeDefinition('form.type_guesser.validator');
             }
         } else {
             $container->removeDefinition('Symfony\Component\Form\Command\DebugCommand');
@@ -287,6 +290,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_warmer');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
+        $container->registerForAutoconfiguration(ResettableInterface::class)
+            ->addTag('kernel.reset', array('method' => 'reset'));
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
@@ -341,6 +346,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
+        }
+
+        if (!class_exists(Translator::class)) {
+            $container->removeDefinition('form.type_extension.upload.validator');
         }
     }
 

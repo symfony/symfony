@@ -18,6 +18,7 @@ CHANGELOG
  * added `AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT` context option
    to disable throwing an `UnexpectedValueException` on a type mismatch
  * added support for serializing `DateInterval` objects
+ * added getter for extra attributes in `ExtraAttributesException`
 
 3.3.0
 -----

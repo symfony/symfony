@@ -19,6 +19,11 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
+    protected function setUp()
+    {
+        Inline::initialize(0);
+    }
+
     /**
      * @dataProvider getTestsForParse
      */
@@ -241,11 +246,16 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider getReservedIndicators
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
     {
+        if (method_exists($this, 'expectExceptionMessage')) {
+            $this->expectException(ParseException::class);
+            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+        } else {
+            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+        }
+
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
     }
 
@@ -256,11 +266,16 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider getScalarIndicators
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
     {
+        if (method_exists($this, 'expectExceptionMessage')) {
+            $this->expectException(ParseException::class);
+            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+        } else {
+            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+        }
+
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
     }
 

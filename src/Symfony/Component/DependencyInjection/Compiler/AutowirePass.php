@@ -34,7 +34,7 @@ class AutowirePass extends AbstractRecursivePass
     private $autowiringExceptions = array();
 
     /**
-     * @param bool $throwOnAutowireException If false, retrieved errors via getAutowiringExceptions
+     * @param bool $throwOnAutowireException Errors can be retrieved via Definition::getErrors()
      */
     public function __construct($throwOnAutowireException = true)
     {
@@ -42,10 +42,14 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
+     * @deprecated since version 3.4, to be removed in 4.0.
+     *
      * @return AutowiringFailedException[]
      */
     public function getAutowiringExceptions()
     {
+        @trigger_error('Calling AutowirePass::getAutowiringExceptions() is deprecated since Symfony 3.4 and will be removed in 4.0. Use Definition::getErrors() instead.', E_USER_DEPRECATED);
+
         return $this->autowiringExceptions;
     }
 
@@ -79,6 +83,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $this->autowiringExceptions[] = $e;
+            $this->container->getDefinition($this->currentId)->addError($e->getMessage());
 
             return parent::processValue($value, $isRoot);
         }
@@ -103,7 +108,6 @@ class AutowirePass extends AbstractRecursivePass
             return $value;
         }
 
-        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
         $methodCalls = $value->getMethodCalls();
 
         try {
@@ -116,7 +120,7 @@ class AutowirePass extends AbstractRecursivePass
             array_unshift($methodCalls, array($constructor, $value->getArguments()));
         }
 
-        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
+        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls);
 
         if ($constructor) {
             list(, $arguments) = array_shift($methodCalls);
@@ -134,61 +138,18 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * Gets the list of methods to autowire.
-     *
      * @param \ReflectionClass $reflectionClass
-     *
-     * @return \ReflectionMethod[]
-     */
-    private function getMethodsToAutowire(\ReflectionClass $reflectionClass)
-    {
-        $methodsToAutowire = array();
-
-        foreach ($reflectionClass->getMethods() as $reflectionMethod) {
-            $r = $reflectionMethod;
-
-            if ($r->isConstructor()) {
-                continue;
-            }
-
-            while (true) {
-                if (false !== $doc = $r->getDocComment()) {
-                    if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
-                        $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
-                        break;
-                    }
-                    if (false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
-                        break;
-                    }
-                }
-                try {
-                    $r = $r->getPrototype();
-                } catch (\ReflectionException $e) {
-                    break; // method has no prototype
-                }
-            }
-        }
-
-        return $methodsToAutowire;
-    }
-
-    /**
-     * @param \ReflectionClass    $reflectionClass
-     * @param array               $methodCalls
-     * @param \ReflectionMethod[] $autowiredMethods
+     * @param array            $methodCalls
      *
      * @return array
      */
-    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls, array $autowiredMethods)
+    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls)
     {
         foreach ($methodCalls as $i => $call) {
             list($method, $arguments) = $call;
 
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
-            } elseif (isset($autowiredMethods[$lcMethod = strtolower($method)]) && $autowiredMethods[$lcMethod]->isPublic()) {
-                $reflectionMethod = $autowiredMethods[$lcMethod];
-                unset($autowiredMethods[$lcMethod]);
             } else {
                 $reflectionMethod = $this->getReflectionMethod(new Definition($reflectionClass->name), $method);
             }
@@ -198,16 +159,6 @@ class AutowirePass extends AbstractRecursivePass
             if ($arguments !== $call[1]) {
                 $methodCalls[$i][1] = $arguments;
             }
-        }
-
-        foreach ($autowiredMethods as $lcMethod => $reflectionMethod) {
-            $method = $reflectionMethod->name;
-
-            if (!$reflectionMethod->isPublic()) {
-                $class = $reflectionClass->name;
-                throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": method "%s()" must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
-            }
-            $methodCalls[] = array($method, $this->autowireMethod($reflectionMethod, array()));
         }
 
         return $methodCalls;

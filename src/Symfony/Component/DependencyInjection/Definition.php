@@ -43,6 +43,7 @@ class Definition
     private $autowired = false;
     private $changes = array();
     private $bindings = array();
+    private $errors = array();
 
     protected $arguments = array();
 
@@ -867,5 +868,25 @@ class Definition
         $this->bindings = $bindings;
 
         return $this;
+    }
+
+    /**
+     * Add an error that occurred when building this Definition.
+     *
+     * @param string $error
+     */
+    public function addError($error)
+    {
+        $this->errors[] = $error;
+    }
+
+    /**
+     * Returns any errors that occurred while building this Definition.
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }

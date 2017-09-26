@@ -24,6 +24,7 @@ class ProxyAdapterTest extends AdapterTestCase
     protected $skippedTests = array(
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
+        'testPrune' => 'ProxyAdapter just proxies',
     );
 
     public function createCachePool($defaultLifetime = 0)

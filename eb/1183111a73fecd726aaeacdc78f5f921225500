@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by Koc at 2017-07-10T21:46:46Z
+
+Why not to use `count($finder)`?
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2017-07-10T21:55:57Z
+
+Because that will iterate through every single file that matches. If I only want to know if some exist or not, that's an overly expensive check
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T06:44:24Z
+
+I remember a similar proposal that wasn't accepted, because the use case is not common enough.
+You can achieve it in just *one* extra line btw:
+```php
+foreach ($finder as $thing) {
+    // do things here
+    break;
+}
+```
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2017-07-11T06:52:45Z
+
+It may be only one extra line but a lot of the clarity is lost. You see a `foreach` and you think we're doing something with the results, it's misleading
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-11T09:35:55Z
+
+@duncan3dc, I'm not sure but I think you could try to use the `Iterator::valid` method instead of `foreach` loop:
+```php
+if ($finder->getIterator->valid()) {
+}
+```
+
+---------------------------------------------------------------------------
+
+by duncan3dc at 2017-07-11T09:39:07Z
+
+@voronkovich Not if the iterator is an `IteratorAggregate` you can't
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-12T11:15:00Z
+
+I like this feature proposal ... and I recently needed it 😄
+
+However, I don't like the proposed `found()` method name, so I checked the method names of [PHP SPL iterators](http://php.net/manual/en/spl.iterators.php). They don't have a method to check if the iterator has elements, but somewhat related it's the `valid()` method (e.g. in ArrayIterator, valid() returns true if the array contains any more entries).
+
+I'd prefer a more descriptive method name: `hasResults()`, `hasItems()`, `hasEntries()`, `hasElements()`, etc.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-07-12T11:19:13Z
+
+I like the proposal too, and it can be useful, `hasResults()` is quite nice
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2017-07-12T11:33:15Z
+
+:+1:  for `hasResults`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T14:48:55Z
+
+@symfony/deciders we need to make a decision here. Personally I'm "-0" :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-26T14:54:11Z
+
+I'm 👍

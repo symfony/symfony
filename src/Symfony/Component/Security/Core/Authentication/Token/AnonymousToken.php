@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * AnonymousToken represents an anonymous token.
@@ -36,6 +37,8 @@ class AnonymousToken extends AbstractToken
         $this->secret = $secret;
         $this->setUser($user);
         $this->setAuthenticated(true);
+
+        $this->setShouldUpdateRoles($user instanceof UserInterface && $user->getRoles() === $roles);
     }
 
     /**

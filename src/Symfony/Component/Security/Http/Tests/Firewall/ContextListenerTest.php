@@ -162,8 +162,10 @@ class ContextListenerTest extends TestCase
             ->will($this->returnValue($session));
         $session->expects($this->any())
             ->method('get')
-            ->with('_security_key123')
-            ->will($this->returnValue($token));
+            ->will($this->returnValueMap(array(
+                array('_security_key123', $token),
+                array('_security_key123_refreshable_roles', false),
+            )));
         $tokenStorage->expects($this->once())
             ->method('setToken')
             ->with(null);
@@ -319,10 +321,10 @@ class ContextListenerTest extends TestCase
     public function testRolesCanBeRefreshed()
     {
         $tokenStorage = new TokenStorage();
-        $originalUser = new User('foobar', 'baz');
+        $originalUser = new User('foobar', 'baz', array('ROLE_ORIGINAL'));
         $sessionToken = new UsernamePasswordToken($originalUser, '', 'context_key', array('ROLE_ORIGINAL'));
         $refreshedUser = new User('foobar', 'baz', array('ROLE_NEW'));
-        $this->handleEventWithPreviousSession($tokenStorage, array(new SupportingUserProvider($refreshedUser)), null, true, $sessionToken);
+        $this->handleEventWithPreviousSession($tokenStorage, array(new SupportingUserProvider($refreshedUser)), null, true, $sessionToken, true);
 
         $this->assertEquals(array(new Role('ROLE_NEW')), $tokenStorage->getToken()->getRoles());
     }
@@ -355,11 +357,14 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders, UserInterface $user = null, $logoutOnUserChange = false, TokenInterface $sessionToken = null)
+    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders, UserInterface $user = null, $logoutOnUserChange = false, TokenInterface $sessionToken = null, $shouldRefreshRoles = null)
     {
         $user = $user ?: new User('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
         $session->set('_security_context_key', serialize($sessionToken ? $sessionToken : new UsernamePasswordToken($user, '', 'context_key', array('ROLE_USER'))));
+        if (null !== $shouldRefreshRoles) {
+            $session->set('_security_context_key_refreshable_roles', $shouldRefreshRoles);
+        }
 
         $request = new Request();
         $request->setSession($session);

@@ -22,4 +22,15 @@ interface RefreshableRolesTokenInterface
      * @param array $roles An array of roles
      */
     public function updateRoles(array $roles);
+
+    /**
+     * Returns whether or not roles *should* be updated on this token.
+     *
+     * This can be useful if your token is adding custom roles,
+     * and so you purposely do not want the roles in the token to
+     * be automatically reset.
+     *
+     * @return bool
+     */
+    public function shouldUpdateRoles();
 }

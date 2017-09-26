@@ -1,0 +1,29 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+services:
+    refreshable_roles_user_provider:
+      class: Symfony\Bundle\SecurityBundle\Tests\Functional\RefreshableRolesUserProvider
+      arguments: ['@request_stack']
+
+security:
+    encoders:
+        Symfony\Bundle\SecurityBundle\Tests\Functional\RefreshableUser: plaintext
+
+    providers:
+        all_users:
+            id: refreshable_roles_user_provider
+
+    firewalls:
+        # This firewall doesn't make sense in combination with the rest of the
+        # configuration file, but it's here for testing purposes (do not use
+        # this file in a real world scenario though)
+        login_form:
+            pattern: ^/login$
+            security: false
+
+        default:
+            form_login:
+                check_path: /login_check
+                default_target_path: /profile
+            anonymous: ~

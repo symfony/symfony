@@ -48,6 +48,8 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
         // this token is meant to be used after authentication success, so it is always authenticated
         // you could set it as non authenticated later if you need to
         parent::setAuthenticated(true);
+
+        $this->setShouldUpdateRoles($user instanceof UserInterface && $user->getRoles() === $roles);
     }
 
     /**

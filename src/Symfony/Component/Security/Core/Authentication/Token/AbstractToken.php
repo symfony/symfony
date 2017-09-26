@@ -29,6 +29,7 @@ abstract class AbstractToken implements TokenInterface, RefreshableRolesTokenInt
     private $roles = array();
     private $authenticated = false;
     private $attributes = array();
+    private $shouldUpdateRoles = false;
 
     /**
      * Constructor.
@@ -238,6 +239,14 @@ abstract class AbstractToken implements TokenInterface, RefreshableRolesTokenInt
     /**
      * {@inheritdoc}
      */
+    public function shouldUpdateRoles()
+    {
+        return $this->shouldUpdateRoles;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function __toString()
     {
         $class = get_class($this);
@@ -249,6 +258,18 @@ abstract class AbstractToken implements TokenInterface, RefreshableRolesTokenInt
         }
 
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
+    }
+
+    /**
+     * Call this from a sub-class if you want the token's roles
+     * to be updated from UserInterface::getRoles() on each
+     * page refresh (when using session-based authentication).
+     *
+     * @param bool $shouldUpdateRoles
+     */
+    protected function setShouldUpdateRoles($shouldUpdateRoles)
+    {
+        $this->shouldUpdateRoles = $shouldUpdateRoles;
     }
 
     private function hasUserChanged(UserInterface $user)

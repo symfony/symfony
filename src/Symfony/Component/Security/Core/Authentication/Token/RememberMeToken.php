@@ -49,6 +49,7 @@ class RememberMeToken extends AbstractToken
 
         $this->setUser($user);
         parent::setAuthenticated(true);
+        $this->setShouldUpdateRoles(true);
     }
 
     /**

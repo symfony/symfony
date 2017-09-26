@@ -159,7 +159,7 @@ class UserAuthenticationProviderTest extends TestCase
     public function testAuthenticate()
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $user->expects($this->once())
+        $user->expects($this->atLeastOnce())
              ->method('getRoles')
              ->will($this->returnValue(array('ROLE_FOO')))
         ;
@@ -193,7 +193,7 @@ class UserAuthenticationProviderTest extends TestCase
     public function testAuthenticateWithPreservingRoleSwitchUserRole()
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $user->expects($this->once())
+        $user->expects($this->atLeastOnce())
              ->method('getRoles')
              ->will($this->returnValue(array('ROLE_FOO')))
         ;

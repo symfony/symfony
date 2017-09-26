@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * PreAuthenticatedToken implements a pre-authenticated token.
  *
@@ -44,6 +46,8 @@ class PreAuthenticatedToken extends AbstractToken
         if ($roles) {
             $this->setAuthenticated(true);
         }
+
+        $this->setShouldUpdateRoles($user instanceof UserInterface && $user->getRoles() === $roles);
     }
 
     /**

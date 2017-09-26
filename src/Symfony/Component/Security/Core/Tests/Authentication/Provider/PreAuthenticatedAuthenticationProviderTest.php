@@ -56,7 +56,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('getRoles')
             ->will($this->returnValue(array()))
         ;

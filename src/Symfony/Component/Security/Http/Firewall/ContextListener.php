@@ -40,12 +40,14 @@ class ContextListener implements ListenerInterface
     private $tokenStorage;
     private $contextKey;
     private $sessionKey;
+    private $refreshableRolesSessionKey;
     private $logger;
     private $userProviders;
     private $dispatcher;
     private $registered;
     private $trustResolver;
     private $logoutOnUserChange = false;
+    private $refreshedToken;
 
     /**
      * @param TokenStorageInterface                     $tokenStorage
@@ -65,6 +67,8 @@ class ContextListener implements ListenerInterface
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
         $this->sessionKey = '_security_'.$contextKey;
+        $this->refreshableRolesSessionKey = $this->sessionKey.'_refreshable_roles';
+
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
@@ -120,7 +124,8 @@ class ContextListener implements ListenerInterface
             $token = null;
         }
 
-        if ($token instanceof RefreshableRolesTokenInterface && $token->getUser() instanceof UserInterface) {
+        // see if this token wants the roles refreshed from the User
+        if ($session->get($this->refreshableRolesSessionKey) && $token->getUser() instanceof UserInterface) {
             if (null !== $this->logger) {
                 $this->logger->debug('Refreshing token roles from the User object');
             }
@@ -128,6 +133,7 @@ class ContextListener implements ListenerInterface
             $token->updateRoles($token->getUser()->getRoles());
         }
 
+        $this->refreshedToken = $token;
         $this->tokenStorage->setToken($token);
     }
 
@@ -155,12 +161,19 @@ class ContextListener implements ListenerInterface
         if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
+                $session->remove($this->refreshableRolesSessionKey);
             }
         } else {
             $session->set($this->sessionKey, serialize($token));
 
             if (null !== $this->logger) {
                 $this->logger->debug('Stored the security token in the session.', array('key' => $this->sessionKey));
+            }
+
+            // if the token changed, then re-set the refreshable key
+            if ($token !== $this->refreshedToken) {
+                $shouldUpdateRoles = $token instanceof RefreshableRolesTokenInterface && $token->shouldUpdateRoles();
+                $session->set($this->refreshableRolesSessionKey, $shouldUpdateRoles);
             }
         }
     }

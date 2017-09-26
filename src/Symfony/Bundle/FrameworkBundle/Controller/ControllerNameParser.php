@@ -52,47 +52,32 @@ class ControllerNameParser
         }
 
         $originalController = $controller;
-        list($bundle, $controller, $action) = $parts;
+        list($bundleName, $controller, $action) = $parts;
         $controller = str_replace('/', '\\', $controller);
-        $bundles = array();
 
         try {
             // this throws an exception if there is no such bundle
-            $allBundles = $this->kernel->getBundle($bundle, false, true);
+            $bundle = $this->kernel->getBundle($bundleName);
         } catch (\InvalidArgumentException $e) {
             $message = sprintf(
                 'The "%s" (from the _controller value "%s") does not exist or is not enabled in your kernel!',
-                $bundle,
+                $bundleName,
                 $originalController
             );
 
-            if ($alternative = $this->findAlternative($bundle)) {
+            if ($alternative = $this->findAlternative($bundleName)) {
                 $message .= sprintf(' Did you mean "%s:%s:%s"?', $alternative, $controller, $action);
             }
 
             throw new \InvalidArgumentException($message, 0, $e);
         }
 
-        if (!is_array($allBundles)) {
-            // happens when HttpKernel is version 4+
-            $allBundles = array($allBundles);
+        $try = $bundle->getNamespace().'\\Controller\\'.$controller.'Controller';
+        if (class_exists($try)) {
+            return $try.'::'.$action.'Action';
         }
 
-        foreach ($allBundles as $b) {
-            $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
-            if (class_exists($try)) {
-                return $try.'::'.$action.'Action';
-            }
-
-            $bundles[] = $b->getName();
-            $msg = sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundle, $controller, $action, $try);
-        }
-
-        if (count($bundles) > 1) {
-            $msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $bundles));
-        }
-
-        throw new \InvalidArgumentException($msg);
+        throw new \InvalidArgumentException(sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundleName, $controller, $action, $try));
     }
 
     /**

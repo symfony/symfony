@@ -605,7 +605,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle'),
-            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'parent' => null, 'path' => __DIR__.'/Fixtures/TestBundle')),
+            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle')),
         ));
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
@@ -641,7 +641,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle'),
-            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'parent' => null, 'path' => __DIR__.'/Fixtures/CustomPathBundle')),
+            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/CustomPathBundle')),
         ));
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
@@ -848,7 +848,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testSerializerMapping()
     {
-        $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle', 'parent' => null))));
+        $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle'))));
         $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
         $expectedLoaders = array(
             new Definition(AnnotationLoader::class, array(new Reference('annotation_reader'))),
@@ -980,7 +980,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
-            'kernel.bundles_metadata' => array('FrameworkBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..', 'parent' => null)),
+            'kernel.bundles_metadata' => array('FrameworkBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..')),
             'kernel.cache_dir' => __DIR__,
             'kernel.project_dir' => __DIR__,
             'kernel.debug' => false,

@@ -109,18 +109,9 @@ class TwigExtension extends Extension
         $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
         $container->getDefinition('twig.template_iterator')->replaceArgument(2, $config['paths']);
 
-        $bundleHierarchy = $this->getBundleHierarchy($container, $config);
-
-        foreach ($bundleHierarchy as $name => $bundle) {
+        foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);
-
-            foreach ($bundle['children'] as $child) {
-                foreach ($bundleHierarchy[$child]['paths'] as $path) {
-                    $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
-                }
-            }
-
-            foreach ($bundle['paths'] as $path) {
+            foreach ($paths as $path) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
         }
@@ -166,58 +157,24 @@ class TwigExtension extends Extension
         $container->registerForAutoconfiguration(RuntimeExtensionInterface::class)->addTag('twig.runtime');
     }
 
-    private function getBundleHierarchy(ContainerBuilder $container, array $config)
+    private function getBundleTemplatePaths(ContainerBuilder $container, array $config)
     {
         $bundleHierarchy = array();
-
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if (!array_key_exists($name, $bundleHierarchy)) {
-                $bundleHierarchy[$name] = array(
-                    'paths' => array(),
-                    'parents' => array(),
-                    'children' => array(),
-                );
-            }
-
             if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
-                $bundleHierarchy[$name]['paths'][] = $dir;
+                $bundleHierarchy[$name][] = $dir;
             }
             $container->addResource(new FileExistenceResource($dir));
 
             if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name)) {
-                $bundleHierarchy[$name]['paths'][] = $dir;
+                $bundleHierarchy[$name][] = $dir;
             }
             $container->addResource(new FileExistenceResource($dir));
 
             if (file_exists($dir = $bundle['path'].'/Resources/views')) {
-                $bundleHierarchy[$name]['paths'][] = $dir;
+                $bundleHierarchy[$name][] = $dir;
             }
             $container->addResource(new FileExistenceResource($dir));
-
-            if (!isset($bundle['parent']) || null === $bundle['parent']) {
-                continue;
-            }
-
-            $bundleHierarchy[$name]['parents'][] = $bundle['parent'];
-
-            if (!array_key_exists($bundle['parent'], $bundleHierarchy)) {
-                $bundleHierarchy[$bundle['parent']] = array(
-                    'paths' => array(),
-                    'parents' => array(),
-                    'children' => array(),
-                );
-            }
-
-            $bundleHierarchy[$bundle['parent']]['children'] = array_merge($bundleHierarchy[$name]['children'], array($name), $bundleHierarchy[$bundle['parent']]['children']);
-
-            foreach ($bundleHierarchy[$bundle['parent']]['parents'] as $parent) {
-                $bundleHierarchy[$name]['parents'][] = $parent;
-                $bundleHierarchy[$parent]['children'] = array_merge($bundleHierarchy[$name]['children'], array($name), $bundleHierarchy[$parent]['children']);
-            }
-
-            foreach ($bundleHierarchy[$name]['children'] as $child) {
-                $bundleHierarchy[$child]['parents'] = array_merge($bundleHierarchy[$child]['parents'], $bundleHierarchy[$name]['parents']);
-            }
         }
 
         return $bundleHierarchy;

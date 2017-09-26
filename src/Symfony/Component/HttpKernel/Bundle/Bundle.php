@@ -129,15 +129,6 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Returns the bundle parent name.
-     *
-     * @return string|null The Bundle parent name it overrides or null if no parent
-     */
-    public function getParent()
-    {
-    }
-
-    /**
      * Returns the bundle name (the class short name).
      *
      * @return string The Bundle name

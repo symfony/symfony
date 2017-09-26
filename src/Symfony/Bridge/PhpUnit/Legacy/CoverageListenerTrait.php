@@ -51,7 +51,7 @@ class CoverageListenerTrait
             if ($this->warningOnSutNotFound) {
                 $message = 'Could not find the tested class.';
                 // addWarning does not exist on old PHPUnit version
-                if (method_exists($test->getTestResultObject(), 'addWarning')) {
+                if (method_exists($test->getTestResultObject(), 'addWarning') && class_exists(Warning::class)) {
                     $test->getTestResultObject()->addWarning($test, new Warning($message), 0);
                 } else {
                     $this->warnings[] = sprintf("%s::%s\n%s", get_class($test), $test->getName(), $message);

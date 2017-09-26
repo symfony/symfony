@@ -642,6 +642,9 @@ Security
 
  * Support for defining voters that don't implement the `VoterInterface` has been removed.
 
+ * Calling `ContextListener::setLogoutOnUserChange(false)` won't have any
+   effect anymore.
+
 SecurityBundle
 --------------
 
@@ -659,6 +662,9 @@ SecurityBundle
  * `SetAclCommand::__construct()` now requires an instance of
    `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
     as first argument.
+
+ * The firewall option `logout_on_user_change` is now always true, which will
+   trigger a logout if the user changes between requests.
 
 Serializer
 ----------

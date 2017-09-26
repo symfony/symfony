@@ -90,9 +90,11 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         }
 
         if ($parent) {
+            $bindings = $definition->getBindings();
             $abstract = $container->setDefinition('abstract.instanceof.'.$id, $definition);
 
             // cast Definition to ChildDefinition
+            $definition->setBindings(array());
             $definition = serialize($definition);
             $definition = substr_replace($definition, '53', 2, 2);
             $definition = substr_replace($definition, 'Child', 44, 0);
@@ -117,6 +119,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 
             // reset fields with "merge" behavior
             $abstract
+                ->setBindings($bindings)
                 ->setArguments(array())
                 ->setMethodCalls(array())
                 ->setTags(array())

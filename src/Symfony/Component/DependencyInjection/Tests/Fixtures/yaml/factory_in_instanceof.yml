@@ -1,0 +1,7 @@
+services:
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Loader\FooInterface:
+            factory:    [ "@default_factory", foo ]
+
+    Symfony\Component\DependencyInjection\Tests\Loader\Foo:
+        arguments:      [ "bar" ]

@@ -1,0 +1,6 @@
+services:
+    _defaults:
+        factory:        [ "@default_factory", foo ]
+
+    Foo:
+        arguments:      [ "bar" ]

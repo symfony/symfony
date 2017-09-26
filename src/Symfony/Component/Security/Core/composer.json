@@ -20,6 +20,7 @@
         "symfony/polyfill-php56": "~1.0"
     },
     "require-dev": {
+        "psr/container": "^1.0",
         "symfony/event-dispatcher": "~2.8|~3.0|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
         "symfony/http-foundation": "~2.8|~3.0|~4.0",
@@ -28,6 +29,7 @@
         "psr/log": "~1.0"
     },
     "suggest": {
+        "psr/container": "To instantiate the Security class",
         "symfony/event-dispatcher": "",
         "symfony/http-foundation": "",
         "symfony/validator": "For using the user password constraint",

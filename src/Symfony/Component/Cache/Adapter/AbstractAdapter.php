@@ -116,7 +116,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         }
 
         $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
-        if ('cli' === PHP_SAPI && !ini_get('apc.enable_cli')) {
+        if ('cli' === \PHP_SAPI && !ini_get('apc.enable_cli')) {
             $apcu->setLogger(new NullLogger());
         } elseif (null !== $logger) {
             $apcu->setLogger($logger);

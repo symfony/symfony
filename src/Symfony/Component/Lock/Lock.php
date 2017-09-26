@@ -133,7 +133,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isExpired()
     {
@@ -141,9 +141,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     }
 
     /**
-     * Returns the remaining lifetime.
-     *
-     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     * {@inheritdoc}
      */
     public function getRemainingLifetime()
     {

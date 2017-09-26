@@ -146,6 +146,17 @@ EOF;
         $this->assertCount($violationsCount, $specificErrors);
     }
 
+    public function testHasViolations()
+    {
+        $list = new ConstraintViolationList();
+
+        $this->assertFalse($list->hasViolations());
+        $list->add($this->getViolation('Error'));
+        $this->assertTrue($list->hasViolations());
+        $list->remove(0);
+        $this->assertFalse($list->hasViolations());
+    }
+
     public function findByCodesProvider()
     {
         return array(

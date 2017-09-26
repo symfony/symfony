@@ -14,6 +14,9 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Firewall\DigestData;
 
+/**
+ * @group legacy
+ */
 class DigestDataTest extends TestCase
 {
     public function testGetResponse()

@@ -47,7 +47,7 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new JsonLoginFactory());
         $extension->addSecurityListenerFactory(new HttpBasicFactory());
         $extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
-        $extension->addSecurityListenerFactory(new HttpDigestFactory());
+        $extension->addSecurityListenerFactory(new HttpDigestFactory(false));
         $extension->addSecurityListenerFactory(new RememberMeFactory());
         $extension->addSecurityListenerFactory(new X509Factory());
         $extension->addSecurityListenerFactory(new RemoteUserFactory());

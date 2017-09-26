@@ -222,7 +222,7 @@ abstract class AbstractToken implements TokenInterface, RefreshableRolesTokenInt
      */
     public function updateRoles(array $roles)
     {
-        $this->roles = [];
+        $this->roles = array();
 
         foreach ($roles as $role) {
             if (is_string($role)) {

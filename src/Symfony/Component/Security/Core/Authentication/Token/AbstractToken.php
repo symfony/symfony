@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\EquatableInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class AbstractToken implements TokenInterface
+abstract class AbstractToken implements TokenInterface, RefreshableRolesTokenInterface
 {
     private $user;
     private $roles = array();
@@ -39,15 +39,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function __construct(array $roles = array())
     {
-        foreach ($roles as $role) {
-            if (is_string($role)) {
-                $role = new Role($role);
-            } elseif (!$role instanceof RoleInterface) {
-                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, Role instances or RoleInterface instances, but got %s.', gettype($role)));
-            }
-
-            $this->roles[] = $role;
-        }
+        $this->updateRoles($roles);
     }
 
     /**
@@ -223,6 +215,24 @@ abstract class AbstractToken implements TokenInterface
     public function setAttribute($name, $value)
     {
         $this->attributes[$name] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateRoles(array $roles)
+    {
+        $this->roles = [];
+
+        foreach ($roles as $role) {
+            if (is_string($role)) {
+                $role = new Role($role);
+            } elseif (!$role instanceof RoleInterface) {
+                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, Role instances or RoleInterface instances, but got %s.', gettype($role)));
+            }
+
+            $this->roles[] = $role;
+        }
     }
 
     /**

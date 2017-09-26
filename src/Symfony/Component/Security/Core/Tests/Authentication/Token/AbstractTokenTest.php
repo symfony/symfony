@@ -138,6 +138,13 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals(array(new Role('ROLE_FOO'), new Role('ROLE_BAR')), $token->getRoles());
     }
 
+    public function testUpdateRoles()
+    {
+        $token = $this->getToken();
+        $token->updateRoles(array('ROLE_FOO'));
+        $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
+    }
+
     public function testAuthenticatedFlag()
     {
         $token = $this->getToken();

@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RefreshableRolesTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -117,6 +118,14 @@ class ContextListener implements ListenerInterface
             }
 
             $token = null;
+        }
+
+        if ($token instanceof RefreshableRolesTokenInterface && $token->getUser() instanceof UserInterface) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Refreshing token roles from the User object');
+            }
+
+            $token->updateRoles($token->getUser()->getRoles());
         }
 
         $this->tokenStorage->setToken($token);

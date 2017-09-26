@@ -23,9 +23,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -314,6 +316,17 @@ class ContextListenerTest extends TestCase
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    public function testRolesCanBeRefreshed()
+    {
+        $tokenStorage = new TokenStorage();
+        $originalUser = new User('foobar', 'baz');
+        $sessionToken = new UsernamePasswordToken($originalUser, '', 'context_key', array('ROLE_ORIGINAL'));
+        $refreshedUser = new User('foobar', 'baz', array('ROLE_NEW'));
+        $this->handleEventWithPreviousSession($tokenStorage, array(new SupportingUserProvider($refreshedUser)), null, true, $sessionToken);
+
+        $this->assertEquals(array(new Role('ROLE_NEW')), $tokenStorage->getToken()->getRoles());
+    }
+
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());
@@ -342,11 +355,11 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders, UserInterface $user = null, $logoutOnUserChange = false)
+    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders, UserInterface $user = null, $logoutOnUserChange = false, TokenInterface $sessionToken = null)
     {
         $user = $user ?: new User('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
-        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', array('ROLE_USER'))));
+        $session->set('_security_context_key', serialize($sessionToken ? $sessionToken : new UsernamePasswordToken($user, '', 'context_key', array('ROLE_USER'))));
 
         $request = new Request();
         $request->setSession($session);

@@ -103,15 +103,15 @@ class TextDescriptor extends Descriptor
         $dump = $this->getDumpFunction();
         $map = array(
             'Required' => 'required',
-            'Default' => 'defaults',
+            'Default' => 'default',
             'Allowed types' => 'allowedTypes',
             'Allowed values' => 'allowedValues',
-            'Normalizer' => 'normalizers',
+            'Normalizer' => 'normalizer',
         );
         $rows = array();
         foreach ($map as $label => $name) {
             $value = array_key_exists($name, $definition) ? $dump($definition[$name]) : '-';
-            if ('defaults' === $name && isset($definition['lazy'])) {
+            if ('default' === $name && isset($definition['lazy'])) {
                 $value = "Value: $value\n\nClosure(s): ".$dump($definition['lazy']);
             }
 

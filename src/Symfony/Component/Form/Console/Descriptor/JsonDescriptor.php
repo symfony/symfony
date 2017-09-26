@@ -61,7 +61,7 @@ class JsonDescriptor extends Descriptor
 
         $map = array(
             'required' => 'required',
-            'default' => 'defaults',
+            'default' => 'default',
             'allowed_types' => 'allowedTypes',
             'allowed_values' => 'allowedValues',
         );
@@ -69,12 +69,12 @@ class JsonDescriptor extends Descriptor
             if (array_key_exists($name, $definition)) {
                 $data[$label] = $definition[$name];
 
-                if ('defaults' === $name) {
+                if ('default' === $name) {
                     $data['is_lazy'] = isset($definition['lazy']);
                 }
             }
         }
-        $data['has_normalizer'] = isset($definition['normalizers']);
+        $data['has_normalizer'] = isset($definition['normalizer']);
 
         $this->writeData($data, $options);
     }

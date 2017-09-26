@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added `OptionsResolverIntrospector` to inspect options definitions inside an `OptionsResolver` instance
+
 2.6.0
 -----
 

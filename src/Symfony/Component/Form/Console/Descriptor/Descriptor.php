@@ -18,6 +18,8 @@ use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Util\OptionsResolverWrapper;
+use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
+use Symfony\Component\OptionsResolver\Exception\NoConfigurationException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -104,19 +106,24 @@ abstract class Descriptor implements DescriptorInterface
 
     protected function getOptionDefinition(OptionsResolver $optionsResolver, $option)
     {
-        $refObject = new \ReflectionObject($optionsResolver);
-        foreach (array('defaults', 'lazy', 'allowedTypes', 'allowedValues', 'normalizers') as $name) {
-            $property = $refObject->getProperty($name);
-            $property->setAccessible(true);
-            $value = $property->getValue($optionsResolver);
-            if (array_key_exists($option, $value)) {
-                $definition[$name] = $value[$option];
-            }
-        }
-        $definition['required'] = $optionsResolver->isRequired($option);
+        $definition = array('required' => $optionsResolver->isRequired($option));
 
-        if (isset($definition['lazy']) && 1 === count($definition['lazy'])) {
-            $definition['lazy'] = $definition['lazy'][0];
+        $introspector = new OptionsResolverIntrospector($optionsResolver);
+
+        $map = array(
+            'default' => 'getDefault',
+            'lazy' => 'getLazyClosures',
+            'allowedTypes' => 'getAllowedTypes',
+            'allowedValues' => 'getAllowedValues',
+            'normalizer' => 'getNormalizer',
+        );
+
+        foreach ($map as $key => $method) {
+            try {
+                $definition[$key] = $introspector->{$method}($option);
+            } catch (NoConfigurationException $e) {
+                // noop
+            }
         }
 
         return $definition;

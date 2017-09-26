@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-09T14:49:39Z
+
+This class exist since 2.8. Shouldn't this refactoring (if it's worth) be done in this branch?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-10T22:09:59Z
+
+I think refactoring should be done on master. Maintenance branches should be updated for bug fixes only, avoiding behavior changes and silly BC breaks on patch releases (potentially breaking apps expecting to be safe by locking on a LTS, and that for no strong reason).
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-05-11T08:32:43Z
+
+@chalasr ... which is exactly how this is handled.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-11T08:34:37Z
+
+@mpdude sure, just to give one more point of view :) this looks good to me.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-05-11T08:46:43Z
+
+@chalasr the problem of refactoring in the master branch is that it increases the number of merge conflicts when merging other PRs from lower branches to higher.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-05-11T09:57:42Z
+
+Sure. Question is ... do we prefer merge conflicts potentially leading to bad merges on our dev branch (internal and, most of the times, quickly fixed) or potential breakages on production (userland, stable stuff suddenly broken with generally 1month for being fixed)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-16T13:28:17Z
+
+It's not refactoring really.. just moving code around :) i would do this on 2.8 to avoid the merge conflicts.
+
+But is it worth it? :thinking: we only change a single occurrence; i.e. what are you solving?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-05-16T16:50:00Z
+
+Improving clarity, always worth it.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-06-03T21:58:14Z
+
+@fabot What do you think – should such refactorings go into the oldest branch to avoid merge conflicts later on, or are changes on old branches strictly bugfix-only?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-06-05T04:31:42Z
+
+Doing this in 3.4 looks good to me.

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by klandaika at 2017-03-15T16:47:18Z
+
+Would you like me to do anything else in regards to this?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-04-19T15:27:16Z
+
+Can you also add a test that checks that the token can be replaced?
+
+---------------------------------------------------------------------------
+
+by klandaika at 2017-04-19T16:48:41Z
+
+Did all that was requested. Please check again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-28T17:59:51Z
+
+Moving to milestone 3.4 as 3.3 is about to be closed.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-02T14:00:21Z
+
+Seems legit to me. @klandaika would you mind to rebase this PR against the 3.4 branch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:54:31Z
+
+ping @chalasr @xabbuh for review

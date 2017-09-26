@@ -8,15 +8,12 @@ CHANGELOG
    `VoterInterface` on the class is now deprecated and will be removed in 4.0.
  * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
  * added info about called security listeners in profiler 
- * `InitAclCommand::__construct()` now takes an instance of
-   `Doctrine\DBAL\Connection`  as first argument
- * `SetAclCommand::__construct()` now takes an instance of
-   `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
-   as first argument
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid
    deprecations in the configuration.
  * deprecated HTTP digest authentication
+ * deprecated command `acl:set` along with `SetAclCommand` class
+ * deprecated command `init:acl` along with `InitAclCommand` class
 
 3.3.0
 -----

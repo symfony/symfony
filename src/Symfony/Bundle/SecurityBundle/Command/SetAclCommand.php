@@ -11,11 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
+@trigger_error(sprintf('Class "%s" is deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Bundle\AclBundle\Command\SetAclCommand instead.', SetAclCommand::class), E_USER_DEPRECATED);
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
@@ -28,7 +32,7 @@ use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  *
- * @final since version 3.4
+ * @deprecated since version 3.4, to be removed in 4.0. See Symfony\Bundle\AclBundle\Command\SetAclCommand instead.
  */
 class SetAclCommand extends ContainerAwareCommand
 {
@@ -42,8 +46,6 @@ class SetAclCommand extends ContainerAwareCommand
     public function __construct($provider = null)
     {
         if (!$provider instanceof MutableAclProviderInterface) {
-            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, MutableAclProviderInterface::class), E_USER_DEPRECATED);
-
             parent::__construct($provider);
 
             return;
@@ -56,8 +58,6 @@ class SetAclCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
      */
     public function isEnabled()
     {
@@ -117,7 +117,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
+        (new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output))->warning('Command "acl:set" is deprecated since version 3.4 and will be removed from SecurityBundle in 4.0. Install symfony/acl-bundle to use this command.');
+
         if (null === $this->provider) {
             $this->provider = $this->getContainer()->get('security.acl.provider');
         }
@@ -191,8 +192,6 @@ EOF
 
     /**
      * Gets the mask builder.
-     *
-     * BC to be removed in 4.0
      *
      * @return MaskBuilder
      */

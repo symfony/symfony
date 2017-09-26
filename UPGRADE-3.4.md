@@ -205,6 +205,24 @@ FrameworkBundle
    `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
     and `YamlLintCommand` classes have been marked as final
 
+HttpFoundation
+--------------
+
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`
+   class has been deprecated and will be removed in 4.0. Use the `\SessionHandler` class instead.
+
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy` class has been
+   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
+
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` class has been
+   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
+
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` class has been
+   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
+
+ * `NativeSessionStorage::setSaveHandler()` now takes an instance of `\SessionHandlerInterface` as argument.
+   Not passing it is deprecated and will throw a `TypeError` in 4.0.
+
 HttpKernel
 ----------
 
@@ -268,6 +286,10 @@ SecurityBundle
    `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
     as first argument. Not passing it is deprecated and will throw a `TypeError`
     in 4.0.
+
+ * Added `logout_on_user_change` to the firewall options. This config item will
+   trigger a logout when the user has changed. Should be set to true to avoid
+   deprecations in the configuration.
 
 Translation
 -----------

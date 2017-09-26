@@ -44,6 +44,7 @@ class ContextListener implements ListenerInterface
     private $dispatcher;
     private $registered;
     private $trustResolver;
+    private $logoutOnUserChange = false;
 
     /**
      * @param TokenStorageInterface                     $tokenStorage
@@ -66,6 +67,16 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+    }
+
+    /**
+     * Enables deauthentication during refreshUser when the user has changed.
+     *
+     * @param bool $logoutOnUserChange
+     */
+    public function setLogoutOnUserChange($logoutOnUserChange)
+    {
+        $this->logoutOnUserChange = (bool) $logoutOnUserChange;
     }
 
     /**
@@ -122,14 +133,14 @@ class ContextListener implements ListenerInterface
             return;
         }
 
-        if (!$event->getRequest()->hasSession()) {
+        $request = $event->getRequest();
+
+        if (!$request->hasSession()) {
             return;
         }
 
         $this->dispatcher->removeListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
         $this->registered = false;
-
-        $request = $event->getRequest();
         $session = $request->getSession();
 
         if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
@@ -171,6 +182,19 @@ class ContextListener implements ListenerInterface
             try {
                 $refreshedUser = $provider->refreshUser($user);
                 $token->setUser($refreshedUser);
+
+                // tokens can be deauthenticated if the user has been changed.
+                if (!$token->isAuthenticated()) {
+                    if ($this->logoutOnUserChange) {
+                        if (null !== $this->logger) {
+                            $this->logger->debug('Token was deauthenticated after trying to refresh it.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
+                        }
+
+                        return null;
+                    }
+
+                    @trigger_error('Refreshing a deauthenticated user is deprecated as of 3.4 and will trigger a logout in 4.0.', E_USER_DEPRECATED);
+                }
 
                 if (null !== $this->logger) {
                     $context = array('provider' => get_class($provider), 'username' => $refreshedUser->getUsername());

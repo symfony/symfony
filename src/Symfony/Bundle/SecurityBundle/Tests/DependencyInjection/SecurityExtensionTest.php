@@ -38,6 +38,7 @@ class SecurityExtensionTest extends TestCase
                     'form_login' => array(
                         'check_path' => '/some_area/login_check',
                     ),
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -61,6 +62,7 @@ class SecurityExtensionTest extends TestCase
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -88,6 +90,7 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => array(),
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -110,6 +113,7 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => null,
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -117,6 +121,31 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Setting logout_on_user_change to false is deprecated as of 3.4 and will always be true in 4.0. Set logout_on_user_change to true in your firewall configuration.
+     */
+    public function testDeprecationForUserLogout()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'logout_on_user_change' => false,
+                ),
+            ),
+        ));
+
+        $container->compile();
     }
 
     protected function getRawContainer()

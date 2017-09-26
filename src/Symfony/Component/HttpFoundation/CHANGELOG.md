@@ -18,6 +18,13 @@ CHANGELOG
    method (by not passing `false` as its argument) is not supported anymore and
    throws a `\BadMethodCallException`
 
+3.4.0
+-----
+
+ * deprecated the `NativeSessionHandler` class,
+ * deprecated the `AbstractProxy`, `NativeProxy` and `SessionHandlerProxy` classes,
+ * deprecated setting session save handlers that do not implement `\SessionHandlerInterface` in `NativeSessionStorage::setSaveHandler()`
+
 3.3.0
 -----
 

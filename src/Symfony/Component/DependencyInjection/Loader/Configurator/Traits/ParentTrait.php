@@ -38,6 +38,8 @@ trait ParentTrait
             $this->definition->setParent($parent);
         } elseif ($this->definition->isAutoconfigured()) {
             throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.', $this->id));
+        } elseif ($this->definition->getBindings()) {
+            throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also "bind" arguments.', $this->id));
         } else {
             // cast Definition to ChildDefinition
             $definition = serialize($this->definition);

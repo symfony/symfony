@@ -22,6 +22,9 @@ CHANGELOG
  * `SetAclCommand::__construct()` now takes an instance of
    `Symfony\Component\Security\Acl\Model\MutableAclProviderInterfaceConnection`
    as first argument
+ * Added `logout_on_user_change` to the firewall options. This config item will
+   trigger a logout when the user has changed. Should be set to true to avoid
+   deprecations in the configuration.
 
 3.3.0
 -----

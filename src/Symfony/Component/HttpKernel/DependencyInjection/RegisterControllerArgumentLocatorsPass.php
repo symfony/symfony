@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -54,11 +53,13 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             $def->setPublic(true);
             $class = $def->getClass();
             $autowire = $def->isAutowired();
+            $bindings = $def->getBindings();
 
             // resolve service class, taking parent definitions into account
-            while (!$class && $def instanceof ChildDefinition) {
+            while ($def instanceof ChildDefinition) {
                 $def = $container->findDefinition($def->getParent());
-                $class = $def->getClass();
+                $class = $class ?: $def->getClass();
+                $bindings = $def->getBindings();
             }
             $class = $parameterBag->resolveValue($class);
 
@@ -110,9 +111,6 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     throw new InvalidArgumentException(sprintf('Invalid "%s" tag for service "%s": method "%s()" has no "%s" argument on class "%s".', $this->controllerTag, $id, $r->name, $attributes['argument'], $class));
                 }
             }
-
-            // not validated, they are later in ResolveBindingsPass
-            $bindings = $def->getBindings();
 
             foreach ($methods as list($r, $parameters)) {
                 /** @var \ReflectionMethod $r */

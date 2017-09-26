@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
+@trigger_error('The '.__NAMESPACE__.'\SessionHandlerProxy class is deprecated since version 3.4 and will be removed in 4.0. Use your session handler implementation directly.', E_USER_DEPRECATED);
+
 /**
- * SessionHandler proxy.
+ * @deprecated since version 3.4, to be removed in 4.0. Use your session handler implementation directly.
  *
  * @author Drak <drak@zikula.org>
  */
@@ -23,11 +25,6 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      */
     protected $handler;
 
-    /**
-     * Constructor.
-     *
-     * @param \SessionHandlerInterface $handler
-     */
     public function __construct(\SessionHandlerInterface $handler)
     {
         $this->handler = $handler;

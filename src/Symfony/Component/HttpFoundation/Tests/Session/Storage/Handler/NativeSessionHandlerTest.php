@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
+ * @group legacy
  */
 class NativeSessionHandlerTest extends TestCase
 {

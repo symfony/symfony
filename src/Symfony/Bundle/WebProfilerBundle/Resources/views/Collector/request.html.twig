@@ -274,7 +274,7 @@
                         <a href="{{ path('_profiler', { token: child.token }) }}">
                             {{ helper.set_handler(child.getcollector('request').controller) }}
                         </a>
-                        <small>(token = {{ child.token }})</small>
+                        <small>(token = <a href="{{ path('_profiler', { token: child.token }) }}">{{ child.token }}</a>)</small>
                     </h3>
 
                     {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: child.getcollector('request').requestattributes }, with_context = false) }}

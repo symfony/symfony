@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-19T10:41:37Z
+
+fyi: the header merging of variable array structures is specifically optimized for collection like substructures, to maintain good ordering. the testcase included is not such a case
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-19T10:50:28Z
+
+@dunglas would be nice if you could review, since the original impl is done by you
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-20T05:26:15Z
+
+@backbone87 I changed the base branch to 3.4 because that's the correct target. Could you please rebase on 3.4 on your side?
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-20T06:10:32Z
+
+@nicolas-grekas done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-27T04:33:53Z
+
+Can you add a note in the component CHANGELOG before we merge? Thanks.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2017-09-27T07:14:18Z
+
+@fabpot done, but i guess, i need to rebase?

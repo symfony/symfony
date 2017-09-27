@@ -19,8 +19,8 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 use Symfony\Component\Security\Core\User\User;
 
 /**
@@ -117,9 +117,9 @@ EOF
 
         $encoderFactory = $this->encoderFactory ?: $this->getContainer()->get('security.encoder_factory');
         $encoder = $encoderFactory->getEncoder($userClass);
-        $bcryptWithoutEmptySalt = !$emptySalt && $encoder instanceof BCryptPasswordEncoder;
+        $saltlessWithoutEmptySalt = !$emptySalt && $encoder instanceof SelfSaltingEncoderInterface;
 
-        if ($bcryptWithoutEmptySalt) {
+        if ($saltlessWithoutEmptySalt) {
             $emptySalt = true;
         }
 
@@ -161,8 +161,8 @@ EOF
 
         if (!$emptySalt) {
             $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
-        } elseif ($bcryptWithoutEmptySalt) {
-            $errorIo->note('Bcrypt encoder used: the encoder generated its own built-in salt.');
+        } elseif ($saltlessWithoutEmptySalt) {
+            $errorIo->note('Self-salting encoder used: the encoder generated its own built-in salt.');
         }
 
         $errorIo->success('Password encoding succeeded');

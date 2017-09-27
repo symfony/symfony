@@ -37,7 +37,7 @@ class LocaleValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -45,7 +45,7 @@ class LocaleValidator extends ConstraintValidator
         $locales = Intl::getLocaleBundle()->getLocaleNames();
         $aliases = Intl::getLocaleBundle()->getAliases();
 
-        if (!isset($locales[$value]) && !in_array($value, $aliases)) {
+        if (!isset($locales[$value]) && !\in_array($value, $aliases)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))

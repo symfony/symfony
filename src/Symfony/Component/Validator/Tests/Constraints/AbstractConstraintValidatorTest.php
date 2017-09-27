@@ -169,8 +169,8 @@ abstract class AbstractConstraintValidatorTest extends TestCase
     protected function setObject($object)
     {
         $this->object = $object;
-        $this->metadata = is_object($object)
-            ? new ClassMetadata(get_class($object))
+        $this->metadata = \is_object($object)
+            ? new ClassMetadata(\get_class($object))
             : null;
 
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
@@ -179,8 +179,8 @@ abstract class AbstractConstraintValidatorTest extends TestCase
     protected function setProperty($object, $property)
     {
         $this->object = $object;
-        $this->metadata = is_object($object)
-            ? new PropertyMetadata(get_class($object), $property)
+        $this->metadata = \is_object($object)
+            ? new PropertyMetadata(\get_class($object), $property)
             : null;
 
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
@@ -240,7 +240,7 @@ abstract class AbstractConstraintValidatorTest extends TestCase
 
     protected function assertNoViolation()
     {
-        $this->assertSame(0, $violationsCount = count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
+        $this->assertSame(0, $violationsCount = \count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
     }
 
     /**
@@ -279,7 +279,7 @@ abstract class AbstractConstraintValidatorTest extends TestCase
 
         $violations = $this->context->getViolations();
 
-        $this->assertCount(count($expected), $violations);
+        $this->assertCount(\count($expected), $violations);
 
         $i = 0;
 
@@ -413,7 +413,7 @@ class ConstraintViolationAssertion
 
         $violations = iterator_to_array($this->context->getViolations());
 
-        Assert::assertSame($expectedCount = count($expected), $violationsCount = count($violations), sprintf('%u violation(s) expected. Got %u.', $expectedCount, $violationsCount));
+        Assert::assertSame($expectedCount = \count($expected), $violationsCount = \count($violations), sprintf('%u violation(s) expected. Got %u.', $expectedCount, $violationsCount));
 
         reset($violations);
 

@@ -131,7 +131,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
             }
 
-            if (in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
+            if (\in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
@@ -144,7 +144,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     {
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
-            if (in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
+            if (\in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }

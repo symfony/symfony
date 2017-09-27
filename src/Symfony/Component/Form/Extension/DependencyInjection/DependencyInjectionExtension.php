@@ -86,7 +86,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
                 $guessers[] = $this->container->get($serviceId);
             }
 
-            if (count($guessers) > 0) {
+            if (\count($guessers) > 0) {
                 $this->guesser = new FormTypeGuesserChain($guessers);
             }
         }

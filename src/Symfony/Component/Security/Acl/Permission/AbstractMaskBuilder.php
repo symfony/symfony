@@ -36,7 +36,7 @@ abstract class AbstractMaskBuilder implements MaskBuilderInterface
      */
     public function set($mask)
     {
-        if (!is_int($mask)) {
+        if (!\is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
         }
 

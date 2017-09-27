@@ -54,7 +54,7 @@ class ClassUtils
      */
     public static function getRealClass($object)
     {
-        $class = is_object($object) ? get_class($object) : $object;
+        $class = \is_object($object) ? \get_class($object) : $object;
 
         if (false === $pos = strrpos($class, '\\'.self::MARKER.'\\')) {
             return $class;

@@ -35,7 +35,7 @@ class ChoiceValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Choice');
         }
 
-        if (!is_array($constraint->choices) && !$constraint->callback) {
+        if (!\is_array($constraint->choices) && !$constraint->callback) {
             throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
         }
 
@@ -43,7 +43,7 @@ class ChoiceValidator extends ConstraintValidator
             return;
         }
 
-        if ($constraint->multiple && !is_array($value)) {
+        if ($constraint->multiple && !\is_array($value)) {
             throw new UnexpectedTypeException($value, 'array');
         }
 
@@ -53,14 +53,14 @@ class ChoiceValidator extends ConstraintValidator
             ) {
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
             }
-            $choices = call_user_func($choices);
+            $choices = \call_user_func($choices);
         } else {
             $choices = $constraint->choices;
         }
 
         if ($constraint->multiple) {
             foreach ($value as $_value) {
-                if (!in_array($_value, $choices, $constraint->strict)) {
+                if (!\in_array($_value, $choices, $constraint->strict)) {
                     if ($this->context instanceof ExecutionContextInterface) {
                         $this->context->buildViolation($constraint->multipleMessage)
                             ->setParameter('{{ value }}', $this->formatValue($_value))
@@ -79,7 +79,7 @@ class ChoiceValidator extends ConstraintValidator
                 }
             }
 
-            $count = count($value);
+            $count = \count($value);
 
             if (null !== $constraint->min && $count < $constraint->min) {
                 if ($this->context instanceof ExecutionContextInterface) {
@@ -116,7 +116,7 @@ class ChoiceValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!in_array($value, $choices, $constraint->strict)) {
+        } elseif (!\in_array($value, $choices, $constraint->strict)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))

@@ -348,7 +348,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'expanded' => false,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
 '/select
@@ -651,7 +651,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'expanded' => false,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
 '/select
@@ -922,7 +922,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'expanded' => true,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
@@ -1261,7 +1261,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'required' => true,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div

@@ -142,7 +142,7 @@ class KernelTest extends TestCase
             ->method('getLogDir')
             ->will($this->returnValue(sys_get_temp_dir()));
 
-        $reflection = new \ReflectionClass(get_class($kernel));
+        $reflection = new \ReflectionClass(\get_class($kernel));
         $method = $reflection->getMethod('buildContainer');
         $method->setAccessible(true);
         $method->invoke($kernel);
@@ -799,7 +799,7 @@ EOF;
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(null === $bundleName ? get_class($bundle) : $bundleName))
+            ->will($this->returnValue(null === $bundleName ? \get_class($bundle) : $bundleName))
         ;
 
         $bundle

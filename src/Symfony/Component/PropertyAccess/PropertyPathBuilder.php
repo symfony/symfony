@@ -52,7 +52,7 @@ class PropertyPathBuilder
      */
     public function append($path, $offset = 0, $length = 0)
     {
-        if (is_string($path)) {
+        if (\is_string($path)) {
             $path = new PropertyPath($path);
         }
 
@@ -122,7 +122,7 @@ class PropertyPathBuilder
      */
     public function replace($offset, $length, $path, $pathOffset = 0, $pathLength = 0)
     {
-        if (is_string($path)) {
+        if (\is_string($path)) {
             $path = new PropertyPath($path);
         }
 
@@ -194,7 +194,7 @@ class PropertyPathBuilder
      */
     public function getLength()
     {
-        return count($this->elements);
+        return \count($this->elements);
     }
 
     /**
@@ -247,7 +247,7 @@ class PropertyPathBuilder
             return;
         }
 
-        $length = count($this->elements);
+        $length = \count($this->elements);
 
         if ($cutLength > $insertionLength) {
             // More elements should be removed than inserted

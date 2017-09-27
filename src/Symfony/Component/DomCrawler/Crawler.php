@@ -79,12 +79,12 @@ class Crawler extends \SplObjectStorage
             $this->addNodeList($node);
         } elseif ($node instanceof \DOMNode) {
             $this->addNode($node);
-        } elseif (is_array($node)) {
+        } elseif (\is_array($node)) {
             $this->addNodes($node);
-        } elseif (is_string($node)) {
+        } elseif (\is_string($node)) {
             $this->addContent($node);
         } elseif (null !== $node) {
-            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', is_object($node) ? get_class($node) : gettype($node)));
+            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', \is_object($node) ? \get_class($node) : \gettype($node)));
         }
     }
 
@@ -205,7 +205,7 @@ class Crawler extends \SplObjectStorage
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(array('href'));
 
         $baseHref = current($base);
-        if (count($base) && !empty($baseHref)) {
+        if (\count($base) && !empty($baseHref)) {
             if ($this->baseHref) {
                 $linkNode = $dom->createElement('a');
                 $linkNode->setAttribute('href', $baseHref);
@@ -414,7 +414,7 @@ class Crawler extends \SplObjectStorage
      */
     public function last()
     {
-        return $this->eq(count($this) - 1);
+        return $this->eq(\count($this) - 1);
     }
 
     /**
@@ -426,7 +426,7 @@ class Crawler extends \SplObjectStorage
      */
     public function siblings()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -442,7 +442,7 @@ class Crawler extends \SplObjectStorage
      */
     public function nextAll()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -458,7 +458,7 @@ class Crawler extends \SplObjectStorage
      */
     public function previousAll()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -474,7 +474,7 @@ class Crawler extends \SplObjectStorage
      */
     public function parents()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -499,7 +499,7 @@ class Crawler extends \SplObjectStorage
      */
     public function children()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -519,7 +519,7 @@ class Crawler extends \SplObjectStorage
      */
     public function attr($attribute)
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -537,7 +537,7 @@ class Crawler extends \SplObjectStorage
      */
     public function nodeName()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -553,7 +553,7 @@ class Crawler extends \SplObjectStorage
      */
     public function text()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -569,7 +569,7 @@ class Crawler extends \SplObjectStorage
      */
     public function html()
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -597,7 +597,7 @@ class Crawler extends \SplObjectStorage
     public function extract($attributes)
     {
         $attributes = (array) $attributes;
-        $count = count($attributes);
+        $count = \count($attributes);
 
         $data = array();
         foreach ($this as $node) {
@@ -704,7 +704,7 @@ class Crawler extends \SplObjectStorage
      */
     public function link($method = 'get')
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -740,7 +740,7 @@ class Crawler extends \SplObjectStorage
      */
     public function form(array $values = null, $method = null)
     {
-        if (!count($this)) {
+        if (!\count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -860,7 +860,7 @@ class Crawler extends \SplObjectStorage
         // We cannot simply drop
         $nonMatchingExpression = 'a[name() = "b"]';
 
-        $xpathLen = strlen($xpath);
+        $xpathLen = \strlen($xpath);
         $openedBrackets = 0;
         $startPosition = strspn($xpath, " \t\n\r\0\x0B");
 

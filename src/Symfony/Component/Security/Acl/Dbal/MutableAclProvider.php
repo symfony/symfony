@@ -51,7 +51,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     public function createAcl(ObjectIdentityInterface $oid)
     {
         if (false !== $this->retrieveObjectIdentityPrimaryKey($oid)) {
-            $objectName = method_exists($oid, '__toString') ? $oid : get_class($oid);
+            $objectName = method_exists($oid, '__toString') ? $oid : \get_class($oid);
             throw new AclAlreadyExistsException(sprintf('%s is already associated with an ACL.', $objectName));
         }
 
@@ -215,12 +215,12 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 $acePropertyChanges[$propertyName] = array($oldValue, $newValue);
             }
 
-            if (count($acePropertyChanges) > 0) {
+            if (\count($acePropertyChanges) > 0) {
                 $propertyChanges['aces']->offsetSet($ace, $acePropertyChanges);
             } else {
                 $propertyChanges['aces']->offsetUnset($ace);
 
-                if (0 === count($propertyChanges['aces'])) {
+                if (0 === \count($propertyChanges['aces'])) {
                     unset($propertyChanges['aces']);
                 }
             }
@@ -240,7 +240,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
         $propertyChanges = $this->propertyChanges->offsetGet($acl);
         // check if any changes were made to this ACL
-        if (0 === count($propertyChanges)) {
+        if (0 === \count($propertyChanges)) {
             return;
         }
 
@@ -307,7 +307,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
             // if there have been changes to shared properties, we need to synchronize other
             // ACL instances for object identities of the same type that are already in-memory
-            if (count($sharedPropertyChanges) > 0) {
+            if (\count($sharedPropertyChanges) > 0) {
                 $classAcesProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Acl', 'classAces');
                 $classAcesProperty->setAccessible(true);
                 $classFieldAcesProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Acl', 'classFieldAces');
@@ -333,7 +333,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             }
 
             // persist any changes to the acl_object_identities table
-            if (count($sets) > 0) {
+            if (\count($sets) > 0) {
                 $this->connection->executeQuery($this->getUpdateObjectIdentitySql($acl->getId(), $sets));
             }
 
@@ -347,7 +347,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         $this->propertyChanges->offsetSet($acl, array());
 
         if (null !== $this->cache) {
-            if (count($sharedPropertyChanges) > 0) {
+            if (\count($sharedPropertyChanges) > 0) {
                 // FIXME: Currently, there is no easy way to clear the cache for ACLs
                 //        of a certain type. The problem here is that we need to make
                 //        sure to clear the cache of all child ACLs as well, and these
@@ -678,7 +678,7 @@ QUERY;
      */
     protected function getUpdateObjectIdentitySql($pk, array $changes)
     {
-        if (0 === count($changes)) {
+        if (0 === \count($changes)) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 
@@ -728,7 +728,7 @@ QUERY;
      */
     protected function getUpdateAccessControlEntrySql($pk, array $sets)
     {
-        if (0 === count($sets)) {
+        if (0 === \count($sets)) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 
@@ -853,7 +853,7 @@ QUERY;
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; ++$i) {
+            for ($i = 0, $c = \count($new); $i < $c; ++$i) {
                 $ace = $new[$i];
 
                 if (null === $ace->getId()) {
@@ -894,7 +894,7 @@ QUERY;
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; ++$i) {
+            for ($i = 0, $c = \count($new); $i < $c; ++$i) {
                 $ace = $new[$i];
 
                 if (null !== $ace->getId()) {
@@ -904,7 +904,7 @@ QUERY;
         }
 
         foreach ($changes[0] as $old) {
-            for ($i = 0, $c = count($old); $i < $c; ++$i) {
+            for ($i = 0, $c = \count($old); $i < $c; ++$i) {
                 $ace = $old[$i];
 
                 if (!isset($currentIds[$ace->getId()])) {
@@ -927,7 +927,7 @@ QUERY;
 
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
-        for ($i = 0, $c = count($new); $i < $c; ++$i) {
+        for ($i = 0, $c = \count($new); $i < $c; ++$i) {
             $ace = $new[$i];
 
             if (null === $ace->getId()) {
@@ -968,7 +968,7 @@ QUERY;
         list($old, $new) = $changes;
         $currentIds = array();
 
-        for ($i = 0, $c = count($new); $i < $c; ++$i) {
+        for ($i = 0, $c = \count($new); $i < $c; ++$i) {
             $ace = $new[$i];
 
             if (null !== $ace->getId()) {
@@ -976,7 +976,7 @@ QUERY;
             }
         }
 
-        for ($i = 0, $c = count($old); $i < $c; ++$i) {
+        for ($i = 0, $c = \count($old); $i < $c; ++$i) {
             $ace = $old[$i];
 
             if (!isset($currentIds[$ace->getId()])) {

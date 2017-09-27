@@ -24,7 +24,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
     public static function setUpBeforeClass()
     {
         foreach (spl_autoload_functions() as $function) {
-            if (!is_array($function)) {
+            if (!\is_array($function)) {
                 continue;
             }
 

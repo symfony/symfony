@@ -202,7 +202,7 @@ class ParameterBagTest extends TestCase
             $this->assertEquals($parameters[$key], $val);
         }
 
-        $this->assertEquals(count($parameters), $i);
+        $this->assertEquals(\count($parameters), $i);
     }
 
     public function testCount()
@@ -210,7 +210,7 @@ class ParameterBagTest extends TestCase
         $parameters = array('foo' => 'bar', 'hello' => 'world');
         $bag = new ParameterBag($parameters);
 
-        $this->assertEquals(count($parameters), count($bag));
+        $this->assertEquals(\count($parameters), \count($bag));
     }
 
     public function testGetBoolean()

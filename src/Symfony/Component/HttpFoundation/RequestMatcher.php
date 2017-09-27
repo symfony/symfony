@@ -145,11 +145,11 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matches(Request $request)
     {
-        if ($this->schemes && !in_array($request->getScheme(), $this->schemes, true)) {
+        if ($this->schemes && !\in_array($request->getScheme(), $this->schemes, true)) {
             return false;
         }
 
-        if ($this->methods && !in_array($request->getMethod(), $this->methods, true)) {
+        if ($this->methods && !\in_array($request->getMethod(), $this->methods, true)) {
             return false;
         }
 
@@ -173,6 +173,6 @@ class RequestMatcher implements RequestMatcherInterface
 
         // Note to future implementors: add additional checks above the
         // foreach above or else your check might not be run!
-        return 0 === count($this->ips);
+        return 0 === \count($this->ips);
     }
 }

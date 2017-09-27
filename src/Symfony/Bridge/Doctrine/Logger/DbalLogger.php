@@ -79,12 +79,12 @@ class DbalLogger implements SQLLogger
     {
         foreach ($params as $index => $param) {
             // normalize recursively
-            if (is_array($param)) {
+            if (\is_array($param)) {
                 $params[$index] = $this->normalizeParams($param);
                 continue;
             }
 
-            if (!is_string($params[$index])) {
+            if (!\is_string($params[$index])) {
                 continue;
             }
 
@@ -101,7 +101,7 @@ class DbalLogger implements SQLLogger
                     continue;
                 }
             } else {
-                if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
+                if (self::MAX_STRING_LENGTH < \strlen($params[$index])) {
                     $params[$index] = substr($params[$index], 0, self::MAX_STRING_LENGTH - 6).' [...]';
                     continue;
                 }

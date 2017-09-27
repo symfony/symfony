@@ -43,7 +43,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 
                 $factory = $definition->getFactory();
 
-                if (is_array($factory) && isset($factory[0])) {
+                if (\is_array($factory) && isset($factory[0])) {
                     $factory[0] = $parameterBag->resolveValue($factory[0]);
                     $definition->setFactory($factory);
                 }

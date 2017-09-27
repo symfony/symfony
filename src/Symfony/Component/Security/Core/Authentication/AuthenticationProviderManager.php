@@ -50,7 +50,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
         foreach ($providers as $provider) {
             if (!$provider instanceof AuthenticationProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', get_class($provider)));
+                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', \get_class($provider)));
             }
         }
 
@@ -104,7 +104,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         }
 
         if (null === $lastException) {
-            $lastException = new ProviderNotFoundException(sprintf('No Authentication Provider found for token of class "%s".', get_class($token)));
+            $lastException = new ProviderNotFoundException(sprintf('No Authentication Provider found for token of class "%s".', \get_class($token)));
         }
 
         if (null !== $this->eventDispatcher) {

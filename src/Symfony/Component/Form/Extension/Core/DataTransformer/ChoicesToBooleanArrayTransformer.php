@@ -53,7 +53,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
             return array();
         }
 
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -90,7 +90,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      */
     public function reverseTransform($values)
     {
-        if (!is_array($values)) {
+        if (!\is_array($values)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -113,7 +113,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
             }
         }
 
-        if (count($unknown) > 0) {
+        if (\count($unknown) > 0) {
             throw new TransformationFailedException(sprintf('The choices "%s" were not found', implode('", "', $unknown)));
         }
 

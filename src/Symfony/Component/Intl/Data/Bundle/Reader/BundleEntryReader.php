@@ -97,7 +97,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
                 $readSucceeded = true;
 
                 $isCurrentTraversable = $currentEntry instanceof \Traversable;
-                $isCurrentMultiValued = $isCurrentTraversable || is_array($currentEntry);
+                $isCurrentMultiValued = $isCurrentTraversable || \is_array($currentEntry);
 
                 // Return immediately if fallback is disabled or we are dealing
                 // with a scalar non-null entry
@@ -169,7 +169,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
         );
 
         // Append fallback locales, if any
-        if (count($testedLocales) > 1) {
+        if (\count($testedLocales) > 1) {
             // Remove original locale
             array_shift($testedLocales);
 

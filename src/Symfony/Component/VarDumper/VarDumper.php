@@ -35,7 +35,7 @@ class VarDumper
             };
         }
 
-        return call_user_func(self::$handler, $var);
+        return \call_user_func(self::$handler, $var);
     }
 
     public static function setHandler($callable)

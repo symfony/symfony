@@ -113,7 +113,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function renderEnctype(FormView $view)
     {
-        $this->markTestSkipped(sprintf('Legacy %s::renderEnctype() is not implemented.', get_class($this)));
+        $this->markTestSkipped(sprintf('Legacy %s::renderEnctype() is not implemented.', \get_class($this)));
     }
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
@@ -584,7 +584,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'expanded' => false,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
@@ -930,7 +930,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'expanded' => false,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
@@ -1049,7 +1049,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'expanded' => true,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
@@ -1179,7 +1179,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'required' => true,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+        $classPart = \in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div

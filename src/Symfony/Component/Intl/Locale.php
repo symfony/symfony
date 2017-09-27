@@ -74,7 +74,7 @@ final class Locale extends \Locale
 
             // Don't return default fallback for "root", "meta" or others
             // Normal locales have two or three letters
-            if (strlen($locale) < 4) {
+            if (\strlen($locale) < 4) {
                 return self::$defaultFallback;
             }
 

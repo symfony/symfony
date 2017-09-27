@@ -172,8 +172,8 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         foreach ($aliases as $alias => $language) {
             // $language is a string before ICU 5.5
-            $language = is_string($language) ? $language : $language['replacement'];
-            if (2 === strlen($language) && 3 === strlen($alias)) {
+            $language = \is_string($language) ? $language : $language['replacement'];
+            if (2 === \strlen($language) && 3 === \strlen($alias)) {
                 if (isset(self::$preferredAlpha2ToAlpha3Mapping[$language])) {
                     // Validate to prevent typos
                     if (!isset($aliases[self::$preferredAlpha2ToAlpha3Mapping[$language]])) {
@@ -186,7 +186,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
                     }
 
                     $alpha3 = self::$preferredAlpha2ToAlpha3Mapping[$language];
-                    $alpha2 = is_string($aliases[$alpha3]) ? $aliases[$alpha3] : $aliases[$alpha3]['replacement'];
+                    $alpha2 = \is_string($aliases[$alpha3]) ? $aliases[$alpha3] : $aliases[$alpha3]['replacement'];
 
                     if ($language !== $alpha2) {
                         throw new RuntimeException(

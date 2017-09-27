@@ -137,7 +137,7 @@ class DialogHelper extends InputAwareHelper
             $i = 0;
             $ofs = -1;
             $matches = $autocomplete;
-            $numMatches = count($matches);
+            $numMatches = \count($matches);
 
             $sttyMode = shell_exec('stty -g');
 
@@ -162,7 +162,7 @@ class DialogHelper extends InputAwareHelper
                     if (0 === $i) {
                         $ofs = -1;
                         $matches = $autocomplete;
-                        $numMatches = count($matches);
+                        $numMatches = \count($matches);
                     } else {
                         $numMatches = 0;
                     }
@@ -186,13 +186,13 @@ class DialogHelper extends InputAwareHelper
                         $ofs += ('A' === $c[2]) ? -1 : 1;
                         $ofs = ($numMatches + $ofs) % $numMatches;
                     }
-                } elseif (ord($c) < 32) {
+                } elseif (\ord($c) < 32) {
                     if ("\t" === $c || "\n" === $c) {
                         if ($numMatches > 0 && -1 !== $ofs) {
                             $ret = $matches[$ofs];
                             // Echo out remaining chars for current match
                             $output->write(substr($ret, $i));
-                            $i = strlen($ret);
+                            $i = \strlen($ret);
                         }
 
                         if ("\n" === $c) {
@@ -214,7 +214,7 @@ class DialogHelper extends InputAwareHelper
 
                     foreach ($autocomplete as $value) {
                         // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                        if (0 === strpos($value, $ret) && $i !== strlen($value)) {
+                        if (0 === strpos($value, $ret) && $i !== \strlen($value)) {
                             $matches[$numMatches++] = $value;
                         }
                     }
@@ -237,7 +237,7 @@ class DialogHelper extends InputAwareHelper
             shell_exec(sprintf('stty %s', $sttyMode));
         }
 
-        return strlen($ret) > 0 ? $ret : $default;
+        return \strlen($ret) > 0 ? $ret : $default;
     }
 
     /**
@@ -254,7 +254,7 @@ class DialogHelper extends InputAwareHelper
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {
         $answer = 'z';
-        while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
+        while ($answer && !\in_array(strtolower($answer[0]), array('y', 'n'))) {
             $answer = $this->ask($output, $question);
         }
 
@@ -490,7 +490,7 @@ class DialogHelper extends InputAwareHelper
             }
 
             try {
-                return call_user_func($validator, $interviewer());
+                return \call_user_func($validator, $interviewer());
             } catch (\Exception $e) {
             }
         }

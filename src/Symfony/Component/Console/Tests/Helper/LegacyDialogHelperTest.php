@@ -193,7 +193,7 @@ class LegacyDialogHelperTest extends TestCase
         $question = 'What color was the white horse of Henry IV?';
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
-            if (!in_array($color, array('white', 'black'))) {
+            if (!\in_array($color, array('white', 'black'))) {
                 throw new \InvalidArgumentException($error);
             }
 

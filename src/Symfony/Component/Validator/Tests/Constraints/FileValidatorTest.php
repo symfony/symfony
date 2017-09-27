@@ -45,7 +45,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
     {
         parent::tearDown();
 
-        if (is_resource($this->file)) {
+        if (\is_resource($this->file)) {
             fclose($this->file);
         }
 

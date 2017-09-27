@@ -68,12 +68,12 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->firstCall = false;
         if ($this->logger || null !== $this->throwAt) {
             $handler = set_error_handler('var_dump');
-            $handler = is_array($handler) ? $handler[0] : null;
+            $handler = \is_array($handler) ? $handler[0] : null;
             restore_error_handler();
             if ($handler instanceof ErrorHandler) {
                 if ($this->logger) {
                     $handler->setDefaultLogger($this->logger, $this->levels);
-                    if (is_array($this->levels)) {
+                    if (\is_array($this->levels)) {
                         $scream = 0;
                         foreach ($this->levels as $type => $log) {
                             $scream |= $type;
@@ -108,12 +108,12 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
         if ($this->exceptionHandler) {
             $handler = set_exception_handler('var_dump');
-            $handler = is_array($handler) ? $handler[0] : null;
+            $handler = \is_array($handler) ? $handler[0] : null;
             restore_exception_handler();
             if ($handler instanceof ErrorHandler) {
                 $h = $handler->setExceptionHandler('var_dump') ?: $this->exceptionHandler;
                 $handler->setExceptionHandler($h);
-                $handler = is_array($h) ? $h[0] : null;
+                $handler = \is_array($h) ? $h[0] : null;
             }
             if ($handler instanceof ExceptionHandler) {
                 $handler->setHandler($this->exceptionHandler);
@@ -129,7 +129,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     {
         $events = array(KernelEvents::REQUEST => array('configure', 2048));
 
-        if (defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
+        if (\defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
             $events[ConsoleEvents::COMMAND] = array('configure', 2048);
         }
 

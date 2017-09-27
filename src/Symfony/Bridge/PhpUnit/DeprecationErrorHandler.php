@@ -58,13 +58,13 @@ class DeprecationErrorHandler
             $trace = debug_backtrace(true);
             $group = 'other';
 
-            $i = count($trace);
+            $i = \count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_')))) {
                 // No-op
             }
 
             if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
-                $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
+                $class = isset($trace[$i]['object']) ? \get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
 
                 if (0 !== error_reporting()) {
@@ -73,7 +73,7 @@ class DeprecationErrorHandler
                     || 0 === strpos($method, 'provideLegacy')
                     || 0 === strpos($method, 'getLegacy')
                     || strpos($class, '\Legacy')
-                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+                    || \in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
                 ) {
                     $group = 'legacy';
                 } else {
@@ -167,6 +167,6 @@ class DeprecationErrorHandler
                 || 'xterm' === getenv('TERM');
         }
 
-        return defined('STDOUT') && function_exists('posix_isatty') && @posix_isatty(STDOUT);
+        return \defined('STDOUT') && function_exists('posix_isatty') && @posix_isatty(STDOUT);
     }
 }

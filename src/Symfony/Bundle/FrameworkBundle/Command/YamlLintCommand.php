@@ -140,7 +140,7 @@ EOF
             }
         }
 
-        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', count($filesInfo) - $errors, count($filesInfo)));
+        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', \count($filesInfo) - $errors, \count($filesInfo)));
 
         return min($errors, 1);
     }
@@ -156,7 +156,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
+        $output->writeln(json_encode($filesInfo, \defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
 
         return min($errors, 1);
     }

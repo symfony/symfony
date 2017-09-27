@@ -52,8 +52,8 @@ class TextDescriptor extends Descriptor
                 $controller = $route->getDefault('_controller');
                 if ($controller instanceof \Closure) {
                     $controller = 'Closure';
-                } elseif (is_object($controller)) {
-                    $controller = get_class($controller);
+                } elseif (\is_object($controller)) {
+                    $controller = \get_class($controller);
                 }
                 $row[] = $controller;
             }
@@ -81,7 +81,7 @@ class TextDescriptor extends Descriptor
             '<comment>Host Regex</comment>   '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : ''),
             '<comment>Scheme</comment>       '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY'),
             '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
-            '<comment>Class</comment>        '.get_class($route),
+            '<comment>Class</comment>        '.\get_class($route),
             '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
             '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
             '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
@@ -145,7 +145,7 @@ class TextDescriptor extends Descriptor
         } else {
             $description = $this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id']))
                 ."\n".sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-')
-                ."\n".sprintf('<comment>Class</comment>            %s', get_class($service));
+                ."\n".sprintf('<comment>Class</comment>            %s', \get_class($service));
 
             $this->writeText($description, $options);
         }
@@ -187,10 +187,10 @@ class TextDescriptor extends Descriptor
                     foreach ($tags as $tag) {
                         foreach ($tag as $key => $value) {
                             if (!isset($maxTags[$key])) {
-                                $maxTags[$key] = strlen($key);
+                                $maxTags[$key] = \strlen($key);
                             }
-                            if (strlen($value) > $maxTags[$key]) {
-                                $maxTags[$key] = strlen($value);
+                            if (\strlen($value) > $maxTags[$key]) {
+                                $maxTags[$key] = \strlen($value);
                             }
                         }
                     }
@@ -198,7 +198,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $tagsCount = count($maxTags);
+        $tagsCount = \count($maxTags);
         $tagsNames = array_keys($maxTags);
 
         $table = new Table($this->getOutput());
@@ -227,7 +227,7 @@ class TextDescriptor extends Descriptor
                 $alias = $definition;
                 $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             } else {
-                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
+                $table->addRow(array_merge(array($serviceId, \get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             }
         }
 
@@ -247,7 +247,7 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: '-');
 
         $tags = $definition->getTags();
-        if (count($tags)) {
+        if (\count($tags)) {
             $description[] = '<comment>Tags</comment>';
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
@@ -286,7 +286,7 @@ class TextDescriptor extends Descriptor
         }
 
         if ($factory = $definition->getFactory()) {
-            if (is_array($factory)) {
+            if (\is_array($factory)) {
                 if ($factory[0] instanceof Reference) {
                     $description[] = sprintf('<comment>Factory Service</comment>  %s', $factory[0]);
                 } elseif ($factory[0] instanceof Definition) {
@@ -381,7 +381,7 @@ class TextDescriptor extends Descriptor
      */
     private function formatRouterConfig(array $array)
     {
-        if (!count($array)) {
+        if (!\count($array)) {
             return 'NONE';
         }
 
@@ -412,15 +412,15 @@ class TextDescriptor extends Descriptor
      */
     private function formatCallable($callable)
     {
-        if (is_array($callable)) {
-            if (is_object($callable[0])) {
-                return sprintf('%s::%s()', get_class($callable[0]), $callable[1]);
+        if (\is_array($callable)) {
+            if (\is_object($callable[0])) {
+                return sprintf('%s::%s()', \get_class($callable[0]), $callable[1]);
             }
 
             return sprintf('%s::%s()', $callable[0], $callable[1]);
         }
 
-        if (is_string($callable)) {
+        if (\is_string($callable)) {
             return sprintf('%s()', $callable);
         }
 
@@ -429,7 +429,7 @@ class TextDescriptor extends Descriptor
         }
 
         if (method_exists($callable, '__invoke')) {
-            return sprintf('%s::__invoke()', get_class($callable));
+            return sprintf('%s::__invoke()', \get_class($callable));
         }
 
         throw new \InvalidArgumentException('Callable is not describable.');

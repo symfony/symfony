@@ -114,9 +114,9 @@ class EventDispatcher implements EventDispatcherInterface
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
-            if (is_string($params)) {
+            if (\is_string($params)) {
                 $this->addListener($eventName, array($subscriber, $params));
-            } elseif (is_string($params[0])) {
+            } elseif (\is_string($params[0])) {
                 $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
             } else {
                 foreach ($params as $listener) {
@@ -132,12 +132,12 @@ class EventDispatcher implements EventDispatcherInterface
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
-            if (is_array($params) && is_array($params[0])) {
+            if (\is_array($params) && \is_array($params[0])) {
                 foreach ($params as $listener) {
                     $this->removeListener($eventName, array($subscriber, $listener[0]));
                 }
             } else {
-                $this->removeListener($eventName, array($subscriber, is_string($params) ? $params : $params[0]));
+                $this->removeListener($eventName, array($subscriber, \is_string($params) ? $params : $params[0]));
             }
         }
     }
@@ -158,7 +158,7 @@ class EventDispatcher implements EventDispatcherInterface
             if ($event->isPropagationStopped()) {
                 break;
             }
-            call_user_func($listener, $event, $eventName, $this);
+            \call_user_func($listener, $event, $eventName, $this);
         }
     }
 
@@ -172,6 +172,6 @@ class EventDispatcher implements EventDispatcherInterface
         $this->sorted[$eventName] = array();
 
         krsort($this->listeners[$eventName]);
-        $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
+        $this->sorted[$eventName] = \call_user_func_array('array_merge', $this->listeners[$eventName]);
     }
 }

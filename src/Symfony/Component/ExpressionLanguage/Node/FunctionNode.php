@@ -32,7 +32,7 @@ class FunctionNode extends Node
 
         $function = $compiler->getFunction($this->attributes['name']);
 
-        $compiler->raw(call_user_func_array($function['compiler'], $arguments));
+        $compiler->raw(\call_user_func_array($function['compiler'], $arguments));
     }
 
     public function evaluate($functions, $values)
@@ -42,6 +42,6 @@ class FunctionNode extends Node
             $arguments[] = $node->evaluate($functions, $values);
         }
 
-        return call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
+        return \call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
     }
 }

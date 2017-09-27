@@ -52,7 +52,7 @@ abstract class IteratorTestCase extends TestCase
 
         foreach ($expected as $subarray) {
             $temp = array();
-            while (count($values) && count($temp) < count($subarray)) {
+            while (\count($values) && \count($temp) < \count($subarray)) {
                 $temp[] = array_shift($values);
             }
             sort($temp);

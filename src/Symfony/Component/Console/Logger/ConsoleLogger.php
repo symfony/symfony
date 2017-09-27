@@ -108,7 +108,7 @@ class ConsoleLogger extends AbstractLogger
         // build a replacement array with braces around the context keys
         $replace = array();
         foreach ($context as $key => $val) {
-            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+            if (!\is_array($val) && (!\is_object($val) || method_exists($val, '__toString'))) {
                 $replace[sprintf('{%s}', $key)] = $val;
             }
         }

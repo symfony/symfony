@@ -32,7 +32,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->append($child);
 
         $this->assertCount(3, $this->getField($parent, 'children'));
-        $this->assertTrue(in_array($child, $this->getField($parent, 'children')));
+        $this->assertTrue(\in_array($child, $this->getField($parent, 'children')));
     }
 
     /**
@@ -43,7 +43,7 @@ class ArrayNodeDefinitionTest extends TestCase
     {
         $node = new ArrayNodeDefinition('root');
 
-        call_user_func_array(array($node, $method), $args);
+        \call_user_func_array(array($node, $method), $args);
 
         $node->getNode();
     }

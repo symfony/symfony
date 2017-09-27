@@ -65,13 +65,13 @@ class SymfonyStyle extends OutputStyle
     public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false)
     {
         $this->autoPrependBlock();
-        $messages = is_array($messages) ? array_values($messages) : array($messages);
+        $messages = \is_array($messages) ? array_values($messages) : array($messages);
         $indentLength = 0;
         $lines = array();
 
         if (null !== $type) {
             $typePrefix = sprintf('[%s] ', $type);
-            $indentLength = strlen($typePrefix);
+            $indentLength = \strlen($typePrefix);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
 
@@ -87,7 +87,7 @@ class SymfonyStyle extends OutputStyle
                 }
             }
 
-            if (count($messages) > 1 && $key < count($messages) - 1) {
+            if (\count($messages) > 1 && $key < \count($messages) - 1) {
                 $lines[] = '';
             }
         }
@@ -122,7 +122,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('=', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('=', \strlen($message))),
         ));
         $this->newLine();
     }
@@ -135,7 +135,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('-', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('-', \strlen($message))),
         ));
         $this->newLine();
     }
@@ -161,7 +161,7 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
 
-        if (!is_array($message)) {
+        if (!\is_array($message)) {
             $this->writeln(sprintf(' // %s', $message));
 
             return;

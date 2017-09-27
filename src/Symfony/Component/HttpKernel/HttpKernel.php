@@ -141,7 +141,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $arguments = $this->resolver->getArguments($request, $controller);
 
         // call controller
-        $response = call_user_func_array($controller, $arguments);
+        $response = \call_user_func_array($controller, $arguments);
 
         // view
         if (!$response instanceof Response) {
@@ -256,11 +256,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     private function varToString($var)
     {
-        if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+        if (\is_object($var)) {
+            return sprintf('Object(%s)', \get_class($var));
         }
 
-        if (is_array($var)) {
+        if (\is_array($var)) {
             $a = array();
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
@@ -269,7 +269,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             return sprintf('Array(%s)', implode(', ', $a));
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return sprintf('Resource(%s)', get_resource_type($var));
         }
 

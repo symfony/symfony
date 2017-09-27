@@ -31,7 +31,7 @@ class SecurityIdentityRetrievalStrategyTest extends TestCase
                 ->getMock();
         } else {
             $class = '';
-            if (is_string($user)) {
+            if (\is_string($user)) {
                 $class = 'MyCustomTokenImpl';
             }
 

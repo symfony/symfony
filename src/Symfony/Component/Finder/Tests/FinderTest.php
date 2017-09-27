@@ -426,7 +426,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testCountWithoutIn()
     {
         $finder = Finder::create()->files();
-        count($finder);
+        \count($finder);
     }
 
     /**

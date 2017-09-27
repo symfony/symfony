@@ -40,7 +40,7 @@ class FormTest_AuthorWithoutRefSetter
     // to update it
     public function getReferenceCopy()
     {
-        return is_object($this->referenceCopy) ? clone $this->referenceCopy : $this->referenceCopy;
+        return \is_object($this->referenceCopy) ? clone $this->referenceCopy : $this->referenceCopy;
     }
 
     public function setReferenceCopy($reference)

@@ -45,7 +45,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
             return array();
         }
 
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -67,13 +67,13 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
             return array();
         }
 
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
         $choices = $this->choiceList->getChoicesForValues($array);
 
-        if (count($choices) !== count($array)) {
+        if (\count($choices) !== \count($array)) {
             throw new TransformationFailedException('Could not find all matching choices for the given values');
         }
 

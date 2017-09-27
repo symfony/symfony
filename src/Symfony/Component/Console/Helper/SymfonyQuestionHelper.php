@@ -37,7 +37,7 @@ class SymfonyQuestionHelper extends QuestionHelper
                 $value = $validator($value);
             } else {
                 // make required
-                if (!is_array($value) && !is_bool($value) && 0 === strlen($value)) {
+                if (!\is_array($value) && !\is_bool($value) && 0 === \strlen($value)) {
                     throw new \Exception('A value is required.');
                 }
             }

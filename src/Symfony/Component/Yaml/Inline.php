@@ -97,13 +97,13 @@ class Inline
     public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false)
     {
         switch (true) {
-            case is_resource($value):
+            case \is_resource($value):
                 if ($exceptionOnInvalidType) {
                     throw new DumpException(sprintf('Unable to dump PHP resources in a YAML file ("%s").', get_resource_type($value)));
                 }
 
                 return 'null';
-            case is_object($value):
+            case \is_object($value):
                 if ($objectSupport) {
                     return '!php/object:'.serialize($value);
                 }
@@ -113,7 +113,7 @@ class Inline
                 }
 
                 return 'null';
-            case is_array($value):
+            case \is_array($value):
                 return self::dumpArray($value, $exceptionOnInvalidType, $objectSupport);
             case null === $value:
                 return 'null';
@@ -122,13 +122,13 @@ class Inline
             case false === $value:
                 return 'false';
             case ctype_digit($value):
-                return is_string($value) ? "'$value'" : (int) $value;
+                return \is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value):
                 $locale = setlocale(LC_NUMERIC, 0);
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, 'C');
                 }
-                if (is_float($value)) {
+                if (\is_float($value)) {
                     $repr = (string) $value;
                     if (is_infinite($value)) {
                         $repr = str_ireplace('INF', '.Inf', $repr);
@@ -137,7 +137,7 @@ class Inline
                         $repr = '!!float '.$repr;
                     }
                 } else {
-                    $repr = is_string($value) ? "'$value'" : (string) $value;
+                    $repr = \is_string($value) ? "'$value'" : (string) $value;
                 }
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, $locale);
@@ -225,13 +225,13 @@ class Inline
      */
     public static function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true, $references = array())
     {
-        if (in_array($scalar[$i], $stringDelimiters)) {
+        if (\in_array($scalar[$i], $stringDelimiters)) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
 
             if (null !== $delimiters) {
                 $tmp = ltrim(substr($scalar, $i), ' ');
-                if (!in_array($tmp[0], $delimiters)) {
+                if (!\in_array($tmp[0], $delimiters)) {
                     throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)));
                 }
             }
@@ -239,7 +239,7 @@ class Inline
             // "normal" string
             if (!$delimiters) {
                 $output = substr($scalar, $i);
-                $i += strlen($output);
+                $i += \strlen($output);
 
                 // remove comments
                 if (Parser::preg_match('/[ \t]+#/', $output, $match, PREG_OFFSET_CAPTURE)) {
@@ -247,7 +247,7 @@ class Inline
                 }
             } elseif (Parser::preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
                 $output = $match[1];
-                $i += strlen($output);
+                $i += \strlen($output);
             } else {
                 throw new ParseException(sprintf('Malformed inline YAML string: %s.', $scalar));
             }
@@ -276,7 +276,7 @@ class Inline
             throw new ParseException(sprintf('Malformed inline YAML string: %s.', substr($scalar, $i)));
         }
 
-        $output = substr($match[0], 1, strlen($match[0]) - 2);
+        $output = substr($match[0], 1, \strlen($match[0]) - 2);
 
         $unescaper = new Unescaper();
         if ('"' == $scalar[$i]) {
@@ -285,7 +285,7 @@ class Inline
             $output = $unescaper->unescapeSingleQuotedString($output);
         }
 
-        $i += strlen($match[0]);
+        $i += \strlen($match[0]);
 
         return $output;
     }
@@ -304,7 +304,7 @@ class Inline
     private static function parseSequence($sequence, &$i = 0, $references = array())
     {
         $output = array();
-        $len = strlen($sequence);
+        $len = \strlen($sequence);
         ++$i;
 
         // [foo, bar, ...]
@@ -324,11 +324,11 @@ class Inline
                 case ' ':
                     break;
                 default:
-                    $isQuoted = in_array($sequence[$i], array('"', "'"));
+                    $isQuoted = \in_array($sequence[$i], array('"', "'"));
                     $value = self::parseScalar($sequence, array(',', ']'), array('"', "'"), $i, true, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
-                    if (!is_array($value) && !$isQuoted && false !== strpos($value, ': ')) {
+                    if (!\is_array($value) && !$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
                             $pos = 0;
@@ -363,7 +363,7 @@ class Inline
     private static function parseMapping($mapping, &$i = 0, $references = array())
     {
         $output = array();
-        $len = strlen($mapping);
+        $len = \strlen($mapping);
         ++$i;
 
         // {foo: bar, bar:foo, ...}

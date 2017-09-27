@@ -30,9 +30,9 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     public function handleError(array $error, FatalErrorException $exception)
     {
-        $messageLen = strlen($error['message']);
+        $messageLen = \strlen($error['message']);
         $notFoundSuffix = '\' not found';
-        $notFoundSuffixLen = strlen($notFoundSuffix);
+        $notFoundSuffixLen = \strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
             return;
         }
@@ -43,7 +43,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
 
         foreach (array('class', 'interface', 'trait') as $typeName) {
             $prefix = ucfirst($typeName).' \'';
-            $prefixLen = strlen($prefix);
+            $prefixLen = \strlen($prefix);
             if (0 !== strpos($error['message'], $prefix)) {
                 continue;
             }
@@ -86,7 +86,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     private function getClassCandidates($class)
     {
-        if (!is_array($functions = spl_autoload_functions())) {
+        if (!\is_array($functions = spl_autoload_functions())) {
             return array();
         }
 
@@ -94,7 +94,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         $classes = array();
 
         foreach ($functions as $function) {
-            if (!is_array($function)) {
+            if (!\is_array($function)) {
                 continue;
             }
             // get class loaders wrapped by DebugClassLoader
@@ -102,11 +102,11 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
                 $function = $function[0]->getClassLoader();
 
                 // @deprecated since version 2.5. Returning an object from DebugClassLoader::getClassLoader() is deprecated.
-                if (is_object($function)) {
+                if (\is_object($function)) {
                     $function = array($function);
                 }
 
-                if (!is_array($function)) {
+                if (!\is_array($function)) {
                     continue;
                 }
             }

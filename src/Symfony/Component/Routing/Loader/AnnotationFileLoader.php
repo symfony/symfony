@@ -77,7 +77,7 @@ class AnnotationFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'annotation' === $type);
+        return \is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'annotation' === $type);
     }
 
     /**
@@ -105,7 +105,7 @@ class AnnotationFileLoader extends FileLoader
 
             if (true === $namespace && T_STRING === $token[0]) {
                 $namespace = $token[1];
-                while (isset($tokens[++$i][1]) && in_array($tokens[$i][0], array(T_NS_SEPARATOR, T_STRING))) {
+                while (isset($tokens[++$i][1]) && \in_array($tokens[$i][0], array(T_NS_SEPARATOR, T_STRING))) {
                     $namespace .= $tokens[$i][1];
                 }
                 $token = $tokens[$i];
@@ -122,7 +122,7 @@ class AnnotationFileLoader extends FileLoader
                     if (T_DOUBLE_COLON === $tokens[$j][0]) {
                         $isClassConstant = true;
                         break;
-                    } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                    } elseif (!\in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
                         break;
                     }
                 }

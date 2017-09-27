@@ -553,7 +553,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata')->getMock();
         $metadata->expects($this->any())
             ->method('getClassName')
-            ->will($this->returnValue(get_class($entity)));
+            ->will($this->returnValue(\get_class($entity)));
 
         $this->metadataFactory->addMetadata($metadata);
 
@@ -572,7 +572,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata')->getMock();
         $metadata->expects($this->any())
             ->method('getClassName')
-            ->will($this->returnValue(get_class($entity->reference)));
+            ->will($this->returnValue(\get_class($entity->reference)));
 
         $this->metadataFactory->addMetadata($metadata);
 
@@ -591,7 +591,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
         // Legacy interface
         $propertyMetadata = $this->getMockBuilder('Symfony\Component\Validator\MetadataInterface')->getMock();
-        $metadata = new FakeClassMetadata(get_class($entity));
+        $metadata = new FakeClassMetadata(\get_class($entity));
         $metadata->addCustomPropertyMetadata('firstName', $propertyMetadata);
 
         $this->metadataFactory->addMetadata($metadata);

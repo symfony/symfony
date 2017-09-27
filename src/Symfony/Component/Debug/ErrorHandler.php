@@ -143,7 +143,7 @@ class ErrorHandler
             $handler->isRoot = true;
         }
 
-        if ($handlerIsNew && is_array($prev) && $prev[0] instanceof self) {
+        if ($handlerIsNew && \is_array($prev) && $prev[0] instanceof self) {
             $handler = $prev[0];
             $replace = false;
         }
@@ -169,7 +169,7 @@ class ErrorHandler
     {
         $loggers = array();
 
-        if (is_array($levels)) {
+        if (\is_array($levels)) {
             foreach ($levels as $type => $logLevel) {
                 if (empty($this->loggers[$type][0]) || $replace) {
                     $loggers[$type] = array($logger, $logLevel);
@@ -208,7 +208,7 @@ class ErrorHandler
             if (!isset($prev[$type])) {
                 throw new \InvalidArgumentException('Unknown error type: '.$type);
             }
-            if (!is_array($log)) {
+            if (!\is_array($log)) {
                 $log = array($log);
             } elseif (!array_key_exists(0, $log)) {
                 throw new \InvalidArgumentException('No logger provided');
@@ -334,7 +334,7 @@ class ErrorHandler
     {
         if ($prev !== $this->thrownErrors | $this->loggedErrors) {
             $handler = set_error_handler('var_dump');
-            $handler = is_array($handler) ? $handler[0] : null;
+            $handler = \is_array($handler) ? $handler[0] : null;
             restore_error_handler();
             if ($handler === $this) {
                 restore_error_handler();
@@ -373,7 +373,7 @@ class ErrorHandler
         }
         $scope = $this->scopedErrors & $type;
 
-        if (4 < $numArgs = func_num_args()) {
+        if (4 < $numArgs = \func_num_args()) {
             $context = $scope ? (func_get_arg(4) ?: array()) : array();
             $backtrace = 5 < $numArgs ? func_get_arg(5) : null; // defined on HHVM
         } else {
@@ -533,7 +533,7 @@ class ErrorHandler
             throw $exception; // Give back $exception to the native handler
         }
         try {
-            call_user_func($this->exceptionHandler, $exception);
+            \call_user_func($this->exceptionHandler, $exception);
         } catch (\Exception $handlerException) {
         } catch (\Throwable $handlerException) {
         }
@@ -559,7 +559,7 @@ class ErrorHandler
         self::$reservedMemory = null;
 
         $handler = set_error_handler('var_dump');
-        $handler = is_array($handler) ? $handler[0] : null;
+        $handler = \is_array($handler) ? $handler[0] : null;
         restore_error_handler();
 
         if (!$handler instanceof self) {
@@ -712,7 +712,7 @@ class ErrorHandler
         @trigger_error('The '.__METHOD__.' static method is deprecated since version 2.6 and will be removed in 3.0. Use the setLoggers() or setDefaultLogger() methods instead.', E_USER_DEPRECATED);
 
         $handler = set_error_handler('var_dump');
-        $handler = is_array($handler) ? $handler[0] : null;
+        $handler = \is_array($handler) ? $handler[0] : null;
         restore_error_handler();
         if (!$handler instanceof self) {
             return;

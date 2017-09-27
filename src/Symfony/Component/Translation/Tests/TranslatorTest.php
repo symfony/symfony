@@ -537,7 +537,7 @@ class TranslatorTest extends TestCase
     {
         $locales = array_keys($resources);
         $_locale = null !== $locale ? $locale : reset($locales);
-        $locales = array_slice($locales, 0, array_search($_locale, $locales));
+        $locales = \array_slice($locales, 0, array_search($_locale, $locales));
 
         $translator = new Translator($_locale, new MessageSelector());
         $translator->setFallbackLocales(array_reverse($locales));

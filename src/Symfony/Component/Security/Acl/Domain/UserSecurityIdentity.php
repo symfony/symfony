@@ -74,7 +74,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
             return self::fromAccount($user);
         }
 
-        return new self((string) $user, is_object($user) ? ClassUtils::getRealClass($user) : ClassUtils::getRealClass($token));
+        return new self((string) $user, \is_object($user) ? ClassUtils::getRealClass($user) : ClassUtils::getRealClass($token));
     }
 
     /**

@@ -78,7 +78,7 @@ class FormFactory implements FormFactoryInterface
 
         if ($type instanceof FormTypeInterface) {
             $type = $this->resolveType($type);
-        } elseif (is_string($type)) {
+        } elseif (\is_string($type)) {
             $type = $this->registry->getType($type);
         } elseif (!$type instanceof ResolvedFormTypeInterface) {
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');

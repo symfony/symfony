@@ -48,7 +48,7 @@ class AclVoter implements VoterInterface
 
     public function supportsAttribute($attribute)
     {
-        return is_string($attribute) && $this->permissionMap->contains($attribute);
+        return \is_string($attribute) && $this->permissionMap->contains($attribute);
     }
 
     public function vote(TokenInterface $token, $object, array $attributes)

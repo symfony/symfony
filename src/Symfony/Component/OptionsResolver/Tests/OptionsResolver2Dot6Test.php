@@ -1554,6 +1554,6 @@ class OptionsResolver2Dot6Test extends TestCase
         $this->resolver->setDefined('bar');
         $this->resolver->setDefault('lazy1', function () {});
 
-        count($this->resolver);
+        \count($this->resolver);
     }
 }

@@ -47,7 +47,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterf
     private function processReferences(array $arguments)
     {
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if (\is_array($argument)) {
                 $this->processReferences($argument);
             } elseif ($argument instanceof Definition) {
                 $this->processDefinition($argument);

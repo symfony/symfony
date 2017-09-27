@@ -38,7 +38,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         krsort($voters);
-        $voters = call_user_func_array('array_merge', $voters);
+        $voters = \call_user_func_array('array_merge', $voters);
 
         $container->getDefinition('security.access.decision_manager')->replaceArgument(0, $voters);
     }

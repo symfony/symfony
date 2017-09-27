@@ -99,7 +99,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
         $value = $this->parameters[$root];
         $currentKey = null;
-        for ($i = $pos, $c = strlen($path); $i < $c; ++$i) {
+        for ($i = $pos, $c = \strlen($path); $i < $c; ++$i) {
             $char = $path[$i];
 
             if ('[' === $char) {
@@ -113,7 +113,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
                     throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
                 }
 
-                if (!is_array($value) || !array_key_exists($currentKey, $value)) {
+                if (!\is_array($value) || !array_key_exists($currentKey, $value)) {
                     return $default;
                 }
 
@@ -257,12 +257,12 @@ class ParameterBag implements \IteratorAggregate, \Countable
         $value = $this->get($key, $default, $deep);
 
         // Always turn $options into an array - this allows filter_var option shortcuts.
-        if (!is_array($options) && $options) {
+        if (!\is_array($options) && $options) {
             $options = array('flags' => $options);
         }
 
         // Add a convenience check for arrays.
-        if (is_array($value) && !isset($options['flags'])) {
+        if (\is_array($value) && !isset($options['flags'])) {
             $options['flags'] = FILTER_REQUIRE_ARRAY;
         }
 
@@ -286,6 +286,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->parameters);
+        return \count($this->parameters);
     }
 }

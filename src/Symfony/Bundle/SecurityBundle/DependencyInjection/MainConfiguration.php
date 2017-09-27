@@ -143,7 +143,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->performNoDeepMerging()
                         ->beforeNormalization()->ifString()->then(function ($v) { return array('value' => $v); })->end()
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return is_array($v) && isset($v['value']); })
+                            ->ifTrue(function ($v) { return \is_array($v) && isset($v['value']); })
                             ->then(function ($v) { return preg_split('/\s*,\s*/', $v['value']); })
                         ->end()
                         ->prototype('scalar')->end()
@@ -265,7 +265,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->children()
                     ->arrayNode('delete_cookies')
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return is_array($v) && is_int(key($v)); })
+                            ->ifTrue(function ($v) { return \is_array($v) && \is_int(key($v)); })
                             ->then(function ($v) { return array_map(function ($v) { return array('name' => $v); }, $v); })
                         ->end()
                         ->useAttributeAsKey('name')
@@ -390,11 +390,11 @@ class MainConfiguration implements ConfigurationInterface
 
         $providerNodeBuilder
             ->validate()
-                ->ifTrue(function ($v) { return count($v) > 1; })
+                ->ifTrue(function ($v) { return \count($v) > 1; })
                 ->thenInvalid('You cannot set multiple provider types for the same provider')
             ->end()
             ->validate()
-                ->ifTrue(function ($v) { return 0 === count($v); })
+                ->ifTrue(function ($v) { return 0 === \count($v); })
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;

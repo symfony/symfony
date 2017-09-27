@@ -88,7 +88,7 @@ class BinaryNode extends Node
             $right = $this->nodes['right']->evaluate($functions, $values);
 
             if ('not in' === $operator) {
-                return !in_array($left, $right);
+                return !\in_array($left, $right);
             }
             $f = self::$functions[$operator];
 
@@ -130,9 +130,9 @@ class BinaryNode extends Node
             case '<=':
                 return $left <= $right;
             case 'not in':
-                return !in_array($left, $right);
+                return !\in_array($left, $right);
             case 'in':
-                return in_array($left, $right);
+                return \in_array($left, $right);
             case '+':
                 return $left + $right;
             case '-':

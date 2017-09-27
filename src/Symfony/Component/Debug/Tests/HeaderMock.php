@@ -27,12 +27,12 @@ function testHeader()
 {
     static $headers = array();
 
-    if (!$h = func_get_args()) {
+    if (!$h = \func_get_args()) {
         $h = $headers;
         $headers = array();
 
         return $h;
     }
 
-    $headers[] = func_get_args();
+    $headers[] = \func_get_args();
 }

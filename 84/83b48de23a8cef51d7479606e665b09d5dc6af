@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-21T17:27:47Z
+
+Ive switched to 3.3, for consistency across branches. Added 2 more commits to improve performance of page with heavy tabs (request+logger panel). The CSS tweak is priceless :) and avoids scrollbar jumping around.
+
+Not sure about 0c10f97 for 3.3, or 3.4. It _fixes_ the signaling IMHO.

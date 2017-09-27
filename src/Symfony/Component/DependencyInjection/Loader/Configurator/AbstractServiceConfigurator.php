@@ -17,9 +17,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 abstract class AbstractServiceConfigurator extends AbstractConfigurator
 {
     protected $parent;
-    protected $definition;
     protected $id;
-    protected $defaultTags = array();
+    private $defaultTags = array();
 
     public function __construct(ServicesConfigurator $parent, Definition $definition, $id = null, array $defaultTags = array())
     {
@@ -59,7 +58,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
      * Creates an alias.
      *
      * @param string $id
-     * @param string $ref
+     * @param string $referencedId
      *
      * @return AliasConfigurator
      */

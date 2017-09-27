@@ -1099,7 +1099,6 @@ class FilesystemTest extends FilesystemTestCase
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/src/Symfony/Component/', '../'),
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component', '../'),
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component/', '../'),
-            array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
             array('/aa/bb', '/aa/bb', './'),
@@ -1139,6 +1138,15 @@ class FilesystemTest extends FilesystemTestCase
         }
 
         return $paths;
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Support for passing relative paths to Symfony\Component\Filesystem\Filesystem::makePathRelative() is deprecated since version 3.4 and will be removed in 4.0.
+     */
+    public function testMakePathRelativeWithRelativePaths()
+    {
+        $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component'));
     }
 
     public function testMirrorCopiesFilesAndDirectoriesRecursively()

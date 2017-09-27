@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-14T12:35:40Z
+
+Our docblock always stated that we expected absolute paths. However, we also had tests for relative paths. Thus, I suggest as a compromise to (silently) keep support for relative paths in Symfony 3 (see #22321) and drop it explicitly in 4.0.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-14T12:40:25Z
+
+Is there any reason why relative paths should not be supported?
+
+With #22321 relative paths work perfectly fine without problems, why should the method be limited to absolute paths?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-14T12:43:42Z
+
+@ausi Because it's called `makePathRelative()` (which implies that the input is not relative), not `correctRelativePath()`. It's not its job.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-14T12:46:02Z
+
+Additionally, it's not clear to what base a path is relative. Will both paths be treated as being relative to the same directory? What if only one of the input paths is relative. All of this can (depending on the context in which it is used) lead to confusion and even be wrong (because of different perceptions of how the paths should be interpreted).
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-14T12:56:09Z
+
+> Because it's called `makePathRelative()` (which implies that the input is not relative), not `correctRelativePath()`. It's not its job.
+
+The method description says *“Given an existing path, convert it to a path relative to a given starting path.”*. I don’t see why *“existing path”* and *“starting path”* have to be absolute.
+
+IMO it doesn’t imply that the input is not relative, but it implies that the *“existing path”* is not relative to the *“starting path”*.
+
+> Additionally, it's not clear to what base a path is relative. Will both paths be treated as being relative to the same directory?
+
+I think it’s obvious that two relative paths would refer to the same base, just as two absolute paths refer to the same root.
+
+> All of this can (depending on the context in which it is used) lead to confusion and even be wrong (because of different perceptions of how the paths should be interpreted).
+
+From my point of view `makePathRelative('aa/cc', 'bb/cc')` returning `./` (as it does in the current version) leads to much more confusion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-16T15:18:39Z
+
+small conflict to resolve
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T10:30:54Z
+
+@ausi the confusion also comes from the case where one path is relative, and the other is not: this makes the result of the function context sensitive, thus non-predictable (sensitive to `getcwd()`)
+So confirming my +1.
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-26T11:54:24Z
+
+> @ausi the confusion also comes from the case where one path is relative, and the other is not
+
+Couldn’t we just disallow this case?
+Like so:
+
+```php
+if ($this->isAbsolutePath($endPath) !== $this->isAbsolutePath($startPath)) {
+    throw new InvalidArgumentException('...');
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T13:20:54Z
+
+The goal is also to make things easier to maintain. WDYT @xabbuh?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-26T13:52:03Z
+
+I would separate responsibilities. If there is need for relative paths, I would add a method that returns the absolute path (probably based on a working directory that can also be passed).
+
+---------------------------------------------------------------------------
+
+by ausi at 2017-09-26T15:16:15Z
+
+Why should it be harder to maintain? Relative paths work already and are unit tested with #22321.
+
+@xabbuh your suggestion would then result in code like this:
+
+```php
+$fs->makePathRelative(
+	$fs->getAbsolutePath($endPath, $rootPath),
+	$fs->getAbsolutePath($startPath, $rootPath)
+);
+```
+
+instead of just:
+
+```php
+$fs->makePathRelative($endPath, $startPath);
+```
+
+It would also require to know the root path of the relative paths. I don’t see the benefit here.

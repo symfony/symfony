@@ -36,20 +36,6 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $container->getParameter('security.role_hierarchy.roles'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
-     */
-    public function testRolesHierarchyWithAcl()
-    {
-        $container = $this->getContainer('container1_with_acl');
-        $this->assertEquals(array(
-            'ROLE_ADMIN' => array('ROLE_USER'),
-            'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_REMOTE' => array('ROLE_USER', 'ROLE_ADMIN'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
-    }
-
     public function testUserProviders()
     {
         $container = $this->getContainer('container1');
@@ -322,30 +308,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => array(15),
             ),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
-     */
-    public function testAcl()
-    {
-        $container = $this->getContainer('container1_with_acl');
-
-        $this->assertTrue($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('security.acl.dbal.provider', (string) $container->getAlias('security.acl.provider'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
-     */
-    public function testCustomAclProvider()
-    {
-        $container = $this->getContainer('custom_acl_provider');
-
-        $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
     }
 
     public function testRememberMeThrowExceptionsDefault()

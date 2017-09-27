@@ -17,6 +17,11 @@ CHANGELOG
  * checking for cacheable HTTP methods using the `Request::isMethodSafe()`
    method (by not passing `false` as its argument) is not supported anymore and
    throws a `\BadMethodCallException`
+ * the `NativeSessionHandler` class has been removed
+ * the `AbstractProxy`, `NativeProxy` and `SessionHandlerProxy` classes have been removed
+ * setting session save handlers that do not implement `\SessionHandlerInterface` in 
+   `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a 
+   `\TypeError`
 
 3.4.0
 -----

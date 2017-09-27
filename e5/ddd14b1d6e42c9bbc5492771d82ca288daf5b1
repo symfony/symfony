@@ -1,0 +1,142 @@
+---------------------------------------------------------------------------
+
+by fbourigault at 2017-03-23T10:13:54Z
+
+What about adding a `framework.lock.default` config to override the `lock.factory` priority order? So the user can choose the implementation he wants as default.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-23T10:46:51Z
+
+Maybe I'm late, but I'd like to propose a simpler way to use and configure this component inside the Symfony Framework. The idea, as usual, is to optimize/simplify the common case and don't complicate much the complex case.
+
+### Common case
+
+Application defines/needs just 1 lock type.
+
+#### Configuration
+
+This is the default config, where Symfony picks the best lock type for you: semaphore if the extension is installed; flock otherwise:
+
+```yaml
+framework:
+    lock: ~
+```
+
+This is the explicit config where you set the lock type (string or array and some smart conversion by the Config component, as we do everywhere else):
+
+```yaml
+framework:
+    lock: 'flock'
+    lock: 'semaphore'
+    lock: 'memcached://m1.docker'
+    lock: ['memcached://m1.docker', 'memcached://m2.docker']
+    lock: 'redis://r1.docker'
+    lock: ['redis://r1.docker', 'redis://r2.docker']
+```
+
+#### Usage
+
+```php
+// non-blocking, non-expiring
+$lock = $this->get('lock')->acquire();
+// $lock = $container->get('lock')->acquire();
+
+// blocking, non-expiring
+$lock = $this->get('lock')->acquire(true);
+
+// non-blocking, expiring in 60 seconds
+$lock = $this->get('lock')->acquire(false, 60);
+
+// normal operations on the lock
+$lock->isAcquired();
+$lock->refresh();
+$lock->release();
+```
+
+### Complex case
+
+Application defines and uses several lock types.
+
+#### Configuration
+
+```yaml
+framework:
+    lock:
+        users: ['memcached://m1.docker', 'memcached://m2.docker']
+        admin: 'flock'
+        partners: 'redis://r1.docker'
+        invoices: 'semaphore'
+```
+
+#### Usage
+
+```php
+$adminLock = $this->get('lock.admin')->acquire();
+$invoicesLock = $this->get('lock.invoices')->acquire(true);
+$partnersLock = $this->get('lock.partners')->acquire(false, 30);
+// ...
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-04-01T20:05:08Z
+
+@javiereguiluz Today I start to implement your suggestion (much simpler, I like it).
+But then, I realize, it'll not be compatible with dynamic resources.
+I suggest a small change in your proposal by adding factories too.
+```
+$this->get('lock_factory.invoices')->createLock('invoices.'.$invoice->getId());
+```
+the service `lock.invoices` would be an alias of `$this->get('lock_factory.invoices')->createLock('invoices')`.
+WDYT?
+
+I've got some other question:
+
+When you says `$lock = $this->get('lock')->acquire();` you means `$lock = $this->get('lock')` + `$isLocked = $this->get('lock')->acquire();` right?
+
+Last point you are moving the `ttl` from the lock constructor to the acquire method. Is it made on purpose? Shouldn't it be a parameter defined in the config file like:
+```
+framework:
+    lock:
+        users: ['memcached://m1.docker', 'memcached://m2.docker']
+        invoices:
+            store: ['memcached://m1.docker', 'memcached://m2.docker']
+            ttl: 300
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-28T17:46:35Z
+
+Moving to milestone 3.4 as this is not a blocker for 3.3. If you don't agree, please tell :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-07-31T06:27:38Z
+
+PR rebased
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-09T19:37:31Z
+
+@jderusse btw could you take a look at the the failing test on travis? It happens randomly and is unrelated to this PR, fixing it would be great
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-10T07:35:22Z
+
+@chalasr tests should be fixed by https://github.com/symfony/symfony/pull/23847
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-10T07:36:15Z
+
+Cool! thanks
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-18T09:31:36Z
+
+ping @symfony/deciders

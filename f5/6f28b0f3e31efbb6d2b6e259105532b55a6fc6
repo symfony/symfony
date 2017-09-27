@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-10T13:19:18Z
+
+Tests are broken
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-03-10T13:27:09Z
+
+The `FormTypeValidatorExtensionTest` class depends on the `validator` property, which is now removed. I just need to figure out a way around this, will push an update later to fix it
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-03-15T09:55:55Z
+
+Tests back to green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:57:18Z
+
+@pierredup looks like this one just needs fixing one small comment. Would you be up for fixing it+rebasing/retargeting to 3.4?

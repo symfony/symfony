@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-24T11:45:18Z
+
+Just asking, what is the use case of this class? I think that it's always better to create custom normalizers (implementing the `NormalizerInterface` than adding the serialization logic in the class itself.
+
+I would be in favor of deprecating this class now and remove it from Symfony 4.
+
+---------------------------------------------------------------------------
+
+by chrisguitarguy at 2017-02-24T12:43:58Z
+
+> Just asking, what is the use case of this class?
+
+In my case, I was interested in using it with a "dumb" dto-like object.
+
+```php
+class SomeDto implements DenormalizableInterface
+{
+  // ...
+}
+```
+
+The idea being to keep everything close together: the normalization, denormalization, and the DTO itself. So basically what you are against :)
+
+I was interested in doing this because I think it's a lot nicer developer experience to keep the normalization/denormalization closer to the object being serialized/deserialized. Easier to understand and catch at a glance. Doesn't require you to register services in the container with a special tag, etc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-26T23:15:43Z
+
+@chrisguitarguy Can you please rebase it so that we can merge it? Thanks. Base should also be changed to 3.4.
+
+---------------------------------------------------------------------------
+
+by chrisguitarguy at 2017-09-27T00:39:24Z
+
+@fabpot rebased onto 3.4. Did you want me to make any of the changes @dunglas suggested?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-27T00:50:19Z
+
+Looks like he approved this PR without any further changes :)

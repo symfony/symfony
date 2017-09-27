@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-02-15T11:37:36Z
+
+Awesome, thanks for the feedback so quickly, @stof! I wasn't exactly sure how to implement it but wanted to shove it on GitHub before I forgot about it :smile:
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-15T11:40:00Z
+
+I'm not just not sure about the naming of the interface. These encoders are still using a salt, but they generate it internally and don't require storing it separately for the verification step.
+
+@symfony/deciders do you have a better idea for the naming ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-02-15T11:41:40Z
+
+I like this idea a lot ... but I don't like the proposed name `SaltlessEncoderInterface`. Here are some alternatives:
+
+1) If "salt-less hashers" are the future, why not call this simply: `EncoderInterface`
+2) In the Wikipedia, these hashers are classified under *"Key derivation functions"*. It's an ugly name, but this could be called `KeyDerivationEncoderInterface`
+3) Another classification of these hashers is via its syntax/format. They use the "Modular Crypt Format". So, why not `ModularEncoderInterface`
+4) Finally, if we want to fix an historical issue with the "encoder" name ... why not call this what it really is: `HasherInterface`
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-02-15T11:44:23Z
+
+I really like the idea of moving away from the `Encoder` name since password hashes cannot be decoded.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-15T13:46:30Z
+
+@javiereguiluz this interface is just a marker one. so I would not give it a name which is more generic than the real implementation.
+
+If I was designing this system from scratch, I would change 2 things:
+- talk about hashing, not encoding
+- remove the salt from all signatures, by forcing all encoders to generate it internally and to embed it in the hash for verification (i.e. what our bcrypt and argon2i encoders are doing).
+
+However, we cannot easily switch to such system, as it implies a BC break in the storage format for people not using bcrypt today, and so writing a migration layer would be very hard.
+I already though about doing such change for Symfony 4, and I gave up for now.
+
+But starting to talk about hashing now in a marker interface for the existing API would be a mistake IMO (more confusing than anything else)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-16T09:59:39Z
+
+I think for now "Encoder" is good enough. However, I would like to move on to a name change (soon tm) to "Hasher" because it's already confusing and complex _without_ this naming issue.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-02-16T10:44:42Z
+
+I've renamed `SaltlessEncoderInterface` to `EncoderInterface`, should the following (variable name and note message) be updated for clarification too?
+
+```php
+} elseif ($saltlessWithoutEmptySalt) {
+    $io->note('Saltless encoder used: the encoder generated its own built-in salt.');
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-20T13:17:12Z
+
+@zanderbaldwin ``EncoderInterface`` is a bad name. As this is only a marker interface, not a feature interface, the name must describe what it is marking. ``EncoderInterface`` is far too generic
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-03-20T13:59:01Z
+
+Sure. From the comments above I'm not sure what to name the interface - was anything concretely decided on?
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-04-12T07:34:52Z
+
+> In the Wikipedia, these hashers are classified under "Key derivation functions". It's an ugly name, but this could be called KeyDerivationEncoderInterface.
+
+https://en.wikipedia.org/wiki/Key_derivation_function
+
+A Key derivation function is something completely else, a Key derivation is used a generate a "passphrase", to be used an encryption key. As using your password directly is considered highly insecure because of the minimum required length of key, which is not achieved with a 10 character password (you need at least 128bits).
+
+PBKDF (Password-Based Key Derivation Function) is actually designed for this and for NOT for passwords, because it's slow and not fully protected against memory attacks. (I was not aware of that at the time 😅 ).
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-04-12T16:01:48Z
+
+I think that whatever is decided it's going to be a compromise - so I'll leave it up to the members of @symfony/deciders to inform me what the interface should be called :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:32:05Z
+
+@stof any help to move this one forward?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-26T13:22:08Z
+
+`SelfSaltingEncoderInterface`. The idea of "salt" exists in core already, and this very simply is an encoder that does not require a salt to be passed in explicitly.. it handles it on its own.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-26T13:35:21Z
+
+I like Ryan's proposal.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-26T14:01:59Z
+
+I've implemented Ryan's proposal :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-26T14:32:02Z
+
+I like it as well
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T15:15:25Z
+
+I think the failure is a false positive related to this security-bundle requiring symfony/security, but the CI building syfmony/security-http. That's a bug in the CI script. But not for this PR.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-26T15:24:43Z
+
+Does the target branch need to be changed from `master` to `3.4`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T15:26:02Z
+
+Yes please
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T15:46:15Z
+
+tests are legitimately failing, both on Windows and Linux
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-27T12:10:18Z
+
+Can anyone clarify if the test is now failing for `PHP: 7.1 deps=high` because the Security component is installed via Composer for the SecurityBundle tests, so therefore the changes in this PR for the Security component are not used when the tests are run?
+
+Because I get the following:
+
+```bash
+$ cd "<repoRoot>"
+# On pull request branch ("zanbaldwin:saltless-encoder-interface").
+$ composer install
+# Package "symfony/phpunit-bridge" installed.
+$ cd "<repoRoot>/src/Symfony/Bundle/SecurityBundle"
+
+$ composer install
+# Package "symfony/security" installed at version "3.4.x-dev 2910bac".
+$ ../../../../vendor/bin/simple-phpunit
+# Tests fail :(
+
+$ rm -rf vendor/symfony/security
+$ ln -s ../../../../Component/Security vendor/symfony/security
+$ ../../../../vendor/bin/simple-phpunit
+# Tests pass! :)
+```
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-27T13:10:44Z
+
+@zanbaldwin : Yes this is expected. Tests will pass once the PR code is merged up to master.
+
+AppVeyor failure is not related.

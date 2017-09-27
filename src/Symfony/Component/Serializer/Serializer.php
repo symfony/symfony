@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
 use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -24,7 +26,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Serializer serializes and deserializes data.
@@ -98,7 +99,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function serialize($data, $format, array $context = array())
     {
         if (!$this->supportsEncoding($format)) {
-            throw new UnexpectedValueException(sprintf('Serialization for the format %s is not supported', $format));
+            throw new NotEncodableValueException(sprintf('Serialization for the format %s is not supported', $format));
         }
 
         if ($this->encoder->needsNormalization($format)) {
@@ -114,7 +115,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     final public function deserialize($data, $type, $format, array $context = array())
     {
         if (!$this->supportsDecoding($format)) {
-            throw new UnexpectedValueException(sprintf('Deserialization for the format %s is not supported', $format));
+            throw new NotEncodableValueException(sprintf('Deserialization for the format %s is not supported', $format));
         }
 
         $data = $this->decode($data, $format, $context);
@@ -150,14 +151,16 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($data)));
+            throw new NotNormalizableValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($data)));
         }
 
-        throw new UnexpectedValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));
+        throw new NotNormalizableValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws NotNormalizableValueException
      */
     public function denormalize($data, $type, $format = null, array $context = array())
     {
@@ -169,7 +172,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $normalizer->denormalize($data, $type, $format, $context);
         }
 
-        throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type));
+        throw new NotNormalizableValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type));
     }
 
     /**

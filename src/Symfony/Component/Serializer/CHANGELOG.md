@@ -19,6 +19,8 @@ CHANGELOG
    to disable throwing an `UnexpectedValueException` on a type mismatch
  * added support for serializing `DateInterval` objects
  * added getter for extra attributes in `ExtraAttributesException`
+ * improved `CsvEncoder` to handle variable nested structures
+ * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable 
 
 3.3.0
 -----

@@ -26,7 +26,7 @@ class FlockStoreTest extends AbstractStoreTest
      */
     protected function getStore()
     {
-        return new FlockStore(sys_get_temp_dir());
+        return new FlockStore();
     }
 
     /**

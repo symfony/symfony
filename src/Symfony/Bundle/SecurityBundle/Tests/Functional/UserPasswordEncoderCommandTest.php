@@ -120,13 +120,11 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordBcryptOutput()
     {
-        $this->passwordEncoderCommandTester->execute(
-            array(
-                'command' => 'security:encode-password',
-                'password' => 'p@ssw0rd',
-                'user-class' => 'Custom\Class\Bcrypt\User',
-            )
-        );
+        $this->passwordEncoderCommandTester->execute(array(
+            'command' => 'security:encode-password',
+            'password' => 'p@ssw0rd',
+            'user-class' => 'Custom\Class\Bcrypt\User',
+        ), array('interactive' => false));
 
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }

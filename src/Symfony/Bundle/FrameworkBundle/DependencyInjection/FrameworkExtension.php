@@ -38,6 +38,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -52,6 +53,11 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\Store\StoreFactory;
+use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -246,6 +252,10 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['lock'])) {
+            $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
@@ -1375,6 +1385,84 @@ class FrameworkExtension extends Extension
             $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
+        }
+    }
+
+    private function registerLockConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('lock.xml');
+
+        foreach ($config['resources'] as $resourceName => $resourceStores) {
+            if (0 === count($resourceStores)) {
+                continue;
+            }
+
+            // Generate stores
+            $storeDefinitions = array();
+            foreach ($resourceStores as $storeDsn) {
+                $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
+                switch (true) {
+                    case 'flock' === $storeDsn:
+                        $storeDefinition = new Reference('lock.store.flock');
+                        break;
+                    case 'semaphore' === $storeDsn:
+                        $storeDefinition = new Reference('lock.store.semaphore');
+                        break;
+                    case $usedEnvs || preg_match('#^[a-z]++://#', $storeDsn):
+                        if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
+                            $connectionDefinition = new Definition(\stdClass::class);
+                            $connectionDefinition->setPublic(false);
+                            $connectionDefinition->setFactory(array(StoreFactory::class, 'createConnection'));
+                            $connectionDefinition->setArguments(array($storeDsn));
+                            $container->setDefinition($connectionDefinitionId, $connectionDefinition);
+                        }
+
+                        $storeDefinition = new Definition(StoreInterface::class);
+                        $storeDefinition->setPublic(false);
+                        $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
+                        $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
+
+                        $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
+
+                        $storeDefinition = new Reference($storeDefinitionId);
+                        break;
+                    default:
+                        throw new InvalidArgumentException(sprintf('Lock store DSN "%s" is not valid in resource "%s"', $storeDsn, $resourceName));
+                }
+
+                $storeDefinitions[] = $storeDefinition;
+            }
+
+            // Wrap array of stores with CombinedStore
+            if (count($storeDefinitions) > 1) {
+                $combinedDefinition = new ChildDefinition('lock.store.combined.abstract');
+                $combinedDefinition->replaceArgument(0, $storeDefinitions);
+                $container->setDefinition('lock.'.$resourceName.'.store', $combinedDefinition);
+            } else {
+                $container->setAlias('lock.'.$resourceName.'.store', new Alias((string) $storeDefinitions[0], false));
+            }
+
+            // Generate factories for each resource
+            $factoryDefinition = new ChildDefinition('lock.factory.abstract');
+            $factoryDefinition->replaceArgument(0, new Reference('lock.'.$resourceName.'.store'));
+            $container->setDefinition('lock.'.$resourceName.'.factory', $factoryDefinition);
+
+            // Generate services for lock instances
+            $lockDefinition = new Definition(Lock::class);
+            $lockDefinition->setPublic(false);
+            $lockDefinition->setFactory(array(new Reference('lock.'.$resourceName.'.factory'), 'createLock'));
+            $lockDefinition->setArguments(array($resourceName));
+            $container->setDefinition('lock.'.$resourceName, $lockDefinition);
+
+            // provide alias for default resource
+            if ('default' === $resourceName) {
+                $container->setAlias('lock.store', new Alias('lock.'.$resourceName.'.store', false));
+                $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory', false));
+                $container->setAlias('lock', new Alias('lock.'.$resourceName, false));
+                $container->setAlias(StoreInterface::class, new Alias('lock.store', false));
+                $container->setAlias(Factory::class, new Alias('lock.factory', false));
+                $container->setAlias(LockInterface::class, new Alias('lock', false));
+            }
         }
     }
 

@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T14:07:26Z
+
+@pquerner ive tested this with the RemoteCall plugin.. and results are impressive i must say. Good news is for SF this works out-of-the-box with
+
+```
+framework.ide: http://localhost:8091?message=%%f:%%l&/from/path/>/to/path/
+```
+
+AFAIK there's no real need for making this an XHR call (but i tested this only in chrome, which magically also preserves the current URL).
+
+As a result im experimenting with integration in the toolbar.
+
+![image](https://user-images.githubusercontent.com/1047696/30521593-3459347e-9bc2-11e7-8428-13f46990c514.png)
+
+Works perfect; thus super fast template navigation. Needs some CSS.
+
+---------------------------------------------------------------------------
+
+by pquerner at 2017-09-17T14:17:58Z
+
+The Magento Module does it via XHR aswell, so there are no unneeded browser tabs.
+https://github.com/AOEpeople/Aoe_TemplateHints/blob/master/app/code/community/Aoe/TemplateHints/Helper/BlockInfo.php#L132
+
+Impressive work so far. On a page with loads of templates the select box are not very helpful I guess, since you cant "spot" the right template from it as quick as from the profiler template page. Maybe limit results in that select box or make it optional via configuration?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T14:23:38Z
+
+SF doesnt add `target` attribute, so works by default :) (with ctrl+click you indeed are left with empty tab). it's more the browser compat. im not sure about.
+
+Access from the WDT is really worth it.. so i hope we can do something. Ideally has "select as you type".
+
+cc @javiereguiluz @ogizanagi (as you wrote dumper search thingy)
+
+---------------------------------------------------------------------------
+
+by pquerner at 2017-09-17T14:26:59Z
+
+Select as you type would mean you have a small idea on the templates filename. Which is not the case when working on a project you just took over for instance? I dont know. Hard to spec this out I guess.
+Some of the big folks should look at this. ;)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-21T07:05:48Z
+
+Agree, it's experimental really. Also from a "navigate to used templates" pov, this saves a profiler visit. So again; if we can do _something_ that be awesome.
+
+However the issue of many templates is real; so i can imagine we wont be able to integrate this properly in the toolbar.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-21T09:07:09Z
+
+Well, I just opened a page of my own project and looked at the number of templates listed in the profiler. There are 35 (I have a deeper inheritance hierarchy than just a single layout, and a bunch of helper templates being included for reusable parts). I don't think this would fit in the toolbar itself (and I actually rarely open files from the profiler btw, so a big selector would actually annoy me)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T07:32:45Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T08:28:42Z
+
+Updated. All good :) tested on real life project.
+
+cc @javiereguiluz @stof
+
+status: needs review

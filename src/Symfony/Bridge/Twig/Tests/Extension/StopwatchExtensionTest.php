@@ -56,7 +56,7 @@ class StopwatchExtensionTest extends TestCase
 
     protected function getStopwatch($events = array())
     {
-        $events = is_array($events) ? $events : array($events);
+        $events = \is_array($events) ? $events : array($events);
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
 
         $i = -1;

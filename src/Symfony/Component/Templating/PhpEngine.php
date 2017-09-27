@@ -226,7 +226,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function addHelpers(array $helpers)
     {
         foreach ($helpers as $alias => $helper) {
-            $this->set($helper, is_int($alias) ? null : $alias);
+            $this->set($helper, \is_int($alias) ? null : $alias);
         }
     }
 
@@ -315,13 +315,13 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         // the performance when the same value is escaped multiple times (e.g. loops)
         if (is_scalar($value)) {
             if (!isset(self::$escaperCache[$context][$value])) {
-                self::$escaperCache[$context][$value] = call_user_func($this->getEscaper($context), $value);
+                self::$escaperCache[$context][$value] = \call_user_func($this->getEscaper($context), $value);
             }
 
             return self::$escaperCache[$context][$value];
         }
 
-        return call_user_func($this->getEscaper($context), $value);
+        return \call_user_func($this->getEscaper($context), $value);
     }
 
     /**
@@ -435,7 +435,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($that, $flags) {
                     // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlspecialchars($value, $flags, $that->getCharset(), false) : $value;
+                    return \is_string($value) ? htmlspecialchars($value, $flags, $that->getCharset(), false) : $value;
                 },
 
             'js' =>

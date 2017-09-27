@@ -29,7 +29,7 @@ class ObjectIdentityRetrievalStrategyTest extends TestCase
         $objectIdentity = $strategy->getObjectIdentity($domainObject);
 
         $this->assertEquals($domainObject->getId(), $objectIdentity->getIdentifier());
-        $this->assertEquals(get_class($domainObject), $objectIdentity->getType());
+        $this->assertEquals(\get_class($domainObject), $objectIdentity->getType());
     }
 }
 

@@ -30,11 +30,11 @@ class CountValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_array($value) && !$value instanceof \Countable) {
+        if (!\is_array($value) && !$value instanceof \Countable) {
             throw new UnexpectedTypeException($value, 'array or \Countable');
         }
 
-        $count = count($value);
+        $count = \count($value);
 
         if (null !== $constraint->max && $count > $constraint->max) {
             if ($this->context instanceof ExecutionContextInterface) {

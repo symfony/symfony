@@ -62,13 +62,13 @@ class AssetExtension extends AbstractExtension
     public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
     {
         // BC layer to be removed in 3.0
-        if (2 < $count = func_num_args()) {
+        if (2 < $count = \func_num_args()) {
             @trigger_error('Generating absolute URLs with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use absolute_url() instead.', E_USER_DEPRECATED);
             if (4 === $count) {
                 @trigger_error('Forcing a version with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
             }
 
-            $args = func_get_args();
+            $args = \func_get_args();
 
             return $this->getLegacyAssetUrl($path, $packageName, $args[2], isset($args[3]) ? $args[3] : null);
         }

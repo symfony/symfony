@@ -28,7 +28,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
      */
     public static function enable()
     {
-        if (!is_array($functions = spl_autoload_functions())) {
+        if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
 
@@ -37,7 +37,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
         }
 
         foreach ($functions as $function) {
-            if (is_array($function) && $function[0] instanceof UniversalClassLoader) {
+            if (\is_array($function) && $function[0] instanceof UniversalClassLoader) {
                 $loader = new static();
                 $loader->registerNamespaceFallbacks($function[0]->getNamespaceFallbacks());
                 $loader->registerPrefixFallbacks($function[0]->getPrefixFallbacks());

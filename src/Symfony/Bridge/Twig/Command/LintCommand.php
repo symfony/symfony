@@ -98,7 +98,7 @@ EOF
 
         $filenames = $input->getArgument('filename');
 
-        if (0 === count($filenames)) {
+        if (0 === \count($filenames)) {
             if (0 !== ftell(STDIN)) {
                 throw new \RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
@@ -182,7 +182,7 @@ EOF
             }
         }
 
-        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', count($filesInfo) - $errors, count($filesInfo)));
+        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', \count($filesInfo) - $errors, \count($filesInfo)));
 
         return min($errors, 1);
     }
@@ -201,7 +201,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
+        $output->writeln(json_encode($filesInfo, \defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
 
         return min($errors, 1);
     }
@@ -234,7 +234,7 @@ EOF
         $lines = explode("\n", $template);
 
         $position = max(0, $line - $context);
-        $max = min(count($lines), $line - 1 + $context);
+        $max = min(\count($lines), $line - 1 + $context);
 
         $result = array();
         while ($position < $max) {

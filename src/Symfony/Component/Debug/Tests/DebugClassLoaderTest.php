@@ -45,7 +45,7 @@ class DebugClassLoaderTest extends TestCase
 
         $functions = spl_autoload_functions();
         foreach ($functions as $function) {
-            if (is_array($function) && $function[0] instanceof DebugClassLoader) {
+            if (\is_array($function) && $function[0] instanceof DebugClassLoader) {
                 $reflClass = new \ReflectionClass($function[0]);
                 $reflProp = $reflClass->getProperty('classLoader');
                 $reflProp->setAccessible(true);
@@ -81,7 +81,7 @@ class DebugClassLoaderTest extends TestCase
         if (\PHP_VERSION_ID >= 70000) {
             $this->markTestSkipped('PHP7 throws exceptions, unsilencing is not required anymore.');
         }
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM is not handled in this test case.');
         }
 
@@ -106,7 +106,7 @@ class DebugClassLoaderTest extends TestCase
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
             $this->markTestSkipped('The ContextErrorException class is already loaded.');
         }
-        if (defined('HHVM_VERSION')) {
+        if (\defined('HHVM_VERSION')) {
             $this->markTestSkipped('HHVM is not handled in this test case.');
         }
 

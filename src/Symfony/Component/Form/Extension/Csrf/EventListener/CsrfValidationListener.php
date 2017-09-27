@@ -116,7 +116,7 @@ class CsrfValidationListener implements EventSubscriberInterface
                 $form->addError(new FormError($errorMessage));
             }
 
-            if (is_array($data)) {
+            if (\is_array($data)) {
                 unset($data[$this->fieldName]);
                 $event->setData($data);
             }

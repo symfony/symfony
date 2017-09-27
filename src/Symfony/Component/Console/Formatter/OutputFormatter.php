@@ -48,10 +48,10 @@ class OutputFormatter implements OutputFormatterInterface
     public static function escapeTrailingBackslash($text)
     {
         if ('\\' === substr($text, -1)) {
-            $len = strlen($text);
+            $len = \strlen($text);
             $text = rtrim($text, '\\');
             $text = str_replace("\0", '', $text);
-            $text .= str_repeat("\0", $len - strlen($text));
+            $text .= str_repeat("\0", $len - \strlen($text));
         }
 
         return $text;
@@ -143,7 +143,7 @@ class OutputFormatter implements OutputFormatterInterface
 
             // add the text up to the next tag
             $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
-            $offset = $pos + strlen($text);
+            $offset = $pos + \strlen($text);
 
             // opening tag?
             if ($open = '/' != $text[1]) {
@@ -227,6 +227,6 @@ class OutputFormatter implements OutputFormatterInterface
      */
     private function applyCurrentStyle($text)
     {
-        return $this->isDecorated() && strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
+        return $this->isDecorated() && \strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
     }
 }

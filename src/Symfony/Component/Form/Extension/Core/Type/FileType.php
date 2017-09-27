@@ -36,7 +36,7 @@ class FileType extends AbstractType
                 if (array(null) === $data) {
                     $emptyData = $form->getConfig()->getEmptyData();
 
-                    $data = is_callable($emptyData) ? call_user_func($emptyData, $form, $data) : $emptyData;
+                    $data = is_callable($emptyData) ? \call_user_func($emptyData, $form, $data) : $emptyData;
                     $event->setData($data);
                 }
             });

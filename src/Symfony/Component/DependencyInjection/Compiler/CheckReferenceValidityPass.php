@@ -90,7 +90,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
     private function validateReferences(array $arguments)
     {
         foreach ($arguments as $argument) {
-            if (is_array($argument)) {
+            if (\is_array($argument)) {
                 $this->validateReferences($argument);
             } elseif ($argument instanceof Reference) {
                 $targetDefinition = $this->getDefinition((string) $argument);
@@ -138,11 +138,11 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 
         $id = (string) $reference;
 
-        if (in_array($scope, $this->currentScopeChildren, true)) {
+        if (\in_array($scope, $this->currentScopeChildren, true)) {
             throw new ScopeWideningInjectionException($this->currentId, $this->currentScope, $id, $scope);
         }
 
-        if (!in_array($scope, $this->currentScopeAncestors, true)) {
+        if (!\in_array($scope, $this->currentScopeAncestors, true)) {
             throw new ScopeCrossingInjectionException($this->currentId, $this->currentScope, $id, $scope);
         }
     }

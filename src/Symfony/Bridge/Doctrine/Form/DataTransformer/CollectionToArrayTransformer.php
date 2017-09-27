@@ -38,7 +38,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
 
         // For cases when the collection getter returns $collection->toArray()
         // in order to prevent modifications of the returned collection
-        if (is_array($collection)) {
+        if (\is_array($collection)) {
             return $collection;
         }
 

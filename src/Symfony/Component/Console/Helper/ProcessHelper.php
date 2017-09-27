@@ -44,7 +44,7 @@ class ProcessHelper extends Helper
 
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        if (is_array($cmd)) {
+        if (\is_array($cmd)) {
             $process = ProcessBuilder::create($cmd)->getProcess();
         } elseif ($cmd instanceof Process) {
             $process = $cmd;
@@ -126,7 +126,7 @@ class ProcessHelper extends Helper
             $output->write($formatter->progress(spl_object_hash($process), $that->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
-                call_user_func($callback, $type, $buffer);
+                \call_user_func($callback, $type, $buffer);
             }
         };
     }

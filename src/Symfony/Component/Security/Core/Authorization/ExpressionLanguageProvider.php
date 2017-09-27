@@ -51,7 +51,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             new ExpressionFunction('has_role', function ($role) {
                 return sprintf('in_array(%s, $roles)', $role);
             }, function (array $variables, $role) {
-                return in_array($role, $variables['roles']);
+                return \in_array($role, $variables['roles']);
             }),
         );
     }

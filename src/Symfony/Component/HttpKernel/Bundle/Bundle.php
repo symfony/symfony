@@ -104,7 +104,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function getNamespace()
     {
-        $class = get_class($this);
+        $class = \get_class($this);
 
         return substr($class, 0, strrpos($class, '\\'));
     }
@@ -144,7 +144,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             return $this->name;
         }
 
-        $name = get_class($this);
+        $name = \get_class($this);
         $pos = strrpos($name, '\\');
 
         return $this->name = false === $pos ? $name : substr($name, $pos + 1);

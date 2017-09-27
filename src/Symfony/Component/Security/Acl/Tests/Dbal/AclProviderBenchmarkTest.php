@@ -107,7 +107,7 @@ class AclProviderBenchmarkTest extends TestCase
 
     protected function generateAclLevel($depth, $parentId, $ancestors)
     {
-        $level = count($ancestors);
+        $level = \count($ancestors);
         for ($i = 0, $t = rand(1, 10); $i < $t; ++$i) {
             $id = $this->generateAcl($this->chooseClassId(), $parentId, $ancestors);
 
@@ -184,7 +184,7 @@ class AclProviderBenchmarkTest extends TestCase
 
             do {
                 $sid = $this->chooseSid();
-            } while (array_key_exists($sid, $sids) && in_array($fieldName, $sids[$sid], true));
+            } while (array_key_exists($sid, $sids) && \in_array($fieldName, $sids[$sid], true));
 
             $fieldOrder[$fieldName] = array_key_exists($fieldName, $fieldOrder) ? $fieldOrder[$fieldName] + 1 : 0;
             if (!isset($sids[$sid])) {
@@ -236,9 +236,9 @@ class AclProviderBenchmarkTest extends TestCase
     protected function getRandomString($length, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
     {
         $s = '';
-        $cLength = strlen($chars);
+        $cLength = \strlen($chars);
 
-        while (strlen($s) < $length) {
+        while (\strlen($s) < $length) {
             $s .= $chars[mt_rand(0, $cLength - 1)];
         }
 

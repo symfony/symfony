@@ -50,7 +50,7 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
 
     public function count()
     {
-        return count($this->array);
+        return \count($this->array);
     }
 
     public function serialize()

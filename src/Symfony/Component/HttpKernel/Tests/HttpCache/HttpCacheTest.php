@@ -213,7 +213,7 @@ class HttpCacheTest extends HttpCacheTestCase
             if ($request->cookies->has('authenticated')) {
                 $response->headers->set('Cache-Control', 'private, no-store');
                 $response->setETag('"private tag"');
-                if (in_array('"private tag"', $etags)) {
+                if (\in_array('"private tag"', $etags)) {
                     $response->setStatusCode(304);
                 } else {
                     $response->setStatusCode(200);
@@ -223,7 +223,7 @@ class HttpCacheTest extends HttpCacheTestCase
             } else {
                 $response->headers->set('Cache-Control', 'public');
                 $response->setETag('"public tag"');
-                if (in_array('"public tag"', $etags)) {
+                if (\in_array('"public tag"', $etags)) {
                     $response->setStatusCode(304);
                 } else {
                     $response->setStatusCode(200);
@@ -956,7 +956,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertEquals('', $this->response->getContent());
-        $this->assertEquals(strlen('Hello World'), $this->response->headers->get('Content-Length'));
+        $this->assertEquals(\strlen('Hello World'), $this->response->headers->get('Content-Length'));
     }
 
     public function testSendsNoContentWhenFresh()
@@ -1148,7 +1148,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
 
         // check for 100 or 99 as the test can be executed after a second change
-        $this->assertTrue(in_array($this->response->getTtl(), array(99, 100)));
+        $this->assertTrue(\in_array($this->response->getTtl(), array(99, 100)));
     }
 
     public function testEsiCacheForceValidation()

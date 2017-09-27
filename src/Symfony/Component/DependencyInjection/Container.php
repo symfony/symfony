@@ -280,7 +280,7 @@ class Container implements IntrospectableContainerInterface
                     $alternatives = array();
                     foreach ($this->getServiceIds() as $knownId) {
                         $lev = levenshtein($id, $knownId);
-                        if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                        if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
                             $alternatives[] = $knownId;
                         }
                     }
@@ -392,7 +392,7 @@ class Container implements IntrospectableContainerInterface
             }
 
             // update global map
-            $this->services = call_user_func_array('array_diff_key', $services);
+            $this->services = \call_user_func_array('array_diff_key', $services);
             array_shift($services);
 
             // add stack entry for this scope so we can restore the removed services later
@@ -432,10 +432,10 @@ class Container implements IntrospectableContainerInterface
         }
 
         // update global map
-        $this->services = call_user_func_array('array_diff_key', $services);
+        $this->services = \call_user_func_array('array_diff_key', $services);
 
         // check if we need to restore services of a previous scope of this type
-        if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
+        if (isset($this->scopeStacks[$name]) && \count($this->scopeStacks[$name]) > 0) {
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 

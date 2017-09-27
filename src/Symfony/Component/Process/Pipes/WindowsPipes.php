@@ -145,7 +145,7 @@ class WindowsPipes extends AbstractPipes
             $data = stream_get_contents($fileHandle, -1, $this->readBytes[$type]);
 
             if (isset($data[0])) {
-                $this->readBytes[$type] += strlen($data);
+                $this->readBytes[$type] += \strlen($data);
                 $read[$type] = $data;
             }
             if ($close) {

@@ -159,7 +159,7 @@ class StringUtil
     {
         $pluralRev = strrev($plural);
         $lowerPluralRev = strtolower($pluralRev);
-        $pluralLength = strlen($lowerPluralRev);
+        $pluralLength = \strlen($lowerPluralRev);
 
         // The outer loop iterates over the entries of the plural table
         // The inner loop $j iterates over the characters of the plural suffix
@@ -202,7 +202,7 @@ class StringUtil
                     // the singular suffix too
                     $firstUpper = ctype_upper($pluralRev[$j - 1]);
 
-                    if (is_array($newSuffix)) {
+                    if (\is_array($newSuffix)) {
                         $singulars = array();
 
                         foreach ($newSuffix as $newSuffixEntry) {

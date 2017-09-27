@@ -43,7 +43,7 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && !$data instanceof \Traversable;
+        return \is_object($data) && !$data instanceof \Traversable;
     }
 
     /**
@@ -96,14 +96,14 @@ class ObjectNormalizer extends AbstractNormalizer
         }
 
         foreach ($attributes as $attribute) {
-            if (in_array($attribute, $this->ignoredAttributes)) {
+            if (\in_array($attribute, $this->ignoredAttributes)) {
                 continue;
             }
 
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
             if (isset($this->callbacks[$attribute])) {
-                $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
+                $attributeValue = \call_user_func($this->callbacks[$attribute], $attributeValue);
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -148,8 +148,8 @@ class ObjectNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            $allowed = false === $allowedAttributes || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
+            $allowed = false === $allowedAttributes || \in_array($attribute, $allowedAttributes);
+            $ignored = \in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {
                 try {

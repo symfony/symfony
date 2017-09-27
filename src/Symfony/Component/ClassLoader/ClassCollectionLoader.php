@@ -118,7 +118,7 @@ REGEX;
         $files = array();
         $content = '';
         foreach (self::getOrderedClasses($classes) as $class) {
-            if (in_array($class->getName(), $declared)) {
+            if (\in_array($class->getName(), $declared)) {
                 continue;
             }
 
@@ -136,8 +136,8 @@ REGEX;
                 if (1 >= $i) {
                     $file = var_export(implode('/', $file), true);
                 } else {
-                    $file = array_slice($file, $i);
-                    $file = str_repeat('../', count($cacheDir) - $i).implode('/', $file);
+                    $file = \array_slice($file, $i);
+                    $file = str_repeat('../', \count($cacheDir) - $i).implode('/', $file);
                     $file = '__DIR__.'.var_export('/'.$file, true);
                 }
 
@@ -190,7 +190,7 @@ REGEX;
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
-            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+            } elseif (\in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 // strip comments
                 continue;
             } elseif (T_NAMESPACE === $token[0]) {
@@ -200,7 +200,7 @@ REGEX;
                 $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (isset($tokens[++$i][1]) && in_array($tokens[$i][0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (isset($tokens[++$i][1]) && \in_array($tokens[$i][0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
                     $rawChunk .= $tokens[$i][1];
                 }
                 if ('{' === $tokens[$i]) {

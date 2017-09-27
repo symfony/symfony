@@ -55,7 +55,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
 
     public function count()
     {
-        return count($this->array);
+        return \count($this->array);
     }
 
     public function serialize()

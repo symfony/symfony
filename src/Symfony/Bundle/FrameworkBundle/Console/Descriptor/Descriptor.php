@@ -76,7 +76,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeCallable($object, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', \get_class($object)));
         }
     }
 
@@ -224,11 +224,11 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected function formatValue($value)
     {
-        if (is_object($value)) {
-            return sprintf('object(%s)', get_class($value));
+        if (\is_object($value)) {
+            return sprintf('object(%s)', \get_class($value));
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return $value;
         }
 
@@ -244,7 +244,7 @@ abstract class Descriptor implements DescriptorInterface
      */
     protected function formatParameter($value)
     {
-        if (is_bool($value) || is_array($value) || (null === $value)) {
+        if (\is_bool($value) || \is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
 
             if (preg_match('/^(.{60})./us', $jsonString, $matches)) {

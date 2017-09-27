@@ -61,7 +61,7 @@ class MoFileLoader extends ArrayLoader
         }
 
         // not an array
-        if (!is_array($messages)) {
+        if (!\is_array($messages)) {
             throw new InvalidResourceException(sprintf('The file "%s" must contain a valid mo file.', $resource));
         }
 
@@ -154,7 +154,7 @@ class MoFileLoader extends ArrayLoader
             $ids = array('singular' => $singularId, 'plural' => $pluralId);
             $item = compact('ids', 'translated');
 
-            if (is_array($item['translated'])) {
+            if (\is_array($item['translated'])) {
                 $messages[$item['ids']['singular']] = stripcslashes($item['translated'][0]);
                 if (isset($item['ids']['plural'])) {
                     $plurals = array();

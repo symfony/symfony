@@ -57,7 +57,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
         $elements = $path->getElements();
         $data = false;
 
-        for ($i = 0, $l = count($elements); $i < $l; ++$i) {
+        for ($i = 0, $l = \count($elements); $i < $l; ++$i) {
             if (!$data) {
                 // The element "data" has not yet been passed
                 if ('children' === $elements[$i] && $path->isProperty($i)) {
@@ -108,7 +108,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
             }
         }
 
-        $this->length = count($this->elements);
+        $this->length = \count($this->elements);
 
         $this->buildString();
     }

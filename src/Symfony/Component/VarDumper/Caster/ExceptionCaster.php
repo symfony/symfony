@@ -70,7 +70,7 @@ class ExceptionCaster
                 'file' => $b[$prefix.'file'],
                 'line' => $b[$prefix.'line'],
             );
-            array_splice($b[$xPrefix.'trace'], -1 - count($a[$xPrefix.'trace']));
+            array_splice($b[$xPrefix.'trace'], -1 - \count($a[$xPrefix.'trace']));
             static::filterTrace($b[$xPrefix.'trace'], false);
             $a[Caster::PREFIX_VIRTUAL.'trace'] = $b[$xPrefix.'trace'];
         }

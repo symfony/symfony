@@ -130,7 +130,7 @@ class Router extends BaseRouter implements WarmableInterface
      */
     private function resolve($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             foreach ($value as $key => $val) {
                 $value[$key] = $this->resolve($val);
             }
@@ -138,7 +138,7 @@ class Router extends BaseRouter implements WarmableInterface
             return $value;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             return $value;
         }
 
@@ -152,7 +152,7 @@ class Router extends BaseRouter implements WarmableInterface
 
             $resolved = $container->getParameter($match[1]);
 
-            if (is_string($resolved) || is_numeric($resolved)) {
+            if (\is_string($resolved) || is_numeric($resolved)) {
                 return (string) $resolved;
             }
 
@@ -161,7 +161,7 @@ class Router extends BaseRouter implements WarmableInterface
                 'must be a string or numeric, but it is of type %s.',
                 $match[1],
                 $value,
-                gettype($resolved)
+                \gettype($resolved)
                 )
             );
         }, $value);

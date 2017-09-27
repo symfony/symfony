@@ -60,7 +60,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
             throw new BadCredentialsException('Invalid password.');
         }
 
-        if (!in_array($this->algorithm, hash_algos(), true)) {
+        if (!\in_array($this->algorithm, hash_algos(), true)) {
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 
@@ -84,7 +84,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
     private function hashPbkdf2($algorithm, $password, $salt, $iterations, $length = 0)
     {
         // Number of blocks needed to create the derived key
-        $blocks = ceil($length / strlen(hash($algorithm, null, true)));
+        $blocks = ceil($length / \strlen(hash($algorithm, null, true)));
         $digest = '';
 
         for ($i = 1; $i <= $blocks; ++$i) {

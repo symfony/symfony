@@ -35,7 +35,7 @@ class UrlPackage extends Package
     {
         parent::__construct($version, $format);
 
-        if (!is_array($baseUrls)) {
+        if (!\is_array($baseUrls)) {
             $baseUrls = (array) $baseUrls;
         }
 
@@ -72,7 +72,7 @@ class UrlPackage extends Package
      */
     public function getBaseUrl($path)
     {
-        switch ($count = count($this->baseUrls)) {
+        switch ($count = \count($this->baseUrls)) {
             case 0:
                 return '';
 

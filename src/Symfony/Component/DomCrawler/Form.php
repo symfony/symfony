@@ -110,7 +110,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getFiles()
     {
-        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
+        if (!\in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
             return array();
         }
 
@@ -144,7 +144,7 @@ class Form extends Link implements \ArrayAccess
             $qs = http_build_query(array($name => $value), '', '&');
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
-                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $varName = substr($name, 0, \strlen(key($expandedValue)));
                 $values = array_replace_recursive($values, array($varName => current($expandedValue)));
             }
         }
@@ -171,7 +171,7 @@ class Form extends Link implements \ArrayAccess
             $qs = http_build_query(array($name => $value), '', '&');
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
-                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $varName = substr($name, 0, \strlen(key($expandedValue)));
 
                 array_walk_recursive(
                     $expandedValue,
@@ -204,7 +204,7 @@ class Form extends Link implements \ArrayAccess
     {
         $uri = parent::getUri();
 
-        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
+        if (!\in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
             $query = parse_url($uri, PHP_URL_QUERY);
             $currentParameters = array();
             if ($query) {
@@ -375,7 +375,7 @@ class Form extends Link implements \ArrayAccess
     protected function setNode(\DOMElement $node)
     {
         $this->button = $node;
-        if ('button' === $node->nodeName || ('input' === $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
+        if ('button' === $node->nodeName || ('input' === $node->nodeName && \in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
@@ -476,7 +476,7 @@ class Form extends Link implements \ArrayAccess
             }
         } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $nodeName && !in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
+        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
             $this->set(new Field\InputFormField($node));
         } elseif ('textarea' == $nodeName) {
             $this->set(new Field\TextareaFormField($node));

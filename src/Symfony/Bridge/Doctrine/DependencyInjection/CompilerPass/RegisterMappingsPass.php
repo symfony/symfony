@@ -126,7 +126,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
         $this->managerParameters = $managerParameters;
         $this->driverPattern = $driverPattern;
         $this->enabledParameter = $enabledParameter;
-        if (count($aliasMap) && (!$configurationPattern || !$registerAliasMethodName)) {
+        if (\count($aliasMap) && (!$configurationPattern || !$registerAliasMethodName)) {
             throw new \InvalidArgumentException('configurationPattern and registerAliasMethodName are required to register namespace alias');
         }
         $this->configurationPattern = $configurationPattern;
@@ -153,7 +153,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             $chainDriverDef->addMethodCall('addDriver', array($mappingDriverDef, $namespace));
         }
 
-        if (!count($this->aliasMap)) {
+        if (!\count($this->aliasMap)) {
             return;
         }
 

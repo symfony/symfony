@@ -130,7 +130,7 @@ class Data
         $firstSeen = true;
 
         if (!$item instanceof Stub) {
-            $type = gettype($item);
+            $type = \gettype($item);
         } elseif (Stub::TYPE_REF === $item->type) {
             if ($item->handle) {
                 if (!isset($refs[$r = $item->handle - (PHP_INT_MAX >> 1)])) {
@@ -142,7 +142,7 @@ class Data
                 $cursor->hardRefHandle = $this->useRefHandles & $item->handle;
                 $cursor->hardRefCount = $item->refCount;
             }
-            $type = $item->class ?: gettype($item->value);
+            $type = $item->class ?: \gettype($item->value);
             $item = $item->value;
         }
         if ($item instanceof Stub) {
@@ -163,7 +163,7 @@ class Data
 
                 if ($cursor->stop) {
                     if ($cut >= 0) {
-                        $cut += count($children);
+                        $cut += \count($children);
                     }
                     $children = array();
                 }
@@ -187,7 +187,7 @@ class Data
                     if ($withChildren) {
                         $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
                     } elseif ($children && 0 <= $cut) {
-                        $cut += count($children);
+                        $cut += \count($children);
                     }
                     $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
@@ -223,7 +223,7 @@ class Data
         ++$cursor->depth;
         $cursor->hashType = $hashType;
         $cursor->hashIndex = 0;
-        $cursor->hashLength = count($children);
+        $cursor->hashLength = \count($children);
         $cursor->hashCut = $hashCut;
         foreach ($children as $key => $child) {
             $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);

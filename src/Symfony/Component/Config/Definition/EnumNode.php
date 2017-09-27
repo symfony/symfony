@@ -25,7 +25,7 @@ class EnumNode extends ScalarNode
     public function __construct($name, NodeInterface $parent = null, array $values = array())
     {
         $values = array_unique($values);
-        if (count($values) <= 1) {
+        if (\count($values) <= 1) {
             throw new \InvalidArgumentException('$values must contain at least two distinct elements.');
         }
 
@@ -42,7 +42,7 @@ class EnumNode extends ScalarNode
     {
         $value = parent::finalizeValue($value);
 
-        if (!in_array($value, $this->values, true)) {
+        if (!\in_array($value, $this->values, true)) {
             $ex = new InvalidConfigurationException(sprintf(
                 'The value %s is not allowed for path "%s". Permissible values: %s',
                 json_encode($value),

@@ -54,7 +54,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             return;
         }
 
-        if (!is_bool($value)) {
+        if (!\is_bool($value)) {
             throw new TransformationFailedException('Expected a Boolean.');
         }
 
@@ -76,7 +76,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             return false;
         }
 
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 

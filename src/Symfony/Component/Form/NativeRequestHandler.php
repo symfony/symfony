@@ -86,7 +86,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $form->submit(null, false);
 
                 $form->addError(new FormError(
-                    call_user_func($form->getConfig()->getOption('upload_max_size_message')),
+                    \call_user_func($form->getConfig()->getOption('upload_max_size_message')),
                     null,
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
                 ));
@@ -111,7 +111,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                 return;
             }
 
-            if (is_array($params) && is_array($files)) {
+            if (\is_array($params) && \is_array($files)) {
                 $data = array_replace_recursive($params, $files);
             } else {
                 $data = $params ?: $files;
@@ -119,7 +119,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         // Don't auto-submit the form unless at least one field is present.
-        if ('' === $name && count(array_intersect_key($data, $form->all())) <= 0) {
+        if ('' === $name && \count(array_intersect_key($data, $form->all())) <= 0) {
             return;
         }
 
@@ -165,14 +165,14 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private static function fixPhpFilesArray($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys !== $keys || !isset($data['name']) || !is_array($data['name'])) {
+        if (self::$fileKeys !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
@@ -203,7 +203,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      */
     private static function stripEmptyFiles($data)
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return $data;
         }
 

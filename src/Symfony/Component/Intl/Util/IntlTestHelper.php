@@ -42,7 +42,7 @@ class IntlTestHelper
         //   * the intl extension is loaded with version Intl::getIcuStubVersion()
         //   * the intl extension is not loaded
 
-        if (($minimumIcuVersion || defined('HHVM_VERSION_ID')) && IcuVersion::compare(Intl::getIcuVersion(), $minimumIcuVersion, '<', 1)) {
+        if (($minimumIcuVersion || \defined('HHVM_VERSION_ID')) && IcuVersion::compare(Intl::getIcuVersion(), $minimumIcuVersion, '<', 1)) {
             $testCase->markTestSkipped('ICU version '.$minimumIcuVersion.' is required.');
         }
 

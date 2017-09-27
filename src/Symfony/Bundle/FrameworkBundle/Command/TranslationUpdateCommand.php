@@ -81,7 +81,7 @@ EOF
         // check format
         $writer = $this->getContainer()->get('translation.writer');
         $supportedFormats = $writer->getFormats();
-        if (!in_array($input->getOption('output-format'), $supportedFormats)) {
+        if (!\in_array($input->getOption('output-format'), $supportedFormats)) {
             $output->error(array('Wrong output format', 'Supported formats are '.implode(', ', $supportedFormats).'.'));
 
             return 1;
@@ -144,7 +144,7 @@ EOF
             : new MergeOperation($currentCatalogue, $extractedCatalogue);
 
         // Exit if no messages found.
-        if (!count($operation->getDomains())) {
+        if (!\count($operation->getDomains())) {
             $output->warning('No translation found.');
 
             return;

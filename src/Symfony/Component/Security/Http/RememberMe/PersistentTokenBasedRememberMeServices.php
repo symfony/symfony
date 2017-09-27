@@ -72,7 +72,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
         // Delete cookie from the tokenProvider
         if (null !== ($cookie = $request->cookies->get($this->options['name']))
-            && 2 === count($parts = $this->decodeCookie($cookie))
+            && 2 === \count($parts = $this->decodeCookie($cookie))
         ) {
             list($series) = $parts;
             $this->tokenProvider->deleteTokenBySeries($series);
@@ -84,7 +84,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
-        if (2 !== count($cookieParts)) {
+        if (2 !== \count($cookieParts)) {
             throw new AuthenticationException('The cookie is invalid.');
         }
 
@@ -126,7 +126,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(
-                get_class($user = $token->getUser()),
+                \get_class($user = $token->getUser()),
                 $user->getUsername(),
                 $series,
                 $tokenValue,

@@ -97,7 +97,7 @@ class HttpFoundationExtension extends AbstractExtension
 
         if (!$path || '/' !== $path[0]) {
             $prefix = $request->getPathInfo();
-            $last = strlen($prefix) - 1;
+            $last = \strlen($prefix) - 1;
             if ($last !== $pos = strrpos($prefix, '/')) {
                 $prefix = substr($prefix, 0, $pos).'/';
             }

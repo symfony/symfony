@@ -42,7 +42,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         $this->decimalPoint = localeconv();
         $this->decimalPoint = $this->decimalPoint['decimal_point'];
         $this->setOutput($output ?: static::$defaultOutput);
-        if (!$output && is_string(static::$defaultOutput)) {
+        if (!$output && \is_string(static::$defaultOutput)) {
             static::$defaultOutput = $this->outputStream;
         }
     }
@@ -62,7 +62,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
             $this->outputStream = null;
             $this->lineDumper = $output;
         } else {
-            if (is_string($output)) {
+            if (\is_string($output)) {
                 $output = fopen($output, 'wb');
             }
             $this->outputStream = $output;
@@ -165,7 +165,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     protected function dumpLine($depth)
     {
-        call_user_func($this->lineDumper, $this->line, $depth, $this->indentPad);
+        \call_user_func($this->lineDumper, $this->line, $depth, $this->indentPad);
         $this->line = '';
     }
 
@@ -206,7 +206,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         }
 
         $s .= $s;
-        $len = strlen($s);
+        $len = \strlen($s);
 
         for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
             switch (true) {
@@ -221,7 +221,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 
                 default:
                     $s[$j] = "\xC3";
-                    $s[++$j] = chr(ord($s[$i]) - 64);
+                    $s[++$j] = \chr(\ord($s[$i]) - 64);
                     break;
             }
         }

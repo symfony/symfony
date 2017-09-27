@@ -74,7 +74,7 @@ class XliffFileDumper extends FileDumper
             $t->appendChild($text);
 
             $metadata = $messages->getMetadata($source, $domain);
-            if (null !== $metadata && array_key_exists('notes', $metadata) && is_array($metadata['notes'])) {
+            if (null !== $metadata && array_key_exists('notes', $metadata) && \is_array($metadata['notes'])) {
                 foreach ($metadata['notes'] as $note) {
                     if (!isset($note['content'])) {
                         continue;

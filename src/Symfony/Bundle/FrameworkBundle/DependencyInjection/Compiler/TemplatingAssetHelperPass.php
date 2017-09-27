@@ -42,7 +42,7 @@ class TemplatingAssetHelperPass implements CompilerPassInterface
             return;
         }
 
-        if (!is_array($args[1])) {
+        if (!\is_array($args[1])) {
             return;
         }
 

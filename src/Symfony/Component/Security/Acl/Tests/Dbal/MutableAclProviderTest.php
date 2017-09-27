@@ -35,7 +35,7 @@ class MutableAclProviderTest extends TestCase
 
     public static function assertAceEquals(EntryInterface $a, EntryInterface $b)
     {
-        self::assertInstanceOf(get_class($a), $b);
+        self::assertInstanceOf(\get_class($a), $b);
 
         foreach (array('getId', 'getMask', 'getStrategy', 'isGranting') as $getter) {
             self::assertSame($a->$getter(), $b->$getter());
@@ -319,7 +319,7 @@ class MutableAclProviderTest extends TestCase
 
         $aces = $acl->getObjectAces();
         $reloadedAces = $reloadedAcl->getObjectAces();
-        $this->assertEquals(count($aces), count($reloadedAces));
+        $this->assertEquals(\count($aces), \count($reloadedAces));
         foreach ($aces as $index => $ace) {
             $this->assertAceEquals($ace, $reloadedAces[$index]);
         }
@@ -437,7 +437,7 @@ class MutableAclProviderTest extends TestCase
 
         $aces = $acl->getObjectAces();
         $reloadedAces = $reloadedAcl->getObjectAces();
-        $this->assertEquals(count($aces), count($reloadedAces));
+        $this->assertEquals(\count($aces), \count($reloadedAces));
         foreach ($reloadedAces as $ace) {
             $this->assertTrue($ace->getSecurityIdentity()->equals($newSid));
         }

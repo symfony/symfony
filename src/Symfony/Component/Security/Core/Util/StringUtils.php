@@ -39,11 +39,11 @@ class StringUtils
     public static function equals($knownString, $userInput)
     {
         // Avoid making unnecessary duplications of secret data
-        if (!is_string($knownString)) {
+        if (!\is_string($knownString)) {
             $knownString = (string) $knownString;
         }
 
-        if (!is_string($userInput)) {
+        if (!\is_string($userInput)) {
             $userInput = (string) $userInput;
         }
 
@@ -61,7 +61,7 @@ class StringUtils
         $result = 0;
 
         for ($i = 0; $i < $knownLen; ++$i) {
-            $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
+            $result |= (\ord($knownString[$i]) ^ \ord($userInput[$i]));
         }
 
         // They are only identical strings if $result is exactly 0...
@@ -88,6 +88,6 @@ class StringUtils
             return mb_strlen($string, '8bit');
         }
 
-        return strlen($string);
+        return \strlen($string);
     }
 }

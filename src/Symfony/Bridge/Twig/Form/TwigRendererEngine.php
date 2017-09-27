@@ -100,7 +100,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
 
         // Check each theme whether it contains the searched block
         if (isset($this->themes[$cacheKey])) {
-            for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
+            for ($i = \count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
                 $this->loadResourcesFromTheme($cacheKey, $this->themes[$cacheKey][$i]);
                 // CONTINUE LOADING (see doc comment)
             }
@@ -108,7 +108,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
 
         // Check the default themes once we reach the root view without success
         if (!$view->parent) {
-            for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
+            for ($i = \count($this->defaultThemes) - 1; $i >= 0; --$i) {
                 $this->loadResourcesFromTheme($cacheKey, $this->defaultThemes[$i]);
                 // CONTINUE LOADING (see doc comment)
             }

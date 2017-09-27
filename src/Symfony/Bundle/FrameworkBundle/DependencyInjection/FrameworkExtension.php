@@ -505,7 +505,7 @@ class FrameworkExtension extends Extension
             $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
 
             // Use a delegation unless only a single loader was registered
-            if (1 === count($loaders)) {
+            if (1 === \count($loaders)) {
                 $container->setAlias('templating.loader', (string) reset($loaders));
             } else {
                 $container->getDefinition('templating.loader.chain')->addArgument($loaders);
@@ -534,7 +534,7 @@ class FrameworkExtension extends Extension
         $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
         // Use a delegation unless only a single engine was registered
-        if (1 === count($engines)) {
+        if (1 === \count($engines)) {
             $container->setAlias('templating', (string) reset($engines));
         } else {
             foreach ($engines as $engine) {
@@ -549,7 +549,7 @@ class FrameworkExtension extends Extension
         ;
 
         // configure the PHP engine if needed
-        if (in_array('php', $config['engines'], true)) {
+        if (\in_array('php', $config['engines'], true)) {
             $loader->load('templating_php.xml');
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
@@ -752,11 +752,11 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
         list($xmlMappings, $yamlMappings) = $this->getValidatorMappingFiles($container);
-        if (count($xmlMappings) > 0) {
+        if (\count($xmlMappings) > 0) {
             $validatorBuilder->addMethodCall('addXmlMappings', array($xmlMappings));
         }
 
-        if (count($yamlMappings) > 0) {
+        if (\count($yamlMappings) > 0) {
             $validatorBuilder->addMethodCall('addYamlMappings', array($yamlMappings));
         }
 

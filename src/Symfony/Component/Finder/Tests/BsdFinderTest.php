@@ -20,7 +20,7 @@ class BsdFinderTest extends FinderTest
         $adapter = new BsdFindAdapter();
 
         if (!$adapter->isSupported()) {
-            $this->markTestSkipped(get_class($adapter).' is not supported.');
+            $this->markTestSkipped(\get_class($adapter).' is not supported.');
         }
 
         return $adapter;

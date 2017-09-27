@@ -94,7 +94,7 @@ class XmlFileLoaderTest extends TestCase
 
         libxml_disable_entity_loader($disableEntities);
 
-        $this->assertTrue(count($containerBuilder->getParameterBag()->all()) > 0, 'Parameters can be read from the config file.');
+        $this->assertTrue(\count($containerBuilder->getParameterBag()->all()) > 0, 'Parameters can be read from the config file.');
     }
 
     public function testLoadParameters()
@@ -502,7 +502,7 @@ class XmlFileLoaderTest extends TestCase
         $services = $container->getDefinitions();
 
         $this->assertTrue(isset($services['foo']), '->load() parses <srv:service> elements');
-        $this->assertEquals(1, count($services['foo']->getTag('foo.tag')), '->load parses <srv:tag> elements');
+        $this->assertEquals(1, \count($services['foo']->getTag('foo.tag')), '->load parses <srv:tag> elements');
         $this->assertEquals(array(array('setBar', array('foo'))), $services['foo']->getMethodCalls(), '->load() parses the <srv:call> tag');
     }
 

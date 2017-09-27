@@ -202,7 +202,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Node "%s" not supported.', $node->getNodeName()));
         }
 
-        return call_user_func($this->nodeTranslators[$node->getNodeName()], $node, $this);
+        return \call_user_func($this->nodeTranslators[$node->getNodeName()], $node, $this);
     }
 
     /**
@@ -220,7 +220,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Combiner "%s" not supported.', $combiner));
         }
 
-        return call_user_func($this->combinationTranslators[$combiner], $this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
+        return \call_user_func($this->combinationTranslators[$combiner], $this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
     }
 
     /**
@@ -237,7 +237,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Function "%s" not supported.', $function->getName()));
         }
 
-        return call_user_func($this->functionTranslators[$function->getName()], $xpath, $function);
+        return \call_user_func($this->functionTranslators[$function->getName()], $xpath, $function);
     }
 
     /**
@@ -254,7 +254,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Pseudo-class "%s" not supported.', $pseudoClass));
         }
 
-        return call_user_func($this->pseudoClassTranslators[$pseudoClass], $xpath);
+        return \call_user_func($this->pseudoClassTranslators[$pseudoClass], $xpath);
     }
 
     /**
@@ -273,7 +273,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException(sprintf('Attribute matcher operator "%s" not supported.', $operator));
         }
 
-        return call_user_func($this->attributeMatchingTranslators[$operator], $xpath, $attribute, $value);
+        return \call_user_func($this->attributeMatchingTranslators[$operator], $xpath, $attribute, $value);
     }
 
     /**

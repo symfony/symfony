@@ -69,10 +69,10 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     private function expectAnnotationsToBeReadFrom(array $classes)
     {
-        $this->reader->expects($this->exactly(count($classes)))
+        $this->reader->expects($this->exactly(\count($classes)))
             ->method('getClassAnnotation')
             ->with($this->callback(function (\ReflectionClass $class) use ($classes) {
-                return in_array($class->getName(), $classes);
+                return \in_array($class->getName(), $classes);
             }));
     }
 }

@@ -36,7 +36,7 @@ class ScalarNode extends VariableNode
             $ex = new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected scalar, but got %s.',
                 $this->getPath(),
-                gettype($value)
+                \gettype($value)
             ));
             if ($hint = $this->getInfo()) {
                 $ex->addHint($hint);

@@ -109,7 +109,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function formatTypeOf($value)
     {
-        return is_object($value) ? get_class($value) : gettype($value);
+        return \is_object($value) ? \get_class($value) : \gettype($value);
     }
 
     /**
@@ -158,7 +158,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
             return $value->format('Y-m-d H:i:s');
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             if (($format & self::OBJECT_TO_STRING) && method_exists($value, '__toString')) {
                 return $value->__toString();
             }
@@ -166,15 +166,15 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
             return 'object';
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return 'array';
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return '"'.$value.'"';
         }
 
-        if (is_resource($value)) {
+        if (\is_resource($value)) {
             return 'resource';
         }
 

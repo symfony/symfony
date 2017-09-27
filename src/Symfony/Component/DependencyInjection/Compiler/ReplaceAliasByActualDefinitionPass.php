@@ -95,7 +95,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
     {
         foreach ($arguments as $k => $argument) {
             // Handle recursion step
-            if (is_array($argument)) {
+            if (\is_array($argument)) {
                 $arguments[$k] = $this->updateArgumentReferences($replacements, $definitionId, $argument);
                 continue;
             }
@@ -135,7 +135,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 
     private function updateFactoryReference(array $replacements, $factory)
     {
-        if (is_array($factory) && $factory[0] instanceof Reference && isset($replacements[$referenceId = (string) $factory[0]])) {
+        if (\is_array($factory) && $factory[0] instanceof Reference && isset($replacements[$referenceId = (string) $factory[0]])) {
             $factory[0] = new Reference($replacements[$referenceId], $factory[0]->getInvalidBehavior());
         }
 

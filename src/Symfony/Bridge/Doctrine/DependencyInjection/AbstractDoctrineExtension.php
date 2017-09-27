@@ -162,7 +162,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (in_array($bundleConfig['type'], array('annotation', 'staticphp'))) {
+            if (\in_array($bundleConfig['type'], array('annotation', 'staticphp'))) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
@@ -249,7 +249,7 @@ abstract class AbstractDoctrineExtension extends Extension
             throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
+        if (!\in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
             throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php" or '.
                 '"staticphp" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. '.
                 'You can register them by adding a new driver to the '.
@@ -278,11 +278,11 @@ abstract class AbstractDoctrineExtension extends Extension
         $container->addResource(new FileResource($resource));
 
         $extension = $this->getMappingResourceExtension();
-        if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && count($files)) {
+        if (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.xml')) && \count($files)) {
             return 'xml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.yml')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.yml')) && \count($files)) {
             return 'yml';
-        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.php')) && count($files)) {
+        } elseif (($files = glob($dir.'/'.$configPath.'/*.'.$extension.'.php')) && \count($files)) {
             return 'php';
         }
 

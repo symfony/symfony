@@ -59,7 +59,7 @@ class YamlFileLoader extends ArrayLoader
         }
 
         // not an array
-        if (!is_array($messages)) {
+        if (!\is_array($messages)) {
             throw new InvalidResourceException(sprintf('The file "%s" must contain a YAML array.', $resource));
         }
 

@@ -56,7 +56,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      */
     public function reverseTransform($array)
     {
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -75,8 +75,8 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
             }
         }
 
-        if (count($emptyKeys) > 0) {
-            if (count($emptyKeys) == count($this->keys)) {
+        if (\count($emptyKeys) > 0) {
+            if (\count($emptyKeys) == \count($this->keys)) {
                 // All keys empty
                 return;
             }

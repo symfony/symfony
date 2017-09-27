@@ -68,14 +68,14 @@ class NodeBuilderTest extends TestCase
         $node1 = $builder->node('', 'VaRiAbLe');
         $node2 = $builder->node('', 'variable');
 
-        $this->assertInstanceOf(get_class($node1), $node2);
+        $this->assertInstanceOf(\get_class($node1), $node2);
 
         $builder->setNodeClass('CuStOm', __NAMESPACE__.'\\SomeNodeDefinition');
 
         $node1 = $builder->node('', 'CUSTOM');
         $node2 = $builder->node('', 'custom');
 
-        $this->assertInstanceOf(get_class($node1), $node2);
+        $this->assertInstanceOf(\get_class($node1), $node2);
     }
 
     public function testNumericNodeCreation()

@@ -117,7 +117,7 @@ class EntityChoiceList extends ObjectChoiceList
         $this->entityLoader = $entityLoader;
         $this->classMetadata = $manager->getClassMetadata($class);
         $this->class = $this->classMetadata->getName();
-        $this->loaded = is_array($entities) || $entities instanceof \Traversable;
+        $this->loaded = \is_array($entities) || $entities instanceof \Traversable;
         $this->preferredEntities = $preferredEntities;
         list(
             $this->idAsIndex,
@@ -453,13 +453,13 @@ class EntityChoiceList extends ObjectChoiceList
 
         $identifiers = $classMetadata->getIdentifierFieldNames();
 
-        if (1 === count($identifiers)) {
+        if (1 === \count($identifiers)) {
             $identifier = $identifiers[0];
 
             if (!$classMetadata->hasAssociation($identifier)) {
                 $idAsValue = true;
 
-                if (in_array($classMetadata->getTypeOfField($identifier), array('integer', 'smallint', 'bigint'))) {
+                if (\in_array($classMetadata->getTypeOfField($identifier), array('integer', 'smallint', 'bigint'))) {
                     $idAsIndex = true;
                 }
             }

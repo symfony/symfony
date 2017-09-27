@@ -206,7 +206,7 @@ class SessionTest extends TestCase
             ++$i;
         }
 
-        $this->assertEquals(count($attributes), $i);
+        $this->assertEquals(\count($attributes), $i);
     }
 
     public function testGetCount()

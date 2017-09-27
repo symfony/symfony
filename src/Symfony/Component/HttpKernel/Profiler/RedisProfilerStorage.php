@@ -314,7 +314,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
     private function isItemNameValid($name)
     {
-        $length = strlen($name);
+        $length = \strlen($name);
 
         if ($length > 2147483648) {
             throw new \RuntimeException(sprintf('The Redis item key "%s" is too long (%s bytes). Allowed maximum size is 2^31 bytes.', $name, $length));

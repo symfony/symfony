@@ -152,6 +152,6 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      */
     public function count()
     {
-        return count($this->attributes);
+        return \count($this->attributes);
     }
 }

@@ -164,6 +164,6 @@ class DirectoryResourceTest extends TestCase
         $resourceA = new DirectoryResource($this->directory, '/.xml$/');
         $resourceB = new DirectoryResource($this->directory, '/.yaml$/');
 
-        $this->assertEquals(2, count(array_unique(array($resourceA, $resourceB))));
+        $this->assertEquals(2, \count(array_unique(array($resourceA, $resourceB))));
     }
 }

@@ -84,7 +84,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromChoices($choices, $value = null)
     {
-        if (is_string($value) && !is_callable($value)) {
+        if (\is_string($value) && !is_callable($value)) {
             $value = new PropertyPath($value);
         }
 
@@ -95,7 +95,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (is_object($choice) || is_array($choice)) {
+                if (\is_object($choice) || \is_array($choice)) {
                     return $accessor->getValue($choice, $value);
                 }
             };
@@ -134,7 +134,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        if (is_string($value) && !is_callable($value)) {
+        if (\is_string($value) && !is_callable($value)) {
             $value = new PropertyPath($value);
         }
 
@@ -145,7 +145,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 // when such values are passed to
                 // ChoiceListInterface::getValuesForChoices(). Handle this case
                 // so that the call to getValue() doesn't break.
-                if (is_object($choice) || is_array($choice)) {
+                if (\is_object($choice) || \is_array($choice)) {
                     return $accessor->getValue($choice, $value);
                 }
             };
@@ -170,7 +170,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     {
         $accessor = $this->propertyAccessor;
 
-        if (is_string($label) && !is_callable($label)) {
+        if (\is_string($label) && !is_callable($label)) {
             $label = new PropertyPath($label);
         }
 
@@ -180,7 +180,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($preferredChoices) && !is_callable($preferredChoices)) {
+        if (\is_string($preferredChoices) && !is_callable($preferredChoices)) {
             $preferredChoices = new PropertyPath($preferredChoices);
         }
 
@@ -195,7 +195,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($index) && !is_callable($index)) {
+        if (\is_string($index) && !is_callable($index)) {
             $index = new PropertyPath($index);
         }
 
@@ -205,7 +205,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($groupBy) && !is_callable($groupBy)) {
+        if (\is_string($groupBy) && !is_callable($groupBy)) {
             $groupBy = new PropertyPath($groupBy);
         }
 
@@ -219,7 +219,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if (is_string($attr) && !is_callable($attr)) {
+        if (\is_string($attr) && !is_callable($attr)) {
             $attr = new PropertyPath($attr);
         }
 

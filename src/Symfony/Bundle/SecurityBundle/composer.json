@@ -32,7 +32,6 @@
         "symfony/form": "~3.4|~4.0",
         "symfony/framework-bundle": "~3.4|~4.0",
         "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/security-acl": "~2.8|~3.0",
         "symfony/translation": "~3.4|~4.0",
         "symfony/twig-bundle": "~3.4|~4.0",
         "symfony/twig-bridge": "~3.4|~4.0",
@@ -49,9 +48,6 @@
         "symfony/event-dispatcher": "<3.4",
         "symfony/framework-bundle": "<3.4",
         "symfony/console": "<3.4"
-    },
-    "suggest": {
-        "symfony/security-acl": "For using the ACL functionality of this bundle"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

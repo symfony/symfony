@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
 use Twig\Markup;
 use Twig\Profiler\Dumper\HtmlDumper;
 use Twig\Profiler\Profile;
@@ -28,13 +28,13 @@ use Twig\Profiler\Profile;
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $profile;
-    private $loader;
+    private $twig;
     private $computed;
 
-    public function __construct(Profile $profile, FilesystemLoader $loader = null)
+    public function __construct(Profile $profile, Environment $twig)
     {
         $this->profile = $profile;
-        $this->loader = $loader;
+        $this->twig = $twig;
     }
 
     /**
@@ -52,19 +52,15 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = array();
 
-        if (null !== $this->loader) {
-            $locator = (new \ReflectionObject($this->loader))->getMethod('findTemplate');
-            $locator->setAccessible(true);
-            $finder = function (Profile $profile) use (&$finder, $locator) {
-                if ($profile->isTemplate()) {
-                    $this->data['template_paths'][$profile->getName()] = $locator->invoke($this->loader, $profile->getName());
-                }
-                foreach ($profile as $p) {
-                    $finder($p);
-                }
-            };
-            $finder($this->profile);
-        }
+        $templateFinder = function (Profile $profile) use (&$templateFinder) {
+            if ($profile->isTemplate() && $template = $this->twig->load($profile->getName())->getSourceContext()->getPath()) {
+                $this->data['template_paths'][$profile->getName()] = $template;
+            }
+            foreach ($profile as $p) {
+                $templateFinder($p);
+            }
+        };
+        $templateFinder($this->profile);
     }
 
     public function getTime()

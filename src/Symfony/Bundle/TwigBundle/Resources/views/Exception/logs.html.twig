@@ -11,7 +11,15 @@
 
     <tbody>
     {% for log in logs %}
-        <tr class="status-{{ log.priority >= 400 ? 'error' : log.priority >= 300 ? 'warning' : 'normal' }}">
+        {% if log.priority >= 400 %}
+            {% set status = 'error' %}
+        {% elseif log.priority >= 300 %}
+            {% set status = 'warning' %}
+        {% else %}
+            {% set severity = log.context.exception.severity|default(false) %}
+            {% set status = severity is constant('E_DEPRECATED') or severity is constant('E_USER_DEPRECATED') ? 'warning' : 'normal' %}
+        {% endif %}
+        <tr class="status-{{ status }}">
             <td class="text-small" nowrap>
                 <span class="colored text-bold">{{ log.priorityName }}</span>
                 <span class="text-muted newline">{{ log.timestamp|date('H:i:s') }}</span>

@@ -33,15 +33,13 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  * @requires extension pdo_sqlite
+ * @group legacy
  */
 class SetAclCommandTest extends WebTestCase
 {
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
 
-    /**
-     * @group legacy
-     */
     public function testSetAclUser()
     {
         $objectId = 1;

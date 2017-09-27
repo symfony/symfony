@@ -11,11 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
+@trigger_error(sprintf('Class "%s" is deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Bundle\AclBundle\Command\SetAclCommand instead.', SetAclCommand::class), E_USER_DEPRECATED);
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
@@ -28,19 +32,48 @@ use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  *
- * @final since version 3.4
+ * @deprecated since version 3.4, to be removed in 4.0. See Symfony\Bundle\AclBundle\Command\SetAclCommand instead.
  */
-class SetAclCommand extends Command
+class SetAclCommand extends ContainerAwareCommand
 {
     protected static $defaultName = 'acl:set';
 
     private $provider;
 
-    public function __construct(MutableAclProviderInterface $provider)
+    /**
+     * @param MutableAclProviderInterface $provider
+     */
+    public function __construct($provider = null)
     {
+        if (!$provider instanceof MutableAclProviderInterface) {
+            parent::__construct($provider);
+
+            return;
+        }
+
         parent::__construct();
 
         $this->provider = $provider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled()
+    {
+        if (null !== $this->provider) {
+            return parent::isEnabled();
+        }
+        if (!$this->getContainer()->has('security.acl.provider')) {
+            return false;
+        }
+
+        $provider = $this->getContainer()->get('security.acl.provider');
+        if (!$provider instanceof MutableAclProviderInterface) {
+            return false;
+        }
+
+        return parent::isEnabled();
     }
 
     /**
@@ -84,9 +117,15 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        (new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output))->warning('Command "acl:set" is deprecated since version 3.4 and will be removed from SecurityBundle in 4.0. Install symfony/acl-bundle to use this command.');
+
+        if (null === $this->provider) {
+            $this->provider = $this->getContainer()->get('security.acl.provider');
+        }
+
         // Parse arguments
         $objectIdentities = array();
-        $maskBuilder = new MaskBuilder();
+        $maskBuilder = $this->getMaskBuilder();
         foreach ($input->getArgument('arguments') as $argument) {
             $data = explode(':', $argument, 2);
 
@@ -149,5 +188,15 @@ EOF
 
             $this->provider->updateAcl($acl);
         }
+    }
+
+    /**
+     * Gets the mask builder.
+     *
+     * @return MaskBuilder
+     */
+    protected function getMaskBuilder()
+    {
+        return new MaskBuilder();
     }
 }

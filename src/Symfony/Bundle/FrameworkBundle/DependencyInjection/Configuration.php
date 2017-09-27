@@ -52,7 +52,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->beforeNormalization()
-                ->ifTrue(function ($v) { return !isset($v['assets']) && isset($v['templating']); })
+                ->ifTrue(function ($v) { return !isset($v['assets']) && isset($v['templating']) && class_exists(Package::class); })
                 ->then(function ($v) {
                     $v['assets'] = array();
 

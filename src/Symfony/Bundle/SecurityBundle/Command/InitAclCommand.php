@@ -11,9 +11,13 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
+@trigger_error(sprintf('Class "%s" is deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Bundle\AclBundle\Command\SetAclCommand instead.', SetAclCommand::class), E_USER_DEPRECATED);
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -23,21 +27,39 @@ use Doctrine\DBAL\Schema\SchemaException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since version 3.4
+ * @deprecated since version 3.4, to be removed in 4.0. See Symfony\Bundle\AclBundle\Command\SetAclCommand instead.
  */
-class InitAclCommand extends Command
+class InitAclCommand extends ContainerAwareCommand
 {
     protected static $defaultName = 'init:acl';
 
     private $connection;
     private $schema;
 
-    public function __construct(Connection $connection, Schema $schema)
+    public function __construct($connection = null, Schema $schema = null)
     {
+        if (!$connection instanceof Connection) {
+            parent::__construct($connection);
+
+            return;
+        }
+
         parent::__construct();
 
         $this->connection = $connection;
         $this->schema = $schema;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled()
+    {
+        if (!$this->connection && !$this->getContainer()->has('security.acl.dbal.connection')) {
+            return false;
+        }
+
+        return parent::isEnabled();
     }
 
     /**
@@ -67,6 +89,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        (new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output))->warning('Command "init:acl" is deprecated since version 3.4 and will be removed from SecurityBundle in 4.0. Install symfony/acl-bundle and use "acl:init" instead.');
+
+        if (null === $this->connection) {
+            $this->connection = $this->getContainer()->get('security.acl.dbal.connection');
+            $this->schema = $this->getContainer()->get('security.acl.dbal.schema');
+        }
+
         try {
             $this->schema->addToSchema($this->connection->getSchemaManager()->createSchema());
         } catch (SchemaException $e) {

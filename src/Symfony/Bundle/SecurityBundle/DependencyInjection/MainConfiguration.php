@@ -19,15 +19,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
- * This class contains the configuration information.
- *
- * This information is for the following tags:
- *
- *   * security.config
- *   * security.acl
- *
- * This information is solely responsible for how the different configuration
- * sections are normalized, and merged.
+ * SecurityExtension configuration structure.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

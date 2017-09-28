@@ -32,6 +32,7 @@
         "symfony/security-http": "self.version"
     },
     "require-dev": {
+        "psr/container": "^1.0",
         "symfony/finder": "~2.8|~3.0|~4.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~2.8|~3.0|~4.0",
@@ -41,6 +42,7 @@
         "psr/log": "~1.0"
     },
     "suggest": {
+        "psr/container": "To instantiate the Security class",
         "symfony/form": "",
         "symfony/validator": "For using the user password constraint",
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs",

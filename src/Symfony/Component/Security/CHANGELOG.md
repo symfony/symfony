@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added `getUser`, `getToken` and `isGranted` methods to `Security`.
  * added a `setToken()` method to the `SwitchUserEvent` class to allow to replace the created token while switching users
    when custom token generation is required by application. 
  * Using voters that do not implement the `VoterInterface`is now deprecated in

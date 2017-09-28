@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Debug;
 
+use Symfony\Component\Debug\Formatter\HtmlFormatter;
+use Symfony\Component\Debug\Formatter\TextFormatter;
+
 /**
  * Registers all the debug tools.
  *
@@ -47,7 +50,17 @@ class Debug
 
         if ('cli' !== PHP_SAPI) {
             ini_set('display_errors', 0);
-            ExceptionHandler::register();
+
+            // Default to HTML, unless requested with a text-only browser or with XMLHttpRequest.
+            if ((!isset($_SERVER['HTTP_ACCEPT']) || false !== stripos('html', $_SERVER['HTTP_ACCEPT']))
+                && !(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 'XMLHttpRequest' === $_SERVER['HTTP_X_REQUESTED_WITH'])
+            ) {
+                $formatter = new HtmlFormatter();
+            } else {
+                $formatter = new TextFormatter();
+            }
+
+            ExceptionHandler::register(true, null, null, $formatter);
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
             // CLI - display errors only if they're not already logged to STDERR
             ini_set('display_errors', 1);

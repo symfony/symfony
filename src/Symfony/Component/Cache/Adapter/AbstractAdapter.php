@@ -19,6 +19,10 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractTrait;
+use Symfony\Component\Dsn\ConnectionFactory;
+use Symfony\Component\Dsn\Exception\InvalidArgumentException as DsnInvalidArgumentException;
+use Symfony\Component\Dsn\Factory\MemcachedConnectionFactory;
+use Symfony\Component\Dsn\Factory\RedisConnectionFactory;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -128,14 +132,19 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
     public static function createConnection($dsn, array $options = array())
     {
-        if (!is_string($dsn)) {
-            throw new InvalidArgumentException(sprintf('The %s() method expect argument #1 to be string, %s given.', __METHOD__, gettype($dsn)));
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the DsnFactory::createConnection() method from Dsn component instead.', __METHOD__), E_USER_DEPRECATED);
+
+        try {
+            $type = ConnectionFactory::getType($dsn);
+        } catch (DsnInvalidArgumentException $e) {
+            throw new InvalidArgumentException($e->getMessage(), 0, $e);
         }
-        if (0 === strpos($dsn, 'redis://')) {
-            return RedisAdapter::createConnection($dsn, $options);
-        }
-        if (0 === strpos($dsn, 'memcached://')) {
-            return MemcachedAdapter::createConnection($dsn, $options);
+
+        switch ($type) {
+            case ConnectionFactory::TYPE_MEMCACHED:
+                return MemcachedConnectionFactory::createConnection($dsn, $options);
+            case ConnectionFactory::TYPE_REDIS:
+                return RedisConnectionFactory::createConnection($dsn, $options);
         }
 
         throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));

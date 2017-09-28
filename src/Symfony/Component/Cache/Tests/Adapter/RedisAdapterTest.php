@@ -22,6 +22,20 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation This "%s" method is deprecated.
+     */
+    public function testCreateConnectionDeprecated()
+    {
+        $client = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+
+        $this->assertInstanceOf(\Redis::class, $client);
+    }
+
+    /**
+     * @group legacy
+     */
     public function testCreateConnection()
     {
         $redisHost = getenv('REDIS_HOST');
@@ -45,6 +59,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     }
 
     /**
+     * @group legacy
      * @dataProvider provideFailedCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Redis connection failed
@@ -64,6 +79,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     }
 
     /**
+     * @group legacy
      * @dataProvider provideInvalidCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid Redis DSN

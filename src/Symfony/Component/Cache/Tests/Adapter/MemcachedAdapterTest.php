@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Dsn\Factory\MemcachedFactory;
 
 class MemcachedAdapterTest extends AdapterTestCase
 {
@@ -27,7 +28,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         if (!MemcachedAdapter::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
         }
-        self::$client = MemcachedConnectionFactory::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
+        self::$client = MemcachedFactory::create('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
@@ -38,14 +39,14 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        $client = $defaultLifetime ? MemcachedConnectionFactory::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
+        $client = $defaultLifetime ? MemcachedFactory::create('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
 
         return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation This "%s" method is deprecated.
+     * @expectedDeprecation The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the MemcachedFactory::create() method from Dsn component instead.
      */
     public function testCreateConnectionDeprecated()
     {

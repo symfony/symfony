@@ -13,18 +13,19 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Dsn\Factory\RedisFactory;
 
 class RedisAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        self::$redis = RedisFactory::create('redis://'.getenv('REDIS_HOST'));
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation This "%s" method is deprecated.
+     * @expectedDeprecation The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the RedisFactory::create() method from Dsn component instead.
      */
     public function testCreateConnectionDeprecated()
     {

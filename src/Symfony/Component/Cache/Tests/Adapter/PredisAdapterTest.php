@@ -24,13 +24,11 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
 
     /**
      * @group legacy
-     * @expectedDeprecation This "%s" method is deprecated.
+     * @expectedDeprecation The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the RedisFactory::create() method from Dsn component instead.
      */
     public function testCreateConnectionDeprecated()
     {
-        $client = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
-
-        $this->assertInstanceOf(\Predis\Client, $client);
+        RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
     }
 
     /**

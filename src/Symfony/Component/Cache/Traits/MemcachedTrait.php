@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Dsn\Factory\MemcachedConnectionFactory;
+use Symfony\Component\Dsn\Factory\MemcachedFactory;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
@@ -52,15 +52,15 @@ trait MemcachedTrait
     }
 
     /**
-     * @see MemcachedConnectionFactory::createConnection()
+     * @see MemcachedFactory::create()
      */
     public static function createConnection($servers, array $options = array())
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the MemcachedDsnFactory::createConnection() method from Dsn component instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the MemcachedFactory::create() method from Dsn component instead.', __METHOD__), E_USER_DEPRECATED);
 
         foreach ((array) $servers as $i => $dsn) {
             if (is_array($dsn)) {
-                @trigger_error(sprintf('Passing an array of array to the %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the MemcachedDsnFactory::createConnection() method from Dsn component instead with an array of Dsn instead.', __METHOD__), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Passing an array of array to the %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the MemcachedFactory::create() method from Dsn component instead with an array of Dsn instead.', __METHOD__), E_USER_DEPRECATED);
 
                 $scheme = 'memcached://';
                 $host = isset($dsn['host']) ? $dsn['host'] : '';
@@ -81,14 +81,10 @@ trait MemcachedTrait
         }
 
         try {
-            return MemcachedConnectionFactory::createConnection($servers, $options);
+            return MemcachedFactory::create($servers, $options);
         } catch (\Symfony\Component\Dsn\Exception\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), 0, $e);
         }
-    }
-
-    private static function buildDsn($parsedDsn)
-    {
     }
 
     /**

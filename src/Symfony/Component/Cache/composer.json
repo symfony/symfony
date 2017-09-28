@@ -33,6 +33,9 @@
         "predis/predis": "~1.0",
         "symfony/dsn": "3.4"
     },
+    "suggest": {
+        "symfony/dsn": "For configuring redis and memcached adapters with Dsn"
+    },
     "conflict": {
         "symfony/var-dumper": "<3.3"
     },

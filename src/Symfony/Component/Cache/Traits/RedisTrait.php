@@ -16,7 +16,7 @@ use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Response\Status;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Dsn\Factory\RedisConnectionFactory;
+use Symfony\Component\Dsn\Factory\RedisFactory;
 
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
@@ -47,14 +47,14 @@ trait RedisTrait
     }
 
     /**
-     * @see RedisConnectionFactory::createConnection()
+     * @see RedisFactory::create()
      */
     public static function createConnection($dsn, array $options = array())
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the RedisDsnFactory::createConnection() method from Dsn component instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the RedisFactory::create() method from Dsn component instead.', __METHOD__), E_USER_DEPRECATED);
 
         try {
-            return RedisConnectionFactory::createConnection($dsn, $options);
+            return RedisFactory::create($dsn, $options);
         } catch (\Symfony\Component\Dsn\Exception\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), 0, $e);
         }

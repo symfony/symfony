@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Symfony\Component\Cache\Simple\MemcachedCache;
-use Symfony\Component\Dsn\Factory\MemcachedConnectionFactory;
+use Symfony\Component\Dsn\Factory\MemcachedFactory;
 
 class MemcachedCacheTest extends CacheTestCase
 {
@@ -29,7 +29,7 @@ class MemcachedCacheTest extends CacheTestCase
         if (!MemcachedCache::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
         }
-        self::$client = MemcachedConnectionFactory::createConnection('memcached://'.getenv('MEMCACHED_HOST'));
+        self::$client = MemcachedFactory::create('memcached://'.getenv('MEMCACHED_HOST'));
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
@@ -40,7 +40,7 @@ class MemcachedCacheTest extends CacheTestCase
 
     public function createSimpleCache($defaultLifetime = 0)
     {
-        $client = $defaultLifetime ? MemcachedConnectionFactory::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false)) : self::$client;
+        $client = $defaultLifetime ? MemcachedFactory::create('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false)) : self::$client;
 
         return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }

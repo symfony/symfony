@@ -1,7 +1,8 @@
 Dsn Component
 =============
 
-Provides utilities for handle Data Source Names.
+Provides utilities for creating connections using DSN (Data Source Names) 
+strings.
 
 Resources
 ---------

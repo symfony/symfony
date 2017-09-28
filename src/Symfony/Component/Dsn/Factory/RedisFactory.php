@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Dsn\Factory;
 
+use Predis\Connection\Factory;
 use Symfony\Component\Dsn\Exception\InvalidArgumentException;
 
 /**

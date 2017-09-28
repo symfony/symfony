@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Dsn\ConnectionFactory;
@@ -132,6 +133,10 @@ class CachePoolPass implements CompilerPassInterface
             $dsn = $name;
 
             if (!$container->hasDefinition($name = 'cache_connection.'.ContainerBuilder::hash($dsn))) {
+                if (!class_exists(ConnectionFactory::class)) {
+                    throw new LogicException('Cache adapters cannot be configured as the Dsn component is not installed.');
+                }
+
                 $definition = new Definition(AbstractAdapter::class);
                 $definition->setPublic(false);
                 $definition->setFactory(array(ConnectionFactory::class, 'createConnection'));

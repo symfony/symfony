@@ -1,0 +1,210 @@
+---------------------------------------------------------------------------
+
+by andersonamuller at 2017-09-26T20:01:43Z
+
+I think I good name for this would be `Access`
+
+```php
+$access->getUser();
+
+$access->getToken();
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-26T20:31:28Z
+
+@weaverryan small conflict to resolve
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-27T07:11:37Z
+
+I'm still :-1: on this for a few important reasons:
+ - The only reason the user could ever be needed by anything other than the security component internally, is when you use it as entity. While this is makes certain tasks easier, it's not "the right thing to do".
+ - Same as the above counts for the token, you don't really need it anywhere outside of the security related functionality. The most common locations where you need them, are the voters and you have it available there
+ - That leaves us with the only useful method: `isGranted`, which is perfectly fine the way it is right now, though I admit that the naming is a bit unfortunate due to its length.
+
+I feel that making shortcuts like this improves the short-term problem solving of applications, but also makes it easier to entangle your http layer with your domain layer. 3+ years later after making such decisions, I still have to suffer through this Technical Debt.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-27T07:34:31Z
+
+This proposal looks like a small change ... but it's a "game changer". See the before/after comparison:
+
+### Before
+
+```php
+public function indexAction(TokenStorageInterface $tokenStorage)
+{
+    $user = $tokenStorage->getToken()->getUser();
+}
+```
+
+### After
+
+```php
+public function indexAction(Security $security)
+{
+    $user = $security->getUser();
+}
+```
+
+-----
+
+### Before
+
+```php
+public function indexAction(AuthorizationCheckerInterface $authorizationChecker)
+{
+    if ($authorizationChecker->isGranted('EDIT', $item)) {
+        // ...
+    }
+}
+```
+
+### After
+
+```php
+public function indexAction(Security $security)
+{
+    if ($security->isGranted('EDIT', $item)) {
+        // ...
+    }
+}
+```
+
+-----
+
+The Security part is the biggest problem for Symfony users. We need to make big and immediate changes to improve the situation. This proposal goes in that direction hiding internal details that users shouldn't care about.
+
+---------------------------------------------------------------------------
+
+by afurculita at 2017-09-27T07:44:35Z
+
+Truly, the security component is one of the biggest Symfony problems.
+
+In the current implementation, I would keep only `getUser()` and `isGranted()`. As @iltar stated, Token is not needed outside the security internals. I always used it only for getting the user.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-27T07:48:51Z
+
+@javiereguiluz but what about this?
+
+```php
+/** @Security("is_granted('EDIT', item)") */
+public function indexAction(UserInterface $user, Item $item)
+{
+    // ...
+}
+```
+
+Granted, this requires the SensioFrameworkExtraBundle, but I rather see a generic solution for this (security annotation) as action requirement being added. If the length of the AuthorizationCheckerInterface is the problem, maybe this can be solved by making an alias?
+
+Edit: don't get me wrong, `Security` as typehint is a lot nicer than the current solution!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-27T08:03:51Z
+
+@iltar that's fine ... but as an alternative. Symfony is pushing hard towards autowiring + service injection. That's why we must introduce this `Security` utility to avoid things like this 🤢 :
+
+```php
+public function indexAction(AuthorizationCheckerInterface $authorizationChecker)
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-27T08:12:55Z
+
+Just brainfarting here, but what about:
+
+```php
+public function indexAction(IsGranted $isGranted, Item $item)
+{
+    if ($isGranted('EDIT', $item)) {
+        // ...
+    }
+}
+```
+
+Which would feel similar to:
+```php
+/**
+ * @IsGranted("EDIT", subject="item")
+ */
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-27T08:30:06Z
+
+@iltar I don't like the `IsGranted` proposal for two reasons:
+
+* The name sounds like a boolean variable instead of a class name.
+* It forces me to learn more concepts and internal security things.
+
+A single and centralized `Security` service simplifies everything, including the explanation of the common security things.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-27T08:37:38Z
+
+The downside is that it promotes another solution to fetch the User object, execute authorization checks and getting the token. I know _why_ you want to add it, I just don't think it's a good idea because it often implies you might be on the wrong track of doing things.
+
+If it's about long names, you could also simply rename the `AuthorizationChecker` to `Authorizer` and add an alias to the DIC for autowiring purposes, this prevents duplication of functionality.
+ - Getting the token in the action is hardly ever needed, if ever at all
+ - The user can be obtained already as I mentioned above
+ - That leaves the `AuthorizationCheckerInterface`, which could become `Authorizer`?
+
+Side note, my signatures often are `(AuthorizationCheckerInterface $authorizer)`, so it does feel natural to me to name it as such if desired.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-27T08:53:53Z
+
+@iltar we'll never agree on this ... but that's fine. I still think we need this to solve the most common security needs in a simple way. `$security->getUser()` and `$security->isGranted(...)` is something that anybody can easily understand. The alternative is not easy to understand at all (tokens, storages, authentication checkers, access decision managers, etc.)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-27T09:08:39Z
+
+The idea is to make things simpler, but this change will give them more options to do the same, which seems counter productive to me, that's what's bothering me at the moment. If that can be fixed, I'll be all :+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-27T12:12:05Z
+
+Im not sure this helps in terms of teaching people they should decouple their security user from it's source of truth (an entity or so). Which IMHO is the real thing to solve, by teaching better practices.
+
+Today i do it like this [`SecurityUserFactory`](https://github.com/ro0NL/symfony-ddd/blob/master/src/Infra/Domain/User/Security/SecurityUserFactory.php) + [`SecurityUser`](https://github.com/ro0NL/symfony-ddd/blob/master/src/Infra/Domain/User/Security/SecurityUser.php)
+
+Thanks to this _awesome_ article; https://stovepipe.systems/post/decoupling-your-security-user
+
+Works perfect today and doesnt require any additional wrapper/god objects etc.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-27T14:24:12Z
+
+Hey guys!
+
+About decoupling the `User` class from the `User` entity, it's a very interesting idea, and solves some real problems. But, more work needs to be done in core before this can become the official way: it must be *just* as easy and as the current way. This might mean, for example, something similar to the `SecurityUserFactory` (from @ro0NL / @iltar's blog post) in core, because we still need a way to easily fetch the current User entity object (if you have that kind of setup) in a controller, service or template. This probably won't be a lot of work, but it does not exist in core for 3.4. So, that's the challenge: if you want this to become "the way" for 4.1, let's add a few shortcuts to make that really great experience.
+
+For 3.4, we need this shortcut. And we can always deprecate and remove this if we move forward with a different philosophy in 4.1. In fact, I would love that - the Security component is benefiting from fresh thinking :).
+
+This PR is ready for review again: unit & functional tests added, and `psr/container` dependency added to the Security component and the sub-component `Core`.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-27T15:03:19Z
+
+I believe the failure is false: it's failing (https://travis-ci.org/symfony/symfony/jobs/280454407#L2945) because the new method on `Security` don't exist on the master branch yet.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-28T13:37:14Z
+
+Should be ready again. Moved the new dep on `psr/container` to `require-dev` and `suggest`

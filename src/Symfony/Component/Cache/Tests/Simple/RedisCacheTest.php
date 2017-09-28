@@ -12,15 +12,28 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Symfony\Component\Cache\Simple\RedisCache;
+use Symfony\Component\Dsn\Factory\RedisFactory;
 
 class RedisCacheTest extends AbstractRedisCacheTest
 {
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = RedisCache::createConnection('redis://'.getenv('REDIS_HOST'));
+        self::$redis = RedisFactory::create('redis://'.getenv('REDIS_HOST'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the RedisFactory::create() method from Dsn component instead.
+     */
+    public function testCreateConnectionDeprecated()
+    {
+        RedisCache::createConnection('redis://'.getenv('REDIS_HOST'));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testCreateConnection()
     {
         $redisHost = getenv('REDIS_HOST');
@@ -44,6 +57,7 @@ class RedisCacheTest extends AbstractRedisCacheTest
     }
 
     /**
+     * @group legacy
      * @dataProvider provideFailedCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Redis connection failed
@@ -63,6 +77,7 @@ class RedisCacheTest extends AbstractRedisCacheTest
     }
 
     /**
+     * @group legacy
      * @dataProvider provideInvalidCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid Redis DSN

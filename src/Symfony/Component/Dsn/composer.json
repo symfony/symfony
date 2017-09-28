@@ -1,14 +1,14 @@
 {
-    "name": "symfony/lock",
+    "name": "symfony/dsn",
     "type": "library",
-    "description": "Symfony Lock Component",
-    "keywords": ["locking", "redlock", "mutex", "semaphore", "flock", "cas"],
+    "description": "Symfony Dsn Component",
+    "keywords": ["dsn", "redis", "memcached"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
-            "name": "Jérémy Derussé",
-            "email": "jeremy@derusse.com"
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
         },
         {
             "name": "Symfony Community",
@@ -16,18 +16,13 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8",
-        "symfony/polyfill-php70": "~1.0",
-        "psr/log": "~1.0"
+        "php": "^5.5.9|>=7.0.8"
     },
     "require-dev": {
         "predis/predis": "~1.0"
     },
-    "suggest": {
-        "symfony/dsn": "For configuring redis and memcached stores with Dsn"
-    },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Lock\\": "" },
+        "psr-4": { "Symfony\\Component\\Dsn\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

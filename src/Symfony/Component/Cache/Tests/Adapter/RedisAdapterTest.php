@@ -13,15 +13,30 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Dsn\Factory\RedisFactory;
 
 class RedisAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+        self::$redis = RedisFactory::create('redis://'.getenv('REDIS_HOST'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the RedisFactory::create() method from Dsn component instead.
+     */
+    public function testCreateConnectionDeprecated()
+    {
+        $client = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
+
+        $this->assertInstanceOf(\Redis::class, $client);
+    }
+
+    /**
+     * @group legacy
+     */
     public function testCreateConnection()
     {
         $redisHost = getenv('REDIS_HOST');
@@ -45,6 +60,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     }
 
     /**
+     * @group legacy
      * @dataProvider provideFailedCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Redis connection failed
@@ -64,6 +80,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     }
 
     /**
+     * @group legacy
      * @dataProvider provideInvalidCreateConnection
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid Redis DSN

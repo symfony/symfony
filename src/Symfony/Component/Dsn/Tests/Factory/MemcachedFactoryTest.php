@@ -11,79 +11,54 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dsn\Factory\MemcachedFactory;
 
-class MemcachedAdapterTest extends AdapterTestCase
+/**
+ * @requires extension memcached
+ */
+class MemcachedFactoryTest extends TestCase
 {
-    protected $skippedTests = array(
-        'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
-        'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
-    );
-
-    protected static $client;
-
-    public static function setupBeforeClass()
+    public function testOptions()
     {
-        if (!MemcachedAdapter::isSupported()) {
-            self::markTestSkipped('Extension memcached >=2.2.0 required.');
+        $client = MemcachedFactory::create(array(), array(
+            'libketama_compatible' => false,
+            'distribution' => 'modula',
+            'compression' => true,
+            'serializer' => 'php',
+            'hash' => 'md5',
+        ));
+
+        $this->assertSame(\Memcached::SERIALIZER_PHP, $client->getOption(\Memcached::OPT_SERIALIZER));
+        $this->assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_HASH));
+        $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
+        if (version_compare(phpversion('memcached'), '2.2.0', '>=')) {
+            $this->assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
         }
-        self::$client = MemcachedFactory::create('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
-        self::$client->get('foo');
-        $code = self::$client->getResultCode();
-
-        if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
-            self::markTestSkipped('Memcached error: '.strtolower(self::$client->getResultMessage()));
-        }
-    }
-
-    public function createCachePool($defaultLifetime = 0)
-    {
-        $client = $defaultLifetime ? MemcachedFactory::create('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
-
-        return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        $this->assertSame(\Memcached::DISTRIBUTION_MODULA, $client->getOption(\Memcached::OPT_DISTRIBUTION));
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation The %s() method is deprecated since version 3.4 and will be removed in 4.0. Use the MemcachedFactory::create() method from Dsn component instead.
-     */
-    public function testCreateConnectionDeprecated()
-    {
-        $client = MemcachedAdapter::createConnection('memcached://localhost');
-
-        $this->assertInstanceOf(\Memcached::class, $client);
-    }
-
-    /**
-     * @group legacy
      * @dataProvider provideBadOptions
      * @expectedException \ErrorException
      * @expectedExceptionMessage constant(): Couldn't find constant Memcached::
      */
     public function testBadOptions($name, $value)
     {
-        MemcachedAdapter::createConnection(array(), array($name => $value));
+        MemcachedFactory::create(array(), array($name => $value));
     }
 
     public function provideBadOptions()
     {
-        return array(
-            array('foo', 'bar'),
-            array('hash', 'zyx'),
-            array('serializer', 'zyx'),
-            array('distribution', 'zyx'),
-        );
+        yield array('foo', 'bar');
+        yield array('hash', 'zyx');
+        yield array('serializer', 'zyx');
+        yield array('distribution', 'zyx');
     }
 
-    /**
-     * @group legacy
-     */
     public function testDefaultOptions()
     {
-        $this->assertTrue(MemcachedAdapter::isSupported());
-
-        $client = MemcachedAdapter::createConnection(array());
+        $client = MemcachedFactory::create(array());
 
         $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
@@ -91,28 +66,12 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @group legacy
-     * @expectedException \Symfony\Component\Cache\Exception\CacheException
-     * @expectedExceptionMessage MemcachedAdapter: "serializer" option must be "php" or "igbinary".
-     */
-    public function testOptionSerializer()
-    {
-        if (!\Memcached::HAVE_JSON) {
-            $this->markTestSkipped('Memcached::HAVE_JSON required');
-        }
-
-        new MemcachedAdapter(MemcachedAdapter::createConnection(array(), array('serializer' => 'json')));
-    }
-
-    /**
-     * @group legacy
      * @dataProvider provideServersSetting
      */
     public function testServersSetting($dsn, $host, $port)
     {
-        $client1 = MemcachedAdapter::createConnection($dsn);
-        $client2 = MemcachedAdapter::createConnection(array($dsn));
-        $client3 = MemcachedAdapter::createConnection(array(array($host, $port)));
+        $client1 = MemcachedFactory::create($dsn);
+        $client2 = MemcachedFactory::create(array($dsn));
         $expect = array(
             'host' => $host,
             'port' => $port,
@@ -121,7 +80,6 @@ class MemcachedAdapterTest extends AdapterTestCase
         $f = function ($s) { return array('host' => $s['host'], 'port' => $s['port']); };
         $this->assertSame(array($expect), array_map($f, $client1->getServerList()));
         $this->assertSame(array($expect), array_map($f, $client2->getServerList()));
-        $this->assertSame(array($expect), array_map($f, $client3->getServerList()));
     }
 
     public function provideServersSetting()
@@ -163,12 +121,11 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider provideDsnWithOptions
      */
     public function testDsnWithOptions($dsn, array $options, array $expectedOptions)
     {
-        $client = MemcachedAdapter::createConnection($dsn, $options);
+        $client = MemcachedFactory::create($dsn, $options);
 
         foreach ($expectedOptions as $option => $expect) {
             $this->assertSame($expect, $client->getOption($option));
@@ -177,10 +134,6 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function provideDsnWithOptions()
     {
-        if (!class_exists('\Memcached')) {
-            self::markTestSkipped('Extension memcached required.');
-        }
-
         yield array(
             'memcached://localhost:11222?retry_timeout=10',
             array(\Memcached::OPT_RETRY_TIMEOUT => 8),

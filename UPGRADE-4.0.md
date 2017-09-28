@@ -1,6 +1,13 @@
 UPGRADE FROM 3.x to 4.0
 =======================
 
+Cache
+-----
+
+ * The `AbstractAdapter::createConnection()`, `RedisTrait::createConnection()` 
+   and `MemcachedTrait::createConnection()` methods have been removed. Use the
+   Dsn component instead.
+ 
 ClassLoader
 -----------
 

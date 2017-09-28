@@ -9,6 +9,8 @@ CHANGELOG
  * added prune logic to FilesystemTrait, PhpFilesTrait, PdoTrait, TagAwareAdapter and ChainTrait
  * now FilesystemAdapter, PhpFilesAdapter, FilesystemCache, PhpFilesCache, PdoAdapter, PdoCache, ChainAdapter, and
    ChainCache implement PruneableInterface and support manual stale cache pruning
+ * deprecated `AbstractAdapter::createConnection()`, `RedisTrait::createConnection()` and 
+   `MemcachedTrait::createConnection()` 
 
 3.3.0
 -----

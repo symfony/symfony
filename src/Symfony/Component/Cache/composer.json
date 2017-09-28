@@ -30,7 +30,11 @@
         "cache/integration-tests": "dev-master",
         "doctrine/cache": "~1.6",
         "doctrine/dbal": "~2.4",
-        "predis/predis": "~1.0"
+        "predis/predis": "~1.0",
+        "symfony/dsn": "3.4"
+    },
+    "suggest": {
+        "symfony/dsn": "For configuring redis and memcached adapters with Dsn"
     },
     "conflict": {
         "symfony/var-dumper": "<3.3"

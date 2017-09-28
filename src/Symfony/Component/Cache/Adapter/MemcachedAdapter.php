@@ -25,7 +25,7 @@ class MemcachedAdapter extends AbstractAdapter
      * Using a MemcachedAdapter with a TagAwareAdapter for storing tags is discouraged.
      * Using a RedisAdapter is recommended instead. If you cannot do otherwise, be aware that:
      * - the Memcached::OPT_BINARY_PROTOCOL must be enabled
-     *   (that's the default when using MemcachedAdapter::createConnection());
+     *   (that's the default when using MemcachedFactory::create());
      * - tags eviction by Memcached's LRU algorithm will break by-tags invalidation;
      *   your Memcached memory should be large enough to never trigger LRU.
      *

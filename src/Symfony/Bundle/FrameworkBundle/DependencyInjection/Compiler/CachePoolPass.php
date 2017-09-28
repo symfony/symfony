@@ -17,8 +17,10 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\Dsn\ConnectionFactory;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -133,7 +135,7 @@ class CachePoolPass implements CompilerPassInterface
             if (!$container->hasDefinition($name = 'cache_connection.'.ContainerBuilder::hash($dsn))) {
                 $definition = new Definition(AbstractAdapter::class);
                 $definition->setPublic(false);
-                $definition->setFactory(array(AbstractAdapter::class, 'createConnection'));
+                $definition->setFactory(array(ConnectionFactory::class, 'createConnection'));
                 $definition->setArguments(array($dsn));
                 $container->setDefinition($name, $definition);
             }

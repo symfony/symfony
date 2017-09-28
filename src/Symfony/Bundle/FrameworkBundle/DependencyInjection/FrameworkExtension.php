@@ -43,6 +43,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\Dsn\ConnectionFactory;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -1706,7 +1707,7 @@ class FrameworkExtension extends Extension
                         if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
-                            $connectionDefinition->setFactory(array(StoreFactory::class, 'createConnection'));
+                            $connectionDefinition->setFactory(array(ConnectionFactory::class, 'createConnection'));
                             $connectionDefinition->setArguments(array($storeDsn));
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }

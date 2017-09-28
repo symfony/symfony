@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-09-15T21:38:25Z
+
+You use same kind of foreach loops I removed via https://github.com/symfony/symfony/pull/21756 Please consider using union operator again. It reduces big chunk of unnecessary verbosity and you get NULL handling for free. Example of usage in your patch:
+
+```diff
+@@ -257,14 +257,8 @@
+
+                         $refValue = $this->refs[$refName];
+
+-                        if (is_array($refValue)) {
+-                            $data += $refValue; // array union
+-                        } elseif ((bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags) && $refValue instanceof \stdClass) {
+-                            foreach ($refValue as $refValueKey => $refValueValue) {
+-                                if (!isset($data[$refValueKey])) {
+-                                    $data[$refValueKey] = $refValueValue;
+-                                }
+-                            }
++                        if (is_array($refValue) || (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags) && $refValue instanceof \stdClass) {
++                            $data += (array) $refValue; // array union
+                         } else {
+                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
+                         }
+@@ -294,11 +288,7 @@
+                                 $data += $parsed; // array union
+                             }
+                         } elseif ((bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags) && $parsed instanceof \stdClass) {
+-                            foreach ($parsed as $parsedKey => $parsedValue) {
+-                                if (!isset($data[$parsedKey])) {
+-                                    $data[$parsedKey] = $parsedValue;
+-                                }
+-                            }
++                            $data += (array) $parsed;
+                         } else {
+                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
+                         }
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-28T11:01:08Z
+
+ping @symfony/deciders :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-28T11:21:05Z
+
+@xabbuh Just tried it out, it seems to fix it for #24133 code but not for #23587.
+Reproducer:
+
+```php
+<?php
+require __DIR__ .'/vendor/autoload.php';
+
+use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
+
+$yaml = <<<YAML
+root:
+    mergekeyrefdef:
+        a: foo
+        <<: &quux
+            b: bar
+            c: baz
+    mergekeyderef:
+        d: quux
+        <<: *quux
+YAML;
+
+$arr = (new Parser())->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP);
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-28T12:30:10Z
+
+@chalasr Thanks for checking. You are absolutely right. And the bug described in #23587 is actually not related to the `PARSE_OBJECT_FOR_MAP` flag, but purely to the fact that the parser fails when a reference is defined on a merge key. We need to fix that in a different PR on the `2.7` branch.

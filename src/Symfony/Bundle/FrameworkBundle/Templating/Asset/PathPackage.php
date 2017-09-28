@@ -26,8 +26,6 @@ use Symfony\Component\Templating\Asset\PathPackage as BasePathPackage;
 class PathPackage extends BasePathPackage
 {
     /**
-     * Constructor.
-     *
      * @param Request $request The current request
      * @param string  $version The version
      * @param string  $format  The version format

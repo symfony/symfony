@@ -27,8 +27,6 @@ class LogoutUrlHelper extends Helper
     private $generator;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface|LogoutUrlGenerator $generator    A ContainerInterface or LogoutUrlGenerator instance
      * @param UrlGeneratorInterface|null            $router       The router service
      * @param TokenStorageInterface|null            $tokenStorage The token storage service

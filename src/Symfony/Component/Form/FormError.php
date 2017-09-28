@@ -61,8 +61,6 @@ class FormError implements \Serializable
     private $origin;
 
     /**
-     * Constructor.
-     *
      * Any array key in $messageParameters will be used as a placeholder in
      * $messageTemplate.
      *

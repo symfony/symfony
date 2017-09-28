@@ -24,8 +24,6 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
     private $role;
 
     /**
-     * Constructor.
-     *
      * @param mixed $role a Role instance, or its string representation
      */
     public function __construct($role)

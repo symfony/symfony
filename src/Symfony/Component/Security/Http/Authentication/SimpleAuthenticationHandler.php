@@ -35,8 +35,6 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     protected $logger;
 
     /**
-     * Constructor.
-     *
      * @param SimpleAuthenticatorInterface          $authenticator  SimpleAuthenticatorInterface instance
      * @param AuthenticationSuccessHandlerInterface $successHandler Default success handler
      * @param AuthenticationFailureHandlerInterface $failureHandler Default failure handler

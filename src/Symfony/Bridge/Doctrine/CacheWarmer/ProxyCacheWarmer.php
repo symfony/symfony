@@ -27,8 +27,6 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     private $registry;
 
     /**
-     * Constructor.
-     *
      * @param ManagerRegistry $registry A ManagerRegistry instance
      */
     public function __construct(ManagerRegistry $registry)

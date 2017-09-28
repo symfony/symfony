@@ -63,16 +63,11 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * {$options['class']}.
- *
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */
 class {$options['class']} extends {$options['base_class']}
 {
-    /**
-     * Constructor.
-     */
     public function __construct(RequestContext \$context)
     {
         \$this->context = \$context;

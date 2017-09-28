@@ -75,8 +75,6 @@ class Application
     private $initialized;
 
     /**
-     * Constructor.
-     *
      * @param string $name    The name of the application
      * @param string $version The version of the application
      */

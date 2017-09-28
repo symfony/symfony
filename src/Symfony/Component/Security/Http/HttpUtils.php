@@ -31,8 +31,6 @@ class HttpUtils
     private $urlMatcher;
 
     /**
-     * Constructor.
-     *
      * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The URL or Request matcher
      *

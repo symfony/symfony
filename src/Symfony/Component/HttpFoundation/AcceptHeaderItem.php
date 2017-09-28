@@ -39,8 +39,6 @@ class AcceptHeaderItem
     private $attributes = array();
 
     /**
-     * Constructor.
-     *
      * @param string $value
      * @param array  $attributes
      */

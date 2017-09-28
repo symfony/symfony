@@ -41,8 +41,6 @@ class Crawler extends \SplObjectStorage
     private $baseHref;
 
     /**
-     * Constructor.
-     *
      * @param mixed  $node       A Node to use as the base for the crawling
      * @param string $currentUri The current URI
      * @param string $baseHref   The base href value

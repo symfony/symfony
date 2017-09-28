@@ -25,8 +25,6 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     protected $container;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface $container The DI container
      * @param array              $engineIds An array of engine Ids
      */

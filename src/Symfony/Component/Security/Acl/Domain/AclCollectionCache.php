@@ -28,8 +28,6 @@ class AclCollectionCache
     private $securityIdentityRetrievalStrategy;
 
     /**
-     * Constructor.
-     *
      * @param AclProviderInterface                       $aclProvider
      * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
      * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy

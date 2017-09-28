@@ -36,8 +36,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     private $scale;
 
     /**
-     * Constructor.
-     *
      * @see self::$types for a list of supported types
      *
      * @param int    $scale The scale

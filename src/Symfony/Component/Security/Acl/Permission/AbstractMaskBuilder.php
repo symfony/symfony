@@ -22,8 +22,6 @@ abstract class AbstractMaskBuilder implements MaskBuilderInterface
     protected $mask;
 
     /**
-     * Constructor.
-     *
      * @param int $mask optional; defaults to 0
      */
     public function __construct($mask = 0)

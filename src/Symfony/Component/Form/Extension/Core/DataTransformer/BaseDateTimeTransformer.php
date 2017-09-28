@@ -30,8 +30,6 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
     protected $outputTimezone;
 
     /**
-     * Constructor.
-     *
      * @param string $inputTimezone  The name of the input timezone
      * @param string $outputTimezone The name of the output timezone
      *

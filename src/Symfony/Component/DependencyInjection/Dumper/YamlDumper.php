@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -255,6 +256,9 @@ class YamlDumper extends Dumper
             $value = $value->getValues()[0];
         }
         if ($value instanceof ArgumentInterface) {
+            if ($value instanceof TaggedIteratorArgument) {
+                return new TaggedValue('tagged', $value->getTag());
+            }
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
             } else {

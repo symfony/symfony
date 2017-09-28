@@ -155,6 +155,16 @@ services:
     alias_for_alias:
         alias: 'foo'
         public: true
+    tagged_iterator_foo:
+        class: Bar
+        tags:
+            - { name: foo }
+        public: false
+    tagged_iterator:
+        class: Bar
+        arguments:
+            - !tagged foo
+        public: true
     Psr\Container\ContainerInterface:
         alias: service_container
         public: false

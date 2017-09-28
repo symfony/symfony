@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
@@ -499,6 +500,12 @@ class XmlFileLoader extends FileLoader
                     } catch (InvalidArgumentException $e) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="iterator" only accepts collections of type="service" references in "%s".', $name, $file));
                     }
+                    break;
+                case 'tagged':
+                    if (!$arg->getAttribute('tag')) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="tagged" has no or empty "tag" attribute in "%s".', $name, $file));
+                    }
+                    $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'));
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;

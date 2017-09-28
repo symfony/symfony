@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -707,6 +708,13 @@ class YamlFileLoader extends FileLoader
                 } catch (InvalidArgumentException $e) {
                     throw new InvalidArgumentException(sprintf('"!iterator" tag only accepts arrays of "@service" references in "%s".', $file));
                 }
+            }
+            if ('tagged' === $value->getTag()) {
+                if (!is_string($argument) || !$argument) {
+                    throw new InvalidArgumentException(sprintf('"!tagged" tag only accepts non empty string in "%s".', $file));
+                }
+
+                return new TaggedIteratorArgument($argument);
             }
             if ('service' === $value->getTag()) {
                 if ($isParameter) {

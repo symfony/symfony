@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2017-09-26T14:07:15Z
+
+@fabpot The license header in the `src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php` file is somewhat special. Anything I can do to make `fabbot` happy?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-27T04:48:51Z
+
+@mpdude No, just keep it like it is.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-27T09:24:40Z
+
+But doesn't this now always violate the "The HEAD method is identical to GET except that the server MUST NOT return a message-body in the response." part?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-09-27T12:37:50Z
+
+@xabbuh – not sure what you mean. That no body should be returned? There's code elsewhere (can figure it out if you like) that will remove the body for `HEAD` requests. Until then, we need it to determine `Content-Length`.
+
+Does that answer your question?

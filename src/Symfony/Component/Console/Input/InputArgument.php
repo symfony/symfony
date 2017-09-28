@@ -28,8 +28,6 @@ class InputArgument
     private $description;
 
     /**
-     * Constructor.
-     *
      * @param string $name        The argument name
      * @param int    $mode        The argument mode: self::REQUIRED or self::OPTIONAL
      * @param string $description A description text

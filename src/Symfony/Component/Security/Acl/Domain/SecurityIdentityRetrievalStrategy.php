@@ -29,8 +29,6 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
     private $authenticationTrustResolver;
 
     /**
-     * Constructor.
-     *
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver
      */

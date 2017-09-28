@@ -27,8 +27,6 @@ class OutputFormatterStyleStack
     private $emptyStyle;
 
     /**
-     * Constructor.
-     *
      * @param OutputFormatterStyleInterface|null $emptyStyle
      */
     public function __construct(OutputFormatterStyleInterface $emptyStyle = null)

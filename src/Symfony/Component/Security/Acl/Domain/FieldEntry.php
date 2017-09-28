@@ -25,8 +25,6 @@ class FieldEntry extends Entry implements FieldEntryInterface
     private $field;
 
     /**
-     * Constructor.
-     *
      * @param int                       $id
      * @param AclInterface              $acl
      * @param string                    $field

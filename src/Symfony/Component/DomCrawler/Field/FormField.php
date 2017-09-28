@@ -44,8 +44,6 @@ abstract class FormField
     protected $disabled;
 
     /**
-     * Constructor.
-     *
      * @param \DOMElement $node The node associated with this field
      */
     public function __construct(\DOMElement $node)

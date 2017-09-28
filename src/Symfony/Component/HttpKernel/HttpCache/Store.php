@@ -29,8 +29,6 @@ class Store implements StoreInterface
     private $locks;
 
     /**
-     * Constructor.
-     *
      * @param string $root The path to the cache directory
      *
      * @throws \RuntimeException

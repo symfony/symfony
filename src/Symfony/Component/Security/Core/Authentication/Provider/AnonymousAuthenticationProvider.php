@@ -25,8 +25,6 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
     private $key;
 
     /**
-     * Constructor.
-     *
      * @param string $key The key shared with the authentication token
      */
     public function __construct($key)

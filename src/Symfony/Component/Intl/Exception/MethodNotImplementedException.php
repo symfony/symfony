@@ -17,8 +17,6 @@ namespace Symfony\Component\Intl\Exception;
 class MethodNotImplementedException extends NotImplementedException
 {
     /**
-     * Constructor.
-     *
      * @param string $methodName The name of the method
      */
     public function __construct($methodName)

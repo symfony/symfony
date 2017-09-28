@@ -26,8 +26,6 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     protected $db;
 
     /**
-     * Constructor.
-     *
      * @param string $dsn      A data source name
      * @param string $username The username for the database
      * @param string $password The password for the database

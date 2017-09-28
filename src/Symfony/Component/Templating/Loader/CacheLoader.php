@@ -30,8 +30,6 @@ class CacheLoader extends Loader
     protected $dir;
 
     /**
-     * Constructor.
-     *
      * @param LoaderInterface $loader A Loader instance
      * @param string          $dir    The directory where to store the cache files
      */

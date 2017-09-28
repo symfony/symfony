@@ -25,8 +25,6 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     protected $locator;
 
     /**
-     * Constructor.
-     *
      * @param TemplateFinderInterface $finder  A template finder
      * @param TemplateLocator         $locator The template locator
      */

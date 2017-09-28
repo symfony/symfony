@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * MessageDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  *
@@ -33,8 +31,6 @@ class MessageDataCollector extends DataCollector
     private $isSpool;
 
     /**
-     * Constructor.
-     *
      * We don't inject the message logger and mailer here
      * to avoid the creation of these objects when no emails are sent.
      *

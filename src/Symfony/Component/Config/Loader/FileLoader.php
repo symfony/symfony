@@ -35,8 +35,6 @@ abstract class FileLoader extends Loader
     private $currentDir;
 
     /**
-     * Constructor.
-     *
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
      */
     public function __construct(FileLocatorInterface $locator)

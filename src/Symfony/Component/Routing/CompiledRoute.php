@@ -28,8 +28,6 @@ class CompiledRoute implements \Serializable
     private $hostTokens;
 
     /**
-     * Constructor.
-     *
      * @param string      $staticPrefix  The static prefix of the compiled route
      * @param string      $regex         The regular expression to use to match this route
      * @param array       $tokens        An array of tokens to use to generate URL for this route

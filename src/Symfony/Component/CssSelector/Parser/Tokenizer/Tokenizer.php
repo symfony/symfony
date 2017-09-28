@@ -31,9 +31,6 @@ class Tokenizer
      */
     private $handlers;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $patterns = new TokenizerPatterns();

@@ -17,8 +17,6 @@ namespace Symfony\Component\Intl\Exception;
 class MethodArgumentValueNotImplementedException extends NotImplementedException
 {
     /**
-     * Constructor.
-     *
      * @param string $methodName        The method name that raised the exception
      * @param string $argName           The argument name
      * @param string $argValue          The argument value that is not implemented

@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Helper class for commonly-needed security tasks.
- *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class Security
 {

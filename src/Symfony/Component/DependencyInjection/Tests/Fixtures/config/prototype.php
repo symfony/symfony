@@ -5,7 +5,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 
 return function (ContainerConfigurator $c) {
-
     $di = $c->services()->defaults()
         ->tag('baz');
     $di->load(Prototype::class.'\\', '../Prototype')
@@ -20,5 +19,4 @@ return function (ContainerConfigurator $c) {
         ->parent('foo');
     $di->set('foo')->lazy()->abstract();
     $di->get(Prototype\Foo::class)->lazy(false);
-
 };

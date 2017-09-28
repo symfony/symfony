@@ -49,9 +49,12 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
+            'tagged_iterator' => 'getTaggedIteratorService',
+            'tagged_iterator_foo' => 'getTaggedIteratorFooService',
         );
         $this->privates = array(
             'factory_simple' => true,
+            'tagged_iterator_foo' => true,
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -340,6 +343,19 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the public 'tagged_iterator' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getTaggedIteratorService()
+    {
+        return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
+            yield 0 => ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'};
+            yield 1 => ${($_ = isset($this->services['tagged_iterator_foo']) ? $this->services['tagged_iterator_foo'] : $this->services['tagged_iterator_foo'] = new \Bar()) && false ?: '_'};
+        }, 2));
+    }
+
+    /**
      * Gets the private 'factory_simple' shared service.
      *
      * @return \SimpleFactoryClass
@@ -351,6 +367,16 @@ class ProjectServiceContainer extends Container
         @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 
         return $this->services['factory_simple'] = new \SimpleFactoryClass('foo');
+    }
+
+    /**
+     * Gets the private 'tagged_iterator_foo' shared service.
+     *
+     * @return \Bar
+     */
+    protected function getTaggedIteratorFooService()
+    {
+        return $this->services['tagged_iterator_foo'] = new \Bar();
     }
 
     /**

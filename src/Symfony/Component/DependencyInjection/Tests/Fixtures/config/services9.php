@@ -9,7 +9,6 @@ require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';
 
 return function (ContainerConfigurator $c) {
-
     $p = $c->parameters();
     $p->set('baz_class', 'BazClass');
     $p->set('foo_class', FooClass::class)
@@ -119,4 +118,11 @@ return function (ContainerConfigurator $c) {
     $s->set('lazy_context_ignore_invalid_ref', 'LazyContext')
         ->args(array(iterator(array(ref('foo.baz'), ref('invalid')->ignoreOnInvalid())), iterator(array())));
 
+    $s->set('tagged_iterator_foo', 'Bar')
+        ->private()
+        ->tag('foo');
+
+    $s->set('tagged_iterator', 'Bar')
+        ->public()
+        ->args(array(tagged('foo')));
 };

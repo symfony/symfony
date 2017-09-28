@@ -29,6 +29,8 @@ digraph sc {
   node_factory_service_simple [label="factory_service_simple\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_lazy_context [label="lazy_context\nLazyContext\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_lazy_context_ignore_invalid_ref [label="lazy_context_ignore_invalid_ref\nLazyContext\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_tagged_iterator_foo [label="tagged_iterator_foo\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_tagged_iterator [label="tagged_iterator\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];

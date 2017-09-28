@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Toto pole nebyla očekávána.</target>
+                <target>Toto pole nebylo očekáváno.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>

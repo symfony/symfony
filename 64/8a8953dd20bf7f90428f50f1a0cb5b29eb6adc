@@ -1,0 +1,297 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-28T11:05:48Z
+
+you don't have a XML syntax for this
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-28T11:12:54Z
+
+Also no tests.. it's a proof of concept :) but will do that.. wanted to propose it first.
+
+Perhaps introduces a few things to discuss...
+- ~~may require tag attributes to be blank~~ dont think this is needed as were only interested in collecting services at this point
+- could support the priority attribute built in
+- could leverage expression language for basic atribute support (in terms of filtering)
+- ~~may require something that does `iterator_to_array` to satisfy any `array` constraints~~ not related to this PR
+
+I think the latter is actually an important one...
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-03-29T15:34:16Z
+
+Tagged scalars won't be supported in yaml before 4.0. So you can either use a different syntax, or you can whitelist just one tag using:
+```patch
+diff --git a/src/Symfony/Component/Yaml/Inline.php b/src/Symfony/Component/Yaml/Inline.php
+index e8d5faa..82112f0 100644
+--- a/src/Symfony/Component/Yaml/Inline.php
++++ b/src/Symfony/Component/Yaml/Inline.php
+@@ -710,8 +710,10 @@ class Inline
+
+         // Is followed by a scalar
+         if (!isset($value[$nextOffset]) || !in_array($value[$nextOffset], array('[', '{'), true)) {
+-            // Manage scalars in {@link self::evaluateScalar()}
+-            return;
++            if (!in_array($tag, $whitelist = array('foo'))) {
++                // Manage scalars in {@link self::evaluateScalar()}
++                return;
++            }
+         }
+
+         // Built-in tags
+diff --git a/src/Symfony/Component/Yaml/Parser.php b/src/Symfony/Component/Yaml/Parser.php
+index 7b572e1..bbb1531 100644
+--- a/src/Symfony/Component/Yaml/Parser.php
++++ b/src/Symfony/Component/Yaml/Parser.php
+@@ -642,6 +642,8 @@ class Parser
+             if ('' !== $matches['tag']) {
+                 if ('!!binary' === $matches['tag']) {
+                     return Inline::evaluateBinaryScalar($data);
++                } elseif (in_array($matches['tag'], $whitelist = array('!foo'))) {
++                    return new TaggedValue(substr($matches['tag'], 1), $data);
+                 } elseif ('!' !== $matches['tag']) {
+                     @trigger_error(sprintf('Using the custom tag "%s" for the value "%s" is deprecated since version 3.3. It will be replaced by an instance of %s in 4.0.', $matches['tag'], $data, TaggedValue::class), E_USER_DEPRECATED);
+                 }
+```
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-03-29T15:40:44Z
+
+For XML, the syntax could be:
+```xml
+<service>
+    <argument type="tagged-services" tag="foo" />
+</service>
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-03-29T15:45:47Z
+
+Above works currently (tagged scalar on a new line), so the syntax only improves as of 4.0.
+
+perhaps to compromise it could allow `!tagged_services [tagN, ...]` as well.. to benefit from the allowed oneliner :) and multiple tag support of course.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-13T18:51:08Z
+
+Little update from my side;
+- renamed to `TaggedIteratorArgument`
+- yaml support `!tagged_iterator tag-name`
+- xml support `<argument/property type="tagged_iterator" tag="tag-name" />`
+- order tags by priority
+- initial tests
+- no multiple tag support, no automatic to array expansion
+
+Open for any cosmetic changes / better naming etc :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-13T19:01:09Z
+
+Could that be used to replace any existing passes? If yes, that'd be a good sign of the usefulness of it and should be done in the same PR if possible.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-13T19:08:21Z
+
+Technically yes. Now the priority attribute is handled it could replace some :crossed_fingers:
+
+Will look into that.
+
+edit: from https://symfony.com/doc/current/service_container/tags.html looks like `twig.extension` is a candidate...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-13T19:14:22Z
+
+Furthermore if we ever allow to map a `!iterator` against an adder it could benefit from that by passing along tag attributes. Making everything available in runtime (sounds cool at least :))
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-15T20:09:42Z
+
+@nicolas-grekas would it make sense to merge `ServiceLocator` and `RewindableGenerator`? Making `IteratorArgument` obsolete.. as we have something (`ServiceLocatorArgument` probably) that can be used for almost anything, i.e. typehints against iterable or ContainerInterface or array (with #22204).
+
+That would end the iterator vs map thingy. And allows this PR to move forward with a single `!tagged_service_locator` again :) (we should expose `!service_locator` as well - https://github.com/symfony/symfony/issues/22649#issuecomment-299462617, and for #23454 it can be `!service_closure`).
+
+> Could that be used to replace any existing passes? If yes, that'd be a good sign of the usefulness of it and should be done in the same PR if possible.
+
+I guess the problem is most rely on array API, so the auto expansion could actually help here to satisfy those and have easier migration.
+
+Also thinks like https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Resources/config/session.xml#L59 can benefit i guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-15T20:46:23Z
+
+Dunno, we could try... :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-15T22:03:22Z
+
+See https://github.com/ro0NL/symfony/commit/1360bab6154c9d29d27d42a9011a9300c8048afd for where im leaning to.. `Argument\IteratorArg` could become `Argument\ServiceLocArg` allowing to deprecate `DI\ServiceLoc`. Could work out, feel free to contrib :)
+
+Basically i dont understand why we favor
+
+```
+!service { arguments: { k: '@ref' }, tags: [container.service_loc] }
+```
+
+over (simply)
+
+```
+!service_locator { k: '@ref' }
+!service_locator [ '@ref' ] # keys are arbitrary
+```
+
+What `!iterator` does actually :) it has way better DX, dont you think? But maybe im missing why a tag is needed.
+
+edit: if im correct it creates a new def+alias only to be inlined again afterwards.. lost me :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-18T08:11:24Z
+
+@nicolas-grekas final proposal; im leaning to roll out my own yaml tag(s) otherwise.
+
+Looking at my own usecases i could definitely use a tagged iterator as well as a tagged service locator *.
+
+We can keep leveraging iterator arg and simply dont support tagged service locators, but to me thats half the feature. Not sure if worth it then.
+
+So we could do `!tagged_services tag-name`; giving you an iterator. Or `!tagged_services {tag: tag-name, index_by: id|class|tag-attr }`; giving you a service locator.
+
+*) Problem with tagged service locator is we cant get the full map, it's not iterable nor exposes getKeys. Which may be limiting, and therefor im not sure whats best way to introduce it in core; hence im leaning to roll out my own and keep things as is in core.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-18T12:06:58Z
+
+If you know the name of the tagged services, you don't need to tag them.
+And of you don't know their name, you cannot "get" them from the service locator.
+Which means to me only an iterator is useful... esp.since if you have an iterator, you can easily turn that into a map with iterator_to_array.
+I also prefer tagged_services instead of tagged_iterator.
+You did not deprecate any existing compiler pass, does that mean none can be replaced with this generic implem?
+What's missing?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-18T12:36:35Z
+
+> If you know the name of the tagged services, you don't need to tag them.
+> And of you don't know their name, you cannot "get" them from the service locator.
+
+Yes, so true :) we dont need this :+1:
+
+>  if you have an iterator, you can easily turn that into a map with iterator_to_array.
+
+But there's no key control, you'll just get numeric indexes. But lets forget about maps here ;-)
+
+So, as is, we can at least cover `twig.extension`, `kernel.cache_clear` for sure. But we need to update some APIs from iterable to array, that be the cleanest. Or apply iterator_to_array out-of-the-box based on typehint; seems pragmatic but im not sure (well.. i was :P).. wdyt?
+
+Tags like security.voter are a bit more difficult. And things like commands cannot even be done this way i guess. So it needs a per case decision.
+
+For end users it may fit many more cases though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-18T13:01:57Z
+
+> apply iterator_to_array out-of-the-box based on typehint
+
+I wouldn't recommend doing that :)
+
+> we can at least cover twig.extension, kernel.cache_clear
+
+Let's see how it goes then
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-22T07:29:35Z
+
+@nicolas-grekas this is hard :) and im not sure about the best approach.
+
+I think there are 2 viable directions, given
+
+```php
+method($mixed, array $array, iterable $iterable, ...$variadic)
+```
+
+Variant A - type based:
+```yaml
+'$mixed': !tagged-services tag # pass a lazy iterable
+'$array': !tagged-services tag # pass an array
+'$iterable': !tagged-services tag # pass a lazy iterable
+'$variadic': !tagged-services tag # pass a service + append subsequent services as arg
+```
+
+Variadic for numeric arg doesnt resolve subsequent arguments, as it implies subsequent args come from config (though not sure), i.e;
+```yaml
+- [mixed]
+- [array]
+- [iterable]
+- !tagged-services tag # pass a lazy iterable
+- x # pass scalar for subsequent variadic
+```
+
+Variant B - tag based:
+```yaml
+'$mixed': !tagged-services tag # pass an array
+'$array': !tagged-services tag # pass an array
+'$iterable': !tagged-services tag # pass an array
+'$iterable': !iterator { values: !tagged-services tag } # pass a lazy iterable
+'$variadic': !variadic { values: !tagged-services tag } # pass a service + append subsequent services as arg
+```
+
+I guess this variant allows for the same approach between numeric and named args.
+
+So im leaning to tag based, but it requires refactoring here and there. Though type based looks nice.. i think explicitness is the way to go.
+
+Basically we introduce a little DSL with `!iterator !tagged-services foo`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T08:35:09Z
+
+Ready for review :) updated to `tagged` keyword; thus `!tagged`, `type="tagged"` and future `$c->tagged()`. Datatype is now iterator by design, and closes (IMHO) the map vs. collection debate, and anything related to that.
+
+cc @GuilhemN yaml is patched, might need a trigger from DI as in YAML "tagged" is just a magic string. But works for me :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:26:40Z
+
+@ro0NL could you rebase please?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-26T12:34:05Z
+
+Done.
+
+edit: looking at tests.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-26T14:09:06Z
+
+Status: needs work. Cant get tests to work.
+
+Need some help to both fix
+
+```
+DependencyInjection/Tests/Loader/PhpFileLoaderTest.php --filter testConfig
+DependencyInjection/Tests/Dumper/PhpDumperTest.php --filter testAddService
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-28T14:24:00Z
+
+Now green fabbot failures are false-positives.
+PR ready, still :+1: on my side.

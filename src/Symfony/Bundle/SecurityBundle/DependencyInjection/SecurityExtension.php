@@ -188,10 +188,6 @@ class SecurityExtension extends Extension
                 $customUserChecker = true;
             }
 
-            if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
-                @trigger_error('Setting logout_on_user_change to false is deprecated as of 3.4 and will always be true in 4.0. Set logout_on_user_change to true in your firewall configuration.', E_USER_DEPRECATED);
-            }
-
             $contextListenerDefinition->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
 
             $configId = 'security.firewall.map.config.'.$name;
@@ -610,11 +606,6 @@ class SecurityExtension extends Extension
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
 
-        // in 4.0, ignore the `switch_user.stateless` key if $stateless is `true`
-        if ($stateless && false === $config['stateless']) {
-            @trigger_error(sprintf('Firewall "%s" is configured as "stateless" but the "switch_user.stateless" key is set to false. Both should have the same value, the firewall\'s "stateless" value will be used as default value for the "switch_user.stateless" key in 4.0.', $id), E_USER_DEPRECATED);
-        }
-
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));
         $listener->replaceArgument(1, new Reference($userProvider));
@@ -622,7 +613,7 @@ class SecurityExtension extends Extension
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);
-        $listener->replaceArgument(9, $config['stateless']);
+        $listener->replaceArgument(9, $stateless ?: $config['stateless']);
 
         return $switchUserListenerId;
     }

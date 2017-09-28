@@ -4,6 +4,49 @@ CHANGELOG
 4.0.0
 -----
 
+ * Relying on service auto-registration while autowiring is not supported anymore.
+   Explicitly inject your dependencies or create services whose ids are
+   their fully-qualified class name.
+
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+    ```
  * removed autowiring services based on the types they implement
  * added a third `$methodName` argument to the `getProxyFactoryCode()` method
    of the `DumperInterface`

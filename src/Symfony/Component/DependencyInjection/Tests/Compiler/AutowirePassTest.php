@@ -247,11 +247,10 @@ class AutowirePassTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Relying on service auto-registration for type "Symfony\Component\DependencyInjection\Tests\Compiler\Lille" is deprecated since version 3.4 and won't be supported in 4.0. Create a service named "Symfony\Component\DependencyInjection\Tests\Compiler\Lille" instead.
-     * @expectedDeprecation Relying on service auto-registration for type "Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas" is deprecated since version 3.4 and won't be supported in 4.0. Create a service named "Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas" instead.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+     * @expectedExceptionMessage Cannot autowire service "coop_tilleuls": argument "$j" of method "Symfony\Component\DependencyInjection\Tests\Compiler\LesTilleuls::__construct()" references class "Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas" but no such service exists.
      */
-    public function testCreateDefinition()
+    public function testServicesAreNotAutoCreated()
     {
         $container = new ContainerBuilder();
 
@@ -260,19 +259,6 @@ class AutowirePassTest extends TestCase
 
         $pass = new AutowirePass();
         $pass->process($container);
-
-        $this->assertCount(2, $container->getDefinition('coop_tilleuls')->getArguments());
-        $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas', $container->getDefinition('coop_tilleuls')->getArgument(0));
-        $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas', $container->getDefinition('coop_tilleuls')->getArgument(1));
-
-        $dunglasDefinition = $container->getDefinition('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Dunglas');
-        $this->assertEquals(__NAMESPACE__.'\Dunglas', $dunglasDefinition->getClass());
-        $this->assertFalse($dunglasDefinition->isPublic());
-        $this->assertCount(1, $dunglasDefinition->getArguments());
-        $this->assertEquals('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Lille', $dunglasDefinition->getArgument(0));
-
-        $lilleDefinition = $container->getDefinition('autowired.Symfony\Component\DependencyInjection\Tests\Compiler\Lille');
-        $this->assertEquals(__NAMESPACE__.'\Lille', $lilleDefinition->getClass());
     }
 
     public function testResolveParameter()
@@ -561,25 +547,6 @@ class AutowirePassTest extends TestCase
             array(new TypedReference(A::class, A::class, SetterInjection::class)),
             $methodCalls[0][1]
         );
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Relying on service auto-registration for type "Symfony\Component\DependencyInjection\Tests\Compiler\A" is deprecated since version 3.4 and won't be supported in 4.0. Create a service named "Symfony\Component\DependencyInjection\Tests\Compiler\A" instead.
-     */
-    public function testTypedReference()
-    {
-        $container = new ContainerBuilder();
-
-        $container
-            ->register('bar', Bar::class)
-            ->setProperty('a', array(new TypedReference(A::class, A::class, Bar::class)))
-        ;
-
-        $pass = new AutowirePass();
-        $pass->process($container);
-
-        $this->assertSame(A::class, $container->getDefinition('autowired.'.A::class)->getClass());
     }
 
     public function getCreateResourceTests()

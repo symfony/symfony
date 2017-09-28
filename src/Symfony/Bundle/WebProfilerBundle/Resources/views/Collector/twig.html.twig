@@ -85,7 +85,7 @@
             <tbody>
             {% for template, count in collector.templates %}
                 <tr>
-                    {%- set file = collector.templatePaths[template]|default(false)|e('js') -%}
+                    {%- set file = collector.templatePaths[template]|default(false) -%}
                     {%- set link = file ? file|file_link(1) : false -%}
                     <td>{% if link %}<a href="{{ link }}" title="{{ file }}">{{ template }}</a>{% else %}{{ template }}{% endif %}</td>
                     <td class="font-normal">{{ count }}</td>

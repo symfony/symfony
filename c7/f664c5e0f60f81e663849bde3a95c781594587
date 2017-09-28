@@ -1,0 +1,213 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-22T17:56:23Z
+
+@ro0NL I recommend you to stop working on this feature. The reason is that the related issue hasn't been approved at all as a legit new feature. (Personally I'm not sure it's needed at all). It's always better to work only on approved features and verified bugs. Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-22T18:03:15Z
+
+Imo. the behavior is buggy, and this is my approach to revise it (i may do PR's right?).
+
+I explained why imo. it's needed, so feel free to argue.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-22T18:08:19Z
+
+There are 2 viable options to me;
+- this approach
+- introduce a new `%asset.default_base_path%` param and provide a default context
+
+Option 2 is also reasonable, and may perhaps be the better approach. However i chose this one as we already introduced routing params ~~, and it will work for people who already set the base url with it~~ (not sure about that actually).
+
+edit:
+After all, I think we should go with
+
+```yml
+assets:
+  context:
+    base_path: '%asset.context.base_path%'
+    secure: '%asset.context.secure%'
+    # ...
+````
+
+Any thoughts?
+
+edit: yep, basically https://github.com/symfony/symfony/issues/19396#issuecomment-234212063 :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-24T11:19:13Z
+
+@stof different approach, way simpler :) WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-27T14:08:43Z
+
+Since this adds new parameters, this is not a bug but only a feature.
+Doc PR should be opened before merging, because that's the only way to know about the params.
+About the params, they are obscure things usually to users, which means very little are going to know about them and their purpose, even if it's documented.
+Which means we shouls try hard to *not* add new params when possible (I don't know here, just emphasizing this important point :) .)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-27T14:16:06Z
+
+Agree.. on the params. Im not even sure we need them, same for routing context params actually; see #21043
+
+However the bug is real.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T23:20:36Z
+
+Before the introduction of the new Asset component the `asset()` function made use of the request context config options, right?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T08:03:01Z
+
+Not sure, i should have a look at that. Fact is (given the current context options) we cannot go from base url to base path genericly.
+
+```
+/request-base/app_dev.php/route
+/request-base/asset-base/asset vs. /request-base/app_dev.php/asset-base/asset
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T10:27:58Z
+
+I guess practically one could get away with configuring package base urls, going absolute. Bypassing `RequestStackContext::getBasePath` and no support for relative URL's :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T10:43:48Z
+
+As this used to work in previous releases we should at least strive to make the Asset component compatible with how the Twig functions used to work before. We can still think about how to make things better and deprecate stuff in 3.3/3.4.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:09:38Z
+
+> As this used to work in previous releases we should at least strive to make the Asset component compatible with how the Twig functions used to work before.
+
+Im not sure i follow.. i did a quik test; installed latest 2.7 in a subdir (reachable at `http://symfony-sub.dev/sf27/web/app_dev.php`)
+
+Updated framework config with `assets: { version: 1, base_path: /assets }`
+
+Updated `app/Resources/views/default/index.html.twig` to display `{{ asset('foo.jpg') }}`
+
+Added a command `test` with `$output->writeln($this->getContainer()->get('twig')->render(':default:index.html.twig'));`
+
+## Results :)
+
+![image](https://cloud.githubusercontent.com/assets/1047696/21542639/7f0109a6-cdbf-11e6-98f7-f8b2670084ab.png)
+
+![image](https://cloud.githubusercontent.com/assets/1047696/21542658/99db61b8-cdbf-11e6-8067-da0d747f3e5a.png)
+
+What did we removed? Or what am i missing here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T11:12:44Z
+
+I mean before the introduction of the Asset component (so you will have to use a Symfony version before 2.7 to see how it used to behave back then).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:17:30Z
+
+I see. Not gonna investigate that now :) I mean, i cannot really compare the asset component against nothing. Either the approach was the same-ish, or it suffered from the same problem. Here's my approach for 2.7 and up :+1: (perhaps along with #21043).
+
+But again, if im missing something in terms of a different approach done previously.. let me know :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:19:28Z
+
+Oh, and it's totally fixable in user land. So we can always keep things as is here; an unsupported feature.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T11:25:22Z
+
+> Oh, and it's totally fixable in user land. So we can always keep things as is here; an unsupported feature.
+
+But the thing is that this used to work before (the `asset()` function did exist before the introduction of the Asset component in #13234, see https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bundle/TwigBundle/Extension/AssetsExtension.php#L55).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:33:36Z
+
+I think looking at https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bundle/FrameworkBundle/Templating/Asset/PathPackage.php#L31 and https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/Templating/Asset/PathPackage.php#L35 it suffered the same problem.
+
+But im really not aware of any CLI defaulting with params or so in 2.3, which would be basically this approach.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:38:50Z
+
+Now we could do it convention wise perhaps, making use of `%router.request_context.base_url%`.
+
+If ending with `/` it's the base path (`/request-base/`), otherwise it's the base URL (`/request-base/app_dev.php`) and we do a `dirname`. Could work...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T15:35:30Z
+
+@ro0NL I'll look into an old 2.3 application to check how exactly it used to work then.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-12T15:49:41Z
+
+@xabbuh any news? :P
+
+Prettiest fix is still #21043 IMO. But this PR should do as well :-)
+
+Otherwise im planning to close; as it's solvable in userland by using a package base URL (coming from a custom param or so).
+
+> About the params, they are obscure things usually to users, which means very little are going to know about them and their purpose, even if it's documented.
+
+I tend to believe people will bump into it (if documented somewhere of course) once dealing with this issue =/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T14:12:37Z
+
+can you add a changelog line to advertise the feature?
+also, should we add corresponding config options? not sure, just wondering.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-02T07:27:39Z
+
+Changelog added; extra config is not needed IMHO; it's the same approach as routing does.
+
+Because of that ive renamed the params to `%asset.request_context.*%` so it's in line with `%router.request_context.*%`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-06T11:07:42Z
+
+changelog updated. Not sure about a note in assets component; change is in no way related to that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-18T14:46:59Z
+
+ping @fabpot as I guess you're the one merging on Asset?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T20:55:26Z
+
+Also im not experiencing this issue myself. Honestly thought to fix _linked issue_ real quick :) confirmed as it is (https://github.com/symfony/symfony/issues/19396#issuecomment-234212063).
+
+Not sure what's blocking here. However i dont wanna imply im pushing this PR or so.
+
+edit: as this is a new feature; now polished :)

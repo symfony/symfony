@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-28T11:39:04Z
+
+#24303 already improved the situation when running `composer require`/`composer install`. Though I suggest we can go one step further and also make the core form themes available even if the user does not want to use the Translation component.

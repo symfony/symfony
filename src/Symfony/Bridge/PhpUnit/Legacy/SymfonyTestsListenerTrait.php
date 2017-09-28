@@ -303,7 +303,7 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function handleError($type, $msg, $file, $line, $context)
+    public function handleError($type, $msg, $file, $line, $context = array())
     {
         if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
             $h = $this->previousErrorHandler;

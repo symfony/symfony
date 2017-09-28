@@ -12,8 +12,8 @@ CHANGELOG
    require symfony/stopwatch` in your `dev` environment.
  * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
- * Deprecated `AddCacheClearerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` instead.
- * Deprecated `AddCacheWarmerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` instead.
+ * Deprecated `AddCacheClearerPass`, use tagged iterator arguments instead.
+ * Deprecated `AddCacheWarmerPass`, use tagged iterator arguments instead.
  * Deprecated `TranslationDumperPass`, use 
    `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` instead
  * Deprecated `TranslationExtractorPass`, use 
@@ -82,7 +82,7 @@ CHANGELOG
  * Deprecated `SessionListener`
  * Deprecated `TestSessionListener`
  * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`.
-   Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
+   Use tagged iterator arguments instead.
  * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
  * Deprecated `ControllerArgumentValueResolverPass`. Use
    `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead

@@ -17,6 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\DependencyInjection\ConfigCachePass;
 
+/**
+ * @group legacy
+ */
 class ConfigCachePassTest extends TestCase
 {
     public function testThatCheckersAreProcessedInPriorityOrder()

@@ -204,6 +204,14 @@ FrameworkBundle
    `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
     and `YamlLintCommand` classes have been marked as final
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpExtractor` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpStringTokenParser`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpStringTokenParser` class instead.
+
 HttpFoundation
 --------------
 
@@ -280,8 +288,8 @@ Profiler
 Security
 --------
 
- * Deprecated the HTTP digest authentication: `NonceExpiredException`, 
-   `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` will be 
+ * Deprecated the HTTP digest authentication: `NonceExpiredException`,
+   `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` will be
    removed in 4.0. Use another authentication system like `http_basic` instead.
 
 SecurityBundle
@@ -305,7 +313,7 @@ SecurityBundle
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid
    deprecations in the configuration.
-   
+
  * Deprecated the HTTP digest authentication: `HttpDigestFactory` will be removed in 4.0.
    Use another authentication system like `http_basic` instead.
 

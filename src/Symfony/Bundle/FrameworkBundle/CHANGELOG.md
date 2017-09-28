@@ -105,6 +105,10 @@ CHANGELOG
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` instead
  * Deprecated `ConstraintValidatorFactory`, use
    `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
+ * Deprecated `PhpStringTokenParser`, use
+   `Symfony\Component\Translation\Extractor\PhpStringTokenParser` instead.
+ * Deprecated `PhpExtractor`, use
+   `Symfony\Component\Translation\Extractor\PhpExtractor` instead.
 
 3.2.0
 -----

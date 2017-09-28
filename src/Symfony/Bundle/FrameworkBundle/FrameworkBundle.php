@@ -25,11 +25,8 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLan
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\WorkflowGuardListenerPass;
-use Symfony\Component\Config\DependencyInjection\ConfigCachePass;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
-use Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass;
-use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
@@ -102,8 +99,6 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new TranslatorPass('translator.default', 'translation.loader'));
         }
         $container->addCompilerPass(new LoggingTranslatorPass());
-        $container->addCompilerPass(new AddCacheWarmerPass());
-        $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
@@ -124,7 +119,6 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
-            $this->addCompilerPassIfExists($container, ConfigCachePass::class);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
         }
     }

@@ -136,12 +136,10 @@ FrameworkBundle
    instead (e.g. `--prefix=""`)
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass`
-   class has been deprecated and will be removed in 4.0. Use the
-   `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+   class has been deprecated and will be removed in 4.0. Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass`
-   class has been deprecated and will be removed in 4.0. Use the
-   `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+   class has been deprecated and will be removed in 4.0. Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
    class has been deprecated and will be removed in 4.0. Use the
@@ -259,6 +257,14 @@ HttpKernel
    Use the `%kernel.cache_dir%` parameter instead. Not doing so may break the `cache:clear` command.
 
  * The `Symfony\Component\HttpKernel\Config\EnvParametersResource` class has been deprecated and will be removed in 4.0.
+
+ * The `ChainCacheClearer::add()` method has been deprecated and will be removed in 4.0,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate::add()` and `setWarmers()` methods have been deprecated and will be removed in 4.0,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate` and `ChainCacheClearer` classes have been made final.
 
 Process
 -------

@@ -39,6 +39,9 @@ class ChainCacheClearerTest extends TestCase
         $chainClearer->clear(self::$cacheDir);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInjectClearerUsingAdd()
     {
         $clearer = $this->getMockClearer();

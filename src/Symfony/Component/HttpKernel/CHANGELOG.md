@@ -12,6 +12,10 @@ CHANGELOG
  * added `AddCacheWarmerPass`
  * deprecated `EnvParametersResource`
  * added `Symfony\Component\HttpKernel\Client::catchExceptions()`
+ * deprecated the `ChainCacheClearer::add()` method
+ * deprecated the `CacheaWarmerAggregate::add()` and `setWarmers()` methods
+ * made `CacheWarmerAggregate` and `ChainCacheClearer` classes final
+
 
 3.3.0
 -----

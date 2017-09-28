@@ -384,7 +384,7 @@ FrameworkBundle
    class instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass` class has been removed.
-   Use `Symfony\Component\Config\DependencyInjection\ConfigCachePass` class instead.
+   Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass` class has been
    removed. Use the `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass`
@@ -439,10 +439,10 @@ FrameworkBundle
    been removed.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed.
-   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+   Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed.
-   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+   Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
    class has been removed. Use the
@@ -602,6 +602,14 @@ HttpKernel
    Use the `%kernel.cache_dir%` parameter instead. Not doing so may break the `cache:clear` command.
 
  * The `Symfony\Component\HttpKernel\Config\EnvParametersResource` class has been removed.
+
+ * The `ChainCacheClearer::add()` method has been removed,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate::add()` and `setWarmers()` methods have been removed,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate` and `ChainCacheClearer` classes have been made final.
 
 Ldap
 ----

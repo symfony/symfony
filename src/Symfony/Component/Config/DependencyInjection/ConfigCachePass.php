@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config\DependencyInjection;
 
+@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use tagged iterator arguments instead.', ConfigCachePass::class), E_USER_DEPRECATED);
+
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -21,6 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  * @author Benjamin Klotz <bk@webfactory.de>
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use tagged iterator arguments instead.
  */
 class ConfigCachePass implements CompilerPassInterface
 {

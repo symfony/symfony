@@ -29,6 +29,6 @@ class SecurityTest extends WebTestCase
 
         $security = $container->get('functional_test.security.helper');
         $this->assertTrue($security->isGranted('ROLE_USER'));
-        $this->assertSAme($token, $security->getToken());
+        $this->assertSame($token, $security->getToken());
     }
 }

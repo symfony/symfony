@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-28T15:28:55Z
+
+when merging into master, "symfony/dependency-injection" should be removed from Config's composer.json

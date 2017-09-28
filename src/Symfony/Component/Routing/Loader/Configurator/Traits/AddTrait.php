@@ -28,7 +28,7 @@ trait AddTrait
      * Adds a route.
      *
      * @param string $name
-     * @param string $value
+     * @param string $path
      *
      * @return RouteConfigurator
      */

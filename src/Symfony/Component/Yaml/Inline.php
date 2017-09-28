@@ -746,19 +746,4 @@ EOF;
     {
         return '~^0x[0-9a-f_]++$~i';
     }
-
-    private static function getDeprecationMessage($message)
-    {
-        $message = rtrim($message, '.');
-
-        if (null !== self::$parsedFilename) {
-            $message .= ' in '.self::$parsedFilename;
-        }
-
-        if (-1 !== self::$parsedLineNumber) {
-            $message .= ' on line '.self::$parsedLineNumber;
-        }
-
-        return $message.'.';
-    }
 }

@@ -20,21 +20,6 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
  */
 class StoreFactory
 {
-    public static function createConnection($dsn, array $options = array())
-    {
-        if (!is_string($dsn)) {
-            throw new InvalidArgumentException(sprintf('The %s() method expects argument #1 to be string, %s given.', __METHOD__, gettype($dsn)));
-        }
-        if (0 === strpos($dsn, 'redis://')) {
-            return RedisStore::createConnection($dsn, $options);
-        }
-        if (0 === strpos($dsn, 'memcached://')) {
-            return MemcachedStore::createConnection($dsn, $options);
-        }
-
-        throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));
-    }
-
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached $connection
      *

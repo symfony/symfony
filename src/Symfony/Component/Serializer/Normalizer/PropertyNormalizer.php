@@ -163,22 +163,15 @@ class PropertyNormalizer extends AbstractObjectNormalizer
      */
     private function getReflectionProperty($classOrObject, $attribute)
     {
-        $class = is_string($classOrObject) ? $classOrObject : get_class($classOrObject);
-
-        try {
-            return new \ReflectionProperty($class, $attribute);
-        } catch (\ReflectionException $e) {
-            $class = new \ReflectionClass($class);
-
-            while ($parent = $class->getParentClass()) {
-                try {
-                    return new \ReflectionProperty($parent->getName(), $attribute);
-                } catch (\ReflectionException $e) {
-                    $class = $parent;
+        $reflectionClass = new \ReflectionClass($classOrObject);
+        while (true) {
+            try {
+                return $reflectionClass->getProperty($attribute);
+            } catch (\ReflectionException $e) {
+                if (!$reflectionClass = $reflectionClass->getParentClass()) {
+                    throw $e;
                 }
             }
-
-            throw $e;
         }
     }
 }

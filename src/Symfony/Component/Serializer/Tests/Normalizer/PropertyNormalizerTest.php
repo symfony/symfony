@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyChild;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
@@ -67,14 +68,15 @@ class PropertyNormalizerTest extends TestCase
 
     public function testNormalizeWithParentClass()
     {
-        $group = new GroupDummy();
+        $group = new GroupDummyChild();
+        $group->setBaz('baz');
         $group->setFoo('foo');
         $group->setBar('bar');
         $group->setKevin('Kevin');
         $group->setCoopTilleuls('coop');
         $this->assertEquals(
             array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin',
-                  'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, ),
+                  'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz', ),
             $this->normalizer->normalize($group, 'any')
         );
     }
@@ -82,13 +84,14 @@ class PropertyNormalizerTest extends TestCase
     public function testDenormalizeWithParentClass()
     {
         $obj = $this->normalizer->denormalize(
-            array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin'),
-            GroupDummy::class,
+            array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin', 'baz' => 'baz'),
+            GroupDummyChild::class,
             'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
         $this->assertEquals('Kevin', $obj->getKevin());
+        $this->assertEquals('baz', $obj->getBaz());
         $this->assertNull($obj->getSymfony());
     }
 

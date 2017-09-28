@@ -241,6 +241,7 @@
             <argument>_switch_user</argument>
             <argument>ROLE_ALLOWED_TO_SWITCH</argument>
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
+            <argument>false</argument> <!-- Stateless -->
         </service>
 
         <service id="security.access_listener" class="Symfony\Component\Security\Http\Firewall\AccessListener">

@@ -49,8 +49,9 @@ class SwitchUserListener implements ListenerInterface
     private $role;
     private $logger;
     private $dispatcher;
+    private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, $stateless = false)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -65,6 +66,7 @@ class SwitchUserListener implements ListenerInterface
         $this->role = $role;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->stateless = $stateless;
     }
 
     /**
@@ -92,12 +94,13 @@ class SwitchUserListener implements ListenerInterface
             }
         }
 
-        $request->query->remove($this->usernameParameter);
-        $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+        if (!$this->stateless) {
+            $request->query->remove($this->usernameParameter);
+            $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+            $response = new RedirectResponse($request->getUri(), 302);
 
-        $response = new RedirectResponse($request->getUri(), 302);
-
-        $event->setResponse($response);
+            $event->setResponse($response);
+        }
     }
 
     /**

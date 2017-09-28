@@ -122,6 +122,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 ->setBindings($bindings)
                 ->setArguments(array())
                 ->setMethodCalls(array())
+                ->setDecoratedService(null)
                 ->setTags(array())
                 ->setAbstract(true);
         }

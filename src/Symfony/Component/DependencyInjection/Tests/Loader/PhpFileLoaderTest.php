@@ -73,4 +73,17 @@ class PhpFileLoaderTest extends TestCase
         yield array('child');
         yield array('php7');
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "child_service" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.
+     */
+    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator());
+        $loader->load($fixtures.'/config/services_autoconfigure_with_parent.php');
+        $container->compile();
+    }
 }

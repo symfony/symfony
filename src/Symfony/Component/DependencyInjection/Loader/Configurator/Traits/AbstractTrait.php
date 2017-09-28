@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
-use Symfony\Component\DependencyInjection\Definition;
-
 /**
  * @method $this abstract(bool $abstract = true)
  */

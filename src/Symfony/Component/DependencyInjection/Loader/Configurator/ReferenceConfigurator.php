@@ -16,10 +16,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ReferenceConfigurator
+class ReferenceConfigurator extends AbstractConfigurator
 {
-    private $id;
-    private $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+    /** @internal */
+    protected $id;
+
+    /** @internal */
+    protected $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
 
     public function __construct($id)
     {

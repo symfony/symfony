@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Controller;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * A controller resolver searching for a controller in a psr-11 container when using the "service:method" notation.
@@ -29,6 +30,20 @@ class ContainerControllerResolver extends ControllerResolver
         $this->container = $container;
 
         parent::__construct($logger);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getController(Request $request)
+    {
+        $controller = parent::getController($request);
+
+        if (is_array($controller) && isset($controller[0]) && is_string($controller[0]) && $this->container->has($controller[0])) {
+            $controller[0] = $this->instantiateController($controller[0]);
+        }
+
+        return $controller;
     }
 
     /**

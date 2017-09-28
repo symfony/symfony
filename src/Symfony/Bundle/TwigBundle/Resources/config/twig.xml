@@ -72,7 +72,8 @@
         </service>
 
         <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TranslationExtension">
-            <argument type="service" id="translator" />
+            <argument type="service" id="translator" on-invalid="null" />
+            <tag name="twig.extension" />
         </service>
 
         <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension">

@@ -1031,4 +1031,17 @@ class Parser
 
         throw new ParseException(sprintf('Tags support is not enabled. You must use the flag `Yaml::PARSE_CUSTOM_TAGS` to use "%s".', $matches['tag']), $this->getRealCurrentLineNb() + 1, $value, $this->filename);
     }
+
+    private function getDeprecationMessage($message)
+    {
+        $message = rtrim($message, '.');
+
+        if (null !== $this->filename) {
+            $message .= ' in '.$this->filename;
+        }
+
+        $message .= ' on line '.($this->getRealCurrentLineNb() + 1);
+
+        return $message.'.';
+    }
 }

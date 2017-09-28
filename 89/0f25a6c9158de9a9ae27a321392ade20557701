@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-28T07:22:18Z
+
+@nicolas-grekas : I've reverted last changes about the protected properties. I don't have strong justification appart simplification (and STA). Argument about maintenance burden is fair, but `AbstractServiceConfigurator` already opens these properties (`AbstractServiceConfigurator::$defaultTags` as protected doesn't seem legit AFAIU btw).
+
+Before inspecting this more and doing any other change:
+How likely are these configurator classes to be extended in userland? Is that something we really want? What about making them `@final` or even `@internal`, appart from the `AbstractConfigurator`?

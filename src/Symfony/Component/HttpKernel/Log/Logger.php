@@ -18,11 +18,9 @@ use Psr\Log\LogLevel;
 /**
  * Minimalist PSR-3 logger designed to write in stderr or any other stream.
  *
- * @internal
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class Logger extends AbstractLogger
+class Logger extends AbstractLogger
 {
     private static $levels = array(
         LogLevel::DEBUG => 0,

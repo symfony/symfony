@@ -11,10 +11,19 @@
 
 namespace PhpUnitCoverageTest;
 
-class Foo
+class BarCov
 {
-    public function fooZ()
+    private $foo;
+
+    public function __construct(FooCov $foo)
     {
-        return 'foo';
+        $this->foo = $foo;
+    }
+
+    public function barZ()
+    {
+        $this->foo->fooZ();
+
+        return 'bar';
     }
 }

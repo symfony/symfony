@@ -27,11 +27,11 @@ class CoverageListenerTest extends TestCase
 
         exec("$php -d zend_extension=xdebug.so $phpunit -c $dir/phpunit-without-listener.xml.dist $dir/tests/ --coverage-text", $output);
         $output = implode("\n", $output);
-        $this->assertContains('Foo', $output);
+        $this->assertContains('FooCov', $output);
 
         exec("$php -d zend_extension=xdebug.so $phpunit -c $dir/phpunit-with-listener.xml.dist $dir/tests/ --coverage-text", $output);
         $output = implode("\n", $output);
-        $this->assertNotContains('Foo', $output);
+        $this->assertNotContains('FooCov', $output);
         $this->assertContains("SutNotFoundTest::test\nCould not find the tested class.", $output);
         $this->assertNotContains("CoversTest::test\nCould not find the tested class.", $output);
         $this->assertNotContains("CoversDefaultClassTest::test\nCould not find the tested class.", $output);

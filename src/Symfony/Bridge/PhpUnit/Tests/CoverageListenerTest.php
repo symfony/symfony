@@ -8,12 +8,17 @@ class CoverageListenerTest extends TestCase
 {
     public function test()
     {
-        if ("\n" !== PHP_EOL) {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot be run on Windows.');
         }
 
         if (defined('HHVM_VERSION')) {
             $this->markTestSkipped('This test cannot be run on HHVM.');
+        }
+
+        exec('php --ri xdebug -d zend_extension=xdebug.so 2> /dev/null', $output, $returnCode);
+        if (0 !== $returnCode) {
+            $this->markTestSkipped('Xdebug is required to run this test.');
         }
 
         $dir = __DIR__.'/../Tests/Fixtures/coverage';

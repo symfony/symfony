@@ -91,7 +91,7 @@
 
     {% if collector.events is empty %}
         <div class="empty">
-            <p>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</p>
+            <p>No timing events have been recorded. Check that symfony/stopwatch is installed and debugging enabled in the kernel.</p>
         </div>
     {% else %}
         {{ block('panelContent') }}

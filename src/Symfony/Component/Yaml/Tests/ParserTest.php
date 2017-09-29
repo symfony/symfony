@@ -1748,6 +1748,43 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
     }
 
+    public function testMergeKeysWhenMappingsAreParsedAsObjects()
+    {
+        $yaml = <<<YAML
+foo: &FOO
+    bar: 1
+bar: &BAR
+    baz: 2
+    <<: *FOO
+baz:
+    baz_foo: 3
+    <<:
+        baz_bar: 4
+foobar:
+    bar: ~
+    <<: [*FOO, *BAR]
+YAML;
+        $expected = (object) array(
+            'foo' => (object) array(
+                'bar' => 1,
+            ),
+            'bar' => (object) array(
+                'baz' => 2,
+                'bar' => 1,
+            ),
+            'baz' => (object) array(
+                'baz_foo' => 3,
+                'baz_bar' => 4,
+            ),
+            'foobar' => (object) array(
+                'bar' => null,
+                'baz' => 2,
+            ),
+        );
+
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
     public function testFilenamesAreParsedAsStringsWithoutFlag()
     {
         $file = __DIR__.'/Fixtures/index.yml';

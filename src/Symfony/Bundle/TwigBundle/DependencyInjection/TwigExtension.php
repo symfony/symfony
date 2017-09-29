@@ -114,6 +114,11 @@ class TwigExtension extends Extension
             foreach ($paths as $path) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
+
+            if ($paths) {
+                // the last path must be the bundle views directory
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, '!'.$namespace));
+            }
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {

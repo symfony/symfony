@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Translation;
+namespace Symfony\Component\Translation\Extractor;
 
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\Extractor\AbstractFileExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
 /**
  * PhpExtractor extracts translation messages from a PHP template.

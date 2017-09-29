@@ -21,6 +21,9 @@ CHANGELOG
    has been dropped, use the `HttpKernel::allowCustomResponseCode()` method
    instead
  * removed convention-based commands registration
+ * removed the `ChainCacheClearer::add()` method
+ * removed the `CacheaWarmerAggregate::add()` and `setWarmers()` methods
+ * made `CacheWarmerAggregate` and `ChainCacheClearer` classes final
 
 3.4.0
 -----
@@ -29,10 +32,12 @@ CHANGELOG
  * deprecated bundle inheritance
  * added `RebootableInterface` and implemented it in `Kernel`
  * deprecated commands auto registration
- * added `AddCacheClearerPass`
- * added `AddCacheWarmerPass`
  * deprecated `EnvParametersResource`
  * added `Symfony\Component\HttpKernel\Client::catchExceptions()`
+ * deprecated the `ChainCacheClearer::add()` method
+ * deprecated the `CacheaWarmerAggregate::add()` and `setWarmers()` methods
+ * made `CacheWarmerAggregate` and `ChainCacheClearer` classes final
+
 
 3.3.0
 -----

@@ -23,6 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\ResettableInterface;
@@ -1412,7 +1413,7 @@ class FrameworkExtension extends Extension
                         if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
-                            $connectionDefinition->setFactory(array(StoreFactory::class, 'createConnection'));
+                            $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
                             $connectionDefinition->setArguments(array($storeDsn));
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }

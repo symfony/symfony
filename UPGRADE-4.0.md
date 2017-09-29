@@ -384,7 +384,7 @@ FrameworkBundle
    class instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass` class has been removed.
-   Use `Symfony\Component\Config\DependencyInjection\ConfigCachePass` class instead.
+   Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass` class has been
    removed. Use the `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass`
@@ -439,10 +439,10 @@ FrameworkBundle
    been removed.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass` class has been removed.
-   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+   Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass` class has been removed.
-   Use the `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+   Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
    class has been removed. Use the
@@ -494,6 +494,14 @@ FrameworkBundle
    `Symfony\Component\Translation\TranslatorInterface` as
     first argument.
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpExtractor` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpStringTokenParser`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpStringTokenParser` class instead.
+
 HttpFoundation
 --------------
 
@@ -525,9 +533,9 @@ HttpFoundation
  * The ability to check only for cacheable HTTP methods using `Request::isMethodSafe()` is
    not supported anymore, use `Request::isMethodCacheable()` instead.
 
- * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`, 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`,
    `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy`,
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` and 
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` and
    `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` classes have been removed.
 
  * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
@@ -603,6 +611,14 @@ HttpKernel
 
  * The `Symfony\Component\HttpKernel\Config\EnvParametersResource` class has been removed.
 
+ * The `ChainCacheClearer::add()` method has been removed,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate::add()` and `setWarmers()` methods have been removed,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate` and `ChainCacheClearer` classes have been made final.
+
 Ldap
 ----
 
@@ -674,7 +690,7 @@ SecurityBundle
 
  * The firewall option `logout_on_user_change` is now always true, which will
    trigger a logout if the user changes between requests.
-   
+
  * Removed the HTTP digest authentication system. The `HttpDigestFactory` class
    has been removed. Use another authentication system like `http_basic` instead.
 

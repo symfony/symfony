@@ -136,12 +136,10 @@ FrameworkBundle
    instead (e.g. `--prefix=""`)
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass`
-   class has been deprecated and will be removed in 4.0. Use the
-   `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` class instead.
+   class has been deprecated and will be removed in 4.0. Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass`
-   class has been deprecated and will be removed in 4.0. Use the
-   `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` class instead.
+   class has been deprecated and will be removed in 4.0. Use tagged iterator arguments instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass`
    class has been deprecated and will be removed in 4.0. Use the
@@ -206,6 +204,14 @@ FrameworkBundle
    `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
     and `YamlLintCommand` classes have been marked as final
 
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpExtractor` class instead.
+
+ * The `Symfony\Bundle\FrameworkBundle\Translation\PhpStringTokenParser`
+   class has been deprecated and will be removed in 4.0. Use the
+   `Symfony\Component\Translation\Extractor\PhpStringTokenParser` class instead.
+
 HttpFoundation
 --------------
 
@@ -260,6 +266,14 @@ HttpKernel
 
  * The `Symfony\Component\HttpKernel\Config\EnvParametersResource` class has been deprecated and will be removed in 4.0.
 
+ * The `ChainCacheClearer::add()` method has been deprecated and will be removed in 4.0,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate::add()` and `setWarmers()` methods have been deprecated and will be removed in 4.0,
+   inject the list of clearers as a constructor argument instead.
+
+ * The `CacheWarmerAggregate` and `ChainCacheClearer` classes have been made final.
+
 Process
 -------
 
@@ -274,8 +288,8 @@ Profiler
 Security
 --------
 
- * Deprecated the HTTP digest authentication: `NonceExpiredException`, 
-   `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` will be 
+ * Deprecated the HTTP digest authentication: `NonceExpiredException`,
+   `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` will be
    removed in 4.0. Use another authentication system like `http_basic` instead.
 
 SecurityBundle
@@ -299,7 +313,7 @@ SecurityBundle
  * Added `logout_on_user_change` to the firewall options. This config item will
    trigger a logout when the user has changed. Should be set to true to avoid
    deprecations in the configuration.
-   
+
  * Deprecated the HTTP digest authentication: `HttpDigestFactory` will be removed in 4.0.
    Use another authentication system like `http_basic` instead.
 

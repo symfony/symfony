@@ -191,6 +191,7 @@ class TwigExtensionTest extends TestCase
             array(__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'),
             array(__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'),
             array(realpath(__DIR__.'/../..').'/Resources/views', 'Twig'),
+            array(realpath(__DIR__.'/../..').'/Resources/views', '!Twig'),
             array(__DIR__.'/Fixtures/Resources/views'),
             array(__DIR__.'/Fixtures/templates'),
         ), $paths);

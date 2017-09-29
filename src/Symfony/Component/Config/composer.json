@@ -21,12 +21,10 @@
     },
     "require-dev": {
         "symfony/finder": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0"
+        "symfony/yaml": "~3.4|~4.0"
     },
     "conflict": {
-        "symfony/finder": "<3.4",
-        "symfony/dependency-injection": "<3.4"
+        "symfony/finder": "<3.4"
     },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"

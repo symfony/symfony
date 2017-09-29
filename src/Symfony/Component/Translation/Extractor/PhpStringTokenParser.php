@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Translation;
+namespace Symfony\Component\Translation\Extractor;
 
 /*
  * The following is derived from code at http://github.com/nikic/PHP-Parser

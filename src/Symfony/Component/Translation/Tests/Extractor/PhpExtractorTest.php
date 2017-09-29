@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
+namespace Symfony\Component\Translation\Tests\Extractor;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class PhpExtractorTest extends TestCase
@@ -71,7 +71,7 @@ EOF;
 
     public function resourcesProvider()
     {
-        $directory = __DIR__.'/../Fixtures/Resources/views/';
+        $directory = __DIR__.'/../fixtures/extractor/';
         $splFiles = array();
         foreach (new \DirectoryIterator($directory) as $fileInfo) {
             if ($fileInfo->isDot()) {

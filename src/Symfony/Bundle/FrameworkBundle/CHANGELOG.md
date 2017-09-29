@@ -20,6 +20,8 @@ CHANGELOG
  * Removed support of the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Removed the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
  * Removed the "framework.validation.cache" configuration option. Configure the "cache.validator" service under "framework.cache.pools" instead.
+ * Removed `PhpStringTokenParser`, use `Symfony\Component\Translation\Extractor\PhpStringTokenParser` instead.
+ * Removed `PhpExtractor`, use `Symfony\Component\Translation\Extractor\PhpExtractor` instead.
 
 3.4.0
 -----
@@ -32,8 +34,8 @@ CHANGELOG
    require symfony/stopwatch` in your `dev` environment.
  * Deprecated using the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
  * Deprecated the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
- * Deprecated `AddCacheClearerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass` instead.
- * Deprecated `AddCacheWarmerPass`, use `Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass` instead.
+ * Deprecated `AddCacheClearerPass`, use tagged iterator arguments instead.
+ * Deprecated `AddCacheWarmerPass`, use tagged iterator arguments instead.
  * Deprecated `TranslationDumperPass`, use 
    `Symfony\Component\Translation\DependencyInjection\TranslationDumperPass` instead
  * Deprecated `TranslationExtractorPass`, use 
@@ -74,6 +76,8 @@ CHANGELOG
    `EventDispatcherDebugCommand`, `RouterDebugCommand`, `RouterMatchCommand`,
    `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
     and `YamlLintCommand` classes have been marked as final
+ * Added `asset.request_context.base_path` and `asset.request_context.secure` parameters
+   to provide a default request context in case the stack is empty (similar to `router.request_context.*` parameters)
 
 3.3.0
 -----
@@ -102,7 +106,7 @@ CHANGELOG
  * Deprecated `SessionListener`
  * Deprecated `TestSessionListener`
  * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`.
-   Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
+   Use tagged iterator arguments instead.
  * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
  * Deprecated `ControllerArgumentValueResolverPass`. Use
    `Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass` instead
@@ -123,6 +127,10 @@ CHANGELOG
    `Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass` instead
  * Deprecated `ConstraintValidatorFactory`, use
    `Symfony\Component\Validator\ContainerConstraintValidatorFactory` instead.
+ * Deprecated `PhpStringTokenParser`, use
+   `Symfony\Component\Translation\Extractor\PhpStringTokenParser` instead.
+ * Deprecated `PhpExtractor`, use
+   `Symfony\Component\Translation\Extractor\PhpExtractor` instead.
 
 3.2.0
 -----

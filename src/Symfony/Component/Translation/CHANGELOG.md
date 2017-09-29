@@ -20,6 +20,8 @@ CHANGELOG
  * Added `TranslationWriterInterface`
  * Deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
  * added support for adding custom message formatter and decoupling the default one.
+ * Added `PhpExtractor`
+ * Added `PhpStringTokenParser`
 
 3.2.0
 -----

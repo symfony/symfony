@@ -1,11 +1,17 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `ConfigCachePass`
+
 3.4.0
 -----
 
  * added `setDeprecated()` method to indicate a deprecated node
  * added `XmlUtils::parse()` method to parse an XML string
+ * deprecated `ConfigCachePass`
 
 3.3.0
 -----

@@ -56,7 +56,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public function encode($data, $format, array $context = array())
     {
         if ($data instanceof \DOMDocument) {
-            return $data->saveXML();
+            return $data->saveXML($this->dom);
         }
 
         $xmlRootNodeName = $this->resolveXmlRootName($context);
@@ -73,7 +73,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $this->appendNode($this->dom, $data, $xmlRootNodeName);
         }
 
-        return $this->dom->saveXML();
+        return $this->dom->saveXML($this->dom);
     }
 
     /**

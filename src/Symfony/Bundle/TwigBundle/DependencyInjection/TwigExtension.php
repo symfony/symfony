@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
+require_once __DIR__.'/../Resources/di/tags.php';
+
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;

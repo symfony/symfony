@@ -114,7 +114,17 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new Parser();
         }
 
-        $classes = $this->yamlParser->parse(file_get_contents($this->file), Yaml::PARSE_KEYS_AS_STRINGS);
+        $prevErrorHandler = set_error_handler(function ($level, $message, $script, $line) use (&$prevErrorHandler) {
+            $message = E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$this->file.'"$0', $message) : $message;
+
+            return $prevErrorHandler ? $prevErrorHandler($level, $message, $script, $line) : false;
+        });
+
+        try {
+            $classes = $this->yamlParser->parse(file_get_contents($this->file), Yaml::PARSE_KEYS_AS_STRINGS);
+        } finally {
+            restore_error_handler();
+        }
 
         if (empty($classes)) {
             return array();

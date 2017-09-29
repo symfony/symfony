@@ -19,6 +19,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
@@ -308,6 +309,18 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => array(15),
             ),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
+    }
+
+    public function testArgon2iEncoder()
+    {
+        if (!Argon2iPasswordEncoder::isSupported()) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
+
+        $this->assertSame(array(array('JMS\FooBundle\Entity\User7' => array(
+            'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+            'arguments' => array(),
+        ))), $this->getContainer('argon2i_encoder')->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testRememberMeThrowExceptionsDefault()

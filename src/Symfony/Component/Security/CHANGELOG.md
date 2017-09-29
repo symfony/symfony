@@ -25,6 +25,7 @@ CHANGELOG
    the user will always be logged out when the user has changed between
    requests.
  * deprecated HTTP digest authentication
+ * Added a new password encoder for the Argon2i hashing algorithm
 
 3.3.0
 -----

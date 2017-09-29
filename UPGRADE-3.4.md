@@ -316,6 +316,10 @@ SecurityBundle
 
  * Deprecated the HTTP digest authentication: `HttpDigestFactory` will be removed in 4.0.
    Use another authentication system like `http_basic` instead.
+   
+ * Not configuring explicitly the provider on a firewall is ambiguous when there is more than one registered provider. 
+   Using the first configured provider is deprecated since 3.4 and will throw an exception on 4.0.
+   Explicitly configure the provider to use on your firewalls.
 
 Translation
 -----------

@@ -45,9 +45,9 @@
             <chain providers="service, basic" />
         </provider>
 
-        <firewall name="simple" pattern="/login" security="false" />
+        <firewall name="simple" pattern="/login" security="false" provider="default" />
 
-        <firewall name="secure" stateless="true">
+        <firewall name="secure" stateless="true" provider="default">
             <http-basic />
             <http-digest secret="TheSecret" />
             <form-login />
@@ -60,12 +60,12 @@
             <remember-me secret="TheSecret"/>
         </firewall>
 
-        <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST" logout-on-user-change="true">
+        <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST" logout-on-user-change="true" provider="default">
             <anonymous />
             <http-basic />
         </firewall>
 
-        <firewall name="with_user_checker" logout-on-user-change="true">
+        <firewall name="with_user_checker" logout-on-user-change="true" provider="default">
             <anonymous />
             <http-basic />
             <user-checker>app.user_checker</user-checker>

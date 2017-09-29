@@ -359,6 +359,10 @@ class SecurityExtension extends Extension
             $defaultProvider = $providerIds[$normalizedName];
         } else {
             $defaultProvider = reset($providerIds);
+
+            if (count($providerIds) > 1) {
+                @trigger_error(sprintf('Firewall "%s" has no "provider" set but multiple providers exist. Using the first configured provider (%s) is deprecated since 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.', $id, key($providerIds)), E_USER_DEPRECATED);
+            }
         }
 
         $config->replaceArgument(5, $defaultProvider);

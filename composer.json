@@ -105,6 +105,7 @@
     "provide": {
         "psr/cache-implementation": "1.0",
         "psr/container-implementation": "1.0",
+        "psr/log-implementation": "1.0",
         "psr/simple-cache-implementation": "1.0"
     },
     "autoload": {

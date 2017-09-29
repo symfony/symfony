@@ -101,9 +101,6 @@
         "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
-    "provide": {
-        "psr/log-implementation": "1.0.0"
-    },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.2.0",
@@ -112,6 +109,7 @@
     "provide": {
         "psr/cache-implementation": "1.0",
         "psr/container-implementation": "1.0",
+        "psr/log-implementation": "1.0",
         "psr/simple-cache-implementation": "1.0"
     },
     "autoload": {

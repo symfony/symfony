@@ -41,7 +41,7 @@
         "psr/cache": "~1.0"
     },
     "provide": {
-        "psr/log-implementation": "1.0.0"
+        "psr/log-implementation": "1.0"
     },
     "conflict": {
         "symfony/config": "<2.8",

@@ -34,21 +34,21 @@ class LoggerTest extends TestCase
 
     protected function setUp()
     {
-        $this->tmpFile = sys_get_temp_dir().'/log';
+        $this->tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'log';
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile);
     }
 
     protected function tearDown()
     {
-        unlink($this->tmpFile);
+        if (!@unlink($this->tmpFile)) {
+            file_put_contents($this->tmpFile, '');
+        }
     }
 
-    private function assertLogsMatch(array $expected, array $given)
+    public static function assertLogsMatch(array $expected, array $given)
     {
         foreach ($given as $k => $line) {
-            if (!preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2} '.preg_quote($expected[$k]).'/', $line)) {
-                throw new \Exception("$line do not match expected pattern $expected[$k]");
-            }
+            self::assertThat(1 === preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[\+-][0-9]{2}:[0-9]{2} '.preg_quote($expected[$k]).'/', $line), self::isTrue(), "\"$line\" do not match expected pattern \"$expected[$k]\"");
         }
     }
 
@@ -104,7 +104,7 @@ class LoggerTest extends TestCase
         $this->logger->log(LogLevel::DEBUG, 'test', array('user' => 'Bob'));
 
         // Will always be true, but asserts than an exception isn't thrown
-        $this->assertLogsMatch(array(), $this->getLogs());
+        $this->assertSame(array(), $this->getLogs());
     }
 
     /**

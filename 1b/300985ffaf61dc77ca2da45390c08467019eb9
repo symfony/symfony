@@ -1,0 +1,227 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-02-14T08:00:03Z
+
+With the constant changing of recommended algorithms, would it be an idea to provide a migration layer in Symfony? Currently people will have to build this themselves, but it could be a lot easier if Symfony would provide an extension point, especially now that we can rehash with native php functions.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-02-14T11:19:19Z
+
+That's a great idea since Symfony really should be promoting security best practices (though likely out of the scope of this PR so I'll have a go at starting that separately - if you've got any ideas on what direction that would take, what the config would look like, etc).
+
+It's pretty much a given that Argon2i will be the next hashing algorithm supported by `password_hash()` (and therefore `password_needs_rehash()`) in PHP 7.2 but I haven't actually found anywhere that confirms it - either way it won't become `PASSWORD_DEFAULT` until at least 7.3 :cry:
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-14T11:27:57Z
+
+> is a new password encoder considered a new feature (therefore should be against master) or a security improvement/patch (therefore should be against 2.8)?
+
+to me, it is a new feature
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-14T11:30:12Z
+
+> Is a MAX_PASSWORD_LENGTH of 72 appropriate? Argon2i is, in terms of execution duration, generally along the lines of BCrypt with a cost of 11.
+
+the max password length of 72 for bcrypt is because the bcrypt algorithm does not support longer passwords at all (it truncates the input at 72 chars).
+If Argon2i does not have a 72 chars restriction, we should not add it here (keeping the much longer restriction we have in all other encoders)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-14T11:34:49Z
+
+Please rebase this on top of master and change the target branch of the PR
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-02-14T11:59:41Z
+
+All done, thanks. I'll update the `MAX_PASSWORD_LENGTH` once I can find some concrete evidence that Argon2i does not have the same length limitations as BCrypt.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-14T12:15:27Z
+
+@zanderbaldwin if the algo does not explicitly says it truncates the input, it means it does not do it. you would have to look at the algo description.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-14T12:19:17Z
+
+another solution to detect it experimentally: hash a very long password, and then verify it with a string changing a single char in the string. and keep doing it, by increasing the altered index little by little. Once you find a case where the altered string is accepted in verify, it means you passed over the accepted input length.
+Of course, you don't need to increase 1 by 1 (unless you have days to spend on your machine for that, or a botnet to distribute the work). You can start with a high value and increase by big numbers, until you find an accepted mismatch, and then bisect the length being the max.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-02-14T12:39:58Z
+
+Confirmed, I tested up to 8192 characters and there are no false-positives from truncating. More than enough for a `MAX_PASSWORD_LENGTH` of 4096.
+
+---------------------------------------------------------------------------
+
+by jedisct1 at 2017-02-14T18:05:21Z
+
+You can safely use passwords up to 2^32-1 bits long.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-03-13T10:27:01Z
+
+Hi, all requested changes have been made and I've finally got round to fixing the conflicts with the latest version of `master` :+1:
+
+There will be conflicts with #21620 that I'll have to fix (most likely in this PR if #21620 gets merged first since it's been marked for `3.3`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-22T19:57:46Z
+
+`src/Symfony/Component/Security/Core/Encoder/EncoderFactory.php` should also be updated to account for argon2
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-03-23T16:25:48Z
+
+I've updated `EncoderFactory` but I admit that I didn't quite comprehend the `EncoderFactoryTest` to modify it appropriately; if this needs updating can someone point me in the right direction please?
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-06-18T11:13:04Z
+
+EncoderFactoryTest doesn't need to be updated, both bcrypt and pbkdf2 are not listed in this test-class also.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-09T10:39:19Z
+
+> Whilst the libsodium RFC has been approved and the public API confirmed, there has been no confirmation of Argon2i becoming an official algorithm for passhword_hash(). If that is confirmed, then the implementation should absolutely use the native password_* functions since the sodium_* functions do not have an equivalent to the password_needs_rehash() function.
+
+Confirmed it is: PHP 7.2 introduces `PASSWORD_ARGON2I` as algo for `password_hash()` (see https://wiki.php.net/rfc/argon2_password_hash).
+
+@zanderbaldwin What's the status of this PR? Could you finish it? Or do you want someone to take it over? I would like to get this in.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-12T16:05:35Z
+
+Sure, I'll get on this in the next few days.
+
+Does anyone know a good way to determine if the constant `PASSWORD_ARGON2I` is user or core defined? I'd rather feature test than test `PHP_VERSION_ID >= 70200`.
+
+I'm currently testing with the `php:7.2.0RC1-alpine` Docker image and the constant isn't defined yet (getting really weird behaviour on 3v4l.org too).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-14T08:26:00Z
+
+@zanderbaldwin Just tried out, using `defined('PASSWORD_ARGON2I')` should do the job.
+See https://3v4l.org/N8RCV
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:31:20Z
+
+@zanbaldwin would you have time to finish this PR for the end of the week?
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-26T13:31:05Z
+
+I've made most of the changes. Some points I want to clarify are:
+
+- `PASSWORD_ARGON2I` could be user-defined in versions of PHP less than 7.2 so I also do version-testing. But I hate version checking instead of feature checking, so does anyone know of a better way of doing this?
+- There are three different ways to test for the presence of Sodium, do we need them all?
+  - `PHP_VERSION_ID >= 70200 && defined('PASSWORD_ARGON2I')` uses the built in `password_hash()` functions.
+  - `function_exists('sodium_crypto_pwhash_str')` uses the Sodium functions that are native in 7.2.
+  - `extension_loaded('libsodium')` uses the Sodium extension for PHP versions less than 7.2.
+
+I'm thinking of getting rid of the `function_exists('sodium_crypto_pwhash_str')` check, but while testing on `php:7.2.0RC2-alpine` Docker image I've found that the constant `PASSWORD_ARGON2I` is not defined (but it works completely fine on 3v4l.org). Thoughts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T14:00:11Z
+
+please rebase using git, against branch 3.4
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-26T14:05:03Z
+
+Ah, I did `git rebase master` since that's the target branch.
+Would that be the reason Travis is spitting out 48 failed tests?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T14:10:21Z
+
+3.4 is the branch where we add features, so the target branch should also be updated.
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-09-26T14:18:11Z
+
+Make a back-up first (`git branch 2.8-argon2i-encoder-bak`)
+`git rebase --onto 3.4 master` and then push with force, don't forget to change the pull-request target branch.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-26T15:44:31Z
+
+should also be rebased once https://github.com/symfony/symfony/pull/21620 is merged to benefit from it
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-27T13:35:18Z
+
+@zanbaldwin please rebase this as the SelfSaltingEncoderInterface is now merged.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-28T12:42:18Z
+
+I've made some changes, but committed them in [a separate commit](4b0d83d30a2531982e7508580b201c0c7b3c3ee5) (which can be squashed later).
+
+- Update all exception messages regarding the Argon2i algorithm not being supported to be the same string.
+- Add a [static helper method on the `Argon2iPasswordEncoder` class](https://github.com/zanbaldwin/symfony/blob/4b0d83d30a2531982e7508580b201c0c7b3c3ee5/src/Symfony/Component/Security/Core/Encoder/Argon2iPasswordEncoder.php#L23-L28), all checks throughout the Security component and SecurityBundle use the same method. If this changes, it only needs to be updated in one place.
+- Added a check in the [`SecurityExtension`](https://github.com/zanbaldwin/symfony/blob/4b0d83d30a2531982e7508580b201c0c7b3c3ee5/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php#L613-L615). Is this the correct place to put it, or should the check be directly in the [`MainConfiguration`](https://github.com/zanbaldwin/symfony/blob/4b0d83d30a2531982e7508580b201c0c7b3c3ee5/src/Symfony/Bundle/SecurityBundle/DependencyInjection/MainConfiguration.php#L442) class using config validation callbacks?
+
+Feedback welcomed, as always :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-28T12:43:22Z
+
+tests are currently failing (see the CI builds) :)
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-28T12:47:33Z
+
+That's because Travis installs the [`symfony/security`](https://packagist.org/packages/symfony/security) package as version `dev-master 45020b8` rather than using the Security component code of this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-28T13:08:57Z
+
+@zanbaldwin In fact, the code is right (at least on the PHP 5.5 build, see https://travis-ci.org/symfony/symfony/jobs/280855177#L3622), but the Argon2i algorithm is not available. Tests should reflect this possibility.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2017-09-29T11:52:59Z
+
+Should I squash my five commits?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-29T12:09:00Z
+
+@zanbaldwin We can do it while merging, as you wish.
+@stof requested changes have been made, is this ok for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-29T12:57:42Z
+
+In fact yes, squashing is needed because we can't make it when several authors are in the history.

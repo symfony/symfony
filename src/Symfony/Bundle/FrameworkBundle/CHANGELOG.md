@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added `DotenvDataCollector` to collect envs loaded by the Dotenv component
  * Deprecated `profiler.matcher` option
  * Added support for `EventSubscriberInterface` on `MicroKernelTrait`
  * Removed `doctrine/cache` from the list of required dependencies in `composer.json`

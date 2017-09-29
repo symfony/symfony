@@ -51,5 +51,9 @@
             <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
             <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="285" />
         </service>
+
+        <service id="data_collector.dotenv" class="Symfony\Bundle\FrameworkBundle\DataCollector\DotenvDataCollector">
+            <tag name="data_collector" id="dotenv" />
+        </service>
     </services>
 </container>

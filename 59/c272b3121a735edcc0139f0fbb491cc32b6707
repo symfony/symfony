@@ -1,0 +1,168 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-30T11:19:04Z
+
+IMO this is a bugfix and should then be based on the `2.7` branch.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-08-30T11:37:36Z
+
+and even if we decide to consider it as a feature, it should go in 3.4, not in master (which is currently 4.0)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-30T18:09:27Z
+
+We should try harder to fix the issue for everyone without resorting to bcmath: the `function_exists()` check means some ppl will have the correct behavior, and some others will have the bug. This wouldn't qualify as a correct bugfix to me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-08-30T23:55:20Z
+
+@nicolas-grekas polyfill for bcmath? ;) Not that trivial I assume.
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2017-08-31T07:56:10Z
+
+@Tobion I think bcmath-polyfill wouldn't be out of the question. I have seen stuff like adding/multiplying large numbers as code kata before. I think it's more of a question of whether the trade off precision vs. performance is worth it? After all, if I know this issue I can avoid it in other ways in my application which better suit my needs. For example I could be doing `(int)(string) $value` which is fine in my code where I know that using the divisor will only return floats that should represent a full int value (and where I can probably add comments as to why this weird construct is there), but probably not in Symfony?
+
+edit: But I would certainly be interested in seeing a more generic solution to this. I'm interested to see what @nicolas-grekas or someone else can come up with. 🙂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T08:08:05Z
+
+I think we can work around the issue by enforcing a precision of 14, which is way enough for a money transformer, and is the minimal precision to represent most float accurately (the max is 17, but we don't care for the potential precision loss at this scale in this specific case).
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-31T10:16:10Z
+
+When working with money/currency and precision is required, the usage of strings and proper libraries should be enforced. The usage of floats/doubles and simply using `*` and `/` can lead to extremely annoying bugs as shown in the example.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T16:54:43Z
+
+See #21769 for a similar issue that we solved using cast-to-string.
+We should do the same here IMHO.
+
+---------------------------------------------------------------------------
+
+by Rubinum at 2017-09-02T09:21:00Z
+
+@nicolas-grekas thank you for digging down through the older PRs.
+As I understand the older PR that you mentioned, a solution could be to cast the whole operation to string? The return type of  `reverseTransform` and `transform` would change from `int|float` to `string`.
+
+```
+
+/**
+* Transforms a localized money string into a normalized format.
+*
+* @uses extension bcmath
+*
+* @param string $value Localized money string
+*
+* @return string Normalized number
+*
+* @throws TransformationFailedException If the given value is not a string
+*                                       or if the value can not be transformed.
+*/
+public function reverseTransform($value)
+    {
+        $value = parent::reverseTransform($value);
+        if (null !== $value) {
+            $value = (string) ($value * $this->divisor);
+        }
+        return $value;
+    }
+
+/**
+* Transforms a localized money string into a normalized format.
+*
+* @requires extension bcmath
+*
+* @param string $value Localized money string
+*
+* @return string Normalized number
+*
+* @throws TransformationFailedException If the given value is not a string
+*                                       or if the value can not be transformed.
+*/
+public function transform($value)
+    {
+        if (null !== $value) {
+            if (!is_numeric($value)) {
+                throw new TransformationFailedException('Expected a numeric.');
+            }
+            $value = (string) ($value / $this->divisor);
+        }
+        return parent::transform($value);
+    }
+```
+I mean we could do it the other way around and cast the string from my solution to float to stick to the return type:
+```
+$value = (float) function_exists('bcmul') ? bcmul((string) $value, (string) $this->divisor, $this->scale) : $value * $this->divisor;
+/* ... */
+$value = (float) function_exists('bcdiv') ? bcdiv((string) $value, (string) $this->divisor, $this->scale) : $value / $this->divisor;
+```
+But this looks a bit weird in my opinion ^^. What do you prefer?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-03T07:50:52Z
+
+```php
+public function reverseTransform($value)
+{
+    $value = parent::reverseTransform($value);
+
+    if (null !== $value) {
+        $value = (string) ($value * $this->divisor);
+
+        if (ctype_digit($value)) {
+            $value = (int) $value;
+        } else {
+            $value = (float) $value;
+        }
+    }
+
+    return $value;
+}
+```
+
+What about something like this?
+
+---------------------------------------------------------------------------
+
+by Rubinum at 2017-09-12T07:04:55Z
+
+@smoench. Thank you for that hint. I removed it.
+
+---------------------------------------------------------------------------
+
+by smoench at 2017-09-21T08:40:54Z
+
+Could this be merged?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-29T16:22:56Z
+
+Some background: We know floats cannot be represented perfectly so there is some lost precision.
+So a float like `36.55 * 100` can actually be `3654.99999999`.
+The problem when you cast that float to int, PHP cuts the scale and that leaves you with an `3654` instead of `6355`. By string casting, PHP will use the number precision and realize `3654.99999999` is just meant to be `3655` and then casting that to float again the float will be represented as something like `3655.00000001` instead which will also cast to the expected integer again.
+
+I wondered how many common montary values are affected by this difference and if it's reliable. Or if there are numbers where the string cast approach actually doesn't work as expected as well. I wrote a little script: https://3v4l.org/JdfjZ
+
+For numbers between 1 and 99999.
+Unexpected count traditional approach: 4586
+Unexpected count new approach: 0
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-09-29T16:28:12Z
+
+That makes me wonder by PHP by default does not do this automatically, i.e. `(int) $float === (int) (string) $float`. I guess that would solve some unexpected floating precision with type casting either explicitly or implicitly by scalar type declarations.

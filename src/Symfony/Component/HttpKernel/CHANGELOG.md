@@ -8,8 +8,6 @@ CHANGELOG
  * deprecated bundle inheritance
  * added `RebootableInterface` and implemented it in `Kernel`
  * deprecated commands auto registration
- * added `AddCacheClearerPass`
- * added `AddCacheWarmerPass`
  * deprecated `EnvParametersResource`
  * added `Symfony\Component\HttpKernel\Client::catchExceptions()`
  * deprecated the `ChainCacheClearer::add()` method

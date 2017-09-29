@@ -57,14 +57,15 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      * Checks whether this warmer is optional or not.
      *
      * @return bool always false
-     *
-     * @deprecated since version 3.4, to be removed in 4.0, inject the list of clearers as a constructor argument instead.
      */
     public function isOptional()
     {
         return false;
     }
 
+    /**
+     * @deprecated since version 3.4, to be removed in 4.0, inject the list of clearers as a constructor argument instead.
+     */
     public function setWarmers(array $warmers)
     {
         @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), E_USER_DEPRECATED);

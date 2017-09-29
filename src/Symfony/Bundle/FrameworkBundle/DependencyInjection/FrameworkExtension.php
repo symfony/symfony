@@ -1508,7 +1508,7 @@ class FrameworkExtension extends Extension
             if (!$container->getParameter('kernel.debug')) {
                 $propertyAccessDefinition->setFactory(array(PropertyAccessor::class, 'createCache'));
                 $propertyAccessDefinition->setArguments(array(null, null, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
-                $propertyAccessDefinition->addTag('cache.pool', array('clearer' => 'cache.default_clearer'));
+                $propertyAccessDefinition->addTag('cache.pool', array('clearer' => 'cache.system_clearer'));
                 $propertyAccessDefinition->addTag('monolog.logger', array('channel' => 'cache'));
             } else {
                 $propertyAccessDefinition->setClass(ArrayAdapter::class);

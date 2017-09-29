@@ -70,6 +70,8 @@ class StreamedResponse extends Response
     public function setCallback(callable $callback)
     {
         $this->callback = $callback;
+
+        return $this;
     }
 
     /**
@@ -85,7 +87,7 @@ class StreamedResponse extends Response
 
         $this->headersSent = true;
 
-        parent::sendHeaders();
+        return parent::sendHeaders();
     }
 
     /**
@@ -106,6 +108,8 @@ class StreamedResponse extends Response
         }
 
         call_user_func($this->callback);
+
+        return $this;
     }
 
     /**
@@ -118,6 +122,8 @@ class StreamedResponse extends Response
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a StreamedResponse instance.');
         }
+
+        return $this;
     }
 
     /**

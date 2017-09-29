@@ -40,6 +40,9 @@
         "symfony/var-dumper": "~3.3|~4.0",
         "psr/cache": "~1.0"
     },
+    "provide": {
+        "psr/log-implementation": "1.0"
+    },
     "conflict": {
         "symfony/config": "<2.8",
         "symfony/dependency-injection": "<3.4",

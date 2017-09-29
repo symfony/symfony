@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Always register a minimalist logger that writes in `stderr`
  * Deprecated `profiler.matcher` option
  * Added support for `EventSubscriberInterface` on `MicroKernelTrait`
  * Removed `doctrine/cache` from the list of required dependencies in `composer.json`

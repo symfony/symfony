@@ -175,8 +175,8 @@ class SecurityExtensionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Firewall "default" has no "provider" set but multiple providers exist. Using the first configured provider (first) is deprecated since 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Not configuring explicitly the provider on "default" firewall is ambiguous as there is more than one registered provider.
      */
     public function testDeprecationForAmbiguousProvider()
     {

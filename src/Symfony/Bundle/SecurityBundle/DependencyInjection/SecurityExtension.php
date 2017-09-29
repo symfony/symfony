@@ -261,6 +261,10 @@ class SecurityExtension extends Extension
             }
             $defaultProvider = $providerIds[$normalizedName];
         } else {
+            if (count($providerIds) > 1) {
+                throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
+            }
+
             $defaultProvider = reset($providerIds);
 
             if (count($providerIds) > 1) {

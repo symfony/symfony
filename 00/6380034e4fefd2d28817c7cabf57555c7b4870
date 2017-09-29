@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-13T18:42:53Z
+
+If we agree on this change, I will update the YAML file loaders from the Routing, Serializer, Translation and Validator components accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-15T08:52:19Z
+
+That is very specific and needs cooperation from the outside. I'm not convinced at all this is a good design...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-15T13:57:21Z
+
+For what it's worth: we already follow a similar approach in the `YamlLintCommand`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-15T14:46:13Z
+
+For configuration errors; file > stacktrace.
+
+> User Deprecated: Duplicate key "initials" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.
+
+Stacktrace is huge but doesnt help me at all. I end up searching the project for `initials:` in yaml files; got a few hits across files, but also in different branches of the same file. Got lucky, first attempt was good :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-16T15:29:41Z
+
+So, this looks like a workaround to me.
+Instead, I propose to make Yaml aware of the file name.
+We can do it with a flag: `Yaml::parse($file, Yaml::PARSE_FILE)`.
+Would be more sensible to me. WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-17T17:58:24Z
+
+`PARSE_FILE` sounds good. Wouldnt that fix a bunch of exception wrapping in DI also?
+
+In general i like the goal of; deprecation X > click WDT > [click file](https://github.com/symfony/symfony/pull/24236) > fix
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-19T09:12:02Z
+
+> So, this looks like a workaround to me.
+> Instead, I propose to make Yaml aware of the file name.
+> We can do it with a flag: `Yaml::parse($file, Yaml::PARSE_FILE)`.
+> Would be more sensible to me. WDYT?
+
+My intent was to improve the situation in Symfony 3.3 where such a flag could not be added as this would be a new feature. However, I agree that this would be a cleaner solution and thus I opened #24253.

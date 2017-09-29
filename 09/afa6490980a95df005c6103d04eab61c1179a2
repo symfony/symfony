@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-24T09:02:35Z
+
+I've changed the way levels are handled:
+
+* Only `stderr` is used by default
+* Levels less critical than `warning` are ignored by default
+* if `kernel.debug` is set, all levels enabled (in the compiled pass, and sent to `stderr`)
+
+I've also fixed most comments, thanks everybody for the review.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-24T16:51:52Z
+
+@ogizanagi
+
+> I wonder: would it be interesting to allow not interpolating messages, but inline context at the end (see Monolog's LineFormatter)? It'll allow better aggregation, but I don't know if the logging systems you mentioned could leverage it easily.
+
+AFAIK, most platforms doesn't support that unless you use their proprietary API (ex for Stackdriver: https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry).
+I'm not aware of a standard way to do that (but if you have a hint, I'm very interested).
+
+IMO we should keep this builtin logger as small and standard as possible and recommend to use other libraries such as Monolog for more advanced uses like this one... until a standard appears.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-26T10:49:18Z
+
+Changed the implementation to:
+
+* Only allow a minimal log level
+* Only allow one input (as in Go)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-27T13:49:34Z
+
+I'm wondering if the Logger shouldn't be part of the HttpKernel component instead. We had a logger there in the past, and as there is nothing tied to FrameworkBundle, it might be better (for reusability). WDTY? We could even move it into a new component, but that might be too much.
+
+---------------------------------------------------------------------------
+
+by shouze at 2017-09-27T13:56:08Z
+
+@fabpot yes in fact `HttpKernel` component should probably be split into `Kernel` and `HttpKernel` at some point because when you want to create a cli, this `Http` in `HttpKernel` should not be a requirement. It's another debate of course and it's a very good idea to put the minimal logger in the logger BTW.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-27T13:57:31Z
+
+@fabpot excellent idea. It will allow to easily reuse this tiny logger without having to install the whole framework.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-27T15:33:34Z
+
+I agree about moving it to the HttpKernel component.
+
+I don't think a dedicated component makes sense, as we don't plan to turn this into a configurable logger (Monolog is there for that), and the interface is not part of it either (psr/log is there)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-27T15:43:22Z
+
+Ok, let's move it to HttpKernel then.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-28T22:10:54Z
+
+- Moved to HttpKernel
+- Marked as `@experimental` instead of `@internal` (I think it makes sense with the move, but let me know if you prefer I revert that)
+- Changelogs updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-28T22:58:20Z
+
+when test are reasonably green :)

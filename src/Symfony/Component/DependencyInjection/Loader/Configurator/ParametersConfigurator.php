@@ -31,7 +31,7 @@ class ParametersConfigurator extends AbstractConfigurator
      * Creates a parameter.
      *
      * @param string $name
-     * @param string $value
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -46,7 +46,7 @@ class ParametersConfigurator extends AbstractConfigurator
      * Creates a parameter.
      *
      * @param string $name
-     * @param string $value
+     * @param mixed  $value
      *
      * @return $this
      */

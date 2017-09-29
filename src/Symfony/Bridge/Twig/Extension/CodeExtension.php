@@ -202,6 +202,10 @@ class CodeExtension extends AbstractExtension
      */
     public function getFileLink($file, $line)
     {
+        //If on Windows, we must escape $file if it contains backslash char
+        if('\\' === DIRECTORY_SEPARATOR && FALSE !== strpos($file, '\\')) {
+            $file = addslashes($file);
+        }
         if ($fmt = $this->fileLinkFormat) {
             return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
         }

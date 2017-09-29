@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-25T13:31:12Z
+
+I just updated the description to clarify the proposal, it's not about `Bundle` suffix but bundle class name instead. So, you have a bundle named `AcmeBlogBundle`? you will have two namespaces for their templates: `@AcmeBlog` and `@AcmeBlogBundle`. The last one is specially useful when you're overriding a template that also extends itself, without configure `twig.paths` manually.
+
+At the same time, you can from a controller or anywhere to load directly the template of the bundle or the overridden one in your app, without create extra templates or extra configuration to achieve it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-27T02:28:44Z
+
+Feat. freeze is coming :) also we can use some preffix or suffix to achieve it, WDYT?
+
+ping @fabpot, @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-27T06:32:20Z
+
+I don't dislike the idea ... but I'm not sold on it either. My concern is that you'll have two almost identical namespaces that are completely different: `@FOSUser`, `@FOSUserBundle` ... which one should I use? I already have a lot of problems remembering if the namespace contains the `Bundle` suffix or not. If I see `@TwigBundle/...` in a template, I don't think I'll remember that it refers to the original template path of the parent bundle.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-27T10:51:09Z
+
+Another proposal that is easy to remember?
+
+ * `!FOSUser`
+ * `FOSUser!`
+ * `FOSUserSource`
+ * `FOSUserOriginal`
+ * `FOSUserParent`
+ * `FOSUserBundle`
+
+This namespace should be used only to avoid the circular reference.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-27T11:07:37Z
+
+I share @javiereguiluz' concerns though I also do not have a better proposal.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-27T11:15:56Z
+
+Some random proposals:
+
+```twig
+{% extends 'parent@Foo/layout.html.twig' %}
+
+{% extends '@@Foo/layout.html.twig' %}
+
+{% extends '@Foo/layout.html.twig', { parent: true } %}
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-27T11:34:32Z
+
+@javiereguiluz only the second one `@@Foo` can be possible right now as valid Twig namespace, I'll take your proposal, thanks.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-27T12:15:24Z
+
+It's not intuitive anyway, so we need document it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-28T17:56:14Z
+
+@ogizanagi's suggestion sounds good to me too.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-28T17:58:54Z
+
+Perfect! I like this too, changed to `!` preffix :)

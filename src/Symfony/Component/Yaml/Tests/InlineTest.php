@@ -81,7 +81,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead.
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 1.
      */
     public function testDeprecatedConstantTag()
     {
@@ -182,7 +182,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0.
+     * @expectedDeprecation Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0 on line 1.
      * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
      */
     public function testParseMappingKeyWithColonNotFollowedBySpace()
@@ -270,7 +270,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A reference must contain at least one character.
+     * @expectedExceptionMessage A reference must contain at least one character at line 1.
      */
     public function testParseUnquotedAsterisk()
     {
@@ -279,7 +279,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A reference must contain at least one character.
+     * @expectedExceptionMessage A reference must contain at least one character at line 1.
      */
     public function testParseUnquotedAsteriskFollowedByAComment()
     {
@@ -293,9 +293,9 @@ class InlineTest extends TestCase
     {
         if (method_exists($this, 'expectExceptionMessage')) {
             $this->expectException(ParseException::class);
-            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo ").', $indicator));
         } else {
-            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo ").', $indicator));
         }
 
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
@@ -313,9 +313,9 @@ class InlineTest extends TestCase
     {
         if (method_exists($this, 'expectExceptionMessage')) {
             $this->expectException(ParseException::class);
-            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo ").', $indicator));
         } else {
-            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar (near "%sfoo ").', $indicator));
+            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo ").', $indicator));
         }
 
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
@@ -328,7 +328,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not quoting the scalar "%bar " starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.
+     * @expectedDeprecation Not quoting the scalar "%bar " starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0 on line 1.
      * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
      */
     public function testParseUnquotedScalarStartingWithPercentCharacter()
@@ -705,7 +705,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported}.
+     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported} at line 1.
      */
     public function testNotSupportedMissingValue()
     {
@@ -724,7 +724,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0.
+     * @expectedDeprecation Omitting the key of a mapping is deprecated and will throw a ParseException in 4.0 on line 1.
      */
     public function testOmittedMappingKeyIsParsedAsColon()
     {
@@ -754,7 +754,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.
+     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead on line 1.
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
     public function testImplicitStringCastingOfMappingKeysIsDeprecated($yaml, $expected)
@@ -765,7 +765,7 @@ class InlineTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Using the Yaml::PARSE_KEYS_AS_STRINGS flag is deprecated since version 3.4 as it will be removed in 4.0. Quote your keys when they are evaluable instead.
-     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead.
+     * @expectedDeprecation Implicit casting of incompatible mapping keys to strings is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead on line 1.
      * @dataProvider getNotPhpCompatibleMappingKeyData
      */
     public function testExplicitStringCastingOfMappingKeys($yaml, $expected)
@@ -785,7 +785,7 @@ class InlineTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Support for the !str tag is deprecated since version 3.4. Use the !!str tag instead.
+     * @expectedDeprecation Support for the !str tag is deprecated since version 3.4. Use the !!str tag instead on line 1.
      */
     public function testDeprecatedStrTag()
     {

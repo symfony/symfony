@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-29T13:33:15Z
+
+Can you add a description of why you want this change? Also, your table doesn't list this as a new feature, while it does look like one to me. You're also missing `@return` notations in the docblocks.
+
+---------------------------------------------------------------------------
+
+by abellion at 2017-09-29T13:45:16Z
+
+Just to allow things like that :
+
+```php
+return $response->setCallback(/* ... */);
+```
+Instead of :
+```php
+$response->setCallback(/* ... */);
+
+return $response;
+```
+I'm gonna add the doc block.

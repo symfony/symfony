@@ -44,6 +44,7 @@ security:
     firewalls:
         simple: { pattern: /login, security: false }
         secure:
+            provider: default
             stateless: true
             http_basic: true
             http_digest:
@@ -60,6 +61,7 @@ security:
             user_checker: ~
 
         host:
+            provider: default
             pattern: /test
             host: foo\.example\.org
             methods: [GET,POST]
@@ -67,6 +69,7 @@ security:
             http_basic: true
 
         with_user_checker:
+            provider: default
             anonymous: ~
             http_basic: ~
             user_checker: app.user_checker

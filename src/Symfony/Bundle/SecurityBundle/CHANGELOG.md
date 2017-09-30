@@ -18,6 +18,7 @@ CHANGELOG
  * deprecated command `init:acl` along with `InitAclCommand` class
  * Added support for the new Argon2i password encoder
  * added `stateless` option to the `switch_user` listener
+ * deprecated auto picking the first registered provider when no configured provider on a firewall and ambiguous
 
 3.3.0
 -----

@@ -60,8 +60,9 @@ $container->loadFromExtension('security', array(
     ),
 
     'firewalls' => array(
-        'simple' => array('pattern' => '/login', 'security' => false),
+        'simple' => array('provider' => 'default', 'pattern' => '/login', 'security' => false),
         'secure' => array('stateless' => true,
+            'provider' => 'default',
             'http_basic' => true,
             'form_login' => true,
             'anonymous' => true,
@@ -74,6 +75,7 @@ $container->loadFromExtension('security', array(
             'logout_on_user_change' => true,
         ),
         'host' => array(
+            'provider' => 'default',
             'pattern' => '/test',
             'host' => 'foo\\.example\\.org',
             'methods' => array('GET', 'POST'),
@@ -82,6 +84,7 @@ $container->loadFromExtension('security', array(
             'logout_on_user_change' => true,
         ),
         'with_user_checker' => array(
+            'provider' => 'default',
             'user_checker' => 'app.user_checker',
             'anonymous' => true,
             'http_basic' => true,

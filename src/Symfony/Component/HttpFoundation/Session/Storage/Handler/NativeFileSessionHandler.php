@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
- * NativeFileSessionHandler.
- *
  * Native session handler using PHP's built in file storage.
  *
  * @author Drak <drak@zikula.org>
@@ -21,8 +19,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class NativeFileSessionHandler extends NativeSessionHandler
 {
     /**
-     * Constructor.
-     *
      * @param string $savePath Path of directory to save session files
      *                         Default null will leave setting as defined by PHP.
      *                         '/path', 'N;/path', or 'N;octal-mode;/path

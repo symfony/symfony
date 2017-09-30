@@ -26,8 +26,6 @@ class HttpKernelExtension extends AbstractExtension
     private $handler;
 
     /**
-     * Constructor.
-     *
      * @param FragmentHandler $handler A FragmentHandler instance
      */
     public function __construct(FragmentHandler $handler)

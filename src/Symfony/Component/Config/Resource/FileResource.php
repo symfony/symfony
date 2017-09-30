@@ -26,8 +26,6 @@ class FileResource implements ResourceInterface, \Serializable
     private $resource;
 
     /**
-     * Constructor.
-     *
      * @param string $resource The file path to the resource
      */
     public function __construct($resource)

@@ -12,15 +12,11 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 /**
- * UnprocessableEntityHttpException.
- *
  * @author Steve Hutchins <hutchinsteve@gmail.com>
  */
 class UnprocessableEntityHttpException extends HttpException
 {
     /**
-     * Constructor.
-     *
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
      * @param int        $code     The internal exception code

@@ -24,8 +24,6 @@ class SwitchUserRole extends Role
     private $source;
 
     /**
-     * Constructor.
-     *
      * @param string         $role   The role as a string
      * @param TokenInterface $source The original token
      */

@@ -27,8 +27,6 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
     private $class;
 
     /**
-     * Constructor.
-     *
      * @param string $username the username representation
      * @param string $class    the user's fully qualified class name
      *

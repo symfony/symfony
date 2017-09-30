@@ -36,8 +36,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     private $secureRandom;
 
     /**
-     * Constructor.
-     *
      * @param array                 $userProviders
      * @param string                $key
      * @param string                $providerKey

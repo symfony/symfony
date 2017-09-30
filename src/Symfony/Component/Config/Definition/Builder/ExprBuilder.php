@@ -26,8 +26,6 @@ class ExprBuilder
     public $thenPart;
 
     /**
-     * Constructor.
-     *
      * @param NodeDefinition $node The related node
      */
     public function __construct(NodeDefinition $node)

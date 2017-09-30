@@ -34,8 +34,6 @@ class Parser
     private $locallySkippedLineNumbers = array();
 
     /**
-     * Constructor.
-     *
      * @param int      $offset             The offset of YAML document (used for line numbers in error messages)
      * @param int|null $totalNumberOfLines The overall number of lines being parsed
      * @param int[]    $skippedLineNumbers Number of comment lines that have been skipped by the parser

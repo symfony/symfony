@@ -68,8 +68,6 @@ class ApcUniversalClassLoader extends UniversalClassLoader
     private $prefix;
 
     /**
-     * Constructor.
-     *
      * @param string $prefix A prefix to create a namespace in APC
      *
      * @throws \RuntimeException

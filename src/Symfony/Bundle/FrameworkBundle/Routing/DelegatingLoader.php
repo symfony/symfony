@@ -32,8 +32,6 @@ class DelegatingLoader extends BaseDelegatingLoader
     private $loading = false;
 
     /**
-     * Constructor.
-     *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
      * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance

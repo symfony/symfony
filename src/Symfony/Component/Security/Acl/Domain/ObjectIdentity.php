@@ -27,8 +27,6 @@ final class ObjectIdentity implements ObjectIdentityInterface
     private $type;
 
     /**
-     * Constructor.
-     *
      * @param string $identifier
      * @param string $type
      *

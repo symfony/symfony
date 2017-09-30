@@ -40,8 +40,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     protected $requestStack;
 
     /**
-     * Constructor.
-     *
      * @param EventDispatcherInterface    $dispatcher   An EventDispatcherInterface instance
      * @param ControllerResolverInterface $resolver     A ControllerResolverInterface instance
      * @param RequestStack                $requestStack A stack for master/sub requests

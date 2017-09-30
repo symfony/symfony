@@ -73,8 +73,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
     protected $defaultRouteIndex = 0;
 
     /**
-     * Constructor.
-     *
      * @param Reader $reader
      */
     public function __construct(Reader $reader)

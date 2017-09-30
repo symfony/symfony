@@ -39,8 +39,6 @@ class ProfilerListener implements EventSubscriberInterface
     protected $parents;
 
     /**
-     * Constructor.
-     *
      * @param Profiler                     $profiler           A Profiler instance
      * @param RequestMatcherInterface|null $matcher            A RequestMatcher instance
      * @param bool                         $onlyException      true if the profiler only collects data when an exception occurs, false otherwise

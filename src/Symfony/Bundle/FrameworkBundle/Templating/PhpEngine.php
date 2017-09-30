@@ -27,8 +27,6 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
     protected $container;
 
     /**
-     * Constructor.
-     *
      * @param TemplateNameParserInterface $parser    A TemplateNameParserInterface instance
      * @param ContainerInterface          $container The DI container
      * @param LoaderInterface             $loader    A loader instance

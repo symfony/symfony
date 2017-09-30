@@ -25,8 +25,6 @@ class ArrayInput extends Input
     private $parameters;
 
     /**
-     * Constructor.
-     *
      * @param array                $parameters An array of parameters
      * @param InputDefinition|null $definition A InputDefinition instance
      */

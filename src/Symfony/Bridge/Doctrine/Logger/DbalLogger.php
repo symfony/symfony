@@ -16,8 +16,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\DBAL\Logging\SQLLogger;
 
 /**
- * DbalLogger.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DbalLogger implements SQLLogger
@@ -29,8 +27,6 @@ class DbalLogger implements SQLLogger
     protected $stopwatch;
 
     /**
-     * Constructor.
-     *
      * @param LoggerInterface $logger    A LoggerInterface instance
      * @param Stopwatch       $stopwatch A Stopwatch instance
      */

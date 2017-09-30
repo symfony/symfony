@@ -40,8 +40,6 @@ class FragmentHandler
     private $requestStack;
 
     /**
-     * Constructor.
-     *
      * RequestStack will become required in 3.0.
      *
      * @param FragmentRendererInterface[] $renderers    An array of FragmentRendererInterface instances

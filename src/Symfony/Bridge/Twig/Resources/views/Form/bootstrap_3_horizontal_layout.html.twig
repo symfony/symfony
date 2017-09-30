@@ -9,9 +9,7 @@
 
 {% block form_label -%}
 {% spaceless %}
-    {% if label is same as(false) %}
-        <div class="{{ block('form_label_class') }}"></div>
-    {% else %}
+    {% if label is not same as(false) %}
         {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ block('form_label_class'))|trim}) %}
         {{- parent() -}}
     {% endif %}
@@ -77,5 +75,9 @@ col-sm-2
 {% endblock reset_row %}
 
 {% block form_group_class -%}
-col-sm-10
+    {%- if label is same as(false) -%}
+        col-sm-12
+    {%- else -%}
+        col-sm-10
+    {%- endif -%}
 {%- endblock form_group_class %}

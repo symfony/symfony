@@ -100,6 +100,16 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
         );
     }
 
+    public function testLabelNoDivIfFalse()
+    {
+        $this->assertEmpty(
+            $this->renderLabel(
+                $this->factory->createNamed('name', 'date', null, array('label' => false))->createView()
+            ),
+            'The label should not be rendered'
+        );
+    }
+
     public function testStartTag()
     {
         $form = $this->factory->create('form', null, array(

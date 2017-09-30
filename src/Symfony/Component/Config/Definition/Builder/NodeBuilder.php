@@ -21,9 +21,6 @@ class NodeBuilder implements NodeParentInterface
     protected $parent;
     protected $nodeMapping;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->nodeMapping = array(

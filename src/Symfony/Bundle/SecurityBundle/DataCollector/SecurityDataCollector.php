@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
- * SecurityDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityDataCollector extends DataCollector
@@ -29,8 +27,6 @@ class SecurityDataCollector extends DataCollector
     private $roleHierarchy;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface|null  $tokenStorage
      * @param RoleHierarchyInterface|null $roleHierarchy
      */

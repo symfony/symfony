@@ -34,8 +34,6 @@ class Link
     protected $currentUri;
 
     /**
-     * Constructor.
-     *
      * @param \DOMElement $node       A \DOMElement instance
      * @param string      $currentUri The URI of the page where the link is embedded (or the base href)
      * @param string      $method     The method to use for the link (get by default)

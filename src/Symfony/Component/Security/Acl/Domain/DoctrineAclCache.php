@@ -32,8 +32,6 @@ class DoctrineAclCache implements AclCacheInterface
     private $permissionGrantingStrategy;
 
     /**
-     * Constructor.
-     *
      * @param Cache                               $cache
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param string                              $prefix

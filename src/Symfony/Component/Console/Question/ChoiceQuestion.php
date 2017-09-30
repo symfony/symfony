@@ -24,8 +24,6 @@ class ChoiceQuestion extends Question
     private $errorMessage = 'Value "%s" is invalid';
 
     /**
-     * Constructor.
-     *
      * @param string $question The question to ask to the user
      * @param array  $choices  The list of available choices
      * @param mixed  $default  The default answer to return

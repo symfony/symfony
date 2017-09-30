@@ -37,8 +37,6 @@ class Command
     private $errorHandler;
 
     /**
-     * Constructor.
-     *
      * @param Command|null $parent Parent command
      */
     public function __construct(Command $parent = null)

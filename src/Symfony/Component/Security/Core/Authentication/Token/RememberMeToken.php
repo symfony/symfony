@@ -24,8 +24,6 @@ class RememberMeToken extends AbstractToken
     private $providerKey;
 
     /**
-     * Constructor.
-     *
      * @param UserInterface $user
      * @param string        $providerKey
      * @param string        $key

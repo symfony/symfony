@@ -25,8 +25,6 @@ class TokenStream
     private $expression;
 
     /**
-     * Constructor.
-     *
      * @param array  $tokens     An array of tokens
      * @param string $expression
      */

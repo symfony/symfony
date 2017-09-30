@@ -21,8 +21,6 @@ class SerializedParsedExpression extends ParsedExpression
     private $nodes;
 
     /**
-     * Constructor.
-     *
      * @param string $expression An expression
      * @param string $nodes      The serialized nodes for the expression
      */

@@ -57,8 +57,6 @@ class AclProvider implements AclProviderInterface
     private $permissionGrantingStrategy;
 
     /**
-     * Constructor.
-     *
      * @param Connection                          $connection
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array                               $options

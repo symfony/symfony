@@ -62,8 +62,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     private $reflMember = array();
 
     /**
-     * Constructor.
-     *
      * @param string $class    The name of the class this member is defined on
      * @param string $name     The name of the member
      * @param string $property The property the member belongs to

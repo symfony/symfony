@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
- * Session.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Drak <drak@zikula.org>
  */
@@ -44,8 +42,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     private $attributeName;
 
     /**
-     * Constructor.
-     *
      * @param SessionStorageInterface $storage    A SessionStorageInterface instance
      * @param AttributeBagInterface   $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
      * @param FlashBagInterface       $flashes    A FlashBagInterface instance (defaults null for default FlashBag)

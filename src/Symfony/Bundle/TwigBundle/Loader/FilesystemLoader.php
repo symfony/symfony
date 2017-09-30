@@ -29,8 +29,6 @@ class FilesystemLoader extends BaseFilesystemLoader
     protected $parser;
 
     /**
-     * Constructor.
-     *
      * @param FileLocatorInterface        $locator A FileLocatorInterface instance
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      */

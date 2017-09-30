@@ -26,8 +26,6 @@ abstract class GeneratorDumper implements GeneratorDumperInterface
     private $routes;
 
     /**
-     * Constructor.
-     *
      * @param RouteCollection $routes The RouteCollection to dump
      */
     public function __construct(RouteCollection $routes)

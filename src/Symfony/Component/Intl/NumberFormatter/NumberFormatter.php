@@ -255,8 +255,6 @@ class NumberFormatter
     );
 
     /**
-     * Constructor.
-     *
      * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only supported styles are NumberFormatter::DECIMAL

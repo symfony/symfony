@@ -24,8 +24,6 @@ final class Schema extends BaseSchema
     private $options;
 
     /**
-     * Constructor.
-     *
      * @param array      $options    the names for tables
      * @param Connection $connection
      */

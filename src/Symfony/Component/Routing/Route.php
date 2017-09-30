@@ -65,8 +65,6 @@ class Route implements \Serializable
     private $condition = '';
 
     /**
-     * Constructor.
-     *
      * Available options:
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)

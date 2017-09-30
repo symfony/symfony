@@ -48,8 +48,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     private $listeners = array();
 
     /**
-     * Constructor.
-     *
      * @param int                                 $id
      * @param ObjectIdentityInterface             $objectIdentity
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy

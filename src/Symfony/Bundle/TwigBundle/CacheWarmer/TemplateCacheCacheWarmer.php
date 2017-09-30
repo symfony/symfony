@@ -30,8 +30,6 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
     protected $finder;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface           $container The dependency injection container
      * @param TemplateFinderInterface|null $finder    The template paths cache warmer
      */

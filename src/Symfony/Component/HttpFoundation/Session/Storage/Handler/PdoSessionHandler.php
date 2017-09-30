@@ -148,8 +148,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private $gcCalled = false;
 
     /**
-     * Constructor.
-     *
      * You can either pass an existing database connection as PDO instance or
      * pass a DSN string that will be used to lazy-connect to the database
      * when the session is actually used. Furthermore it's possible to pass null

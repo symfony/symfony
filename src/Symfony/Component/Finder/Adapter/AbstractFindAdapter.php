@@ -31,9 +31,6 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      */
     protected $shell;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->shell = new Shell();

@@ -32,8 +32,6 @@ class Entry implements AuditableEntryInterface
     private $granting;
 
     /**
-     * Constructor.
-     *
      * @param int                       $id
      * @param AclInterface              $acl
      * @param SecurityIdentityInterface $sid

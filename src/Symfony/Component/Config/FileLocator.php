@@ -21,8 +21,6 @@ class FileLocator implements FileLocatorInterface
     protected $paths;
 
     /**
-     * Constructor.
-     *
      * @param string|array $paths A path or an array of paths where to look for resources
      */
     public function __construct($paths = array())

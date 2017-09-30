@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-30T13:44:35Z
+
+Documentation sounds good for now. In any case, #24300 will need some tweaks. I've tested in real-life, and this does not work well IMHO.

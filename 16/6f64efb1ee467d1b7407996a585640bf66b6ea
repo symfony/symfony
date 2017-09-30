@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-14T08:33:12Z
+
+The `FileType` should handle this quite well since #20418.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-14T08:50:55Z
+
+@xabbuh It does not work because the null is somehow converted to an empty string. I don't know when or why. And regardless I believe this should be fixed in HttpFoundation anyway - some people are using HttpFoundation without Forms.
+
+Should I revert the FileType fix as part of this PR? I don't think it's the right place to fix this issue.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-14T09:07:49Z
+
+Not sure about reverting the change inside the `FileType`. We may discuss that. However, can you create a test covering the change you are doing here?
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-14T09:09:39Z
+
+Of course. I wouldn't want you to merge it without a test anyway.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-14T09:39:33Z
+
+@xabbuh Test added. For the Forms component I'd like to remove the `FileType::buildForm()` method. Other changes from #20418 should stay.
+
+@yceruto Since you're the author of #20418, can I ask for your opinion?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-14T12:00:05Z
+
+@enumag Can you rebase and change the target branch to `2.7`?
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-14T12:06:00Z
+
+@xabbuh Sure. Can I ask why? I mean according to [Symfony Release Process](http://symfony.com/doc/current/contributing/community/releases.html) maintenance for 2.7 already ended. I don't think this qualifies for a security fix.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-14T12:14:00Z
+
+Symfony is an LTS release it receives bugfix until May 2018.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-14T12:16:48Z
+
+Oh right, my mistake. I'll rebase it soon.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-14T12:30:03Z
+
+@xabbuh All done.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-14T13:28:05Z
+
+Yep, I think `buildForm()` and related test case can be removed safely so.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-18T07:08:50Z
+
+@xabbuh Should I remove the buildForm here or in another PR? Perhaps it should only be removed in newer symfony versions to prevent regression when new version of Form component is used with old version of HttpFoundation?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-20T09:58:08Z
+
+We *could* remove the Form related part, but as you said it may hurt people mixing different versions of the HttpFoundation and Form components. Thus, as it doesn't hurt, I'd vote to keep it as is.
+
+---------------------------------------------------------------------------
+
+by enumag at 2017-09-20T16:48:26Z
+
+Alright. I will send a PR to Forms later when there is no possibility of such conflict.

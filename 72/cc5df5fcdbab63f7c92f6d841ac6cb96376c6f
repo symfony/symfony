@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-27T12:01:10Z
+
+there are a lot more, shall I remove them, too?
+
+https://github.com/symfony/symfony/search?o=asc&q=%2A+Constructor.&s=indexed&type=&utf8=%E2%9C%93
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-27T13:14:28Z
+
+Yes please
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-27T14:01:59Z
+
+It should start by targeting the lowest maintained branch (i.e 2.7), not 3.3. :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-27T14:31:09Z
+
+> It should start by targeting the lowest maintained branch (i.e 2.7), not 3.3. :)
+
+can you do this or shall I switch the branch?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-09-27T14:45:44Z
+
+You should do it since it will lead to a rebase
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-28T07:15:40Z
+
+Refs https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/2511
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-28T07:19:41Z
+
+> It should start by targeting the lowest maintained branch (i.e 2.7), not 3.3. :)
+
+done @ogizanagi
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-28T07:40:02Z
+
+@OskarStark: There are still some tests failing.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-28T10:05:01Z
+
+> @OskarStark: There are still some tests failing.
+
+*fabbot* is failing, but not related to this PR
+*AppVeyor* is green
+*travis* failed, due to now output for 10 minutes, I restarted via --force push
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-28T10:29:29Z
+
+can you still fix fabbot failure please?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-28T11:12:13Z
+
+> can you still fix fabbot failure please?
+
+done @nicolas-grekas 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-28T11:31:48Z
+
+Hmm, I don't know why they are failing... 😢
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2017-09-28T11:59:15Z
+
+> travis error is a false positive
+
+good to know, thank you @nicolas-grekas

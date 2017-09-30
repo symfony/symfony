@@ -49,7 +49,7 @@
             <http-basic />
             <form-login />
             <anonymous />
-            <switch-user />
+            <switch-user stateless="true" />
             <x509 />
             <remote-user />
             <user-checker />

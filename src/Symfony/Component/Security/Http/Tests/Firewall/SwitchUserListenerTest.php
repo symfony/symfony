@@ -266,4 +266,29 @@ class SwitchUserListenerTest extends TestCase
 
         $this->assertSame($replacedToken, $this->tokenStorage->getToken());
     }
+
+    public function testSwitchUserStateless()
+    {
+        $token = new UsernamePasswordToken('username', '', 'key', array('ROLE_FOO'));
+        $user = new User('username', 'password', array());
+
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+
+        $this->accessDecisionManager->expects($this->once())
+            ->method('decide')->with($token, array('ROLE_ALLOWED_TO_SWITCH'))
+            ->will($this->returnValue(true));
+
+        $this->userProvider->expects($this->once())
+            ->method('loadUserByUsername')->with('kuba')
+            ->will($this->returnValue($user));
+        $this->userChecker->expects($this->once())
+            ->method('checkPostAuth')->with($user);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', null, true);
+        $listener->handle($this->event);
+
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $this->tokenStorage->getToken());
+        $this->assertFalse($this->event->hasResponse());
+    }
 }

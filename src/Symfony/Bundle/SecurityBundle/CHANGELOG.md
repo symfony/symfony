@@ -17,6 +17,7 @@ CHANGELOG
  * deprecated command `acl:set` along with `SetAclCommand` class
  * deprecated command `init:acl` along with `InitAclCommand` class
  * Added support for the new Argon2i password encoder
+ * added `stateless` option to the `switch_user` listener
 
 3.3.0
 -----

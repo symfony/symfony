@@ -130,6 +130,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 array(
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                    'stateless' => true,
                 ),
             ),
             array(
@@ -256,6 +257,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 array(
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                    'stateless' => true,
                 ),
             ),
             array(

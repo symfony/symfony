@@ -693,6 +693,8 @@ SecurityBundle
 
  * Removed the HTTP digest authentication system. The `HttpDigestFactory` class
    has been removed. Use another authentication system like `http_basic` instead.
+   
+ * The `switch_user.stateless` option is now always true if the firewall is stateless.
 
 Serializer
 ----------

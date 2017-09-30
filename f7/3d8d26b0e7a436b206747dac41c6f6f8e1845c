@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-12T17:38:04Z
+
+Tests don't appreciate at all this change, see appveyor and travis... :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-13T09:02:53Z
+
+Here we go. The PR is green ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-13T10:24:18Z
+
+Note: I don't understand something. PHP seems inconsistent:
+
+* the parameter of  `locale_parse` should follow the [FCP47](https://tools.ietf.org/html/bcp47) RFC. but I can also be an ISO_3166-1
+* the return of `locale_compose` seems the [ISO_3166-1](https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes).
+
+---
+
+**edit**:
+
+Anyway, with this patch, my issue issue is solved in both case (with or without the int function)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-21T08:20:54Z
+
+:+1:

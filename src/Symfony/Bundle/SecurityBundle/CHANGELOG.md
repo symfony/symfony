@@ -13,6 +13,7 @@ CHANGELOG
  * removed command `acl:set` along with `SetAclCommand` class
  * removed command `init:acl` along with `InitAclCommand` class
  * removed `acl` configuration key and related services, use symfony/acl-bundle instead
+ * removed auto picking the first registered provider when no configured provider on a firewall and ambiguous
 
 3.4.0
 -----

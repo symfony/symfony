@@ -262,6 +262,10 @@ class SecurityExtension extends Extension
             $defaultProvider = $providerIds[$normalizedName];
         } else {
             $defaultProvider = reset($providerIds);
+
+            if (count($providerIds) > 1) {
+                @trigger_error(sprintf('Firewall "%s" has no "provider" set but multiple providers exist. Using the first configured provider (%s) is deprecated since 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.', $id, key($providerIds)), E_USER_DEPRECATED);
+            }
         }
 
         $config->replaceArgument(5, $defaultProvider);
@@ -359,7 +363,7 @@ class SecurityExtension extends Extension
         // Switch user listener
         if (isset($firewall['switch_user'])) {
             $listenerKeys[] = 'switch_user';
-            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
+            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider, $firewall['stateless']));
         }
 
         // Access listener
@@ -602,9 +606,14 @@ class SecurityExtension extends Extension
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener($container, $id, $config, $defaultProvider)
+    private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless)
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
+
+        // in 4.0, ignore the `switch_user.stateless` key if $stateless is `true`
+        if ($stateless && false === $config['stateless']) {
+            @trigger_error(sprintf('Firewall "%s" is configured as "stateless" but the "switch_user.stateless" key is set to false. Both should have the same value, the firewall\'s "stateless" value will be used as default value for the "switch_user.stateless" key in 4.0.', $id), E_USER_DEPRECATED);
+        }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));
@@ -613,6 +622,7 @@ class SecurityExtension extends Extension
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);
+        $listener->replaceArgument(9, $config['stateless']);
 
         return $switchUserListenerId;
     }

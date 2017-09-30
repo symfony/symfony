@@ -316,6 +316,13 @@ SecurityBundle
 
  * Deprecated the HTTP digest authentication: `HttpDigestFactory` will be removed in 4.0.
    Use another authentication system like `http_basic` instead.
+   
+ * Deprecated setting the `switch_user.stateless` option to false when the firewall is `stateless`.
+   Setting it to false will have no effect in 4.0.
+
+ * Not configuring explicitly the provider on a firewall is ambiguous when there is more than one registered provider. 
+   Using the first configured provider is deprecated since 3.4 and will throw an exception on 4.0.
+   Explicitly configure the provider to use on your firewalls.
 
 Translation
 -----------

@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -84,6 +85,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerInterface::class,
+            'message_bus' => '?'.MessageBusInterface::class,
         );
     }
 }

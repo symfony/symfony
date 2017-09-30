@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-09-20T13:03:06Z
+
+should we actually have this extra configuration ? couldn't we just make the switch_user listener stateless when the firewall itself is stateless ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-20T13:05:47Z
+
+@stof ideally yes, like the exceptionlistener. But disabling the redirection for stateless firewalls now would be a BC Break right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T13:28:52Z
+
+> disabling the redirection for stateless firewalls now would be a BC Break right?
+
+should we plan any deprecation here? Like when the option doesn't match the statelessyness of the firewall, then plan to deprecate the option in 4.1 and make it automatic meanwhile?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-28T12:04:37Z
+
+Deprecation added
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-30T11:19:38Z
+
+Rebased. ping @symfony/deciders

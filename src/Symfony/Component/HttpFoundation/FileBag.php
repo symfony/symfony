@@ -67,7 +67,7 @@ class FileBag extends ParameterBag
      *
      * @param array|UploadedFile $file A (multi-dimensional) array of uploaded file information
      *
-     * @return UploadedFile|UploadedFile[] A (multi-dimensional) array of UploadedFile instances
+     * @return UploadedFile[]|UploadedFile|null A (multi-dimensional) array of UploadedFile instances
      */
     protected function convertFileInformation($file)
     {
@@ -87,7 +87,7 @@ class FileBag extends ParameterBag
                     $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['size'], $file['error']);
                 }
             } else {
-                $file = array_map(array($this, 'convertFileInformation'), $file);
+                $file = array_filter(array_map(array($this, 'convertFileInformation'), $file));
             }
         }
 

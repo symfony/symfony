@@ -340,7 +340,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $this->assertEquals('Fixtures', $kernel->getName());
+        $this->assertEquals('app', $kernel->getName());
     }
 
     public function testOverrideGetName()
@@ -771,6 +771,10 @@ EOF;
         $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Auto-discovery of the kernel name is deprecated since Symfony 3.4 and won't be supported in 4.0.
+     */
     public function testKernelRootDirNameStartingWithANumber()
     {
         $dir = __DIR__.'/Fixtures/123';
@@ -816,14 +820,14 @@ EOF;
 
         $containerClass = get_class($kernel->getContainer());
         $containerFile = (new \ReflectionClass($kernel->getContainer()))->getFileName();
-        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+        unlink(__DIR__.'/Fixtures/cache/custom/appCustomDebugProjectContainer.php.meta');
 
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
 
         $this->assertSame($containerClass, get_class($kernel->getContainer()));
         $this->assertFileExists($containerFile);
-        unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta');
+        unlink(__DIR__.'/Fixtures/cache/custom/appCustomDebugProjectContainer.php.meta');
 
         $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();
@@ -838,6 +842,15 @@ EOF;
         $kernel->boot();
 
         $this->assertTrue($kernel->getContainer()->getParameter('test.processed'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage "123" is not a valid kernel name.
+     */
+    public function testInvalidKernelName()
+    {
+        new KernelForTest('dev', true, '123');
     }
 
     /**
@@ -895,7 +908,7 @@ EOF;
         $kernel = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->setMethods($methods)
-            ->setConstructorArgs(array('test', false))
+            ->setConstructorArgs(array('test', false, 'app'))
             ->getMockForAbstractClass()
         ;
         $kernel->expects($this->any())
@@ -944,7 +957,7 @@ class CustomProjectDirKernel extends Kernel
 
     public function __construct(\Closure $buildContainer = null)
     {
-        parent::__construct('custom', true);
+        parent::__construct('custom', true, 'app');
 
         $this->baseDir = 'foo';
         $this->buildContainer = $buildContainer;
@@ -982,7 +995,7 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function __construct(\Closure $buildContainer = null)
     {
         parent::__construct();
-        Kernel::__construct('pass', true);
+        Kernel::__construct('pass', true, 'app');
     }
 
     public function process(ContainerBuilder $container)

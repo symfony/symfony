@@ -78,15 +78,23 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Constructor.
      *
-     * @param string $environment The environment
-     * @param bool   $debug       Whether to enable debugging or not
+     * @param string      $environment The environment
+     * @param bool        $debug       Whether to enable debugging or not
+     * @param string|null $name        The application name
      */
-    public function __construct($environment, $debug)
+    public function __construct($environment, $debug, $name = null)
     {
         $this->environment = $environment;
         $this->debug = (bool) $debug;
         $this->rootDir = $this->getRootDir();
-        $this->name = $this->getName();
+
+        if (null === $name) {
+            $this->name = $this->getName();
+        } elseif (preg_match('~^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$~', $name)) {
+            $this->name = $name;
+        } else {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid kernel name.', $name));
+        }
 
         if ($this->debug) {
             $this->startTime = microtime(true);
@@ -296,6 +304,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
             if (ctype_digit($this->name[0])) {
                 $this->name = '_'.$this->name;
+            }
+
+            if ('app' !== $this->name) {
+                @trigger_error(sprintf('Auto-discovery of the kernel name is deprecated since Symfony 3.4 and won\'t be supported in 4.0.'), E_USER_DEPRECATED);
             }
         }
 

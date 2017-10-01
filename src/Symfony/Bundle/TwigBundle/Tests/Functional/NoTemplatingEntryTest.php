@@ -21,7 +21,7 @@ class NoTemplatingEntryTest extends TestCase
 {
     public function test()
     {
-        $kernel = new NoTemplatingEntryKernel('dev', true);
+        $kernel = new NoTemplatingEntryKernel('dev', true, 'app');
         $kernel->boot();
 
         $container = $kernel->getContainer();

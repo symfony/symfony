@@ -17,6 +17,11 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class KernelWithoutBundles extends Kernel
 {
+    public function __construct($environment, $debug, $name = 'app')
+    {
+        parent::__construct($environment, $debug, $name);
+    }
+
     public function registerBundles()
     {
         return array();

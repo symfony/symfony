@@ -36,4 +36,11 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface
      * Resets the trace.
      */
     public function reset();
+
+    /**
+     * Gets the orphaned events.
+     *
+     * @return array An array of orphaned events
+     */
+    public function getOrphanedEvents();
 }

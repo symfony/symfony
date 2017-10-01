@@ -4,6 +4,7 @@ CHANGELOG
 4.0.0
 -----
 
+  * The method `EventDispatcherInterface::getOrphanedEvents()` has been added.
  * removed the `ContainerAwareEventDispatcher` class
  * added the `reset()` method to the `TraceableEventDispatcherInterface`
 

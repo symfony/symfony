@@ -29,4 +29,9 @@ class TestEventDispatcher extends EventDispatcher implements TraceableEventDispa
     public function reset()
     {
     }
+
+    public function getOrphanedEvents()
+    {
+        return array();
+    }
 }

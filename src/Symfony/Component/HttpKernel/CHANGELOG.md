@@ -9,6 +9,7 @@ CHANGELOG
 4.0.0
 -----
 
+ * added orphaned events support to `EventDataCollector`
  * removed the `DataCollector::varToString()` method, use `DataCollector::cloneVar()`
    instead
  * using the `DataCollector::cloneVar()` method requires the VarDumper component

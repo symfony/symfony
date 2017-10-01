@@ -106,7 +106,7 @@ class CachePoolPass implements CompilerPassInterface
 
         foreach ($clearers as $id => $pools) {
             $clearer = $container->getDefinition($id);
-            if ($clearer instanceof ChilDefinition) {
+            if ($clearer instanceof ChildDefinition) {
                 $clearer->replaceArgument(0, $pools);
             } else {
                 $clearer->setArgument(0, $pools);

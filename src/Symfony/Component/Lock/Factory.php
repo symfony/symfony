@@ -36,14 +36,15 @@ class Factory implements LoggerAwareInterface
     /**
      * Creates a lock for the given resource.
      *
-     * @param string $resource The resource to lock
-     * @param float  $ttl      maximum expected lock duration
+     * @param string $resource    The resource to lock
+     * @param float  $ttl         Maximum expected lock duration in seconds
+     * @param bool   $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      *
      * @return Lock
      */
-    public function createLock($resource, $ttl = 300.0)
+    public function createLock($resource, $ttl = 300.0, $autoRelease = true)
     {
-        $lock = new Lock(new Key($resource), $this->store, $ttl);
+        $lock = new Lock(new Key($resource), $this->store, $ttl, $autoRelease);
         $lock->setLogger($this->logger);
 
         return $lock;

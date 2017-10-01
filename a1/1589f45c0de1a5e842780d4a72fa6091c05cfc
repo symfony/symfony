@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-08-25T12:10:01Z
+
+> https://github.com/symfony/symfony/issues/23927#issuecomment-324850467
+> It seems that in php 5.3 tests pass, while in php 7 and 7.1 they don't pass. I can't figure out why. In my installation with 2.8 on php 7.0.10 I don't have problems. :(
+
+PHP: 7 deps=high failure is normal, because was Installed `symfony/form (2.8.x-dev 41d84cd)` and your changes aren't there yet. (nothing to do).
+
+PHP: 7.1 deps=low failure is understood, because was installed `symfony/form (v2.7.25)` (release) and your changes aren't there either, but you need update deps=low constraint in `Bridge/Doctrine/composer.json` for `"symfony/form"` to be able to test these changes.
+
+---
+
+Please add the "Fixed tickets" row to the QA table, it is helpful to close the related issue automatically when this PR is merged.
+
+| Q             | A
+| ------------- | ---
+| Fixed tickets | https://github.com/symfony/symfony/issues/23927
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-28T08:49:28Z
+
+Here is the missing patch @yceruto is talking about.
+Would it be possible to have a test in the Form component also?
+
+```diff
+--- a/src/Symfony/Bridge/Doctrine/composer.json
++++ b/src/Symfony/Bridge/Doctrine/composer.json
+@@ -22,7 +22,7 @@
+     "require-dev": {
+         "symfony/stopwatch": "~2.2",
+         "symfony/dependency-injection": "~2.2",
+-        "symfony/form": "~2.7.25|^2.8.18",
++        "symfony/form": "~2.7.34|^2.8.27",
+         "symfony/http-kernel": "~2.2",
+         "symfony/property-access": "~2.3",
+         "symfony/security": "~2.2",
+```

@@ -102,6 +102,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     {
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $attributeMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : [];
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
@@ -110,8 +111,15 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
             }
 
             $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+            $groups = array_key_exists($attributeName, $attributeMetadata) ? $attributeMetadata[$attributeName]->getGroupsByMemberName($method->name) : [];
 
-            if ($this->isAllowedAttribute($object, $attributeName)) {
+            // If using groups, ensure that the method has the group.
+            if (isset($context[static::GROUPS]) && is_array($context[static::GROUPS])) {
+                if (count(array_intersect($groups, $context[static::GROUPS])) && $this->isAllowedAttribute($object, $attributeName)) {
+                    $attributes[] = $attributeName;
+                }
+            }
+            elseif ($this->isAllowedAttribute($object, $attributeName)) {
                 $attributes[] = $attributeName;
             }
         }

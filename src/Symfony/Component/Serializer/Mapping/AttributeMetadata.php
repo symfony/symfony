@@ -108,6 +108,10 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
      * {@inheritdoc}
      */
     public function getGroupsByMemberName($memberName) {
+        if (!isset($this->memberGroups[$memberName])) {
+            return [];
+        }
+
         return $this->memberGroups[$memberName];
     }
 

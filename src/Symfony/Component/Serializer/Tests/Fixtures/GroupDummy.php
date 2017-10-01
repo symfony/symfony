@@ -26,7 +26,13 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
      * @Groups({"b", "c", "name_converter"})
      */
     protected $bar;
+    /**
+     * @Groups({"name_converter"})
+     */
     private $fooBar;
+    /**
+     * @Groups({"name_converter"})
+     */
     private $symfony;
 
     /**

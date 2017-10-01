@@ -368,4 +368,30 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return false;
         }
     }
+
+    /**
+     * Determine if the member is allowed.
+     *
+     * @param object $object
+     * @param string $attributeName
+     * @param string $methodName
+     * @param array $context
+     *
+     * @return bool
+     */
+    protected function isMemberAllowed($object, $attributeName, $memberName, $context = array()) {
+        $attributeMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : [];
+
+        $groups = array_key_exists($attributeName, $attributeMetadata) ? $attributeMetadata[$attributeName]->getGroupsByMemberName($memberName) : [];
+        if (isset($context[static::GROUPS]) && is_array($context[static::GROUPS])) {
+            if (count(array_intersect($groups, $context[static::GROUPS])) && $this->isAllowedAttribute($object, $attributeName)) {
+                return true;
+            }
+        }
+        else if ($this->isAllowedAttribute($object, $attributeName)) {
+            return true;
+        }
+
+        return false;
+    }
 }

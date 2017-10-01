@@ -41,11 +41,13 @@ class TestClassMetadataFactory
         $fooBar->addMemberGroup('isFooBar', 'b');
         $fooBar->addMemberGroup('isFooBar', 'name_converter');
         $fooBar->addMemberGroup('setFooBar', 'name_converter');
+        $fooBar->addMemberGroup('fooBar', 'name_converter');
         $expected->addAttributeMetadata($fooBar);
 
         $symfony = new AttributeMetadata('symfony');
         $expected->addAttributeMetadata($symfony);
         $symfony->addMemberGroup('setSymfony', 'name_converter');
+        $symfony->addMemberGroup('symfony', 'name_converter');
 
         if ($withParent) {
             $kevin = new AttributeMetadata('kevin');

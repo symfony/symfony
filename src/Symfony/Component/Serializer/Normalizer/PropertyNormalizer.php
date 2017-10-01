@@ -99,7 +99,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         $attributes = array();
 
         foreach ($reflectionObject->getProperties() as $property) {
-            if (!$this->isAllowedAttribute($object, $property->name)) {
+            if (!$this->isMemberAllowed($object, $property->name, $property->name, $context)) {
                 continue;
             }
 
@@ -133,6 +133,10 @@ class PropertyNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
     {
+        if (!$this->isMemberAllowed($object, $attribute, $attribute, $context)) {
+            return;
+        }
+
         try {
             $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
         } catch (\ReflectionException $reflectionException) {

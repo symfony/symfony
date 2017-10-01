@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * The `TraceableEventDispatcher::getOrphanedEvents()` method has been added.
+ * The `TraceableEventDispatcherInterface` has been deprecated and will be removed in 5.0.
+
 4.0.0
 -----
 

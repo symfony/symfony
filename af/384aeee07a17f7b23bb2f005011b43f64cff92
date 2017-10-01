@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-03-24T11:47:13Z
+
+this would force to have extra accesses to the store for everyone writing correct code releasing locks.
+and it does not ensure it will be released: https://github.com/symfony/symfony/pull/22115#issuecomment-288594301
+
+So I'm rather -1 on this.
+
+the second commit adding exception messages is good though (please submit it separately)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-24T15:35:12Z
+
+@stof should the store release the lock then?
+IMHO, it'd be really nice to release any remaining lock once not used anymore.
+Not as a feature one could rely on, but as a "be-clean" strategy.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-03-30T13:49:20Z
+
+What we could do to avoid performance overhead on the store access is to add a private property storing whether we already asked to release the lock, to skip the logic in the destructor in this case (and reset this private property if we ask to acquire the lock again)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-03-31T18:59:26Z
+
+I add a `isDirty` parameter to address the suggestion of @stof .
+I'm not a big fan of the name of this variable, if you've a better idea, I'm listening (I don't wont to use a `isLocked` variable to avoid confusion, with the only source of trust: le Store)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T10:13:26Z
+
+Note that on a command tunnel, it may be nice to allow one to "lock" some item in their "stock" accros several pages, so one should be able to opt-out from this auto-unlocking.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-04-03T11:11:46Z
+
+I wonder if we should take this use-case into account @nicolas-grekas
+Most of stores won't be compatible (stores linked to the process like flock, semaphore, etc..)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-04-26T17:51:07Z
+
+We need to take a decision on this one. Either merge or close, but before 3.3. As first beta is probably coming out next week, what do you think? @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T14:10:34Z
+
+I'm personnaly in favor of having auto-unlock by default, and manual unlock as opt-in. Less space for mistakes.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-07-11T20:00:31Z
+
+What do you think about
+```
+class LockFactory
+{
+  public function createLock(): AutoRealesedLock
+  public function createManualLock(): Lock
+}
+```
+Can we change the interface contract or is it considered as BC break?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T20:48:51Z
+
+Do we need a new Lock type of can we deal with a new constructor/factory arg ($autoUnlock?)
+About the interface, we can change everything, this has never been tagged so we are not bound by any BC promise.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-11T21:19:19Z
+
+I personally think it is important to be able to determine the type of lock, whether that is allowed by having separate `AutoRealesedLock` and `Lock`
+
+```php
+if (!$lock instanceof AutoRealesedLock) {
+  // do stuff
+}
+```
+
+or through a method on the lock instance itself
+
+```php
+if (!$lock->isAutoReleased()) {
+  // do stuff
+}
+```
+
+I don't have any particular preference.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-11T21:31:31Z
+
+do we really have a use case were we would have conditional branching base on this?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-07-11T21:46:09Z
+
+@nicolas-grekas In you challenging me to provide a real-world use case for such a conditional, you convinced me that maybe there isn't a need, as I can't think of any. Carry on. ;-)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-08-23T11:52:47Z
+
+What's the status of this PR? I'd like to merge/close all PRs about the lock component ASAP to avoid having to revert the component for 3.4.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-08-23T11:58:33Z
+
+@fabpot All discussions are resolved. This PR is waiting for approval.
+
+- auto release avoid unnecessary calls on stores as mentionned by @stof
+- auto release is configurable as per @nicolas-grekas's suggestion
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T17:27:53Z
+
+What's the status of this PR? Mergeable? That's probably a PR we need to close or merge before feature freeze.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-10-01T17:53:27Z
+
+All comments are take into account. IMO ready to merge.ping @symfony/deciders

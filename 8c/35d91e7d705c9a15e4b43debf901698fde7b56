@@ -1,0 +1,149 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-02-24T16:11:44Z
+
+Looks like you removed any commits once again...
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-24T16:12:08Z
+
+btw, you could push to the same branch name again and reopen the existing PR instead of creating a new one
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-02-24T22:45:03Z
+
+I still have no idea why GitHub did not show my initial patch and did not allow me to reopen the previous PR.
+In the previous PR I am using the same branch, for which the GitHub diff shows (and showed) the single commit which was my PR patch.
+I will keep this one open, as the previous PR still shows 0 commits and no diff.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-05T20:13:52Z
+
+Anyone willing to review this one? @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by wuethrich44 at 2017-08-10T11:57:57Z
+
+@hiddewie Is it possible to use [custom checkboxes](https://v4-alpha.getbootstrap.com/components/forms/#checkboxes) with this PR?
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-10T13:25:48Z
+
+At the moment no, this should be a choice for the end user designing their web application using Bootstrap. However, I would be happy to create a follow-up PR if this has been accepted containing one extra template using the Bootstrap 4 form template, but with custom Bootstrap checkboxes/radio buttons.
+
+---------------------------------------------------------------------------
+
+by wuethrich44 at 2017-08-10T13:43:40Z
+
+@hiddewie Ok thanks for your quick reply. Hope this gets merged soon!
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-10T13:45:20Z
+
+I hope so too. The PR gets rebased every month or so, but originally it was submitted for 3.2.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-08-11T07:17:55Z
+
+Bootstrap 4 has just published its first beta version: https://github.com/twbs/bootstrap/releases/tag/v4.0.0-beta Could we please review if they made any change that affects to this pull request? Thanks!
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-14T20:22:11Z
+
+Several small things have been updated for the beta version of Bootstrap 4:
+- The `div` layout had to be updated slightly for radio buttons and checkboxes
+- The form validation has been updated with the new classes. See twbs/bootstrap#23426.
+
+I do not understand the single failing test in Travis CI, as the class seems to be defined correctly.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-08-15T05:13:40Z
+
+> I do not understand the single failing test in Travis CI, as the class seems to be defined correctly.
+
+@hiddewie That is the `deps=low` test; it is possible an older version of the `twig-bridge` is being pulled in. Possibly, you need to up the required dependency?
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-15T08:56:04Z
+
+@robfrawley The `deps=low` build config confuses me. In this PR, I added content in the Twig Bridge and in the Form component (the base/abstract classes for the Bootstrap tests). However, it seems to download a stable version from Composer of the Form component, which of course does not contain my test classes, and causes the error for the Twig Bridge tests.
+
+I don't see how upping the dependency would solve this problem, as it needs *my* updated PR code, both for the Twig Bridge and the Form component. How to solve this?
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-08-15T09:10:31Z
+
+The dependencies do matter; I'm not 100% sure how this is handled internally but see https://github.com/symfony/symfony/pull/23451#issuecomment-316191850 where I had to deal with a similar issue, as well.
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-15T09:14:02Z
+
+> It'll be green when the PR will be merged.
+
+Ah, so I guess that the test with the missing abstract class will have a green light after the PR is merged, because the downloaded dependency of `symfony/form` is version `3.4.x-dev`, the same version for which this PR is proposed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-22T17:19:16Z
+
+@hiddewie You need to rebase your PR against the `3.4` branch and then change the target path of the PR on GitHub too.
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-23T15:36:46Z
+
+@xabbuh Done. The single failing test with `deps=low` is again the one which requires my new abstract class in the `Forms` bundle.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-24T08:19:10Z
+
+You need to update the version constraint for `symfony/form` in the `require-dev` section of the TwigBridge as well as the conflict rule like this:
+
+```json
+"require-dev": {
+    "symfony/form": "~3.4|~4.0"
+},
+"conflict": {
+    "symfony/form": "<3.4"
+}
+```
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2017-08-24T09:15:09Z
+
+@xabbuh Yes, thank you. Now the `deps=high` is failing, again because the abstract class is missing. Probably because the branch targets `3.4` and the `4.0` version of `symfony/form` is being installed.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-09-26T12:21:14Z
+
+I've just had a quick look at the screenshots. I have a few things regarding accessibility and errors. But I guess that is no blocker for getting this merged.
+
+---------------------------------------------------------------------------
+
+by silverbackdan at 2017-09-26T12:45:42Z
+
+Just as a note on the custom options - I have an implementation when BS4 was in alpha6 which also required some form type extensions to give the options as to whether a user wants custom inputs or not.
+
+Extensions are here: https://github.com/silverbackis/SilverbackPublishing/tree/master/src/SyliusUiBootstrapBundle/Form/Extension
+
+This was my layout:
+https://github.com/silverbackis/SilverbackPublishing/blob/master/src/SyliusUiBootstrapBundle/Resources/views/Form/bootstrap_4_layout.html.twig
+
+I think I left bits out and this PR is far superior as a template, but I thought I may comment this to show how the custom options may be implemented in a follow-up PR after this is merged.
+
+@hiddewie were you thinking to implement the custom option is a way where it could be configured with options?
